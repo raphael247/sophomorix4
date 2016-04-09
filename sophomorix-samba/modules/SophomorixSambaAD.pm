@@ -719,7 +719,6 @@ sub AD_ou_add {
 
     # <token>-examaccounts
     $group=$token.$DevelConf::examaccount;
-    #$dn_group="CN=".$group.",".$DevelConf::AD_room_ou.",".$dn;
     $target_branch="OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
     $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
 
@@ -737,21 +736,38 @@ sub AD_ou_add {
                          ]
                      );
 
-    ## <token>workstations
-    ## workstations sind in keiner Gruppe
-    #$group=$token.$DevelConf::workstation;
-    #$dn_group="CN=".$group.",".$DevelConf::AD_room_ou.",".$dn;
-    #if($Conf::log_level>=2){
-    #    print "   * Adding group $group\n";
-    #} 
-    #$result = $ldap->add( $dn_group,
-    #                     attr => [
-    #                         'cn'   => $group,
-    #                         'sAMAccountName' => $group,
-    #                         'objectclass' => ['top',
-    #                                           'group' ],
-    #                     ]
-    #                 );
+
+    # <token>-wifi
+    $group=$token.$DevelConf::AD_wifi_group;
+    $dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
+    if($Conf::log_level>=2){
+        print "   * Adding group $group\n";
+    }
+    $result = $ldap->add( $dn_group,
+                         attr => [
+                             'cn'   => $group,
+                             'sAMAccountName' => $group,
+                             'objectclass' => ['top',
+                                               'group' ],
+                         ]
+                     );
+
+    # <token>-internet
+    $group=$token.$DevelConf::AD_internet_group;
+    $dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
+    if($Conf::log_level>=2){
+        print "   * Adding group $group\n";
+    }
+    $result = $ldap->add( $dn_group,
+                         attr => [
+                             'cn'   => $group,
+                             'sAMAccountName' => $group,
+                             'objectclass' => ['top',
+                                               'group' ],
+                         ]
+                     );
+
+
 
 
     ############################################################
