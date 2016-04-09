@@ -26,7 +26,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_create
                                  AD_group_addmember
                                  AD_user_kill
-                                 AD_workstation_kill
+                                 AD_computer_kill
                                  AD_object_search
                                  AD_get_name_tokened
                                     );
@@ -116,7 +116,7 @@ Step by step Test:
   Copy workstations/classrooms file (Step 1):
       sophomorix-test-2 --copy-wsfile-1
   Import the file:
-      sophomorix-workstation
+      sophomorix-device
   Run the tests:
       sophomorix-test-2 --test-ws-1
 
@@ -125,7 +125,7 @@ Step 2-4 are missing
   Copy EMPTY workstations/classrooms file (Step 5):
       sophomorix-test-2 --copy-wsfile-5
   Import the file:
-      sophomorix-workstation
+      sophomorix-device
   Run the tests:
       sophomorix-test-2 --test-ws-5
 ');
@@ -187,7 +187,7 @@ if ($copy_wsfile_1==1){
 }
 
 if ($full==1){
-    system("sophomorix-workstation $verbose_options");
+    system("sophomorix-device $verbose_options");
 }
 
 if ($test_ws_1==1){
@@ -309,7 +309,7 @@ if ($copy_wsfile_5==1){
 }
 
 if ($full==1){
-    system("sophomorix-workstation $verbose_options");
+    system("sophomorix-device $verbose_options");
 }
 
 if ($test_ws_5==1){

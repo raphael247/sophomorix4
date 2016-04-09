@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# This script (sophomorix-workstation) is maintained by Rüdiger Beck
+# This script (sophomorix-device) is maintained by Rüdiger Beck
 # It is Free Software (License GPLv3)
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
@@ -30,11 +30,11 @@
 # 
 # 
 
-# sophomorix-workstations macht
+# sophomorix-device macht
 # - kein syntaxcheck
 # - obsolete accounts und raeume entfernen
 # - neue accounts und raume anlegen
-# - Aufruf: sophomorix-workstations
+# - Aufruf: sophomorix-device
 # - Rueckgabewerte:
 # - 0: alles OK
 # - 1: Fehler Allgemein. import_workstations bricht ab
@@ -118,9 +118,9 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
-                                 AD_workstation_fetch
+                                 AD_computer_fetch
                                  AD_user_kill
-                                 AD_workstation_kill
+                                 AD_computer_kill
                                  get_forbidden_logins
                                     );
 
@@ -250,7 +250,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
-sophomorix-workstation adds the DomainComputer and Examaccount 
+sophomorix-device adds the DomainComputer and Examaccount 
   from ');
    print "$host_workstation";
    print('
@@ -270,7 +270,7 @@ Managing italc:
                              italcroom/globalconfig.xml)
 
 
-Please see the sophomorix-workstation(8) man pages for full documentation
+Please see the sophomorix-device(8) man pages for full documentation
 ');
    print "\n";
    exit 0;
@@ -285,7 +285,7 @@ Please see the sophomorix-workstation(8) man pages for full documentation
 &print_title("Asking the system for exam and computer accounts ...");
 
 #my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &get_sys_workstations();
-my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &AD_workstation_fetch($ldap,$root_dse);
+my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &AD_computer_fetch($ldap,$root_dse);
 
 #exit;
 
@@ -634,11 +634,11 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Killing Workstations:");
     my $count=1;
     foreach my $computer (@killing_computer){
-        &AD_workstation_kill({ldap=>$ldap,
-                              root_dse=>$root_dse,
-                              workstation=>$computer,
-                              count=>$count,
-                     });
+        &AD_computer_kill({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           workstation=>$computer,
+                           count=>$count,
+                         });
         $count++;
         #system("/usr/sbin/sophomorix-kill --killuser $computer");
     }
@@ -678,7 +678,7 @@ if ($set_computer_passwords==1){
 #        $ref_examaccounts) = &get_sys_workstations();
     my ($ref_domcomputers,
         $ref_rooms,
-        $ref_examaccounts) = &AD_workstation_fetch();
+        $ref_examaccounts) = &AD_computer_fetch();
     # system
     my %domcomputers_system = %$ref_domcomputers;
     my $count=1;

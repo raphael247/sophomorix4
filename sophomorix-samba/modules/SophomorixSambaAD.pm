@@ -32,7 +32,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_create
             AD_user_move
             AD_user_kill
-            AD_workstation_kill
+            AD_computer_kill
             AD_group_create
             AD_group_kill
             AD_group_addmember
@@ -42,7 +42,7 @@ $Data::Dumper::Terse = 1;
             get_forbidden_logins
             AD_ou_add
             AD_object_search
-            AD_workstation_fetch
+            AD_computer_fetch
             AD_object_move
             AD_debug_logdump
             );
@@ -160,7 +160,7 @@ sub AD_user_kill {
 }
 
 
-sub AD_workstation_kill {
+sub AD_computer_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -845,7 +845,7 @@ sub AD_object_search {
     }
 }
 
-sub AD_workstation_fetch {
+sub AD_computer_fetch {
     my ($ldap,$root_dse) = @_;
     # domcomputers
     # key: host$ (lowercase)
