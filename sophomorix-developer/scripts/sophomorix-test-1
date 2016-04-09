@@ -388,7 +388,7 @@ if ($add==1 or $test_add==1){
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-teachers,OU=Classes,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=bsz-teachers,OU=bsz-teachers,OU=Teachers,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-teachers",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students,bsz-students",
@@ -418,7 +418,7 @@ if ($add==1 or $test_add==1){
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-teachers,OU=Classes,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=bsz-teachers,OU=bsz-teachers,OU=Teachers,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-teachers",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students",
@@ -522,7 +522,7 @@ if ($add==1 or $test_add==1){
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=uni-teachers,OU=Classes,OU=UNIVERSITÄT,".$root_dse,
+                   dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-teachers",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students",
@@ -552,7 +552,7 @@ if ($add==1 or $test_add==1){
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=uni-teachers,OU=Classes,OU=UNIVERSITÄT,".$root_dse,
+                   dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-teachers",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students,uni-students",
@@ -615,7 +615,7 @@ if ($add==1 or $test_add==1){
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=teachers,OU=Classes,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=teachers,OU=teachers,OU=Teachers,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"teachers",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students,uni-students",

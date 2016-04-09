@@ -614,14 +614,14 @@ sub AD_get_container {
     if ($role eq "student"){
         $container=$group_strg.$DevelConf::AD_student_ou;
     }  elsif ($role eq "teacher"){
-        $container=$group_strg.$DevelConf::AD_teacher_ou;
+#        $container=$group_strg.$DevelConf::AD_teacher_ou;
+        $container="OU=".$group.",".$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "workstation"){
         $container=$group_strg.$DevelConf::AD_computer_ou;
     }  elsif ($role eq "examaccount"){
         $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container
     }  elsif ($role eq "adminclass"){
-#        $container=$DevelConf::AD_class_ou;
         $container="OU=".$group.",".$DevelConf::AD_student_ou;
     }  elsif ($role eq "project"){
         $container=$DevelConf::AD_project_ou;
@@ -683,9 +683,14 @@ sub AD_ou_add {
     $result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # Adding some groups
-    # <token>teachers
+    # <token>-teachers
     my $group=$token.$DevelConf::teacher;
-    my $dn_group="CN=".$group.",".$DevelConf::AD_class_ou.",".$dn;
+    my $target_branch="OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
+    my $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
+
+    # create parent
+    my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
@@ -698,7 +703,7 @@ sub AD_ou_add {
                          ]
                      );
 
-    # <token>students
+    # <token>-students
     $group=$token.$DevelConf::student;
     $dn_group="CN=".$group.",".$DevelConf::AD_class_ou.",".$dn;
     if($Conf::log_level>=2){
@@ -713,7 +718,7 @@ sub AD_ou_add {
                          ]
                      );
 
-    # <token>examaccounts
+    # <token>-examaccounts
     $group=$token.$DevelConf::examaccount;
     $dn_group="CN=".$group.",".$DevelConf::AD_room_ou.",".$dn;
     if($Conf::log_level>=2){
