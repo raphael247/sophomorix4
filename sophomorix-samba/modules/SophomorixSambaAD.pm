@@ -669,11 +669,11 @@ sub AD_ou_add {
     $result = $ldap->add($workstation,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $examaccount=$DevelConf::AD_examaccount_ou.",".$dn;
     $result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
     # group ou
-    my $class=$DevelConf::AD_class_ou.",".$dn;
-    $result = $ldap->add($class,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $room=$DevelConf::AD_room_ou.",".$dn;
     $result = $ldap->add($room,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
     # other
     my $management=$DevelConf::AD_management_ou.",".$dn;
     $result = $ldap->add($management,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -706,7 +706,6 @@ sub AD_ou_add {
     $group=$token.$DevelConf::student;
 
     $target_branch="OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
-#    $dn_group="CN=".$group.",".$DevelConf::AD_class_ou.",".$dn;
     $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
 
     if($Conf::log_level>=2){
