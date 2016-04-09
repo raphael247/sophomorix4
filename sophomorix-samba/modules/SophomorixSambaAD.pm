@@ -568,7 +568,7 @@ sub AD_get_name_tokened {
         $role eq "examaccount" or
         $role eq "workstation"){
         if ($school_token eq "---" or $school_token eq ""){
-            # no multischool
+            # SCHOOL, no multischool
             $name_tokened=$name;
         } else {
             # multischool
@@ -756,9 +756,9 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding sub ou's ...\n";
     }
-    # Multigroups ou
-    my $multigroup=$DevelConf::AD_multigroup_ou.",".$global_dn;
-    $result = $ldap->add($multigroup,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    # Groups ou
+    my $globalgroup=$DevelConf::AD_globalgroup_ou.",".$global_dn;
+    $result = $ldap->add($globalgroup,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # Projects ou
     my $projects=$DevelConf::AD_project_ou.",".$global_dn;
@@ -767,45 +767,35 @@ sub AD_ou_add {
     my $custom=$DevelConf::AD_custom_ou.",".$global_dn;
     $result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
-    # students in Multigroups,OU=GLOBAL
-    my $global_dn_group="CN=multi-".$DevelConf::student.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    # students in Groups,OU=GLOBAL
+    my $global_dn_group="CN=global-".$DevelConf::student.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $result = $ldap->add( $global_dn_group,
                          attr => [
-                             'cn'   => "multi-".$DevelConf::student,
-                             'sAMAccountName' => "multi-".$DevelConf::student,
+                             'cn'   => "global-".$DevelConf::student,
+                             'sAMAccountName' => "global-".$DevelConf::student,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
                      );
     if($Conf::log_level>=2){
-        print "   * Adding OU=SOPHOMOROX multi-groups ...\n";
+        print "   * Adding OU=SOPHOMOROX global-groups ...\n";
     }
-    # teachers in Multigroups,OU=GLOBAL
-    $global_dn_group="CN=multi-".$DevelConf::teacher.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    # teachers in Groups,OU=GLOBAL
+    $global_dn_group="CN=global-".$DevelConf::teacher.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $result = $ldap->add( $global_dn_group,
                          attr => [
-                             'cn'   => "multi-".$DevelConf::teacher,
-                             'sAMAccountName' => "multi-".$DevelConf::teacher,
+                             'cn'   => "global-".$DevelConf::teacher,
+                             'sAMAccountName' => "global-".$DevelConf::teacher,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
                      );
-    # workstations in Multigroups,OU=GLOBAL
-    $global_dn_group="CN=multi-".$DevelConf::workstation.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    # ExamAccounts in Groups,OU=GLOBAL
+    $global_dn_group="CN=global-".$DevelConf::examaccount.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $result = $ldap->add( $global_dn_group,
                          attr => [
-                             'cn'   => "multi-".$DevelConf::workstation,
-                             'sAMAccountName' => "multi-".$DevelConf::workstation,
-                             'objectclass' => ['top',
-                                               'group' ],
-                         ]
-                     );
-    # ExamAccounts in Multigroups,OU=GLOBAL
-    $global_dn_group="CN=multi-".$DevelConf::examaccount.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
-    $result = $ldap->add( $global_dn_group,
-                         attr => [
-                             'cn'   => "multi-".$DevelConf::examaccount,
-                             'sAMAccountName' => "multi-".$DevelConf::examaccount,
+                             'cn'   => "global-".$DevelConf::examaccount,
+                             'sAMAccountName' => "global-".$DevelConf::examaccount,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -998,10 +988,10 @@ sub AD_group_create {
     if ($type eq "adminclass"){
         my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school_token,"adminclass");
         if ($group eq $teacher_group_expected){
-            # add <token>-teachers to multi-teachers
+            # add <token>-teachers to global-teachers
             &AD_group_addmember({ldap => $ldap,
                                  root_dse => $root_dse, 
-                                 group => "multi-".$DevelConf::teacher,
+                                 group => "global-".$DevelConf::teacher,
                                  addgroup => $group,
                                });
         } else {
@@ -1014,10 +1004,10 @@ sub AD_group_create {
                                  group => $token_students,
                                  addgroup => $group,
                                });
-            # add group <token>-students to multi-students
+            # add group <token>-students to global-students
             &AD_group_addmember({ldap => $ldap,
                                  root_dse => $root_dse, 
-                                 group => "multi-".$DevelConf::student,
+                                 group => "global-".$DevelConf::student,
                                  addgroup => $token_students,
                                });
         }
@@ -1029,10 +1019,10 @@ sub AD_group_create {
                              group => $token_examaccounts,
                              addgroup => $group,
                            });
-        # add group <token>-examaccounts to multi-examaccounts
+        # add group <token>-examaccounts to global-examaccounts
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
-                             group => "multi-".$DevelConf::examaccount,
+                             group => "global-".$DevelConf::examaccount,
                              addgroup => $token_examaccounts,
                            });
     }
