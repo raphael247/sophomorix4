@@ -745,8 +745,8 @@ sub AD_ou_add {
 
 
     ############################################################
-    # OU=SOPHOMORIX
-    my $sophomorix_dn=$DevelConf::AD_sophomorix_ou.",".$root_dse;
+    # OU=GLOBAL
+    my $sophomorix_dn=$DevelConf::AD_global_ou.",".$root_dse;
     if($Conf::log_level>=2){
         print "Adding $sophomorix_dn\n";
     }
@@ -763,7 +763,7 @@ sub AD_ou_add {
     my $projects=$DevelConf::AD_project_ou.",".$sophomorix_dn;
     $result = $ldap->add($projects,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
-    # students in Multigroups,OU=SOPHOMORIX
+    # students in Multigroups,OU=GLOBAL
     my $sophomorix_dn_group="CN=multi-".$DevelConf::student.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
     $result = $ldap->add( $sophomorix_dn_group,
                          attr => [
@@ -776,7 +776,7 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding OU=SOPHOMOROX multi-groups ...\n";
     }
-    # teachers in Multigroups,OU=SOPHOMORIX
+    # teachers in Multigroups,OU=GLOBAL
     $sophomorix_dn_group="CN=multi-".$DevelConf::teacher.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
     $result = $ldap->add( $sophomorix_dn_group,
                          attr => [
@@ -786,7 +786,7 @@ sub AD_ou_add {
                                                'group' ],
                          ]
                      );
-    # workstations in Multigroups,OU=SOPHOMORIX
+    # workstations in Multigroups,OU=GLOBAL
     $sophomorix_dn_group="CN=multi-".$DevelConf::workstation.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
     $result = $ldap->add( $sophomorix_dn_group,
                          attr => [
@@ -796,7 +796,7 @@ sub AD_ou_add {
                                                'group' ],
                          ]
                      );
-    # ExamAccounts in Multigroups,OU=SOPHOMORIX
+    # ExamAccounts in Multigroups,OU=GLOBAL
     $sophomorix_dn_group="CN=multi-".$DevelConf::examaccount.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
     $result = $ldap->add( $sophomorix_dn_group,
                          attr => [

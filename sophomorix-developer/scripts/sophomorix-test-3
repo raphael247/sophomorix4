@@ -149,14 +149,14 @@ if ($add_pro==1){
 # --test-add-pro  
 if ($test_add_pro==1){
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_Chemie-AG,OU=Projects,OU=SOPHOMORIX,".$root_dse,
+                   dn=>"CN=p_Chemie-AG,OU=Projects,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"p_Chemie-AG",
                    memberOf => "",
                    not_memberOf => "teachers",
                   });
 
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SOPHOMORIX,".$root_dse,
+                   dn=>"CN=p_mathe,OU=Projects,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"p_mathe",
                    memberOf => "",
                    not_memberOf => "teachers",

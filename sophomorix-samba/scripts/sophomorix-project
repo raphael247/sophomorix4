@@ -658,7 +658,7 @@ if ($create==1 and $project ne ""){
   my $group_token=&AD_get_name_tokened($project,"---","project");
   &AD_group_create({ldap=>$ldap,
                     root_dse=>$root_dse,
-                    ou=>"SOPHOMORIX",
+                    ou=>"GLOBAL",
                     group=>$group_token,
                     type=>"project",
                   });
@@ -673,7 +673,7 @@ if ($kill==1 and $project ne ""){
   &AD_group_kill({ldap=>$ldap,
                   root_dse=>$root_dse,
                   group=>$group_token,
-                  ou=>"SOPHOMORIX",
+                  ou=>"GLOBAL",
                   school_token=>"---",
                   type=>"project",
                   });
