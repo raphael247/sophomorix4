@@ -724,10 +724,15 @@ sub AD_ou_add {
 
     # <token>-examaccounts
     $group=$token.$DevelConf::examaccount;
-    $dn_group="CN=".$group.",".$DevelConf::AD_room_ou.",".$dn;
+    #$dn_group="CN=".$group.",".$DevelConf::AD_room_ou.",".$dn;
+    $target_branch="OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
+    $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
+
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
+    # create parent
+    $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     $result = $ldap->add( $dn_group,
                          attr => [
                              'cn'   => $group,
