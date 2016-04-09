@@ -688,12 +688,11 @@ sub AD_ou_add {
     my $target_branch="OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
     my $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
 
-    # create parent
-    my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
+    # create parent
+    my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     $result = $ldap->add( $dn_group,
                          attr => [
                              'cn'   => $group,
@@ -705,10 +704,16 @@ sub AD_ou_add {
 
     # <token>-students
     $group=$token.$DevelConf::student;
-    $dn_group="CN=".$group.",".$DevelConf::AD_class_ou.",".$dn;
+
+    $target_branch="OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
+#    $dn_group="CN=".$group.",".$DevelConf::AD_class_ou.",".$dn;
+    $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
+
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
+    # create parent
+    $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     $result = $ldap->add( $dn_group,
                          attr => [
                              'cn'   => $group,
