@@ -614,19 +614,18 @@ sub AD_get_container {
     if ($role eq "student"){
         $container=$group_strg.$DevelConf::AD_student_ou;
     }  elsif ($role eq "teacher"){
-#        $container=$group_strg.$DevelConf::AD_teacher_ou;
-        $container="OU=".$group.",".$DevelConf::AD_teacher_ou;
+        $container=$group_strg.$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "workstation"){
         $container=$group_strg.$DevelConf::AD_computer_ou;
     }  elsif ($role eq "examaccount"){
         $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container
     }  elsif ($role eq "adminclass"){
-        $container="OU=".$group.",".$DevelConf::AD_student_ou;
+        $container=$group_strg.$DevelConf::AD_student_ou;
     }  elsif ($role eq "project"){
         $container=$DevelConf::AD_project_ou;
     }  elsif ($role eq "room"){
-        $container=$DevelConf::AD_room_ou;
+        $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # other
     }  elsif ($role eq "management"){
         $container=$DevelConf::AD_management_ou;
@@ -660,7 +659,7 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding sub ou's ...\n";
     }
-    # ous for users
+    # ou's for users
     my $student=$DevelConf::AD_student_ou.",".$dn;
     $result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $teacher=$DevelConf::AD_teacher_ou.",".$dn;
@@ -669,10 +668,6 @@ sub AD_ou_add {
     $result = $ldap->add($workstation,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $examaccount=$DevelConf::AD_examaccount_ou.",".$dn;
     $result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
-    # group ou
-    my $room=$DevelConf::AD_room_ou.",".$dn;
-    $result = $ldap->add($room,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # other
     my $management=$DevelConf::AD_management_ou.",".$dn;
@@ -1006,7 +1001,6 @@ sub AD_group_create {
         &AD_debug_logdump($result,2,(caller(0))[3]);
     } else {
         print "   * Group $group exists already ($count results)\n";
-        #return;
     }
     if ($type eq "adminclass"){
         my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school_token,"adminclass");
