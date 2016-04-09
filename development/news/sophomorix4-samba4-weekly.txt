@@ -6,6 +6,28 @@ sophomorix4/Samba4 weekly Nr. 4  (xx.04.2016)
 
 Info über Enwicklungs-Entscheidungen
 ------------------------------------------------------------
+- Die alle Schulen überspannende OU heisst GLOBAL
+  - die Gruppen darin:
+    global-students
+    global-teachers
+    ...
+- Die OU der standard Schule heisst SCHOOL
+- Der (mehrdeutige) Begriff 'workstation(s)' wird ersetzt durch
+    Computer(s)
+    Printer(s)
+  Z.B. heisst di OU für die windows-Dollar Accounts nun 'OU=Computers'
+- schueler.txt   -->  students.csv, abc.students.csv, ...
+- lehrer.txt     -->  teachers.csv, abc.teachers.csv, ...
+
+workstation(s) --> computer(s) 
+  - workstations   -->  devices.csv, abc.devices.csv, ... (weil auch printer, ... darin sind)
+  - sophomorix-workstation --> sophomorix-device
+  - Rolle: workstation -> computer
+- Schul-Kurzzeichen (school token):
+  - wird VORANGESTELLT:
+    bei Klassen z.B. 7a --> abc-7a
+    bei Loginnamen: kein school token: maierpe --> maierpe
+    bei Projekten:  p_Astronomie -> p_abc-Astronomie
 
 Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
