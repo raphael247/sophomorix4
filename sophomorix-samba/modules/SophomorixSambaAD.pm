@@ -621,7 +621,8 @@ sub AD_get_container {
         $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container
     }  elsif ($role eq "adminclass"){
-        $container=$DevelConf::AD_class_ou;
+#        $container=$DevelConf::AD_class_ou;
+        $container="OU=".$group.",".$DevelConf::AD_student_ou;
     }  elsif ($role eq "project"){
         $container=$DevelConf::AD_project_ou;
     }  elsif ($role eq "room"){
@@ -935,7 +936,7 @@ sub AD_object_move {
     print "   * DN:     $dn\n";
     print "   * Target: $target_branch\n";
 
-    # create branch
+    # create target branch
     my $result = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result,2,(caller(0))[3]);
     # move object
@@ -962,6 +963,7 @@ sub AD_group_create {
 
     # calculate missing Attributes
     my $container=&AD_get_container($type,$group);
+    my $target_branch=$container."OU=".$ou.",".$root_dse;
     my $dn = "CN=".$group.",".$container."OU=".$ou.",".$root_dse;
 
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
@@ -969,8 +971,15 @@ sub AD_group_create {
         # adding the group
         &Sophomorix::SophomorixBase::print_title("Creating Group (begin):");
         print("   DN:       $dn\n");
+        print("   Target:   $target_branch\n");
         print("   Group:    $group\n");
         print("   Type:     $type\n");
+
+        # Create target branch
+        my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($target,2,(caller(0))[3]);
+
+        # Create object
         my $result = $ldap->add( $dn,
                                 attr => [
                                     'cn'   => $group,
