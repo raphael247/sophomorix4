@@ -38,7 +38,7 @@ sub AD_workstations_any {
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
-                   filter => '(&(objectClass=computer)(sophomorixRole=workstation))',
+                   filter => '(&(objectClass=computer)(sophomorixRole=computer))',
                    attrs => ['sAMAccountName']
                          );
     my $max_user = $mesg->count; 

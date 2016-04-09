@@ -113,7 +113,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
-                                 AD_workstation_create
+                                 AD_computer_create
                                  AD_group_create
                                  AD_group_addmember
                                  AD_get_ou_tokened
@@ -649,17 +649,17 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         # using saved, tokened values
         my $room_saved=$domcomputers_file{$user}{'ROOM'};
         my $ws_saved=$domcomputers_file{$user}{'WORKSTATION'};
-        &AD_workstation_create({ldap=>$ldap, 
-                                root_dse=>$root_dse,
-                                ws_count=>$ws_count,
-                                name=>$ws_saved,
-                                room=>$room_saved,
-                                ou=>$ou,
-                                role=>"workstation",
-			        type=>"roomws",
-                                school_token=>$school_token,
-                                creationdate=>$time_stamp_AD,
-                              });
+        &AD_computer_create({ldap=>$ldap, 
+                             root_dse=>$root_dse,
+                             ws_count=>$ws_count,
+                             name=>$ws_saved,
+                             room=>$room_saved,
+                             ou=>$ou,
+                             role=>"workstation",
+		             type=>"roomws",
+                             school_token=>$school_token,
+                             creationdate=>$time_stamp_AD,
+                           });
         $ws_count++;
         #system("/usr/sbin/sophomorix-useradd --computer $u_comp");
         #system("/usr/sbin/sophomorix-passwd --force -u $u_comp --pass $pass");

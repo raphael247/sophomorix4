@@ -29,7 +29,7 @@ $Data::Dumper::Terse = 1;
             AD_unbind_admin
             AD_dns_get
             AD_user_create
-            AD_workstation_create
+            AD_computer_create
             AD_user_move
             AD_user_kill
             AD_workstation_kill
@@ -166,9 +166,9 @@ sub AD_workstation_kill {
     my $root_dse = $arg_ref->{root_dse};
     my $ws = $arg_ref->{workstation};
     my $count = $arg_ref->{count};
-    &Sophomorix::SophomorixBase::print_title("Killing workstation $ws ($count):");
+    &Sophomorix::SophomorixBase::print_title("Killing computer $ws ($count):");
     my $dn="";
-    my $filter="(&(objectClass=computer)(sophomorixRole=workstation)(sAMAccountName=".$ws."))";
+    my $filter="(&(objectClass=computer)(sophomorixRole=computer)(sAMAccountName=".$ws."))";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -209,7 +209,7 @@ sub AD_group_kill {
     }
 }
 
-sub AD_workstation_create {
+sub AD_computer_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -291,13 +291,13 @@ sub AD_workstation_create {
     my $result = $ldap->add( $dn,
                    attr => [
                    'sAMAccountName' => $smb_name,
-                   'displayName' => "Workstation ".$display_name,
+                   'displayName' => "Computer ".$display_name,
                    'dNSHostName' => $dns_name,
 #                   'givenName'   => "Workstation",
 #                   'sn'   => "Account",
 #                   'cn'   => $name_token,
                    'cn'   => $name,
-                    'accountExpires' => '9223372036854775807', # means never
+                   'accountExpires' => '9223372036854775807', # means never
                    'servicePrincipalName' => \@service_principal_name,
 #                   'unicodePwd' => $uni_password,
 #                   'sophomorixExitAdminClass' => "unknown", 
@@ -307,7 +307,7 @@ sub AD_workstation_create {
 #                   'sophomorixFirstPassword' => $plain_password, 
 #                   'sophomorixFirstnameASCII' => $firstname_ascii,
 #                   'sophomorixSurnameASCII'  => $surname_ascii,
-                   'sophomorixRole' => "workstation",
+                   'sophomorixRole' => "computer",
                    'sophomorixSchoolPrefix' => $school_token,
                    'sophomorixSchoolname' => $ou,
                    'sophomorixCreationDate' => $creationdate, 
@@ -616,7 +616,7 @@ sub AD_get_container {
     }  elsif ($role eq "teacher"){
         $container=$group_strg.$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "workstation"){
-        $container=$group_strg.$DevelConf::AD_workstation_ou;
+        $container=$group_strg.$DevelConf::AD_computer_ou;
     }  elsif ($role eq "examaccount"){
         $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container
@@ -664,7 +664,7 @@ sub AD_ou_add {
     $result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $teacher=$DevelConf::AD_teacher_ou.",".$dn;
     $result = $ldap->add($teacher,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    my $workstation=$DevelConf::AD_workstation_ou.",".$dn;
+    my $workstation=$DevelConf::AD_computer_ou.",".$dn;
     $result = $ldap->add($workstation,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $examaccount=$DevelConf::AD_examaccount_ou.",".$dn;
     $result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -855,7 +855,7 @@ sub AD_workstation_fetch {
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
-                   filter => '(&(objectClass=computer)(sophomorixRole=workstation))',
+                   filter => '(&(objectClass=computer)(sophomorixRole=computer))',
                    attrs => ['sAMAccountName']
                          );
     my $max_user = $mesg->count; 
