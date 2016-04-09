@@ -746,26 +746,30 @@ sub AD_ou_add {
 
     ############################################################
     # OU=GLOBAL
-    my $sophomorix_dn=$DevelConf::AD_global_ou.",".$root_dse;
+    { # start: make the following vars for OU=GLOBAL local vars
+    my $global_dn=$DevelConf::AD_global_ou.",".$root_dse;
     if($Conf::log_level>=2){
-        print "Adding $sophomorix_dn\n";
+        print "Adding $global_dn\n";
     }
-    $result = $ldap->add($sophomorix_dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    $result = $ldap->add($global_dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     if($Conf::log_level>=2){
         print "   * Adding sub ou's ...\n";
     }
     # Multigroups ou
-    my $multigroup=$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
+    my $multigroup=$DevelConf::AD_multigroup_ou.",".$global_dn;
     $result = $ldap->add($multigroup,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # Projects ou
-    my $projects=$DevelConf::AD_project_ou.",".$sophomorix_dn;
+    my $projects=$DevelConf::AD_project_ou.",".$global_dn;
     $result = $ldap->add($projects,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
+    my $custom=$DevelConf::AD_custom_ou.",".$global_dn;
+    $result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
     # students in Multigroups,OU=GLOBAL
-    my $sophomorix_dn_group="CN=multi-".$DevelConf::student.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
-    $result = $ldap->add( $sophomorix_dn_group,
+    my $global_dn_group="CN=multi-".$DevelConf::student.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    $result = $ldap->add( $global_dn_group,
                          attr => [
                              'cn'   => "multi-".$DevelConf::student,
                              'sAMAccountName' => "multi-".$DevelConf::student,
@@ -777,8 +781,8 @@ sub AD_ou_add {
         print "   * Adding OU=SOPHOMOROX multi-groups ...\n";
     }
     # teachers in Multigroups,OU=GLOBAL
-    $sophomorix_dn_group="CN=multi-".$DevelConf::teacher.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
-    $result = $ldap->add( $sophomorix_dn_group,
+    $global_dn_group="CN=multi-".$DevelConf::teacher.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    $result = $ldap->add( $global_dn_group,
                          attr => [
                              'cn'   => "multi-".$DevelConf::teacher,
                              'sAMAccountName' => "multi-".$DevelConf::teacher,
@@ -787,8 +791,8 @@ sub AD_ou_add {
                          ]
                      );
     # workstations in Multigroups,OU=GLOBAL
-    $sophomorix_dn_group="CN=multi-".$DevelConf::workstation.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
-    $result = $ldap->add( $sophomorix_dn_group,
+    $global_dn_group="CN=multi-".$DevelConf::workstation.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    $result = $ldap->add( $global_dn_group,
                          attr => [
                              'cn'   => "multi-".$DevelConf::workstation,
                              'sAMAccountName' => "multi-".$DevelConf::workstation,
@@ -797,8 +801,8 @@ sub AD_ou_add {
                          ]
                      );
     # ExamAccounts in Multigroups,OU=GLOBAL
-    $sophomorix_dn_group="CN=multi-".$DevelConf::examaccount.",".$DevelConf::AD_multigroup_ou.",".$sophomorix_dn;
-    $result = $ldap->add( $sophomorix_dn_group,
+    $global_dn_group="CN=multi-".$DevelConf::examaccount.",".$DevelConf::AD_multigroup_ou.",".$global_dn;
+    $result = $ldap->add( $global_dn_group,
                          attr => [
                              'cn'   => "multi-".$DevelConf::examaccount,
                              'sAMAccountName' => "multi-".$DevelConf::examaccount,
@@ -806,6 +810,8 @@ sub AD_ou_add {
                                                'group' ],
                          ]
                      );
+
+    } # end: make the following vars for OU=GLOBAL local vars
     &AD_debug_logdump($result,2,(caller(0))[3]);
 }
 
