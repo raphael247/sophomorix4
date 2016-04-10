@@ -35,7 +35,7 @@ use Sophomorix::SophomorixTest qw(
 
 $Conf::log_level=1;
 my $help=0;
-my $full=1;
+my $full=0;
 my $add_pro=0;
 my $test_add_pro=0;
 
@@ -94,19 +94,19 @@ Options
   -h  / --help
 
   Projects:
-  --add-pro  
+  sophomorix-test-3 --add-pro  
     add some projects
-  --test-add-pro
+  sophomorix-test-3 --test-add-pro
     test the added projects
 
-  --mod-pro
+  sophomorix-test-3 --mod-pro
     modify added projects
-  --test-mod-pro
+  sophomorix-test-3 --test-mod-pro
     test modified projects
 
-  --kill-pro
+  sophomorix-test-3 --kill-pro
     kill all added projects
-  --test-kill-pro
+  sophomorix-test-3 --test-kill-pro
     test killed projects
 
 ');
@@ -139,7 +139,9 @@ if ($full==1){
 ############################################################
 # --add-pro  
 if ($add_pro==1){
-    system("sophomorix-project $verbose_options --create -p mathe");
+    # project in OU=BSZLEO
+    system("sophomorix-project $verbose_options --create -p mathe --ou BSZLEO --school-token bsz");
+    # project in OU=SCHOOL
     system("sophomorix-project $verbose_options --create -p Chemie-AG");
 }
 
@@ -149,15 +151,15 @@ if ($add_pro==1){
 # --test-add-pro  
 if ($test_add_pro==1){
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_Chemie-AG,OU=Projects,OU=GLOBAL,".$root_dse,
+                   dn=>"CN=p_Chemie-AG,OU=Projects,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"p_Chemie-AG",
                    memberOf => "",
                    not_memberOf => "teachers",
                   });
 
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
+                   dn=>"CN=p_bsz-mathe,OU=Projects,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"p_bsz-mathe",
                    memberOf => "",
                    not_memberOf => "teachers",
                   });

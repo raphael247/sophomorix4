@@ -566,7 +566,8 @@ sub AD_get_name_tokened {
         $role eq "room" or 
         $role eq "roomws" or
         $role eq "examaccount" or
-        $role eq "workstation"){
+        $role eq "workstation" or
+        $role eq "project"){
         if ($school_token eq "---" or $school_token eq ""){
             # SCHOOL, no multischool
             $name_tokened=$name;
@@ -584,17 +585,26 @@ sub AD_get_name_tokened {
             # make uppercase
             $name_tokened=~tr/a-z/A-Z/;
         }
+        if ($role eq "project"){
+            unless ($name_tokened =~ m/^p\_/) { 
+                # add refix to projects: p_ 
+                $name_tokened="p_".$name_tokened;
+            }
+        }
         return $name_tokened;
     } elsif ($role eq "teacher" or
              $role eq "student"){
         return $name;
-    } elsif ($role eq "project"){
-        # project: no token-prefix
-        unless ($name =~ m/^p\_/) { 
-            # add refix to projects: p_ 
-            $name="p_".$name;
-        }
-        return $name;
+    # } elsif ($role eq "project"){
+    #     if ($school_token eq "---" or $school_token eq ""){
+    #         # OU=SCHOOL
+    #         $name_tokened=$school_token."-".$name;
+    #     } else 
+    #     unless ($name_tokened =~ m/^p\_/) { 
+    #         # add refix to projects: p_ 
+    #         $name_tokened="p_".$name_tokened;
+    #     }
+    #     return $name_tokened;
     } else {
         return $name;
     }

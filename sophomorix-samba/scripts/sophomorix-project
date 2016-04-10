@@ -70,6 +70,9 @@ $Conf::log_level=1;
 
 my $project="";
 
+my $ou="---";
+my $school_token="";
+
 my $k;
 my $v;
 
@@ -126,6 +129,8 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "join!" => \$join,
            "tree" => \$tree,
+           "ou=s" => \$ou,
+           "school-token=s" => \$school_token,
            "caller=s" => \$caller,
            "addmembers=s" => \$addmembers,
            "removemembers=s" => \$removemembers,
@@ -649,16 +654,19 @@ if (defined $p_long_name) {
 
 
 
+
+
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
-
+print "$ou\n";
 # --create --project <name>
 if ($create==1 and $project ne ""){
-  my $group_token=&AD_get_name_tokened($project,"---","project");
+  my $group_token=&AD_get_name_tokened($project,$school_token,"project");
   &AD_group_create({ldap=>$ldap,
                     root_dse=>$root_dse,
-                    ou=>"GLOBAL",
+                    ou=>$ou,
+                    school_token=>$school_token,
                     group=>$group_token,
                     type=>"project",
                   });
@@ -669,12 +677,12 @@ if ($create==1 and $project ne ""){
 
 # --kill --project <name>
 if ($kill==1 and $project ne ""){
-  my $group_token=&AD_get_name_tokened($project,"---","project");
+  my $group_token=&AD_get_name_tokened($project,$school_token,"project");
   &AD_group_kill({ldap=>$ldap,
                   root_dse=>$root_dse,
                   group=>$group_token,
-                  ou=>"GLOBAL",
-                  school_token=>"---",
+                  ou=>$ou,
+                  school_token=>$school_token,
                   type=>"project",
                   });
   exit;
