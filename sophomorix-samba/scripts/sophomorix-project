@@ -662,6 +662,7 @@ if (defined $p_long_name) {
 print "$ou\n";
 # --create --project <name>
 if ($create==1 and $project ne ""){
+  &AD_ou_add($ldap,$root_dse,$ou,$school_token);
   my $group_token=&AD_get_name_tokened($project,$school_token,"project");
   &AD_group_create({ldap=>$ldap,
                     root_dse=>$root_dse,
