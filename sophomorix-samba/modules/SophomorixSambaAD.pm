@@ -670,6 +670,8 @@ sub AD_ou_add {
     $result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # other
+    my $project=$DevelConf::AD_project_ou.",".$dn;
+    $result = $ldap->add($project,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $management=$DevelConf::AD_management_ou.",".$dn;
     $result = $ldap->add($management,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $printer=$DevelConf::AD_printer_ou.",".$dn;
@@ -786,9 +788,9 @@ sub AD_ou_add {
     my $globalgroup=$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $result = $ldap->add($globalgroup,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
-    # Projects ou
-    my $projects=$DevelConf::AD_project_ou.",".$global_dn;
-    $result = $ldap->add($projects,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+#    # Projects ou
+#    my $projects=$DevelConf::AD_project_ou.",".$global_dn;
+#    $result = $ldap->add($projects,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     my $custom=$DevelConf::AD_custom_ou.",".$global_dn;
     $result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
