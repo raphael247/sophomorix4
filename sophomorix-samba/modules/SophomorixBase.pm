@@ -64,8 +64,13 @@ sub print_title {
 
 # use this timestamp for the sophomorix-schema in AD
 sub time_stamp_AD {
+  # 2016-04-04 21:51:44
   my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
   chomp($timestamp);
+  # 
+  #my $timestamp = `date --utc '+%Y%m%d%H%M%S'`;
+  #chomp($timestamp);
+  #$timestamp=$timestamp.".0Z";
   return $timestamp;
 }
 
@@ -75,6 +80,9 @@ sub time_stamp_file {
    chomp($zeit);
    return $zeit;
 }
+
+
+
 
 
 # sophomorix locking
