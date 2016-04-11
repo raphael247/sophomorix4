@@ -43,8 +43,6 @@ mayContain: sophomorixSurnameASCII
 mayContain: sophomorixRole
 mayContain: sophomorixSchoolPrefix
 mayContain: sophomorixSchoolname
-# <--------------- OK marker, new attrs below ----------------->
-
 
 # <-- Group -->
 
@@ -72,7 +70,12 @@ changetype: modify
 replace: mayContain
 mayContain: sophomorixQuota
 mayContain: sophomorixMailQuota
-# <--------------- OK marker, new attrs below ----------------->
+mayContain: sophomorixAutoMembers
+mayContain: sophomorixSchooltype
+mayContain: sophomorixDepartment
+mayContain: sophomorixType
+mayContain: sophomorixMailAlias
+mayContain: sophomorixMailList
 
 # <-- Project -->
 
@@ -94,6 +97,26 @@ rDNAttID: cn
 schemaIDGUID:: pkoov8mDSV6c3ELyXMGM/g
 subClassOf: top
 systemOnly: FALSE
+
+dn: CN=Sophomorix-Project,<SchemaContainerDN>
+changetype: modify
+replace: mayContain
+mayContain: sophomorixAddQuota
+mayContain: sophomorixAddMailQuota
+mayContain: sophomorixStatus
+mayContain: sophomorixJoinable
+mayContain: sophomorixEnddate
+mayContain: sophomorixLongname
+mayContain: sophomorixMaxMembers
+mayContain: sophomorixCreationDate
+mayContain: sophomorixTolerationDate
+mayContain: sophomorixDeactivationDate
+mayContain: sophomorixMembers
+mayContain: sophomorixMemberGroups
+mayContain: sophomorixAdmins
+mayContain: sophomorixAdminGroups
+mayContain: sophomorixMemberProjects
+mayContain: sophomorixAdminProjects
 
 # Reload Schema
 dn:
