@@ -995,6 +995,7 @@ sub AD_group_create {
     my $ou = $arg_ref->{ou};
     my $type = $arg_ref->{type};
     my $school_token = $arg_ref->{school_token};
+    my $creationdate = $arg_ref->{creationdate};
 
     $ou=&AD_get_ou_tokened($ou);
 
@@ -1007,10 +1008,11 @@ sub AD_group_create {
     if ($count==0){
         # adding the group
         &Sophomorix::SophomorixBase::print_title("Creating Group (begin):");
-        print("   DN:       $dn\n");
-        print("   Target:   $target_branch\n");
-        print("   Group:    $group\n");
-        print("   Type:     $type\n");
+        print("   DN:            $dn\n");
+        print("   Target:        $target_branch\n");
+        print("   Group:         $group\n");
+        print("   Type:          $type\n");
+        print "   Creationdate:  $creationdate\n";
 
         # Create target branch
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -1021,6 +1023,7 @@ sub AD_group_create {
                                 attr => [
                                     'cn'   => $group,
                                     'sAMAccountName' => $group,
+                                    'sophomorixCreationDate' => $creationdate, 
                                     'objectclass' => ['top',
                                                       'group' ],
                                 ]
