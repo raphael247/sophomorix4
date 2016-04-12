@@ -426,14 +426,11 @@ while(<SOPHOMORIXADD>){
    # 1. Entry in AD
     if (not exists $ou_created{$ou}){
         # create ou
-        #&AD_ou_add($ldap,$root_dse,$ou,$school_token);
         &AD_ou_add({ldap=>$ldap,
                     root_dse=>$root_dse,
                     ou=>$ou,
                     school_token=>$school_token,
-                  # type=>"adminclass",    
-                  # status=>"P",
-                  # creationdate=>$creationdate,
+                    creationdate=>$time_stamp_AD,
                   });
         # remember ou
         $ou_created{$ou}="already created";

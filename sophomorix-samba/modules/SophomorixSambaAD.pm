@@ -500,14 +500,11 @@ sub AD_user_move {
     # make sure OU and tree exists
 #    if (not exists $ou_created{$ou_new}){
 #         # create new ou
-         #&AD_ou_add($ldap,$root_dse,$ou_new,$school_token_new);
          &AD_ou_add({ldap=>$ldap,
                      root_dse=>$root_dse,
                      ou=>$ou_new,
                      school_token=>$school_token_new,
-                   # type=>"adminclass",    
-                   # status=>"P",
-                   # creationdate=>$creationdate,
+                     creationdate=>$creationdate,
                    });
 #         # remember new ou to add it only once
 #         $ou_created{$ou_new}="already created";
@@ -669,6 +666,7 @@ sub AD_ou_add {
     my $root_dse = $arg_ref->{root_dse};
     my $ou = $arg_ref->{ou};
     my $token = $arg_ref->{school_token};
+    my $creationdate = $arg_ref->{creationdate};
 
     $ou=&AD_get_ou_tokened($ou);
     if ($token eq "---"){
@@ -723,6 +721,7 @@ sub AD_ou_add {
                           attr => [
                               'cn'   => $group,
                               'sAMAccountName' => $group,
+                              'sophomorixCreationDate' => $creationdate,
                               'objectclass' => ['top',
                                                 'group' ],
                           ]
@@ -752,6 +751,7 @@ sub AD_ou_add {
                          attr => [
                              'cn'   => $group,
                              'sAMAccountName' => $group,
+                             'sophomorixCreationDate' => $creationdate,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -771,6 +771,7 @@ sub AD_ou_add {
                          attr => [
                              'cn'   => $group,
                              'sAMAccountName' => $group,
+                             'sophomorixCreationDate' => $creationdate,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -787,6 +788,7 @@ sub AD_ou_add {
                          attr => [
                              'cn'   => $group,
                              'sAMAccountName' => $group,
+                             'sophomorixCreationDate' => $creationdate,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -801,6 +803,7 @@ sub AD_ou_add {
     $result = $ldap->add( $dn_group,
                          attr => [
                              'cn'   => $group,
+                             'sophomorixCreationDate' => $creationdate,
                              'sAMAccountName' => $group,
                              'objectclass' => ['top',
                                                'group' ],
@@ -839,6 +842,7 @@ sub AD_ou_add {
                          attr => [
                              'cn'   => "global-".$DevelConf::student,
                              'sAMAccountName' => "global-".$DevelConf::student,
+                             'sophomorixCreationDate' => $creationdate,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -852,6 +856,7 @@ sub AD_ou_add {
                          attr => [
                              'cn'   => "global-".$DevelConf::teacher,
                              'sAMAccountName' => "global-".$DevelConf::teacher,
+                             'sophomorixCreationDate' => $creationdate,
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -862,6 +867,7 @@ sub AD_ou_add {
                          attr => [
                              'cn'   => "global-".$DevelConf::examaccount,
                              'sAMAccountName' => "global-".$DevelConf::examaccount,
+                             'sophomorixCreationDate' => $creationdate,
                              'objectclass' => ['top',
                                                'group' ],
                          ]

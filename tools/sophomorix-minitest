@@ -69,13 +69,30 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 
 
-my $user="lordjo42";
+#my $user="lordjo42";
 
-my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$user);
+#my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$user);
+my $ou="schule";
+my $token="sch";
+#&AD_ou_add($ldap,$root_dse,$ou,$token);
+  &AD_ou_add({ldap=>$ldap,
+              root_dse=>$root_dse,
+              ou=>$ou,
+              school_token=>$token,
+             # type=>"adminclass",    
+             # status=>"P",
+             # creationdate=>$creationdate,
+             });
+#print "$count):   $dn\n";
 
-print "$count):   $dn\n";
 
 
+#use POSIX;
+#print strftime("%Z", localtime()), "\n";
+
+#use DateTime::TimeZone;
+
+#print DateTime::TimeZone->new( name => 'local' )->name();
 
 
 ############################################################
