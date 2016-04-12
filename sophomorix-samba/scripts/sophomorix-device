@@ -293,10 +293,10 @@ my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &AD_computer_fetch($ldap,$
 my %domcomputers_system = %$ref_domcomputers;
 my %rooms_system = %$ref_rooms;
 my %examaccounts_system = %$ref_examaccounts; 
+my @dns_hosts=();
 
 # /etc/linuxmuster/workstation
 my %hosts_file=();
-
 &get_classrooms();
 
 
@@ -567,9 +567,31 @@ $school_token="bsz";
 
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
+    # build the DNS
+    &print_title("Rebuilding the DNS ...");
+    foreach my $host (@dns_hosts){
+        print "   DNS for: $host\n";
+        print "        IP: $domcomputers_file{$host}{'IP'}\n";
+        print "       Rev: ???\n";
+        my $command_1="samba-tool ... 1";
+        my $command_2="samba-tool ... 2";
+        my $command_3="samba-tool ... 3";
+
+        print "   $command_1\n";
+        print "   $command_2\n";
+        print "   $command_3\n";
+
+
+
+        print "\n";
+    }
+}
+
+
+
+if ($no_sync==0){ # $no_sync==0 -> SYNC
     if (not exists $ou_created{$ou}){
         # create ou
-        #&AD_ou_add($ldap,$root_dse,$ou,$school_token);
         &AD_ou_add({ldap=>$ldap,
                     root_dse=>$root_dse,
                     ou=>$ou,
@@ -953,12 +975,15 @@ sub analyze_line {
         my $ws_token=&AD_get_name_tokened($host,$school_token,"workstation");
         my $ws_token_account=$ws_token."\$";
         if($Conf::log_level>=2){
-            print "ExamAccount:  $host  -->  $host_token\n";
-            print "Room:         $room  -->  $room_token\n";
-            print "Workstation:  $host  -->  $ws_token\n";
-            print "Workstation\$: $host  -->  $ws_token_account\n";
+            print "ExamAccount: $host  -->  $host_token\n";
+            print "Room:        $room  -->  $room_token\n";
+            print "Computer:    $host  -->  $ws_token\n";
+            print "Computer\$:  $host  -->  $ws_token_account\n";
             print "\n";
 	}
+
+        # save for DNS
+        push @dns_hosts, $host_token;
 
         # save data into hashes for reuse
         $domcomputers_file{$host_token}{"HWK"}=$hwk;
