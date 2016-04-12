@@ -123,6 +123,9 @@ sub AD_test_object {
     my $s_role = $arg_ref->{sophomorixRole};
     my $s_school_prefix = $arg_ref->{sophomorixSchoolPrefix};
     my $s_school_name = $arg_ref->{sophomorixSchoolname};
+    my $s_creationdate = $arg_ref->{sophomorixCreationDate};
+    my $s_tolerationdate = $arg_ref->{sophomorixTolerationDate};
+    my $s_deactivationdate = $arg_ref->{sophomorixDeactivationDate};
 
     # sophomorix group
     my $s_status = $arg_ref->{sophomorixStatus};
@@ -221,6 +224,27 @@ sub AD_test_object {
         if (defined $s_status){
             is ($entry->get_value ('sophomorixStatus'),$s_status,
 		"  * sophomorixStatus is $s_status");
+        }
+        if (defined $s_creationdate){
+            my $strg_ok="201";
+            my $date=$entry->get_value ('sophomorixCreationDate');
+            $test_date=substr($date,0,3);
+            is ($test_date,$strg_ok,
+		"  $date beginns with $strg_ok ");
+        }
+        if (defined $s_tolerationdate){
+            my $strg_ok="201";
+            my $date=$entry->get_value ('sophomorixTolerationDate');
+            $test_date=substr($date,0,3);
+            is ($test_date,$strg_ok,
+		"  $date beginns with $strg_ok ");
+        }
+        if (defined $s_deactivationdate){
+            my $strg_ok="201";
+            my $date=$entry->get_value ('sophomorixDeactivationDate');
+            $test_date=substr($date,0,3);
+            is ($test_date,$strg_ok,
+		"  $date beginns with $strg_ok ");
         }
 
         #is ($entry->get_value ('sophomorixCreationDate'),'',
