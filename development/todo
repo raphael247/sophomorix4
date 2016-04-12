@@ -26,14 +26,37 @@ mailquota bei user mailquota
 
 mailalias bei user? oder kann diese Mailadresse schon eingetragen werden
 
+############################################################
+Set password of administrator
+############################################################
+
+samba-tool user setpassword Administrator
+
+############################################################
+DNS
+############################################################
+
+* DNS-Einträge anlegen:
+  # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 
+
+  # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa
+
+  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR
+j1010-p01.linuxmuster.lokal
+
+
+#INFO# samba-tool dns serverinfo localhost
+
 
 
 ############################################################
 Tree
 ############################################################
 
-Forbidden OU's: SCHOOL, SOPHOMORIX
-Forbidden tokens: multi, ---
+
+
+Forbidden OU's: SCHOOL, GLOBAL
+Forbidden tokens: global, ---
 
 ############################################################
 Scripts
