@@ -618,7 +618,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           group=>$room_saved,
                           ou=>$ou,
                           school_token=>$school_token,
+                          status=>"P",
                           type=>"room",
+                          creationdate=>$time_stamp_AD,
                          });
         # add examaccount to its room
         &AD_group_addmember({ldap => $ldap,

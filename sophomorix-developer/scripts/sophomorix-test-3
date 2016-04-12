@@ -153,6 +153,8 @@ if ($test_add_pro==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_Chemie-AG,OU=Projects,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"p_Chemie-AG",
+                   type=>"project",
+                   status=>"P",
                    memberOf => "",
                    not_memberOf => "teachers",
                   });
@@ -160,6 +162,8 @@ if ($test_add_pro==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_bsz-mathe,OU=Projects,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"p_bsz-mathe",
+                   type=>"project",
+                   status=>"P",
                    memberOf => "",
                    not_memberOf => "teachers",
                   });

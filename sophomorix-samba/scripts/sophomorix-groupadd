@@ -31,6 +31,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                     );
 
 my @arguments = @ARGV;
+my $time_stamp_AD=&time_stamp_AD();
 
 
 # ===========================================================================
@@ -119,6 +120,8 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 &AD_group_create({ldap=>$ldap,
                   root_dse=>$root_dse, 
                   group=>$group,
+                  status=>"P",
+                  creationdate=>$time_stamp_AD,
                   type=>"sophomorix-groupadd"
                 });
 

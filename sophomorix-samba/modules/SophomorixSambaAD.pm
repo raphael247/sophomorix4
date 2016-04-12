@@ -455,6 +455,7 @@ sub AD_user_move {
     my $school_token_old = $arg_ref->{school_token_old};
     my $school_token_new = $arg_ref->{school_token_new};
     my $role_new = $arg_ref->{role};
+    my $creationdate = $arg_ref->{creationdate};
 
     # calculate
     my $group_type_old;
@@ -493,6 +494,7 @@ sub AD_user_move {
         print "   Role (New):     $role_new\n";
         print "   School(Old):    $school_token_old ($ou_old)\n";
         print "   School(New):    $school_token_new ($ou_new)\n";
+        print "   Creationdate:   $creationdate (if new group must be added)\n";
     }
 
     # make sure OU and tree exists
@@ -509,7 +511,9 @@ sub AD_user_move {
                       group=>$group_new,
                       ou=>$ou_new,
                       school_token=>$school_token_new,
-                      type=>"adminclass",
+                      type=>"adminclass",    
+                      status=>"P",
+                      creationdate=>$creationdate,
                     });
 
     # update user entry
@@ -996,6 +1000,7 @@ sub AD_group_create {
     my $type = $arg_ref->{type};
     my $school_token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
+    my $status = $arg_ref->{status};
 
     $ou=&AD_get_ou_tokened($ou);
 
@@ -1024,6 +1029,8 @@ sub AD_group_create {
                                     'cn'   => $group,
                                     'sAMAccountName' => $group,
                                     'sophomorixCreationDate' => $creationdate, 
+                                    'sophomorixType' => $type, 
+                                    'sophomorixStatus' => $status,
                                     'objectclass' => ['top',
                                                       'group' ],
                                 ]

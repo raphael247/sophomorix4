@@ -33,6 +33,7 @@ use Sophomorix::SophomorixSambaAD qw(
 my @arguments = @ARGV;
 
 my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
 my $user_nummer=0;
 
 my $alte_klasse;
@@ -335,6 +336,7 @@ while(<USERVERSETZEN>){
                    school_token_new=>$school_token_new,
                    type=>"adminclass",
                    role=>$role,
+                   creationdate=>$time_stamp_AD,
                   });
 
    # 0. rember login to set quota later

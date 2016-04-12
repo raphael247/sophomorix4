@@ -124,6 +124,9 @@ sub AD_test_object {
     my $s_school_prefix = $arg_ref->{sophomorixSchoolPrefix};
     my $s_school_name = $arg_ref->{sophomorixSchoolname};
 
+    # sophomorix group
+    my $s_status = $arg_ref->{sophomorixStatus};
+    my $s_type = $arg_ref->{sophomorixType};
 
     my $member_of = $arg_ref->{memberOf};
     my $not_member_of = $arg_ref->{not_memberOf};
@@ -210,6 +213,14 @@ sub AD_test_object {
         if (defined $s_school_name){
             is ($entry->get_value ('sophomorixSchoolname'),$s_school_name,
 		"  * sophomorixSchoolname is $s_school_name");
+        }
+        if (defined $s_type){
+            is ($entry->get_value ('sophomorixType'),$s_type,
+		"  * sophomorixType is $s_type");
+        }
+        if (defined $s_status){
+            is ($entry->get_value ('sophomorixStatus'),$s_status,
+		"  * sophomorixStatus is $s_status");
         }
 
         #is ($entry->get_value ('sophomorixCreationDate'),'',

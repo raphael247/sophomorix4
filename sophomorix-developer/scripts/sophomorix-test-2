@@ -215,6 +215,8 @@ if ($test_ws_1==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-j1008",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
                    memberOf => "bsz-examaccounts",
                    not_memberOf => "bsz-teachers",
                   });
