@@ -230,25 +230,22 @@ sub AD_test_object {
             my $date=$entry->get_value ('sophomorixCreationDate');
             $test_date=substr($date,0,3);
             is ($test_date,$strg_ok,
-		"  $date beginns with $strg_ok ");
+		"  * $date beginns with $strg_ok ");
         }
         if (defined $s_tolerationdate){
             my $strg_ok="201";
             my $date=$entry->get_value ('sophomorixTolerationDate');
             $test_date=substr($date,0,3);
             is ($test_date,$strg_ok,
-		"  $date beginns with $strg_ok ");
+		"  * $date beginns with $strg_ok ");
         }
         if (defined $s_deactivationdate){
             my $strg_ok="201";
             my $date=$entry->get_value ('sophomorixDeactivationDate');
             $test_date=substr($date,0,3);
             is ($test_date,$strg_ok,
-		"  $date beginns with $strg_ok ");
+		"  * $date beginns with $strg_ok ");
         }
-
-        #is ($entry->get_value ('sophomorixCreationDate'),'',
-	#	    "  * creationDate IS $entry->get_value ('sophomorixCreationDate' ");
 
         if (defined $ser_pri_name){
             # get servicePrincipalName data into hash

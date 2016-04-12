@@ -722,6 +722,8 @@ sub AD_ou_add {
                               'cn'   => $group,
                               'sAMAccountName' => $group,
                               'sophomorixCreationDate' => $creationdate,
+                              'sophomorixStatus' => "P",
+                              'sophomorixtype' => "ouclass",
                               'objectclass' => ['top',
                                                 'group' ],
                           ]
@@ -752,6 +754,8 @@ sub AD_ou_add {
                              'cn'   => $group,
                              'sAMAccountName' => $group,
                              'sophomorixCreationDate' => $creationdate,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -772,6 +776,8 @@ sub AD_ou_add {
                              'cn'   => $group,
                              'sAMAccountName' => $group,
                              'sophomorixCreationDate' => $creationdate,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -789,6 +795,8 @@ sub AD_ou_add {
                              'cn'   => $group,
                              'sAMAccountName' => $group,
                              'sophomorixCreationDate' => $creationdate,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -805,6 +813,8 @@ sub AD_ou_add {
                              'cn'   => $group,
                              'sophomorixCreationDate' => $creationdate,
                              'sAMAccountName' => $group,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -843,6 +853,8 @@ sub AD_ou_add {
                              'cn'   => "global-".$DevelConf::student,
                              'sAMAccountName' => "global-".$DevelConf::student,
                              'sophomorixCreationDate' => $creationdate,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -857,6 +869,8 @@ sub AD_ou_add {
                              'cn'   => "global-".$DevelConf::teacher,
                              'sAMAccountName' => "global-".$DevelConf::teacher,
                              'sophomorixCreationDate' => $creationdate,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -868,6 +882,8 @@ sub AD_ou_add {
                              'cn'   => "global-".$DevelConf::examaccount,
                              'sAMAccountName' => "global-".$DevelConf::examaccount,
                              'sophomorixCreationDate' => $creationdate,
+                             'sophomorixStatus' => "P",
+                             'sophomorixtype' => "ouclass",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
