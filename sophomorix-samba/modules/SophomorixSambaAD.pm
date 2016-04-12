@@ -500,7 +500,15 @@ sub AD_user_move {
     # make sure OU and tree exists
 #    if (not exists $ou_created{$ou_new}){
 #         # create new ou
-         &AD_ou_add($ldap,$root_dse,$ou_new,$school_token_new);
+         #&AD_ou_add($ldap,$root_dse,$ou_new,$school_token_new);
+         &AD_ou_add({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     ou=>$ou_new,
+                     school_token=>$school_token_new,
+                   # type=>"adminclass",    
+                   # status=>"P",
+                   # creationdate=>$creationdate,
+                   });
 #         # remember new ou to add it only once
 #         $ou_created{$ou_new}="already created";
 #     }
@@ -655,7 +663,13 @@ sub AD_get_container {
 
 sub AD_ou_add {
     # if $result->code is not given, the add is silent
-    my ($ldap,$root_dse,$ou,$token) = @_;
+    #my ($ldap,$root_dse,$ou,$token) = @_;
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $ou = $arg_ref->{ou};
+    my $token = $arg_ref->{school_token};
+
     $ou=&AD_get_ou_tokened($ou);
     if ($token eq "---"){
         $token=""; # OU=SCHOOL
@@ -704,14 +718,24 @@ sub AD_ou_add {
     }
     # create parent
     my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    $result = $ldap->add( $dn_group,
-                         attr => [
-                             'cn'   => $group,
-                             'sAMAccountName' => $group,
-                             'objectclass' => ['top',
-                                               'group' ],
-                         ]
-                     );
+
+     $result = $ldap->add( $dn_group,
+                          attr => [
+                              'cn'   => $group,
+                              'sAMAccountName' => $group,
+                              'objectclass' => ['top',
+                                                'group' ],
+                          ]
+                      );
+#    &AD_group_create({ldap=>$ldap,
+#                      root_dse=>$root_dse,
+#                      group=>$group,
+#                      ou=>$ou_new,
+#                      school_token=>$school_token_new,
+#                      type=>"adminclass",    
+#                      status=>"P",
+#                      creationdate=>$creationdate,
+#                    });
 
     # <token>-students
     $group=$token.$DevelConf::student;
