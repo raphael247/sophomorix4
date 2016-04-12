@@ -287,6 +287,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m7ab,OU=bsz-m7ab,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-m7ab",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "bsz-teachers",
                   });
@@ -328,6 +331,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m8cd,OU=bsz-m8cd,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-m8cd",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "bsz-teachers",
                   });
@@ -369,6 +375,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m8cd,OU=bsz-m8cd,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-m8cd",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "bsz-teachers",
                   });
@@ -410,6 +419,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-teachers,OU=bsz-teachers,OU=Teachers,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students,bsz-students",
                   });
@@ -475,6 +487,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-12abc,OU=uni-12abc,OU=Students,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-12abc",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "uni-students",
                    not_memberOf => "uni-teachers",
                   });
@@ -516,6 +531,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-12abc,OU=uni-12abc,OU=Students,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-12abc",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "uni-students",
                    not_memberOf => "students,teachers",
                   });
@@ -591,6 +609,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                    memberOf => "global-teachers",
                    not_memberOf => "global-students,uni-students",
                   });
@@ -620,6 +641,9 @@ if ($add==1 or $test_add==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=s6ade,OU=s6ade,OU=Students,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"s6ade",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "students",
                    not_memberOf => "global-students,teachers",
                   });
@@ -734,6 +758,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-attic,OU=bsz-attic,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-attic",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "students,lin-students,uni-students",
                   });
@@ -775,6 +802,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lin-attic,OU=lin-attic,OU=Students,OU=LINUXLEO,".$root_dse,
                    sAMAccountname=>"lin-attic",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "lin-students",
                    not_memberOf => "students,uni-students,bsz-students",
                   });
@@ -816,6 +846,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m9cd,OU=bsz-m9cd,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-m9cd",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "students,uni-students,lin-students",
                   });
@@ -857,6 +890,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m9cd,OU=bsz-m9cd,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-m9cd",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "students,uni-students,lin-students",
                   });
@@ -898,6 +934,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-alumni,OU=bsz-alumni,OU=Students,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-alumni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "bsz-students",
                    not_memberOf => "students,uni-students,lin-students",
                   });
@@ -939,6 +978,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                    memberOf => "global-teachers",
                    not_memberOf => "students,uni-students,lin-students",
                   });
@@ -970,6 +1012,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                    memberOf => "global-teachers",
                    not_memberOf => "students,uni-students,lin-students",
                   });
@@ -1001,6 +1046,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lin-teachers,OU=lin-teachers,OU=Teachers,OU=LINUXLEO,".$root_dse,
                    sAMAccountname=>"lin-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                    memberOf => "global-teachers",
                    not_memberOf => "students,uni-students,lin-students",
                   });
@@ -1032,6 +1080,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-alumni,OU=uni-alumni,OU=Students,OU=UNIVERSITÄT,".$root_dse,
                    sAMAccountname=>"uni-alumni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "uni-students",
                    not_memberOf => "students,lin-students",
                   });
@@ -1072,6 +1123,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=ghs-alumni,OU=ghs-alumni,OU=Students,OU=GHS-SCHOOL,".$root_dse,
                    sAMAccountname=>"ghs-alumni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "ghs-students",
                    not_memberOf => "students,lin-students",
                   });
@@ -1112,6 +1166,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=s7ade,OU=s7ade,OU=Students,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"s7ade",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "students",
                    not_memberOf => "bsz-students,lin-students",
                   });
@@ -1154,6 +1211,9 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=alumni,OU=alumni,OU=Students,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"alumni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
                    memberOf => "students",
                    not_memberOf => "lin-students",
                   });
@@ -1172,14 +1232,23 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-examaccounts,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-examaccounts",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-students,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-students",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
                   });
 }
 
