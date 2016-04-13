@@ -14,6 +14,7 @@ require Exporter;
 use Unicode::Map8;
 use Unicode::String qw(utf16);
 use Net::LDAP;
+use Net::LDAP::Control::Sort;
 #use Sophomorix::SophomorixBase;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -1063,11 +1064,14 @@ sub AD_project_update {
 sub AD_project_show_list {
     my ($ldap,$root_dse) = @_;
     my $filter="(&(objectClass=group)(sophomorixType=project))";
+    my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
+
     #print "Filter: $filter\n";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
                    filter => $filter,
+                   control => [ $sort ]
                          );
     my $max_pro = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_pro Projects");
