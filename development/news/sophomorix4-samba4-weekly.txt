@@ -1,7 +1,44 @@
 sophomorix-samba für linuxmuster.net 7 --- Weekly x
 
+
+
 ############################################################
-sophomorix4/Samba4 weekly Nr. 4  (xx.04.2016)
+sophomorix4/Samba4 weekly Nr. 5  (xx.04.2016)
+############################################################
+
+Info über Enwicklungs-Entscheidungen
+------------------------------------------------------------
+
+Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+------------------------------------------------------------
+
+Was habe ich seit dem letzten Weekly erledigt/verändert?
+----------------------------------------------------------------------
+
+Was mache ich als nächstes?
+----------------------------------------------------------------------
+
+Kleinere Aufgaben, bei denen ich unterstützung brauchen könnte:
+----------------------------------------------------------------------
+(Bitte um kurze Mail an die Entwicklerliste, 
+ wenn jemand etwas übernehmen/recherchieren möchte)
+
+  - nscd: brauchts den nscd noch bei Ubuntu Xenial und samba 4?
+
+
+
+Momentane Testanleitung:
+----------------------------------------------------------------------
+Es kann getestet werden!
+
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
+
+### Die weeklys finden sich auf github (von unten nach oben lesen):
+### https://github.com/linuxmuster/sophomorix4/blob/xenial/development/news/sophomorix4-samba4-weekly.txt
+
+
+############################################################
+sophomorix4/Samba4 weekly Nr. 4  (13.04.2016)
 ############################################################
 
 Info über Enwicklungs-Entscheidungen
@@ -31,17 +68,8 @@ workstation(s) --> computer(s)
 
 Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
-- Name computer/workstation
-  -> für einen der beiden entscheiden:
-     workstations-datei -> computers-datei?
-  Oder besser hosts
-
 - Administrator aus Gruppe teachers herauslassen
   - sonstige spezial-Accounts?
-- Klassennamen bei Multischool-Umgebungen:
-  Z.B. Schule abc und Klasse 7a:
-      7a-abc  ODER abc-7a?
-
 - Dateisystem (wichtig für journaling Quota, ACL, immutble bit)
    --> ich würde gerne bei ext4 bleiben, 
        - weil das am wenigsten Aufwand ist
@@ -52,9 +80,15 @@ Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
 
 Was habe ich seit dem letzten Weekly erledigt/verändert?
 ----------------------------------------------------------------------
+- LDAP-Baum so umgestellt, wie besprochen
+- mehr Tests
 
 Was mache ich als nächstes?
 ----------------------------------------------------------------------
+Der zweite Teil des Schemas von SerNet ist da.
+ --> Erweiterungen für Gruppen (insbesondere Projekte)
+ --> Projekte mit allen Eigenschaften anlegen  
+
 
 Kleinere Aufgaben, bei denen ich unterstützung brauchen könnte:
 ----------------------------------------------------------------------
