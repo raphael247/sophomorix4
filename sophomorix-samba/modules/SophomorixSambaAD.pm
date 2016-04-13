@@ -45,6 +45,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_fetch
             AD_project_fetch
             AD_project_update
+            AD_project_show_list
             AD_object_move
             AD_debug_logdump
             );
@@ -1055,11 +1056,67 @@ sub AD_project_update {
     my $dn = $arg_ref->{dn};
 
     &Sophomorix::SophomorixBase::print_title("Updating $dn");
-
-
-
+    # ????????????????????
 }
 
+
+sub AD_project_show_list {
+    my ($ldap,$root_dse) = @_;
+    my $filter="(&(objectClass=group)(sophomorixType=project))";
+    #print "Filter: $filter\n";
+    my $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                         );
+    my $max_pro = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_pro Projects");
+    print "-----------------+----------+-----+----+-+-",
+          "+-+-+--------------------------------\n";
+    printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
+           "Name","AQ","AMQ","MM","A","L","S","J","(Longname)";
+    print "-----------------+----------+-----+----+-+-",
+          "+-+-+--------------------------------\n";
+
+    for( my $index = 0 ; $index < $max_pro ; $index++) {
+        my $entry = $mesg->entry($index);
+        $dn=$entry->dn();
+        my $mailalias;
+        if ($entry->get_value('sophomorixMailAlias') eq "FALSE"){
+            $mailalias=0;
+        } else {
+            $mailalias=1;
+        }
+        my $maillist;
+        if ($entry->get_value('sophomorixMailList') eq "FALSE"){
+            $maillist=0;
+        } else {
+            $maillist=1;
+        }
+        my $joinable;
+        if ($entry->get_value('sophomorixJoinable') eq "FALSE"){
+            $joinable=0;
+        } else {
+            $joinable=1;
+        }
+
+        printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
+                  $entry->get_value('sAMAccountName'),
+                  $entry->get_value('sophomorixAddQuota'),
+                  $entry->get_value('sophomorixAddMailQuota'),
+                  $entry->get_value('sophomorixMaxMembers'),
+                  $mailalias,
+                  $maillist,
+                  $entry->get_value('sophomorixStatus'),
+                  $joinable,
+	          $entry->get_value('sAMAccountName');
+    }
+    print "-----------------+----------+-----+----+-+-",
+          "+-+-+--------------------------------\n";
+    print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
+    print " A=mailalias    L=mailist,       S=status                  \n";
+    &Sophomorix::SophomorixBase::print_title("$max_pro Projects");
+}
 
 
 sub AD_object_move {
@@ -1127,6 +1184,12 @@ sub AD_group_create {
                                     'sophomorixCreationDate' => $creationdate, 
                                     'sophomorixType' => $type, 
                                     'sophomorixStatus' => $status,
+                                    'sophomorixAddQuota' => "---",
+                                    'sophomorixAddMailQuota' => "---",
+                                    'sophomorixMaxMembers' => "0",
+                                    'sophomorixMailAlias' => "FALSE",
+                                    'sophomorixMailList' => "FALSE",
+                                    'sophomorixJoinable' => "FALSE",
                                     'objectclass' => ['top',
                                                       'group' ],
                                 ]
