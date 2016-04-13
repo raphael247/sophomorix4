@@ -43,6 +43,8 @@ $Data::Dumper::Terse = 1;
             AD_ou_add
             AD_object_search
             AD_computer_fetch
+            AD_project_fetch
+            AD_project_update
             AD_object_move
             AD_debug_logdump
             );
@@ -1008,6 +1010,54 @@ sub AD_computer_fetch {
            \%rooms_system, 
            \%examaccounts_system, 
           );
+}
+
+
+sub AD_project_fetch {
+    my ($ldap,$root_dse,$pro,$ou,$school_token) = @_;
+    my $dn="";
+    my $project="";
+    # projects from ldap
+    if (defined $school_token){
+        $project=&AD_get_name_tokened($pro,$school_token,"project");
+    } else {
+        $project=&AD_get_name_tokened($pro,"---","project");
+    }
+    &Sophomorix::SophomorixBase::print_title("Searching for $project ...");
+
+    my $filter="(&(objectClass=group)(sophomorixType=project)(cn=".$project."))";
+    #print "Filter: $filter\n";
+    my $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                         );
+    my $max_pro = $mesg->count; 
+    for( my $index = 0 ; $index < $max_pro ; $index++) {
+        my $entry = $mesg->entry($index);
+        $dn=$entry->dn();
+        if($Conf::log_level>=2){
+            print "   * ",$entry->get_value('sAMAccountName'),"\n";
+            print "     * ",$entry->get_value('sophomorixType'),"\n";
+            print "     * $dn\n";
+        }
+    }
+    &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
+    return ($dn,$max_pro);
+}
+
+
+
+sub AD_project_update {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $dn = $arg_ref->{dn};
+
+    &Sophomorix::SophomorixBase::print_title("Updating $dn");
+
+
+
 }
 
 

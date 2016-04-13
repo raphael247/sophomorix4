@@ -139,9 +139,11 @@ if ($full==1){
 ############################################################
 # --add-pro  
 if ($add_pro==1){
-    # project in OU=BSZLEO
+    # projects in OU=BSZLEO
     system("sophomorix-project $verbose_options --create -p mathe --ou BSZLEO --school-token bsz");
-    # project in OU=SCHOOL
+    system("sophomorix-project $verbose_options --create -p Chemie-AG --ou BSZLEO --school-token bsz");
+    # projects in OU=SCHOOL
+    system("sophomorix-project $verbose_options --create -p mathe");
     system("sophomorix-project $verbose_options --create -p Chemie-AG");
 }
 
@@ -198,6 +200,8 @@ if ($test_mod_pro==1){
 # --kill-pro  
 if ($kill_pro==1){
     system("sophomorix-project $verbose_options --kill -p mathe --ou BSZLEO --school-token bsz");
+    system("sophomorix-project $verbose_options --kill -p mathe");
+    system("sophomorix-project $verbose_options --kill -p Chemie-AG --ou BSZLEO --school-token bsz");
     system("sophomorix-project $verbose_options --kill -p Chemie-AG");
 }
 

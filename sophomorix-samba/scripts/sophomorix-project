@@ -42,6 +42,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
+                                 AD_project_fetch
+                                 AD_project_update
                                  get_forbidden_logins
                                     );
 
@@ -163,53 +165,53 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 
-# help if no project is given
-# and no useful option
-if ($project eq "" 
-     and $info==0
-     and $admininfo==0
-     and $user_info==0
-     and $tree==0
-     and $dump_all_projects eq ""
-     and $create_from_file eq ""
-     and $update_from_file eq ""
-     and $curr_member eq ""
-    ){
-    $help=1;
-}
+# # help if no project is given
+# # and no useful option
+# if ($project eq "" 
+#      and $info==0
+#      and $admininfo==0
+#      and $user_info==0
+#      and $tree==0
+#      and $dump_all_projects eq ""
+#      and $create_from_file eq ""
+#      and $update_from_file eq ""
+#      and $curr_member eq ""
+#     ){
+#     $help=1;
+# }
 
 
-# help if project is given
-# and no useful option
-if ($project ne "" 
-      and not defined $p_admins
-      and not defined $p_members
-      and not defined $p_groups 
-      and not defined $p_projects
-      and $addmembers eq ""
-      and $removemembers eq ""
-      and $addadmins eq ""
-      and $removeadmins eq ""
-      and $addmembergroups eq ""
-      and $removemembergroups eq ""
-      and $addmemberprojects eq ""
-      and $removememberprojects eq ""
-      and $info==0
-      and $admininfo==0
-      and $tree==0
-      and $kill==0
-      and $create==0
-      and not defined $maillist
-      and not defined $mailalias
-      and not defined $join
-      and $p_add_quota eq "" 
-      and $p_add_mail_quota eq "" 
-      and $dump_all_projects eq ""
-      and $create_from_file eq ""
-      and $update_from_file eq ""
-    ){
-    $help=1;
-}
+# # help if project is given
+# # and no useful option
+# if ($project ne "" 
+#       and not defined $p_admins
+#       and not defined $p_members
+#       and not defined $p_groups 
+#       and not defined $p_projects
+#       and $addmembers eq ""
+#       and $removemembers eq ""
+#       and $addadmins eq ""
+#       and $removeadmins eq ""
+#       and $addmembergroups eq ""
+#       and $removemembergroups eq ""
+#       and $addmemberprojects eq ""
+#       and $removememberprojects eq ""
+#       and $info==0
+#       and $admininfo==0
+#       and $tree==0
+#       and $kill==0
+#       and $create==0
+#       and not defined $maillist
+#       and not defined $mailalias
+#       and not defined $join
+#       and $p_add_quota eq "" 
+#       and $p_add_mail_quota eq "" 
+#       and $dump_all_projects eq ""
+#       and $create_from_file eq ""
+#       and $update_from_file eq ""
+#     ){
+#     $help=1;
+# }
 
 
 
@@ -411,59 +413,60 @@ if ($curr_member ne ""){
 
 
 # --caller and --nojoin
-if ($project ne "" and $create==0
-    and 
-    ($addmembers ne ""
-     or $removemembers ne ""
-     or $addadmins ne ""
-     or $removeadmins ne ""
-     or $addmembergroups ne ""
-     or $removemembergroups ne ""
-     or $addmemberprojects ne ""
-     or $removememberprojects ne ""
-     or defined $p_admins
-     or defined $p_members
-     or defined $p_groups
-     or defined $p_projects
-     or defined $join)
-    ){
-    # print "Changing something, eh ----\n";
-    # my ($a1,$a2,$a3,$a4,$join_val) = &fetchinfo_from_project($project);
-    # if ($join_val==0){
-    #     print "Project is NOT joinable $join_val\n";
-    #     if ($caller eq ""){
-    #        print "You must use --caller name to modify such a project!\n";
-    #        &Sophomorix::SophomorixBase::log_script_exit(
-    #            "Request to modify nojoin project without --caller!",
-    #            1,1,0,@arguments);
+# if ($project ne "" and $create==0
+#     and 
+#     ($addmembers ne ""
+#      or $removemembers ne ""
+#      or $addadmins ne ""
+#      or $removeadmins ne ""
+#      or $addmembergroups ne ""
+#      or $removemembergroups ne ""
+#      or $addmemberprojects ne ""
+#      or $removememberprojects ne ""
+#      or defined $p_admins
+#      or defined $p_members
+#      or defined $p_groups
+#      or defined $p_projects
+#      or defined $join)
+#     ){
+#     # print "Changing something, eh ----\n";
+#     # my ($a1,$a2,$a3,$a4,$join_val) = &fetchinfo_from_project($project);
+#     # if ($join_val==0){
+#     #     print "Project is NOT joinable $join_val\n";
+#     #     if ($caller eq ""){
+#     #        print "You must use --caller name to modify such a project!\n";
+#     #        &Sophomorix::SophomorixBase::log_script_exit(
+#     #            "Request to modify nojoin project without --caller!",
+#     #            1,1,0,@arguments);
 
-    #     } else {
-    #        print "I must check if $caller is allowed\n";
-    #        my @admins_val=&fetchadmins_from_project($project);
-    #        my $go_on=0;
-    #        if ($caller eq "root"){
-    # 	       $go_on=1;
-    #            print "$caller is root!\n";
-    #        } else {
-    #            foreach my $admin_val (@admins_val){
-    #                #print "Checking ---$admin_val--- and ---$caller---\n";
-    #                if ($caller eq $admin_val){
-    #                    $go_on=1;
-    #                    print "$caller is admin!\n";
-    #                    last;
-    #                }
-    #            }
-    #        }
-    #        if ($go_on==0){
-    #            print "$caller is NOT admin of $project\n";
-    #            print "$caller is NOT allowed to change userlist\n";
-    #            &Sophomorix::SophomorixBase::log_script_exit(
-    #            "Nonadmin tried to change nojoin project!",
-    #            1,1,0,@arguments);
-    #        }
-    #     }
-    # }
-}
+#     #     } else {
+#     #        print "I must check if $caller is allowed\n";
+#     #        my @admins_val=&fetchadmins_from_project($project);
+#     #        my $go_on=0;
+#     #        if ($caller eq "root"){
+#     # 	       $go_on=1;
+#     #            print "$caller is root!\n";
+#     #        } else {
+#     #            foreach my $admin_val (@admins_val){
+#     #                #print "Checking ---$admin_val--- and ---$caller---\n";
+#     #                if ($caller eq $admin_val){
+#     #                    $go_on=1;
+#     #                    print "$caller is admin!\n";
+#     #                    last;
+#     #                }
+#     #            }
+#     #        }
+#     #        if ($go_on==0){
+#     #            print "$caller is NOT admin of $project\n";
+#     #            print "$caller is NOT allowed to change userlist\n";
+#     #            &Sophomorix::SophomorixBase::log_script_exit(
+#     #            "Nonadmin tried to change nojoin project!",
+#     #            1,1,0,@arguments);
+#     #        }
+#     #     }
+#     # }
+# }
+
 
 
 
@@ -659,8 +662,12 @@ if (defined $p_long_name) {
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
-print "$ou\n";
+
+
+
+
 # --create --project <name>
+############################################################
 if ($create==1 and $project ne ""){
   &AD_ou_add({ldap=>$ldap,
               root_dse=>$root_dse,
@@ -684,6 +691,7 @@ if ($create==1 and $project ne ""){
 
 
 # --kill --project <name>
+############################################################
 if ($kill==1 and $project ne ""){
   my $group_token=&AD_get_name_tokened($project,$school_token,"project");
   &AD_group_kill({ldap=>$ldap,
@@ -697,6 +705,24 @@ if ($kill==1 and $project ne ""){
 }
 
 
+# get dn if project exists and continue
+############################################################
+
+my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token);
+
+if ($count>1){
+    print "\n$count Projects found.\n";
+    print "Specify the school-token to choose a project\n\n";
+    exit $count;
+}
+
+
+# all actions from now on work on the dn retrieved
+############################################################
+  &AD_project_update({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    dn=>$dn_pro,
+                    });
 
 
 
@@ -783,7 +809,6 @@ if ($kill==1 and $project ne ""){
 # } else {
 #     &titel("NOT creating mailaliases/lists (nothing mail related changed)");
 # }
-
 
 &AD_unbind_admin($ldap);
 
