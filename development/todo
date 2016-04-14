@@ -37,16 +37,15 @@ DNS
 ############################################################
 
 * DNS-Einträge anlegen:
-  # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 
+  # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 --password=Muster!
 
   # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa
 
-  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR
-j1010-p01.linuxmuster.lokal
+  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR j1010-p01.linuxmuster.lokal
 
 
 #INFO# samba-tool dns serverinfo localhost
-
+samba-tool dns zoneinfo localhost 100.16.10.in-addr.arpa
 
 
 ############################################################
