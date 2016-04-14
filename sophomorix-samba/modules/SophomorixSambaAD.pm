@@ -1015,8 +1015,9 @@ sub AD_computer_fetch {
 }
 
 
+
 sub AD_project_fetch {
-    my ($ldap,$root_dse,$pro,$ou,$school_token) = @_;
+    my ($ldap,$root_dse,$pro,$ou,$school_token,$info) = @_;
     my $dn="";
     my $project="";
     # projects from ldap
@@ -1025,7 +1026,7 @@ sub AD_project_fetch {
     } else {
         $project=&AD_get_name_tokened($pro,"---","project");
     }
-    &Sophomorix::SophomorixBase::print_title("Searching for $project ...");
+    #&Sophomorix::SophomorixBase::print_title("Searching for $project ...");
 
     my $filter="(&(objectClass=group)(sophomorixType=project)(cn=".$project."))";
     #print "Filter: $filter\n";
@@ -1038,15 +1039,105 @@ sub AD_project_fetch {
     for( my $index = 0 ; $index < $max_pro ; $index++) {
         my $entry = $mesg->entry($index);
         $dn=$entry->dn();
-        if($Conf::log_level>=2){
-            print "   * ",$entry->get_value('sAMAccountName'),"\n";
-            print "     * ",$entry->get_value('sophomorixType'),"\n";
-            print "     * $dn\n";
+
+        # project attributes
+	my $addquota = $entry->get_value('sophomorixAddQuota');
+        my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
+        my $mailalias = $entry->get_value('sophomorixMailAlias');
+        my $maillist = $entry->get_value('sophomorixMailList');
+        my $status = $entry->get_value('sophomorixStatus');
+        my $joinable = $entry->get_value('sophomorixJoinable');
+        my $maxmembers = $entry->get_value('sophomorixMaxMembers');
+        my $creationdate = $entry->get_value('sophomorixCreationDate');
+
+        # left column in printout
+	my @project_attr=("gidnumber: ???",
+                          "LongName:",
+                          "  ???",
+                          "AddQuota: $addquota  MB",
+                          "AddMailQuota: $addmailquota MB",
+                          "MailAlias: $mailalias",
+                          "MailList: $maillist",
+                          "SophomorixStatus: $status",
+                          "Joinable: $joinable",
+                          "MaxMembers: $maxmembers",
+                          "CreationTime:",
+                          " $creationdate"
+                         );
+
+        # fetching attributes and counting them
+        # .... ????????????????????? ......
+        my @admin_by_attr=();    # admin by members (new)
+        my $admin_by_attr=$#admin_by_attr+1;
+        my @user_by_attr=();     # user members
+        my $user_by_attr=$#user_by_attr+1;
+        my @groups_by_attr=();   # group members
+        my $groups_by_attr=$#groups_by_attr+1;
+        my @projects_by_attr=(); # project members
+        my $projects_by_attr=$#projects_by_attr+1;
+
+        # calculate max height of colums
+        my $max=$#project_attr;
+        if ($#admin_by_attr > $max){
+	    $max=$#admin_by_attr;
+        }
+        if ($#user_by_attr > $max){
+	    $max=$#user_by_attr;
+        }
+        if ($#groups_by_attr > $max){
+	    $max=$#groups_by_attr;
+        }
+        if ($#projects_by_attr > $max){
+	    $max=$#projects_by_attr;
+        }
+
+        if($Conf::log_level>=2 or $info==1){
+            &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
+            print "+----------------------+----------+----------+",
+                  "--------------+-----------------+\n";
+            printf "|%-22s|%-10s|%-10s|%-14s|%-17s|\n",
+                   "Project:"," Admins "," Members "," Member "," Member ";
+            printf "|%-22s|%-10s|%-10s|%-14s|%-17s|\n",
+                   "  $project"," byOption "," byOption "," Groups "," Projects ";
+            print "+----------------------+----------+----------+",
+                  "--------------+-----------------+\n";
+
+            # print the columns
+            for (my $i=0;$i<=$max;$i++){
+                if (not defined $project_attr[$i]){
+	            $project_attr[$i]="";
+                }
+                if (not defined $admin_by_attr[$i]){
+	            $admin_by_attr[$i]="";
+                }
+                if (not defined $user_by_attr[$i]){
+	            $user_by_attr[$i]="";
+                }
+                if (not defined $groups_by_attr[$i]){
+	            $groups_by_attr[$i]="";
+                }
+                if (not defined $projects_by_attr[$i]){
+	            $projects_by_attr[$i]="";
+                }
+                printf "|%-22s| %-9s| %-9s|%-14s|%-17s|\n",
+                       $project_attr[$i],
+                       $admin_by_attr[$i],
+                       $user_by_attr[$i],
+                       $groups_by_attr[$i],
+                       $projects_by_attr[$i];
+            }
+
+            print "+----------------------+----------+----------+",
+                  "--------------+-----------------+\n";
+            printf "|%21s |%9s |%9s |%13s |%16s |\n",
+                   "",$admin_by_attr,$user_by_attr,$groups_by_attr,$projects_by_attr;
+            print "+----------------------+----------+----------+",
+                  "--------------+-----------------+\n";
         }
     }
-    &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
     return ($dn,$max_pro);
 }
+
 
 
 
@@ -1059,6 +1150,7 @@ sub AD_project_update {
     &Sophomorix::SophomorixBase::print_title("Updating $dn");
     # ????????????????????
 }
+
 
 
 sub AD_project_show_list {

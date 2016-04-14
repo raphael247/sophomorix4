@@ -350,6 +350,7 @@ if ($project eq "" and $info==1){
 
 # --info --project name
 if ($project ne "" and $info==1){
+    my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token,$info);
 #    &show_project($project);
     exit;
 }
@@ -710,7 +711,7 @@ if ($kill==1 and $project ne ""){
 # get dn if project exists and continue
 ############################################################
 
-my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token);
+my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token,$info);
 
 if ($count>1){
     print "\n$count Projects found.\n";
