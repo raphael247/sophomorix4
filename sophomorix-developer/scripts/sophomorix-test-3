@@ -141,7 +141,7 @@ if ($full==1){
 if ($add_pro==1){
     # projects in OU=BSZLEO
     system("sophomorix-project $verbose_options --create -p mathe --ou BSZLEO --school-token bsz");
-    system("sophomorix-project $verbose_options --create -p Chemie-AG --ou BSZLEO --school-token bsz");
+    system("sophomorix-project $verbose_options --create -p Chemie-AG --ou BSZLEO --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --maxmembers 36");
     # projects in OU=SCHOOL
     system("sophomorix-project $verbose_options --create -p mathe");
     system("sophomorix-project $verbose_options --create -p Chemie-AG");
@@ -171,15 +171,15 @@ if ($test_add_pro==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_bsz-Chemie-AG,OU=Projects,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"p_bsz-Chemie-AG",
-                   description=>"p_bsz-Chemie-AG",
+                   description=>"Chemie AG des Gymnasiums",
                    sophomorixType=>"project",
-                   sophomorixAddQuota=>"---",
-                   sophomorixAddMailQuota=>"---",
-                   sophomorixMailAlias=>"FALSE",
-                   sophomorixMailList=>"FALSE",
-                   sophomorixStatus=>"P",
-                   sophomorixJoinable=>"FALSE",
-                   sophomorixMaxMembers=>"0",
+                   sophomorixAddQuota=>"100+60",
+                   sophomorixAddMailQuota=>"200",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"G",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"36",
                    sophomorixCreationDate => "exists",
                    memberOf => "",
                    not_memberOf => "teachers",

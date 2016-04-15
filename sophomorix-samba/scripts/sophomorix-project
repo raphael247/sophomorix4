@@ -240,22 +240,25 @@ Getting information:
   -i -p projectname
   -u  / --user / --user-info -p project
 
-Changing a project:
+Changing/creating/killing a project:
   -p projectname, / --project projectname 
-  --create 
-  --kill
+  --create -p projectname
+  --kill -p projectname
+  --description \'multiple words possible\'
+  --addquota quotastring
+  --addmailquota number
+  --mailalias, --nomailalias
+  --maillist, --nomaillist 
+  --status <letter>
   --join,  --nojoin
-  --longname projectname(long)
+  --maxmembers number
+
+
   --admins user1,user2,user3, ... 
   --members user1,user2,user3, ... 
   --membergroups group1,group2,group3, ... 
   --memberprojects project1,project2,project3, ... 
-  --addquota quotastring
-  --addmailquota number
-  --maxmembers number
 
-  --mailalias, --nomailalias
-  --maillist, --nomaillist 
 
   -p project --addmembers user1,user2,user3, ...
   -p project --removemembers user1,user2,user3, ...
@@ -691,7 +694,6 @@ if ($create==1 and $project ne ""){
                     status=>"P",
                     creationdate=>$time_stamp_AD,
                   });
-  exit;
 }
 
 
@@ -707,7 +709,6 @@ if ($kill==1 and $project ne ""){
                   school_token=>$school_token,
                   type=>"project",
                   });
-  exit;
 }
 
 
