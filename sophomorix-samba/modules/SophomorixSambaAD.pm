@@ -1050,6 +1050,14 @@ sub AD_project_fetch {
         my $joinable = $entry->get_value('sophomorixJoinable');
         my $maxmembers = $entry->get_value('sophomorixMaxMembers');
         my $creationdate = $entry->get_value('sophomorixCreationDate');
+        my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
+        my $admin_by_attr = $#admin_by_attr+1;
+        my @member_by_attr = sort $entry->get_value('sophomorixMembers');
+        my $member_by_attr = $#member_by_attr+1;
+        my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
+        my $membergroups_by_attr = $#membergroups_by_attr+1;
+        my @admingroups_by_attr = sort $entry->get_value('sophomorixAdminGroups');
+        my $admingroups_by_attr = $#admingroups_by_attr+1;
 
         # left column in printout
 	my @project_attr=("gidnumber: ???",
@@ -1066,42 +1074,31 @@ sub AD_project_fetch {
                           " $creationdate"
                          );
 
-        # fetching attributes and counting them
-        # .... ????????????????????? ......
-        my @admin_by_attr=();    # admin by members (new)
-        my $admin_by_attr=$#admin_by_attr+1;
-        my @user_by_attr=();     # user members
-        my $user_by_attr=$#user_by_attr+1;
-        my @groups_by_attr=();   # group members
-        my $groups_by_attr=$#groups_by_attr+1;
-        my @projects_by_attr=(); # project members
-        my $projects_by_attr=$#projects_by_attr+1;
-
         # calculate max height of colums
         my $max=$#project_attr;
         if ($#admin_by_attr > $max){
 	    $max=$#admin_by_attr;
         }
-        if ($#user_by_attr > $max){
-	    $max=$#user_by_attr;
+        if ($#member_by_attr > $max){
+	    $max=$#member_by_attr;
         }
-        if ($#groups_by_attr > $max){
-	    $max=$#groups_by_attr;
+        if ($#membergroups_by_attr > $max){
+	    $max=$#membergroups_by_attr;
         }
-        if ($#projects_by_attr > $max){
-	    $max=$#projects_by_attr;
+        if ($#admingroups_by_attr > $max){
+	    $max=$#admingroups_by_attr;
         }
 
         if($Conf::log_level>=2 or $info==1){
             &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
-            print "+----------------------+----------+----------+",
-                  "--------------+-----------------+\n";
-            printf "|%-22s|%-10s|%-10s|%-14s|%-17s|\n",
-                   "Project:"," Admins "," Members "," Member "," Member ";
-            printf "|%-22s|%-10s|%-10s|%-14s|%-17s|\n",
-                   "  $project"," byOption "," byOption "," Groups "," Projects ";
-            print "+----------------------+----------+----------+",
-                  "--------------+-----------------+\n";
+            print "+---------------------+----------+----------+",
+                  "----------------+----------------+\n";
+            printf "|%-21s|%-10s|%-10s|%-16s|%-16s|\n",
+                   "Project:"," "," "," "," ";
+            printf "|%-21s|%-10s|%-10s|%-16s|%-16s|\n",
+                   "  $project"," Admins "," Members "," MemberGroups "," AdminGroups ";
+            print "+---------------------+----------+----------+",
+                  "----------------+----------------+\n";
 
             # print the columns
             for (my $i=0;$i<=$max;$i++){
@@ -1111,29 +1108,29 @@ sub AD_project_fetch {
                 if (not defined $admin_by_attr[$i]){
 	            $admin_by_attr[$i]="";
                 }
-                if (not defined $user_by_attr[$i]){
-	            $user_by_attr[$i]="";
+                if (not defined $member_by_attr[$i]){
+	            $member_by_attr[$i]="";
                 }
-                if (not defined $groups_by_attr[$i]){
-	            $groups_by_attr[$i]="";
+                if (not defined $membergroups_by_attr[$i]){
+	            $membergroups_by_attr[$i]="";
                 }
-                if (not defined $projects_by_attr[$i]){
-	            $projects_by_attr[$i]="";
+                if (not defined $admingroups_by_attr[$i]){
+	            $admingroups_by_attr[$i]="";
                 }
-                printf "|%-22s| %-9s| %-9s|%-14s|%-17s|\n",
+                printf "|%-21s| %-9s| %-9s| %-15s| %-15s|\n",
                        $project_attr[$i],
                        $admin_by_attr[$i],
-                       $user_by_attr[$i],
-                       $groups_by_attr[$i],
-                       $projects_by_attr[$i];
+                       $member_by_attr[$i],
+                       $membergroups_by_attr[$i],
+                       $admingroups_by_attr[$i];
             }
 
-            print "+----------------------+----------+----------+",
-                  "--------------+-----------------+\n";
-            printf "|%21s |%9s |%9s |%13s |%16s |\n",
-                   "",$admin_by_attr,$user_by_attr,$groups_by_attr,$projects_by_attr;
-            print "+----------------------+----------+----------+",
-                  "--------------+-----------------+\n";
+            print "+---------------------+----------+----------+",
+                  "----------------+----------------+\n";
+            printf "|%20s |%9s |%9s |%15s |%15s |\n",
+                   "",$admin_by_attr,$member_by_attr,$membergroups_by_attr,$admingroups_by_attr;
+            print "+---------------------+----------+----------+",
+                  "----------------+----------------+\n";
         }
     }
     return ($dn,$max_pro);
