@@ -89,10 +89,13 @@ my $addmemberprojects="";
 my $removememberprojects="";
 
 my $p_long_name;
-my $p_admins;
-my $p_groups;
-my $p_members;
-my $p_projects;
+#my $p_admins;
+#my $p_groups;
+#my $p_projects;
+
+
+
+
 
 my $description;
 my $addquota;
@@ -102,6 +105,11 @@ my $maillist;
 my $status;
 my $join; # 0,1
 my $maxmembers;
+
+my $members;
+my $admins;
+my $membergroups;
+my $admingroups;
 
 
 my $caller="";
@@ -147,9 +155,10 @@ my $testopt=GetOptions(
 #           "removememberprojects=s" => \$removememberprojects,
            "name|project|p=s" => \$project,
 #           "longname=s" => \$p_long_name,
-#           "admins=s" => \$p_admins,
-#           "members=s" => \$p_members,
-#           "membergroups=s" => \$p_groups,
+           "admins=s" => \$admins,
+           "members=s" => \$members,
+           "admingroups=s" => \$admingroups,
+           "membergroups=s" => \$membergroups,
 #           "memberprojects=s" => \$p_projects,
            "addquota=s" => \$addquota,
            "addmailquota=s" => \$addmailquota,
@@ -257,6 +266,10 @@ Changing/creating/killing a project:
   --admins user1,user2,user3, ... 
   --members user1,user2,user3, ... 
   --membergroups group1,group2,group3, ... 
+  --admingroups group1,group2,group3, ... 
+
+
+Obsolete?
   --memberprojects project1,project2,project3, ... 
 
 
@@ -798,6 +811,42 @@ if (defined $maxmembers){
                         root_dse=>$root_dse,
                         dn=>$dn_pro,
                         maxmembers=>$maxmembers,
+                      });
+}
+
+# --members <user1,user2>
+if (defined $members){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        members=>$members,
+                      });
+}
+
+# --admins <user1,user2>
+if (defined $admins){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        admins=>$admins,
+                      });
+}
+
+# --membergroups <group1,group2>
+if (defined $membergroups){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        membergroups=>$membergroups,
+                      });
+}
+
+# --admingroups <group1,group2>
+if (defined $admingroups){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        admingroups=>$admingroups,
                       });
 }
 

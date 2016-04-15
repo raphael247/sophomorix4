@@ -1155,6 +1155,10 @@ sub AD_project_update {
     my $status = $arg_ref->{status};
     my $join = $arg_ref->{join};
     my $maxmembers = $arg_ref->{maxmembers};
+    my $members = $arg_ref->{members};
+    my $admins = $arg_ref->{admins};
+    my $membergroups = $arg_ref->{membergroups};
+    my $admingroups = $arg_ref->{admingroups};
 
     &Sophomorix::SophomorixBase::print_title("Updating $dn");
     # description   
@@ -1200,6 +1204,40 @@ sub AD_project_update {
         print "   * Setting sophomorixMaxMembers to $maxmembers\n";
         my $mesg = $ldap->modify($dn,replace => {sophomorixMaxMembers => $maxmembers}); 
     }
+    # members   
+    if (defined $members){
+        my @members=split(/,/,$members);
+        @members = reverse @members;
+        print "   * Setting sophomorixMembers to @members\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixMembers' => \@members }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    # admins
+    if (defined $admins){
+        my @admins=split(/,/,$admins);
+        @admins = reverse @admins;
+        print "   * Setting sophomorixAdmins to @admins\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmins' => \@admins }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    # membergroups   
+    if (defined $membergroups){
+        my @membergroups=split(/,/,$membergroups);
+        @membergroups = reverse @membergroups;
+        print "   * Setting sophomorixMemberGroups to @membergroups\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixMemberGroups' => \@membergroups }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    # admingroups
+    if (defined $admingroups){
+        my @admingroups=split(/,/,$admingroups);
+        @admingroups = reverse @admingroups;
+        print "   * Setting sophomorixAdmingroups to @admingroups\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+
+
 }
 
 
