@@ -93,16 +93,16 @@ my $p_admins;
 my $p_groups;
 my $p_members;
 my $p_projects;
-my $p_add_quota;
-my $p_add_mail_quota;
-my $p_max_members;
+
+my $description;
+my $addquota;
+my $addmailquota;
 my $mailalias;
-my $p_mailalias;
 my $maillist;
-my $p_maillist;
-my $p_status;
+my $status;
 my $join; # 0,1
-my $p_join="TRUE"; # FALSE,TRUE
+my $maxmembers;
+
 
 my $caller="";
 my $curr_member="";
@@ -125,41 +125,43 @@ my @addorder_list=();   # order in which projects have to be added
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
-           "user|user-info|u" => \$user_info,
-           "admininfo" => \$admininfo,
+#           "user|user-info|u" => \$user_info,
+#           "admininfo" => \$admininfo,
            "create" => \$create,
            "kill" => \$kill,
            "verbose|v+" => \$Conf::log_level,
            "join!" => \$join,
-           "tree" => \$tree,
+#           "tree" => \$tree,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
-           "caller=s" => \$caller,
-           "addmembers=s" => \$addmembers,
-           "removemembers=s" => \$removemembers,
-           "addadmins=s" => \$addadmins,
-           "removeadmins=s" => \$removeadmins,
-           "addmembergroups=s" => \$addmembergroups,
-           "removemembergroups=s" => \$removemembergroups,
-           "addmemberprojects=s" => \$addmemberprojects,
-           "removememberprojects=s" => \$removememberprojects,
+           "description=s" => \$description,
+           "status=s" => \$status,
+#           "caller=s" => \$caller,
+#           "addmembers=s" => \$addmembers,
+#           "removemembers=s" => \$removemembers,
+#           "addadmins=s" => \$addadmins,
+#           "removeadmins=s" => \$removeadmins,
+#           "addmembergroups=s" => \$addmembergroups,
+#           "removemembergroups=s" => \$removemembergroups,
+#           "addmemberprojects=s" => \$addmemberprojects,
+#           "removememberprojects=s" => \$removememberprojects,
            "name|project|p=s" => \$project,
-           "longname=s" => \$p_long_name,
-           "admins=s" => \$p_admins,
-           "members=s" => \$p_members,
-           "membergroups=s" => \$p_groups,
-           "memberprojects=s" => \$p_projects,
-           "addquota=s" => \$p_add_quota,
-           "addmailquota=s" => \$p_add_mail_quota,
-           "maxmembers=s" => \$p_max_members,
+#           "longname=s" => \$p_long_name,
+#           "admins=s" => \$p_admins,
+#           "members=s" => \$p_members,
+#           "membergroups=s" => \$p_groups,
+#           "memberprojects=s" => \$p_projects,
+           "addquota=s" => \$addquota,
+           "addmailquota=s" => \$addmailquota,
+           "maxmembers=s" => \$maxmembers,
            "mailalias!" => \$mailalias,
            "maillist!" => \$maillist,
-           "dump=s" => \$dump_all_projects,
-           "create-from-file=s" => \$create_from_file,
-           "update-from-file=s" => \$update_from_file,
-           "update" => \$update,
-           "curr-member|current-member=s" => \$curr_member,
-           "new-member|newmember=s" => \$new_member,
+#           "dump=s" => \$dump_all_projects,
+#           "create-from-file=s" => \$create_from_file,
+#           "update-from-file=s" => \$update_from_file,
+#           "update" => \$update,
+#           "curr-member|current-member=s" => \$curr_member,
+#           "new-member|newmember=s" => \$new_member,
          );
 
 # Prüfen, ob Optionen erkannt wurden
@@ -599,34 +601,34 @@ if ($removememberprojects ne "" and $project ne ""){
 }
 
 
-# --join
-if (not defined $join){
-    $p_join="";
-} elsif ($join==0) {
-    $p_join="FALSE"; 
-} elsif ($join==1) {
-    $p_join="TRUE";
-}
+# # --join
+# if (not defined $join){
+#     $p_join="";
+# } elsif ($join==0) {
+#     $p_join="FALSE"; 
+# } elsif ($join==1) {
+#     $p_join="TRUE";
+# }
 
 
-# --mailalias
-if (not defined $mailalias){
-    $p_mailalias=""; 
-} elsif ($mailalias==0){
-    $p_mailalias="FALSE"; 
-} else {
-    $p_mailalias="TRUE";
-}
+# # --mailalias
+# if (not defined $mailalias){
+#     $p_mailalias=""; 
+# } elsif ($mailalias==0){
+#     $p_mailalias="FALSE"; 
+# } else {
+#     $p_mailalias="TRUE";
+# }
 
 
-# --maillist
-if (not defined $maillist){
-    $p_maillist=""; 
-} elsif ($maillist==0){
-    $p_maillist="FALSE"; 
-} else {
-    $p_maillist="TRUE";
-}
+# # --maillist
+# if (not defined $maillist){
+#     $p_maillist=""; 
+# } elsif ($maillist==0){
+#     $p_maillist="FALSE"; 
+# } else {
+#     $p_maillist="TRUE";
+# }
 
 
 # parse arguments
@@ -684,6 +686,7 @@ if ($create==1 and $project ne ""){
                     ou=>$ou,
                     school_token=>$school_token,
                     group=>$group_token,
+                    description=>$group_token,
                     type=>"project",
                     status=>"P",
                     creationdate=>$time_stamp_AD,
@@ -722,11 +725,80 @@ if ($count>1){
 
 # all actions from now on work on the dn retrieved
 ############################################################
-  &AD_project_update({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    dn=>$dn_pro,
-                    });
 
+# --description <strg>
+if (defined $description){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        description=>$description,
+                      });
+}
+
+# --addquota <strg>
+if (defined $addquota){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        addquota=>$addquota,
+                      });
+}
+
+
+# --addmailquota <strg>
+if (defined $addmailquota){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        addmailquota=>$addmailquota,
+                      });
+}
+
+
+# --mailalias/nomailalias
+if (defined $mailalias){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        mailalias=>$mailalias,
+                      });
+}
+
+# --maillist/--nomaillist
+if (defined $maillist){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        maillist=>$maillist,
+                      });
+}
+
+# --status <P>
+if (defined $status){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        status=>$status,
+                      });
+}
+
+# --join/--nojoin
+if (defined $join){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        join=>$join,
+                      });
+}
+
+# --maxmembers <strg>
+if (defined $maxmembers){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        maxmembers=>$maxmembers,
+                      });
+}
 
 
 

@@ -1041,6 +1041,7 @@ sub AD_project_fetch {
         $dn=$entry->dn();
 
         # project attributes
+	my $description = $entry->get_value('description');
 	my $addquota = $entry->get_value('sophomorixAddQuota');
         my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
         my $mailalias = $entry->get_value('sophomorixMailAlias');
@@ -1052,10 +1053,10 @@ sub AD_project_fetch {
 
         # left column in printout
 	my @project_attr=("gidnumber: ???",
-                          "LongName:",
-                          "  ???",
-                          "AddQuota: $addquota  MB",
-                          "AddMailQuota: $addmailquota MB",
+                          "Description:",
+                          " $description",
+                          "AddQuota: ${addquota}MB",
+                          "AddMailQuota: ${addmailquota}MB",
                           "MailAlias: $mailalias",
                           "MailList: $maillist",
                           "SophomorixStatus: $status",
@@ -1146,9 +1147,59 @@ sub AD_project_update {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $dn = $arg_ref->{dn};
+    my $description = $arg_ref->{description};
+    my $addquota = $arg_ref->{addquota};
+    my $addmailquota = $arg_ref->{addmailquota};
+    my $mailalias = $arg_ref->{mailalias};
+    my $maillist = $arg_ref->{maillist};
+    my $status = $arg_ref->{status};
+    my $join = $arg_ref->{join};
+    my $maxmembers = $arg_ref->{maxmembers};
 
     &Sophomorix::SophomorixBase::print_title("Updating $dn");
-    # ????????????????????
+    # description   
+    if (defined $description){
+        print "   * Setting Description to '$description'\n";
+        my $mesg = $ldap->modify($dn,replace => {Description => $description}); 
+    }
+    # addquota   
+    if (defined $addquota){
+        print "   * Setting sophomorixAddquota to $addquota\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixAddquota => $addquota}); 
+    }
+    # addmailquota   
+    if (defined $addmailquota){
+        print "   * Setting sophomorixAddmailquota to $addmailquota\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixAddmailquota => $addmailquota}); 
+    }
+    # mailalias   
+    if (defined $mailalias){
+        if($mailalias==0){$mailalias="FALSE"}else{$mailalias="TRUE"};
+        print "   * Setting sophomorixMailalias to $mailalias\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixMailalias => $mailalias}); 
+    }
+    # maillist   
+    if (defined $maillist){
+        if($maillist==0){$maillist="FALSE"}else{$maillist="TRUE"};
+        print "   * Setting sophomorixMaillist to $maillist\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixMaillist => $maillist}); 
+    }
+    # status   
+    if (defined $status){
+        print "   * Setting sophomorixStatus to $status\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixStatus => $status}); 
+    }
+    # joinable
+    if (defined $join){
+        if($join==0){$join="FALSE"}else{$join="TRUE"};
+        print "   * Setting sophomorixJoinable to $join\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixJoinable => $join}); 
+    }
+    # maxmembers   
+    if (defined $maxmembers){
+        print "   * Setting sophomorixMaxMembers to $maxmembers\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixMaxMembers => $maxmembers}); 
+    }
 }
 
 
@@ -1245,6 +1296,7 @@ sub AD_group_create {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $group = $arg_ref->{group};
+    my $description = $arg_ref->{description};
     my $ou = $arg_ref->{ou};
     my $type = $arg_ref->{type};
     my $school_token = $arg_ref->{school_token};
@@ -1276,6 +1328,7 @@ sub AD_group_create {
         my $result = $ldap->add( $dn,
                                 attr => [
                                     'cn'   => $group,
+                                    'description' => $description,
                                     'sAMAccountName' => $group,
                                     'sophomorixCreationDate' => $creationdate, 
                                     'sophomorixType' => $type, 
