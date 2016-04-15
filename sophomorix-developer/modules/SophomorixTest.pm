@@ -112,7 +112,7 @@ sub AD_test_object {
     my $dns_hostname =$arg_ref->{dNSHostName};
     my $ser_pri_name =$arg_ref->{servicePrincipalName};
     my $sn =$arg_ref->{sn};
-
+    my $description =$arg_ref->{description};
 
     # sophomorix user
     my $s_admin_class = $arg_ref->{sophomorixAdminClass};
@@ -128,8 +128,14 @@ sub AD_test_object {
     my $s_deactivationdate = $arg_ref->{sophomorixDeactivationDate};
 
     # sophomorix group
-    my $s_status = $arg_ref->{sophomorixStatus};
     my $s_type = $arg_ref->{sophomorixType};
+    my $s_addquota = $arg_ref->{sophomorixAddQuota};
+    my $s_addmailquota = $arg_ref->{sophomorixAddMailQuota};
+    my $s_mailalias = $arg_ref->{sophomorixMailAlias};
+    my $s_maillist = $arg_ref->{sophomorixMailList};
+    my $s_status = $arg_ref->{sophomorixStatus};
+    my $s_joinable = $arg_ref->{sophomorixJoinable};
+    my $s_maxmembers = $arg_ref->{sophomorixMaxMembers};
 
     my $member_of = $arg_ref->{memberOf};
     my $not_member_of = $arg_ref->{not_memberOf};
@@ -181,6 +187,10 @@ sub AD_test_object {
             is ($entry->get_value ('sn'),$sn,
 		"  * sn is $sn");
         }
+        if (defined $description){
+            is ($entry->get_value ('description'),$description,
+		"  * description is $description");
+        }
         if (defined $upn){
             is ($entry->get_value ('userPrincipalName'),$upn,
 		"  * userPrincipalName is $upn");
@@ -224,6 +234,30 @@ sub AD_test_object {
         if (defined $s_status){
             is ($entry->get_value ('sophomorixStatus'),$s_status,
 		"  * sophomorixStatus is $s_status");
+        }
+        if (defined $s_addquota){
+            is ($entry->get_value ('sophomorixAddQuota'),$s_addquota,
+		"  * sophomorixAddQuota is $s_addquota");
+        }
+        if (defined $s_addmailquota){
+            is ($entry->get_value ('sophomorixAddMailQuota'),$s_addmailquota,
+		"  * sophomorixAddMailQuota is $s_addmailquota");
+        }
+        if (defined $s_mailalias){
+            is ($entry->get_value ('sophomorixMailalias'),$s_mailalias,
+		"  * sophomorixMailalias is $s_mailalias");
+        }
+        if (defined $s_maillist){
+            is ($entry->get_value ('sophomorixMaillist'),$s_maillist,
+		"  * sophomorixMaillist is $s_maillist");
+        }
+        if (defined $s_joinable){
+            is ($entry->get_value ('sophomorixJoinable'),$s_joinable,
+		"  * sophomorixJoinable is $s_joinable");
+        }
+        if (defined $s_maxmembers){
+            is ($entry->get_value ('sophomorixMaxMembers'),$s_maxmembers,
+		"  * sophomorixMaxMembers is $s_maxmembers");
         }
         if (defined $s_creationdate){
             my $strg_ok="201";
