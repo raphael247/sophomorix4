@@ -1026,7 +1026,6 @@ sub AD_project_fetch {
     } else {
         $project=&AD_get_name_tokened($pro,"---","project");
     }
-    #&Sophomorix::SophomorixBase::print_title("Searching for $project ...");
 
     my $filter="(&(objectClass=group)(sophomorixType=project)(cn=".$project."))";
     #print "Filter: $filter\n";
@@ -1066,10 +1065,10 @@ sub AD_project_fetch {
             my %user=();
             my %group=();
 
-            my @admin_prefixed = &_project_prefix($ldap,$root_dse,@admin_by_attr); 
-            my @member_prefixed = &_project_prefix($ldap,$root_dse,@member_by_attr); 
-            my @admingroups_prefixed = &_project_prefix($ldap,$root_dse,@admingroups_by_attr); 
-            my @membergroups_prefixed = &_project_prefix($ldap,$root_dse,@membergroups_by_attr); 
+            my @admin_prefixed = &_project_info_prefix($ldap,$root_dse,"user",@admin_by_attr); 
+            my @member_prefixed = &_project_info_prefix($ldap,$root_dse,"user",@member_by_attr); 
+            my @admingroups_prefixed = &_project_info_prefix($ldap,$root_dse,"group",@admingroups_by_attr); 
+            my @membergroups_prefixed = &_project_info_prefix($ldap,$root_dse,"group",@membergroups_by_attr); 
 
             # left column in printout
             my @project_attr=("gidnumber: ???",
@@ -1116,24 +1115,12 @@ sub AD_project_fetch {
                 if (not defined $project_attr[$i]){
 	            $project_attr[$i]="";
                 }
-#                if (not defined $admin_by_attr[$i]){
-#	            $admin_by_attr[$i]="";
-#                }
                 if (not defined $admin_prefixed[$i]){
 	            $admin_prefixed[$i]="";
                 }
-#                if (not defined $member_by_attr[$i]){
-#	            $member_by_attr[$i]="";
-#                }
                 if (not defined $member_prefixed[$i]){
 	            $member_prefixed[$i]="";
                 }
-#                if (not defined $membergroups_by_attr[$i]){
-#	            $membergroups_by_attr[$i]="";
-#                }
-#                if (not defined $admingroups_by_attr[$i]){
-#	            $admingroups_by_attr[$i]="";
-#                }
                 if (not defined $membergroups_prefixed[$i]){
 	            $membergroups_prefixed[$i]="";
                 }
@@ -1142,12 +1129,8 @@ sub AD_project_fetch {
                 }
                 printf "|%-21s| %-9s| %-9s| %-15s| %-15s|\n",
                        $project_attr[$i],
-#                       $admin_by_attr[$i],
                        $admin_prefixed[$i],
-#                       $member_by_attr[$i],
                        $member_prefixed[$i],
-#                       $admingroups_by_attr[$i],
-#                       $membergroups_by_attr[$i];
                        $admingroups_prefixed[$i],
                        $membergroups_prefixed[$i];
             }
@@ -1158,6 +1141,7 @@ sub AD_project_fetch {
                    "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
             print "+---------------------+----------+----------+",
                   "----------------+----------------+\n";
+            print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
         }
     }
     return ($dn,$max_pro);
@@ -1659,25 +1643,25 @@ sub AD_debug_logdump {
 }
 
 
-sub _project_prefix {
-    my ($ldap,$root_dse,@list)=@_;
+sub _project_info_prefix {
+    my ($ldap,$root_dse,$type,@list)=@_;
     my @list_prefixed=();
     # finding status of user/group
     # ? nonexisting
     # - existing, NOT member in project
     # + existing AND member in project
-    foreach my $user (@list){
-        print "User: $user\n"; 
-        my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
+    foreach my $item (@list){
+        print "$type: $item\n"; 
+        my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,$type,$item);
         if ($count==0){
-            push @list_prefixed,"?".$user;
-        #    $user{$user}="?";
+            push @list_prefixed,"?".$item;
+        #    $user{$item}="?";
         } elsif ($count==1){
             # test membership
-            #$user($user)=$dn_exist;
-        #    $user{$user}="-";
+            #$user($item)=$dn_exist;
+            push @list_prefixed,"-".$item;
         } else {
-        #    $user{$user}="???";
+        #    $user{$item}="???";
         }
     }
     return @list_prefixed;
