@@ -1036,67 +1036,78 @@ sub AD_project_fetch {
                    filter => $filter,
                          );
     my $max_pro = $mesg->count; 
-    for( my $index = 0 ; $index < $max_pro ; $index++) {
-        my $entry = $mesg->entry($index);
-        $dn=$entry->dn();
-
-        # project attributes
-	my $description = $entry->get_value('description');
-	my $addquota = $entry->get_value('sophomorixAddQuota');
-        my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
-        my $mailalias = $entry->get_value('sophomorixMailAlias');
-        my $maillist = $entry->get_value('sophomorixMailList');
-        my $status = $entry->get_value('sophomorixStatus');
-        my $joinable = $entry->get_value('sophomorixJoinable');
-        my $maxmembers = $entry->get_value('sophomorixMaxMembers');
-        my $creationdate = $entry->get_value('sophomorixCreationDate');
-        my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
-        my $admin_by_attr = $#admin_by_attr+1;
-        my @member_by_attr = sort $entry->get_value('sophomorixMembers');
-        my $member_by_attr = $#member_by_attr+1;
-        my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
-        my $membergroups_by_attr = $#membergroups_by_attr+1;
-        my @admingroups_by_attr = sort $entry->get_value('sophomorixAdminGroups');
-        my $admingroups_by_attr = $#admingroups_by_attr+1;
-
-        # left column in printout
-	my @project_attr=("gidnumber: ???",
-                          "Description:",
-                          " $description",
-                          "AddQuota: ${addquota}MB",
-                          "AddMailQuota: ${addmailquota}MB",
-                          "MailAlias: $mailalias",
-                          "MailList: $maillist",
-                          "SophomorixStatus: $status",
-                          "Joinable: $joinable",
-                          "MaxMembers: $maxmembers",
-                          "CreationTime:",
-                          " $creationdate"
-                         );
-
-        # calculate max height of colums
-        my $max=$#project_attr;
-        if ($#admin_by_attr > $max){
-	    $max=$#admin_by_attr;
-        }
-        if ($#member_by_attr > $max){
-	    $max=$#member_by_attr;
-        }
-        if ($#membergroups_by_attr > $max){
-	    $max=$#membergroups_by_attr;
-        }
-        if ($#admingroups_by_attr > $max){
-	    $max=$#admingroups_by_attr;
-        }
+        for( my $index = 0 ; $index < $max_pro ; $index++) {
+            my $entry = $mesg->entry($index);
+            $dn=$entry->dn();
 
         if($Conf::log_level>=2 or $info==1){
+
+            # project attributes
+	    my $description = $entry->get_value('description');
+	    my $addquota = $entry->get_value('sophomorixAddQuota');
+            my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
+            my $mailalias = $entry->get_value('sophomorixMailAlias');
+            my $maillist = $entry->get_value('sophomorixMailList');
+            my $status = $entry->get_value('sophomorixStatus');
+            my $joinable = $entry->get_value('sophomorixJoinable');
+            my $maxmembers = $entry->get_value('sophomorixMaxMembers');
+            my $creationdate = $entry->get_value('sophomorixCreationDate');
+            my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
+            my $admin_by_attr = $#admin_by_attr+1;
+            my @member_by_attr = sort $entry->get_value('sophomorixMembers');
+            my $member_by_attr = $#member_by_attr+1;
+            my @admingroups_by_attr = sort $entry->get_value('sophomorixAdminGroups');
+            my $admingroups_by_attr = $#admingroups_by_attr+1;
+            my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
+            my $membergroups_by_attr = $#membergroups_by_attr+1;
+
+            my @users=(@member_by_attr, @admin_by_attr);
+            my @groups=(@membergroups_by_attr,@admingroups_by_attr);
+            my %user=();
+            my %group=();
+
+            my @admin_prefixed = &_project_prefix($ldap,$root_dse,@admin_by_attr); 
+            my @member_prefixed = &_project_prefix($ldap,$root_dse,@member_by_attr); 
+            my @admingroups_prefixed = &_project_prefix($ldap,$root_dse,@admingroups_by_attr); 
+            my @membergroups_prefixed = &_project_prefix($ldap,$root_dse,@membergroups_by_attr); 
+
+            # left column in printout
+            my @project_attr=("gidnumber: ???",
+                              "Description:",
+                              " $description",
+                              "AddQuota: ${addquota} MB",
+                              "AddMailQuota: ${addmailquota} MB",
+                              "MailAlias: $mailalias",
+                              "MailList: $maillist",
+                              "SophomorixStatus: $status",
+                              "Joinable: $joinable",
+                              "MaxMembers: $maxmembers",
+                              "CreationTime:",
+                              " $creationdate"
+                             );
+
+            # calculate max height of colums
+            my $max=$#project_attr;
+            if ($#admin_by_attr > $max){
+	        $max=$#admin_by_attr;
+            }
+            if ($#member_by_attr > $max){
+	        $max=$#member_by_attr;
+            }
+            if ($#membergroups_by_attr > $max){
+	        $max=$#membergroups_by_attr;
+            }
+            if ($#admingroups_by_attr > $max){
+	        $max=$#admingroups_by_attr;
+            }
+
             &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
             print "+---------------------+----------+----------+",
                   "----------------+----------------+\n";
             printf "|%-21s|%-10s|%-10s|%-16s|%-16s|\n",
                    "Project:"," "," "," "," ";
             printf "|%-21s|%-10s|%-10s|%-16s|%-16s|\n",
-                   "  $project"," Admins "," Members "," MemberGroups "," AdminGroups ";
+                   "  $project"," Admins "," Members "," AdminGroups "," MemberGroups ";
             print "+---------------------+----------+----------+",
                   "----------------+----------------+\n";
 
@@ -1105,30 +1116,46 @@ sub AD_project_fetch {
                 if (not defined $project_attr[$i]){
 	            $project_attr[$i]="";
                 }
-                if (not defined $admin_by_attr[$i]){
-	            $admin_by_attr[$i]="";
+#                if (not defined $admin_by_attr[$i]){
+#	            $admin_by_attr[$i]="";
+#                }
+                if (not defined $admin_prefixed[$i]){
+	            $admin_prefixed[$i]="";
                 }
-                if (not defined $member_by_attr[$i]){
-	            $member_by_attr[$i]="";
+#                if (not defined $member_by_attr[$i]){
+#	            $member_by_attr[$i]="";
+#                }
+                if (not defined $member_prefixed[$i]){
+	            $member_prefixed[$i]="";
                 }
-                if (not defined $membergroups_by_attr[$i]){
-	            $membergroups_by_attr[$i]="";
+#                if (not defined $membergroups_by_attr[$i]){
+#	            $membergroups_by_attr[$i]="";
+#                }
+#                if (not defined $admingroups_by_attr[$i]){
+#	            $admingroups_by_attr[$i]="";
+#                }
+                if (not defined $membergroups_prefixed[$i]){
+	            $membergroups_prefixed[$i]="";
                 }
-                if (not defined $admingroups_by_attr[$i]){
-	            $admingroups_by_attr[$i]="";
+                if (not defined $admingroups_prefixed[$i]){
+	            $admingroups_prefixed[$i]="";
                 }
                 printf "|%-21s| %-9s| %-9s| %-15s| %-15s|\n",
                        $project_attr[$i],
-                       $admin_by_attr[$i],
-                       $member_by_attr[$i],
-                       $membergroups_by_attr[$i],
-                       $admingroups_by_attr[$i];
+#                       $admin_by_attr[$i],
+                       $admin_prefixed[$i],
+#                       $member_by_attr[$i],
+                       $member_prefixed[$i],
+#                       $admingroups_by_attr[$i],
+#                       $membergroups_by_attr[$i];
+                       $admingroups_prefixed[$i],
+                       $membergroups_prefixed[$i];
             }
 
             print "+---------------------+----------+----------+",
                   "----------------+----------------+\n";
             printf "|%20s |%9s |%9s |%15s |%15s |\n",
-                   "",$admin_by_attr,$member_by_attr,$membergroups_by_attr,$admingroups_by_attr;
+                   "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
             print "+---------------------+----------+----------+",
                   "----------------+----------------+\n";
         }
@@ -1632,7 +1659,29 @@ sub AD_debug_logdump {
 }
 
 
-
+sub _project_prefix {
+    my ($ldap,$root_dse,@list)=@_;
+    my @list_prefixed=();
+    # finding status of user/group
+    # ? nonexisting
+    # - existing, NOT member in project
+    # + existing AND member in project
+    foreach my $user (@list){
+        print "User: $user\n"; 
+        my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
+        if ($count==0){
+            push @list_prefixed,"?".$user;
+        #    $user{$user}="?";
+        } elsif ($count==1){
+            # test membership
+            #$user($user)=$dn_exist;
+        #    $user{$user}="-";
+        } else {
+        #    $user{$user}="???";
+        }
+    }
+    return @list_prefixed;
+}
 
 
 # END OF FILE
