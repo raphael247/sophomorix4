@@ -1061,15 +1061,67 @@ sub AD_project_fetch {
             my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
             my $membergroups_by_attr = $#membergroups_by_attr+1;
 
-            my @users=(@member_by_attr, @admin_by_attr);
-            my @groups=(@membergroups_by_attr,@admingroups_by_attr);
-            my %user=();
-            my %group=();
+            # memberships (actual state)
+            my @members= $entry->get_value('member');
+            my %members=();
+            foreach my $entry (@members){
+                print "member: $entry\n";
+                $members{$entry}="seen";
+            }
 
-            my @admin_prefixed = &_project_info_prefix($ldap,$root_dse,"user",@admin_by_attr); 
-            my @member_prefixed = &_project_info_prefix($ldap,$root_dse,"user",@member_by_attr); 
-            my @admingroups_prefixed = &_project_info_prefix($ldap,$root_dse,"group",@admingroups_by_attr); 
-            my @membergroups_prefixed = &_project_info_prefix($ldap,$root_dse,"group",@membergroups_by_attr); 
+            # sophomorix-memberships (target state)
+            my @s_members= (@member_by_attr, @admin_by_attr);
+            my @s_groups= (@membergroups_by_attr,@admingroups_by_attr);
+            my %s_allmem=();
+
+            # example map maier1 ---> +maier1   (+: exists and is member)
+            # empty element stays empty
+            my %name_prefixname_map=(""=>""); 
+           
+
+            foreach my $item (@s_members){
+                my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$item);
+                if ($count==1){
+                    # user of target state exists
+                    $s_allmem{$dn_exist}=$item;
+                    if (exists $members{$dn_exist}){
+                        # existing user is member (+)
+                        $name_prefixname_map{$item}="+$item";
+                    } else {
+                        # existing user is not member (-)
+                        $name_prefixname_map{$item}="-$item";
+                    }
+                } else {
+                    # nonexisting user 
+                    $name_prefixname_map{$item}="?$item";
+                }
+            }
+
+            foreach my $item (@s_groups){
+                my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$item);
+                if ($count==1){
+                    # group of target state exists
+                    $s_allmem{$dn_exist}=$item;
+                    if (exists $members{$dn_exist}){
+                        # existing group is member (+)
+                        $name_prefixname_map{$item}="+$item";
+                    } else {
+                        # existing group is not member (-)
+                        $name_prefixname_map{$item}="-$item";
+                    }
+                } else {
+                    # nonexisting group 
+                    $name_prefixname_map{$item}="?$item";
+                }
+            }
+
+
+
+
+            # ?????? go through membership (actual)
+            # is there a s_member? -> OK, else (Warn, repair/remove atctual member)
+
+
 
             # left column in printout
             my @project_attr=("gidnumber: ???",
@@ -1102,46 +1154,46 @@ sub AD_project_fetch {
             }
 
             &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
-            print "+---------------------+----------+----------+",
-                  "----------------+----------------+\n";
-            printf "|%-21s|%-10s|%-10s|%-16s|%-16s|\n",
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
+            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
                    "Project:"," "," "," "," ";
-            printf "|%-21s|%-10s|%-10s|%-16s|%-16s|\n",
+            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
                    "  $project"," Admins "," Members "," AdminGroups "," MemberGroups ";
-            print "+---------------------+----------+----------+",
-                  "----------------+----------------+\n";
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
 
             # print the columns
             for (my $i=0;$i<=$max;$i++){
                 if (not defined $project_attr[$i]){
 	            $project_attr[$i]="";
                 }
-                if (not defined $admin_prefixed[$i]){
-	            $admin_prefixed[$i]="";
+                if (not defined $admin_by_attr[$i]){
+	            $admin_by_attr[$i]="";
                 }
-                if (not defined $member_prefixed[$i]){
-	            $member_prefixed[$i]="";
+                if (not defined $member_by_attr[$i]){
+	            $member_by_attr[$i]="";
                 }
-                if (not defined $membergroups_prefixed[$i]){
-	            $membergroups_prefixed[$i]="";
+                if (not defined $membergroups_by_attr[$i]){
+	            $membergroups_by_attr[$i]="";
                 }
-                if (not defined $admingroups_prefixed[$i]){
-	            $admingroups_prefixed[$i]="";
+                if (not defined $admingroups_by_attr[$i]){
+	            $admingroups_by_attr[$i]="";
                 }
-                printf "|%-21s| %-9s| %-9s| %-15s| %-15s|\n",
+                printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
                        $project_attr[$i],
-                       $admin_prefixed[$i],
-                       $member_prefixed[$i],
-                       $admingroups_prefixed[$i],
-                       $membergroups_prefixed[$i];
+                       $name_prefixname_map{$admin_by_attr[$i]},
+                       $name_prefixname_map{$member_by_attr[$i]},
+                       $name_prefixname_map{$admingroups_by_attr[$i]},
+		       $name_prefixname_map{$membergroups_by_attr[$i]};
             }
 
-            print "+---------------------+----------+----------+",
-                  "----------------+----------------+\n";
-            printf "|%20s |%9s |%9s |%15s |%15s |\n",
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
+            printf "|%20s |%10s |%10s |%14s |%14s |\n",
                    "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
-            print "+---------------------+----------+----------+",
-                  "----------------+----------------+\n";
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
             print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
         }
     }
@@ -1649,20 +1701,16 @@ sub _project_info_prefix {
     my @list_prefixed=();
     # finding status of user/group
     # ? nonexisting
-    # - existing, NOT member in project
-    # + existing AND member in project
+    # - existing
     foreach my $item (@list){
-        print "$type: $item\n"; 
+        #print "$type: $item\n"; 
         my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,$type,$item);
         if ($count==0){
             push @list_prefixed,"?".$item;
-        #    $user{$item}="?";
         } elsif ($count==1){
-            # test membership
-            #$user($item)=$dn_exist;
             push @list_prefixed,"-".$item;
         } else {
-        #    $user{$item}="???";
+            push @list_prefixed,"???".$item;
         }
     }
     return @list_prefixed;
