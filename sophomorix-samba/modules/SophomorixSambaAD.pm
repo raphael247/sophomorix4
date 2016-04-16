@@ -1065,7 +1065,6 @@ sub AD_project_fetch {
             my @members= $entry->get_value('member');
             my %members=();
             foreach my $entry (@members){
-                print "member: $entry\n";
                 $members{$entry}="seen";
             }
 
@@ -1115,13 +1114,14 @@ sub AD_project_fetch {
                 }
             }
 
-
-
-
-            # ?????? go through membership (actual)
-            # is there a s_member? -> OK, else (Warn, repair/remove atctual member)
-
-
+            # check for actual members tha shoulnd be members
+            my @membership_warn=();
+            foreach my $mem (@members){
+                if (not exists $s_allmem{$mem}){
+                    push @membership_warn, 
+                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $project\n";
+                }
+            }
 
             # left column in printout
             my @project_attr=("gidnumber: ???",
@@ -1195,6 +1195,11 @@ sub AD_project_fetch {
             print "+---------------------+-----------+-----------+",
                   "---------------+---------------+\n";
             print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
+
+            # print warnings            
+            foreach my $warn (@membership_warn){
+                print $warn;
+	    }
         }
     }
     return ($dn,$max_pro);
