@@ -56,6 +56,9 @@ my $group="";
 my $addmember="";
 my $removemember="";
 
+my $addgroup="";
+my $removegroup="";
+
 my $skiplock=0;
 
 my $type=-1; # 3: domain group
@@ -70,6 +73,8 @@ my $testopt=GetOptions(
            "school-token=s" => \$school_token,
            "addmember=s" => \$addmember,
            "removemember=s" => \$removemember,
+           "addgroup=s" => \$addgroup,
+           "removegroup=s" => \$removegroup,
            "skiplock" => \$skiplock,
           );
 
@@ -92,11 +97,15 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
-  --addmember member
-  --removemember member
 
   --group name
   --group name --ou MYOU --school-token myo
+
+  --addmember user
+  --removemember user
+
+  --addgroup group
+  --removegroup group
 
 Please see the sophomorix-groupadd(8) man pages for full documentation
 ');
@@ -161,6 +170,25 @@ if ($addmember ne ""){
                          root_dse => $root_dse, 
                          group => $group,
                          addmember => $addmember,
+                       });   
+}
+
+# --removegroup group
+if ($removegroup ne ""){
+    &AD_group_removemember({ldap => $ldap, 
+                            root_dse => $root_dse, 
+                            group => $group,
+                            removegroup => $removegroup,
+                          });   
+}
+
+
+# --addgroup group
+if ($addgroup ne ""){
+    &AD_group_addmember({ldap => $ldap, 
+                         root_dse => $root_dse, 
+                         group => $group,
+                         addgroup => $addgroup,
                        });   
 }
 
