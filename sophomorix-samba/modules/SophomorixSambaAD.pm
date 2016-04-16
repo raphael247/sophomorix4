@@ -1068,20 +1068,38 @@ sub AD_project_fetch {
                 $members{$entry}="seen";
             }
 
-            # sophomorix-memberships (target state)
+
+
+            # sophomorix-memberships (target state of memberships)
             my @s_members= (@member_by_attr, @admin_by_attr);
             my @s_groups= (@membergroups_by_attr,@admingroups_by_attr);
+            # all memberships
             my %s_allmem=();
+            # remember all users and groups (warn when double)
+            my %seen=();
+            # save warnings for later printout
+            my @membership_warn=();
 
-            # example map maier1 ---> +maier1   (+: exists and is member)
+            # mapping of display names
+            #           key    ---> value
+            # example1: maier1 ---> +maier1   (+: exists and is member)
+            # example2: maier2 ---> -maier2   (-: exists and is NOT member)
+            # example3: maier3 ---> ?maier3   (?: maier does not exist)
             # empty element stays empty
             my %name_prefixname_map=(""=>""); 
            
-
+            # go through all user memberships (target state)
             foreach my $item (@s_members){
+                if (exists $seen{$item}){
+                    push @membership_warn, 
+                         "WARNING: $item seen twice! Remove one of them!\n";
+                } else {
+                    # save item
+                    $seen{$item}="seen";
+                }
                 my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$item);
                 if ($count==1){
-                    # user of target state exists
+                    # user of target state exists: save its dn
                     $s_allmem{$dn_exist}=$item;
                     if (exists $members{$dn_exist}){
                         # existing user is member (+)
@@ -1096,10 +1114,18 @@ sub AD_project_fetch {
                 }
             }
 
+            # go through all user memberships (target state)
             foreach my $item (@s_groups){
+                if (exists $seen{$item}){
+                    push @membership_warn, 
+                         "WARNING: $item seen twice! Remove one of them!\n";
+                } else {
+                    # save item
+                    $seen{$item}="seen";
+                }
                 my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$item);
                 if ($count==1){
-                    # group of target state exists
+                    # group of target state exists: save its dn
                     $s_allmem{$dn_exist}=$item;
                     if (exists $members{$dn_exist}){
                         # existing group is member (+)
@@ -1114,8 +1140,7 @@ sub AD_project_fetch {
                 }
             }
 
-            # check for actual members tha shoulnd be members
-            my @membership_warn=();
+            # check for actual members that should not be members
             foreach my $mem (@members){
                 if (not exists $s_allmem{$mem}){
                     push @membership_warn, 
