@@ -24,9 +24,11 @@ use Sophomorix::SophomorixBase qw(
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
+                                 AD_get_name_tokened
                                  AD_group_create
                                  AD_group_addmember
                                  AD_group_removemember
+                                 AD_group_show_list
                                  get_forbidden_logins
                                     );
 
@@ -47,9 +49,14 @@ my $info=0;
 
 $Conf::log_level=1;
 
+my $ou="---";
+my $school_token="---";
+
 my $group="";
 my $addmember="";
 my $removemember="";
+my $ou="---";
+my $school_token="";
 
 my $skiplock=0;
 
@@ -60,6 +67,8 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
            "group=s" => \$group,
+           "ou=s" => \$ou,
+           "school-token=s" => \$school_token,
            "addmember=s" => \$addmember,
            "removemember=s" => \$removemember,
            "skiplock" => \$skiplock,
@@ -83,10 +92,12 @@ Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
-  -i  / --info (unused)
+  -i  / --info
   --addmember member
   --removemember member
+
   --group name
+  --group name --ou MYOU --school-token myo
 
 Please see the sophomorix-groupadd(8) man pages for full documentation
 ');
@@ -95,11 +106,15 @@ Please see the sophomorix-groupadd(8) man pages for full documentation
 }
 
 
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+
 # --info
 if ($info==1){
-    print "No Option --info\n";
+    &AD_group_show_list($ldap,$root_dse,"sophomorix-groupadd");
     exit;
 }
+
 
 
 
@@ -114,15 +129,20 @@ if ($group eq ""){
 &log_script_start(@arguments);
 
 
-my ($ldap,$root_dse) = &AD_bind_admin();
+
+
+my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-groupadd");
 
 # make sure group exists
 &AD_group_create({ldap=>$ldap,
                   root_dse=>$root_dse, 
-                  group=>$group,
+                  ou=>$ou,
+                  school_token=>$school_token,
+                  group=>$group_token,
+                  description=>"Created by sophomorix-groupadd",
+                  type=>"sophomorix-groupadd",
                   status=>"P",
                   creationdate=>$time_stamp_AD,
-                  type=>"sophomorix-groupadd"
                 });
 
 

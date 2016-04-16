@@ -46,7 +46,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_fetch
             AD_project_fetch
             AD_project_update
-            AD_project_show_list
+            AD_group_show_list
             AD_object_move
             AD_debug_logdump
             );
@@ -580,7 +580,8 @@ sub AD_get_name_tokened {
         $role eq "roomws" or
         $role eq "examaccount" or
         $role eq "workstation" or
-        $role eq "project"){
+        $role eq "project" or
+        $role eq "sophomorix-groupadd"){
         if ($school_token eq "---" or $school_token eq ""){
             # SCHOOL, no multischool
             $name_tokened=$name;
@@ -1250,9 +1251,9 @@ sub AD_project_update {
 
 
 
-sub AD_project_show_list {
-    my ($ldap,$root_dse) = @_;
-    my $filter="(&(objectClass=group)(sophomorixType=project))";
+sub AD_group_show_list {
+    my ($ldap,$root_dse,$type) = @_;
+    my $filter="(&(objectClass=group)(sophomorixType=".$type."))";
     my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
 
     #print "Filter: $filter\n";
@@ -1263,11 +1264,11 @@ sub AD_project_show_list {
                    control => [ $sort ]
                          );
     my $max_pro = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_pro Projects");
+    &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
     print "-----------------+----------+-----+----+-+-",
           "+-+-+--------------------------------\n";
     printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
-           "Name","AQ","AMQ","MM","A","L","S","J","(Longname)";
+           "Name","AQ","AMQ","MM","A","L","S","J","Description";
     print "-----------------+----------+-----+----+-+-",
           "+-+-+--------------------------------\n";
 
@@ -1302,13 +1303,13 @@ sub AD_project_show_list {
                   $maillist,
                   $entry->get_value('sophomorixStatus'),
                   $joinable,
-	          $entry->get_value('sAMAccountName');
+	          $entry->get_value('description');
     }
     print "-----------------+----------+-----+----+-+-",
           "+-+-+--------------------------------\n";
     print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
     print " A=mailalias    L=mailist,       S=status                  \n";
-    &Sophomorix::SophomorixBase::print_title("$max_pro Projects");
+    &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
 }
 
 

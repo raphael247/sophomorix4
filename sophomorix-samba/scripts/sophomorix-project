@@ -44,7 +44,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_project_fetch
                                  AD_project_update
-                                 AD_project_show_list
+                                 AD_group_show_list
                                  get_forbidden_logins
                                     );
 
@@ -361,7 +361,7 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 # --info
 if ($project eq "" and $info==1){
 #    &show_project_list();
-    &AD_project_show_list($ldap,$root_dse);
+    &AD_group_show_list($ldap,$root_dse,"project");
     exit;
 }
 
