@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# This script (sophomorix-groupadd) is maintained by Rüdiger Beck
+# This script (sophomorix-group) is maintained by Rüdiger Beck
 # It is Free Software (License GPLv3)
 # If you find errors, contact the author
 # jeffbeck@web.de  or jeffbeck@linuxmuster.net
@@ -22,10 +22,12 @@ use Sophomorix::SophomorixBase qw(
                                  check_options
                                  );
 use Sophomorix::SophomorixSambaAD qw(
+                                 AD_ou_add
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_get_name_tokened
                                  AD_group_create
+                                 AD_group_kill
                                  AD_group_addmember
                                  AD_group_removemember
                                  AD_group_show_list
@@ -53,9 +55,11 @@ my $ou="---";
 my $school_token="---";
 
 my $group="";
+my $create=0;
+my $kill=0;
 my $addmember="";
 my $removemember="";
-
+my $creategroup="";
 my $addgroup="";
 my $removegroup="";
 
@@ -69,6 +73,8 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "verbose|v+" => \$Conf::log_level,
            "group=s" => \$group,
+           "create" => \$create,
+           "kill" => \$kill,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
            "addmember=s" => \$addmember,
@@ -90,7 +96,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-groupadd adds a group to samba 4 AD
+sophomorix-group adds/modifies/deletes a group in samba 4 AD
 
 Options
   -h  / --help
@@ -98,8 +104,10 @@ Options
   -vv / --verbose --verbose
   -i  / --info
 
-  --group name
-  --group name --ou MYOU --school-token myo
+  --create --group name
+  --create --group name --ou MYOU --school-token myo
+
+  --kill --group --group name
 
   --addmember user
   --removemember user
@@ -107,7 +115,7 @@ Options
   --addgroup group
   --removegroup group
 
-Please see the sophomorix-groupadd(8) man pages for full documentation
+Please see the sophomorix-group(8) man pages for full documentation
 ');
    print "\n";
    exit;
@@ -119,39 +127,63 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 # --info
 if ($info==1){
-    &AD_group_show_list($ldap,$root_dse,"sophomorix-groupadd");
+    &AD_group_show_list($ldap,$root_dse,"sophomorix-group");
     exit;
 }
 
 
 
 
-# exit if options are missing
-if ($group eq ""){ 
-     print "\nThe option:\n";
-     print "   --group name \n";
-     print "is mandatory.\n\n";
-     exit;
-}
+# # exit if options are missing
+# if ($group eq ""){ 
+#      print "\nThe option:\n";
+#      print "   --group name \n";
+#      print "is mandatory.\n\n";
+#      exit;
+# }
 
 &log_script_start(@arguments);
 
 
 
 
-my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-groupadd");
 
-# make sure group exists
-&AD_group_create({ldap=>$ldap,
-                  root_dse=>$root_dse, 
+# --create --group <name>
+############################################################
+if ($create==1 and $group ne ""){
+    &AD_ou_add({ldap=>$ldap,
+                root_dse=>$root_dse,
+                ou=>$ou,
+                school_token=>$school_token,
+                creationdate=>$time_stamp_AD,
+              }); 
+    my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-group");
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse, 
+                      ou=>$ou,
+                      school_token=>$school_token,
+                      group=>$group_token,
+                      description=>"Created by sophomorix-group",
+                      type=>"sophomorix-group",
+                      status=>"P",
+                      creationdate=>$time_stamp_AD,
+                    });
+}
+
+
+# --kill --group <name>
+############################################################
+if ($kill==1 and $group ne ""){
+  my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-group");
+  &AD_group_kill({ldap=>$ldap,
+                  root_dse=>$root_dse,
+                  group=>$group_token,
                   ou=>$ou,
                   school_token=>$school_token,
-                  group=>$group_token,
-                  description=>"Created by sophomorix-groupadd",
-                  type=>"sophomorix-groupadd",
-                  status=>"P",
-                  creationdate=>$time_stamp_AD,
-                });
+                  type=>"sophomorix-group",
+                  });
+}
+
 
 
 # --removemember member

@@ -581,7 +581,7 @@ sub AD_get_name_tokened {
         $role eq "examaccount" or
         $role eq "workstation" or
         $role eq "project" or
-        $role eq "sophomorix-groupadd"){
+        $role eq "sophomorix-group"){
         if ($school_token eq "---" or $school_token eq ""){
             # SCHOOL, no multischool
             $name_tokened=$name;
@@ -647,6 +647,8 @@ sub AD_get_container {
     }  elsif ($role eq "adminclass"){
         $container=$group_strg.$DevelConf::AD_student_ou;
     }  elsif ($role eq "project"){
+        $container=$DevelConf::AD_project_ou;
+    }  elsif ($role eq "sophomorix-group"){
         $container=$DevelConf::AD_project_ou;
     }  elsif ($role eq "room"){
         $container=$group_strg.$DevelConf::AD_examaccount_ou;
