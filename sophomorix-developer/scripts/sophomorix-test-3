@@ -493,10 +493,17 @@ if ($test_mod_pro==1){
 ############################################################
 # --kill-pro  
 if ($kill_pro==1){
+    # projects
     system("sophomorix-project $verbose_options --kill -p mathe --ou BSZLEO --school-token bsz");
     system("sophomorix-project $verbose_options --kill -p mathe");
     system("sophomorix-project $verbose_options --kill -p Chemie-AG --ou BSZLEO --school-token bsz");
     system("sophomorix-project $verbose_options --kill -p Chemie-AG");
+    # groups
+    system("sophomorix-group $verbose_options --kill --group super6 --ou BSZLEO --school-token bsz");
+    system("sophomorix-group $verbose_options --kill --group super7 --ou BSZLEO --school-token bsz");
+    system("sophomorix-group $verbose_options --kill --group super12");
+    system("sophomorix-group $verbose_options --kill --group super13");
+
 }
 
 ############################################################
@@ -505,7 +512,13 @@ if ($kill_pro==1){
 # --test-kill-pro  
 if ($test_kill_pro==1){
     &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-mathe");
+    &AD_object_nonexist($ldap,$root_dse,"group","p_mathe");
+    &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-Chemie-AG");
     &AD_object_nonexist($ldap,$root_dse,"group","p_Chemie-AG");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-super6");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-super7");
+    &AD_object_nonexist($ldap,$root_dse,"group","super12");
+    &AD_object_nonexist($ldap,$root_dse,"group","super13");
 }
 
 
