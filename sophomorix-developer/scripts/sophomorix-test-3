@@ -145,6 +145,12 @@ if ($add_pro==1){
     # projects in OU=SCHOOL
     system("sophomorix-project $verbose_options --create -p mathe");
     system("sophomorix-project $verbose_options --create -p Chemie-AG");
+    # groups in OU=BSZLEO
+    system("sophomorix-group $verbose_options --create --group super6 --ou BSZLEO --school-token bsz");
+    system("sophomorix-group $verbose_options --create --group super7 --ou BSZLEO --school-token bsz");
+    # groups in OU=SCHOOL
+    system("sophomorix-group $verbose_options --create --group super12");
+    system("sophomorix-group $verbose_options --create --group super13");
 }
 
 ############################################################
@@ -152,6 +158,7 @@ if ($add_pro==1){
 ############################################################
 # --test-add-pro  
 if ($test_add_pro==1){
+    # Projects
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_Chemie-AG,OU=Projects,OU=SCHOOL,".$root_dse,
                    sAMAccountname=>"p_Chemie-AG",
@@ -217,7 +224,72 @@ if ($test_add_pro==1){
                    memberOf => "",
                    not_memberOf => "teachers",
                   });
+    # groups
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-super6,OU=Projects,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-super6",
+                   description=>"Created by sophomorix-group",
+                   sophomorixType=>"sophomorix-group",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"FALSE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   memberOf => "",
+                   not_memberOf => "teachers",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-super7,OU=Projects,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-super7",
+                   description=>"Created by sophomorix-group",
+                   sophomorixType=>"sophomorix-group",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"FALSE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   memberOf => "",
+                   not_memberOf => "teachers",
+                  });
 
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=super12,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"super12",
+                   description=>"Created by sophomorix-group",
+                   sophomorixType=>"sophomorix-group",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"FALSE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   memberOf => "",
+                   not_memberOf => "teachers",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=super13,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"super13",
+                   description=>"Created by sophomorix-group",
+                   sophomorixType=>"sophomorix-group",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"FALSE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   memberOf => "",
+                   not_memberOf => "teachers",
+                  });
 }
 
 
