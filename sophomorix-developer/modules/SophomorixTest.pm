@@ -137,6 +137,7 @@ sub AD_test_object {
     my $s_joinable = $arg_ref->{sophomorixJoinable};
     my $s_maxmembers = $arg_ref->{sophomorixMaxMembers};
 
+    my $member = $arg_ref->{member};
     my $member_of = $arg_ref->{memberOf};
     my $not_member_of = $arg_ref->{not_memberOf};
 
@@ -302,9 +303,34 @@ sub AD_test_object {
 		    "  * Entry $sam_account HAS servicePrincipalName  $should_be_spn");
 		$test_count++;
             } 
-            # were all actual memberships tested
             is ($spn_count,$test_count,
                 "  * $sam_account has $spn_count servicePrincipalName entries: $test_count tested");
+        }
+
+        if (defined $member){
+            # get member data into hash
+            my %member=();
+            my @data=$entry->get_value ('member');
+            my $member_count=0;
+            foreach my $item (@data){
+                my ($entry,@rest)=split(/,/,$item);
+                $entry=~s/^CN=//;
+                #print "      * Member: $entry\n";
+                $member{$entry}="seen";
+                $member_count++;
+            }
+            # test membership
+            my $test_count=0;
+            my @should_be_member=split(/,/,$member);
+            foreach my $should_be_member (@should_be_member){
+                is (exists $member{$should_be_member},1,
+		    "  * Entry $should_be_member IS member of $sam_account");
+		$test_count++;
+            } 
+
+            # were all actual memberships tested
+            is ($member_count,$test_count,
+                "  * $sam_account has $member_count member entries: $test_count tested");
         }
 
 
