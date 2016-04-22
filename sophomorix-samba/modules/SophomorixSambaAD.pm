@@ -518,6 +518,7 @@ sub AD_user_move {
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       group=>$group_new,
+                      description=>$group_new,
                       ou=>$ou_new,
                       school_token=>$school_token_new,
                       type=>"adminclass",    
