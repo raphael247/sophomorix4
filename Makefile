@@ -235,8 +235,10 @@ install-developer:
 # installing  testdata
 	@install -d $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-1 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-30 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.move-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.kill-1 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.kill-30 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/devices.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/classrooms-1 $(TESTDATA)
 #	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/devices.csv-2 $(TESTDATA)
