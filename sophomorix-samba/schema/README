@@ -1,5 +1,41 @@
-Anleitung:
+ samba-schema: PEN OIDs and date syntax
 
+Use assigned enterprise OIDs, linuxmusterverein PEN prefix:
+
+  1.3.6.1.4.1.47512
+
+Chosen sophomorix sub ID numberspace is
+
+  1.3.6.1.4.1.47512.1
+
+Other projects can use number greater then 1.
+
+Also change the oMSyntax of date attributes from 23 to 24 which is what
+MS-AD uses for date attributes like whenChanged.
+
+Syntax is:
+
+  YYYYMMDDHHMM+0x00
+
+where x denotes the timezone offset.
+
+It's also possible to add a seconds fraction, eg
+
+  YYYYMMDDHHMM.F+0x00
+
+Example
+
+  20160429115500+0100
+
+For GMT time skip the timezone diff and append Z for zero, eg
+
+  20160429115500Z
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+
+
+Anleitung:
+############################################################
 (- Pfad zu den AD Datenbanken suchen: # find /var -name sam.ldb)
 
 - Backup der AD Datenbanken, /path/to/dbs/ durch Pfad aus Schritt 1 ersetzen:
