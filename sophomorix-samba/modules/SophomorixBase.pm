@@ -65,12 +65,15 @@ sub print_title {
 # use this timestamp for the sophomorix-schema in AD
 sub time_stamp_AD {
   # 2016-04-04 21:51:44
-  my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
-  chomp($timestamp);
-  # 
-  #my $timestamp = `date --utc '+%Y%m%d%H%M%S'`;
+  #my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
   #chomp($timestamp);
-  #$timestamp=$timestamp.".0Z";
+  # 
+  # 20160429115500+0100   (YYYYMMDDHHMM+0x00, x is timezonediff)
+  # 20160429115500Z       for GMT/UTC
+  # 20160502194807Z
+  my $timestamp = `date --utc '+%Y%m%d%H%M%S'`;
+  chomp($timestamp);
+  $timestamp=$timestamp.".0Z";
   return $timestamp;
 }
 
