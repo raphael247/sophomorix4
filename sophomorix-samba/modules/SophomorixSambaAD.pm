@@ -46,6 +46,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_fetch
             AD_project_fetch
             AD_project_update
+            AD_project_sync_members
             AD_group_show_list
             AD_object_move
             AD_debug_logdump
@@ -1337,6 +1338,9 @@ sub AD_project_update {
         print "   * Setting sophomorixAdmins to @admins\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmins' => \@admins }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        foreach my $admin (@admins){
+
+        }
     }
     # membergroups   
     if (defined $membergroups){
@@ -1354,8 +1358,141 @@ sub AD_project_update {
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+    #&AD_project_sync_members($ldap,$root_dse,$dn);
+
+}
 
 
+sub AD_project_sync_members {
+    my ($ldap,$root_dse,$dn) = @_;
+    print "Sync members of $dn\n";
+    my $filter="cn=*";
+    my $mesg = $ldap-> search( # perform a search
+                       base   => $dn,
+                       scope => 'base',
+                       filter => $filter,
+                             );
+    my $max_pro = $mesg->count;
+    if ($max_pro==1){
+        print "   * $max_pro project found\n";
+        my $entry = $mesg->entry(0);
+        my $cn = $entry->get_value('cn');
+
+        ##################################################
+        # fetch target memberships
+        my %target=();
+        my @admins = sort $entry->get_value('sophomorixAdmins');
+        foreach my $admin (@admins){
+            $target{$admin}="admin";
+        }
+        my @members = sort $entry->get_value('sophomorixMembers');
+        foreach my $member (@members){
+            $target{$member}="member";
+        }
+        my @admingroups = sort $entry->get_value('sophomorixAdminGroups');
+        foreach my $admingroup (@admingroups){
+            $target{$admingroup}="admingroup";
+        }
+        my @membergroups = sort $entry->get_value('sophomorixMemberGroups');
+        foreach my $membergroup (@membergroups){
+            $target{$membergroup}="membergroup";
+        }
+        # print target memberships
+        if($Conf::log_level>=3){
+            print "   * Target memberships:\n";
+            foreach my $key (keys %target) {
+                my $value = $target{$key};
+                printf "      %-15s -> %-20s\n",$key,$value;
+            }
+        }
+
+        ##################################################
+        # fetch actual memberships
+        my %actual=();
+        my @ac_members = sort $entry->get_value('member');
+        foreach my $member (@ac_members){
+            # retrieving object class
+            my $filter="cn=*";
+            my $mesg2 = $ldap-> search( # perform a search
+                                base   => $member,
+                                scope => 'base',
+                                filter => $filter,
+                                      );
+            my $max_pro = $mesg2->count;
+            my $entry = $mesg2->entry(0);
+            my $cn = $entry->get_value('cn');
+            my @object_classes = $entry->get_value('objectClass');
+            foreach my $object_class (@object_classes){
+                if ($object_class eq "group"){
+                    $actual{$cn}="group";
+                    last;
+                } elsif ($object_class eq "user"){
+                    $actual{$cn}="user";
+                    last;
+                }
+            }
+        }
+        # print actual memberships
+        if($Conf::log_level>=3){
+            print "   * Actual memberships:\n";
+            foreach my $key (keys %actual) {
+                my $value = $actual{$key};
+                printf "      %-15s -> %-20s\n",$key,$value;
+            }
+        }
+
+        ##################################################
+        # sync memberships
+        # Deleting
+        foreach my $key (keys %actual) {
+            my $value = $actual{$key};
+            if (exists $target{$key}){
+                # OK
+            } else {
+                #print "Deleting $actual{$key} $key as member from $cn\n";
+                if ($actual{$key} eq "user"){
+                    &AD_group_removemember({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $cn,
+                                            removemember => $key,
+                                          });   
+                } elsif ($actual{$key} eq "group"){
+                    &AD_group_removemember({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $cn,
+                                            removegroup => $key,
+                                          });   
+                }
+            }
+        }
+
+        # Adding
+        foreach my $key (keys %target) {
+            my $value = $target{$key};
+            if (exists $actual{$key}){
+                # OK
+            } else {
+                my $type="";
+                if ($target{$key} eq "admin" or $target{$key} eq "member"){
+                    #print "Adding user $key as member to $cn\n";
+                    &AD_group_addmember({ldap => $ldap,
+                                         root_dse => $root_dse, 
+                                         group => $cn,
+                                         addmember => $key,
+                                        }); 
+                } elsif ($target{$key} eq "admingroup" or $target{$key} eq "membergroup"){
+                    #print "Adding group $key as member to $cn\n";
+                    &AD_group_addmember({ldap => $ldap,
+                                         root_dse => $root_dse, 
+                                         group => $cn,
+                                         addgroup => $key,
+                                        }); 
+                }
+            }
+        }
+    } else {
+        print "ERROR: Sync failed: $max_pro projects found\n";
+    }
 }
 
 
