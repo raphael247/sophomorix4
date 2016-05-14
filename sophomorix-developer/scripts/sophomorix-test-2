@@ -209,7 +209,6 @@ if ($test_ws_1==1){
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "BSZLEO",
                    memberOf => "bsz-j1008",
-                   not_memberOf => "bsz-students,teachers,bsz-teachers,lin-teachers",
                   });
     ##### Testing the exam accounts room
     &AD_test_object({ldap=>$ldap,
@@ -218,14 +217,12 @@ if ($test_ws_1==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"room",
                    memberOf => "bsz-examaccounts",
-                   not_memberOf => "bsz-teachers",
                   });
     ##### Testing the examaccounts <token>-examaccounts group
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-examaccounts",
                    memberOf => "global-examaccounts",
-                   not_memberOf => "teachers,students",
                   });
 
     # J1008P01$
