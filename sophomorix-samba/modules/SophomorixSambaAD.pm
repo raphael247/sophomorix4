@@ -109,6 +109,30 @@ sub AD_bind_admin {
     # show errors from bind
     $mesg->code && die $mesg->error;
 
+    # Testing if sophomorix schema is present
+    # ldbsearch -H ldap://localhost -UAdministrator%Muster! -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User
+    if($Conf::log_level>=2){
+        print "Testing if the Sophomorix Schema exists (Sophomorix-User)...\n";
+    }
+
+    my $base="CN=Sophomorix-User,CN=Schema,CN=Configuration,".$root_dse;
+    my $filter="(cn=Sophomorix-User)";
+    my $mesg2 = $ldap->search(
+                       base   => $base,
+                       scope => 'base',
+                       filter => $filter,
+                            );
+    my $res = $mesg2->count; 
+    if ($res!=1){
+        if($Conf::log_level>=2){
+            print "   * ERROR: Sophomorix-Schema nonexisting\n";
+        }
+        exit;
+    } elsif ($res==1){
+        if($Conf::log_level>=2){
+            print "   * Sophomorix-Schema exists\n";
+        }
+    }
     return ($ldap,$root_dse);
 }
 
