@@ -136,10 +136,14 @@ sub AD_test_object {
     my $s_status = $arg_ref->{sophomorixStatus};
     my $s_joinable = $arg_ref->{sophomorixJoinable};
     my $s_maxmembers = $arg_ref->{sophomorixMaxMembers};
+    my $s_admins = $arg_ref->{sophomorixAdmins};
+    my $s_members = $arg_ref->{sophomorixMembers};
+    my $s_admingroups = $arg_ref->{sophomorixAdminGroups};
+    my $s_membergroups = $arg_ref->{sophomorixMemberGroups};
 
     my $member = $arg_ref->{member};
     my $member_of = $arg_ref->{memberOf};
-    my $not_member_of = $arg_ref->{not_memberOf};
+    #my $not_member_of = $arg_ref->{not_memberOf};
 
     my $filter="(cn=*)";
     my $mesg = $ldap->search(
@@ -282,6 +286,8 @@ sub AD_test_object {
 		"  * $date beginns with $strg_ok ");
         }
 
+        ##################################################
+        # servicePrincipalName
         if (defined $ser_pri_name){
             # get servicePrincipalName data into hash
             my %ser_pri=();
@@ -307,77 +313,138 @@ sub AD_test_object {
                 "  * $sam_account has $spn_count servicePrincipalName entries: $test_count tested");
         }
 
+
+
+
+        ##################################################
+        if (defined $s_admins){
+            &test_multivalue($s_admins,"sophomorixAdmins",$entry,$sam_account);
+        }
+        ##################################################
+        if (defined $s_members){
+            &test_multivalue($s_members,"sophomorixMembers",$entry,$sam_account);
+        }
+        ##################################################
+        if (defined $s_admingroups){
+            &test_multivalue($s_admingroups,"sophomorixAdminGroups",$entry,$sam_account);
+        }
+        ##################################################
+        if (defined $s_membergroups){
+            &test_multivalue($s_membergroups,"sophomorixMemberGroups",$entry,$sam_account);
+        }
+
+
+
+
+        ##################################################
         if (defined $member){
-            # get member data into hash
-            my %member=();
-            my @data=$entry->get_value ('member');
-            my $member_count=0;
-            foreach my $item (@data){
-                my ($entry,@rest)=split(/,/,$item);
-                $entry=~s/^CN=//;
-                #print "      * Member: $entry\n";
-                $member{$entry}="seen";
-                $member_count++;
-            }
-            # test membership
-            my $test_count=0;
-            my @should_be_member=split(/,/,$member);
-            foreach my $should_be_member (@should_be_member){
-                is (exists $member{$should_be_member},1,
-		    "  * Entry $should_be_member IS member of $sam_account");
-		$test_count++;
-            } 
-
-            # were all actual memberships tested
-            is ($member_count,$test_count,
-                "  * $sam_account has $member_count member entries: $test_count tested");
+            &test_multivalue($member,"member",$entry,$sam_account);
         }
+        # ##################################################
+        # # member
+        # if (defined $member){
+        #     # get member data into hash
+        #     my %member=();
+        #     my @data=$entry->get_value ('member');
+        #     my $member_count=0;
+        #     foreach my $item (@data){
+        #         my ($entry,@rest)=split(/,/,$item);
+        #         $entry=~s/^CN=//;
+        #         #print "      * Member: $entry\n";
+        #         $member{$entry}="seen";
+        #         $member_count++;
+        #     }
+        #     # test membership
+        #     my $test_count=0;
+        #     my @should_be_member=split(/,/,$member);
+        #     foreach my $should_be_member (@should_be_member){
+        #         is (exists $member{$should_be_member},1,
+	# 	    "  * Entry $should_be_member IS member of $sam_account");
+	# 	$test_count++;
+        #     } 
+
+        #     # were all actual memberships tested
+        #     is ($member_count,$test_count,
+        #         "  * $sam_account has $member_count member entries: $test_count tested");
+        # }
 
 
-        if (defined $member_of and $not_member_of){
-            # get membership data into hash
-            my %member_of=();
-            my @data=$entry->get_value ('memberOf');
-            my $membership_count=0;
-            foreach my $item (@data){
-                my ($group,@rest)=split(/,/,$item);
-                $group=~s/^CN=//;
-                #print "      * MemberOf: $group\n";
-                $member_of{$group}="seen";
-                $membership_count++;
-            }
-
-            # test membership
-            my $test_count=0;
-            my @should_be_member=split(/,/,$member_of);
-            foreach my $should_be_member (@should_be_member){
-                is (exists $member_of{$should_be_member},1,
-		    "  * Entry $sam_account IS member of $should_be_member");
-		$test_count++;
-            } 
-
-            # were all actual memberships tested
-            is ($membership_count,$test_count,
-                "  * $sam_account has $membership_count memberOf entries: $test_count tested");
-
-            # test non-membership
-            my @should_not_be_member=split(/,/,$not_member_of);
-            foreach my $should_not_be_member (@should_not_be_member){
-                is (exists $member_of{$should_not_be_member},'',
-		    "  * $sam_account IS NOT member of $should_not_be_member");
-             } 
-        } elsif (defined $member_of or $not_member_of) {
-             print "\nWARNING: Skipping memberOf and not_memberOf completely: Use BOTH in your test script!\n\n"
-        } else {
-	    #print "Not testing any membership on $cn\n";
+        ##################################################
+        if (defined $member_of){
+            &test_multivalue($member_of,"memberOf",$entry,$sam_account);
         }
+        # ##################################################
+        # # membeOf
+        # if (defined $member_of and $not_member_of){
+        #     # get membership data into hash
+        #     my %member_of=();
+        #     my @data=$entry->get_value ('memberOf');
+        #     my $membership_count=0;
+        #     foreach my $item (@data){
+        #         my ($group,@rest)=split(/,/,$item);
+        #         $group=~s/^CN=//;
+        #         #print "      * MemberOf: $group\n";
+        #         $member_of{$group}="seen";
+        #         $membership_count++;
+        #     }
+
+        #     # test membership
+        #     my $test_count=0;
+        #     my @should_be_member=split(/,/,$member_of);
+        #     foreach my $should_be_member (@should_be_member){
+        #         is (exists $member_of{$should_be_member},1,
+	# 	    "  * Entry $sam_account IS member of $should_be_member");
+	# 	$test_count++;
+        #     } 
+
+        #     # were all actual memberships tested
+        #     is ($membership_count,$test_count,
+        #         "  * $sam_account has $membership_count memberOf entries: $test_count tested");
+
+        #     # test non-membership
+        #     my @should_not_be_member=split(/,/,$not_member_of);
+        #     foreach my $should_not_be_member (@should_not_be_member){
+        #         is (exists $member_of{$should_not_be_member},'',
+	# 	    "  * $sam_account IS NOT member of $should_not_be_member");
+        #      } 
+        # } elsif (defined $member_of or $not_member_of) {
+        #      print "\nWARNING: Skipping memberOf and not_memberOf completely: Use BOTH in your test script!\n\n"
+        # } else {
+	#     #print "Not testing any membership on $cn\n";
+        # }
+
     } else {
         print "\nWARNING: Skipping a lot of tests\n\n";
     }
 }
 
 
+sub test_multivalue {
+    my ($should,$attr,$entry,$sam_account) = @_;
+    # get actual attrs
+    my %is=();
+    my @data=$entry->get_value ($attr);
+    my $count=0;
+    foreach my $item (@data){
+        my ($ent,@rest)=split(/,/,$item);
+        $ent=~s/^CN=//;
+        #print "      * Datum: $ent\n";
+        $is{$ent}="seen";
+        $count++;
+    }
+    # compare with should attrs
+    my $test_count=0;
+    my @should_be=split(/,/,$should);
+    foreach my $should_be (@should_be){
+        is (exists $is{$should_be},1,
+	    "  * Entry $should_be IS in multivalue attribute $attr of $sam_account");
+	$test_count++;
+    } 
+    # were all actual memberships tested
+    is ($count,$test_count,
+        "  * $sam_account has $count entries in multivalue attribute $attr: $test_count tested");
 
+}
 
 # END OF FILE
 # Return true=1
