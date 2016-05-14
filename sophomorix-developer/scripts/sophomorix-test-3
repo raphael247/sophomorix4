@@ -189,7 +189,7 @@ if ($test_add_pro==1){
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "BSZLEO",
                    sophomorixCreationDate => "exists",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab,p_bsz-Chemie-AG",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -198,7 +198,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
-                   memberOf => "bsz-students",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -230,7 +230,7 @@ if ($test_add_pro==1){
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "BSZLEO",
                    sophomorixCreationDate => "exists",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab,p_bsz-Chemie-AG",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -239,7 +239,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
-                   memberOf => "bsz-students",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -280,7 +280,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
-                   memberOf => "bsz-students",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -321,7 +321,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
-                   memberOf => "bsz-students",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -353,7 +353,7 @@ if ($test_add_pro==1){
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "BSZLEO",
                    sophomorixCreationDate => "exists",
-                   memberOf => "bsz-teachers,",
+                   memberOf => "bsz-teachers,p_bsz-Chemie-AG",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -385,7 +385,7 @@ if ($test_add_pro==1){
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "BSZLEO",
                    sophomorixCreationDate => "exists",
-                   memberOf => "bsz-teachers,",
+                   memberOf => "bsz-teachers,p_bsz-Chemie-AG",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -508,7 +508,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"ouclass",
-                   memberOf => "global-teachers",
+                   memberOf => "global-teachers,p_bsz-Chemie-AG",
                   });
 
 
@@ -540,7 +540,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"ouclass",
-                   memberOf => "global-teachers",
+                   memberOf => "global-teachers,p_bsz-Chemie-AG",
                   });
     # schneima23
     &AD_test_object({ldap=>$ldap,
@@ -672,6 +672,7 @@ if ($test_add_pro==1){
                    sophomorixMembers => "maiersa23,muellegr23",
                    sophomorixAdminGroups => "uni-teachers",
                    sophomorixMemberGroups => "bsz-m7ab,bsz-m8cd",
+                   member => "oe23,wu23,maiersa23,muellegr23,uni-teachers,bsz-m7ab,bsz-m8cd",
                    memberOf => "",
                   });
 
