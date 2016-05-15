@@ -72,7 +72,21 @@ add groups with role 'project'
   - p_name (no school_token).
   - projects can contain students of all schools
   - project name length
-  - p_longname: Better to use a description field instead
+  - p_longname: description field used
+
+
+Tests:
+
+if user is admin and should be member -> degrade user
+if user is member and should be admin -> upgrade user
+           member AND admin -> throw error
+dito for groups
+
+--members/admins  nonexisting user -> dont add user 
+
+
+option sync memberships: go throuh all projects and sync memberships
+
 
 
 -> sophomorix-device

@@ -1358,14 +1358,14 @@ sub AD_project_update {
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
-    #&AD_project_sync_members($ldap,$root_dse,$dn);
+    &AD_project_sync_members($ldap,$root_dse,$dn);
 
 }
 
 
 sub AD_project_sync_members {
     my ($ldap,$root_dse,$dn) = @_;
-    print "Sync members of $dn\n";
+    print "   * Sync member: $dn\n";
     my $filter="cn=*";
     my $mesg = $ldap-> search( # perform a search
                        base   => $dn,
@@ -1374,9 +1374,9 @@ sub AD_project_sync_members {
                              );
     my $max_pro = $mesg->count;
     if ($max_pro==1){
-        print "   * $max_pro project found\n";
         my $entry = $mesg->entry(0);
         my $cn = $entry->get_value('cn');
+        print "     * $max_pro single project found: $cn\n";
 
         ##################################################
         # fetch target memberships
