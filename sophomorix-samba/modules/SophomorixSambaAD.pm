@@ -1327,6 +1327,7 @@ sub AD_project_update {
     if (defined $members){
         my @members=split(/,/,$members);
         @members = reverse @members;
+        @members = &_keep_object_class_only($ldap,$root_dse,"user",@members);
         print "   * Setting sophomorixMembers to @members\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixMembers' => \@members }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -1335,6 +1336,7 @@ sub AD_project_update {
     if (defined $admins){
         my @admins=split(/,/,$admins);
         @admins = reverse @admins;
+        @admins = &_keep_object_class_only($ldap,$root_dse,"user",@admins);
         print "   * Setting sophomorixAdmins to @admins\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmins' => \@admins }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -1346,6 +1348,7 @@ sub AD_project_update {
     if (defined $membergroups){
         my @membergroups=split(/,/,$membergroups);
         @membergroups = reverse @membergroups;
+        @membergroups = &_keep_object_class_only($ldap,$root_dse,"group",@membergroups);
         print "   * Setting sophomorixMemberGroups to @membergroups\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixMemberGroups' => \@membergroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -1354,6 +1357,7 @@ sub AD_project_update {
     if (defined $admingroups){
         my @admingroups=split(/,/,$admingroups);
         @admingroups = reverse @admingroups;
+        @admingroups = &_keep_object_class_only($ldap,$root_dse,"group",@admingroups);
         print "   * Setting sophomorixAdmingroups to @admingroups\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -1888,6 +1892,27 @@ sub AD_debug_logdump {
         }
     }
 }
+
+
+
+sub _keep_object_class_only {
+    # keep only items with objectClass $type_to_keep in @keep_list
+    my $ldap = shift;
+    my $root_dse = shift;
+    my $type_to_keep = shift; 
+    my @list = @_;
+    my @keep_list=();
+    foreach my $item (@list){
+        my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,$type_to_keep,$item);
+        if ($count==1){ #its a user/group
+            push @keep_list, $item;
+        } else {
+            print "   * WARNING: $item is not of objectClass $type_to_keep (Skipping $item)\n";
+        }
+    } 
+    return @keep_list;
+}
+
 
 
 sub _project_info_prefix {
