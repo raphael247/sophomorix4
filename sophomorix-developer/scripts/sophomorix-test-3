@@ -1065,7 +1065,7 @@ if ($mod_pro==1){
                   });
 
 
-    # --admins (2)
+    # --admins (2, delete)
     system("sophomorix-project $verbose_options -p mathe --admins maiersa23");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
@@ -1089,7 +1089,7 @@ if ($mod_pro==1){
                   });
 
 
-    # --members (2)
+    # --members (2, delete)
     system("sophomorix-project $verbose_options -p mathe --members muellegr23");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
@@ -1113,7 +1113,7 @@ if ($mod_pro==1){
                   });
 
 
-    # --admingroups (2)
+    # --admingroups (2, delete)
     system("sophomorix-project $verbose_options -p mathe --admingroups super12");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
@@ -1137,7 +1137,7 @@ if ($mod_pro==1){
                   });
 
 
-    # --membergroups (2)
+    # --membergroups (2, delete)
     system("sophomorix-project $verbose_options -p mathe --membergroups bsz-super7");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
@@ -1160,6 +1160,198 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
 
+
+
+    # --admins (3, nonexisting user)
+    system("sophomorix-project $verbose_options -p mathe --admins maiersa23,nonexuser1");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+   # --members (3, nonexisting user)
+    system("sophomorix-project $verbose_options -p mathe --members muellegr23,nonexuser2");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+    # --admingroups (3, nonexisting user)
+    system("sophomorix-project $verbose_options -p mathe --admingroups super12,nonexgroup1");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+   # --membergroups (3, nonexisting user)
+    system("sophomorix-project $verbose_options -p mathe --membergroups bsz-super7,nonexgroup2");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+   # --admins (4, group instead of user)
+    system("sophomorix-project $verbose_options -p mathe --admins maiersa23,bsz-super6");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+   # --members (4, group instead of user)
+    system("sophomorix-project $verbose_options -p mathe --members muellegr23,super13");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+   # --admingroups (4, user instead of group)
+    system("sophomorix-project $verbose_options -p mathe --admingroups kep23,super12");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
+
+
+   # --membergroups (4, user instead of group)
+    system("sophomorix-project $verbose_options -p mathe --membergroups wu23,bsz-super7");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe",
+                   description=>"Mathe Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "maiersa23",
+                   sophomorixMembers => "muellegr23",
+                   sophomorixAdminGroups => "super12",
+                   sophomorixMemberGroups => "bsz-super7",
+                   member => "maiersa23,muellegr23,super12,bsz-super7",
+                   memberOf => "",
+                  });
 
 
 
