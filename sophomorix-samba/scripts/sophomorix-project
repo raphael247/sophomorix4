@@ -81,12 +81,15 @@ my $v;
 
 my $addmembers="";
 my $removemembers="";
+
 my $addadmins="";
 my $removeadmins="";
+
 my $addmembergroups="";
 my $removemembergroups="";
-my $addmemberprojects="";
-my $removememberprojects="";
+
+my $addadmingroups="";
+my $removeadmingroups="";
 
 my $p_long_name;
 #my $p_admins;
@@ -145,14 +148,14 @@ my $testopt=GetOptions(
            "description=s" => \$description,
            "status=s" => \$status,
 #           "caller=s" => \$caller,
-#           "addmembers=s" => \$addmembers,
-#           "removemembers=s" => \$removemembers,
-#           "addadmins=s" => \$addadmins,
-#           "removeadmins=s" => \$removeadmins,
-#           "addmembergroups=s" => \$addmembergroups,
-#           "removemembergroups=s" => \$removemembergroups,
-#           "addmemberprojects=s" => \$addmemberprojects,
-#           "removememberprojects=s" => \$removememberprojects,
+           "addmembers=s" => \$addmembers,
+           "removemembers=s" => \$removemembers,
+           "addadmins=s" => \$addadmins,
+           "removeadmins=s" => \$removeadmins,
+           "addmembergroups=s" => \$addmembergroups,
+           "removemembergroups=s" => \$removemembergroups,
+           "addadmingroups=s" => \$addadmingroups,
+           "removeadmingroups=s" => \$removeadmingroups,
            "name|project|p=s" => \$project,
 #           "longname=s" => \$p_long_name,
            "admins=s" => \$admins,
@@ -275,12 +278,15 @@ Obsolete?
 
   -p project --addmembers user1,user2,user3, ...
   -p project --removemembers user1,user2,user3, ...
+
   -p project --addadmins user1,user2,user3, ...
   -p project --removeadmins user1,user2,user3, ...
+
   -p project --addmembergroups group1,group2,group3, ...
   -p project --removemembergroups group1,group2,group3, ...
-  -p project --addmemberprojects project1,project2,project3, ...
-  -p project --removememberprojects project1,project2,project3, ...
+
+  -p project --addadmingroups group1,group2,group3, ...
+  -p project --removeadmingroups group1,group2,group3, ...
 
 
 Dumping data into a file:
@@ -524,84 +530,84 @@ if ($project eq "" and $update_from_file ne ""){
 
 
 # --addmembers
-if ($addmembers ne "" and $project ne ""){
+#if ($addmembers ne "" and $project ne ""){
 #    my @new_users = split(/,/,$addmembers);
 #    my @old_users = 
 #       &Sophomorix::SophomorixPgLdap::fetchmembers_by_option_from_project($project);
 #    my @users = (@old_users,@new_users);
 #    $p_members=join(",",@users);
 #    print "   Using: --Members=$p_members\n";
-}
+#}
 
 
 # --removemembers
-if ($removemembers ne "" and $project ne ""){
+#if ($removemembers ne "" and $project ne ""){
 #    my @users = split(/,/,$removemembers);
 #    my @old_users = 
 #       &Sophomorix::SophomorixPgLdap::fetchmembers_by_option_from_project($project);
 #    my @new_users=&remove_duplicates_from_first_list(\@old_users,\@users);
 #    $p_members=join(",",@new_users);
 #    print "   Using: --Members=$p_members\n";
-}
+#}
 
 
 # --addadmins
-if ($addadmins ne "" and $project ne ""){
+#if ($addadmins ne "" and $project ne ""){
 #    my @new_admins = split(/,/,$addadmins);
 #    my @old_admins = 
 #       &Sophomorix::SophomorixPgLdap::fetchadmins_from_project($project);
 #    my @admins = (@old_admins,@new_admins);
 #    $p_admins=join(",",@admins);
 #    print "   Using: --Admins=$p_admins\n";
-}
+#}
 
 
 # --removeadmins
-if ($removeadmins ne "" and $project ne ""){
+#if ($removeadmins ne "" and $project ne ""){
 #    my @admins = split(/,/,$removeadmins);
 #    my @old_admins = 
 #       &Sophomorix::SophomorixPgLdap::fetchadmins_from_project($project);
 #    my @new_admins=&remove_duplicates_from_first_list(\@old_admins,\@admins);
 #    $p_admins=join(",",@new_admins);
 #    print "   Using: --Admins=$p_admins\n";
-}
+#}
 
 
 # --addmembergroups
-if ($addmembergroups ne "" and $project ne ""){
+#if ($addmembergroups ne "" and $project ne ""){
 #    my @new_groups = split(/,/,$addmembergroups);
 #    my @old_groups = 
 #       &Sophomorix::SophomorixPgLdap::fetchgroups_from_project($project);
 #    my @groups = (@old_groups,@new_groups);
 #    $p_groups=join(",",@groups);
 #    print "   Using: --MemberGroups=$p_groups\n";
-}
+#}
 
 
 # --removemembergroups
-if ($removemembergroups ne "" and $project ne ""){
+#if ($removemembergroups ne "" and $project ne ""){
 #    my @groups = split(/,/,$removemembergroups);
 #    my @old_groups = 
 #       &Sophomorix::SophomorixPgLdap::fetchgroups_from_project($project);
 #    my @new_groups=&remove_duplicates_from_first_list(\@old_groups,\@groups);
 #    $p_groups=join(",",@new_groups);
 #    print "   Using: --MemberGroups=$p_groups\n";
-}
+#}
 
 
 # --addmemberprojects
-if ($addmemberprojects ne "" and $project ne ""){
+#if ($addmemberprojects ne "" and $project ne ""){
 #    my @new_projects = split(/,/,$addmemberprojects);
 #    my @old_projects = 
 #       &Sophomorix::SophomorixPgLdap::fetchprojects_from_project($project);
 #    my @projects = (@old_projects,@new_projects);
 #    $p_projects=join(",",@projects);
 #    print "   Using: --MemberProjects=$p_projects\n";
-}
+#}
 
 
 # --removememberprojects
-if ($removememberprojects ne "" and $project ne ""){
+#if ($removememberprojects ne "" and $project ne ""){
 #    # can contain_non_prefixed projects
 #    my @projects= split(/,/,$removememberprojects);
 #    foreach my $n_pro (@projects){
@@ -614,7 +620,7 @@ if ($removememberprojects ne "" and $project ne ""){
 #    my @new_projects=&remove_duplicates_from_first_list(\@old_projects,\@projects);
 #    $p_projects=join(",",@new_projects);
 #    print "   Using: --MemberProjects=$p_projects\n";
-}
+#}
 
 
 # # --join
@@ -841,6 +847,8 @@ if (defined $membergroups){
                       });
 }
 
+
+
 # --admingroups <group1,group2>
 if (defined $admingroups){
     &AD_project_update({ldap=>$ldap,
@@ -848,6 +856,29 @@ if (defined $admingroups){
                         dn=>$dn_pro,
                         admingroups=>$admingroups,
                       });
+}
+
+
+# --addadmingroups <group1,group2>
+if (defined $addadmingroups){
+    my @addadmingroups=split(/,/,$addadmingroups);
+    # get existing admingroups
+    my $filter="cn=*";
+    my $mesg = $ldap-> search( # perform a search
+                       base   => $dn_pro,
+                       scope => 'base',
+                       filter => $filter,
+	);
+    my $entry = $mesg->entry(0);
+    my @admingroups = sort $entry->get_value('sophomorixAdminGroups');
+    my $admingroups=join(",",@admingroups,@addadmingroups);
+    print "ADMINGROUPS: $admingroups\n";
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        admingroups=>$admingroups,
+                      });
+
 }
 
 
