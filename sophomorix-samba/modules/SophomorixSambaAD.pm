@@ -1272,7 +1272,6 @@ sub AD_project_fetch_multivalue {
 	               );
     my $entry = $mesg->entry(0);
     my @results = sort $entry->get_value($attr_name);
-    print "RES @results\n";
     return @results;
 }
 

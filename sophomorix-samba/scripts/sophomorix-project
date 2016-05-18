@@ -32,6 +32,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
+                                 remove_from_list
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -685,6 +686,8 @@ if (defined $maxmembers){
                       });
 }
 
+##################################################
+# members
 # --members <user1,user2>
 if (defined $members){
     &AD_project_update({ldap=>$ldap,
@@ -693,7 +696,6 @@ if (defined $members){
                         members=>$members,
                       });
 }
-
 
 # --addmembers <user1,user2>
 if (defined $addmembers){
@@ -708,8 +710,22 @@ if (defined $addmembers){
                       });
 }
 
+# --removemembers <user1,user2>
+if (defined $removemembers){
+    my @old_members = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
+    my @members = &remove_from_list($removemembers,@old_members);
+    my $members=join(",",@members);
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        members=>$members,
+                      });
+}
 
 
+
+##################################################
+# admins
 # --admins <user1,user2>
 if (defined $admins){
     &AD_project_update({ldap=>$ldap,
@@ -732,8 +748,22 @@ if (defined $addadmins){
                       });
 }
 
+# --removeadmins <user1,user2>
+if (defined $removeadmins){
+    my @old_admins = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
+    my @admins = &remove_from_list($removeadmins,@old_admins);
+    my $admins=join(",",@admins);
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        admins=>$admins,
+                      });
+}
 
 
+
+##################################################
+# membergroups
 # --membergroups <group1,group2>
 if (defined $membergroups){
     &AD_project_update({ldap=>$ldap,
@@ -742,8 +772,6 @@ if (defined $membergroups){
                         membergroups=>$membergroups,
                       });
 }
-
-
 
 # --addmembergroups <group1,group2>
 if (defined $addmembergroups){
@@ -758,8 +786,22 @@ if (defined $addmembergroups){
                       });
 }
 
+# --removemembergroups <user1,user2>
+if (defined $removemembergroups){
+    my @old_membergroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
+    my @membergroups = &remove_from_list($removemembergroups,@old_membergroups);
+    my $membergroups=join(",",@membergroups);
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        membergroups=>$membergroups,
+                      });
+}
 
 
+
+##################################################
+# admingroups
 # --admingroups <group1,group2>
 if (defined $admingroups){
     &AD_project_update({ldap=>$ldap,
@@ -768,7 +810,6 @@ if (defined $admingroups){
                         admingroups=>$admingroups,
                       });
 }
-
 
 # --addadmingroups <group1,group2>
 if (defined $addadmingroups){
@@ -783,6 +824,17 @@ if (defined $addadmingroups){
                       });
 }
 
+# --removeadmingroups <user1,user2>
+if (defined $removeadmingroups){
+    my @old_admingroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
+    my @admingroups = &remove_from_list($removeadmingroups,@old_admingroups);
+    my $admingroups=join(",",@admingroups);
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        admingroups=>$admingroups,
+                      });
+}
 
 
 # # repair.directories einlesen

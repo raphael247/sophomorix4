@@ -20,6 +20,7 @@ require Exporter;
 @EXPORT = qw(
             print_line
             print_title
+            remove_from_list
             time_stamp_AD
             time_stamp_file
             unlock_sophomorix
@@ -56,6 +57,26 @@ sub print_title {
    } else {
          printf "#### %-69s####\n",$a;
    }
+}
+
+
+# helper stuff
+######################################################################
+sub remove_from_list {
+    # first argument: comma seperated elements to remove
+    # other arguments: list elements
+    my $option=shift;
+    my @list = @_;
+    my @removers=split(/,/,$option);
+    my %seen=();
+    my @stripped=();
+    foreach $item (@removers) { $seen{$item} = 1 }
+    foreach $item (@list) {
+	if (not exists $seen{$item}){
+            push(@stripped, $item);
+       }
+    }
+    return @stripped;
 }
 
 
