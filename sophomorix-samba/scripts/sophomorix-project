@@ -14,6 +14,7 @@ use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
@@ -44,6 +45,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_project_fetch
                                  AD_project_update
+                                 AD_project_fetch_multivalue
                                  AD_group_show_list
                                  get_forbidden_logins
                                     );
@@ -79,17 +81,17 @@ my $school_token="---";
 my $k;
 my $v;
 
-my $addmembers="";
-my $removemembers="";
+my $addmembers;
+my $removemembers;
 
-my $addadmins="";
-my $removeadmins="";
+my $addadmins;
+my $removeadmins;
 
-my $addmembergroups="";
-my $removemembergroups="";
+my $addmembergroups;
+my $removemembergroups;
 
-my $addadmingroups="";
-my $removeadmingroups="";
+my $addadmingroups;
+my $removeadmingroups;
 
 my $p_long_name;
 #my $p_admins;
@@ -862,23 +864,14 @@ if (defined $admingroups){
 # --addadmingroups <group1,group2>
 if (defined $addadmingroups){
     my @addadmingroups=split(/,/,$addadmingroups);
-    # get existing admingroups
-    my $filter="cn=*";
-    my $mesg = $ldap-> search( # perform a search
-                       base   => $dn_pro,
-                       scope => 'base',
-                       filter => $filter,
-	);
-    my $entry = $mesg->entry(0);
-    my @admingroups = sort $entry->get_value('sophomorixAdminGroups');
-    my $admingroups=join(",",@admingroups,@addadmingroups);
-    print "ADMINGROUPS: $admingroups\n";
+    my @old_admingroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
+    my @admingroups = uniq(@old_admingroups,@addadmingroups); 
+    my $admingroups=join(",",@admingroups);
     &AD_project_update({ldap=>$ldap,
                         root_dse=>$root_dse,
                         dn=>$dn_pro,
                         admingroups=>$admingroups,
                       });
-
 }
 
 
