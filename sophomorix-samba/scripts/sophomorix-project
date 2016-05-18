@@ -831,6 +831,22 @@ if (defined $members){
                       });
 }
 
+
+# --addmembers <user1,user2>
+if (defined $addmembers){
+    my @addmembers=split(/,/,$addmembers);
+    my @old_members = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
+    my @members = uniq(@old_members,@addmembers); 
+    my $members=join(",",@members);
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        members=>$members,
+                      });
+}
+
+
+
 # --admins <user1,user2>
 if (defined $admins){
     &AD_project_update({ldap=>$ldap,
@@ -840,8 +856,38 @@ if (defined $admins){
                       });
 }
 
+# --addadmins <user1,user2>
+if (defined $addadmins){
+    my @addadmins=split(/,/,$addadmins);
+    my @old_admins = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
+    my @admins = uniq(@old_admins,@addadmins); 
+    my $admins=join(",",@admins);
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        admins=>$admins,
+                      });
+}
+
+
+
 # --membergroups <group1,group2>
 if (defined $membergroups){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        membergroups=>$membergroups,
+                      });
+}
+
+
+
+# --addmembergroups <group1,group2>
+if (defined $addmembergroups){
+    my @addmembergroups=split(/,/,$addmembergroups);
+    my @old_membergroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
+    my @membergroups = uniq(@old_membergroups,@addmembergroups); 
+    my $membergroups=join(",",@membergroups);
     &AD_project_update({ldap=>$ldap,
                         root_dse=>$root_dse,
                         dn=>$dn_pro,
