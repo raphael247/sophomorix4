@@ -30,6 +30,7 @@ $Data::Dumper::Terse = 1;
             AD_test_object
             AD_workstations_any
             AD_examaccounts_any
+            run_command
             );
 
 
@@ -443,8 +444,19 @@ sub test_multivalue {
     # were all actual memberships tested
     is ($count,$test_count,
         "  * $sam_account has $count entries in multivalue attribute $attr: $test_count tested");
-
 }
+
+
+sub run_command {
+    my ($command) = @_;
+    print "\n";
+    print "######################################################################\n";
+    print "$command\n";
+    print "######################################################################\n";
+    system("$command");
+    print "######################################################################\n";
+}
+
 
 # END OF FILE
 # Return true=1

@@ -146,7 +146,7 @@ Step by step Test:
 # Check preliminaries
 ############################################################
 
-system("mkdir -p $DevelConf::path_result");
+&run_command("mkdir -p $DevelConf::path_result");
 
 
 # --full
@@ -204,15 +204,15 @@ if ($kill==1){
 ############################################################
 if ($cp_add==1){
     # copy sophomorix.add
-    system("cp -v $file_add_test $file_add");
+    &run_command("cp -v $file_add_test $file_add");
 }
 
 if ($add==1 or $test_add==1){
     if ($add==1){
         # copy sophomorix.add
-        system("cp -v $file_add_test $file_add");
-        system("sophomorix-add -i");
-        system("sophomorix-add $verbose_options");
+        &run_command("cp -v $file_add_test $file_add");
+        &run_command("sophomorix-add -i");
+        &run_command("sophomorix-add $verbose_options");
     }
 
     ##### Testing the users
@@ -699,15 +699,15 @@ if ($add==1 or $test_add==1){
 ############################################################
 if ($cp_move==1){
     # copy sophomorix.move
-    system("cp -v $file_move_test $file_move");
+    &run_command("cp -v $file_move_test $file_move");
 }
 
 if ($move==1 or $test_move==1){
     if ($move==1){
         # copy sophomorix.move
-        system("cp -v $file_move_test $file_move");
-        system("sophomorix-move -i");
-        system("sophomorix-move $verbose_options");
+        &run_command("cp -v $file_move_test $file_move");
+        &run_command("sophomorix-move -i");
+        &run_command("sophomorix-move $verbose_options");
     }
 
     ##### Testing the users
@@ -1219,15 +1219,15 @@ if ($move==1 or $test_move==1){
 ############################################################
 if ($cp_kill==1){
     # copy sophomorix.kill
-    system("cp -v $file_kill_test $file_kill");
+    &run_command("cp -v $file_kill_test $file_kill");
 }
 
 if ($kill==1 or $test_kill==1){
     if ($kill==1){
         # copy sophomorix.kill
-        system("cp -v $file_kill_test $file_kill");
-        system("sophomorix-kill -i");
-        system("sophomorix-kill $verbose_options");
+        &run_command("cp -v $file_kill_test $file_kill");
+        &run_command("sophomorix-kill -i");
+        &run_command("sophomorix-kill $verbose_options");
     }
   
     ##### Testing the users

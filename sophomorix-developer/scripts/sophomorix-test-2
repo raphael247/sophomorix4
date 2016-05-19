@@ -182,12 +182,12 @@ my $examaccount_token;
 # --copy-wsfile-1
 if ($copy_wsfile_1==1){
     # copy devices.csv-1
-    system("cp -v $wsfile_1 $host_workstation");
-    system("cp -v $crfile_1 $host_classroom");
+    &run_command("cp -v $wsfile_1 $host_workstation");
+    &run_command("cp -v $crfile_1 $host_classroom");
 }
 
 if ($full==1){
-    system("sophomorix-device $verbose_options");
+    &run_command("sophomorix-device $verbose_options");
 }
 
 if ($test_ws_1==1){
@@ -253,8 +253,8 @@ if ($test_ws_1==1){
 # --copy-wsfile-2
 if ($copy_wsfile_2==1){
     # copy devices.csv-2
-    system("cp -v $wsfile_2 $host_workstation");
-    system("cp -v $crfile_2 $host_classroom");
+    &run_command("cp -v $wsfile_2 $host_workstation");
+    &run_command("cp -v $crfile_2 $host_classroom");
 }
 
 
@@ -270,8 +270,8 @@ if ($test_ws_2==1){
 # --copy-wsfile-3
 if ($copy_wsfile_3==1){
     # copy devices.csv-3
-    system("cp -v $wsfile_3 $host_workstation");
-    system("cp -v $crfile_3 $host_classroom");
+    &run_command("cp -v $wsfile_3 $host_workstation");
+    &run_command("cp -v $crfile_3 $host_classroom");
 }
 
 
@@ -287,8 +287,8 @@ if ($test_ws_3==1){
 # --copy-wsfile-4
 if ($copy_wsfile_4==1){
     # copy devices.csv-4
-    system("cp -v $wsfile_4 $host_workstation");
-    system("cp -v $crfile_4 $host_classroom");
+    &run_command("cp -v $wsfile_4 $host_workstation");
+    &run_command("cp -v $crfile_4 $host_classroom");
 }
 
 if ($test_ws_4==1){
@@ -303,12 +303,12 @@ if ($test_ws_4==1){
 # --copy-wsfile-5
 if ($copy_wsfile_5==1){
     # copy devices.csv-5
-    system("cp -v $wsfile_5 $host_workstation");
-    system("cp -v $crfile_5 $host_classroom");
+    &run_command("cp -v $wsfile_5 $host_workstation");
+    &run_command("cp -v $crfile_5 $host_classroom");
 }
 
 if ($full==1){
-    system("sophomorix-device $verbose_options");
+    &run_command("sophomorix-device $verbose_options");
 }
 
 if ($test_ws_5==1){
