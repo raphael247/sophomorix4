@@ -46,7 +46,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_project_fetch
                                  AD_project_update
-                                 AD_project_fetch_multivalue
+                                 AD_dn_fetch_multivalue
                                  AD_group_show_list
                                  get_forbidden_logins
                                     );
@@ -700,7 +700,7 @@ if (defined $members){
 # --addmembers <user1,user2>
 if (defined $addmembers){
     my @addmembers=split(/,/,$addmembers);
-    my @old_members = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
+    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
     my @members = uniq(@old_members,@addmembers); 
     my $members=join(",",@members);
     &AD_project_update({ldap=>$ldap,
@@ -712,7 +712,7 @@ if (defined $addmembers){
 
 # --removemembers <user1,user2>
 if (defined $removemembers){
-    my @old_members = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
+    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
     my @members = &remove_from_list($removemembers,@old_members);
     my $members=join(",",@members);
     &AD_project_update({ldap=>$ldap,
@@ -738,7 +738,7 @@ if (defined $admins){
 # --addadmins <user1,user2>
 if (defined $addadmins){
     my @addadmins=split(/,/,$addadmins);
-    my @old_admins = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
+    my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
     my @admins = uniq(@old_admins,@addadmins); 
     my $admins=join(",",@admins);
     &AD_project_update({ldap=>$ldap,
@@ -750,7 +750,7 @@ if (defined $addadmins){
 
 # --removeadmins <user1,user2>
 if (defined $removeadmins){
-    my @old_admins = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
+    my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
     my @admins = &remove_from_list($removeadmins,@old_admins);
     my $admins=join(",",@admins);
     &AD_project_update({ldap=>$ldap,
@@ -776,7 +776,7 @@ if (defined $membergroups){
 # --addmembergroups <group1,group2>
 if (defined $addmembergroups){
     my @addmembergroups=split(/,/,$addmembergroups);
-    my @old_membergroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
+    my @old_membergroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
     my @membergroups = uniq(@old_membergroups,@addmembergroups); 
     my $membergroups=join(",",@membergroups);
     &AD_project_update({ldap=>$ldap,
@@ -788,7 +788,7 @@ if (defined $addmembergroups){
 
 # --removemembergroups <user1,user2>
 if (defined $removemembergroups){
-    my @old_membergroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
+    my @old_membergroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
     my @membergroups = &remove_from_list($removemembergroups,@old_membergroups);
     my $membergroups=join(",",@membergroups);
     &AD_project_update({ldap=>$ldap,
@@ -814,7 +814,7 @@ if (defined $admingroups){
 # --addadmingroups <group1,group2>
 if (defined $addadmingroups){
     my @addadmingroups=split(/,/,$addadmingroups);
-    my @old_admingroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
+    my @old_admingroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
     my @admingroups = uniq(@old_admingroups,@addadmingroups); 
     my $admingroups=join(",",@admingroups);
     &AD_project_update({ldap=>$ldap,
@@ -826,7 +826,7 @@ if (defined $addadmingroups){
 
 # --removeadmingroups <user1,user2>
 if (defined $removeadmingroups){
-    my @old_admingroups = &AD_project_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
+    my @old_admingroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
     my @admingroups = &remove_from_list($removeadmingroups,@old_admingroups);
     my $admingroups=join(",",@admingroups);
     &AD_project_update({ldap=>$ldap,

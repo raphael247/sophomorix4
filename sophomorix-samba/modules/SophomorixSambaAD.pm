@@ -47,7 +47,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_fetch
             AD_project_fetch
             AD_project_update
-            AD_project_fetch_multivalue
+            AD_dn_fetch_multivalue
             AD_project_sync_members
             AD_group_show_list
             AD_object_move
@@ -1261,8 +1261,8 @@ sub AD_project_fetch {
 }
 
 
-sub AD_project_fetch_multivalue {
-    # get multivalue attributes with dn
+sub AD_dn_fetch_multivalue {
+    # get multivalue attribute with dn
     my ($ldap,$root_dse,$dn,$attr_name) = @_;
     my $filter="cn=*";
     my $mesg = $ldap-> search( # perform a search
