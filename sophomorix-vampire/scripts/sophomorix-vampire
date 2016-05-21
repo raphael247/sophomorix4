@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-project) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  jeffbeck@linuxmuster.net
+
+
+
+# ===========================================================================
+# Bibliotheken
+# ===========================================================================
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+#use IMAP::Admin;
+#use DBI;
+use Net::LDAP;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 check_options
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                    );
+
+my @arguments = @ARGV;
+
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $datadir="/root/linuxmuster6";
+
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "verbose|v+" => \$Conf::log_level,
+         );
+
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlbeschreibung
+   print('
+sophomorix-vampire imports users, classes and projects from a linuxmuster.net 6.x server 
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+
+Getting information:
+  -i / --info
+
+Configuring:
+  --datadir /path/to/migration/files
+
+
+Please see the sophomorix-vampire(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+
+print "Testing files in ";
+
+
+# --info
+if ($info==1){
+    
+    exit;
+}
+
+
+&log_script_start(@arguments);
+
+
+#my ($ldap,$root_dse) = &AD_bind_admin();
+#&AD_unbind_admin($ldap);
+
+&log_script_end(@arguments);

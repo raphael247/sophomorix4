@@ -78,7 +78,7 @@ TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
 #TOOLS=$(DESTDIR)/root/sophomorix-developer
 
 
-all: install-sophomorix-samba install-virusscan install-developer
+all: install-sophomorix-samba install-virusscan install-developer install-vampire
 
 help:
 	@echo ' '
@@ -219,6 +219,11 @@ install-virusscan:
 #	### install-janitor
 #	@install -d $(DESTDIR)/usr/sbin
 #	@install -oroot -groot --mode=0744 sophomorix-base/scripts/sophomorix-janitor $(DESTDIR)/usr/sbin
+
+install-vampire:
+	### install-vampire
+	@install -d $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-vampire/scripts/sophomorix-vampire $(DESTDIR)/usr/sbin
 
 
 
