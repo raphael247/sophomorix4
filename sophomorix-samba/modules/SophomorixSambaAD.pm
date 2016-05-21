@@ -49,7 +49,7 @@ $Data::Dumper::Terse = 1;
             AD_project_update
             AD_dn_fetch_multivalue
             AD_project_sync_members
-            AD_group_show_list
+            AD_group_list
             AD_object_move
             AD_debug_logdump
             );
@@ -1377,7 +1377,6 @@ sub AD_project_update {
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
     &AD_project_sync_members($ldap,$root_dse,$dn);
-
 }
 
 
@@ -1515,8 +1514,10 @@ sub AD_project_sync_members {
 
 
 
-sub AD_group_show_list {
-    my ($ldap,$root_dse,$type) = @_;
+sub AD_group_list {
+    # show==0 return list of project dn's
+    # show==1 print ist, no return
+    my ($ldap,$root_dse,$type,$show) = @_;
     my $filter="(&(objectClass=group)(sophomorixType=".$type."))";
     my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
 
@@ -1527,53 +1528,65 @@ sub AD_group_show_list {
                    filter => $filter,
                    control => [ $sort ]
                          );
-    my $max_pro = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
-    print "-----------------+----------+-----+----+-+-",
-          "+-+-+--------------------------------\n";
-    printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
-           "Name","AQ","AMQ","MM","A","L","S","J","Description";
-    print "-----------------+----------+-----+----+-+-",
-          "+-+-+--------------------------------\n";
+    my $max_pro = $mesg->count;
 
-    for( my $index = 0 ; $index < $max_pro ; $index++) {
-        my $entry = $mesg->entry($index);
-        $dn=$entry->dn();
-        my $mailalias;
-        if ($entry->get_value('sophomorixMailAlias') eq "FALSE"){
-            $mailalias=0;
-        } else {
-            $mailalias=1;
-        }
-        my $maillist;
-        if ($entry->get_value('sophomorixMailList') eq "FALSE"){
-            $maillist=0;
-        } else {
-            $maillist=1;
-        }
-        my $joinable;
-        if ($entry->get_value('sophomorixJoinable') eq "FALSE"){
-            $joinable=0;
-        } else {
-            $joinable=1;
-        }
+    if ($show==1){ 
+        &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
+        print "-----------------+----------+-----+----+-+-",
+              "+-+-+--------------------------------\n";
+        printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
+               "Name","AQ","AMQ","MM","A","L","S","J","Description";
+        print "-----------------+----------+-----+----+-+-",
+              "+-+-+--------------------------------\n";
 
-        printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
-                  $entry->get_value('sAMAccountName'),
-                  $entry->get_value('sophomorixAddQuota'),
-                  $entry->get_value('sophomorixAddMailQuota'),
-                  $entry->get_value('sophomorixMaxMembers'),
-                  $mailalias,
-                  $maillist,
-                  $entry->get_value('sophomorixStatus'),
-                  $joinable,
-	          $entry->get_value('description');
+        for( my $index = 0 ; $index < $max_pro ; $index++) {
+            my $entry = $mesg->entry($index);
+            $dn=$entry->dn();
+            my $mailalias;
+            if ($entry->get_value('sophomorixMailAlias') eq "FALSE"){
+                $mailalias=0;
+            } else {
+                $mailalias=1;
+            }
+            my $maillist;
+            if ($entry->get_value('sophomorixMailList') eq "FALSE"){
+                $maillist=0;
+            } else {
+                $maillist=1;
+            }
+            my $joinable;
+            if ($entry->get_value('sophomorixJoinable') eq "FALSE"){
+                $joinable=0;
+            } else {
+                $joinable=1;
+            }
+
+            printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
+                $entry->get_value('sAMAccountName'),
+                $entry->get_value('sophomorixAddQuota'),
+                $entry->get_value('sophomorixAddMailQuota'),
+                $entry->get_value('sophomorixMaxMembers'),
+                $mailalias,
+                $maillist,
+                $entry->get_value('sophomorixStatus'),
+                $joinable,
+	        $entry->get_value('description');
+        }
+        print "-----------------+----------+-----+----+-+-",
+              "+-+-+--------------------------------\n";
+        print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
+        print " A=mailalias    L=mailist,       S=status                  \n";
+        &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
+    } elsif ($show==0){
+        my @projects_dn=();
+        for( my $index = 0 ; $index < $max_pro ; $index++) {
+            my $entry = $mesg->entry($index);
+            $dn=$entry->dn();
+            push @projects_dn,$dn;   
+        }
+	@projects_dn = sort @projects_dn;
+        return @projects_dn;
     }
-    print "-----------------+----------+-----+----+-+-",
-          "+-+-+--------------------------------\n";
-    print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
-    print " A=mailalias    L=mailist,       S=status                  \n";
-    &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
 }
 
 

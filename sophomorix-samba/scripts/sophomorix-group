@@ -30,7 +30,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_kill
                                  AD_group_addmember
                                  AD_group_removemember
-                                 AD_group_show_list
+                                 AD_group_list
                                  get_forbidden_logins
                                     );
 
@@ -127,7 +127,7 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 # --info
 if ($info==1){
-    &AD_group_show_list($ldap,$root_dse,"sophomorix-group");
+    &AD_group_list($ldap,$root_dse,"sophomorix-group",1);
     exit;
 }
 
