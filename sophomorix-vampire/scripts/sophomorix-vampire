@@ -41,10 +41,17 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $datadir="/root/linuxmuster6";
+my $sophomorix_add_output="/root/sophomorix.add";
 
-my @files=("/var/log/sophomorix/pg2ldif/accounts.sql",
-           "/var/log/sophomorix/pg2ldif/groups.sql",
-           "/var/log/sophomorix/pg2ldif/groups_users.sql",
+
+my @files=(
+            "/viewdump/userdata_view.sql",
+#            "/viewdump/classdata_view.sql",
+#            "/viewdump/projectdata_view.sql",
+#            "/viewdump/memberdata_view.sql",
+#           "/var/log/sophomorix/pg2ldif/accounts.sql_mini",
+#           "/var/log/sophomorix/pg2ldif/groups.sql",
+#           "/var/log/sophomorix/pg2ldif/groups_users.sql",
           );
 
 # Parsen der Optionen
@@ -76,10 +83,12 @@ Options
 
    sophomorix-dump-pg2ldap --dump
    sophomorix-project --dump /root/projects.dump
+   dump-postgres-views.sh root/viewdump
 
 2. Saving the following file in a directory, i.e. /root/migration:
 
    /root/projects.dump
+   /root/viewdump/
 
 2. Saving /etc/sophomorix in a directory, i.e. /root/migration/etc/sophomorix:
 3. Saving /var/lib/sophomorix in a directory, i.e. /root/migration/var/lib/sophomorix
@@ -123,6 +132,79 @@ if ($info==1){
     
     exit;
 }
+
+# creating sophomorix.add
+my $account_sql=$datadir.$files[0];
+open(ACCOUNTS,"<$account_sql") || die;
+open(SOPHOMORIXADD,">$sophomorix_add_output") || die;
+
+my $line_number=0;
+my %tags=();
+while(<ACCOUNTS>){
+    my $line=$_;
+    $line_number++;
+    my @attrs=split(/\|/,$line);
+    my $count=0;
+    print "Line $line_number:\n";
+    if ($line_number==1){
+        foreach my $attr (@attrs){
+            $attr=~s/^\s+//g;# remove leading whitespace
+            $attr=~s/\s+$//g;# remove trailing whitespace
+            print "   $count: * >$attr<\n";
+            $tags{$count}=$attr;
+            $count++;
+        }
+    } else {
+        my %line=();
+        my $role="";
+        my $skip_line=0;
+        foreach my $attr (@attrs){
+            $attr=~s/^\s+//g;# remove leading whitespace
+            $attr=~s/\s+$//g;# remove trailing whitespace
+            print "   $count: $tags{$count}: >$attr<\n";
+            $line{$tags{$count}}=$attr;
+            $count++;
+        }
+        if ($line{"homedirectory"}=~m/\/home\/teachers\//){
+	    print "$line{'uid'} teacher\n";
+            $role="teacher";
+        } elsif ($line{"homedirectory"}=~m/\/home\/students\//){
+            $role="student";
+        } else {
+            # exam accounts are skipped
+            $skip_line=1;
+        }
+        if ($line{"unid"} eq""){
+            $line{"unid"}="---";
+        }
+        my ($year,$month,$day) = split(/-/,$line{"birthday"});
+        my $birthdate=$day.".".$month.".".$year;
+
+        # create_line
+        my $line= $line{"gid"}."::".
+                  $line{"surname"}.";".
+                  $line{"firstname"}.";".
+                  $birthdate."::".
+                  $line{"uid"}."::".
+                  "---"."::".
+                  $line{"uidnumber"}."::".
+                  $line{"gidnumber"}."::".
+                  $line{"unid"}."::".
+                  "---"."::".
+                  "---"."::".
+                  $role."::".
+                  $line{"firstname"}."::".
+                  $line{"surname"}."::\n";
+        if ($skip_line==0){
+	    print $line;
+	    print SOPHOMORIXADD $line;
+        }
+    }
+    print "\n";
+}
+close(ACCOUNTS);
+close(SOPHOMORIXADD);
+
 
 
 &log_script_start(@arguments);
