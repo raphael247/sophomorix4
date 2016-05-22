@@ -69,6 +69,8 @@ my $ou="";
 my $school_token="";
 my $role="unknown";
 
+my @loglines=();
+
 my @users_for_quota=();
 my %forbidden_login_hash=();
 
@@ -368,8 +370,9 @@ while(<SOPHOMORIXADD>){
        # Abbrechen, Wunsch-Login soll nicht verändert werden
        print "\nERROR:\n";
        print "Cannot add user $firstname_ascii $surname_ascii ($firstname_utf8 $surname_utf8) \n";
-       print "Login   $wunsch_login   exists in the system",
-             "/is a forbidden name!\n\n";
+       print "Login $wunsch_login exists already ($forbidden_login_hash{$login_name_to_check})!\n\n";
+       my $error_line="   ERROR: $wunsch_login not added ($forbidden_login_hash{$login_name_to_check})";
+       push @loglines,$error_line;
        next;
    } else {
        # Wenn schon vorhanden, muss Login-Namen modifiziert werden
@@ -549,6 +552,15 @@ while(<SOPHOMORIXADD>){
 
 close(SOPHOMORIXADD);
 close(NOCHANLEGEN);
+
+############################################################
+# print logs
+if ($#loglines >= 0){
+    &print_title("The following Problems were encountered");
+    foreach my $line (@loglines){
+        print "$line\n";
+    }
+}
 
 if ($user_count==0){ 
     &print_title("NOT creating userlists (0 users added)");

@@ -1840,7 +1840,7 @@ sub  get_forbidden_logins{
         my $entry = $mesg->entry($index);
         my @values = $entry->get_value( 'sAMAccountName' );
         foreach my $login (@values){
-            $forbidden_logins{$login}="login in AD";
+            $forbidden_logins{$login}="login $login exists in AD";
         }
     }
 
@@ -1849,7 +1849,7 @@ sub  get_forbidden_logins{
         open(PASS, "/etc/passwd");
         while(<PASS>) {
             my ($login)=split(/:/);
-            $forbidden_logins{$login}="login in /etc/passwd";
+            $forbidden_logins{$login}="login $login exists in /etc/passwd";
         }
         close(PASS);
     }
@@ -1862,7 +1862,7 @@ sub  get_forbidden_logins{
             my ($group)=split(/;/);
             chomp($group);
             if ($group ne ""){
-                $forbidden_logins{$group}="future group in schueler.txt";
+                $forbidden_logins{$group}="future group $group in schueler.txt";
    	    }
          }
          close(STUDENTS);
@@ -1880,7 +1880,7 @@ sub  get_forbidden_logins{
         my $entry = $mesg->entry($index);
         my @values = $entry->get_value( 'sAMAccountName' );
         foreach my $group (@values){
-            $forbidden_logins{$group}="group in AD";
+            $forbidden_logins{$group}="group $group exists in AD";
         }
     }
 
@@ -1889,7 +1889,7 @@ sub  get_forbidden_logins{
         open(GROUP, "/etc/group");
         while(<GROUP>) {
             my ($group)=split(/:/);
-            $forbidden_logins{$group}="group in /etc/group";
+            $forbidden_logins{$group}="group $group exists in /etc/group";
         }
         close(GROUP);
     }
