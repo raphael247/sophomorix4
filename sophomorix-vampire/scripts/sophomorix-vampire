@@ -42,11 +42,16 @@ my $help=0;
 my $info=0;
 my $datadir="/root/linuxmuster6";
 
+my @files=("/var/log/sophomorix/pg2ldif/accounts.sql",
+           "/var/log/sophomorix/pg2ldif/groups.sql",
+           "/var/log/sophomorix/pg2ldif/groups_users.sql",
+          );
 
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "datadir=s" => \$datadir,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -67,6 +72,20 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
+1. Exporting user data on linuxmusternet6 server:
+
+   sophomorix-dump-pg2ldap --dump
+   sophomorix-project --dump /root/projects.dump
+
+2. Saving the following file in a directory, i.e. /root/migration:
+
+   /root/projects.dump
+
+2. Saving /etc/sophomorix in a directory, i.e. /root/migration/etc/sophomorix:
+3. Saving /var/lib/sophomorix in a directory, i.e. /root/migration/var/lib/sophomorix
+4. Saving /var/log/sophomorix in a directory, i.e. /root/migration/var/log/sophomorix
+
+
 Getting information:
   -i / --info
 
@@ -81,8 +100,22 @@ Please see the sophomorix-vampire(8) man pages for full documentation
 }
 
 
+my $missig_files_count=0;
+print "Testing files in ${datadir}:\n";
+foreach my $file (@files){
+    my $abs_file=$datadir.$file;
+    if (-f $abs_file){
+        print "     OK: $abs_file\n";    
+    } else {
+        print "  ERROR: $abs_file\n";    
+	$missig_files_count++;
+    }
+}
 
-print "Testing files in ";
+if ($missig_files_count > 0){
+    print "\nERROR: $missig_files_count file for migration are missing\n\n";
+    exit;
+}
 
 
 # --info
