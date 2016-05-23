@@ -18,6 +18,11 @@ use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -41,11 +46,15 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $datadir="/root/linuxmuster6";
+my $create_add_file=0;
+my $create_project_script=0;
+my $project_script="/root/create_projects.sh";
 my $sophomorix_add_output="/root/sophomorix.add";
 
 
 my @files=(
             "/viewdump/userdata_view.sql",
+            "/projects.dump",
 #            "/viewdump/classdata_view.sql",
 #            "/viewdump/projectdata_view.sql",
 #            "/viewdump/memberdata_view.sql",
@@ -59,6 +68,8 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
            "datadir=s" => \$datadir,
+           "create-add-file" => \$create_add_file,
+           "create-project-script" => \$create_project_script,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -94,6 +105,11 @@ Options
 3. Saving /var/lib/sophomorix in a directory, i.e. /root/migration/var/lib/sophomorix
 4. Saving /var/log/sophomorix in a directory, i.e. /root/migration/var/log/sophomorix
 
+
+Migration:
+
+sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
+sophomorix-vampire --datadir ../sophomorix4-migration-data --create-project-script
 
 Getting information:
   -i / --info
@@ -133,77 +149,185 @@ if ($info==1){
     exit;
 }
 
+# --create-add-file
 # creating sophomorix.add
-my $account_sql=$datadir.$files[0];
-open(ACCOUNTS,"<$account_sql") || die;
-open(SOPHOMORIXADD,">$sophomorix_add_output") || die;
+if ($create_add_file==1){
+    my $account_sql=$datadir.$files[0];
+    open(ACCOUNTS,"<$account_sql") || die;
+    open(SOPHOMORIXADD,">$sophomorix_add_output") || die;
 
-my $line_number=0;
-my %tags=();
-while(<ACCOUNTS>){
-    my $line=$_;
-    $line_number++;
-    my @attrs=split(/\|/,$line);
-    my $count=0;
-    print "Line $line_number:\n";
-    if ($line_number==1){
-        foreach my $attr (@attrs){
-            $attr=~s/^\s+//g;# remove leading whitespace
-            $attr=~s/\s+$//g;# remove trailing whitespace
-            print "   $count: * >$attr<\n";
-            $tags{$count}=$attr;
-            $count++;
-        }
-    } else {
-        my %line=();
-        my $role="";
-        my $skip_line=0;
-        foreach my $attr (@attrs){
-            $attr=~s/^\s+//g;# remove leading whitespace
-            $attr=~s/\s+$//g;# remove trailing whitespace
-            print "   $count: $tags{$count}: >$attr<\n";
-            $line{$tags{$count}}=$attr;
-            $count++;
-        }
-        if ($line{"homedirectory"}=~m/\/home\/teachers\//){
-	    print "$line{'uid'} teacher\n";
-            $role="teacher";
-        } elsif ($line{"homedirectory"}=~m/\/home\/students\//){
-            $role="student";
+    my $line_number=0;
+    my %tags=();
+    while(<ACCOUNTS>){
+        my $line=$_;
+        $line_number++;
+        my @attrs=split(/\|/,$line);
+        my $count=0;
+        print "Line $line_number:\n";
+        if ($line_number==1){
+            foreach my $attr (@attrs){
+                $attr=~s/^\s+//g;# remove leading whitespace
+                $attr=~s/\s+$//g;# remove trailing whitespace
+                print "   $count: * >$attr<\n";
+                $tags{$count}=$attr;
+                $count++;
+            }
         } else {
-            # exam accounts are skipped
-            $skip_line=1;
-        }
-        if ($line{"unid"} eq""){
-            $line{"unid"}="---";
-        }
-        my ($year,$month,$day) = split(/-/,$line{"birthday"});
-        my $birthdate=$day.".".$month.".".$year;
+            my %line=();
+            my $role="";
+            my $skip_line=0;
+            foreach my $attr (@attrs){
+                $attr=~s/^\s+//g;# remove leading whitespace
+                $attr=~s/\s+$//g;# remove trailing whitespace
+                print "   $count: $tags{$count}: >$attr<\n";
+                $line{$tags{$count}}=$attr;
+                $count++;
+            }
+            if ($line{"homedirectory"}=~m/\/home\/teachers\//){
+	        print "$line{'uid'} teacher\n";
+                $role="teacher";
+            } elsif ($line{"homedirectory"}=~m/\/home\/students\//){
+                $role="student";
+            } else {
+                # exam accounts are skipped
+                $skip_line=1;
+            }
+            if ($line{"unid"} eq""){
+                $line{"unid"}="---";
+            }
+            my ($year,$month,$day) = split(/-/,$line{"birthday"});
+            my $birthdate=$day.".".$month.".".$year;
 
-        # create_line
-        my $line= $line{"gid"}."::".
-                  $line{"surname"}.";".
-                  $line{"firstname"}.";".
-                  $birthdate."::".
-                  $line{"uid"}."::".
-                  "---"."::".
-                  $line{"uidnumber"}."::".
-                  $line{"gidnumber"}."::".
-                  $line{"unid"}."::".
-                  "---"."::".
-                  "---"."::".
-                  $role."::".
-                  $line{"firstname"}."::".
-                  $line{"surname"}."::\n";
-        if ($skip_line==0){
-	    print $line;
-	    print SOPHOMORIXADD $line;
+            # create_line
+            my $line= $line{"gid"}."::".
+                      $line{"surname"}.";".
+                      $line{"firstname"}.";".
+                      $birthdate."::".
+                      $line{"uid"}."::".
+                      "---"."::".
+                      $line{"uidnumber"}."::".
+                      $line{"gidnumber"}."::".
+                      $line{"unid"}."::".
+                      "---"."::".
+                      "---"."::".
+                      $role."::".
+                      $line{"firstname"}."::".
+                      $line{"surname"}."::\n";
+            if ($skip_line==0){
+	        print $line;
+	        print SOPHOMORIXADD $line;
+            }
+        }
+        print "\n";
+    }
+    close(ACCOUNTS);
+    close(SOPHOMORIXADD);
+}
+
+
+# --create-project-script
+# creating /root/create_projects.sh
+if ($create_project_script==1){
+    my %data=();
+    my @pro=();
+    print "Creating $project_script\n";
+    my $projects_dump=$datadir.$files[1];
+    open(PRO,"<$projects_dump") || die;
+    open(PROSCRIPT,">$project_script") || die;
+    print PROSCRIPT "#!/bin/sh\n";
+    while(<PRO>){
+        if(m/\./){
+            print $_;
+            chomp();
+            my ($pro,$setting) = split(/\./);
+            my ($para,$set) = split(/=/,$setting);
+            $pro=~s/^\s+//g;# remove leading whitespace
+            print "$pro:  $para  >$set<\n";
+            # saving data
+            push @pro, $pro;
+            $data{$pro}{$para}="$set";
         }
     }
-    print "\n";
+    print Dumper(%data);
+    @pro = uniq(@pro);
+
+    # creating script
+    # create projects
+    foreach my $pro (@pro){
+        my $command="sophomorix-project --create -p $pro";
+        print "   $command\n";
+        print PROSCRIPT "$command\n";
+   
+    }
+
+
+    # change projects
+    foreach my $pro (@pro){
+        my $command="sophomorix-project -p $pro";
+        # --join/--nojoin
+        if ($data{$pro}{'joinable'}==0){
+            $command = $command." --nojoin";
+        } else {
+            $command = $command." --join";
+        }
+        # --mailalias/--nomailalias
+        if ($data{$pro}{'mailalias'}==0){
+            $command = $command." --nomailalias";
+        } else {
+            $command = $command." --mailalias";
+        }
+        # --maillist/--nomaillist
+        if ($data{$pro}{'maillist'}==0){
+            $command = $command." --nomaillist";
+        } else {
+            $command = $command." --maillist";
+        }
+
+        # --maxmembers
+        $command = $command." --maxmembers ".$data{$pro}{'maxmembers'};
+
+        # --description
+        $command = $command." --description ".$data{$pro}{'longname'};
+
+        # --addquota
+        if ($data{$pro}{'addquota'} eq "quota"){
+            $command = $command." --addquota ---";
+        } else {
+            $command = $command." --addquota ".$data{$pro}{'addquota'};
+        }
+
+        # --status
+        $command = $command." --status ".$data{$pro}{'sophomorixstatus'};
+  #      # --creationtime
+  #      $command = $command." --creationtime ".$data{$pro}{'creationtime'};
+
+        # --admins
+        $command = $command." --admins ".$data{$pro}{'admins'};
+        # --members
+        $command = $command." --members ".$data{$pro}{'members'};
+
+        my @membergroups=split(/,/,$data{$pro}{'membergroups'});
+        my @memberprojects=split(/,/,$data{$pro}{'memberprojects'});
+        my @all=(@membergroups,@memberprojects);
+
+
+        my $all="\"\"";
+        if ($#all >= 0){
+            $all = join(",",@all);
+        }
+  
+      # --membergroups
+        $command = $command." --membergroups ".$all;
+
+
+        print "   $command\n";
+        print PROSCRIPT "$command\n";
+
+    }
+    close(PRO);
+    close(PROSCRIPT);
+    system("chmod 755 $project_script");
 }
-close(ACCOUNTS);
-close(SOPHOMORIXADD);
 
 
 
