@@ -1,0 +1,922 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-user) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+
+# ===========================================================================
+# Bibliotheken
+# ===========================================================================
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+#use IMAP::Admin;
+#use DBI;
+use Net::LDAP;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 remove_from_list
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_ou_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_kill
+                                 AD_group_addmember
+                                 AD_get_ou_tokened
+                                 AD_get_name_tokened
+                                 AD_project_fetch
+                                 AD_project_update
+                                 AD_project_sync_members
+                                 AD_dn_fetch_multivalue
+                                 AD_group_list
+                                 get_forbidden_logins
+                                    );
+
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+
+# use strict;
+# use Getopt::Long;
+# Getopt::Long::Configure ("bundling");
+# #use Schedule::at;
+# use String::Approx 'amatch';
+# use Sophomorix::SophomorixConfig;
+# use Sophomorix::SophomorixBase;
+# use Time::Local;
+# use Time::localtime;
+# use Term::ANSIColor qw(:constants); # farbiger Text RED, BLUE, ...
+# # nach jedem Printbefehl wieder auf Standardfarbe zurücksetzen
+# $Term::ANSIColor::AUTORESET = 1;
+# use IMAP::Admin;
+# use DBI;
+# use Net::LDAP;
+# use Date::Calc qw(check_date);
+# use Sophomorix::SophomorixPgLdap qw(show_modulename
+#                                     db_connect
+#                                     check_connections
+#                                     search_user
+#                                     list_teachers_by_year
+#                                     update_uid_ldap
+#                                     fetchdata_from_account
+#                                     forbidden_login_hash
+#                                     update_user_db_entry
+#                                     date_pg2perl
+#                                     user_deaktivieren
+#                                     user_reaktivieren     
+#                                     check_sophomorix_user
+#                                     set_sophomorix_passwd
+#                                     fetchstudents_from_adminclass
+#                                     db_connect
+#                                    );
+#my @arguments = @ARGV;
+
+
+my $today=`date +%d.%m.%Y`;
+chomp($today);
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+$Conf::log_level=1;
+
+my $info=0;
+my $help=0;
+my $empty_password=0;
+my $freeze="";
+my $permanent="";
+my $removable="";
+my $killable="";
+my $kill_all_users=0;
+my $activate="";
+my $teacher="";
+my $sc_toleration="empty";
+my $reset_user="";
+my $search="";
+my $search_login="";
+my $old_uid="";
+my $new_uid="";
+my $old_mailbox="";
+my $new_mailbox="";
+my $auth=0;
+my $new_class="";
+my $list_teachers_by_year=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+       "verbose|v+" => \$Conf::log_level,
+       "help|h" => \$help,
+       "i|info" => \$info,
+       "s|search=s" => \$search,
+       "u|user=s" => \$search_login,
+       "F|freeze=s" => \$freeze,
+       "P|permanent=s" => \$permanent,
+       "R|removable=s" => \$removable,
+       "K|killable=s" => \$killable,
+       "old-uid=s" => \$old_uid,
+       "new-uid=s" => \$new_uid,
+       "old-mailbox=s" => \$old_mailbox,
+       "new-mailbox=s" => \$new_mailbox,
+       "kill-all-users" => \$kill_all_users,
+       "A|activate=s" => \$activate,
+       "reset-user=s" => \$reset_user,
+       "empty-password" => \$empty_password,
+       "scheduled-toleration=s" => \$sc_toleration,
+       "t|teacher=s" => \$teacher,
+       "auth|ldap" => \$auth,
+       "list-teachers-by-year" => \$list_teachers_by_year,
+       "new-class|newclass=s" => \$new_class,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt);
+#&check_connections();
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlbeschreibung
+   print('
+sophomorix-user edits the sophomorix user database.
+
+Options
+  -h   /  --help
+  -i   /  --info
+  -v   /  --verbose
+  -vv  /  --verbose --verbose
+
+Search for a user/users:
+  -s string /   --search string
+  -u user   /   --user user
+  --list-teachers-by-year
+
+Changing status of a user:
+  -F user   /   --freeze user
+  -P user   /   --permanent user
+  -R user   /   --removable user
+  -K user   /   --killable user
+  -A user   /   --activate user
+
+Changing loginname of a user:
+  --old-uid oldlogin --new-uid newlogin
+  (WARNING: This is Alpha!!! This will never work 100%!)
+  Problems: The user has to be logged out!
+            cyrus and imap will be restartet!
+  --> Do this at night!
+  
+Moving the mailbox of a user:
+  (This is included in --old-uid oldlogin --new-uid newlogin.
+  It should never be necessary to move the mailbox by itself)
+  --old-mailbox oldlogin --new-mailbox newlogin
+  --> Do this only when you know what to do!
+
+Changing class of a user (that is not in scheler.txt)
+  -u user --newclass newclass
+  (to move user, sophomorix-move must be called)
+
+
+Actions:
+  --reset-user user1,user2,...
+  --reset-user user1,user2,... --empty-password
+  --teacher teacher --scheduled-toleration yyyy-mm--dd
+  --kill-all-users
+  
+
+
+Please see the sophomorix-user(8) man pages for full documentation
+');
+   print "\n";
+
+   exit;
+}
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+
+
+# --info
+if ($info==1){
+
+    # STUDENTS
+    ##################################################
+    my ($usable)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='U'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($enabled)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='E'
+                                       AND NOT adminclass='${DevelConf::teacher}' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($tolerated)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='T'
+                                       AND NOT adminclass='$DevelConf::teacher'
+                                       AND NOT adminclass='speicher'
+                                      ");
+    my ($activated)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='A'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($selfactivated)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='S'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($disabled)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='D'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($removeable)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='R'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($killable)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='K'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($frozen)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='F'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+    my ($permanent)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='P'
+                                       AND NOT adminclass='$DevelConf::teacher' 
+                                       AND NOT adminclass='speicher' 
+                                     ");
+
+    # TEACHERS
+    ##################################################
+    my ($usable_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='U' 
+                                       AND (adminclass='$DevelConf::teacher'
+                                       OR adminclass='speicher')
+                                     ");
+    my ($enabled_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='E'
+                                       AND (adminclass='$DevelConf::teacher'
+                                       OR adminclass='speicher')
+                                     ");
+    my ($tolerated_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='T'
+                                       AND (adminclass='$DevelConf::teacher'
+                                       OR adminclass='speicher')
+                                      ");
+    my ($activated_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='A'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+    my ($selfactivated_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='S'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+    my ($disabled_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='D'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+    my ($removeable_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='R'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+    my ($killable_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='K'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+    my ($frozen_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='F'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+    my ($permanent_t)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='P'
+                                       AND (adminclass='$DevelConf::teacher' 
+                                       OR adminclass='speicher')
+                                     ");
+
+    # EXAM ACCOUNTS
+    ##################################################
+    my ($permanent_e)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='P'
+                                       AND homedirectory 
+                                       LIKE '/home/workstations/%'");
+    # WORKSTATION ACCOUNTS
+    ##################################################
+    my ($permanent_w)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='P'
+                                       AND uid LIKE '%\$'");
+
+    # ADMINS
+    ##################################################
+    my ($permanent_a)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus='P'
+                                       AND homedirectory 
+                                       LIKE '/home/administrators/%'");
+
+    # OTHERS
+    ##################################################
+
+    my ($others)= $dbh->selectrow_array( "SELECT count(uid) 
+                                       FROM userdata
+                                       WHERE sophomorixstatus IS NULL 
+                                     ");
+
+    # TOTAL
+    ##################################################
+    my $total=$usable+$enabled+$tolerated+$activated+$selfactivated+
+	$disabled+$removeable+$killable+$frozen+$permanent;
+
+    my $total_t=$usable_t+$enabled_t+$tolerated_t+$activated_t+$selfactivated_t+
+	$disabled_t+$removeable_t+$killable_t+$frozen_t+$permanent_t;
+
+    my $total_a=$permanent_a;
+    my $total_w=$permanent_e;
+    my $total_total=$total+$total_t+$total_w+$total_a;
+
+
+    # OUTPUT
+    ##################################################
+    print "----------------+---+----------+----------+------+----------+--------+\n";
+    print "status          |   | students | teachers | exam | computer | admins |\n";
+    print "----------------+---+----------+----------+------+----------+--------+\n";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "usable/unlocked | U",$usable,$usable_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "enabled         | E",$enabled,$enabled_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "tolerated       | T",$tolerated,$tolerated_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "activated       | A",$activated,$activated_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "selfactivated   | S",$selfactivated,$selfactivated_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "disabled        | D",$disabled,$disabled_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "removeable      | R",$removeable,$removeable_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "killable        | K",$killable,$killable_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "frozen          | F",$frozen,$frozen_t,"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "permanent       | P",$permanent,$permanent_t,$permanent_e,$permanent_w,$permanent_a;
+    print "----------------+---+----------+----------+------+----------+--------+\n";
+    printf "%-6s %8s |   | %8s | %8s | %4s | %8s | %6s |\n",
+           "sum:","",
+                                               $total,$total_t,
+                                               $permanent_e,$permanent_w,$permanent_a;
+    print "----------------+---+----------+----------+------+----------+--------+\n";
+
+    print "Total users: $total_total (students,teachers,exam,admins) + $permanent_w (computer)\n\n";
+    exit;
+}
+
+
+&log_script_start(@arguments);
+
+
+#--user user --new-class class
+if ($search_login ne "" and $new_class ne ""){
+    my ($home,
+        $type,
+        $gecos,
+        $group,
+        $uidnumber,
+        $sambahomepath,
+        $firstpassword,
+        $sambaacctflags,
+        $exitadminclass,
+        $sambahomedrive,
+        $sambakickofftime,
+        $sambalmpassword,
+        $sambalogofftime,
+        $sambalogontime,
+        $sambantpassword,
+        $sambaprimarygroupsid,
+        $sambapwdcanchange,
+        $sambapwdlastset,
+        $sambapwdmustchange,
+        $sambasid,
+        $surname,
+        $firstname,
+        $userpassword,
+        $loginshell,
+        $gidnumber,
+        $sophomorixstatus) = &fetchdata_from_account($search_login);
+
+    my $file=${DevelConf::path_result}."/sophomorix.move";
+    print "   Old class:  $group \n";
+    print "   New class:  $new_class \n";
+    print "   Old Status: $sophomorixstatus \n";
+    my $line=$search_login."::".$group."::".$new_class."::".$sophomorixstatus."\n";
+    print "   New Line:   $line";
+
+    my $seen=0;
+    my $line_seen="";
+    open (MOVE, "$file");
+    while(<MOVE>) {
+        #print $_;
+        my ($uid,$rest) = split(/::/,$_);
+        #print "<$uid>\n";
+        if ($search_login eq $uid){
+            $seen=1;
+            $line_seen=$_;
+        }
+    }
+    close (MOVE);
+    if ($seen==0){
+        print "Creating new entry in $file\n";
+        # append line
+        open (MOVE, ">>$file");
+        print MOVE $line;
+        close (MOVE);
+    } else {
+        print "\nWARNING: Cannot create entry in $file\n";
+        print "$search_login has scheduled action: $line_seen\n";
+    }
+
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+# --old-uid oldlogin --new-uid newlogin
+if ($old_uid ne "" and $new_uid ne ""){
+
+    my %forbidden_login_hash=&forbidden_login_hash();
+
+    if (exists($forbidden_login_hash{$new_uid})){
+        &log_script_exit("ERROR: New login $new_uid exists in the system",
+                         1,1,0,@arguments);
+    }
+
+    # Fetch old data
+    my ($old_home,$old_type,$old_gecos,$old_group,$old_uidnumber,
+       $old_sambahomepath) = &fetchdata_from_account($old_uid);
+
+    if ($old_home eq ""){
+        &log_script_exit("Could not find old-uid $old_uid",
+                         1,1,0,@arguments);
+    }
+    my $dbh=&db_connect();
+    my ($old_dn)= $dbh->selectrow_array( "SELECT dn
+                                         FROM ldap_entries 
+                                         WHERE dn LIKE 'uid=$old_uid%'
+                                        ");
+    # changing stuff
+    my $new_home_update=$old_home;
+    $new_home_update=~s/\/${old_uid}$/\/${new_uid}/;
+    my $new_dn_update=$old_dn;
+    $new_dn_update=~s/uid=${old_uid},/uid=${new_uid},/;
+
+    print "1) Updating $old_uid to $new_uid in the sophomorix database\n";
+    &update_user_db_entry($old_uid,"Uid=$new_uid");
+    my $sql="UPDATE ldap_entries SET dn='$new_dn_update'
+             WHERE dn='$old_dn'";
+    if($Conf::log_level>=3){
+              print "\nSQL: $sql\n";
+    }
+    $dbh->do($sql);
+    &update_uid_ldap($old_uid,$new_uid);
+
+    print "2) Moving homedir.\n";
+    system("mv $old_home $new_home_update");
+
+    print "3) Renaming mailbox: $old_uid --> $new_uid\n";
+    &move_mailbox($old_uid,$new_uid);
+
+    print "4) Updating Horde database not supported\n";
+
+    print "5) Updating lehrer.txt if $old_uid is a teacher\n";
+    if ($old_type eq "teacher"){
+        &lehrer_ordnen($old_uid,$new_uid);
+    }
+
+    print "6) Updating /etc/aliases:\n";
+
+    system("${DevelConf::path_sbin}/sophomorix-mail --skiplock");
+    # log
+    &append_login_rename_log("man-rename-login",
+                           $old_uid,
+                           $new_uid,
+                           $old_uidnumber,
+                         );
+    print "... done!\n";
+
+
+    # Fetch new data
+    my ($new_home_db,$new_type,$new_gecos,$new_group,$new_uidnumber,
+       $new_sambahomepath_db) = &fetchdata_from_account($new_uid);
+    my ($new_dn_db)= $dbh->selectrow_array( "SELECT dn
+                                         FROM ldap_entries 
+                                         WHERE dn LIKE 'uid=$new_uid%'
+                                        ");
+    my $id_result_old="";
+    if (system("id $old_uid > /dev/null 2>&1")){
+        $id_result_old="$old_uid (nonexisting,OK)";
+    } else {
+        $id_result_old="$old_uid (existing,ERROR)";
+    };
+    my $id_result_new="";
+    if (system("id $new_uid > /dev/null 2>&1")){
+        $id_result_new="$new_uid (nonexisting,ERROR)";
+    } else {
+        $id_result_new="$new_uid (existing,OK)";
+    };
+
+    my $old_home_result="";
+    if (-d $old_home){
+	$old_home_result=$old_home." (exists,ERROR)";
+    } else {
+	$old_home_result=$old_home." (nonexisting,OK)";
+    }
+    my $new_home_result="";
+    if (-d $new_home_db){
+	$new_home_result=$new_home_db." (exists,OK)";
+    } else {
+	$new_home_result=$new_home_db." (nonexisting,ERROR)";
+    }
+
+    # Path to mailbox
+    my $old_initial= substr $old_uid,0,1;
+    my $new_initial= substr $new_uid,0,1;
+    my $old_mailbox_dir="/var/spool/cyrus/mail/".$old_initial."/user/".$old_uid;
+    my $new_mailbox_dir="/var/spool/cyrus/mail/".$new_initial."/user/".$new_uid;
+    my $old_mailbox_dir_result="";
+    my $new_mailbox_dir_result="";
+
+    if (-d $old_mailbox_dir){
+	$old_mailbox_dir_result=$old_mailbox_dir." (exists, ERROR)";
+    } else {
+	$old_mailbox_dir_result=$old_mailbox_dir." (nonexisting, OK)";
+    }
+    if (-d $new_mailbox_dir){
+	$new_mailbox_dir_result=$new_mailbox_dir." (exists, OK)";
+    } else {
+	$new_mailbox_dir_result=$new_mailbox_dir." (nonexisting, ERROR)";
+    }
+
+    # ????? /var/lib/cyrus/lock/w/user/wei.lock bleibt erhalten
+
+    # print results
+    print "Checking success:\n";
+    print " Unix Acount:\n";
+    print "    OLD: $id_result_old\n";
+    print "    NEW: $id_result_new\n";
+    print " LDAP DN:\n";
+    print "    OLD: $old_dn\n";
+    print "    NEW: $new_dn_db\n";
+    print " UNIX home:\n";
+    print "    OLD: $old_home_result\n";
+    print "    NEW: $new_home_result\n";
+    print " SAMBA home:\n";
+    print "    OLD: $old_sambahomepath\n";
+    print "    NEW: $new_sambahomepath_db\n";
+    print " CYRUS mailbox dir:\n";
+    print "    OLD: $old_mailbox_dir_result\n";
+    print "    NEW: $new_mailbox_dir_result\n";
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# --old-mailbox oldlogin --new-mailbox newlogin
+if ($old_mailbox ne "" and $new_mailbox ne ""){
+    print "Renaming mailbox: $old_mailbox --> $new_mailbox\n";
+    &move_mailbox($old_mailbox,$new_mailbox);
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+
+# --freeze
+if ($freeze ne""){
+    # check if it is really an account
+    if (getpwnam("$freeze")){
+        print "Freezing the account of $freeze:\n";
+	print "   - $freeze is a valid username.\n";
+    } else {
+        &log_script_exit("$freeze is not a valid username",
+                         1,1,0,@arguments);
+    }
+    # doing the freeze
+    &update_user_db_entry($freeze, 
+                          "Status=F",
+       #                   "TolerationDate=",
+       #                   "DeactivationDate="
+                         );
+    &user_deaktivieren($freeze);
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+# --permanent
+if ($permanent ne""){
+    # check if it is really an account
+    if (getpwnam("$permanent")){
+        print "Making the account of $permanent permanent:\n";
+	print "   - $permanent is a valid username.\n";
+    } else {
+        &log_script_exit("$permanent is not a valid username",
+                         1,1,0,@arguments);
+    }
+    # making the account permanent
+    &update_user_db_entry($permanent, 
+                          "Status=P",
+    #                      "TolerationDate=",
+    #                      "DeactivationDate="
+                         );
+    &user_reaktivieren($permanent);
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+
+# --removable
+if ($removable ne""){
+    # check if it is really an account
+    if (getpwnam("$removable")){
+        print "Making the account of $removable removable by sophomorix-kill:\n";
+	print "   - $removable is a valid username.\n";
+    } else {
+        &log_script_exit("$removable is not a valid username",
+                         1,1,0,@arguments);
+    }
+    # doing the removable
+    &update_user_db_entry($removable, 
+                          "Status=R",
+                          "TolerationDate=01.01.1970",
+                          "DeactivationDate=01.01.1970");
+    &user_deaktivieren($removable);
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+
+# --killable
+if ($killable ne""){
+    # check if it is really an account
+    if (&check_sophomorix_user("$killable")==1){
+        print "Making the account of $killable killable by sophomorix-kill:\n";
+	print "   - $killable is a valid username.\n";
+    } else {
+        &log_script_exit("$killable is not a valid username",
+                         1,1,0,@arguments);
+    }
+    # doing the killable
+    &update_user_db_entry($killable, 
+                          "Status=K",
+ #                         "TolerationDate=01.01.1970",
+ #                         "DeactivationDate=01.01.1970"
+                         );
+    &user_deaktivieren($killable);
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# --kill-all-users
+if ($kill_all_users==1){
+    print "\n\n I will kill all users in 5 seconds!!\n";
+    sleep 1;
+    print "\n\n Hit Ctrl-C to abort!\n\n\n";
+    sleep 5;
+    my @teachers=&fetchstudents_from_adminclass(${DevelConf::teacher});
+    my @students=&Sophomorix::SophomorixAPI::fetchstudents_from_school();
+    my @users=(@teachers,@students);
+
+    my $count=0;
+    my $max=$#users;
+    foreach my $user_kill (@users){
+        $count++;
+        print "Mark $user_kill as killable. ($count/$max) \n";
+        system("sophomorix-user -K $user_kill");
+    }
+    # kein nscd_stop, da exit folgt.
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+# --activate
+if ($activate ne""){
+    # check if it is really an account
+    if (getpwnam("$activate")){
+        print "Actvating the account of $activate:\n";
+	print "   - $activate is a valid username.\n";
+    } else {
+        &log_script_exit("$activate is not a valid username",
+                         1,1,0,@arguments);
+    }
+    # activating the account
+    &update_user_db_entry($activate, 
+                          "Status=A",
+                          "TolerationDate=$today",
+                          "DeactivationDate=");
+    &user_reaktivieren($activate);
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+# --teacher teacher --scheduled-toleration
+if ($teacher ne"" and $sc_toleration ne "empty"){
+    # check if it is really an account
+    my ($home,$type,$gecos,$group,$uidnumber)=&fetchdata_from_account($teacher);
+ 
+    if ($type ne "teacher"){
+        &log_script_exit("$teacher is NOT a valid username of type teacher",
+                         1,1,0,@arguments);
+    } else {
+        print "   - $teacher is a valid username and of type 'teacher'\n";
+    }
+
+
+    # check date
+    my ($year,$month,$day)=split(/-/,$sc_toleration);
+    # define values, so that check_date does not throw errors 
+    if (not defined $year){
+        $year=9.99;
+    }
+    if (not defined $month){
+        $month=100;
+    }
+    if (not defined $day ){
+        $day=100;
+    }
+    if ($year eq ""){
+        $year=9.99;
+    }
+    if ($month eq ""){
+        $month=100;
+    }
+    if ($day eq "" ){
+        $day=100;
+    }
+
+    # check if date exists
+    # return 1 when valid
+    # return 0 when invalid
+    my $return=check_date($year,$month,$day);
+
+    # if date is completely empty, allow this to clear the date in the db
+    if ($sc_toleration eq ""){
+        $return=1;
+    }    
+
+    if ($return==0){
+        print "Date $sc_toleration is not a valid date ",
+              "(use this syntax: 2012-04-22)\n";
+    } else {
+        $sc_toleration=&date_pg2perl($sc_toleration);
+	print "   - $sc_toleration is a valid date.\n";
+        # set scheduled-toletration for the account
+        if ($sc_toleration eq ""){
+            print "Removing ScheduledToleration date for $teacher \n";
+        } else {
+            print "Setting ScheduledToleration date for $teacher to $sc_toleration\n";
+        }
+        &update_user_db_entry($teacher, 
+                              "ScheduledToleration=$sc_toleration");
+    }
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# --reset-user
+if ($reset_user ne""){
+    my @users=split(/,/, $reset_user);
+    # repair.directories einlesen
+    &get_alle_verzeichnis_rechte();
+    # fetch permission for all homes
+    &fetch_repairhome();
+    foreach my $user (@users){
+        # check if it is really an account
+        if (getpwnam("$user")){
+            print "Resetting the account of $user:\n";
+	    print "   - $user is a valid username.\n";
+        } else {
+            &log_script_exit("$user is not a valid username",
+                         1,1,0,@arguments);
+        }
+        # reset the account
+        &reset_user($user);
+        if ($empty_password==1){
+            print "   Setting empty password for $user\n";
+            &set_sophomorix_passwd($user,"");
+        }
+    }
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+
+######################################################################
+# Standard: suchen nach string
+######################################################################
+
+if ($search eq "" and $search_login eq "" and $list_teachers_by_year==0){
+   print "I don't know what to search for! (searchstring is empty)\n";
+   &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# suche, falls $search nicht leer
+
+
+
+############################################################
+# Start
+############################################################
+if ($search_login ne ""){
+    &search_user($search,$auth,$search_login);
+} elsif ($list_teachers_by_year==1){
+    &list_teachers_by_year();
+} else {
+    &search_user($search,$auth);
+}
+
+&AD_unbind_admin($ldap);
+&log_script_end(@arguments);
+
+
+
+############################################################
+# subs
+############################################################
+
+# sub move_mailbox {
+#     my ($old,$new) = @_;
+
+#     &mta_stop();
+#     # stop: log out the users, start: needed for renaming
+#     &mda_restart();
+#     print "Waiting 4 Seconds for cyrus to accept connections ...\n";
+#     sleep 4;
+
+#     my $imap=&imap_connect("localhost",${DevelConf::imap_admin});
+#     &imap_rename_mailbox($imap,$old,$new);
+#     &imap_disconnect($imap);
+#     # mailboxes are in 
+
+
+#     &mta_start();
+# }
+
+
