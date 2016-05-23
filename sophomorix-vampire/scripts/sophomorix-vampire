@@ -175,6 +175,9 @@ if ($create_add_file==1){
         } else {
             my %line=();
             my $role="";
+            my $creationdate="---";
+            my $tolerationdate="---";
+            my $deactivationdate="---";
             my $skip_line=0;
             foreach my $attr (@attrs){
                 $attr=~s/^\s+//g;# remove leading whitespace
@@ -188,15 +191,40 @@ if ($create_add_file==1){
                 $role="teacher";
             } elsif ($line{"homedirectory"}=~m/\/home\/students\//){
                 $role="student";
+            } elsif ($line{"homedirectory"}=~m/\/home\/administrators\//){
+                $role="administrator";
+                $skip_line=1;
+            } elsif ($line{"homedirectory"}=~m/\/home\/attic\//){
+                $role="student";
+            } elsif ($line{"homedirectory"}=~m/\/home\/workstations\//){
+                $skip_line=1;
             } else {
                 # exam accounts are skipped
+                if($line{"firstname"} ne "Computer"){
+	            print "SKIPPED: $line \n";
+                }
                 $skip_line=1;
             }
+
+            # skip Computer accounts
+            if($line{"firstname"} eq "Computer"){
+                $skip_line=1;
+            }
+
             if ($line{"unid"} eq""){
                 $line{"unid"}="---";
             }
+
             my ($year,$month,$day) = split(/-/,$line{"birthday"});
             my $birthdate=$day.".".$month.".".$year;
+
+            $creationdate=&convert_date($line{"creationdate"});
+            if ($line{"tolerationdate"} ne ""){
+                $tolerationdate=&convert_date($line{"tolerationdate"});
+            }
+            if ($line{"deactivationdate"} ne ""){
+                $deactivationdate=&convert_date($line{"deactivationdate"});
+            }
 
             # create_line
             my $line= $line{"gid"}."::".
@@ -212,7 +240,11 @@ if ($create_add_file==1){
                       "---"."::".
                       $role."::".
                       $line{"firstname"}."::".
-                      $line{"surname"}."::\n";
+                      $line{"surname"}."::".
+                      $line{"sophomorixstatus"}."::".
+                      $creationdate."::".
+                      $tolerationdate."::".
+                      $deactivationdate."::\n";
             if ($skip_line==0){
 	        print $line;
 	        print SOPHOMORIXADD $line;
@@ -338,3 +370,22 @@ if ($create_project_script==1){
 #&AD_unbind_admin($ldap);
 
 &log_script_end(@arguments);
+
+
+
+sub convert_date {
+    my ($olddate) = @_;
+    my ($date,$time)=split(/ /,$olddate);
+
+    if (not defined $time){
+        $time="00:00:00";
+    }
+    if ($time eq ""){
+        $time="00:00:00";
+    }
+    print "OD: <$olddate> >$time<\n";
+    my ($year,$month,$day)=split(/-/,$date);
+    my ($hour,$minute,$second)=split(/:/,$time);
+    my $newdate=$year.$month.$day.$hour.$minute.$second.".0Z";
+    return $newdate;
+}
