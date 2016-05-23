@@ -273,18 +273,14 @@ sub AD_test_object {
 		"  * $date beginns with $strg_ok ");
         }
         if (defined $s_tolerationdate){
-            my $strg_ok="201";
             my $date=$entry->get_value ('sophomorixTolerationDate');
-            $test_date=substr($date,0,3);
-            is ($test_date,$strg_ok,
-		"  * $date beginns with $strg_ok ");
+            is ($date,$DevelConf::default_date,
+		"  * sophomorixTolerationDate $date is default date $DevelConf::default_date");
         }
         if (defined $s_deactivationdate){
-            my $strg_ok="201";
             my $date=$entry->get_value ('sophomorixDeactivationDate');
-            $test_date=substr($date,0,3);
-            is ($test_date,$strg_ok,
-		"  * $date beginns with $strg_ok ");
+            is ($date,$DevelConf::default_date,
+		"  * sophomorixDeactivationDate $date is default date $DevelConf::default_date ");
         }
 
         ##################################################
