@@ -57,6 +57,10 @@ my $wunsch_login;
 my $wunsch_passwort;
 my $wunsch_id;
 my $wunsch_gid;
+my $status;
+my $creationdate;
+my $tolerationdate;
+my $deactivationdate;
 my $unid;
 my $login_teil_1="";
 my $login_teil_2="";
@@ -322,6 +326,10 @@ while(<SOPHOMORIXADD>){
     $role,
     $surname_utf8,
     $firstname_utf8,
+    $status,
+    $creationdate,
+    $tolerationdate,
+    $deactivationdate,
    )=split("::");
 
    if (not defined $unid){
@@ -416,6 +424,14 @@ while(<SOPHOMORIXADD>){
      }
    }
 
+   # Status
+   if ($status eq "---") {
+       $status="U";
+   }
+   # creationdate
+   if ($creationdate eq "---"){
+       $creationdate=$time_stamp_AD;
+   }
    # 0. rember login to set quota later
    push @users_for_quota, $login_check_ok;
 
@@ -459,7 +475,10 @@ while(<SOPHOMORIXADD>){
                     role=>$role,
                     type=>"adminclass",
                     school_token=>$school_token,
-                    creationdate=>$time_stamp_AD,
+                    creationdate=>$creationdate,
+                    tolerationdate=>$tolerationdate,
+                    deactivationdate=>$deactivationdate,
+                    status=>$status,
                   });
 
    # 1. Entry in sophomorix database and auth system

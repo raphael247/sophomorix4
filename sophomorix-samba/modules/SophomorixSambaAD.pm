@@ -379,6 +379,9 @@ sub AD_user_create {
     my $role = $arg_ref->{role};
     my $type = $arg_ref->{type};
     my $creationdate = $arg_ref->{creationdate};
+    my $tolerationdate = $arg_ref->{tolerationdate};
+    my $deactivationdate = $arg_ref->{deactivationdate};
+    my $status = $arg_ref->{status};
 
     # set defaults if not defined
     if (not defined $identifier){
@@ -392,6 +395,12 @@ sub AD_user_create {
     }
     if (not defined $wunsch_gid){
         $wunsch_gid="---";
+    }
+    if ($tolerationdate eq "---"){
+        $tolerationdate=$DevelConf::default_date;
+    }
+    if ($deactivationdate eq "---"){
+        $deactivationdate=$DevelConf::default_date;
     }
     $ou=&AD_get_ou_tokened($ou);
 
@@ -426,6 +435,7 @@ sub AD_user_create {
         print "   OU:                 $ou\n"; # Organisatinal Unit
         print "   School Token:       $school_token\n"; # Organisatinal Unit
         print "   Role(User):         $role\n";
+        print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
         print "   Group:              $group\n"; # lehrer oder klasse
         print "   Unix-gid:           $wunsch_gid\n"; # lehrer oder klasse
@@ -435,6 +445,8 @@ sub AD_user_create {
         print "   Password:           $plain_password\n";
         # sophomorix stuff
         print "   Creationdate:       $creationdate\n";
+        print "   Tolerationdate:     $tolerationdate\n";
+        print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
         print "   Unix-id:            $wunsch_id\n";
     }
@@ -450,7 +462,7 @@ sub AD_user_create {
                    'unicodePwd' => $uni_password,
                    'sophomorixExitAdminClass' => "unknown", 
                    'sophomorixUnid' => $unid,
-                   'sophomorixStatus' => "U",
+                   'sophomorixStatus' => $status,
                    'sophomorixAdminClass' => $group,    
                    'sophomorixFirstPassword' => $plain_password, 
                    'sophomorixFirstnameASCII' => $firstname_ascii,
@@ -459,6 +471,8 @@ sub AD_user_create {
                    'sophomorixSchoolPrefix' => $school_token,
                    'sophomorixSchoolname' => $ou,
                    'sophomorixCreationDate' => $creationdate, 
+                   'sophomorixTolerationDate' => $tolerationdate, 
+                   'sophomorixDeactivationDate' => $deactivationdate, 
                    'userAccountControl' => '512',
                    'objectclass' => ['top', 'person',
                                      'organizationalPerson',
