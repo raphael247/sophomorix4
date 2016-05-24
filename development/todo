@@ -37,11 +37,12 @@ DNS
 ############################################################
 
 * Alle bisherigen abfragen??:
-
-samba-tool dns query localhost linuxmuster.local -U administrator --password Muster!
+samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --password Muster!
 
 * DNS-Einträge anlegen:
   # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 --password=Muster! -U Administrator
+  This adds: DN: DC=j1010-p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
+  More??? where ist the IP 10.16.1.100 in ldap
 
   # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password=Muster! -U Administrator
 
