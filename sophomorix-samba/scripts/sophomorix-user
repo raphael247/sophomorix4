@@ -221,206 +221,218 @@ if ($info==1){
 
     # STUDENTS
     ##################################################
-    my ($usable)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='U'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($enabled)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='E'
-                                       AND NOT adminclass='${DevelConf::teacher}' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($tolerated)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='T'
-                                       AND NOT adminclass='$DevelConf::teacher'
-                                       AND NOT adminclass='speicher'
-                                      ");
-    my ($activated)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='A'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($selfactivated)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='S'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($disabled)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='D'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($removeable)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='R'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($killable)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='K'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($frozen)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='F'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
-    my ($permanent)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='P'
-                                       AND NOT adminclass='$DevelConf::teacher' 
-                                       AND NOT adminclass='speicher' 
-                                     ");
+    #my $filter="(&(objectclass=user) (sophomorixStatus=U))"; 
+    my $filter="(&(objectclass=user) (sophomorixRole=teacher) (sophomorixStatus=P))"; 
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['cn']
+                            );
+    #&AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $count = $mesg->count;
+    print "COUNT: $count\n";
 
-    # TEACHERS
-    ##################################################
-    my ($usable_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='U' 
-                                       AND (adminclass='$DevelConf::teacher'
-                                       OR adminclass='speicher')
-                                     ");
-    my ($enabled_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='E'
-                                       AND (adminclass='$DevelConf::teacher'
-                                       OR adminclass='speicher')
-                                     ");
-    my ($tolerated_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='T'
-                                       AND (adminclass='$DevelConf::teacher'
-                                       OR adminclass='speicher')
-                                      ");
-    my ($activated_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='A'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
-    my ($selfactivated_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='S'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
-    my ($disabled_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='D'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
-    my ($removeable_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='R'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
-    my ($killable_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='K'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
-    my ($frozen_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='F'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
-    my ($permanent_t)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='P'
-                                       AND (adminclass='$DevelConf::teacher' 
-                                       OR adminclass='speicher')
-                                     ");
+    # my ($usable)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='U'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($enabled)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='E'
+    #                                    AND NOT adminclass='${DevelConf::teacher}' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($tolerated)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='T'
+    #                                    AND NOT adminclass='$DevelConf::teacher'
+    #                                    AND NOT adminclass='speicher'
+    #                                   ");
+    # my ($activated)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='A'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($selfactivated)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='S'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($disabled)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='D'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($removeable)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='R'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($killable)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='K'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($frozen)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='F'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
+    # my ($permanent)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='P'
+    #                                    AND NOT adminclass='$DevelConf::teacher' 
+    #                                    AND NOT adminclass='speicher' 
+    #                                  ");
 
-    # EXAM ACCOUNTS
-    ##################################################
-    my ($permanent_e)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='P'
-                                       AND homedirectory 
-                                       LIKE '/home/workstations/%'");
-    # WORKSTATION ACCOUNTS
-    ##################################################
-    my ($permanent_w)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='P'
-                                       AND uid LIKE '%\$'");
+    # # TEACHERS
+    # ##################################################
+    # my ($usable_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='U' 
+    #                                    AND (adminclass='$DevelConf::teacher'
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($enabled_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='E'
+    #                                    AND (adminclass='$DevelConf::teacher'
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($tolerated_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='T'
+    #                                    AND (adminclass='$DevelConf::teacher'
+    #                                    OR adminclass='speicher')
+    #                                   ");
+    # my ($activated_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='A'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($selfactivated_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='S'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($disabled_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='D'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($removeable_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='R'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($killable_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='K'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($frozen_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='F'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
+    # my ($permanent_t)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='P'
+    #                                    AND (adminclass='$DevelConf::teacher' 
+    #                                    OR adminclass='speicher')
+    #                                  ");
 
-    # ADMINS
-    ##################################################
-    my ($permanent_a)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus='P'
-                                       AND homedirectory 
-                                       LIKE '/home/administrators/%'");
+    # # EXAM ACCOUNTS
+    # ##################################################
+    # my ($permanent_e)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='P'
+    #                                    AND homedirectory 
+    #                                    LIKE '/home/workstations/%'");
+    # # WORKSTATION ACCOUNTS
+    # ##################################################
+    # my ($permanent_w)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='P'
+    #                                    AND uid LIKE '%\$'");
 
-    # OTHERS
-    ##################################################
+    # # ADMINS
+    # ##################################################
+    # my ($permanent_a)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus='P'
+    #                                    AND homedirectory 
+    #                                    LIKE '/home/administrators/%'");
 
-    my ($others)= $dbh->selectrow_array( "SELECT count(uid) 
-                                       FROM userdata
-                                       WHERE sophomorixstatus IS NULL 
-                                     ");
+    # # OTHERS
+    # ##################################################
 
-    # TOTAL
-    ##################################################
-    my $total=$usable+$enabled+$tolerated+$activated+$selfactivated+
-	$disabled+$removeable+$killable+$frozen+$permanent;
+    # my ($others)= $dbh->selectrow_array( "SELECT count(uid) 
+    #                                    FROM userdata
+    #                                    WHERE sophomorixstatus IS NULL 
+    #                                  ");
 
-    my $total_t=$usable_t+$enabled_t+$tolerated_t+$activated_t+$selfactivated_t+
-	$disabled_t+$removeable_t+$killable_t+$frozen_t+$permanent_t;
+    # # TOTAL
+    # ##################################################
+    # my $total=$usable+$enabled+$tolerated+$activated+$selfactivated+
+    # 	$disabled+$removeable+$killable+$frozen+$permanent;
 
-    my $total_a=$permanent_a;
-    my $total_w=$permanent_e;
-    my $total_total=$total+$total_t+$total_w+$total_a;
+    # my $total_t=$usable_t+$enabled_t+$tolerated_t+$activated_t+$selfactivated_t+
+    # 	$disabled_t+$removeable_t+$killable_t+$frozen_t+$permanent_t;
+
+    # my $total_a=$permanent_a;
+    # my $total_w=$permanent_e;
+    # my $total_total=$total+$total_t+$total_w+$total_a;
 
 
-    # OUTPUT
-    ##################################################
-    print "----------------+---+----------+----------+------+----------+--------+\n";
-    print "status          |   | students | teachers | exam | computer | admins |\n";
-    print "----------------+---+----------+----------+------+----------+--------+\n";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "usable/unlocked | U",$usable,$usable_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "enabled         | E",$enabled,$enabled_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "tolerated       | T",$tolerated,$tolerated_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "activated       | A",$activated,$activated_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "selfactivated   | S",$selfactivated,$selfactivated_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "disabled        | D",$disabled,$disabled_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "removeable      | R",$removeable,$removeable_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "killable        | K",$killable,$killable_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "frozen          | F",$frozen,$frozen_t,"","","";
-    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-           "permanent       | P",$permanent,$permanent_t,$permanent_e,$permanent_w,$permanent_a;
-    print "----------------+---+----------+----------+------+----------+--------+\n";
-    printf "%-6s %8s |   | %8s | %8s | %4s | %8s | %6s |\n",
-           "sum:","",
-                                               $total,$total_t,
-                                               $permanent_e,$permanent_w,$permanent_a;
-    print "----------------+---+----------+----------+------+----------+--------+\n";
+    # # OUTPUT
+    # ##################################################
+    # print "----------------+---+----------+----------+------+----------+--------+\n";
+    # print "status          |   | students | teachers | exam | computer | admins |\n";
+    # print "----------------+---+----------+----------+------+----------+--------+\n";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "usable/unlocked | U",$usable,$usable_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "enabled         | E",$enabled,$enabled_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "tolerated       | T",$tolerated,$tolerated_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "activated       | A",$activated,$activated_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "selfactivated   | S",$selfactivated,$selfactivated_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "disabled        | D",$disabled,$disabled_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "removeable      | R",$removeable,$removeable_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "killable        | K",$killable,$killable_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "frozen          | F",$frozen,$frozen_t,"","","";
+    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "permanent       | P",$permanent,$permanent_t,$permanent_e,$permanent_w,$permanent_a;
+    # print "----------------+---+----------+----------+------+----------+--------+\n";
+    # printf "%-6s %8s |   | %8s | %8s | %4s | %8s | %6s |\n",
+    #        "sum:","",
+    #                                            $total,$total_t,
+    #                                            $permanent_e,$permanent_w,$permanent_a;
+    # print "----------------+---+----------+----------+------+----------+--------+\n";
 
-    print "Total users: $total_total (students,teachers,exam,admins) + $permanent_w (computer)\n\n";
+    # print "Total users: $total_total (students,teachers,exam,admins) + $permanent_w (computer)\n\n";
     exit;
 }
 
