@@ -90,26 +90,28 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
+Before:
+
 1. Exporting user data on linuxmusternet6 server:
 
-   sophomorix-dump-pg2ldap --dump
-   sophomorix-project --dump /root/projects.dump
-   dump-postgres-views.sh root/viewdump
+   sophomorix-dump
 
-2. Saving the following file in a directory, i.e. /root/migration:
+2. Save/Copy the following dir to new Server:
 
-   /root/projects.dump
-   /root/viewdump/
-
-2. Saving /etc/sophomorix in a directory, i.e. /root/migration/etc/sophomorix:
-3. Saving /var/lib/sophomorix in a directory, i.e. /root/migration/var/lib/sophomorix
-4. Saving /var/log/sophomorix in a directory, i.e. /root/migration/var/log/sophomorix
+   /root/sophomorix-dump
 
 
-Migration:
+Install on new Server:
 
+sophomorix-vampire --datadir ../sophomorix4-migration-data --restore-config-files
 sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
+cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+sophomorix-add -i
+sophomorix-add
 sophomorix-vampire --datadir ../sophomorix4-migration-data --create-project-script
+/root/create_projects.sh
+sophomorix-device
+
 
 Getting information:
   -i / --info

@@ -80,6 +80,9 @@ print "Starting data dump\n";
 # dump postgres database views
 system("/usr/sbin/sophomorix-dump-postgres-views.sh /root/sophomorix-dump-viewdumps");
 
+# dump projects
+system("/usr/sbin/sophomorix-project --dump /root/sophomorix-dump.projects");
+
 
 # copy relevant files from server                                    
 &copy_files();
