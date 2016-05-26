@@ -47,6 +47,10 @@ SCHEMA=$(DESTDIR)/usr/share/sophomorix/schema
 # Developer configs
 DEVELCONF=$(DESTDIR)/usr/share/sophomorix
 
+# Migration conf
+DUMPCONF=$(DESTDIR)/usr/share/sophomorix-dump
+VAMPIRECONF=$(DESTDIR)/usr/share/sophomorix-vampire
+
 # Encoding-data
 #ENCODING=$(DESTDIR)/usr/share/sophomorix/encoding-data
 
@@ -78,7 +82,7 @@ TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
 #TOOLS=$(DESTDIR)/root/sophomorix-developer
 
 
-all: install-sophomorix-samba install-virusscan install-developer install-vampire
+all: install-sophomorix-samba install-virusscan install-developer install-vampire install-dump
 
 help:
 	@echo ' '
@@ -222,8 +226,19 @@ install-virusscan:
 
 install-vampire:
 	### install-vampire
+	@install -d -m755 -oroot -groot $(VAMPIRECONF)
+	@install -oroot -groot --mode=0644 sophomorix-vampire/config-dump-vampire-common/config-6-to-7.conf $(VAMPIRECONF)
+
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-vampire/scripts/sophomorix-vampire $(DESTDIR)/usr/sbin
+
+install-dump:
+	### install-dump
+	@install -d -m755 -oroot -groot $(DUMPCONF)
+	@install -oroot -groot --mode=0644 sophomorix-vampire/config-dump-vampire-common/config-6-to-7.conf $(DUMPCONF)
+	@install -d $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-dump/scripts/sophomorix-dump $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-dump/scripts/sophomorix-dump-postgres-views.sh $(DESTDIR)/usr/sbin
 
 
 
