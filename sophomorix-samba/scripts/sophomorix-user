@@ -221,8 +221,9 @@ if ($info==1){
 
     # STUDENTS
     ##################################################
+    my $filter="(objectclass=user)"; 
     #my $filter="(&(objectclass=user) (sophomorixStatus=U))"; 
-    my $filter="(&(objectclass=user) (sophomorixRole=teacher) (sophomorixStatus=P))"; 
+    #my $filter="(&(objectclass=user) (sophomorixRole=teacher) (sophomorixStatus=U))"; 
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
@@ -230,8 +231,89 @@ if ($info==1){
                       attr => ['cn']
                             );
     #&AD_debug_logdump($mesg,2,(caller(0))[3]);
-    my $count = $mesg->count;
-    print "COUNT: $count\n";
+    my $max = $mesg->count;
+    my %results=();
+    my @students_u=();
+    my @teachers_u=();
+    my @students_e=();
+    my @teachers_e=();
+    my @students_t=();
+    my @teachers_t=();
+    my @students_a=();
+    my @teachers_a=();
+    my @students_s=();
+    my @teachers_s=();
+    my @students_d=();
+    my @teachers_d=();
+    my @students_r=();
+    my @teachers_r=();
+    my @students_k=();
+    my @teachers_k=();
+    my @students_f=();
+    my @teachers_f=();
+    my @students_p=();
+    my @teachers_p=();
+
+    my @others=();
+
+
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn=$entry->dn();
+        my $role=$entry->get_value('sophomorixRole');
+        my $status=$entry->get_value('sophomorixStatus');
+
+        #my $entry->get_value('sophomorixRole')
+	if (not defined $role or not defined $status){
+            push @others, $dn;
+	} elsif ($role eq "student" and $status eq "U"){
+            push @students_u, $dn;
+	} elsif ($role eq "teacher" and $status eq "U"){
+            push @teachers_u, $dn;
+	} elsif ($role eq "student" and $status eq "E"){
+            push @students_e, $dn;
+	} elsif ($role eq "teacher" and $status eq "E"){
+            push @teachers_e, $dn;
+	} elsif ($role eq "student" and $status eq "T"){
+            push @students_t, $dn;
+	} elsif ($role eq "teacher" and $status eq "T"){
+            push @teachers_t, $dn;
+	} elsif ($role eq "student" and $status eq "A"){
+            push @students_a, $dn;
+	} elsif ($role eq "teacher" and $status eq "A"){
+            push @teachers_a, $dn;
+	} elsif ($role eq "student" and $status eq "S"){
+            push @students_s, $dn;
+	} elsif ($role eq "teacher" and $status eq "S"){
+            push @teachers_s, $dn;
+	} elsif ($role eq "student" and $status eq "D"){
+            push @students_d, $dn;
+	} elsif ($role eq "teacher" and $status eq "D"){
+            push @teachers_d, $dn;
+	} elsif ($role eq "student" and $status eq "R"){
+            push @students_r, $dn;
+	} elsif ($role eq "teacher" and $status eq "R"){
+            push @teachers_r, $dn;
+	} elsif ($role eq "student" and $status eq "K"){
+            push @students_k, $dn;
+	} elsif ($role eq "teacher" and $status eq "K"){
+            push @teachers_k, $dn;
+	} elsif ($role eq "student" and $status eq "F"){
+            push @students_f, $dn;
+	} elsif ($role eq "teacher" and $status eq "F"){
+            push @teachers_f, $dn;
+	} elsif ($role eq "student" and $status eq "P"){
+            push @students_p, $dn;
+	} elsif ($role eq "teacher" and $status eq "P"){
+            push @teachers_p, $dn;
+	} else {
+            print "$dn\n";
+        }
+    }
+
+
+    
+    print "COUNT: $max\n";
 
     # my ($usable)= $dbh->selectrow_array( "SELECT count(uid) 
     #                                    FROM userdata
@@ -400,32 +482,54 @@ if ($info==1){
     # my $total_total=$total+$total_t+$total_w+$total_a;
 
 
-    # # OUTPUT
+
+    $results{'count'}{'students'}{'U'}=$#students_u+1;
+    $results{'count'}{'teachers'}{'U'}=$#teachers_u+1;
+    $results{'count'}{'students'}{'E'}=$#students_e+1;
+    $results{'count'}{'teachers'}{'E'}=$#teachers_e+1;
+    $results{'count'}{'students'}{'T'}=$#students_t+1;
+    $results{'count'}{'teachers'}{'T'}=$#teachers_t+1;
+    $results{'count'}{'students'}{'A'}=$#students_a+1;
+    $results{'count'}{'teachers'}{'A'}=$#teachers_a+1;
+    $results{'count'}{'students'}{'S'}=$#students_s+1;
+    $results{'count'}{'teachers'}{'S'}=$#teachers_s+1;
+    $results{'count'}{'students'}{'D'}=$#students_d+1;
+    $results{'count'}{'teachers'}{'D'}=$#teachers_d+1;
+    $results{'count'}{'students'}{'R'}=$#students_r+1;
+    $results{'count'}{'teachers'}{'R'}=$#teachers_r+1;
+    $results{'count'}{'students'}{'K'}=$#students_k+1;
+    $results{'count'}{'teachers'}{'K'}=$#teachers_k+1;
+    $results{'count'}{'students'}{'F'}=$#students_f+1;
+    $results{'count'}{'teachers'}{'F'}=$#teachers_f+1;
+    $results{'count'}{'students'}{'P'}=$#students_p+1;
+    $results{'count'}{'teachers'}{'P'}=$#teachers_p+1;
+   # # OUTPUT
     # ##################################################
-    # print "----------------+---+----------+----------+------+----------+--------+\n";
-    # print "status          |   | students | teachers | exam | computer | admins |\n";
-    # print "----------------+---+----------+----------+------+----------+--------+\n";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "usable/unlocked | U",$usable,$usable_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "enabled         | E",$enabled,$enabled_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "tolerated       | T",$tolerated,$tolerated_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "activated       | A",$activated,$activated_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "selfactivated   | S",$selfactivated,$selfactivated_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "disabled        | D",$disabled,$disabled_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "removeable      | R",$removeable,$removeable_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "killable        | K",$killable,$killable_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "frozen          | F",$frozen,$frozen_t,"","","";
-    # printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
-    #        "permanent       | P",$permanent,$permanent_t,$permanent_e,$permanent_w,$permanent_a;
-    # print "----------------+---+----------+----------+------+----------+--------+\n";
+    print "----------------+---+----------+----------+------+----------+--------+\n";
+    print "status          |   | students | teachers | exam | computer | admins |\n";
+    print "----------------+---+----------+----------+------+----------+--------+\n";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "usable/unlocked | U",$results{'count'}{'students'}{'U'},$results{'count'}{'teachers'}{'U'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "enabled         | E",$results{'count'}{'students'}{'E'},$results{'count'}{'teachers'}{'E'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "tolerated       | T",$results{'count'}{'students'}{'T'},$results{'count'}{'teachers'}{'T'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "activated       | A",$results{'count'}{'students'}{'A'},$results{'count'}{'teachers'}{'A'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "selfactivated   | S",$results{'count'}{'students'}{'S'},$results{'count'}{'teachers'}{'S'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "disabled        | D",$results{'count'}{'students'}{'D'},$results{'count'}{'teachers'}{'D'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "removeable      | R",$results{'count'}{'students'}{'R'},$results{'count'}{'teachers'}{'R'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "killable        | K",$results{'count'}{'students'}{'K'},$results{'count'}{'teachers'}{'K'},"","","";
+    printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+           "frozen          | F",$results{'count'}{'students'}{'F'},$results{'count'}{'teachers'}{'F'},"","","";
+     printf "%-19s | %8s | %8s | %4s | %8s | %6s |\n",
+            "permanent       | P",$results{'count'}{'students'}{'P'},$results{'count'}{'teachers'}{'P'},"","","";
+#            "permanent       | P",$results{'count'}{'students'}{'P'},$results{'count'}{'teachers'}{'P'},$permanent_e,$permanent_w,$permanent_a;
+     print "----------------+---+----------+----------+------+----------+--------+\n";
     # printf "%-6s %8s |   | %8s | %8s | %4s | %8s | %6s |\n",
     #        "sum:","",
     #                                            $total,$total_t,
@@ -433,6 +537,11 @@ if ($info==1){
     # print "----------------+---+----------+----------+------+----------+--------+\n";
 
     # print "Total users: $total_total (students,teachers,exam,admins) + $permanent_w (computer)\n\n";
+
+    print "\nNon-sophomorix-users:\n";
+    foreach my $dn (@others){
+        print "   * $dn\n";
+    }
     exit;
 }
 
