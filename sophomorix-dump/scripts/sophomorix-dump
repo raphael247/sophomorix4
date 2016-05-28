@@ -26,8 +26,10 @@ my @log=();
 # config
 # ==========================================================================
 my $config="/usr/share/sophomorix-dump/config-6-to-7.conf";
+my $target_topdir="/root/sophomorix-dump";
 my $target_dir="/root/sophomorix-dump/data"; 
-
+my $project_dump="/root/sophomorix-dump.projects";
+my $view_dumps_dir = "/root/sophomorix-dump-viewdumps";
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -70,18 +72,37 @@ Options
 }
 
 
+if (-e $target_topdir){
+    print "\nERROR: The  directory for the dump exists already: $target_topdir\n";
+    print "       Please remove $target_topdir for a clean dump\n\n";
+    exit;
+}
+
+if (-e $project_dump){
+    print "\nERROR: The  directory for the project dump exists already: $project_dump\n";
+    print "       Please remove $project_dump for a clean dump\n\n";
+    exit;
+}
+
+if (-e $view_dumps_dir){
+    print "\nERROR: The  directory for the view dumps exists already: $view_dumps_dir\n";
+    print "       Please remove $view_dumps_dir for a clean dump\n\n";
+    exit;
+}
 
 
-print "Starting data dump\n";
 
 ############################################################
 # dumping data
 ############################################################                        
+
+print "Starting data dump\n";
+
 # dump postgres database views
-system("/usr/sbin/sophomorix-dump-postgres-views.sh /root/sophomorix-dump-viewdumps");
+system("/usr/sbin/sophomorix-dump-postgres-views.sh $view_dumps_dir");
 
 # dump projects
-system("/usr/sbin/sophomorix-project --dump /root/sophomorix-dump.projects");
+system("/usr/sbin/sophomorix-project --dump $project_dump");
 
 
 # copy relevant files from server                                    
