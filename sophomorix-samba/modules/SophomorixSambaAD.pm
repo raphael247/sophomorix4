@@ -333,7 +333,7 @@ sub AD_computer_create {
 #                   'unicodePwd' => $uni_password,
 #                   'sophomorixExitAdminClass' => "unknown", 
 #                   'sophomorixUnid' => $unid,
-#                   'sophomorixStatus' => "U",
+                   'sophomorixStatus' => "P",
 #                   'sophomorixAdminClass' => $group_token,    
 #                   'sophomorixFirstPassword' => $plain_password, 
 #                   'sophomorixFirstnameASCII' => $firstname_ascii,
