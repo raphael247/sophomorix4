@@ -1203,7 +1203,7 @@ sub AD_project_fetch {
                               "SophomorixStatus: $status",
                               "Joinable: $joinable",
                               "MaxMembers: $maxmembers",
-                              "CreationTime:",
+                              "CreationDate:",
                               " $creationdate"
                              );
 
@@ -1306,6 +1306,7 @@ sub AD_project_update {
     my $admins = $arg_ref->{admins};
     my $membergroups = $arg_ref->{membergroups};
     my $admingroups = $arg_ref->{admingroups};
+    my $creationdate = $arg_ref->{creationdate};
 
     &Sophomorix::SophomorixBase::print_title("Updating $dn");
     # description   
@@ -1350,6 +1351,11 @@ sub AD_project_update {
     if (defined $maxmembers){
         print "   * Setting sophomorixMaxMembers to $maxmembers\n";
         my $mesg = $ldap->modify($dn,replace => {sophomorixMaxMembers => $maxmembers}); 
+    }
+    # creationdate   
+    if (defined $creationdate){
+        print "   * Setting sophomorixCreationDate to $creationdate\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixCreationDate => $creationdate}); 
     }
     # members   
     if (defined $members){

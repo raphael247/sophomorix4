@@ -267,6 +267,9 @@ sub AD_test_object {
         }
         if (defined $s_creationdate){
             my $strg_ok="201";
+            if ($s_creationdate ne "exists"){
+                $strg_ok=$s_creationdate;
+            }
             my $date=$entry->get_value ('sophomorixCreationDate');
             $test_date=substr($date,0,3);
             is ($test_date,$strg_ok,

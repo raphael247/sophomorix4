@@ -88,6 +88,7 @@ my $maillist;
 my $status;
 my $join;
 my $maxmembers;
+my $creationdate;
 
 my $members;
 my $addmembers;
@@ -157,6 +158,7 @@ my $testopt=GetOptions(
            "addquota=s" => \$addquota,
            "addmailquota=s" => \$addmailquota,
            "maxmembers=s" => \$maxmembers,
+           "creationdate=s" => \$creationdate,
            "mailalias!" => \$mailalias,
            "maillist!" => \$maillist,
 #           "dump=s" => \$dump_all_projects,
@@ -259,6 +261,7 @@ Changing/creating/killing a project:
   --status <letter>
   --join,  --nojoin
   --maxmembers number
+  -- creationdate <20150529093330.0Z> (only for migration)
 
   -p project --admins user1,user2,user3, ... 
   -p project --members user1,user2,user3, ... 
@@ -693,6 +696,15 @@ if (defined $maxmembers){
                         root_dse=>$root_dse,
                         dn=>$dn_pro,
                         maxmembers=>$maxmembers,
+                      });
+}
+
+# --creationdate <strg>
+if (defined $creationdate){
+    &AD_project_update({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        dn=>$dn_pro,
+                        creationdate=>$creationdate,
                       });
 }
 
