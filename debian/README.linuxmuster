@@ -18,13 +18,13 @@ Create an official package for linuxmuster 7.x/xenial:
 
 
 3. # update versions in debian/control
-   # i.e. replace 3.0.1 with 3.0.2
+   # i.e. replace 3.5.2 with 3.5.3
 
 
 4. # update changelog file:
    cd sophomorix4
    dch -i 
-     -> set version number (example: 3.2.0-1)
+     -> set version number (example: 3.5.3-1)
      -> add a comment to the changelog
      -> set a repo like xenial OR xenial-testing OR xenial-unstable
         (this determines, in which repo the package will be uploaded)
@@ -32,7 +32,7 @@ Create an official package for linuxmuster 7.x/xenial:
 
 5. # Commit changes (use the jeffbeck ssh-key):
    cd sophomorix4
-   git commit -m "prepared new package 3.0.2-1"
+   git commit -m "prepared new package 3.5.3-1"
    git push
 
 
@@ -48,7 +48,7 @@ Create an official package for linuxmuster 7.x/xenial:
 
 
 8. # upload the packages to linuxmuster.net
-   dput -f -c ./dput.cf linuxmuster.net sophomorix4_3.0.2-1.changes
+   dput -f -c ./dput.cf linuxmuster.net sophomorix4_3.5.3-1.changes
 
    # With dput.cf
    [linuxmuster.net]
