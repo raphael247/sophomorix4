@@ -49,6 +49,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_group_list
                                  AD_debug_logdump
+                                 AD_object_search
                                  get_forbidden_logins
                                     );
 
@@ -113,8 +114,7 @@ my $activate="";
 my $teacher="";
 my $sc_toleration="empty";
 my $reset_user="";
-my $search="";
-my $search_login="";
+my $user="";
 my $old_uid="";
 my $new_uid="";
 my $old_mailbox="";
@@ -131,10 +131,9 @@ my $testopt=GetOptions(
        "verbose|v+" => \$Conf::log_level,
        "help|h" => \$help,
        "i|info" => \$info,
-       "s|search=s" => \$search,
        "ou=s" => \$ou,
        "school-token=s" => \$school_token,
-       "u|user=s" => \$search_login,
+       "u|user=s" => \$user,
        "F|freeze=s" => \$freeze,
        "P|permanent=s" => \$permanent,
        "R|removable=s" => \$removable,
@@ -174,13 +173,17 @@ Options
   -v   /  --verbose
   -vv  /  --verbose --verbose
 
-Search for a user/users:
-  -s string /   --search string
+Search for a user/users in sAMAccountName:
   -u user   /   --user user
-
+  -u \'*\'   /   --user u*se*r (option is passed to ldap filter)
+Grep in the results:
+ -u *user* | grep -i --text <strg>
+  
 Choose the school:
-  --ou <SCHOOL>
-  --school-token <prefix>
+  --ou <SCHOOL>, --ou "*"
+  --school-token <prefix>, --school-token "*"
+
+-> continue here
 
   --list-teachers-by-year
 
@@ -226,6 +229,21 @@ Please see the sophomorix-user(8) man pages for full documentation
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 
+# Setting the filters
+my $ou_filter="";
+my $school_token_filter="";
+my $user_filter=();
+if ($ou ne ""){
+    $ou_filter="(sophomorixSchoolname=$ou)";
+}
+if ($school_token ne ""){
+    $school_token_filter="(sophomorixSchoolPrefix=$school_token)";
+}
+if ($user ne ""){
+    $user_filter="(sAMAccountName=$user)";
+}
+
+
 
 # --info
 if ($info==1){
@@ -259,19 +277,11 @@ if ($info==1){
     my @others=();
 
     ##################################################
-    my $ou_filter="";
-    my $school_token_filter="";
     # search for all users
-    if ($ou ne ""){
-        $ou_filter="(sophomorixSchoolname=$ou)";
+    my $filter="( &(objectclass=user) (cn=*) $ou_filter $school_token_filter)"; 
+    if($Conf::log_level>=2){
+        print "Filter: $filter\n";
     }
-    if ($school_token ne ""){
-        $school_token_filter="(sophomorixSchoolPrefix=$school_token)";
-    }
-#    my $filter="(objectclass=user)"; 
-    my $filter="(&(objectclass=user) (sophomorixStatus=*) $ou_filter $school_token_filter)"; 
-    #my $filter="(&(objectclass=user) (sophomorixStatus=U))"; 
-    #my $filter="(&(objectclass=user) (sophomorixRole=teacher) (sophomorixStatus=U))"; 
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
@@ -444,7 +454,7 @@ if ($info==1){
 
 
 #--user user --new-class class
-if ($search_login ne "" and $new_class ne ""){
+if ($user ne "" and $new_class ne ""){
     my ($home,
         $type,
         $gecos,
@@ -470,13 +480,13 @@ if ($search_login ne "" and $new_class ne ""){
         $userpassword,
         $loginshell,
         $gidnumber,
-        $sophomorixstatus) = &fetchdata_from_account($search_login);
+        $sophomorixstatus) = &fetchdata_from_account($user);
 
     my $file=${DevelConf::path_result}."/sophomorix.move";
     print "   Old class:  $group \n";
     print "   New class:  $new_class \n";
     print "   Old Status: $sophomorixstatus \n";
-    my $line=$search_login."::".$group."::".$new_class."::".$sophomorixstatus."\n";
+    my $line=$user."::".$group."::".$new_class."::".$sophomorixstatus."\n";
     print "   New Line:   $line";
 
     my $seen=0;
@@ -486,7 +496,7 @@ if ($search_login ne "" and $new_class ne ""){
         #print $_;
         my ($uid,$rest) = split(/::/,$_);
         #print "<$uid>\n";
-        if ($search_login eq $uid){
+        if ($user eq $uid){
             $seen=1;
             $line_seen=$_;
         }
@@ -500,7 +510,7 @@ if ($search_login ne "" and $new_class ne ""){
         close (MOVE);
     } else {
         print "\nWARNING: Cannot create entry in $file\n";
-        print "$search_login has scheduled action: $line_seen\n";
+        print "$user has scheduled action: $line_seen\n";
     }
 
     &log_script_exit("",0,1,0,@arguments);
@@ -886,26 +896,47 @@ if ($reset_user ne""){
 # Standard: suchen nach string
 ######################################################################
 
-if ($search eq "" and $search_login eq "" and $list_teachers_by_year==0){
+if ($user eq "" and $list_teachers_by_year==0){
    print "I don't know what to search for! (searchstring is empty)\n";
    &log_script_exit("",0,1,0,@arguments);
 }
 
 
-# suche, falls $search nicht leer
 
 
 
 ############################################################
 # Start
 ############################################################
-if ($search_login ne ""){
-    &search_user($search,$auth,$search_login);
+if ($user ne ""){
+    my $filter="(&(objectclass=user) $user_filter $ou_filter $school_token_filter)"; 
+    if($Conf::log_level>=2){
+        print "Filter: $filter\n";
+    }
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['cn']
+	);
+    my $number = $mesg->count;
+    if ($number==0){
+        print "\n";
+        print "No results found in this search\n";
+    } else {
+        my $count=0;
+        foreach my $entry ($mesg->all_entries) {
+            $count++; 
+            my $sam = $entry->get_value ('sAMAccountName');
+            print "\n";
+            &print_title("User $count: $sam");
+            $entry->dump; 
+        }
+    }
 } elsif ($list_teachers_by_year==1){
     &list_teachers_by_year();
-} else {
-    &search_user($search,$auth);
 }
+
 
 &AD_unbind_admin($ldap);
 &log_script_end(@arguments);
