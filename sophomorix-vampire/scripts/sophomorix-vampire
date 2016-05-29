@@ -55,7 +55,7 @@ my $overwriting_files_count=0;
 # ===========================================================================
 # config
 # ==========================================================================
-my $config="/usr/share/sophomorix-dump/config-6-to-7.conf";
+my $config="/usr/share/sophomorix-dump/migration-6-to-7.conf";
 #my $target_topdir="/root/sophomorix-dump";
 #my $target_dir="/root/sophomorix-dump/data"; 
 #my $project_dump="/root/sophomorix-dump.projects";
@@ -174,7 +174,7 @@ Please see the sophomorix-vampire(8) man pages for full documentation
 ##################################################
 # Testing files in the dump
 print "Testing files in ${datadir}:\n";
-open(CONFIG,"<$config") || die;
+open(CONFIG,"<$config") || die "ERROR: $!";
 while(<CONFIG>){
     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
 	next;
@@ -226,8 +226,8 @@ if ($create_add_file==1){
     #my $account_sql=$datadir.$files[0];
     my $account_sql=""; # ?????
 
-    open(ACCOUNTS,"<$account_sql") || die;
-    open(SOPHOMORIXADD,">$sophomorix_add_output") || die;
+    open(ACCOUNTS,"<$account_sql") || die "ERROR: $!";
+    open(SOPHOMORIXADD,">$sophomorix_add_output") || die "ERROR: $!";
 
     my $line_number=0;
     my %tags=();
@@ -339,8 +339,8 @@ if ($create_project_script==1){
 #    my $projects_dump=$datadir.$files[1];
     my $projects_dump="";# ????
 
-    open(PRO,"<$projects_dump") || die;
-    open(PROSCRIPT,">$project_script") || die;
+    open(PRO,"<$projects_dump") || die "ERROR: $!";
+    open(PROSCRIPT,">$project_script") || die "ERROR: $!";
     print PROSCRIPT "#!/bin/sh\n";
     while(<PRO>){
         if(m/\./){
