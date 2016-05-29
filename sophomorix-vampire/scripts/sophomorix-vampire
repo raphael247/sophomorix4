@@ -51,7 +51,7 @@ my $create_project_script=0;
 my $project_script="/root/create_projects.sh";
 my $sophomorix_add_output="/root/sophomorix.add";
 my $missig_files_count=0;
-
+my $overwriting_files_count=0;
 # ===========================================================================
 # config
 # ==========================================================================
@@ -86,6 +86,7 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt);
 
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -100,6 +101,12 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
+Getting information:
+  -i / --info
+Configuring:
+  --datadir /path/to/dir/sophomorix-dump
+
+
 Before:
 
 1. Exporting user data on linuxmusternet6 server:
@@ -111,16 +118,43 @@ Before:
    /root/sophomorix-dump
 
 
-Install on new Server:
+Vampire data into the new server:
 
-sophomorix-vampire --datadir ../sophomorix4-migration-data --restore-config-files
-sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
-cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
-sophomorix-add -i
-sophomorix-add
-sophomorix-vampire --datadir ../sophomorix4-migration-data --create-project-script
-/root/create_projects.sh
-sophomorix-device
+1. Test if dump is complete, read ERRORS and WARNINGS
+
+   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump
+
+
+2. Create file sophomorix.add and add these users:
+ 
+   sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
+   cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+
+   sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
+   sophomorix-add (Add the users)
+
+
+3. Create project script and run it.
+
+   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
+   /root/create_projects.sh
+
+
+4. Copy configuration files into new server:
+
+   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
+
+
+5. Import the workstations (later use linuxmuster command)
+   
+   sophomorix-device
+
+
+6. Manually do the rest (will be automated):
+
+   Copy files in /etc/sophomorix/user/mail/* to new server.
+
+
 
 
 Getting information:
@@ -137,55 +171,48 @@ Please see the sophomorix-vampire(8) man pages for full documentation
 }
 
 
+##################################################
+# Testing files in the dump
 print "Testing files in ${datadir}:\n";
-    open(CONFIG,"<$config") || die;
-    while(<CONFIG>){
-        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-	    next;
+open(CONFIG,"<$config") || die;
+while(<CONFIG>){
+    if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+	next;
+    }
+    chomp();
+    my ($old_path,$new_path)=split(/::/);
+    my $old_path_dump=$datadir."/data".$old_path;
+    if (not -f $old_path_dump){
+        $missig_files_count++;
+        print "ERROR: Missing file $old_path_dump\n"; 
+    }
+    if ($new_path eq "---"){
+        # files that must exist
+        print "   * Exists: $old_path_dump\n";
+    } else {
+        # files to install
+        print "   * Exists: $old_path_dump\n";
+        print "     Target: $new_path\n";
+        if (-e $new_path){
+            print "    WARNING: $new_path\n";
+            $overwriting_files_count++;
         }
-        chomp();
-        my ($old_path,$new_path)=split(/::/);
-        my $old_path_dump=$datadir."/data".$old_path;
-
-
-        if (not -f $old_path_dump){
-            $missig_files_count++;
-	    print "ERROR: Missing file $old_path_dump\n"; 
-        }
-
-        if ($new_path eq "---"){
-            # files that must exist
-            print "   *      Exist: $old_path_dump\n";
-         } else {
-            # files to install
-            print "   * Installing: $old_path_dump\n";
-            print "            to : $new_path\n";
-            if (-e $new_path){
-                    print "  Warning: $new_path\n";
-
-            }
-        }
-
-
-
-
-        #system("install -D   $old_path $old_path_dump");
-	#if (-f $old_path_dump && -s $old_path_dump){
-        #    print "   * Dump OK: $old_path_dump\n";
-        #    push @log, "    * Dump OK: $old_path_dump\n";
-	#} else {
-        #    print "ERROR dumping $old_path_dump\n";
-        #    push @log, "ERROR dumping: $old_path_dump\n";
-        #}
-   }
-    close(CONFIG);
-
-
-if ($missig_files_count > 0){
-    print "\nERROR: $missig_files_count file for migration are missing\n\n";
-    exit;
+    }
 }
-exit;
+close(CONFIG);
+
+
+##################################################
+# print ERRORS and WARNINGS
+print "\n";
+if ($missig_files_count > 0){
+    print "ERROR:    $missig_files_count file(s) is missing in the dump!\n";
+}
+if ($overwriting_files_count > 0){
+    print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
+}
+print "\n";
+
 
 # --info
 if ($info==1){
