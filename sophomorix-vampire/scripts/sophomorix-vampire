@@ -50,18 +50,28 @@ my $create_add_file=0;
 my $create_project_script=0;
 my $project_script="/root/create_projects.sh";
 my $sophomorix_add_output="/root/sophomorix.add";
+my $missig_files_count=0;
+
+# ===========================================================================
+# config
+# ==========================================================================
+my $config="/usr/share/sophomorix-dump/config-6-to-7.conf";
+#my $target_topdir="/root/sophomorix-dump";
+#my $target_dir="/root/sophomorix-dump/data"; 
+#my $project_dump="/root/sophomorix-dump.projects";
+#my $view_dumps_dir = "/root/sophomorix-dump-viewdumps";
 
 
-my @files=(
-            "/viewdump/userdata_view.sql",
-            "/projects.dump",
+#my @files=(
+#            "/viewdump/userdata_view.sql",
+#            "/projects.dump",
 #            "/viewdump/classdata_view.sql",
 #            "/viewdump/projectdata_view.sql",
 #            "/viewdump/memberdata_view.sql",
 #           "/var/log/sophomorix/pg2ldif/accounts.sql_mini",
 #           "/var/log/sophomorix/pg2ldif/groups.sql",
 #           "/var/log/sophomorix/pg2ldif/groups_users.sql",
-          );
+#          );
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -127,23 +137,55 @@ Please see the sophomorix-vampire(8) man pages for full documentation
 }
 
 
-my $missig_files_count=0;
 print "Testing files in ${datadir}:\n";
-foreach my $file (@files){
-    my $abs_file=$datadir.$file;
-    if (-f $abs_file){
-        print "     OK: $abs_file\n";    
-    } else {
-        print "  ERROR: $abs_file\n";    
-	$missig_files_count++;
-    }
-}
+    open(CONFIG,"<$config") || die;
+    while(<CONFIG>){
+        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+	    next;
+        }
+        chomp();
+        my ($old_path,$new_path)=split(/::/);
+        my $old_path_dump=$datadir."/data".$old_path;
+
+
+        if (not -f $old_path_dump){
+            $missig_files_count++;
+	    print "ERROR: Missing file $old_path_dump\n"; 
+        }
+
+        if ($new_path eq "---"){
+            # files that must exist
+            print "   *      Exist: $old_path_dump\n";
+         } else {
+            # files to install
+            print "   * Installing: $old_path_dump\n";
+            print "            to : $new_path\n";
+            if (-e $new_path){
+                    print "  Warning: $new_path\n";
+
+            }
+        }
+
+
+
+
+        #system("install -D   $old_path $old_path_dump");
+	#if (-f $old_path_dump && -s $old_path_dump){
+        #    print "   * Dump OK: $old_path_dump\n";
+        #    push @log, "    * Dump OK: $old_path_dump\n";
+	#} else {
+        #    print "ERROR dumping $old_path_dump\n";
+        #    push @log, "ERROR dumping: $old_path_dump\n";
+        #}
+   }
+    close(CONFIG);
+
 
 if ($missig_files_count > 0){
     print "\nERROR: $missig_files_count file for migration are missing\n\n";
     exit;
 }
-
+exit;
 
 # --info
 if ($info==1){
@@ -154,7 +196,9 @@ if ($info==1){
 # --create-add-file
 # creating sophomorix.add
 if ($create_add_file==1){
-    my $account_sql=$datadir.$files[0];
+    #my $account_sql=$datadir.$files[0];
+    my $account_sql=""; # ?????
+
     open(ACCOUNTS,"<$account_sql") || die;
     open(SOPHOMORIXADD,">$sophomorix_add_output") || die;
 
@@ -265,7 +309,9 @@ if ($create_project_script==1){
     my %data=();
     my @pro=();
     print "Creating $project_script\n";
-    my $projects_dump=$datadir.$files[1];
+#    my $projects_dump=$datadir.$files[1];
+    my $projects_dump="";# ????
+
     open(PRO,"<$projects_dump") || die;
     open(PROSCRIPT,">$project_script") || die;
     print PROSCRIPT "#!/bin/sh\n";
