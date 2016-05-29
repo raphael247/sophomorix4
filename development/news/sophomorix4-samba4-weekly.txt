@@ -1,27 +1,31 @@
 sophomorix-samba für linuxmuster.net 7 --- Weekly x
 
-
 ############################################################
-sophomorix4/Samba4 weekly Nr. 6  (xx.05.2016)
+sophomorix4/Samba4 weekly Nr. 7  (xx.06.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
+
 
 Was habe ich seit dem letzten Weekly erledigt/verändert?
 ----------------------------------------------------------------------
 
+
 Was mache ich als nächstes?
 ----------------------------------------------------------------------
+
 
 Kleinere Aufgaben, bei denen ich unterstützung brauchen könnte:
 ----------------------------------------------------------------------
 (Bitte um kurze Mail an die Entwicklerliste, 
  wenn jemand etwas übernehmen/recherchieren möchte)
 
+  - Migration testen
   - dns in samba
   - nscd: brauchts den nscd noch bei Ubuntu Xenial und samba 4?
 
@@ -30,7 +34,82 @@ Momentane Testanleitung:
 ----------------------------------------------------------------------
 Es kann getestet werden!
 
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_testinstall
 http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_migration
+
+### Die weeklys finden sich auf github (von unten nach oben lesen):
+### https://github.com/linuxmuster/sophomorix4/blob/xenial/development/news/sophomorix4-samba4-weekly.txt
+
+
+
+
+############################################################
+sophomorix4/Samba4 weekly Nr. 6  (29.05.2016)
+############################################################
+
+Info über Entwicklungs-Entscheidungen
+------------------------------------------------------------
+Beim letzten Entwickler-treffen hatten wir festgelegt, dass
+wir möglichst früh mit massenhaften echten Usern, Projekten, ...
+testen wollen, um Performace-Probleme früh zu erkennen und Bugs 
+auf die Schliche zu kommen.
+Deshalb habe ich die Scripte zur Migration 6.x auf 7.0 jetzt schon 
+umgesetzt.
+
+Ich suche also TESTER, die mit den linuxmusternet6 Daten auf 
+ein ubuntu Xenial umziehen wollen!
+Wer jetzt die Migration testet, bei dem wirds später nur 
+so flutschen! 
+
+
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
+------------------------------------------------------------
+Entwicklertreffen bei Netzint am Freitag 10.6.16 
+- Dateisystem festlegen (ext4, ...)
+- Verzeichnis-Hirarchie festlegen
+- User und Gruppennamen dürfen nicht gleich sein?
+- DNS: wie soll das aussehen?
+- Datenübernahme:
+  - soll man versuchen die UserID's und GruppenID's gleich zu lassen?
+    (geht das überhaupt?, besser samba4 die ID's vergeben lassen?)
+  - Konfigurationsdateien übernehmen (wie?)
+  - Gesamtkonzept zur Datenübernahme
+
+Was habe ich seit dem letzten Weekly erledigt/verändert?
+----------------------------------------------------------------------
+Datenübernahme: User, Klassen, Projekte
+
+
+Was mache ich als nächstes?
+----------------------------------------------------------------------
+Bugfixes Datenübernahme:
+- sophomorix-user:  Optionen, die nicht mehr tun fixen
+- sophomorix-class: anzeigen, modifizieren der Klassen
+- Verschlüsseltes Passwort, was noch? ...
+
+Nächster major step (unklar welcher):
+? Latex system zum Laufen bekommen (utf8 Umstellung/Ausdruck)
+? sophomorix-check
+? dns für workstations setzen
+
+Kleinere Aufgaben, bei denen ich unterstützung brauchen könnte:
+----------------------------------------------------------------------
+(Bitte um kurze Mail an die Entwicklerliste, 
+ wenn jemand etwas übernehmen/recherchieren möchte)
+
+  - Migration testen
+  - dns in samba
+  - nscd: brauchts den nscd noch bei Ubuntu Xenial und samba 4?
+
+
+Momentane Testanleitung:
+----------------------------------------------------------------------
+Es kann getestet werden!
+
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_testinstall
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_migration
 
 ### Die weeklys finden sich auf github (von unten nach oben lesen):
 ### https://github.com/linuxmuster/sophomorix4/blob/xenial/development/news/sophomorix4-samba4-weekly.txt
@@ -41,10 +120,10 @@ http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
 sophomorix4/Samba4 weekly Nr. 5  (21.05.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
 
 Was habe ich seit dem letzten Weekly erledigt/verändert?
@@ -87,7 +166,7 @@ http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
 sophomorix4/Samba4 weekly Nr. 4  (13.04.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
 - Die alle Schulen überspannende OU heisst GLOBAL
   - die Gruppen darin:
@@ -112,7 +191,7 @@ workstation(s) --> computer(s)
     bei Loginnamen: kein school token: maierpe --> maierpe
     bei Projekten:  p_Astronomie -> p_abc-Astronomie
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
 - Administrator aus Gruppe teachers herauslassen
   - sonstige spezial-Accounts?
@@ -160,7 +239,7 @@ http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
 sophomorix4/Samba4 weekly Nr. 3  (02.04.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
 Für Bugs/Feature-requests, ... zu samba4 gibt es im Bugtracker die
 Kategorie 'samba4'.
@@ -176,7 +255,7 @@ sophomorix4 in etwa ablesen:
   4.0 Erste Version mit allen Features
 
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
 - Klassennamen bei Multischool-Umgebungen:
   Z.B. Schule abc und Klasse 7a:
@@ -241,12 +320,12 @@ http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
 sophomorix4/Samba4 weekly Nr. 2  (30.03.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
 nix
 
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
  - Dateisystem (wichtig für journaling Quota, ACL, immutble bit)
    --> ich würde gerne bei ext4 bleiben, 
@@ -310,7 +389,7 @@ http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
 sophomorix4/Samba4 weekly Nr. 1  (20.03.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
  - Testpasswörter (Testserver):
    'muster' geht nicht mehr, weil zu wenig komplex, 
@@ -326,7 +405,7 @@ Info über Enwicklungs-Entscheidungen
      sophomorix-virusscan (später, Virenscanner)
 
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
  - Dateisystem (wichtig für journaling Quota, ACL, immutble bit)
    --> ich würde gerne bei ext4 bleiben, 
@@ -415,11 +494,11 @@ TEMPLATE
 sophomorix4/Samba4 weekly Nr. x  (yy.zz.2016)
 ############################################################
 
-Info über Enwicklungs-Entscheidungen
+Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
 
 
-Enwicklungs-Entscheidungen, die bald anstehen/Diskussion
+Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
 
 
