@@ -56,7 +56,8 @@ my $sophomorix_add_output="/root/sophomorix.add";
 
 # --create-project-script
 my $create_project_script=0;
-my $project_script="/root/create_projects.sh";
+my $project_script_input="/data/root/sophomorix-dump.projects";
+my $project_script_output="/root/sophomorix-vampire-projects.sh";
 
 
 my $missig_files_count=0;
@@ -96,8 +97,9 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # modify paths
+# --datadir
 $sophomorix_add_input_sql=$datadir.$sophomorix_add_input_sql;
-
+$project_script_input=$datadir.$project_script_input;
 
 # --help
 if ($help==1) {
@@ -106,7 +108,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
-sophomorix-vampire imports users, classes and projects from a linuxmuster.net 6.x server 
+sophomorix-vampire imports users, classes, projects and devices from a linuxmuster.net 6.x server 
 
 Options
   -h  / --help
@@ -118,65 +120,34 @@ Getting information:
 Configuring:
   --datadir /path/to/dir/sophomorix-dump
 
-
-Before:
-
+Dump data on old server V6:
 1. Exporting user data on linuxmusternet6 server:
-
    sophomorix-dump
-
 2. Save/Copy the following dir to new Server:
-
    /root/sophomorix-dump
 
-
-Vampire data into the new server:
-
+Vampire data into the new server V7:
 1. Test if dump is complete, read ERRORS and WARNINGS
-
    sophomorix-vampire --datadir /path/to/dir/sophomorix-dump
-
-
 2. Create file sophomorix.add and add these users:
- 
    sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
    cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
-
    sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
    sophomorix-add (Add the users)
-
-
 3. Create project script and run it.
-
    sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
-   /root/create_projects.sh
-
-
+   /root/sophomorix-vampire-projects.sh
 4. Copy configuration files into new server:
-
    sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
-
-
 5. Import the workstations (later use linuxmuster command)
-   
    sophomorix-device
-
-
 6. Manually do the rest (will be automated):
-
    Copy files in /etc/sophomorix/user/mail/* to new server.
-
-
-
 
 Getting information:
   -i / --info
-
 Configuring:
   --datadir /path/to/migration/files
-
-
-Please see the sophomorix-vampire(8) man pages for full documentation
 ');
    print "\n";
    exit;
@@ -233,6 +204,7 @@ if ($info==1){
     exit;
 }
 
+##################################################
 # --create-add-file
 # creating sophomorix.add
 if ($create_add_file==1){
@@ -347,45 +319,44 @@ if ($create_add_file==1){
 }
 
 
+##################################################
 # --create-project-script
-# creating /root/create_projects.sh
+# creating /root/sophomorix-vampire-projects.sh
 if ($create_project_script==1){
     my %data=();
     my @pro=();
-    print "Creating $project_script\n";
-#    my $projects_dump=$datadir.$files[1];
-    my $projects_dump="";# ????
-
-    open(PRO,"<$projects_dump") || die "ERROR: $!";
-    open(PROSCRIPT,">$project_script") || die "ERROR: $!";
+    print "Creating $project_script_output\n";
+    open(PRO,"<$project_script_input") || die "ERROR: $!";
+    open(PROSCRIPT,">$project_script_output") || die "ERROR: $!";
     print PROSCRIPT "#!/bin/sh\n";
     while(<PRO>){
         if(m/\./){
-            print $_;
             chomp();
             my ($pro,$setting) = split(/\./);
             my ($para,$set) = split(/=/,$setting);
             $pro=~s/^\s+//g;# remove leading whitespace
-            print "$pro:  $para  >$set<\n";
             # saving data
             push @pro, $pro;
             $data{$pro}{$para}="$set";
         }
     }
-    print Dumper(%data);
+    if($Conf::log_level>=2){
+        print Dumper(%data);
+    }
     @pro = uniq(@pro);
 
     # creating script
-    # create projects
+    # Part1: create projects
+    # (projects need to exist for memberships in other projects)
     foreach my $pro (@pro){
         my $command="sophomorix-project --create -p $pro";
-        print "   $command\n";
+        print "  $command\n";
         print PROSCRIPT "$command\n";
    
     }
 
 
-    # change projects
+    # Part2: change projects
     foreach my $pro (@pro){
         my $command="sophomorix-project -p $pro";
         # --join/--nojoin
@@ -422,8 +393,9 @@ if ($create_project_script==1){
 
         # --status
         $command = $command." --status ".$data{$pro}{'sophomorixstatus'};
-  #      # --creationtime
-  #      $command = $command." --creationtime ".$data{$pro}{'creationtime'};
+        # --creationdate
+        my $creationdate=&convert_date($data{$pro}{'creationdate'});
+        $command = $command." --creationdate ".$creationdate;
 
         # --admins
         $command = $command." --admins ".$data{$pro}{'admins'};
@@ -434,23 +406,28 @@ if ($create_project_script==1){
         my @memberprojects=split(/,/,$data{$pro}{'memberprojects'});
         my @all=(@membergroups,@memberprojects);
 
-
         my $all="\"\"";
         if ($#all >= 0){
             $all = join(",",@all);
         }
   
-      # --membergroups
+        # --membergroups
         $command = $command." --membergroups ".$all;
 
-
-        print "   $command\n";
+        # print the command
+        my $substr_command=substr($command,0,65);
+        if($Conf::log_level>=2){
+            # full multiline command
+            print "  $command\n";
+        } else {
+            # truncated command
+            print "  $substr_command ...\n";
+        }
         print PROSCRIPT "$command\n";
-
     }
     close(PRO);
     close(PROSCRIPT);
-    system("chmod 755 $project_script");
+    system("chmod 755 $project_script_output");
 }
 
 
