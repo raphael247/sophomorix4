@@ -173,7 +173,7 @@ if ($info==1) {
        exit;
    }
     open(USERVERSETZEN,"$move_file") 
-            || die "Fehler: $!";
+            || die "ERROR: $!";
     print "\nThe following users can be moved:\n\n";
     printf "%-12s %-14s %-14s %-2s %-15s %-16s \n",
            "Login","OldClass","NewClass","S","OU-old","OU-new";
@@ -254,10 +254,10 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 # Datei mit den Schülern, die nicht versetzt wurden
 open(NOCHVERSETZEN,">$move_file_new") 
-     || die "Fehler: $!";
+     || die "ERROR: $!";
 
 open(USERVERSETZEN,"$move_file") 
-     || die "Fehler: $!";
+     || die "ERROR: $!";
 while(<USERVERSETZEN>){
     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
         next;

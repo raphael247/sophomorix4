@@ -304,9 +304,9 @@ my @passwort_zeichen=&get_passwd_charlist();
 
 # Datei mit den Schülern, die nicht angelegt wurden
 open(NOCHANLEGEN,">$add_file_new") 
-    || die "Fehler: $!";
+    || die "ERROR: $!";
 open(SOPHOMORIXADD,"$add_file") 
-    || die "Fehler: $!";
+    || die "ERROR: $!";
 while(<SOPHOMORIXADD>){
     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
         next;
