@@ -45,11 +45,20 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+
+# default
 my $datadir="/root/linuxmuster6";
+
+# --create-add-file
 my $create_add_file=0;
+my $sophomorix_add_input_sql="/data/root/sophomorix-dump-viewdumps/userdata_view.sql";
+my $sophomorix_add_output="/root/sophomorix.add";
+
+# --create-project-script
 my $create_project_script=0;
 my $project_script="/root/create_projects.sh";
-my $sophomorix_add_output="/root/sophomorix.add";
+
+
 my $missig_files_count=0;
 my $overwriting_files_count=0;
 # ===========================================================================
@@ -85,6 +94,9 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt);
+
+# modify paths
+$sophomorix_add_input_sql=$datadir.$sophomorix_add_input_sql;
 
 
 # --help
@@ -170,6 +182,7 @@ Please see the sophomorix-vampire(8) man pages for full documentation
    exit;
 }
 
+&log_script_start(@arguments);
 
 ##################################################
 # Testing files in the dump
@@ -223,12 +236,9 @@ if ($info==1){
 # --create-add-file
 # creating sophomorix.add
 if ($create_add_file==1){
-    #my $account_sql=$datadir.$files[0];
-    my $account_sql=""; # ?????
-
-    open(ACCOUNTS,"<$account_sql") || die "ERROR: $!";
+    my @skipped_lines=();
+    open(ACCOUNTS,"<$sophomorix_add_input_sql") || die "ERROR: $!";
     open(SOPHOMORIXADD,">$sophomorix_add_output") || die "ERROR: $!";
-
     my $line_number=0;
     my %tags=();
     while(<ACCOUNTS>){
@@ -260,7 +270,6 @@ if ($create_add_file==1){
                 $count++;
             }
             if ($line{"homedirectory"}=~m/\/home\/teachers\//){
-	        print "$line{'uid'} teacher\n";
                 $role="teacher";
             } elsif ($line{"homedirectory"}=~m/\/home\/students\//){
                 $role="student";
@@ -275,6 +284,7 @@ if ($create_add_file==1){
                 # exam accounts are skipped
                 if($line{"firstname"} ne "Computer"){
 	            print "SKIPPED: $line \n";
+                    push @skipped_lines, $line;
                 }
                 $skip_line=1;
             }
@@ -319,7 +329,7 @@ if ($create_add_file==1){
                       $tolerationdate."::".
                       $deactivationdate."::\n";
             if ($skip_line==0){
-	        print $line;
+	        print "LINE: $line";
 	        print SOPHOMORIXADD $line;
             }
         }
@@ -327,6 +337,13 @@ if ($create_add_file==1){
     }
     close(ACCOUNTS);
     close(SOPHOMORIXADD);
+    my $skipped=$#skipped_lines+1;
+    print "$skipped skipped lines:\n";
+    foreach my $line (@skipped_lines){
+        $line=~s/\s//g;
+        my $line_part=substr($line,0,65);
+        print "  LINE: $line_part ...\n";
+    }
 }
 
 
@@ -438,7 +455,6 @@ if ($create_project_script==1){
 
 
 
-&log_script_start(@arguments);
 
 
 #my ($ldap,$root_dse) = &AD_bind_admin();
@@ -458,7 +474,6 @@ sub convert_date {
     if ($time eq ""){
         $time="00:00:00";
     }
-    print "OD: <$olddate> >$time<\n";
     my ($year,$month,$day)=split(/-/,$date);
     my ($hour,$minute,$second)=split(/:/,$time);
     my $newdate=$year.$month.$day.$hour.$minute.$second.".0Z";
