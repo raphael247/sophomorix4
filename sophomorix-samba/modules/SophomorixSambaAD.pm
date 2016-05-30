@@ -1540,8 +1540,9 @@ sub AD_group_list {
     my ($ldap,$root_dse,$type,$show) = @_;
     my $filter="(&(objectClass=group)(sophomorixType=".$type."))";
     my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
-
-    #print "Filter: $filter\n";
+    if($Conf::log_level>=2){
+        print "Filter: $filter\n";
+    }
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
