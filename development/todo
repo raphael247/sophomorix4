@@ -108,9 +108,10 @@ add groups with role 'project'
   - p_longname: description field used
   - Zeitanzeige lesbarer machen (-i -p <name>)
 
-sophomorix-user
-how to handle users that are organised in wrong school
-  i.e. sophomorisSchoolname is BSZLEO an they are in OU=SCHOOL 
+Obersttufenkurse, wahlweise mit der ID
+http://www.linuxmuster.net/wiki/anwenderwiki:sophomorix:sophomorix-project
+
+
 
 
 Tests:
@@ -125,6 +126,35 @@ dito for groups
 
 option sync memberships: go throuh all projects and sync memberships
 
+
+sophomorix-user
+ options to change status
+ option to list new teachers
+how to handle users that are organised in wrong school
+  i.e. sophomorisSchoolname is BSZLEO an they are in OU=SCHOOL 
+
+sophomorix-class
+(migrate similar to projects)
+- add option to create class (like*-project) --create
+  --hide (sets type adminclass to hiddenclass)
+  --quota
+  --mailquota
+  --mailalia
+  --maillist
+  --description ?  "migrated on $date"  
+  --admins
+  --admingroups
+  (members are managed automatically)
+create tests for that (sophomorix-test-4)
+
+--info to display that (show classes like projects now)
+sophomorix-vampire creates missung groups:
+  --> hiddenclasses
+  --> classes without students
+  ---> and updates them (i.e. groups created by sophmorix-add)
+Think about: create classes first, then the users automatically (avoids name clash)
+
+add --info --class <class>
 
 
 -> sophomorix-device
@@ -160,6 +190,7 @@ sophomorix.add, .move, .kill
 
 
 
+
 sophomorix-useradd
   - replace default password 'linux' with 'LinuxMuster!'
   - maybe put all options for adding users  to sophomorix-add
@@ -182,8 +213,13 @@ sophomorix-print:
      - add support for templates
        see pull requests for sophomorix2
 
+############################################################
+all scripts
+############################################################
 
-all scripts: when die (file missing), tell what file is missing 
+when die (file missing), tell what file is missing 
+
+show ldap search filer on -v (loglevel =>2)
 
 ############################################################
 Janitor scripts
