@@ -54,6 +54,11 @@ my $create_add_file=0;
 my $sophomorix_add_input_sql="/data/root/sophomorix-dump-viewdumps/userdata_view.sql";
 my $sophomorix_add_output="/root/sophomorix.add";
 
+# --create-class-script
+my $create_class_script=0;
+my $class_script_input="/data/root/sophomorix-dump-viewdumps/classdata_view.sql";
+my $class_script_output="/root/sophomorix-vampire-classes.sh";
+
 # --create-project-script
 my $create_project_script=0;
 my $project_script_input="/data/root/sophomorix-dump.projects";
@@ -90,6 +95,7 @@ my $testopt=GetOptions(
            "datadir=s" => \$datadir,
            "create-add-file" => \$create_add_file,
            "create-project-script" => \$create_project_script,
+           "create-class-script" => \$create_class_script,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -100,6 +106,7 @@ my $testopt=GetOptions(
 # --datadir
 $sophomorix_add_input_sql=$datadir.$sophomorix_add_input_sql;
 $project_script_input=$datadir.$project_script_input;
+$class_script_input=$datadir.$class_script_input;
 
 # --help
 if ($help==1) {
@@ -129,19 +136,22 @@ Dump data on old server V6:
 Vampire data into the new server V7:
 1. Test if dump is complete, read ERRORS and WARNINGS
    sophomorix-vampire --datadir /path/to/dir/sophomorix-dump
-2. Create file sophomorix.add and add these users:
+2. Create class script and run it.
+   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-script
+   /root/sophomorix-vampire-classes.sh
+3. Create file sophomorix.add and add these users:
    sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
    cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
    sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
    sophomorix-add (Add the users)
-3. Create project script and run it.
+4. Create project script and run it.
    sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
    /root/sophomorix-vampire-projects.sh
-4. Copy configuration files into new server:
+5. Copy configuration files into new server:
    sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
-5. Import the workstations (later use linuxmuster command)
+6. Import the workstations (later use linuxmuster command)
    sophomorix-device
-6. Manually do the rest (will be automated):
+7. Manually do the rest (will be automated):
    Copy files in /etc/sophomorix/user/mail/* to new server.
 
 Getting information:
@@ -202,6 +212,26 @@ print "\n";
 if ($info==1){
     
     exit;
+}
+
+
+##################################################
+# --create-class-script
+# creating /root/sophomorix-vampire-projects.sh
+if ($create_class_script==1){
+    my %data=();
+    my @pro=();
+    print "Creating $class_script_output\n";
+    open(CLASS,"<$class_script_input") || die "ERROR: $!";
+    open(CLASSSCRIPT,">$class_script_output") || die "ERROR: $!";
+    print CLASSSCRIPT "#!/bin/sh\n";
+    while(<CLASS>){
+
+
+    }
+    close(CLASS);
+    close(CLASSSCRIPT);
+    system("chmod 755 $class_script_output");
 }
 
 ##################################################
