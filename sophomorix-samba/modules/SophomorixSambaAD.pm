@@ -47,7 +47,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_fetch
             AD_class_fetch
             AD_project_fetch
-            AD_project_update
+            AD_group_update
             AD_dn_fetch_multivalue
             AD_project_sync_members
             AD_group_list
@@ -1496,11 +1496,12 @@ sub AD_dn_fetch_multivalue {
     return @results;
 }
 
-sub AD_project_update {
+sub AD_group_update {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $dn = $arg_ref->{dn};
+    my $type = $arg_ref->{type};
     my $description = $arg_ref->{description};
     my $addquota = $arg_ref->{addquota};
     my $addmailquota = $arg_ref->{addmailquota};

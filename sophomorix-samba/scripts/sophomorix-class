@@ -49,7 +49,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_class_fetch
                                  AD_project_fetch
-                                 AD_project_update
+                                 AD_group_update
                                  AD_project_sync_members
                                  AD_dn_fetch_multivalue
                                  AD_group_list
@@ -73,12 +73,20 @@ my $kill=0;
 my $ou="---";
 my $school_token="---";
 
-my $reset_class="";
-my $hide="";
+my $description;
 my $quota;
 my $mailquota;
 my $mailalias;
 my $maillist;
+my $status;
+my $join;
+my $maxmembers;
+my $creationdate;
+
+my $hide="";
+
+
+my $reset_class="";
 $Conf::log_level=1;
 
 # Parsen der Optionen
@@ -90,12 +98,18 @@ my $testopt=GetOptions(
            "kill" => \$kill,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
+
+           "description=s" => \$description,
+           "status=s" => \$status,
+           "maxmembers=s" => \$maxmembers,
+           "creationdate=s" => \$creationdate,
+           "mailalias!" => \$mailalias,
+           "maillist!" => \$maillist,
+
            "reset-class=s" => \$reset_class,
            "hide!" => \$hide,
            "quota=s" => \$quota,
            "mailquota=i" => \$mailquota,
-           "mailalias!" => \$mailalias,
-           "maillist!" => \$maillist,
            "verbose|v+" => \$Conf::log_level,
           );
 
@@ -210,12 +224,27 @@ if ($kill==1 and $class ne ""){
 # get dn if class exists and continue
 ############################################################
 
-my ($dn_pro,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
+my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
 
 if ($count>1){
     print "\n$count Projects found.\n";
     print "Specify the school-token to choose a project\n\n";
     exit $count;
+}
+
+##################################################
+# ??? --sync_all_memberships for classes? ???
+
+
+
+# --description <strg>
+if (defined $description){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      description=>$description,
+                    });
 }
 
 

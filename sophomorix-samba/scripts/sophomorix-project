@@ -43,7 +43,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
                                  AD_project_fetch
-                                 AD_project_update
+                                 AD_group_update
                                  AD_project_sync_members
                                  AD_dn_fetch_multivalue
                                  AD_group_list
@@ -622,96 +622,106 @@ if (defined $sync_all_memberships){
 
 # --description <strg>
 if (defined $description){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        description=>$description,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      description=>$description,
+                    });
 }
 
 # --addquota <strg>
 if (defined $addquota){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        addquota=>$addquota,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      addquota=>$addquota,
+                    });
 }
 
 
 # --addmailquota <strg>
 if (defined $addmailquota){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        addmailquota=>$addmailquota,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      addmailquota=>$addmailquota,
+                    });
 }
 
 
 # --mailalias/nomailalias
 if (defined $mailalias){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        mailalias=>$mailalias,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      mailalias=>$mailalias,
+                    });
 }
 
 # --maillist/--nomaillist
 if (defined $maillist){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        maillist=>$maillist,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      maillist=>$maillist,
+                    });
 }
 
 # --status <P>
 if (defined $status){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        status=>$status,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      status=>$status,
+                    });
 }
 
 # --join/--nojoin
 if (defined $join){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        join=>$join,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      join=>$join,
+                    });
 }
 
 # --maxmembers <strg>
 if (defined $maxmembers){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        maxmembers=>$maxmembers,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      maxmembers=>$maxmembers,
+                    });
 }
 
 # --creationdate <strg>
 if (defined $creationdate){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        creationdate=>$creationdate,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      creationdate=>$creationdate,
+                    });
 }
 
 ##################################################
 # members
 # --members <user1,user2>
 if (defined $members){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        members=>$members,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      members=>$members,
+                    });
 }
 
 # --addmembers <user1,user2>
@@ -720,11 +730,12 @@ if (defined $addmembers){
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
     my @members = uniq(@old_members,@addmembers); 
     my $members=join(",",@members);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        members=>$members,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      members=>$members,
+                    });
 }
 
 # --removemembers <user1,user2>
@@ -732,11 +743,12 @@ if (defined $removemembers){
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
     my @members = &remove_from_list($removemembers,@old_members);
     my $members=join(",",@members);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        members=>$members,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      members=>$members,
+                    });
 }
 
 
@@ -745,11 +757,12 @@ if (defined $removemembers){
 # admins
 # --admins <user1,user2>
 if (defined $admins){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        admins=>$admins,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      admins=>$admins,
+                    });
 }
 
 # --addadmins <user1,user2>
@@ -758,11 +771,12 @@ if (defined $addadmins){
     my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
     my @admins = uniq(@old_admins,@addadmins); 
     my $admins=join(",",@admins);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        admins=>$admins,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      admins=>$admins,
+                    });
 }
 
 # --removeadmins <user1,user2>
@@ -770,11 +784,12 @@ if (defined $removeadmins){
     my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
     my @admins = &remove_from_list($removeadmins,@old_admins);
     my $admins=join(",",@admins);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        admins=>$admins,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      admins=>$admins,
+                    });
 }
 
 
@@ -783,11 +798,12 @@ if (defined $removeadmins){
 # membergroups
 # --membergroups <group1,group2>
 if (defined $membergroups){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        membergroups=>$membergroups,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      membergroups=>$membergroups,
+                    });
 }
 
 # --addmembergroups <group1,group2>
@@ -796,11 +812,12 @@ if (defined $addmembergroups){
     my @old_membergroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
     my @membergroups = uniq(@old_membergroups,@addmembergroups); 
     my $membergroups=join(",",@membergroups);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        membergroups=>$membergroups,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      membergroups=>$membergroups,
+                    });
 }
 
 # --removemembergroups <user1,user2>
@@ -808,11 +825,12 @@ if (defined $removemembergroups){
     my @old_membergroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
     my @membergroups = &remove_from_list($removemembergroups,@old_membergroups);
     my $membergroups=join(",",@membergroups);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        membergroups=>$membergroups,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      membergroups=>$membergroups,
+                    });
 }
 
 
@@ -821,11 +839,12 @@ if (defined $removemembergroups){
 # admingroups
 # --admingroups <group1,group2>
 if (defined $admingroups){
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        admingroups=>$admingroups,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      admingroups=>$admingroups,
+                    });
 }
 
 # --addadmingroups <group1,group2>
@@ -834,11 +853,12 @@ if (defined $addadmingroups){
     my @old_admingroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
     my @admingroups = uniq(@old_admingroups,@addadmingroups); 
     my $admingroups=join(",",@admingroups);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        admingroups=>$admingroups,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      admingroups=>$admingroups,
+                    });
 }
 
 # --removeadmingroups <user1,user2>
@@ -846,11 +866,12 @@ if (defined $removeadmingroups){
     my @old_admingroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
     my @admingroups = &remove_from_list($removeadmingroups,@old_admingroups);
     my $admingroups=join(",",@admingroups);
-    &AD_project_update({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        dn=>$dn_pro,
-                        admingroups=>$admingroups,
-                      });
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project,"
+                      admingroups=>$admingroups,
+                    });
 }
 
 
