@@ -1503,6 +1503,8 @@ sub AD_group_update {
     my $dn = $arg_ref->{dn};
     my $type = $arg_ref->{type};
     my $description = $arg_ref->{description};
+    my $quota = $arg_ref->{quota};
+    my $mailquota = $arg_ref->{mailquota};
     my $addquota = $arg_ref->{addquota};
     my $addmailquota = $arg_ref->{addmailquota};
     my $mailalias = $arg_ref->{mailalias};
@@ -1523,6 +1525,16 @@ sub AD_group_update {
     if (defined $description){
         print "   * Setting Description to '$description'\n";
         my $mesg = $ldap->modify($dn,replace => {Description => $description}); 
+    }
+    # quota   
+    if (defined $quota){
+        print "   * Setting sophomorixQuota to $quota\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
+    }
+    # mailquota   
+    if (defined $mailquota){
+        print "   * Setting sophomorixMailquota to $mailquota\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixMailquota => $mailquota}); 
     }
     # addquota   
     if (defined $addquota){

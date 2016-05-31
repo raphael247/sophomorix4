@@ -98,18 +98,17 @@ my $testopt=GetOptions(
            "kill" => \$kill,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
-
            "description=s" => \$description,
+           "quota=s" => \$quota,
+           "mailquota=i" => \$mailquota,
            "status=s" => \$status,
            "maxmembers=s" => \$maxmembers,
            "creationdate=s" => \$creationdate,
            "mailalias!" => \$mailalias,
            "maillist!" => \$maillist,
-
-           "reset-class=s" => \$reset_class,
-           "hide!" => \$hide,
-           "quota=s" => \$quota,
-           "mailquota=i" => \$mailquota,
+           "join!" => \$join,
+#           "reset-class=s" => \$reset_class,
+#           "hide!" => \$hide,
            "verbose|v+" => \$Conf::log_level,
           );
 
@@ -142,17 +141,28 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
-  -c adminclass, / --class adminclass
-    (can set values also for the group teachers with --class teachers)
-  --hide --class adminclass, --nohide --class hiddenclass 
-  --quota quotastring
-  --mailquota number
-  --mailalias, --nomailalias
-  --maillist, --nomaillist
-  --reset-class class
+
+Changing an adminclass:
+  -c adminclass, / --class adminclass 
+  (can set values also for the group teachers with --class teachers)
+    --description \'multiple words possible\'
+    --quota quotastring
+    --mailquota number
+    --mailalias, --nomailalias
+    --maillist, --nomaillist 
+    --status <letter>
+    --join,  --nojoin
+    --maxmembers number
+
+  ??? --hide --class adminclass, --nohide --class hiddenclass 
+
 
 This is for migration only:
-  --create --class <classname>
+  --create --class <adminclass>
+  --creationdate <20150529093330.0Z> (only for migration)
+
+Be careful with this command:
+  --kill --class <adminclass>
 
 
 Please see the sophomorix-class(8) man pages for full documentation
@@ -247,7 +257,85 @@ if (defined $description){
                     });
 }
 
+# --quota <strg>
+if (defined $quota){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      quota=>$quota,
+                    });
+}
 
+# --mailquota <strg>
+if (defined $mailquota){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      mailquota=>$mailquota,
+                    });
+}
+
+# --mailalias/nomailalias
+if (defined $mailalias){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      mailalias=>$mailalias,
+                    });
+}
+
+# --maillist/--nomaillist
+if (defined $maillist){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      maillist=>$maillist,
+                    });
+}
+
+# --status <P>
+if (defined $status){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      status=>$status,
+                    });
+}
+
+# --join/--nojoin
+if (defined $join){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      join=>$join,
+                    });
+}
+
+# --maxmembers <strg>
+if (defined $maxmembers){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      maxmembers=>$maxmembers,
+                    });
+}
+
+# --creationdate <strg>
+if (defined $creationdate){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      creationdate=>$creationdate,
+                    });
+}
 
 
 exit;

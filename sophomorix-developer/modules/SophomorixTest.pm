@@ -130,6 +130,8 @@ sub AD_test_object {
 
     # sophomorix group
     my $s_type = $arg_ref->{sophomorixType};
+    my $s_quota = $arg_ref->{sophomorixQuota};
+    my $s_mailquota = $arg_ref->{sophomorixMailQuota};
     my $s_addquota = $arg_ref->{sophomorixAddQuota};
     my $s_addmailquota = $arg_ref->{sophomorixAddMailQuota};
     my $s_mailalias = $arg_ref->{sophomorixMailAlias};
@@ -240,6 +242,14 @@ sub AD_test_object {
         if (defined $s_status){
             is ($entry->get_value ('sophomorixStatus'),$s_status,
 		"  * sophomorixStatus is $s_status");
+        }
+        if (defined $s_quota){
+            is ($entry->get_value ('sophomorixQuota'),$s_quota,
+		"  * sophomorixQuota is $s_quota");
+        }
+        if (defined $s_mailquota){
+            is ($entry->get_value ('sophomorixMailQuota'),$s_mailquota,
+		"  * sophomorixMailQuota is $s_mailquota");
         }
         if (defined $s_addquota){
             is ($entry->get_value ('sophomorixAddQuota'),$s_addquota,
