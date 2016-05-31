@@ -563,7 +563,8 @@ sub AD_user_move {
                       description=>$group_new,
                       ou=>$ou_new,
                       school_token=>$school_token_new,
-                      type=>"adminclass",    
+                      type=>"adminclass",
+                      joinable=>"TRUE",
                       status=>"P",
                       creationdate=>$creationdate,
                     });
@@ -778,15 +779,6 @@ sub AD_ou_add {
                                                 'group' ],
                           ]
                       );
-#    &AD_group_create({ldap=>$ldap,
-#                      root_dse=>$root_dse,
-#                      group=>$group,
-#                      ou=>$ou_new,
-#                      school_token=>$school_token_new,
-#                      type=>"adminclass",    
-#                      status=>"P",
-#                      creationdate=>$creationdate,
-#                    });
 
     # <token>-students
     $group=$token.$DevelConf::student;
@@ -1882,6 +1874,7 @@ sub AD_group_create {
         print("   Target:        $target_branch\n");
         print("   Group:         $group\n");
         print("   Type:          $type\n");
+        print("   Joinable:      $joinable\n");
         print "   Creationdate:  $creationdate\n";
 
         # Create target branch
