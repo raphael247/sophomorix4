@@ -114,18 +114,6 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt);
-#&check_connections();
-
-#if (not defined $quota 
-#    and not defined $mailquota
-#    and $info==0 
-#    and not defined $mailalias
-#    and not defined $maillist
-#    and $class eq ""
-#    and $reset_class eq ""){
-#    $help=1;
-#}
-
 
 # --help
 if ($help==1) {
@@ -337,81 +325,17 @@ if (defined $creationdate){
                     });
 }
 
-
-exit;
-
-# --mailalias
-if (defined $mailalias){
-    if ($class eq ""){
-        &log_script_exit("ERROR: You must give a class to use --mailalias",
-                         1,1,0,@arguments);
-    }
-    if ($mailalias==0){
-        &update_class_db_entry($class,"Mailalias=FALSE");
-    } elsif ($mailalias==1){
-        &update_class_db_entry($class,"Mailalias=TRUE");
-    }
-}
-
-
-# --maillist
-if (defined $maillist){
-    if ($class eq ""){
-        print "   You must give a class to use --maillist\n";
-        &log_script_exit("ERROR: You must give a class to use --maillist",
-                         1,1,0,@arguments);
-    }
-    if ($maillist==0){
-        &update_class_db_entry($class,"Maillist=FALSE");
-    } elsif ($maillist==1){
-        &update_class_db_entry($class,"Maillist=TRUE");
-    }
-}
-
-
-# --hide
-if ($hide ne "" and $class ne ""){
-    if ($hide==0){
-        print "Unhiding class $class\n";
-        &update_class_db_entry($class,"Type=adminclass");
-    }
-    if ($hide==1){
-        print "Hiding class $class\n";
-        &update_class_db_entry($class,"Type=hiddenclass");
-    }
-}
-
-
-
-
-
-# --quota
-if (defined $quota){
-    if ($class eq ""){
-        print "   You must give a class to use --quota\n";
-        &log_script_exit("You must give a class to use --quota",
-                         1,1,0,@arguments);
-    }
-    if ($quota eq "" or 
-        $quota eq "quota" or 
-        $quota eq "standard" or
-	$quota eq "default"){
-        &update_class_db_entry($class,"Quota=quota");
-    } else {
-        &update_class_db_entry($class,"Quota=$quota");
-    }
-}
-
-
-# --mailquota
-if (defined $mailquota){
-    if ($class eq ""){
-        &log_script_exit("ERROR: You must give a class to use --mailquota",
-                         1,1,0,@arguments);
-    }
-    &update_class_db_entry($class,"MailQuota=$mailquota");
-}
-
+# # --hide
+# if ($hide ne "" and $class ne ""){
+#     if ($hide==0){
+#         print "Unhiding class $class\n";
+#         &update_class_db_entry($class,"Type=adminclass");
+#     }
+#     if ($hide==1){
+#         print "Hiding class $class\n";
+#         &update_class_db_entry($class,"Type=hiddenclass");
+#     }
+# }
 
 # # --reset-class
 # if ($reset_class ne ""){
@@ -468,9 +392,6 @@ if (defined $mailquota){
 #     }
 # }
 
-
-
-
 # # Setting Quota if necessary
 # if ($Conf::use_quota eq "yes" 
 #     and $class ne "" 
@@ -482,10 +403,6 @@ if (defined $mailquota){
 #     &titel("NOT setting quota (nothing quota related changed)");
 # }
 
-
-
-
-
 # # Creating Mailing Aliases and Lists
 # if ($class ne ""
 #     and (defined $mailalias or defined $maillist)
@@ -495,7 +412,6 @@ if (defined $mailquota){
 # } else {
 #     &titel("NOT creating mailaliases/lists (nothing mail related changed)");
 # }
-
 
 # ===========================================================================
 # Ende des Scripts
