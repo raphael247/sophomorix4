@@ -225,6 +225,7 @@ if ($create_class_script==1){
     my @command_list_modify=();
     my @skipped_lines=();
     my $line_number=0;
+    my %line=();
     my %tags=();
     print "Creating $class_script_output\n";
     open(CLASS,"<$class_script_input") || die "ERROR: $!";
@@ -235,7 +236,6 @@ if ($create_class_script==1){
         $line_number++;
         my @attrs=split(/\|/,$line);
         my $count=0;
-        #print "Line $line_number:\n";
         if ($line_number==1){
             foreach my $attr (@attrs){
                 $attr=~s/^\s+//g;# remove leading whitespace
@@ -255,12 +255,12 @@ if ($create_class_script==1){
             foreach my $attr (@attrs){
                 $attr=~s/^\s+//g;# remove leading whitespace
                 $attr=~s/\s+$//g;# remove trailing whitespace
-#                print "   $count: $tags{$count}: >$attr<\n";
+                #print "   $count: $tags{$count}: >$attr<\n";
                 $line{$tags{$count}}=$attr;
                 $count++;
             }
 
-            
+            # select teacher,adminclasses and hiddenclasses            
             if ($line{"type"} eq "teacher"){
                 $join=" --nojoin";
             } elsif ($line{"type"} eq "adminclass"){
@@ -282,14 +282,19 @@ if ($create_class_script==1){
             }
 
 
-            # creating command
+            # creating commands
+            ##################################################
             my $command_create="sophomorix-class --create -c $line{'gid'}";
             my $command_modify="sophomorix-class -c $line{'gid'}";
+
+            # --description
+            my $description=$line{'gid'}." from migration";
+            $command_modify = $command_modify." --description \"$description\"";
 
             # --join/--nojoin
             $command_modify = $command_modify.$join;
 
-            # quota
+            # --quota
             if ($line{'quota'} eq "quota"){
                 $quota=" --quota \"---\"";
             } else {
@@ -297,7 +302,7 @@ if ($create_class_script==1){
             }
             $command_modify = $command_modify.$quota;
 
-            # mailquota
+            # --mailquota
             if ($line{'mailquota'} eq "-1"){
                 $mailquota=" --mailquota \"-1\"";
             } else {
@@ -305,7 +310,7 @@ if ($create_class_script==1){
             }
             $command_modify = $command_modify.$mailquota;
 
-            # mailalias
+            # --mailalias
             if ($line{'mailalias'} eq "t"){
                 $mailalias=" --mailalias TRUE";
             } else {
@@ -313,7 +318,7 @@ if ($create_class_script==1){
             }
             $command_modify = $command_modify.$mailalias;
 
-            # maillist
+            # --maillist
             if ($line{'maillist'} eq "t"){
                 $maillist=" --maillist TRUE";
             } else {
@@ -327,11 +332,12 @@ if ($create_class_script==1){
                 #print "$command_modify\n";
                 push @command_list_create, $command_create;
                 push @command_list_modify, $command_modify;
-                #print CLASSSCRIPT "$command\n";
 	        #print "LINE: $line";
             }
         }
     }
+
+    # sorting lines and assembling them
     @command_list_create = sort @command_list_create;
     @command_list_modify = sort @command_list_modify;
     my @command_list=("#!/bin/sh",
