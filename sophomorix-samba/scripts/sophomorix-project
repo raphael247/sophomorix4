@@ -103,7 +103,7 @@ my $admingroups;
 my $addadmingroups;
 my $removeadmingroups;
 
-my $sync_all_memberships=0;
+my $sync_all_memberships;
 
 my $caller="";
 my $curr_member="";
@@ -625,7 +625,7 @@ if (defined $description){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       description=>$description,
                     });
 }
@@ -635,7 +635,7 @@ if (defined $addquota){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       addquota=>$addquota,
                     });
 }
@@ -646,7 +646,7 @@ if (defined $addmailquota){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       addmailquota=>$addmailquota,
                     });
 }
@@ -657,7 +657,7 @@ if (defined $mailalias){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       mailalias=>$mailalias,
                     });
 }
@@ -667,7 +667,7 @@ if (defined $maillist){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       maillist=>$maillist,
                     });
 }
@@ -677,7 +677,7 @@ if (defined $status){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       status=>$status,
                     });
 }
@@ -687,7 +687,7 @@ if (defined $join){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       join=>$join,
                     });
 }
@@ -697,7 +697,7 @@ if (defined $maxmembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       maxmembers=>$maxmembers,
                     });
 }
@@ -707,7 +707,7 @@ if (defined $creationdate){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       creationdate=>$creationdate,
                     });
 }
@@ -719,7 +719,7 @@ if (defined $members){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       members=>$members,
                     });
 }
@@ -733,7 +733,7 @@ if (defined $addmembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       members=>$members,
                     });
 }
@@ -746,7 +746,7 @@ if (defined $removemembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       members=>$members,
                     });
 }
@@ -760,7 +760,7 @@ if (defined $admins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       admins=>$admins,
                     });
 }
@@ -774,7 +774,7 @@ if (defined $addadmins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       admins=>$admins,
                     });
 }
@@ -787,7 +787,7 @@ if (defined $removeadmins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       admins=>$admins,
                     });
 }
@@ -801,7 +801,7 @@ if (defined $membergroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       membergroups=>$membergroups,
                     });
 }
@@ -815,7 +815,7 @@ if (defined $addmembergroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       membergroups=>$membergroups,
                     });
 }
@@ -828,7 +828,7 @@ if (defined $removemembergroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       membergroups=>$membergroups,
                     });
 }
@@ -842,7 +842,7 @@ if (defined $admingroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       admingroups=>$admingroups,
                     });
 }
@@ -856,7 +856,7 @@ if (defined $addadmingroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       admingroups=>$admingroups,
                     });
 }
@@ -869,7 +869,7 @@ if (defined $removeadmingroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
-                      type=>"project,"
+                      type=>"project",
                       admingroups=>$admingroups,
                     });
 }

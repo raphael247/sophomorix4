@@ -1516,6 +1516,8 @@ sub AD_group_update {
     my $admingroups = $arg_ref->{admingroups};
     my $creationdate = $arg_ref->{creationdate};
 
+    my $sync_members=0;
+
     &Sophomorix::SophomorixBase::print_title("Updating $dn");
     # description   
     if (defined $description){
@@ -1573,6 +1575,7 @@ sub AD_group_update {
         print "   * Setting sophomorixMembers to @members\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixMembers' => \@members }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        $sync_members++;
     }
     # admins
     if (defined $admins){
@@ -1582,9 +1585,7 @@ sub AD_group_update {
         print "   * Setting sophomorixAdmins to @admins\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmins' => \@admins }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
-        foreach my $admin (@admins){
-
-        }
+        $sync_members++;
     }
     # membergroups   
     if (defined $membergroups){
@@ -1594,6 +1595,7 @@ sub AD_group_update {
         print "   * Setting sophomorixMemberGroups to @membergroups\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixMemberGroups' => \@membergroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        $sync_members++;
     }
     # admingroups
     if (defined $admingroups){
@@ -1603,8 +1605,13 @@ sub AD_group_update {
         print "   * Setting sophomorixAdmingroups to @admingroups\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        $sync_members++;
     }
-    &AD_project_sync_members($ldap,$root_dse,$dn);
+
+    # sync memberships if necessary
+    if ($sync_members>0){
+        &AD_project_sync_members($ldap,$root_dse,$dn);
+    }
 }
 
 
