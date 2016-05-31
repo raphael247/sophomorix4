@@ -1057,8 +1057,8 @@ sub AD_computer_fetch {
 sub AD_class_fetch {
     my ($ldap,$root_dse,$class,$ou,$school_token,$info) = @_;
     my $dn="";
-    my $sam_account="";
-    my $adminclass="";
+    my $sam_account=""; # the search result i.e. class7a
+    my $adminclass="";  # the option i.e. 'class7*'
     if (defined $school_token){
         $adminclass=&AD_get_name_tokened($class,$school_token,"adminclass");
     } else {
@@ -1104,7 +1104,6 @@ sub AD_class_fetch {
             foreach my $entry (@members){
                 $members{$entry}="seen";
             }
-
 
             # sophomorix-memberships (target state of memberships)
             my @s_members= (@member_by_attr, @admin_by_attr);
@@ -1180,7 +1179,7 @@ sub AD_class_fetch {
             foreach my $mem (@members){
                 if (not exists $s_allmem{$mem}){
                     push @membership_warn, 
-                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $project\n";
+                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $sam_account\n";
                 }
             }
 
@@ -1270,8 +1269,8 @@ sub AD_class_fetch {
 sub AD_project_fetch {
     my ($ldap,$root_dse,$pro,$ou,$school_token,$info) = @_;
     my $dn="";
-    my $sam_account="";
-    my $project="";
+    my $sam_account=""; # the search result i.e. p_abt3
+    my $project="";     # the option i.e. 'p_abt*'
     # projects from ldap
     if (defined $school_token){
         $project=&AD_get_name_tokened($pro,$school_token,"project");
@@ -1318,8 +1317,6 @@ sub AD_project_fetch {
             foreach my $entry (@members){
                 $members{$entry}="seen";
             }
-
-
 
             # sophomorix-memberships (target state of memberships)
             my @s_members= (@member_by_attr, @admin_by_attr);
@@ -1395,7 +1392,7 @@ sub AD_project_fetch {
             foreach my $mem (@members){
                 if (not exists $s_allmem{$mem}){
                     push @membership_warn, 
-                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $project\n";
+                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $sam_account\n";
                 }
             }
 
@@ -1782,10 +1779,16 @@ sub AD_group_list {
         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
         print "-----------------+----------+-----+----+-+-",
               "+-+-+--------------------------------\n";
+	if ($type eq "project"){
         printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
-               "Name","AQ","AMQ","MM","A","L","S","J","Description";
+               "Project Name","AQ","AMQ","MM","A","L","S","J","Project Description";
+        } elsif ($type eq "adminclass"){
+        printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
+               "Class Name","Quota","MQ","MM","A","L","S","J","Class Description";
+        }
         print "-----------------+----------+-----+----+-+-",
               "+-+-+--------------------------------\n";
+        
 
         for( my $index = 0 ; $index < $max_pro ; $index++) {
             my $entry = $mesg->entry($index);
@@ -1808,22 +1811,39 @@ sub AD_group_list {
             } else {
                 $joinable=1;
             }
-
-            printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
-                $entry->get_value('sAMAccountName'),
-                $entry->get_value('sophomorixAddQuota'),
-                $entry->get_value('sophomorixAddMailQuota'),
-                $entry->get_value('sophomorixMaxMembers'),
-                $mailalias,
-                $maillist,
-                $entry->get_value('sophomorixStatus'),
-                $joinable,
-	        $entry->get_value('description');
+            if ($type eq "project"){
+                printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
+                    $entry->get_value('sAMAccountName'),
+                    $entry->get_value('sophomorixAddQuota'),
+                    $entry->get_value('sophomorixAddMailQuota'),
+                    $entry->get_value('sophomorixMaxMembers'),
+                    $mailalias,
+                    $maillist,
+                    $entry->get_value('sophomorixStatus'),
+                    $joinable,
+	            $entry->get_value('description');
+            } elsif ($type eq "adminclass"){
+                printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
+                    $entry->get_value('sAMAccountName'),
+                    $entry->get_value('sophomorixQuota'),
+                    $entry->get_value('sophomorixMailQuota'),
+                    $entry->get_value('sophomorixMaxMembers'),
+                    $mailalias,
+                    $maillist,
+                    $entry->get_value('sophomorixStatus'),
+                    $joinable,
+	            $entry->get_value('description');
+            }
         }
         print "-----------------+----------+-----+----+-+-",
               "+-+-+--------------------------------\n";
-        print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
-        print " A=mailalias    L=mailist,       S=status                  \n";
+	if ($type eq "project"){
+            print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
+            print " A=mailalias    L=mailist,       S=status                  \n";
+        } elsif ($type eq "adminclass"){
+            print "MQ=mailquota   J=joinable   MM=maxmembers\n";
+            print " A=mailalias      L=mailist,    S=status                  \n";
+        }
         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
     } elsif ($show==0){
         my @projects_dn=();

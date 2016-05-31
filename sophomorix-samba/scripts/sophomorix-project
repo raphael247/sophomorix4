@@ -352,6 +352,7 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 
 # --info
+# show all projects when no specific projects is given
 if ($project eq "" and $info==1){
     &AD_group_list($ldap,$root_dse,"project",1);
     exit;
@@ -359,6 +360,7 @@ if ($project eq "" and $info==1){
 
 
 # --info --project name
+# list project(s) and exit
 if ($project ne "" and $info==1){
     my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token,$info);
     exit;
@@ -595,7 +597,6 @@ if ($kill==1 and $project ne ""){
 
 # get dn if project exists and continue
 ############################################################
-
 my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token,$info);
 
 if ($count>1){

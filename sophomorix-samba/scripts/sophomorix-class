@@ -168,11 +168,17 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 
 # --info
-#if ($info==1 and $reset_class eq ""){
+# show all class when no specific class is given
 if ($info==1 and $class eq ""){
    &AD_group_list($ldap,$root_dse,"adminclass",1);
-   #&show_class_list();
    exit;
+}
+
+# --info --class name
+# list class(es) and exit
+if ($class ne "" and $info==1){
+    my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
+    exit;
 }
 
 &log_script_start(@arguments);
@@ -219,9 +225,8 @@ if ($kill==1 and $class ne ""){
 }
 
 
-# get dn if class exists and continue
+# get dn if class exists and continue ($info=0)
 ############################################################
-
 my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
 
 if ($count>1){
