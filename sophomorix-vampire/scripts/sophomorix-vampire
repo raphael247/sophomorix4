@@ -217,17 +217,130 @@ if ($info==1){
 
 ##################################################
 # --create-class-script
-# creating /root/sophomorix-vampire-projects.sh
+# creating /root/sophomorix-vampire-classes.sh
 if ($create_class_script==1){
-    my %data=();
-    my @pro=();
+    #my %data=();
+    #my @pro=();
+    my @command_list_create=();
+    my @command_list_modify=();
+    my @skipped_lines=();
+    my $line_number=0;
+    my %tags=();
     print "Creating $class_script_output\n";
     open(CLASS,"<$class_script_input") || die "ERROR: $!";
     open(CLASSSCRIPT,">$class_script_output") || die "ERROR: $!";
-    print CLASSSCRIPT "#!/bin/sh\n";
     while(<CLASS>){
+        my $line=$_;
+        chomp($line);
+        $line_number++;
+        my @attrs=split(/\|/,$line);
+        my $count=0;
+        #print "Line $line_number:\n";
+        if ($line_number==1){
+            foreach my $attr (@attrs){
+                $attr=~s/^\s+//g;# remove leading whitespace
+                $attr=~s/\s+$//g;# remove trailing whitespace
+                print "   $count: * >$attr<\n";
+                $tags{$count}=$attr;
+                $count++;
+            }
+        } else {
+            my %line=();
+            my $skip_line=0;
+            my $join;
+            my $quota;
+            my $mailquota;
+            my $maillist;
+            my $mailalias;
+            foreach my $attr (@attrs){
+                $attr=~s/^\s+//g;# remove leading whitespace
+                $attr=~s/\s+$//g;# remove trailing whitespace
+#                print "   $count: $tags{$count}: >$attr<\n";
+                $line{$tags{$count}}=$attr;
+                $count++;
+            }
+
+            
+            if ($line{"type"} eq "teacher"){
+                $join=" --nojoin";
+            } elsif ($line{"type"} eq "adminclass"){
+                $join=" --join";
+            } elsif ($line{"type"} eq "hiddenclass"){
+                $join=" --join";
+            } elsif ($line{"type"} eq "room"){
+                $skip_line=1;
+                next;
+            } elsif ($line{"type"} eq "project"){
+                $skip_line=1;
+                next;
+            } else {
+                # others are skipped
+	        print "SKIPPED: $line\n";
+                push @skipped_lines, $line;
+                $skip_line=1;
+                next;
+            }
 
 
+            # creating command
+            my $command_create="sophomorix-class --create -c $line{'gid'}";
+            my $command_modify="sophomorix-class -c $line{'gid'}";
+
+            # --join/--nojoin
+            $command_modify = $command_modify.$join;
+
+            # quota
+            if ($line{'quota'} eq "quota"){
+                $quota=" --quota \"---\"";
+            } else {
+                $quota=" --quota $line{'quota'}";
+            }
+            $command_modify = $command_modify.$quota;
+
+            # mailquota
+            if ($line{'mailquota'} eq "-1"){
+                $mailquota=" --mailquota \"-1\"";
+            } else {
+                $mailquota=" --mailquota $line{'mailquota'}";
+            }
+            $command_modify = $command_modify.$mailquota;
+
+            # mailalias
+            if ($line{'mailalias'} eq "t"){
+                $mailalias=" --mailalias TRUE";
+            } else {
+                $mailalias=" --mailalias FALSE";
+            }
+            $command_modify = $command_modify.$mailalias;
+
+            # maillist
+            if ($line{'maillist'} eq "t"){
+                $maillist=" --maillist TRUE";
+            } else {
+                $maillist=" --maillist FALSE";
+            }
+            $command_modify = $command_modify.$maillist;
+
+
+            if ($skip_line==0){
+                #print "$command_create\n";
+                #print "$command_modify\n";
+                push @command_list_create, $command_create;
+                push @command_list_modify, $command_modify;
+                #print CLASSSCRIPT "$command\n";
+	        #print "LINE: $line";
+            }
+        }
+    }
+    @command_list_create = sort @command_list_create;
+    @command_list_modify = sort @command_list_modify;
+    my @command_list=("#!/bin/sh",
+                     "# Create Classes",
+                      @command_list_create,
+                     "# Modify Classes", 
+                      @command_list_modify);
+    foreach my $command (@command_list){
+        print CLASSSCRIPT "$command\n";
     }
     close(CLASS);
     close(CLASSSCRIPT);
@@ -239,10 +352,11 @@ if ($create_class_script==1){
 # creating sophomorix.add
 if ($create_add_file==1){
     my @skipped_lines=();
-    open(ACCOUNTS,"<$sophomorix_add_input_sql") || die "ERROR: $!";
-    open(SOPHOMORIXADD,">$sophomorix_add_output") || die "ERROR: $!";
     my $line_number=0;
     my %tags=();
+    print "Creating $class_script_output\n";
+    open(ACCOUNTS,"<$sophomorix_add_input_sql") || die "ERROR: $!";
+    open(SOPHOMORIXADD,">$sophomorix_add_output") || die "ERROR: $!";
     while(<ACCOUNTS>){
         my $line=$_;
         $line_number++;
