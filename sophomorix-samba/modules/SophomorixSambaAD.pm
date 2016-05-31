@@ -1933,7 +1933,7 @@ sub AD_group_create {
                                     'sophomorixAddQuota' => "---",
                                     'sophomorixAddMailQuota' => "---",
                                     'sophomorixQuota' => "---",
-                                    'sophomorixMailQuota' => "0",
+                                    'sophomorixMailQuota' => "-1",
                                     'sophomorixMaxMembers' => "0",
                                     'sophomorixMailAlias' => "FALSE",
                                     'sophomorixMailList' => "FALSE",
