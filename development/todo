@@ -101,8 +101,6 @@ bz is in forbidden login hash -> /etc/group
 log when a user cannot be created (summary in the end of script)
 use project dump to create projects (is all info there)
 
-Type T,D,R not exported?
-
 add encrypted passwords to sophomorix.add
 
 Tasks to do after migration:
@@ -124,8 +122,10 @@ add groups with role 'project'
   - p_longname: description field used
   - Zeitanzeige lesbarer machen (-i -p <name>)
 
-Obersttufenkurse, wahlweise mit der ID
+Oberstufenkurse, wahlweise mit der ID
 http://www.linuxmuster.net/wiki/anwenderwiki:sophomorix:sophomorix-project
+  - zusammen mit dem Schlerdatenexport  auch oberstufenexport exportieren
+  - sync betrachten
 
 
 
@@ -238,10 +238,16 @@ sophomorix-class -i -c class1*
 sophomorix-project -i -c pro*
 soll das auch gehen
 
+soll das auch für Änderungen gehen?
+
+
+
 
 when die (file missing), tell what file is missing 
 
 show ldap search filer on -v (loglevel =>2)
+
+/usr/sbin/sophomorix-class started ... usw: in loglevel -v verschieben
 
 ############################################################
 Janitor scripts
