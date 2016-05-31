@@ -45,6 +45,7 @@ $Data::Dumper::Terse = 1;
             AD_ou_add
             AD_object_search
             AD_computer_fetch
+            AD_class_fetch
             AD_project_fetch
             AD_project_update
             AD_dn_fetch_multivalue
@@ -1061,9 +1062,223 @@ sub AD_computer_fetch {
 
 
 
+sub AD_class_fetch {
+    my ($ldap,$root_dse,$class,$ou,$school_token,$info) = @_;
+    my $dn="";
+    my $sam_account="";
+    my $adminclass="";
+    if (defined $school_token){
+        $adminclass=&AD_get_name_tokened($class,$school_token,"adminclass");
+    } else {
+        $adminclass=&AD_get_name_tokened($class,"---","adminclass");
+    }
+
+   my $filter="(&(objectClass=group)(sophomorixType=adminclass)(cn=".$adminclass."))";
+
+    my $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                         );
+    my $max_class = $mesg->count; 
+    for( my $index = 0 ; $index < $max_class ; $index++) {
+        my $entry = $mesg->entry($index);
+        $dn=$entry->dn();
+        $sam_account=$entry->get_value('sAMAccountName');
+
+        if($Conf::log_level>=2 or $info==1){
+            # adminclass attributes
+	    my $description = $entry->get_value('description');
+	    my $quota = $entry->get_value('sophomorixQuota');
+            my $mailquota = $entry->get_value('sophomorixMailQuota');
+            my $mailalias = $entry->get_value('sophomorixMailAlias');
+            my $maillist = $entry->get_value('sophomorixMailList');
+            my $status = $entry->get_value('sophomorixStatus');
+            my $joinable = $entry->get_value('sophomorixJoinable');
+            my $maxmembers = $entry->get_value('sophomorixMaxMembers');
+            my $creationdate = $entry->get_value('sophomorixCreationDate');
+            my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
+            my $admin_by_attr = $#admin_by_attr+1;
+            my @member_by_attr = sort $entry->get_value('sophomorixMembers');
+            my $member_by_attr = $#member_by_attr+1;
+            my @admingroups_by_attr = sort $entry->get_value('sophomorixAdminGroups');
+            my $admingroups_by_attr = $#admingroups_by_attr+1;
+            my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
+            my $membergroups_by_attr = $#membergroups_by_attr+1;
+
+            # memberships (actual state)
+            my @members= $entry->get_value('member');
+            my %members=();
+            foreach my $entry (@members){
+                $members{$entry}="seen";
+            }
+
+
+            # sophomorix-memberships (target state of memberships)
+            my @s_members= (@member_by_attr, @admin_by_attr);
+            my @s_groups= (@membergroups_by_attr,@admingroups_by_attr);
+            # all memberships
+            my %s_allmem=();
+            # remember all users and groups (warn when double)
+            my %seen=();
+            # save warnings for later printout
+            my @membership_warn=();
+
+            # mapping of display names
+            #           key    ---> value
+            # example1: maier1 ---> +maier1   (+: exists and is member)
+            # example2: maier2 ---> -maier2   (-: exists and is NOT member)
+            # example3: maier3 ---> ?maier3   (?: maier does not exist)
+            # empty element stays empty
+            my %name_prefixname_map=(""=>""); 
+           
+            # go through all user memberships (target state)
+            foreach my $item (@s_members){
+                if (exists $seen{$item}){
+                    push @membership_warn, 
+                         "WARNING: $item seen twice! Remove one of them!\n";
+                } else {
+                    # save item
+                    $seen{$item}="seen";
+                }
+                my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$item);
+                if ($count==1){
+                    # user of target state exists: save its dn
+                    $s_allmem{$dn_exist}=$item;
+                    if (exists $members{$dn_exist}){
+                        # existing user is member (+)
+                        $name_prefixname_map{$item}="+$item";
+                    } else {
+                        # existing user is not member (-)
+                        $name_prefixname_map{$item}="-$item";
+                    }
+                } else {
+                    # nonexisting user 
+                    $name_prefixname_map{$item}="?$item";
+                }
+            }
+
+            # go through all user memberships (target state)
+            foreach my $item (@s_groups){
+                if (exists $seen{$item}){
+                    push @membership_warn, 
+                         "WARNING: $item seen twice! Remove one of them!\n";
+                } else {
+                    # save item
+                    $seen{$item}="seen";
+                }
+                my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$item);
+                if ($count==1){
+                    # group of target state exists: save its dn
+                    $s_allmem{$dn_exist}=$item;
+                    if (exists $members{$dn_exist}){
+                        # existing group is member (+)
+                        $name_prefixname_map{$item}="+$item";
+                    } else {
+                        # existing group is not member (-)
+                        $name_prefixname_map{$item}="-$item";
+                    }
+                } else {
+                    # nonexisting group 
+                    $name_prefixname_map{$item}="?$item";
+                }
+            }
+
+            # check for actual members that should not be members
+            foreach my $mem (@members){
+                if (not exists $s_allmem{$mem}){
+                    push @membership_warn, 
+                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $project\n";
+                }
+            }
+
+            # left column in printout
+            my @project_attr=("gidnumber: ???",
+                              "Description:",
+                              " $description",
+                              "Quota: ${quota} MB",
+                              "MailQuota: ${mailquota} MB",
+                              "MailAlias: $mailalias",
+                              "MailList: $maillist",
+                              "SophomorixStatus: $status",
+                              "Joinable: $joinable",
+                              "MaxMembers: $maxmembers",
+                              "CreationDate:",
+                              " $creationdate"
+                             );
+
+            # calculate max height of colums
+            my $max=$#project_attr;
+            if ($#admin_by_attr > $max){
+	        $max=$#admin_by_attr;
+            }
+            if ($#member_by_attr > $max){
+	        $max=$#member_by_attr;
+            }
+            if ($#membergroups_by_attr > $max){
+	        $max=$#membergroups_by_attr;
+            }
+            if ($#admingroups_by_attr > $max){
+	        $max=$#admingroups_by_attr;
+            }
+
+            &Sophomorix::SophomorixBase::print_title("($max_class) $dn");
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
+            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+                   "AdminClass:"," "," "," "," ";
+            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+                   "  $sam_account"," Admins "," Members "," --- "," --- ";
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
+
+            # print the columns
+            for (my $i=0;$i<=$max;$i++){
+                if (not defined $project_attr[$i]){
+	            $project_attr[$i]="";
+                }
+                if (not defined $admin_by_attr[$i]){
+	            $admin_by_attr[$i]="";
+                }
+                if (not defined $member_by_attr[$i]){
+	            $member_by_attr[$i]="";
+                }
+                if (not defined $membergroups_by_attr[$i]){
+	            $membergroups_by_attr[$i]="";
+                }
+                if (not defined $admingroups_by_attr[$i]){
+	            $admingroups_by_attr[$i]="";
+                }
+                printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+                       $project_attr[$i],
+                       $name_prefixname_map{$admin_by_attr[$i]},
+                       $name_prefixname_map{$member_by_attr[$i]},
+                       $name_prefixname_map{$admingroups_by_attr[$i]},
+		       $name_prefixname_map{$membergroups_by_attr[$i]};
+            }
+
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
+            printf "|%20s |%10s |%10s |%14s |%14s |\n",
+                   "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
+            print "+---------------------+-----------+-----------+",
+                  "---------------+---------------+\n";
+            print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
+
+            # print warnings            
+            foreach my $warn (@membership_warn){
+                print $warn;
+	    }
+        }
+    }
+    return ($dn,$max_class);
+}
+
+
 sub AD_project_fetch {
     my ($ldap,$root_dse,$pro,$ou,$school_token,$info) = @_;
     my $dn="";
+    my $sam_account="";
     my $project="";
     # projects from ldap
     if (defined $school_token){
@@ -1080,12 +1295,12 @@ sub AD_project_fetch {
                    filter => $filter,
                          );
     my $max_pro = $mesg->count; 
-        for( my $index = 0 ; $index < $max_pro ; $index++) {
-            my $entry = $mesg->entry($index);
-            $dn=$entry->dn();
+    for( my $index = 0 ; $index < $max_pro ; $index++) {
+        my $entry = $mesg->entry($index);
+        $dn=$entry->dn();
+        $sam_account=$entry->get_value('sAMAccountName');
 
         if($Conf::log_level>=2 or $info==1){
-
             # project attributes
 	    my $description = $entry->get_value('description');
 	    my $addquota = $entry->get_value('sophomorixAddQuota');
@@ -1228,7 +1443,7 @@ sub AD_project_fetch {
             printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
                    "Project:"," "," "," "," ";
             printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
-                   "  $project"," Admins "," Members "," AdminGroups "," MemberGroups ";
+                   "  $sam_account"," Admins "," Members "," AdminGroups "," MemberGroups ";
             print "+---------------------+-----------+-----------+",
                   "---------------+---------------+\n";
 
@@ -1647,7 +1862,11 @@ sub AD_group_create {
     my $school_token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
     my $status = $arg_ref->{status};
+    my $joinable = $arg_ref->{joinable};
 
+    if (not defined $joinable){
+        $joinable="FALSE";    
+    }
     $ou=&AD_get_ou_tokened($ou);
 
     # calculate missing Attributes
@@ -1680,10 +1899,12 @@ sub AD_group_create {
                                     'sophomorixStatus' => $status,
                                     'sophomorixAddQuota' => "---",
                                     'sophomorixAddMailQuota' => "---",
+                                    'sophomorixQuota' => "---",
+                                    'sophomorixMailQuota' => "0",
                                     'sophomorixMaxMembers' => "0",
                                     'sophomorixMailAlias' => "FALSE",
                                     'sophomorixMailList' => "FALSE",
-                                    'sophomorixJoinable' => "FALSE",
+                                    'sophomorixJoinable' => $joinable,
                                     'objectclass' => ['top',
                                                       'group' ],
                                 ]
