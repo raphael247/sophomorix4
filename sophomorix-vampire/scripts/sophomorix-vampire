@@ -49,6 +49,10 @@ my $info=0;
 # default
 my $datadir="/root/linuxmuster6";
 
+# --analyze
+my $analyze=0;
+my $classes_map="/root/sophomorix-vampire-classes.map";
+
 # --create-add-file
 my $create_add_file=0;
 my $sophomorix_add_input_sql="/data/root/sophomorix-dump-viewdumps/userdata_view.sql";
@@ -71,27 +75,12 @@ my $overwriting_files_count=0;
 # config
 # ==========================================================================
 my $config="/usr/share/sophomorix-dump/migration-6-to-7.conf";
-#my $target_topdir="/root/sophomorix-dump";
-#my $target_dir="/root/sophomorix-dump/data"; 
-#my $project_dump="/root/sophomorix-dump.projects";
-#my $view_dumps_dir = "/root/sophomorix-dump-viewdumps";
-
-
-#my @files=(
-#            "/viewdump/userdata_view.sql",
-#            "/projects.dump",
-#            "/viewdump/classdata_view.sql",
-#            "/viewdump/projectdata_view.sql",
-#            "/viewdump/memberdata_view.sql",
-#           "/var/log/sophomorix/pg2ldif/accounts.sql_mini",
-#           "/var/log/sophomorix/pg2ldif/groups.sql",
-#           "/var/log/sophomorix/pg2ldif/groups_users.sql",
-#          );
 
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "analyze" => \$analyze,
            "datadir=s" => \$datadir,
            "create-add-file" => \$create_add_file,
            "create-project-script" => \$create_project_script,
@@ -134,23 +123,23 @@ Dump data on old server V6:
    /root/sophomorix-dump
 
 Vampire data into the new server V7:
-1. Test if dump is complete, read ERRORS and WARNINGS
-   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump
-2. Create class script and run it.
-   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-script
-   /root/sophomorix-vampire-classes.sh
+1. Test if dump is complete, read INFO, ERRORS and WARNINGS:
+   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --analyze
+2. Create class script and run it:
+   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-script
+   # /root/sophomorix-vampire-classes.sh
 3. Create file sophomorix.add and add these users:
-   sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
-   cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
-   sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
-   sophomorix-add (Add the users)
-4. Create project script and run it.
-   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
-   /root/sophomorix-vampire-projects.sh
+   # sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
+   # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+   # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
+   # sophomorix-add (Add the users)
+4. Create project script and run it:
+   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
+   # /root/sophomorix-vampire-projects.sh
 5. Copy configuration files into new server:
-   sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
+   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
 6. Import the workstations (later use linuxmuster command)
-   sophomorix-device
+   # sophomorix-device
 7. Manually do the rest (will be automated):
    Copy files in /etc/sophomorix/user/mail/* to new server.
 
@@ -196,6 +185,8 @@ while(<CONFIG>){
 close(CONFIG);
 
 
+
+
 ##################################################
 # print ERRORS and WARNINGS
 print "\n";
@@ -214,11 +205,76 @@ if ($info==1){
     exit;
 }
 
+# --analyze
+if ($analyze==1){
+    my %login=();
+    my %groupnames=();
+    print "Analyzing ...\n";
+    {
+    print "   * Fetching loginnames of users ...\n";
+    my $line_number=0;
+    open(USER,"<$sophomorix_add_input_sql") || die "ERROR: $!";
+    while(<USER>){
+        my $line=$_;
+        $line_number++;
+        my @attrs=split(/\|/,$line);
+        my $count=0;
+        #print "Line $line_number:\n";
+        if ($line_number==1){
+            # skip;
+        } else {
+            my $login=$attrs[2];
+            $login=~s/^\s+//g;# remove leading whitespace
+            $login=~s/\s+$//g;# remove trailing whitespace
+            #print "<$login>\n";
+            $login{$login}="user";
+        }
+    }
+    }
+    {
+    print "   * Fetching classnames ...\n";
+    my $line_number=0;
+
+    open(MAP,">$classes_map") || die "ERROR: $!";
+    open(USER,"<$class_script_input") || die "ERROR: $!";
+    while(<USER>){
+        my $line=$_;
+        $line_number++;
+        my @attrs=split(/\|/,$line);
+        my $count=0;
+        #print "Line $line_number:\n";
+        if ($line_number==1){
+            # skip;
+        } else {
+            my $group=$attrs[8];
+            $group=~s/^\s+//g;# remove leading whitespace
+            $group=~s/\s+$//g;# remove trailing whitespace
+            #print "<$group>\n";
+            $groupnames{$group}="group";
+        }
+    }
+    }
+    print "INFO: The following groupnames will be converted:\n";
+    foreach my $key (keys %groupnames) {
+        my $value = $groupnames{$key};
+        if (exists $login{$key}){
+            my $new_group=$key."-grp";
+            #print "$key  ---> $new_group\n";
+            printf "  %-20s --> %-26s\n",$key,$new_group;
+            print MAP $key."::".$new_group."::\n";
+        }
+    }
+    close(MAP);
+    close(USER);
+    exit;
+}
+
 
 ##################################################
 # --create-class-script
 # creating /root/sophomorix-vampire-classes.sh
 if ($create_class_script==1){
+    my %classes_map=&read_classes_map();
     my @command_list_create=();
     my @command_list_modify=();
     my @skipped_lines=();
@@ -282,11 +338,17 @@ if ($create_class_script==1){
 
             # creating commands
             ##################################################
-            my $command_create="sophomorix-class --create -c $line{'gid'}";
-            my $command_modify="sophomorix-class -c $line{'gid'}";
+            my $class; # the mapped name
+            if (exists $classes_map{$line{'gid'}}){
+                $class=$classes_map{$line{'gid'}};
+            } else {
+                $class=$line{'gid'};
+            }
+            my $command_create="sophomorix-class --create -c $class";
+            my $command_modify="sophomorix-class -c $class";
 
             # --description
-            my $description=$line{'gid'}." from migration";
+            my $description=$line{'gid'}." from migration"; # use unmapped name
             $command_modify = $command_modify." --description \"$description\"";
 
             # --join/--nojoin
@@ -603,4 +665,15 @@ sub convert_date {
     my ($hour,$minute,$second)=split(/:/,$time);
     my $newdate=$year.$month.$day.$hour.$minute.$second.".0Z";
     return $newdate;
+}
+
+sub read_classes_map {
+    my %classes_map=();
+    open(MAP,"<$classes_map") || die "ERROR: $!";
+    while(<MAP>){
+        my $line=$_;
+        my ($old,$new)=split(/::/,$line);
+        $classes_map{$old}=$new;
+    }
+    return %classes_map;
 }
