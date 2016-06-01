@@ -1762,7 +1762,12 @@ sub AD_group_list {
     # show==0 return list of project dn's
     # show==1 print ist, no return
     my ($ldap,$root_dse,$type,$show) = @_;
-    my $filter="(&(objectClass=group)(sophomorixType=".$type."))";
+    my $filter;
+    if ($type eq "project"){
+        $filter="(&(objectClass=group)(sophomorixType=project))";
+    } elsif ($type eq "adminclass"){
+        $filter="(&(objectClass=group)(| (sophomorixType=adminclass)(sophomorixType=ouclass)))";
+    }
     my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
@@ -1793,20 +1798,56 @@ sub AD_group_list {
         for( my $index = 0 ; $index < $max_pro ; $index++) {
             my $entry = $mesg->entry($index);
             $dn=$entry->dn();
+            my $description;
+            if (not defined $entry->get_value('description')){
+                $description=""
+            } else {
+                $description=$entry->get_value('description')
+	    }
+            my $status;
+            if (not defined $entry->get_value('sophomorixStatus')){
+                $status=""
+            } else {
+                $status=$entry->get_value('sophomorixStatus')
+	    }
+            my $quota;
+            if (not defined $entry->get_value('sophomorixQuota')){
+                $quota=""
+            } else {
+                $quota=$entry->get_value('sophomorixQuota')
+	    }
+            my $mailquota;
+            if (not defined $entry->get_value('sophomorixMailQuota')){
+                $mailquota=""
+            } else {
+                $mailquota=$entry->get_value('sophomorixMailQuota')
+	    }
+            my $maxmembers;
+            if (not defined $entry->get_value('sophomorixMaxMembers')){
+                $maxmembers=""
+            } else {
+                $maxmembers=$entry->get_value('sophomorixMaxMembers')
+	    }
             my $mailalias;
-            if ($entry->get_value('sophomorixMailAlias') eq "FALSE"){
+            if (not defined $entry->get_value('sophomorixMailAlias')){
+                $mailalias=""
+            } elsif ($entry->get_value('sophomorixMailAlias') eq "FALSE"){
                 $mailalias=0;
             } else {
                 $mailalias=1;
             }
             my $maillist;
-            if ($entry->get_value('sophomorixMailList') eq "FALSE"){
+            if (not defined $entry->get_value('sophomorixMailList')){
+                $maillist="";
+            } elsif ($entry->get_value('sophomorixMailList') eq "FALSE"){
                 $maillist=0;
             } else {
                 $maillist=1;
             }
             my $joinable;
-            if ($entry->get_value('sophomorixJoinable') eq "FALSE"){
+            if (not defined $entry->get_value('sophomorixJoinable')){
+                $joinable="";
+            } elsif ($entry->get_value('sophomorixJoinable') eq "FALSE"){
                 $joinable=0;
             } else {
                 $joinable=1;
@@ -1816,23 +1857,23 @@ sub AD_group_list {
                     $entry->get_value('sAMAccountName'),
                     $entry->get_value('sophomorixAddQuota'),
                     $entry->get_value('sophomorixAddMailQuota'),
-                    $entry->get_value('sophomorixMaxMembers'),
+                    $maxmembers,
                     $mailalias,
                     $maillist,
-                    $entry->get_value('sophomorixStatus'),
+                    $status,
                     $joinable,
-	            $entry->get_value('description');
+	            $description;
             } elsif ($type eq "adminclass"){
                 printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
                     $entry->get_value('sAMAccountName'),
-                    $entry->get_value('sophomorixQuota'),
-                    $entry->get_value('sophomorixMailQuota'),
-                    $entry->get_value('sophomorixMaxMembers'),
+                    $quota,
+                    $mailquota,
+                    $maxmembers,
                     $mailalias,
                     $maillist,
-                    $entry->get_value('sophomorixStatus'),
+                    $status,
                     $joinable,
-	            $entry->get_value('description');
+	            $description;
             }
         }
         print "-----------------+----------+-----+----+-+-",
