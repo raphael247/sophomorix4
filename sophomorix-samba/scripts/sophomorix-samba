@@ -63,6 +63,9 @@ Options
   --restore-samba suffix   (restores the database)
   --schema-load            (loads the sophomorix-schema)
 
+If you forgot the suffix look here:
+# ls -l /var/lib/samba/private/*ldb*
+
 Please see the sophomorix-add(8) man pages for full documentation
 ');
    print "\n";
@@ -87,10 +90,6 @@ if ($backup_samba ne ""){
         #print "  $command\n";
         system($command);
     } 
-
-
-
-
     exit;
 }
 

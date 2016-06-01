@@ -80,10 +80,10 @@ Forbidden OU's: SCHOOL, GLOBAL
 Forbidden tokens: global, ---
 
 ############################################################
-Scripts
+Migration:
 ############################################################
 
-Migration:
+
 Three steps:
 1) DUMP: run sophomorix-dump on old server
     (dumps to /root/sophomorix-dump)
@@ -105,6 +105,17 @@ add encrypted passwords to sophomorix.add
 
 Tasks to do after migration:
 projects: add displayname
+
+Bugs after Migration tests: 
+sophomoriy-user cannot show  
+
+sophomorix-project -i -p mkk_abt3
+WARNING: sce seen twice! Remove one of them!
+
+
+############################################################
+Scripts
+############################################################
 
 
 
@@ -243,7 +254,8 @@ soll das auch gehen
 
 soll das auch für Änderungen gehen?
 
-
+CSV-Tags entfernen:
+grep '\$Id\$' -ir ./
 
 
 when die (file missing), tell what file is missing 

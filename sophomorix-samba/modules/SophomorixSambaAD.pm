@@ -767,18 +767,19 @@ sub AD_ou_add {
     }
     # create parent
     my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
-     $result = $ldap->add( $dn_group,
-                          attr => [
-                              'cn'   => $group,
-                              'sAMAccountName' => $group,
-                              'sophomorixCreationDate' => $creationdate,
-                              'sophomorixStatus' => "P",
-                              'sophomorixtype' => "ouclass",
-                              'objectclass' => ['top',
-                                                'group' ],
-                          ]
-                      );
+    # create group
+    $result = $ldap->add( $dn_group,
+                         attr => [
+                           'cn'   => $group,
+                           'sAMAccountName' => $group,
+                           'sophomorixCreationDate' => $creationdate,
+                           'sophomorixStatus' => "P",
+                           'sophomorixtype' => "adminclass",
+                           'description' => "LML Teachers for this School",
+                           'objectclass' => ['top',
+                                             'group' ],
+                         ]
+                     );
 
     # <token>-students
     $group=$token.$DevelConf::student;
@@ -791,13 +792,15 @@ sub AD_ou_add {
     }
     # create parent
     $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    # create group
     $result = $ldap->add( $dn_group,
                          attr => [
                              'cn'   => $group,
                              'sAMAccountName' => $group,
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML Students for this School",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -813,13 +816,15 @@ sub AD_ou_add {
     }
     # create parent
     $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    # create group
     $result = $ldap->add( $dn_group,
                          attr => [
                              'cn'   => $group,
                              'sAMAccountName' => $group,
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML ExamAccounts for this School",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -838,7 +843,8 @@ sub AD_ou_add {
                              'sAMAccountName' => $group,
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML Wifigroup for this School",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -856,7 +862,8 @@ sub AD_ou_add {
                              'sophomorixCreationDate' => $creationdate,
                              'sAMAccountName' => $group,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML Internetaccess for this School",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -896,7 +903,8 @@ sub AD_ou_add {
                              'sAMAccountName' => "global-".$DevelConf::student,
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML Global Students",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -912,7 +920,8 @@ sub AD_ou_add {
                              'sAMAccountName' => "global-".$DevelConf::teacher,
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML Global Teachers",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -925,7 +934,8 @@ sub AD_ou_add {
                              'sAMAccountName' => "global-".$DevelConf::examaccount,
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
-                             'sophomorixtype' => "ouclass",
+                             'sophomorixtype' => "adminclass",
+                             'description' => "LML Global ExamAccounts",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -1766,7 +1776,7 @@ sub AD_group_list {
     if ($type eq "project"){
         $filter="(&(objectClass=group)(sophomorixType=project))";
     } elsif ($type eq "adminclass"){
-        $filter="(&(objectClass=group)(| (sophomorixType=adminclass)(sophomorixType=ouclass)))";
+        $filter="(&(objectClass=group)(sophomorixType=adminclass))";
     }
     my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
     if($Conf::log_level>=2){
@@ -1782,16 +1792,16 @@ sub AD_group_list {
 
     if ($show==1){ 
         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
-        print "-----------------+----------+-----+----+-+-",
+        print "-------------------+----------+-----+----+-+-",
               "+-+-+--------------------------------\n";
 	if ($type eq "project"){
-        printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
+        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s \n",
                "Project Name","AQ","AMQ","MM","A","L","S","J","Project Description";
         } elsif ($type eq "adminclass"){
-        printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s \n",
+        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s \n",
                "Class Name","Quota","MQ","MM","A","L","S","J","Class Description";
         }
-        print "-----------------+----------+-----+----+-+-",
+        print "-------------------+----------+-----+----+-+-",
               "+-+-+--------------------------------\n";
         
 
@@ -1853,7 +1863,7 @@ sub AD_group_list {
                 $joinable=1;
             }
             if ($type eq "project"){
-                printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
+                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
                     $entry->get_value('sophomorixAddQuota'),
                     $entry->get_value('sophomorixAddMailQuota'),
@@ -1864,7 +1874,7 @@ sub AD_group_list {
                     $joinable,
 	            $description;
             } elsif ($type eq "adminclass"){
-                printf "%-17s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-20s\n",
+                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %31s\n",
                     $entry->get_value('sAMAccountName'),
                     $quota,
                     $mailquota,
@@ -1876,7 +1886,7 @@ sub AD_group_list {
 	            $description;
             }
         }
-        print "-----------------+----------+-----+----+-+-",
+        print "-------------------+----------+-----+----+-+-",
               "+-+-+--------------------------------\n";
 	if ($type eq "project"){
             print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
