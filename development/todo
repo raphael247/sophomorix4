@@ -107,11 +107,31 @@ Tasks to do after migration:
 projects: add displayname
 
 Bugs after Migration tests: 
+------------------------------
 sophomoriy-user cannot show  
 
 sophomorix-project -i -p mkk_abt3
 WARNING: sce seen twice! Remove one of them!
 
+es gibt ou der haustechnik und haustechnik-grp
+Beim Erzeugen von sophomorix.add muss haustechnik mit 
+haustechnik-grp ersetzt werden
+
+sophomorix-class -i -c klasse:
+- zeigt das user als member raus müssen.
+
+nach sophomorix.add muss 
+
+-> der Inhalt des multivalue 'member'
+   nach multivalue sophomorixMembers kopiert werden
+
+-> und die admins aus 
+   sophomorix-dump/data/root/sophomorix-dump-viewdumps/memberdata_view.sql
+   nach sophomorixAdmins
+   (mit dem sophomorix-Befehl)
+-> alle mit adminclass teacher sind admins in der gid
+   wenn user, die nicht in adminclass teachers sind in anderen gruppen admins sind,
+   ---> script erzeugen um diese nachzutragen
 
 ############################################################
 Scripts
