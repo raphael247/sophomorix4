@@ -372,17 +372,17 @@ if ($create_class_script==1){
 
             # --mailalias
             if ($line{'mailalias'} eq "t"){
-                $mailalias=" --mailalias TRUE";
+                $mailalias=" --mailalias";
             } else {
-                $mailalias=" --mailalias FALSE";
+                $mailalias=" --nomailalias";
             }
             $command_modify = $command_modify.$mailalias;
 
             # --maillist
             if ($line{'maillist'} eq "t"){
-                $maillist=" --maillist TRUE";
+                $maillist=" --maillist";
             } else {
-                $maillist=" --maillist FALSE";
+                $maillist=" --nomaillist";
             }
             $command_modify = $command_modify.$maillist;
 
