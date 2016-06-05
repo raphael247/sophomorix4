@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-objectsearch) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+#use IMAP::Admin;
+#use DBI;
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_ou_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_object_search
+                                 AD_object_move
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_get_name_tokened
+                                 get_forbidden_logins
+                                    );
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $name="";
+my $objectclass="";
+my $help=0;
+my $strg="";
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "name=s" => \$name,
+           "objectclass|o=s" => \$objectclass,
+           "help|h" => \$help
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-objectsearch searches for users of a given objectclass
+
+This script might NOT EXIST permanently
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+  --name <name>
+  --objectclass <objectclass>  (user, group, computer, ...)
+  --lock / --unlock
+
+Please see the sophomorix-objectclass(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+
+############################################################
+
+
+my ($count,$dn_exist,$cn_exist,$info)=&AD_object_search($ldap,$root_dse,$objectclass,$name);
+
+if ($objectclass eq "user"){
+    $strg="Role";
+} elsif ($objectclass eq "group"){
+    $strg="Type";
+} else {
+    $strg="Info";
+}
+
+print "$count objects found\n";
+if ($count==1){
+    print "   * $strg: $info\n";
+    print "   * DN:   $dn_exist\n";
+    print "   * CN:   $cn_exist\n";
+}
+
+
+
+############################################################
+# END: Test code goes here
+############################################################
+
+&AD_unbind_admin($ldap);
+

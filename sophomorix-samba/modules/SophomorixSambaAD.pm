@@ -948,13 +948,13 @@ sub AD_ou_add {
 
 
 sub AD_object_search {
-    my ($ldap,$root_dse,$type,$name) = @_;
+    my ($ldap,$root_dse,$objectclass,$name) = @_;
     # returns 0,"" or 1,"dn of object"
-    # type: group, user, ...
+    # objectclass: group, user, ...
     # check if object exists
     # (&(objectclass=user)(cn=pete)
     # (&(objectclass=group)(cn=7a)
-    my $filter="(&(objectclass=".$type.") (cn=".$name."))"; 
+    my $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
@@ -969,7 +969,13 @@ sub AD_object_search {
         my $dn = $entry->dn();
         my $cn = $entry->get_value ('cn');
         $cn="CN=".$cn;
-        return ($count,$dn,$cn);
+        my $info="no sophomorix info available (Role, Type)";
+        if ($objectclass eq "group"){
+            $info = $entry->get_value ('sophomorixType');
+        } elsif ($objectclass eq "user"){
+            $info = $entry->get_value ('sophomorixRole');
+        }
+        return ($count,$dn,$cn,$info);
     } else {
         return (0,"","");
     }
@@ -2053,7 +2059,7 @@ sub AD_group_addmember {
     my $group = $arg_ref->{group};
     my $adduser = $arg_ref->{addmember};
     my $addgroup = $arg_ref->{addgroup};
-    my ($count_group,$dn_exist_group,$cn_exist_group)=&AD_object_search($ldap,$root_dse,"group",$group);
+    my ($count_group,$dn_exist_group,$cn_exist_group,$type)=&AD_object_search($ldap,$root_dse,"group",$group);
 
     &Sophomorix::SophomorixBase::print_title("Adding member to $group:");
     if ($count_group==0){
