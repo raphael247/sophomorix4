@@ -83,6 +83,12 @@ my $join;
 my $maxmembers;
 my $creationdate;
 
+my $admins;
+my $addadmins;
+my $removeadmins;
+
+
+
 my $hide="";
 
 
@@ -107,6 +113,9 @@ my $testopt=GetOptions(
            "mailalias!" => \$mailalias,
            "maillist!" => \$maillist,
            "join!" => \$join,
+           "admins=s" => \$admins,
+           "addadmins=s" => \$addadmins,
+           "removeadmins=s" => \$removeadmins,
 #           "reset-class=s" => \$reset_class,
 #           "hide!" => \$hide,
            "verbose|v+" => \$Conf::log_level,
@@ -341,6 +350,49 @@ if (defined $creationdate){
 #         &update_class_db_entry($class,"Type=hiddenclass");
 #     }
 # }
+
+
+
+##################################################
+# admins
+
+# --admins <user1,user2>
+if (defined $admins){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      admins=>$admins,
+                    });
+}
+
+# --addadmins <user1,user2>
+if (defined $addadmins){
+    my @addadmins=split(/,/,$addadmins);
+    my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixAdmins");
+    my @admins = uniq(@old_admins,@addadmins); 
+    my $admins=join(",",@admins);
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      admins=>$admins,
+                    });
+}
+
+# --removeadmins <user1,user2>
+if (defined $removeadmins){
+    my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixAdmins");
+    my @admins = &remove_from_list($removeadmins,@old_admins);
+    my $admins=join(",",@admins);
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      admins=>$admins,
+                    });
+}
+
 
 # # --reset-class
 # if ($reset_class ne ""){

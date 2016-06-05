@@ -281,6 +281,8 @@ Dumping data into a file:
   --create-from-file file
   --update-from-file file
 
+Syncing memberships of all projects (sophomorix* -> members):
+  --sync-all-memberships
 
 Listing or replacing a users memberships:
   --current-member user  (List meberships (admin,member) of user)
@@ -738,7 +740,7 @@ if (defined $addmembers){
                       members=>$members,
                     });
 }
-
+ 
 # --removemembers <user1,user2>
 if (defined $removemembers){
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");

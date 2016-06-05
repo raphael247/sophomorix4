@@ -10,6 +10,7 @@ use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
@@ -35,8 +36,11 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_create
                                  AD_group_create
                                  AD_group_addmember
+                                 AD_group_update
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_object_search
                                  get_forbidden_logins
                                     );
 
@@ -524,12 +528,34 @@ while(<SOPHOMORIXADD>){
                     description=>$group_token,
                     creationdate=>$time_stamp_AD,
                   });
+
+
+# OLD
+#  # add student/teacher to its adminclass-group
+#  &AD_group_addmember({ldap => $ldap,
+#                       root_dse => $root_dse, 
+#                       group => $group_token,
+#                       addmember => $login_token,
+#                      });   
+
+
+  # NEW
   # add student/teacher to its adminclass-group
-  &AD_group_addmember({ldap => $ldap,
-                       root_dse => $root_dse, 
-                       group => $group_token,
-                       addmember => $login_token,
-                      });   
+  # find dn of adminclass.group
+  my ($count,$dn_class,$cn_exist,$info)=&AD_object_search($ldap,$root_dse,"group",$group_token);
+  # fetch old members from sophomorixmembers
+  my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+  # create a unique list of new members
+  my @members = uniq(@old_members,$login_token); 
+  my $members=join(",",@members);
+  # update project
+  &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      members=>$members,
+                  });
+
 
 #    if ($role eq "student"){
 # not necessary ????????

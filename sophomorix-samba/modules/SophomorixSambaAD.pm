@@ -1230,14 +1230,14 @@ sub AD_class_fetch {
             }
 
             &Sophomorix::SophomorixBase::print_title("($max_class) $dn");
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
-            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+            print "+-------------------------+--------------+--------------+",
+                  "--------+--------+\n";
+            printf "|%-25s|%-14s|%-14s|%-8s|%-8s|\n",
                    "AdminClass:"," "," "," "," ";
-            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+            printf "|%-25s|%-14s|%-14s|%-8s|%-8s|\n",
                    "  $sam_account"," Admins "," Members "," --- "," --- ";
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
+            print "+-------------------------+--------------+--------------+",
+                  "--------+--------+\n";
 
             # print the columns
             for (my $i=0;$i<=$max;$i++){
@@ -1256,7 +1256,7 @@ sub AD_class_fetch {
                 if (not defined $admingroups_by_attr[$i]){
 	            $admingroups_by_attr[$i]="";
                 }
-                printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+                printf "|%-25s| %-13s| %-13s|%-8s|%-8s|\n",
                        $project_attr[$i],
                        $name_prefixname_map{$admin_by_attr[$i]},
                        $name_prefixname_map{$member_by_attr[$i]},
@@ -1264,12 +1264,12 @@ sub AD_class_fetch {
 		       $name_prefixname_map{$membergroups_by_attr[$i]};
             }
 
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
-            printf "|%20s |%10s |%10s |%14s |%14s |\n",
+            print "+-------------------------+--------------+--------------+",
+                  "--------+--------+\n";
+            printf "|%24s |%13s |%13s |%7s |%7s |\n",
                    "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
+            print "+-------------------------+--------------+--------------+",
+                  "--------+--------+\n";
             print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
 
             # print warnings            
