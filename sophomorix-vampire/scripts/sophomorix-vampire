@@ -417,6 +417,7 @@ if ($create_class_script==1){
 # --create-add-file
 # creating sophomorix.add
 if ($create_add_file==1){
+    my %classes_map=&read_classes_map();
     my @skipped_lines=();
     my $line_number=0;
     my %tags=();
@@ -491,8 +492,16 @@ if ($create_add_file==1){
                 $deactivationdate=&convert_date($line{"deactivationdate"});
             }
 
+            my $class; # the mapped name
+            if (exists $classes_map{$line{'gid'}}){
+                $class=$classes_map{$line{'gid'}};
+            } else {
+                $class=$line{'gid'};
+            }
+
+
             # create_line
-            my $line= $line{"gid"}."::".
+            my $line= $class."::".
                       $line{"surname"}.";".
                       $line{"firstname"}.";".
                       $birthdate."::".
