@@ -775,7 +775,7 @@ sub AD_ou_add {
                            'sophomorixCreationDate' => $creationdate,
                            'sophomorixStatus' => "P",
                            'sophomorixtype' => "adminclass",
-                           'description' => "LML Teachers for this School",
+                           'description' => "LML Teachers for $ou",
                            'objectclass' => ['top',
                                              'group' ],
                          ]
@@ -800,7 +800,7 @@ sub AD_ou_add {
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
                              'sophomorixtype' => "adminclass",
-                             'description' => "LML Students for this School",
+                             'description' => "LML Students for $ou",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -824,7 +824,7 @@ sub AD_ou_add {
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
                              'sophomorixtype' => "adminclass",
-                             'description' => "LML ExamAccounts for this School",
+                             'description' => "LML ExamAccounts for $ou",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -844,7 +844,7 @@ sub AD_ou_add {
                              'sophomorixCreationDate' => $creationdate,
                              'sophomorixStatus' => "P",
                              'sophomorixtype' => "adminclass",
-                             'description' => "LML Wifigroup for this School",
+                             'description' => "LML Wifigroup for $ou",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -863,7 +863,7 @@ sub AD_ou_add {
                              'sAMAccountName' => $group,
                              'sophomorixStatus' => "P",
                              'sophomorixtype' => "adminclass",
-                             'description' => "LML Internetaccess for this School",
+                             'description' => "LML Internetaccess for $ou",
                              'objectclass' => ['top',
                                                'group' ],
                          ]
@@ -1880,7 +1880,7 @@ sub AD_group_list {
                     $joinable,
 	            $description;
             } elsif ($type eq "adminclass"){
-                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %31s\n",
+                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
                     $quota,
                     $mailquota,
