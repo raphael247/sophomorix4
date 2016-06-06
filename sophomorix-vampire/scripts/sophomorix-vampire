@@ -361,7 +361,7 @@ if ($create_class_script==1){
             my $command_modify="sophomorix-class -c $class";
 
             # --description
-            my $description=$line{'gid'}." from migration"; # use unmapped name
+            my $description=$line{'gid'}." migrated"; # use unmapped name
             $command_modify = $command_modify." --description \"$description\"";
 
             # --join/--nojoin
@@ -604,7 +604,14 @@ if ($create_class_adminadd_script==1){
         my ($class,@rest)=split(/,/,$class_dn);
         $class=~s/^CN=//;
         if (exists $classes_admins{$class}){
-            my $command="sophomorix-class -c $class --admins $classes_admins{$class}";
+            my $class_mapped;
+            if (exists $classes_map{$class}){
+                $class_mapped=$classes_map{$class};
+            } else {
+                $class_mapped=$class;
+            }
+
+            my $command="sophomorix-class -c $class_mapped --admins $classes_admins{$class}";
             print MEMBERSCRIPT "$command\n";
         }
     }
