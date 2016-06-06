@@ -32,6 +32,9 @@ use Sophomorix::SophomorixBase qw(
                                  check_options
                                  );
 use Sophomorix::SophomorixSambaAD qw(
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_group_list
                                     );
 
 my @arguments = @ARGV;
@@ -69,6 +72,10 @@ my $create_project_script=0;
 my $project_script_input="/data/root/sophomorix-dump.projects";
 my $project_script_output="/root/sophomorix-vampire-projects.sh";
 
+# --create-class-adminadd-script
+my $create_class_adminadd_script=0;
+my $class_adminadd_script_input="/data/root/sophomorix-dump-viewdumps/memberdata_view.sql";
+my $class_adminadd_script_output="/root/sophomorix-vampire-classes-adminadd.sh";
 
 my $missig_files_count=0;
 my $overwriting_files_count=0;
@@ -86,6 +93,7 @@ my $testopt=GetOptions(
            "create-add-file" => \$create_add_file,
            "create-project-script" => \$create_project_script,
            "create-class-script" => \$create_class_script,
+           "create-class-adminadd-script" => \$create_class_adminadd_script,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -97,6 +105,7 @@ my $testopt=GetOptions(
 $sophomorix_add_input_sql=$datadir.$sophomorix_add_input_sql;
 $project_script_input=$datadir.$project_script_input;
 $class_script_input=$datadir.$class_script_input;
+$class_adminadd_script_input=$datadir.$class_adminadd_script_input;
 
 # --help
 if ($help==1) {
@@ -134,14 +143,17 @@ Vampire data into the new server V7:
    # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
    # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
    # sophomorix-add (Add the users)
-4. Create project script and run it:
+4. Create admin add script for classes and run it:
+   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
+   # /root/sophomorix-vampire-classes-adminadd.sh
+5. Create project script and run it:
    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
    # /root/sophomorix-vampire-projects.sh
-5. Copy configuration files into new server:
+6. Copy configuration files into new server:
    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
-6. Import the workstations (later use linuxmuster command)
+7. Import the workstations (later use linuxmuster command)
    # sophomorix-device
-7. Manually do the rest (will be automated):
+8. Manually do the rest (will be automated):
    Copy files in /etc/sophomorix/user/mail/* to new server.
 
 Getting information:
@@ -536,6 +548,72 @@ if ($create_add_file==1){
         my $line_part=substr($line,0,65);
         print "  LINE: $line_part ...\n";
     }
+}
+
+##################################################
+# --create-class-adminadd-script
+if ($create_class_adminadd_script==1){
+    # read memberships
+    my $line_number=0;
+    my %classes_admins=();
+    my %classes_map=&read_classes_map();
+    print "Creating $class_adminadd_script_output\n";
+    open(MEMBER,"<$class_adminadd_script_input") || die "ERROR: $!";
+    open(MEMBERSCRIPT,">$class_adminadd_script_output") || die "ERROR: $!";
+    while(<MEMBER>){
+        my $line=$_;
+        $line_number++;
+        my @attrs=split(/\|/,$line);
+        my $count=0;
+        #print "Line $line_number:\n";
+        if ($line_number==1){
+            # skip;
+        } else {
+            my $admin=$attrs[0];
+            my $class_admin=$attrs[3];
+            my $group=$attrs[5];
+            $group=~s/^\s+//g;# remove leading whitespace
+            $group=~s/\s+$//g;# remove trailing whitespace
+            $admin=~s/^\s+//g;# remove leading whitespace
+            $admin=~s/\s+$//g;# remove trailing whitespace
+            $class_admin=~s/^\s+//g;# remove leading whitespace
+            $class_admin=~s/\s+$//g;# remove trailing whitespace
+
+            if ($class_admin ne "teachers"){
+                next;
+            }
+            if ($group eq ""){
+                next;
+            }
+
+            print "<$group> : <$admin> ($class_admin) is admin\n";
+            if (exists $classes_admins{$group}){
+		my $new=$classes_admins{$group}.",".$admin;
+                $classes_admins{$group}=$new;
+            } else {
+                $classes_admins{$group}=$admin;
+            } 
+        }
+    }
+
+    # creating command list
+    print MEMBERSCRIPT "#!/bin/sh\n";
+    my ($ldap,$root_dse) = &AD_bind_admin();
+    my @classes_dn=&AD_group_list($ldap,$root_dse,"adminclass",0);
+    foreach my $class_dn (@classes_dn){
+        my ($class,@rest)=split(/,/,$class_dn);
+        $class=~s/^CN=//;
+        if (exists $classes_admins{$class}){
+            my $command="sophomorix-class -c $class --admins $classes_admins{$class}";
+            print MEMBERSCRIPT "$command\n";
+        }
+    }
+
+    &AD_unbind_admin($ldap);
+    close(MEMBER);
+    close(MEMBERSCRIPT);
+    system("chmod 755 $class_adminadd_script_output");
+
 }
 
 

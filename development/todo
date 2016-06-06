@@ -115,25 +115,18 @@ WARNING: sce seen twice! Remove one of them!
 
 agoruom ist a workstation
 
-#es gibt ou der haustechnik und haustechnik-grp
-#Beim Erzeugen von sophomorix.add muss haustechnik mit 
-#haustechnik-grp ersetzt werden
-
 sophomorix-class -i -c klasse:
 - zeigt das user als member raus müssen.
 
 nach sophomorix.add muss 
 
--> der Inhalt des multivalue 'member'
-   nach multivalue sophomorixMembers kopiert werden
-
--> und die admins aus 
-   sophomorix-dump/data/root/sophomorix-dump-viewdumps/memberdata_view.sql
-   nach sophomorixAdmins
-   (mit dem sophomorix-Befehl)
--> alle mit adminclass teacher sind admins in der gid
-   wenn user, die nicht in adminclass teachers sind in anderen gruppen admins sind,
-   ---> script erzeugen um diese nachzutragen
+#-> und die admins aus 
+#   sophomorix-dump/data/root/sophomorix-dump-viewdumps/memberdata_view.sql
+#   nach sophomorixAdmins
+#   (mit dem sophomorix-Befehl)
+#-> alle mit adminclass teacher sind admins in der gid
+#   wenn user, die nicht in adminclass teachers sind in anderen gruppen admins sind,
+#   ---> script erzeugen um diese nachzutragen
 
 ############################################################
 Scripts
@@ -195,6 +188,9 @@ sophomorix-class
   --admingroups
   (members are managed automatically)
 create tests for that (sophomorix-test-4)
+
+count current members (CM) and show then with -i option before MM
+or one column: CM/MM -> 32/0
 
 display type (T=teacher3,S=students)
 display hidden
