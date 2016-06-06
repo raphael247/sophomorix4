@@ -151,6 +151,11 @@ Changing an adminclass:
     --join,  --nojoin
     --maxmembers number
 
+    --admins user1,user2,user3, ... 
+    --addadmins user1,user2,user3, ...
+    --removeadmins user1,user2,user3, ...
+
+
   ??? --hide --class adminclass, --nohide --class hiddenclass 
 
 
@@ -473,6 +478,7 @@ if (defined $removeadmins){
 # ===========================================================================
 # Ende des Scripts
 # ===========================================================================
+&AD_unbind_admin($ldap);
 &log_script_end(@arguments);
 
 
