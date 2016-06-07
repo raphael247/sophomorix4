@@ -187,15 +187,15 @@ if ($add==1){
 
 
 # --kill
-if ($kill==1){
-    if (-e $file_kill){
-        print "\nTo run this test $file_kill must not be there!\n\n";
-        if ($skip_warning==0){
-            exit;
-        }
-    }
-}
-
+#if ($kill==1){
+#    if (-e $file_kill){
+#        print "\nTo run this test $file_kill must not be there!\n\n";
+#        if ($skip_warning==0){
+#            exit;
+#        }
+#    }
+#}
+#print "OHA";
 ############################################################
 # Run the tests
 ############################################################
@@ -1478,7 +1478,6 @@ if ($cp_kill==1){
 
 if ($kill==1 or $test_kill==1){
     if ($kill==1){
-        # copy sophomorix.kill
         &run_command("cp -v $file_kill_test $file_kill");
         &run_command("sophomorix-kill -i");
         &run_command("sophomorix-kill $verbose_options");
@@ -1486,16 +1485,17 @@ if ($kill==1 or $test_kill==1){
         #&run_command("sophomorix-class --kill --class teachers $verbose_options");
         &run_command("sophomorix-class --kill --class m7ab $verbose_options");
         &run_command("sophomorix-class --kill --class m8cd $verbose_options");
-        &run_command("sophomorix-class --kill --class 12abc  $verbose_options");
+        &run_command("sophomorix-class --kill --class 12abc $verbose_options");
         &run_command("sophomorix-class --kill --class s6ade $verbose_options");
-        &run_command("sophomorix-class --kill --class attic  $verbose_options");
-        &run_command("sophomorix-class --kill --class lin-attic  $verbose_options");
+        &run_command("sophomorix-class --kill --class attic $verbose_options");
+        &run_command("sophomorix-class --kill --class lin-attic $verbose_options");
         &run_command("sophomorix-class --kill --class m9cd $verbose_options");
         &run_command("sophomorix-class --kill --class s7ade $verbose_options");
         &run_command("sophomorix-class --kill --class alumni $verbose_options");
         &run_command("sophomorix-class --kill --class ghs-alumni $verbose_options");
+        &run_command("sophomorix-class --kill --class uni-teachers $verbose_options");
     }
-  
+
     ##### Testing the users
     &AD_object_nonexist($ldap,$root_dse,"user","maiersa42");
     &AD_object_nonexist($ldap,$root_dse,"user","muellegr42");

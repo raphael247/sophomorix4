@@ -581,17 +581,48 @@ sub AD_user_move {
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
-    # move user membership to new group
-    &AD_group_removemember({ldap => $ldap,
-                            root_dse => $root_dse, 
-                            group => $group_old,
-                            removemember => $user,
-                          });   
-    &AD_group_addmember({ldap => $ldap,
-                         root_dse => $root_dse, 
-                         group => $group_new,
-                         addmember => $user,
-                       }); 
+
+    # remove user from old group
+    my ($count_oldclass,$dn_oldclass,$cn_oldclass,$info_oldclass)=&AD_object_search($ldap,$root_dse,"group",$group_old);
+    my @old_members_oldgroup = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_oldclass,"sophomorixMembers");
+    my @members_oldgroup = &Sophomorix::SophomorixBase::remove_from_list($user,@old_members_oldgroup);
+    my $members_oldgroup=join(",",@members_oldgroup);
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_oldclass,
+                      type=>"adminclass",
+                      members=>$members_oldgroup,
+                    });
+#    # move user membership to new group
+#    &AD_group_removemember({ldap => $ldap,
+#                            root_dse => $root_dse, 
+#                            group => $group_old,
+#                            removemember => $user,
+#                          });   
+
+    # add user to new group 
+    my ($count_newclass,$dn_newclass,$cn_newclass,$info_newclass)=&AD_object_search($ldap,$root_dse,"group",$group_new);
+    my @old_members_newgroup = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_newclass,"sophomorixMembers");
+    # create a unique list of new members
+    my @members_newgroup = uniq(@old_members_newgroup,$user); 
+    my $members_newgroup=join(",",@members_newgroup);
+    # update project
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_newclass,
+                      type=>"adminclass",
+                      members=>$members_newgroup,
+                    });
+
+    #&AD_group_addmember({ldap => $ldap,
+    #                     root_dse => $root_dse, 
+    #                     group => $group_new,
+    #                     addmember => $user,
+    #                   }); 
+
+
+
+
 
     # move the object in ldap tree
     &AD_object_move({ldap=>$ldap,
