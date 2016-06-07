@@ -151,11 +151,11 @@ if ($add_class==1){
     &run_command("sophomorix-add $verbose_options");
 
     # groups in OU=BSZLEO
-    &run_command("sophomorix-class $verbose_options --create --class class6 --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-class $verbose_options --create --class class7 --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-class $verbose_options --create --class class6-38 --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-class $verbose_options --create --class class7-38 --ou BSZLEO --school-token bsz");
     # groups in OU=SCHOOL
-    &run_command("sophomorix-class $verbose_options --create --class class12");
-    &run_command("sophomorix-class $verbose_options --create --class class13");
+    &run_command("sophomorix-class $verbose_options --create --class class12-38");
+    &run_command("sophomorix-class $verbose_options --create --class class13-38");
 }
 
 ############################################################
@@ -651,11 +651,11 @@ if ($test_add_class==1){
                   });
 
     # groups
-    # bsz-class6
+    # bsz-class6-38
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-class6,OU=bsz-class6,OU=Students,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-class6",
-                   description=>"bsz-class6",
+                   dn=>"CN=bsz-class6-38,OU=bsz-class6-38,OU=Students,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-class6-38",
+                   description=>"bsz-class6-38",
                    sophomorixType=>"adminclass",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -667,11 +667,11 @@ if ($test_add_class==1){
                    sophomorixCreationDate => "exists",
                    memberOf => "bsz-students",
                   });
-    # bsz-class7
+    # bsz-class7-38
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-class7,OU=bsz-class7,OU=Students,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-class7",
-                   description=>"bsz-class7",
+                   dn=>"CN=bsz-class7-38,OU=bsz-class7-38,OU=Students,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-class7-38",
+                   description=>"bsz-class7-38",
                    sophomorixType=>"adminclass",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -683,11 +683,11 @@ if ($test_add_class==1){
                    sophomorixCreationDate => "exists",
                    memberOf => "bsz-students",
                   });
-    # class12
+    # class12-38
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
-                   description=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
+                   description=>"class12-38",
                    sophomorixType=>"adminclass",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -699,11 +699,11 @@ if ($test_add_class==1){
                    sophomorixCreationDate => "exists",
                    memberOf => "students",
                   });
-    # class13
+    # class13-38
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class13,OU=class13,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class13",
-                   description=>"class13",
+                   dn=>"CN=class13-38,OU=class13-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class13-38",
+                   description=>"class13-38",
                    sophomorixType=>"adminclass",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -727,10 +727,10 @@ if ($test_add_class==1){
 if ($mod_class==1){
 
     # --description
-    &run_command("sophomorix-class $verbose_options -c class12 --description 'Klasse 12 TG'");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --description 'Klasse 12 TG'");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"---",
@@ -751,10 +751,10 @@ if ($mod_class==1){
                    memberOf => "students",
                   });
     # --quota
-    &run_command("sophomorix-class $verbose_options -c class12 --quota 100+300");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --quota 100+300");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -776,10 +776,10 @@ if ($mod_class==1){
                   });
 
     # --mailquota 
-    &run_command("sophomorix-class $verbose_options -c class12 --mailquota 897");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --mailquota 897");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -801,10 +801,10 @@ if ($mod_class==1){
                   });
 
     # --mailalias
-    &run_command("sophomorix-class $verbose_options -c class12 --mailalias");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --mailalias");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -826,10 +826,10 @@ if ($mod_class==1){
                   });
 
     # --maillist
-    &run_command("sophomorix-class $verbose_options -c class12 --maillist");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --maillist");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -851,10 +851,10 @@ if ($mod_class==1){
                   });
 
     # --status
-    &run_command("sophomorix-class $verbose_options -c class12 --status S");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --status S");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -876,10 +876,10 @@ if ($mod_class==1){
                   });
 
     # --join
-    &run_command("sophomorix-class $verbose_options -c class12 --nojoin");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --nojoin");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -901,10 +901,10 @@ if ($mod_class==1){
                   });
 
     # --maxmembers
-    &run_command("sophomorix-class $verbose_options -c class12 --maxmembers 16");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --maxmembers 16");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -926,10 +926,10 @@ if ($mod_class==1){
                   });
 
     # --creationdate
-    &run_command("sophomorix-class $verbose_options -c class12 --creationdate 19880529093330.0Z");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --creationdate 19880529093330.0Z");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
                    description=>"Klasse 12 TG",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"100+300",
@@ -951,25 +951,25 @@ if ($mod_class==1){
                   });
 
    #  # --admins
-   #  &run_command("sophomorix-class $verbose_options -c class12 --admins maiersa38,muellegr38");
+   #  &run_command("sophomorix-class $verbose_options -c class12-38 --admins maiersa38,muellegr38");
 
    #  # --members
-   #  &run_command("sophomorix-class $verbose_options -c class12 --members kep38,wu38");
+   #  &run_command("sophomorix-class $verbose_options -c class12-38 --members kep38,wu38");
 
    #  # --admingroups
-   #  &run_command("sophomorix-class $verbose_options -c class12 --admingroups super12,bsz-super6");
+   #  &run_command("sophomorix-class $verbose_options -c class12-38 --admingroups super12,bsz-super6");
 
    #  # --membergroups
-   #  &run_command("sophomorix-class $verbose_options -c class12 --membergroups super13,bsz-super7");
+   #  &run_command("sophomorix-class $verbose_options -c class12-38 --membergroups super13,bsz-super7");
 
 
     # setting all back in one command
-    &run_command("sophomorix-class $verbose_options -c class12 --join --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12'");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --join --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38'");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=class12,OU=class12,OU=Students,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"class12",
-                   description=>"class12",
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
+                   description=>"class12-38",
                    sophomorixType=>"adminclass",
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"-1",
@@ -1010,10 +1010,10 @@ if ($kill_class==1){
     &run_command("sophomorix-kill -i");
     &run_command("sophomorix-kill $verbose_options");
     # groups
-    &run_command("sophomorix-class $verbose_options --kill --class class6 --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-class $verbose_options --kill --class class7 --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-class $verbose_options --kill --class class12");
-    &run_command("sophomorix-class $verbose_options --kill --class class13");
+    &run_command("sophomorix-class $verbose_options --kill --class class6-38 --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-class $verbose_options --kill --class class7-38 --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-class $verbose_options --kill --class class12-38");
+    &run_command("sophomorix-class $verbose_options --kill --class class13-38");
 
 }
 
@@ -1037,10 +1037,10 @@ if ($test_kill_class==1){
     &AD_object_nonexist($ldap,$root_dse,"user","sch38");
 
     # groups
-    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class6");
-    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class7");
-    &AD_object_nonexist($ldap,$root_dse,"group","class12");
-    &AD_object_nonexist($ldap,$root_dse,"group","class13");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class6-38");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class7-38");
+    &AD_object_nonexist($ldap,$root_dse,"group","class12-38");
+    &AD_object_nonexist($ldap,$root_dse,"group","class13-38");
 }
 
 
