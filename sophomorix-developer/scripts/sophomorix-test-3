@@ -151,10 +151,10 @@ if ($add_pro==1){
     &run_command("sophomorix-add $verbose_options");
 
     # projects in OU=BSZLEO
-    &run_command("sophomorix-project $verbose_options --create -p mathe --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-project $verbose_options --create -p mathe23 --ou BSZLEO --school-token bsz");
     &run_command("sophomorix-project $verbose_options --create -p Chemie-AG --ou BSZLEO --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
     # projects in OU=SCHOOL
-    &run_command("sophomorix-project $verbose_options --create -p mathe");
+    &run_command("sophomorix-project $verbose_options --create -p mathe23");
     &run_command("sophomorix-project $verbose_options --create -p Chemie-AG");
 
     # groups in OU=BSZLEO
@@ -209,7 +209,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"bsz-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
 
@@ -252,7 +252,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"bsz-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
 
@@ -295,7 +295,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"bsz-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
 
@@ -338,7 +338,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"bsz-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
 
@@ -372,7 +372,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"bsz-teachers",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-teachers",
                   });
 
@@ -406,7 +406,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"bsz-teachers",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-teachers",
                   });
 
@@ -449,7 +449,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"uni-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
 
@@ -492,7 +492,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"uni-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
 
@@ -526,7 +526,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"uni-teachers",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-teachers,p_bsz-Chemie-AG",
                   });
 
@@ -560,7 +560,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"uni-teachers",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-teachers,p_bsz-Chemie-AG",
                   });
     # schneima23
@@ -601,7 +601,7 @@ if ($test_add_pro==1){
                    sAMAccountname=>"students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                    memberOf => "global-students",
                   });
     # sch23
@@ -640,21 +640,21 @@ if ($test_add_pro==1){
                    sAMAccountname=>"global-examaccounts",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-students,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-students",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-teachers",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"ouclass",
+                   sophomorixType=>"adminclass",
                   });
 
 
@@ -702,11 +702,11 @@ if ($test_add_pro==1){
                    member => "oe23,wu23,maiersa23,muellegr23,uni-teachers,bsz-m7ab,bsz-m8cd",
                    memberOf => "",
                   });
-    # p_mathe
+    # p_mathe23
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"p_mathe",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"p_mathe23",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -718,11 +718,11 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    memberOf => "",
                   });
-    # p_bsz-mathe
+    # p_bsz-mathe23
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_bsz-mathe,OU=Projects,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"p_bsz-mathe",
-                   description=>"p_bsz-mathe",
+                   dn=>"CN=p_bsz-mathe23,OU=Projects,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"p_bsz-mathe23",
+                   description=>"p_bsz-mathe23",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -811,11 +811,11 @@ if ($test_add_pro==1){
 if ($mod_pro==1){
 
     # --description
-    &run_command("sophomorix-project $verbose_options -p mathe --description 'Mathe Grundschule'");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --description 'Mathe23 Grundschule'");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -833,11 +833,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --addquota
-    &run_command("sophomorix-project $verbose_options -p mathe --addquota 100+300");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --addquota 100+300");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"---",
@@ -855,11 +855,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --addmailquota 
-    &run_command("sophomorix-project $verbose_options -p mathe --addmailquota 366");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --addmailquota 366");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -877,11 +877,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --mailalias
-    &run_command("sophomorix-project $verbose_options -p mathe --mailalias");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --mailalias");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -899,11 +899,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --maillist
-    &run_command("sophomorix-project $verbose_options -p mathe --maillist");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --maillist");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -921,11 +921,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --status
-    &run_command("sophomorix-project $verbose_options -p mathe --status S");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --status S");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -943,11 +943,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --join
-    &run_command("sophomorix-project $verbose_options -p mathe --join");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --join");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -965,11 +965,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --maxmembers
-    &run_command("sophomorix-project $verbose_options -p mathe --maxmembers 16");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --maxmembers 16");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -988,11 +988,11 @@ if ($mod_pro==1){
                   });
 
     # --creationdate
-    &run_command("sophomorix-project $verbose_options -p mathe --creationdate 19880529093330.0Z");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --creationdate 19880529093330.0Z");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1012,11 +1012,11 @@ if ($mod_pro==1){
 
 
     # --admins
-    &run_command("sophomorix-project $verbose_options -p mathe --admins maiersa23,muellegr23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admins maiersa23,muellegr23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1034,11 +1034,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --members
-    &run_command("sophomorix-project $verbose_options -p mathe --members kep23,wu23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --members kep23,wu23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1056,11 +1056,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --admingroups
-    &run_command("sophomorix-project $verbose_options -p mathe --admingroups super12,bsz-super6");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admingroups super12,bsz-super6");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1078,11 +1078,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --membergroups
-    &run_command("sophomorix-project $verbose_options -p mathe --membergroups super13,bsz-super7");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --membergroups super13,bsz-super7");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1102,11 +1102,11 @@ if ($mod_pro==1){
 
 
     # --admins (2, delete)
-    &run_command("sophomorix-project $verbose_options -p mathe --admins maiersa23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admins maiersa23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1124,11 +1124,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --members (2, delete)
-    &run_command("sophomorix-project $verbose_options -p mathe --members muellegr23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --members muellegr23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1146,11 +1146,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --admingroups (2, delete)
-    &run_command("sophomorix-project $verbose_options -p mathe --admingroups super12");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admingroups super12");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1168,11 +1168,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --membergroups (2, delete)
-    &run_command("sophomorix-project $verbose_options -p mathe --membergroups bsz-super7");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --membergroups bsz-super7");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1192,11 +1192,11 @@ if ($mod_pro==1){
 
 
     # --admins (3, nonexisting user)
-    &run_command("sophomorix-project $verbose_options -p mathe --admins maiersa23,nonexuser1");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admins maiersa23,nonexuser1");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1214,11 +1214,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --members (3, nonexisting user)
-    &run_command("sophomorix-project $verbose_options -p mathe --members muellegr23,nonexuser2");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --members muellegr23,nonexuser2");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1236,11 +1236,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
     # --admingroups (3, nonexisting user)
-    &run_command("sophomorix-project $verbose_options -p mathe --admingroups super12,nonexgroup1");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admingroups super12,nonexgroup1");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1258,11 +1258,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --membergroups (3, nonexisting user)
-    &run_command("sophomorix-project $verbose_options -p mathe --membergroups bsz-super7,nonexgroup2");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --membergroups bsz-super7,nonexgroup2");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1282,11 +1282,11 @@ if ($mod_pro==1){
 
 
    # --admins (4, group instead of user)
-    &run_command("sophomorix-project $verbose_options -p mathe --admins maiersa23,bsz-super6");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admins maiersa23,bsz-super6");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1304,11 +1304,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --members (4, group instead of user)
-    &run_command("sophomorix-project $verbose_options -p mathe --members muellegr23,super13");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --members muellegr23,super13");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1326,11 +1326,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --admingroups (4, user instead of group)
-    &run_command("sophomorix-project $verbose_options -p mathe --admingroups kep23,super12");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --admingroups kep23,super12");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1348,11 +1348,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --membergroups (4, user instead of group)
-    &run_command("sophomorix-project $verbose_options -p mathe --membergroups wu23,bsz-super7");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --membergroups wu23,bsz-super7");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1372,11 +1372,11 @@ if ($mod_pro==1){
 
 
    # --addadmins (1 adding to existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --addadmins wu23,oe23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --addadmins wu23,oe23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1394,11 +1394,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --addmembers (1 adding to existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --addmembers samardze23,schneima23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --addmembers samardze23,schneima23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1416,11 +1416,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --addadmingroups (1 adding to existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --addadmingroups super13");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --addadmingroups super13");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1438,11 +1438,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --addmembergroups (1 adding to existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --addmembergroups bsz-super6");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --addmembergroups bsz-super6");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1462,11 +1462,11 @@ if ($mod_pro==1){
 
 
    # --removeadmins (1 removing from existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --removeadmins wu23,oe23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --removeadmins wu23,oe23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1484,11 +1484,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --removemembers (1 removing from existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --removemembers samardze23,schneima23");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --removemembers samardze23,schneima23");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1506,11 +1506,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --removeadmingroups (1 removing from existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --removeadmingroups super13");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --removeadmingroups super13");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1528,11 +1528,11 @@ if ($mod_pro==1){
                    memberOf => "",
                   });
    # --removemembergroups (1 removing from existing value)
-    &run_command("sophomorix-project $verbose_options -p mathe --removemembergroups bsz-super6");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --removemembergroups bsz-super6");
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
-                   description=>"Mathe Grundschule",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+300",
                    sophomorixAddMailQuota=>"366",
@@ -1553,11 +1553,11 @@ if ($mod_pro==1){
 
 
     # setting all back in one command
-    &run_command("sophomorix-project $verbose_options -p mathe --nojoin --addquota --- --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --nojoin --addquota --- --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_mathe",
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
                    description=>"Mathematik",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"---",
@@ -1597,8 +1597,8 @@ if ($kill_pro==1){
     &run_command("sophomorix-kill -i");
     &run_command("sophomorix-kill $verbose_options");
     # projects
-    &run_command("sophomorix-project $verbose_options --kill -p mathe --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-project $verbose_options --kill -p mathe");
+    &run_command("sophomorix-project $verbose_options --kill -p mathe23 --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-project $verbose_options --kill -p mathe23");
     &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG --ou BSZLEO --school-token bsz");
     &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG");
     # groups
@@ -1628,8 +1628,8 @@ if ($test_kill_pro==1){
     &AD_object_nonexist($ldap,$root_dse,"user","schneima23");
     &AD_object_nonexist($ldap,$root_dse,"user","sch23");
     # projects
-    &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-mathe");
-    &AD_object_nonexist($ldap,$root_dse,"group","p_mathe");
+    &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-mathe23");
+    &AD_object_nonexist($ldap,$root_dse,"group","p_mathe23");
     &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-Chemie-AG");
     &AD_object_nonexist($ldap,$root_dse,"group","p_Chemie-AG");
     # groups
