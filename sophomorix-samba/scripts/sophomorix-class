@@ -83,6 +83,10 @@ my $join;
 my $maxmembers;
 my $creationdate;
 
+my $members;
+my $addmembers;
+my $removemembers;
+
 my $admins;
 my $addadmins;
 my $removeadmins;
@@ -116,6 +120,9 @@ my $testopt=GetOptions(
            "admins=s" => \$admins,
            "addadmins=s" => \$addadmins,
            "removeadmins=s" => \$removeadmins,
+          "members=s" => \$members,
+           "addmembers=s" => \$addmembers,
+           "removemembers=s" => \$removemembers,
 #           "reset-class=s" => \$reset_class,
 #           "hide!" => \$hide,
            "verbose|v+" => \$Conf::log_level,
@@ -159,9 +166,12 @@ Changing an adminclass:
   ??? --hide --class adminclass, --nohide --class hiddenclass 
 
 
-This is for migration only:
+This is for migration/testing/fixing only:
   --create --class <adminclass>
   --creationdate <20150529093330.0Z> (only for migration)
+  --members user1,user2,user3, ... 
+  --addmembers user1,user2,user3, ...
+  --removemembers user1,user2,user3, ...
 
 Be careful with this command:
   --kill --class <adminclass>
@@ -355,6 +365,46 @@ if (defined $creationdate){
 #         &update_class_db_entry($class,"Type=hiddenclass");
 #     }
 # }
+
+##################################################
+# members
+# --members <user1,user2>
+if (defined $members){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      members=>$members,
+                    });
+}
+
+# --addmembers <user1,user2>
+if (defined $addmembers){
+    my @addmembers=split(/,/,$addmembers);
+    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+    my @members = uniq(@old_members,@addmembers); 
+    my $members=join(",",@members);
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      members=>$members,
+                    });
+}
+ 
+# --removemembers <user1,user2>
+if (defined $removemembers){
+    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+    my @members = &remove_from_list($removemembers,@old_members);
+    my $members=join(",",@members);
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      members=>$members,
+                    });
+}
+
 
 
 
