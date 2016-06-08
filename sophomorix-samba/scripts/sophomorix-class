@@ -80,6 +80,7 @@ my $mailalias;
 my $maillist;
 my $status;
 my $join;
+my $hide;
 my $maxmembers;
 my $creationdate;
 
@@ -90,11 +91,6 @@ my $removemembers;
 my $admins;
 my $addadmins;
 my $removeadmins;
-
-
-
-my $hide="";
-
 
 my $reset_class="";
 $Conf::log_level=1;
@@ -117,6 +113,7 @@ my $testopt=GetOptions(
            "mailalias!" => \$mailalias,
            "maillist!" => \$maillist,
            "join!" => \$join,
+           "hide!" => \$hide,
            "admins=s" => \$admins,
            "addadmins=s" => \$addadmins,
            "removeadmins=s" => \$removeadmins,
@@ -156,15 +153,12 @@ Changing an adminclass:
     --maillist, --nomaillist 
     --status <letter>
     --join,  --nojoin
+    --hide,  --nohide
     --maxmembers number
 
     --admins user1,user2,user3, ... 
     --addadmins user1,user2,user3, ...
     --removeadmins user1,user2,user3, ...
-
-
-  ??? --hide --class adminclass, --nohide --class hiddenclass 
-
 
 This is for migration/testing/fixing only:
   --create --class <adminclass>
@@ -232,6 +226,7 @@ if ($create==1 and $class ne ""){
                     status=>"P",
                     creationdate=>$time_stamp_AD,
                     joinable=>"TRUE",
+                    hidden=>"FALSE",
                   });
 }
 
@@ -331,6 +326,16 @@ if (defined $join){
                       dn=>$dn_class,
                       type=>"adminclass",
                       join=>$join,
+                    });
+}
+
+# --hide/--nohide
+if (defined $hide){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      hide=>$hide,
                     });
 }
 

@@ -84,6 +84,7 @@ my $mailalias;
 my $maillist;
 my $status;
 my $join;
+my $hide;
 my $maxmembers;
 my $creationdate;
 
@@ -131,6 +132,7 @@ my $testopt=GetOptions(
            "kill" => \$kill,
            "verbose|v+" => \$Conf::log_level,
            "join!" => \$join,
+           "hide!" => \$hide,
 #           "tree" => \$tree,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
@@ -257,6 +259,7 @@ Changing/creating/killing a project:
     --maillist, --nomaillist 
     --status <letter>
     --join,  --nojoin
+    --hide,  --nohide
     --maxmembers number
     --creationdate <20150529093330.0Z> (only for migration)
 
@@ -692,6 +695,16 @@ if (defined $join){
                       dn=>$dn_pro,
                       type=>"project",
                       join=>$join,
+                    });
+}
+
+# --hide/--nohide
+if (defined $hide){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_pro,
+                      type=>"project",
+                      hide=>$hide,
                     });
 }
 

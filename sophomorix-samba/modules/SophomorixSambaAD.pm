@@ -1611,6 +1611,7 @@ sub AD_group_update {
     my $maillist = $arg_ref->{maillist};
     my $status = $arg_ref->{status};
     my $join = $arg_ref->{join};
+    my $hide = $arg_ref->{hide};
     my $maxmembers = $arg_ref->{maxmembers};
     my $members = $arg_ref->{members};
     my $admins = $arg_ref->{admins};
@@ -1668,6 +1669,12 @@ sub AD_group_update {
         if($join==0){$join="FALSE"}else{$join="TRUE"};
         print "   * Setting sophomorixJoinable to $join\n";
         my $mesg = $ldap->modify($dn,replace => {sophomorixJoinable => $join}); 
+    }
+    # hide
+    if (defined $hide){
+        if($hide==0){$hide="FALSE"}else{$hide="TRUE"};
+        print "   * Setting sophomorixHidden to $hide\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixHidden => $hide}); 
     }
     # maxmembers   
     if (defined $maxmembers){
