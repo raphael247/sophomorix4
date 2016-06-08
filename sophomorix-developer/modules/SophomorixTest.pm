@@ -121,6 +121,7 @@ sub AD_test_object {
     my $s_first_password = $arg_ref->{sophomorixFirstPassword};
     my $s_firstname_ascii = $arg_ref->{sophomorixFirstnameASCII};
     my $s_surname_ascii = $arg_ref->{sophomorixSurnameASCII};
+    my $s_birthdate = $arg_ref->{sophomorixBirthdate};
     my $s_role = $arg_ref->{sophomorixRole};
     my $s_school_prefix = $arg_ref->{sophomorixSchoolPrefix};
     my $s_school_name = $arg_ref->{sophomorixSchoolname};
@@ -222,6 +223,10 @@ sub AD_test_object {
         if (defined $s_surname_ascii){
             is ($entry->get_value ('sophomorixSurnameASCII'),$s_surname_ascii,
 		"  * sophomorixSurnameASCII is $s_surname_ascii");
+        }
+        if (defined $s_birthdate){
+            is ($entry->get_value ('sophomorixBirthdate'),$s_birthdate,
+		"  * sophomorixBirthdate is $s_birthdate");
         }
         if (defined $s_role){
             is ($entry->get_value ('sophomorixRole'),$s_role,
