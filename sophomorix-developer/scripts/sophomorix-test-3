@@ -152,7 +152,7 @@ if ($add_pro==1){
 
     # projects in OU=BSZLEO
     &run_command("sophomorix-project $verbose_options --create -p mathe23 --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23 --ou BSZLEO --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
+    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23 --ou BSZLEO --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
     # projects in OU=SCHOOL
     &run_command("sophomorix-project $verbose_options --create -p mathe23");
     &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23");
@@ -1001,6 +1001,29 @@ if ($mod_pro==1){
                    member => "",
                    memberOf => "",
                   });
+    # --hide
+    &run_command("sophomorix-project $verbose_options -p mathe23 --hide");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   description=>"Mathe23 Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+300",
+                   sophomorixAddMailQuota=>"366",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "",
+                   sophomorixMembers => "",
+                   sophomorixAdminGroups => "",
+                   sophomorixMemberGroups => "",
+                   sophomorixHidden=>"TRUE",
+                   member => "",
+                   memberOf => "",
+                  });
     # --maxmembers
     &run_command("sophomorix-project $verbose_options -p mathe23 --maxmembers 16");
     &AD_test_object({ldap=>$ldap,
@@ -1020,7 +1043,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "",
                    memberOf => "",
                   });
@@ -1044,7 +1067,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "",
                    memberOf => "",
                   });
@@ -1069,7 +1092,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23",
                    memberOf => "",
                   });
@@ -1092,7 +1115,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "kep23,wu23",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,kep23,wu23",
                    memberOf => "",
                   });
@@ -1115,7 +1138,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "kep23,wu23",
                    sophomorixAdminGroups => "super12,bsz-super6",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,kep23,wu23,super12,bsz-super6",
                    memberOf => "",
                   });
@@ -1138,7 +1161,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "kep23,wu23",
                    sophomorixAdminGroups => "super12,bsz-super6",
                    sophomorixMemberGroups => "super13,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,kep23,wu23,super12,bsz-super6,super13,bsz-super7",
                    memberOf => "",
                   });
@@ -1163,7 +1186,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "kep23,wu23",
                    sophomorixAdminGroups => "super12,bsz-super6",
                    sophomorixMemberGroups => "super13,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,kep23,wu23,super12,bsz-super6,super13,bsz-super7",
                    memberOf => "",
                   });
@@ -1186,7 +1209,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12,bsz-super6",
                    sophomorixMemberGroups => "super13,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super6,super13,bsz-super7",
                    memberOf => "",
                   });
@@ -1209,7 +1232,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "super13,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,super13,bsz-super7",
                    memberOf => "",
                   });
@@ -1232,7 +1255,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1257,7 +1280,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1280,7 +1303,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1303,7 +1326,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1326,7 +1349,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1351,7 +1374,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1374,7 +1397,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1397,7 +1420,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1420,7 +1443,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1445,7 +1468,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "wu23,oe23,maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1468,7 +1491,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23,samardze23,schneima23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "wu23,oe23,maiersa23,muellegr23,samardze23,schneima23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1491,7 +1514,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23,samardze23,schneima23",
                    sophomorixAdminGroups => "super12,super13",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "wu23,oe23,maiersa23,muellegr23,samardze23,schneima23,super12,super13,bsz-super7",
                    memberOf => "",
                   });
@@ -1514,7 +1537,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23,samardze23,schneima23",
                    sophomorixAdminGroups => "super12,super13",
                    sophomorixMemberGroups => "bsz-super6,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "wu23,oe23,maiersa23,muellegr23,samardze23,schneima23,super12,super13,bsz-super6,bsz-super7",
                    memberOf => "",
                   });
@@ -1539,7 +1562,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23,samardze23,schneima23",
                    sophomorixAdminGroups => "super12,super13",
                    sophomorixMemberGroups => "bsz-super6,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,samardze23,schneima23,super12,super13,bsz-super6,bsz-super7",
                    memberOf => "",
                   });
@@ -1562,7 +1585,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12,super13",
                    sophomorixMemberGroups => "bsz-super6,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,super13,bsz-super6,bsz-super7",
                    memberOf => "",
                   });
@@ -1585,7 +1608,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super6,bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super6,bsz-super7",
                    memberOf => "",
                   });
@@ -1608,7 +1631,7 @@ if ($mod_pro==1){
                    sophomorixMembers => "muellegr23",
                    sophomorixAdminGroups => "super12",
                    sophomorixMemberGroups => "bsz-super7",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa23,muellegr23,super12,bsz-super7",
                    memberOf => "",
                   });
@@ -1616,7 +1639,7 @@ if ($mod_pro==1){
 
 
     # setting all back in one command
-    &run_command("sophomorix-project $verbose_options -p mathe23 --nojoin --addquota --- --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
+    &run_command("sophomorix-project $verbose_options -p mathe23 --nojoin --nohide --addquota --- --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=SCHOOL,".$root_dse,
