@@ -144,6 +144,7 @@ sub AD_test_object {
     my $s_members = $arg_ref->{sophomorixMembers};
     my $s_admingroups = $arg_ref->{sophomorixAdminGroups};
     my $s_membergroups = $arg_ref->{sophomorixMemberGroups};
+    my $s_hidden = $arg_ref->{sophomorixHidden};
 
     my $member = $arg_ref->{member};
     my $member_of = $arg_ref->{memberOf};
@@ -279,6 +280,10 @@ sub AD_test_object {
         if (defined $s_maxmembers){
             is ($entry->get_value ('sophomorixMaxMembers'),$s_maxmembers,
 		"  * sophomorixMaxMembers is $s_maxmembers");
+        }
+        if (defined $s_hidden){
+            is ($entry->get_value ('sophomorixHidden'),$s_hidden,
+		"  * sophomorixHidden is $s_hidden");
         }
         if (defined $s_creationdate){
             my $strg_ok="201";
