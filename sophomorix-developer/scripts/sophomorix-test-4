@@ -933,6 +933,32 @@ if ($mod_class==1){
                    memberOf => "students",
                   });
 
+    # --hide
+    &run_command("sophomorix-class $verbose_options -c class12-38 --hide");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"class12-38",
+                   description=>"Klasse 12 TG",
+                   sophomorixType=>"adminclass",
+                   sophomorixQuota=>"100+300",
+                   sophomorixMailQuota=>"897",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"FALSE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "",
+                   sophomorixMembers => "",
+                   sophomorixAdminGroups => "",
+                   sophomorixMemberGroups => "",
+                   sophomorixHidden=>"TRUE",
+                   member => "",
+                   memberOf => "students",
+                  });
+
     # --maxmembers
     &run_command("sophomorix-class $verbose_options -c class12-38 --maxmembers 16");
     &AD_test_object({ldap=>$ldap,
@@ -954,7 +980,7 @@ if ($mod_class==1){
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "",
                    memberOf => "students",
                   });
@@ -980,7 +1006,7 @@ if ($mod_class==1){
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "",
                    memberOf => "students",
                   });
@@ -1006,7 +1032,7 @@ if ($mod_class==1){
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa38,muellegr38",
                    memberOf => "students",
                   });
@@ -1032,7 +1058,7 @@ if ($mod_class==1){
                    sophomorixMembers => "kep38,wu38",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa38,muellegr38,kep38,wu38",
                    memberOf => "students",
                   });
@@ -1058,7 +1084,7 @@ if ($mod_class==1){
                    sophomorixMembers => "kep38,wu38",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa38,muellegr38,kep38,wu38,lordjo38,blackmri38",
                    memberOf => "students",
                   });
@@ -1084,7 +1110,7 @@ if ($mod_class==1){
                    sophomorixMembers => "kep38,wu38,samardze38,schneima38",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa38,muellegr38,kep38,wu38,lordjo38,blackmri38,samardze38,schneima38",
                    memberOf => "students",
                   });
@@ -1109,7 +1135,7 @@ if ($mod_class==1){
                    sophomorixMembers => "kep38,wu38,samardze38,schneima38",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa38,kep38,wu38,blackmri38,samardze38,schneima38",
                    memberOf => "students",
                   });
@@ -1135,13 +1161,13 @@ if ($mod_class==1){
                    sophomorixMembers => "wu38,samardze38",
                    sophomorixAdminGroups => "",
                    sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
+                   sophomorixHidden=>"TRUE",
                    member => "maiersa38,wu38,blackmri38,samardze38",
                    memberOf => "students",
                   });
 
     # setting all back in one command
-    &run_command("sophomorix-class $verbose_options -c class12-38 --join --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38' --admins \"\" --members \"\" ");
+    &run_command("sophomorix-class $verbose_options -c class12-38 --join --nohide --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38' --admins \"\" --members \"\" ");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=SCHOOL,".$root_dse,
