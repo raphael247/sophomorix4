@@ -1186,6 +1186,7 @@ sub AD_class_fetch {
             my $maillist = $entry->get_value('sophomorixMailList');
             my $status = $entry->get_value('sophomorixStatus');
             my $joinable = $entry->get_value('sophomorixJoinable');
+            my $hidden = $entry->get_value('sophomorixHidden');
             my $maxmembers = $entry->get_value('sophomorixMaxMembers');
             my $creationdate = $entry->get_value('sophomorixCreationDate');
             my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
@@ -1292,6 +1293,7 @@ sub AD_class_fetch {
                               "MailList: $maillist",
                               "SophomorixStatus: $status",
                               "Joinable: $joinable",
+                              "Hidden: $hidden",
                               "MaxMembers: $maxmembers",
                               "CreationDate:",
                               " $creationdate"
@@ -1399,6 +1401,7 @@ sub AD_project_fetch {
             my $maillist = $entry->get_value('sophomorixMailList');
             my $status = $entry->get_value('sophomorixStatus');
             my $joinable = $entry->get_value('sophomorixJoinable');
+            my $hidden = $entry->get_value('sophomorixHidden');
             my $maxmembers = $entry->get_value('sophomorixMaxMembers');
             my $creationdate = $entry->get_value('sophomorixCreationDate');
             my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
@@ -1505,6 +1508,7 @@ sub AD_project_fetch {
                               "MailList: $maillist",
                               "SophomorixStatus: $status",
                               "Joinable: $joinable",
+                              "Hidden: $hidden",
                               "MaxMembers: $maxmembers",
                               "CreationDate:",
                               " $creationdate"
