@@ -27,12 +27,15 @@ use Sophomorix::SophomorixTest qw(
 
 $Conf::log_level=1;
 my $add=0;
+my $update=0;
 my $move=0;
 my $kill=0;
 my $cp_add=0;
+my $cp_update=0;
 my $cp_move=0;
 my $cp_kill=0;
 my $test_add=0;
+my $test_update=0;
 my $test_move=0;
 my $test_kill=0;
 my $full=0;
@@ -44,12 +47,15 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "cp-add" => \$cp_add,
+           "cp-update" => \$cp_update,
            "cp-move" => \$cp_move,
            "cp-kill" => \$cp_kill,
            "test-add" => \$test_add,
+           "test-update" => \$test_update,
            "test-move" => \$test_move,
            "test-kill" => \$test_kill,
            "add|a" => \$add,
+           "update|u" => \$update,
            "move|m" => \$move,
            "kill|k" => \$kill,
            "full|f" => \$full,
@@ -74,11 +80,13 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 
 my $file_add=$DevelConf::path_result."/sophomorix.add";
+my $file_update=$DevelConf::path_result."/sophomorix.update";
 my $file_move=$DevelConf::path_result."/sophomorix.move";
 my $file_kill=$DevelConf::path_result."/sophomorix.kill";
 
 my $testdata="/usr/share/sophomorix-developer/testdata";
 my $file_add_test=$testdata."/sophomorix.add-1";
+my $file_update_test=$testdata."/sophomorix.update-1";
 my $file_move_test=$testdata."/sophomorix.move-1";
 my $file_kill_test=$testdata."/sophomorix.kill-1";
 
@@ -115,6 +123,14 @@ Step by step Test:
       sophomorix-add
   Test added users:
       sophomorix-test-1 --test-add
+
+  Copy sophomorix.update:
+      sophomorix-test-1 --cp-update
+  Update the users:
+      sophomorix-update -i
+      sophomorix-update
+  Test updated users:
+      sophomorix-test-1 --test-update
 
   Copy sophomorix.move:
       sophomorix-test-1 --cp-move
@@ -153,6 +169,7 @@ Step by step Test:
 # --full
 if ($full==1){
     $add=1;
+    $update=1;
     $move=1;
     $kill=1;
     $skip_warning=1;
@@ -809,6 +826,49 @@ if ($add==1 or $test_add==1){
 
 
 
+############################################################
+# Moving users --move
+############################################################
+if ($cp_update==1){
+    # copy sophomorix.update
+    &run_command("cp -v $file_update_test $file_update");
+}
+
+if ($update==1 or $test_update==1){
+    if ($update==1){
+        # copy sophomorix.update
+        &run_command("cp -v $file_update_test $file_update");
+        &run_command("sophomorix-update -i");
+        &run_command("sophomorix-update $verbose_options");
+    }
+
+    ##### Testing the users
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=bsz-m7ab,OU=Students,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Sarina Mayer",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   sn=>"Mayer",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Mayer",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "bsz-m7ab",
+                  });
+
+}
+
 
 ############################################################
 # Moving users --move
@@ -832,17 +892,17 @@ if ($move==1 or $test_move==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maiersa42,OU=bsz-attic,OU=Students,OU=BSZLEO,".$root_dse,
                    #####
-                   displayName=>"Sarina Maier",
+                   displayName=>"Sarina Mayer",
                    givenName=>"Sarina",
                    name=>"maiersa42",
                    sAMAccountname=>"maiersa42",
-                   sn=>"Maier",
+                   sn=>"Mayer",
                    userPrincipalName => "maiersa42@".$root_dns,
                    sophomorixAdminClass => "bsz-attic",
                    sophomorixExitAdminClass => "bsz-m7ab",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Sarina",
-                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixSurnameASCII  => "Mayer",
                    sophomorixRole => "student",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "BSZLEO",

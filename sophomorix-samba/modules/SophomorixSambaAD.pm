@@ -31,6 +31,7 @@ $Data::Dumper::Terse = 1;
             AD_unbind_admin
             AD_dns_get
             AD_user_create
+            AD_user_update
             AD_computer_create
             AD_user_move
             AD_user_kill
@@ -486,6 +487,47 @@ sub AD_user_create {
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
 }
 
+
+sub AD_user_update {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $dn = $arg_ref->{dn};
+    my $firstname_ascii = $arg_ref->{firstname_ascii};
+    my $surname_ascii = $arg_ref->{surname_ascii};
+    my $firstname_utf8 = $arg_ref->{firstname_utf8};
+    my $surname_utf8 = $arg_ref->{surname_utf8};
+    my $birthdate = $arg_ref->{birthdate};
+    my $user_count = $arg_ref->{user_count};
+    my $user = $arg_ref->{user};
+
+    # calculate missing attributes
+    my $display_name = $firstname_utf8." ".$surname_utf8;
+
+    if($Conf::log_level>=1){
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title(
+              "Updating User $user_count : $user");
+        print "   DN:                 $dn\n";
+        print "   Surname(ASCII):     $surname_ascii\n";
+        print "   Surname(UTF8):      $surname_utf8\n";
+        print "   Firstname(ASCII):   $firstname_ascii\n";
+        print "   Firstname(UTF8):    $firstname_utf8\n";
+        print "   Birthday:           $birthdate\n";
+    }
+
+    my $mesg = $ldap->modify( $dn,
+		      replace => {
+                          'sophomorixFirstnameASCII' => $firstname_ascii,
+                          'sophomorixSurnameASCII' => $surname_ascii,
+                          'givenName' => $firstname_utf8,
+                          'sn' => $surname_utf8,
+                          'displayName' => [$display_name],
+
+                      }
+               );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+}
 
 
 sub AD_user_move {
@@ -2105,10 +2147,10 @@ sub AD_group_addmember {
          if ($count > 0){
              print "   * User $adduser exists ($count results)\n";
              my $mesg = $ldap->modify( $dn_exist_group,
-     	        	              add => {
-                                    member => $dn_exist,
-                               }
-                           );
+     	        	       add => {
+                                   member => $dn_exist,
+                                      }
+                                     );
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
              #my $command="samba-tool group addmembers ". $group." ".$adduser;
              #print "   # $command\n";
@@ -2122,7 +2164,7 @@ sub AD_group_addmember {
              print "   * Group $addgroup exists ($count_group results)\n";
              my $mesg = $ldap->modify( $dn_exist_group,
      	    	                   add => {
-                                       member => $dn_exist_addgroup,
+                                   member => $dn_exist_addgroup,
                                    }
                                );
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -2159,7 +2201,7 @@ sub AD_group_removemember {
             print "   * User $removeuser exists ($count results)\n";
             my $mesg = $ldap->modify( $dn_exist_group,
 	  	                  delete => {
-                                      member => $dn_exist,
+                                  member => $dn_exist,
                                   }
                               );
             #my $command="samba-tool group removemembers ". $group." ".$removeuser;
@@ -2174,7 +2216,7 @@ sub AD_group_removemember {
              print "   * Group $removegroup exists ($count_group results)\n";
              my $mesg = $ldap->modify( $dn_exist_group,
      	    	                   delete => {
-                                       member => $dn_exist_removegroup,
+                                   member => $dn_exist_removegroup,
                                    }
                                );
              &AD_debug_logdump($mesg,2,(caller(0))[3]);

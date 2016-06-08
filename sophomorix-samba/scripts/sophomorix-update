@@ -1,0 +1,270 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-update) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+
+# Bibliotheken
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use Sophomorix::SophomorixBase;
+use Net::LDAP;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 check_options
+                                 );
+
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_user_move
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_update
+                                 AD_object_search
+                                 AD_get_name_tokened
+                                    );
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+my $user_count=0;
+
+my $alte_klasse;
+my $neue_klasse;
+my $login;
+my $old_status;
+
+my $identifier;
+my $alte_zeile="";
+my $neue_zeile="";
+my $new_home="";
+my $new_homedir_above="";
+my $old_home="";
+
+my $altes_www="";
+my $neues_www="";
+my $www_link="";
+
+
+my @users_for_quota=();
+
+my $k;
+my $v;
+my $key;
+
+my $update_file=${DevelConf::path_result}."/sophomorix.update";
+my $update_file_new=${DevelConf::path_result}."/sophomorix.update.new";
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $lock=0;
+my $unlock=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "lock" => \$lock,
+           "unlock" => \$unlock,
+           "info|i" => \$info,           
+           "help|h" => \$help
+          );
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-update updates the ldap entry of a user
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+Please see the sophomorix-update(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+# --unlock
+if ($unlock==1) {
+    &unlock_sophomorix();
+    exit;
+}
+
+
+# --lock
+if ($lock==1) {
+    &lock_sophomorix("lock",0,@arguments);
+    exit;
+}
+
+
+# --info
+if ($info==1) {
+    my $count=0;
+   if (not -e "$update_file"){
+       print "$update_file does not exist!\n"; 
+       print "Nothing to update: sophomorix.update does not exist!\n"; 
+       exit;
+   }
+    open(USERUPDATE,"$update_file") 
+            || die "ERROR: $!";
+    print "\nThe following users can be updated:\n\n";
+    printf "%-14s %-28s %-16s\n",
+           "Login","NewName","NewBirthdate";
+    &print_line;
+
+    my @lines=();
+    while(<USERUPDATE>){
+       if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+	   next;
+       }
+       push @lines, $_;
+    }
+    close(USERUPDATE);
+
+    my @sorted_lines = sort {
+        my @a_fields = split /::/, $a;
+        my @b_fields = split /::/, $b;
+ 
+        $a_fields[1] cmp $b_fields[1]  # string sort on 1st field, then
+          ||
+        $a_fields[0] cmp $b_fields[0]  # string sort on 2nd field
+    } @lines;
+
+    foreach my $line (@sorted_lines){
+       chomp($line);
+       $count++;
+       my ($login,
+           $unid,
+           $surname,
+           $firstname,
+           $birthdate,
+           $surname_utf8,
+           $firstname_utf,
+          )=split(/::/,$line);
+
+    my $name=$surname.", ".$firstname;
+    # Ausgabe
+    printf "%-14s %-28s %-16s\n",
+           $login,
+           $name, 
+           $birthdate; 
+    }
+    &print_line;
+    print "$count users can be updated\n";
+    &log_script_exit("",1,1,0,@arguments);
+}
+
+
+
+
+# ===========================================================================
+# start
+# ===========================================================================
+my ($ldap,$root_dse) = &AD_bind_admin();
+
+&log_script_start(@arguments);
+
+
+# sophomorix.update mitloggen
+&backup_amku_file($time_stamp_file,"update","before");
+
+
+# Datei mit den Schülern, die nicht versetzt wurden
+open(NOCHUPDATE,">$update_file_new") 
+     || die "ERROR: $!";
+
+open(USERUPDATE,"$update_file") 
+     || die "ERROR: $!";
+while(<USERUPDATE>){
+    if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+        next;
+    }
+    chomp();
+    $user_count++;
+    my ($user,
+        $unid,
+        $surname_ascii,
+        $firstname_ascii,
+        $birthdate,
+        $surname_utf8,
+        $firstname_utf8,
+       )=split(/::/);
+
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     birthdate=>$birthdate,
+                     surname_ascii=>$surname_ascii,
+                     surname_utf8=>$surname_utf8,
+                     firstname_ascii=>$firstname_ascii,
+                     firstname_utf8=>$firstname_utf8,
+                     user_count=>$user_count,
+                   });
+
+#    &AD_user_move({ldap=>$ldap,
+#                   root_dse=>$root_dse,
+#                   user=>$login,
+#                   user_count=>$user_count,
+#                   group_old=>$group_token_old,
+#                   group_new=>$group_token_new,
+#                   ou_old=>$ou_old,
+#                   ou_new=>$ou_new,
+#                   school_token_old=>$school_token_old,
+#                   school_token_new=>$school_token_new,
+#                   type=>"adminclass",
+#                   role=>$role,
+#                   creationdate=>$time_stamp_AD,
+#                  });
+
+}
+
+
+
+close(USERUPDATE);
+close(NOCHUPDATE);
+
+
+# sophomorix.update mitloggen
+&backup_amku_file($time_stamp_file,"update","after");
+
+
+
+# ===========================================================================
+# Nicht verarbeitete User nach sophomorix.update kopieren
+# ===========================================================================
+rename("$update_file_new","$update_file");
+
+
+&AD_unbind_admin($ldap);
+
+&log_script_end(@arguments);
