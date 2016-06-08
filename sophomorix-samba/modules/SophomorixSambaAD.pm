@@ -1882,16 +1882,16 @@ sub AD_group_list {
     if ($show==1){ 
         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
         print "-------------------+----------+-----+----+-+-",
-              "+-+-+--------------------------------\n";
+              "+-+-+-+--------------------------------\n";
 	if ($type eq "project"){
-        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s \n",
-               "Project Name","AQ","AMQ","MM","A","L","S","J","Project Description";
+        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
+               "Project Name","AQ","AMQ","MM","H","A","L","S","J","Project Description";
         } elsif ($type eq "adminclass"){
-        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s \n",
-               "Class Name","Quota","MQ","MM","A","L","S","J","Class Description";
+        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
+               "Class Name","Quota","MQ","MM","H","A","L","S","J","Class Description";
         }
         print "-------------------+----------+-----+----+-+-",
-              "+-+-+--------------------------------\n";
+              "+-+-+-+--------------------------------\n";
         
 
         for( my $index = 0 ; $index < $max_pro ; $index++) {
@@ -1951,23 +1951,33 @@ sub AD_group_list {
             } else {
                 $joinable=1;
             }
+            my $hidden;
+            if (not defined $entry->get_value('sophomorixHidden')){
+                $hidden="";
+            } elsif ($entry->get_value('sophomorixHidden') eq "FALSE"){
+                $hidden=0;
+            } else {
+                $hidden=1;
+            }
             if ($type eq "project"){
-                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s\n",
+                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
                     $entry->get_value('sophomorixAddQuota'),
                     $entry->get_value('sophomorixAddMailQuota'),
                     $maxmembers,
+                    $hidden,
                     $mailalias,
                     $maillist,
                     $status,
                     $joinable,
 	            $description;
             } elsif ($type eq "adminclass"){
-                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s| %-31s\n",
+                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
                     $quota,
                     $mailquota,
                     $maxmembers,
+                    $hidden,
                     $mailalias,
                     $maillist,
                     $status,
@@ -1976,13 +1986,13 @@ sub AD_group_list {
             }
         }
         print "-------------------+----------+-----+----+-+-",
-              "+-+-+--------------------------------\n";
+              "+-+-+-+--------------------------------\n";
 	if ($type eq "project"){
             print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
-            print " A=mailalias    L=mailist,       S=status                  \n";
+            print " A=mailalias    L=mailist,       S=status      H=hidden\n";
         } elsif ($type eq "adminclass"){
-            print "MQ=mailquota   J=joinable   MM=maxmembers\n";
-            print " A=mailalias      L=mailist,    S=status                  \n";
+            print "MQ=mailquota   J=joinable   MM=maxmembers      H=hidden\n";
+            print " A=mailalias      L=mailist,    S=status\n";
         }
         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
     } elsif ($show==0){
