@@ -152,10 +152,10 @@ if ($add_pro==1){
 
     # projects in OU=BSZLEO
     &run_command("sophomorix-project $verbose_options --create -p mathe23 --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG --ou BSZLEO --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
+    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23 --ou BSZLEO --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
     # projects in OU=SCHOOL
     &run_command("sophomorix-project $verbose_options --create -p mathe23");
-    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG");
+    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23");
 
     # groups in OU=BSZLEO
     &run_command("sophomorix-group $verbose_options --create --group super6 --ou BSZLEO --school-token bsz");
@@ -192,7 +192,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
-                   memberOf => "bsz-m7ab,p_bsz-Chemie-AG",
+                   memberOf => "bsz-m7ab,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -202,7 +202,7 @@ if ($test_add_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
                    sophomorixHidden=>"FALSE",
-                   memberOf => "bsz-students,p_bsz-Chemie-AG",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -237,7 +237,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
-                   memberOf => "bsz-m7ab,p_bsz-Chemie-AG",
+                   memberOf => "bsz-m7ab,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -247,7 +247,7 @@ if ($test_add_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
                    sophomorixHidden=>"FALSE",
-                   memberOf => "bsz-students,p_bsz-Chemie-AG",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -292,7 +292,7 @@ if ($test_add_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
                    sophomorixHidden=>"FALSE",
-                   memberOf => "bsz-students,p_bsz-Chemie-AG",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -337,7 +337,7 @@ if ($test_add_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
                    sophomorixHidden=>"FALSE",
-                   memberOf => "bsz-students,p_bsz-Chemie-AG",
+                   memberOf => "bsz-students,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -372,7 +372,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
-                   memberOf => "bsz-teachers,p_bsz-Chemie-AG",
+                   memberOf => "bsz-teachers,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -407,7 +407,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
-                   memberOf => "bsz-teachers,p_bsz-Chemie-AG",
+                   memberOf => "bsz-teachers,p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -542,7 +542,7 @@ if ($test_add_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
                    sophomorixHidden=>"FALSE",
-                   memberOf => "global-teachers,p_bsz-Chemie-AG",
+                   memberOf => "global-teachers,p_bsz-Chemie-AG23",
                   });
 
 
@@ -577,7 +577,7 @@ if ($test_add_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"adminclass",
                    sophomorixHidden=>"FALSE",
-                   memberOf => "global-teachers,p_bsz-Chemie-AG",
+                   memberOf => "global-teachers,p_bsz-Chemie-AG23",
                   });
     # schneima23
     &AD_test_object({ldap=>$ldap,
@@ -687,11 +687,11 @@ if ($test_add_pro==1){
 
 
     # Projects
-    # p_Chemie-AG
+    # p_Chemie-AG23
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_Chemie-AG,OU=Projects,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"p_Chemie-AG",
-                   description=>"p_Chemie-AG",
+                   dn=>"CN=p_Chemie-AG23,OU=Projects,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"p_Chemie-AG23",
+                   description=>"p_Chemie-AG23",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"---",
                    sophomorixAddMailQuota=>"---",
@@ -704,10 +704,10 @@ if ($test_add_pro==1){
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                   });
-    # p_bsz-Chemie-AG
+    # p_bsz-Chemie-AG23
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_bsz-Chemie-AG,OU=Projects,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"p_bsz-Chemie-AG",
+                   dn=>"CN=p_bsz-Chemie-AG23,OU=Projects,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"p_bsz-Chemie-AG23",
                    description=>"Chemie AG des Gymnasiums",
                    sophomorixType=>"project",
                    sophomorixAddQuota=>"100+60",
@@ -1663,8 +1663,8 @@ if ($kill_pro==1){
     # projects
     &run_command("sophomorix-project $verbose_options --kill -p mathe23 --ou BSZLEO --school-token bsz");
     &run_command("sophomorix-project $verbose_options --kill -p mathe23");
-    &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG --ou BSZLEO --school-token bsz");
-    &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG");
+    &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG23 --ou BSZLEO --school-token bsz");
+    &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG23");
     # groups
     &run_command("sophomorix-group $verbose_options --kill --group super6 --ou BSZLEO --school-token bsz");
     &run_command("sophomorix-group $verbose_options --kill --group super7 --ou BSZLEO --school-token bsz");
@@ -1694,8 +1694,8 @@ if ($test_kill_pro==1){
     # projects
     &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-mathe23");
     &AD_object_nonexist($ldap,$root_dse,"group","p_mathe23");
-    &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-Chemie-AG");
-    &AD_object_nonexist($ldap,$root_dse,"group","p_Chemie-AG");
+    &AD_object_nonexist($ldap,$root_dse,"group","p_bsz-Chemie-AG23");
+    &AD_object_nonexist($ldap,$root_dse,"group","p_Chemie-AG23");
     # groups
     &AD_object_nonexist($ldap,$root_dse,"group","bsz-super6");
     &AD_object_nonexist($ldap,$root_dse,"group","bsz-super7");
