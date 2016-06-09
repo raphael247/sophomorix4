@@ -231,6 +231,7 @@ install-vampire:
 
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-vampire/scripts/sophomorix-vampire $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-vampire/scripts/sophomorix-vampire-pwdconvert $(DESTDIR)/usr/sbin
 
 install-dump:
 	### install-dump
