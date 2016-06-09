@@ -511,8 +511,13 @@ if ($create_add_file==1){
             } else {
                 $class=$line{'gid'};
             }
-
-
+   
+            # passwords
+            # not concerted:
+            # my $unicodePwd=$line{"sambantpassword"};
+            # 
+            my $unicodePwd=`/usr/sbin/sophomorix-vampire-pwdconvert $line{"sambantpassword"}`;
+            chomp($unicodePwd);
             # create_line
             my $line= $class."::".
                       $line{"surname"}.";".
@@ -531,7 +536,9 @@ if ($create_add_file==1){
                       $line{"sophomorixstatus"}."::".
                       $creationdate."::".
                       $tolerationdate."::".
-                      $deactivationdate."::\n";
+                      $deactivationdate."::".
+                      $unicodePwd."::".
+                      $line{"userpassword"}."::\n";
             if ($skip_line==0){
 	        print "LINE: $line";
 	        print SOPHOMORIXADD $line;
