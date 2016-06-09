@@ -42,6 +42,16 @@ mailquota bei user mailquota
 
 mailalias bei user? oder kann diese Mailadresse schon eingetragen werden
 
+
+############################################################
+Set password age
+############################################################
+
+soll man das machen:
+
+samba-tool domain passwordsettings set --max-pwd-age 0
+
+
 ############################################################
 Set password of administrator
 ############################################################
@@ -102,6 +112,21 @@ log when a user cannot be created (summary in the end of script)
 use project dump to create projects (is all info there)
 
 add encrypted passwords to sophomorix.add
+old: 
+   userpassword          {SSHA}oTOa69my8cTkVa97XVDVeiJr3Ctmd0JHeS9RMC5SUkV4cElzQmlDa2k5QWtBdjFPek1Dbw== 
+                         {CRYPT}QByepZzk6naTo
+   sambalmpassword
+      FFCA9D16DCB26848AAD3B435B51404EE
+   sambantpassword
+      CA7D70A5587A194B83A4C4D325ED1C44
+new: 
+   unicodePwd
+  
+Migration:
+
+add ldif file that updates
+unicodePwd AND sophomorixFirstPassword
+add option to sophomorix-vampire
 
 Tasks to do after migration:
 projects: add displayname
@@ -260,6 +285,8 @@ sophomorix-print:
        (Firstnames, Surnames will be utf8 encoded)
      - add support for templates
        see pull requests for sophomorix2
+
+
 
 ############################################################
 all scripts
