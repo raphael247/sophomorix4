@@ -857,7 +857,7 @@ sub AD_ou_add {
                            sophomorixMailQuota=> "-1",
                            sophomorixMailalias => "FALSE",
                            sophomorixMaillist => "FALSE",
-                           description => "LML Teachers for $ou",
+                           description => "LML Teachers $ou",
                            objectclass => ['top',
                                              'group' ],
                          ]
@@ -889,7 +889,7 @@ sub AD_ou_add {
                              sophomorixMailQuota=> "-1",
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
-                             description => "LML Students for $ou",
+                             description => "LML Students $ou",
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -920,7 +920,7 @@ sub AD_ou_add {
                              sophomorixMailQuota=> "-1",
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
-                             description => "LML ExamAccounts for $ou",
+                             description => "LML ExamAccounts $ou",
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -947,7 +947,7 @@ sub AD_ou_add {
                              sophomorixMailQuota=> "-1",
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
-                             description => "LML Wifigroup for $ou",
+                             description => "LML Wifigroup $ou",
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -973,7 +973,7 @@ sub AD_ou_add {
                              sophomorixMailQuota=> "-1",
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
-                             description => "LML Internetaccess for $ou",
+                             description => "LML Internetaccess $ou",
                              objectclass => ['top',
                                                'group' ],
                          ]
