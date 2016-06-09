@@ -1,0 +1,8 @@
+#ldbmodify -H /var/lib/samba/private/sam.ldb --controls=local_oid:1.3.6.1.4.1.7165.4.3.12:0 << EOF
+# call this ldif file with:
+# ldbmodify -H /var/lib/samba/private/sam.ldb --controls=local_oid:1.3.6.1.4.1.7165.4.3.12:0 ./tools/bz2
+#dn: CN=bz2,OU=teachers,OU=Teachers,OU=SCHOOL,DC=linuxmuster,DC=local
+dn: CN=koesemu,OU=m3kk3t,OU=Students,OU=SCHOOL,DC=linuxmuster,DC=local
+changetype: modify
+replace: unicodePwd
+unicodePwd:: TCVgOz83tI6q5TOqAdF23g
