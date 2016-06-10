@@ -1,16 +1,71 @@
 Questions:
-show/hidden bei klassen nur als attribut, nicht als klassentyp?
--> evtl. auch bei projekten, usern, ... nutzbar
+show/hidden bei klassen ist Attribut
+(es gibt keine hiddenclass mehr)
 
 Gibts irgendwas, was man quotieren müsste?
-  Printerdaten? Seiten? 
--> neu attribute im ldap erforderlich
+  Printerdaten? Seiten? pykota
+  Schulkonsole Liste  
+-> neu attribute im ldap erforderlich, welche
 
 -> Überlegen
 
 flag für adminclass: teacher
 oder type=teacher (statt adminclass)
 wenn eine gruppe für einen user mit der rolle teacher anlegt wird, dann ists eine solche
+
+samba4 Fragen:
+Gibts Useranzahlbeschränkung?
+User und Gruppennamen gleich? Geht das?
+
+DNS:
+
+wie testet man, obs tut?
+
+Schulkonsole: 
+Wo soll aufgeschrieben werden, wie user usw. abgefragt werden müssen, ...
+
+
+Idee:
+
+machine parsable output für Listen, ...
+--------------------------------------------------
+Vorbild: git ... --porcelain
+-> im human readable output auch FARBEN verwendbar für output
+
+sub &message("error|warning|info",porcelain=1|0,$value);
+
+Bei Liste Titelzeile, was an welcher Stelle was steht 
+(z.B. ldapAttributname)
+
+Ansprechpartner für Format: Kai W.
+--------------------------------------------------
+
+
+ext4 als Standard 
+
+
+drucker in devices.txt mit anderer nummer
+
+
+/etc/linuxmuster/printers in ldap nehmen?
+
+
+index definieren im schema
+
+
+id_mapping
+
+libnns winbind tut nicht
+
+uidnumbers:
+
+- bei mirgation die ale setzen (uidnumber und gidnumer)
+- beim neu anzulegenden user, ein eigenen Zähler hochzählen
+  limit.
+  gruppe/user:
+     gidnumer/uidnumer: gidNumber
+     msSFU30NisDomain: linuxmuster ( bei LINUXMUSER.LOCAL)
+
 
 
 
@@ -63,26 +118,48 @@ DNS
 ############################################################
 
 * Alle bisherigen abfragen??:
-samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --password Muster!
+samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --password='Muster!'
 
 * DNS-Einträge anlegen:
-  # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 --password=Muster! -U Administrator
+  # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 --password='Muster!' -U Administrator
+                               
+
   This adds: DN: DC=j1010-p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
   More??? where ist the IP 10.16.1.100 in ldap
+  
 
-  # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password=Muster! -U Administrator
 
-  # samba-tool dns add localhost 100.16.10.i
-n-addr.arpa 1 PTR j1010-p01.linuxmuster.lokal --password=Muster! -U Administrator
+  # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password='Muster!' -U Administrator
+         100.16.10  -> Erste 3 Oktetts in umgekehrter Reihenfolge
+                    10 bleibt
+                    0,16,32,48,...  
+                       -> Momentan: 2. oktett der server IP (IP aus Datei)
+                       -> Final: aus den setup-Daten /var/linuxmuster, ... legt thomas eine zonendatei an.
+                    100 kommt von der Rechner IP
+
+  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR j1010-p01.linuxmuster.lokal --password=Muster! -U Administrator
 
 
 #INFO# samba-tool dns serverinfo localhost
-samba-tool dns zoneinfo localhost 100.16.10.in-addr.arpa --password=Muster! -U Administrator
+samba-tool dns zoneinfo localhost 100.16.10.in-addr.arpa --password='Muster!' -U Administrator
+
+
+Tests:
+apt-get install dns-utils
+
+dig j1010-p01
+nslookup
+
+
+
+lehrer.txt : eindeutige id nutzen
 
 
 ############################################################
 Tree
 ############################################################
+
+
 
 
 
