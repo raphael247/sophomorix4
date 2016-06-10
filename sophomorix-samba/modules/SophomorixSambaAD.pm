@@ -374,8 +374,8 @@ sub AD_user_create {
     my $birthdate = $arg_ref->{birthdate};
     my $plain_password = $arg_ref->{plain_password};
     my $unid = $arg_ref->{unid};
-    my $wunsch_id = $arg_ref->{wunsch_id};
-    my $wunsch_gid = $arg_ref->{wunsch_gid};
+    my $uidnumber_wish = $arg_ref->{uidnumber_wish};
+    my $gidnumber_wish = $arg_ref->{gidnumber_wish};
     my $ou = $arg_ref->{ou};
     my $school_token = $arg_ref->{school_token};
     my $role = $arg_ref->{role};
@@ -392,11 +392,11 @@ sub AD_user_create {
     if (not defined $unid){
         $unid="---";
     }
-    if (not defined $wunsch_id){
-        $wunsch_id="---";
+    if (not defined $uidnumber_wish){
+        $uidnumber_wish="---";
     }
-    if (not defined $wunsch_gid){
-        $wunsch_gid="---";
+    if (not defined $gidnumber_wish){
+        $gidnumber_wish="---";
     }
     if ($tolerationdate eq "---"){
         $tolerationdate=$DevelConf::default_date;
@@ -440,7 +440,7 @@ sub AD_user_create {
         print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
         print "   Group:              $group\n"; # lehrer oder klasse
-        print "   Unix-gid:           $wunsch_gid\n"; # lehrer oder klasse
+        print "   Unix-gid:           $gidnumber_wish\n"; # lehrer oder klasse
         #print "   GECOS:              $gecos\n";
         #print "   Login (to check):   $login_name_to_check\n";
         print "   Login (check OK):   $login\n";
@@ -450,7 +450,7 @@ sub AD_user_create {
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
-        print "   Unix-id:            $wunsch_id\n";
+        print "   Unix-id:            $uidnumber_wish\n";
     }
 
     $ldap->add($dn_class,attr => ['objectclass' => ['top', 'organizationalUnit']]);

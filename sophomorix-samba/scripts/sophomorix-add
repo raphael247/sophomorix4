@@ -57,10 +57,10 @@ my $firstname_utf8;
 my $surname_utf8;
 my $birthdate;
 my $gecos="";
-my $wunsch_login;
-my $wunsch_passwort;
-my $wunsch_id;
-my $wunsch_gid;
+my $login_wish;
+my $password_wish;
+my $uidnumber_wish;
+my $gidnumber_wish;
 my $status;
 my $creationdate;
 my $tolerationdate;
@@ -215,10 +215,10 @@ if ($info==1) {
        $count++;
        ($class_group,
        $identifier,
-       $wunsch_login,
-       $wunsch_passwort,
-       $wunsch_id,
-       $wunsch_gid,
+       $login_wish,
+       $password_wish,
+       $uidnumber_wish,
+       $gidnumber_wish,
        $unid,
        $ou,
        $school_token,
@@ -230,10 +230,10 @@ if ($info==1) {
        printf "%-11s%-29s%-10s%-6s%-6s%-10s%-10s\n",
               $group_token,
               $identifier_cut,
-              $wunsch_login,
-              $wunsch_id, 
-	      $wunsch_gid,
-              $wunsch_passwort,
+              $login_wish,
+              $uidnumber_wish, 
+	      $gidnumber_wish,
+              $password_wish,
               $unid;
    }
    &print_line;
@@ -320,10 +320,10 @@ while(<SOPHOMORIXADD>){
    # split data
    ($class_group,
     $identifier,
-    $wunsch_login,
-    $wunsch_passwort,
-    $wunsch_id,
-    $wunsch_gid,
+    $login_wish,
+    $password_wish,
+    $uidnumber_wish,
+    $gidnumber_wish,
     $unid,
     $ou,
     $school_token,
@@ -345,8 +345,8 @@ while(<SOPHOMORIXADD>){
    $gecos=$firstname_ascii." ".$surname_ascii; 
 
    # Falls Wunsch-Login-Namen gegeben, diesen benutzen
-   if ($wunsch_login ne "---"){
-    $login_name_to_check="$wunsch_login";
+   if ($login_wish ne "---"){
+    $login_name_to_check="$login_wish";
    } else {
     # Sonst: Login-Name bilden
     # remove - from login
@@ -377,13 +377,13 @@ while(<SOPHOMORIXADD>){
        # Wenn der zu prüfende Login-Name nicht schon vorhanden
        # Kann er benutzt werden 
        $login_check_ok=$login_name_to_check;
-   } elsif ($wunsch_login ne "---"){
+   } elsif ($login_wish ne "---"){
        # Wunsch-Login angegeben
        # Abbrechen, Wunsch-Login soll nicht verändert werden
        print "\nERROR:\n";
        print "Cannot add user $firstname_ascii $surname_ascii ($firstname_utf8 $surname_utf8) \n";
-       print "Login $wunsch_login exists already ($forbidden_login_hash{$login_name_to_check})!\n\n";
-       my $error_line="   ERROR: $wunsch_login not added ($forbidden_login_hash{$login_name_to_check})";
+       print "Login $login_wish exists already ($forbidden_login_hash{$login_name_to_check})!\n\n";
+       my $error_line="   ERROR: $login_wish not added ($forbidden_login_hash{$login_name_to_check})";
        push @loglines,$error_line;
        next;
    } else {
@@ -404,10 +404,10 @@ while(<SOPHOMORIXADD>){
    $forbidden_login_hash{$login_check_ok}="neu";
 
    # Klartext-Passwort
-   if ($wunsch_passwort eq "---") {
+   if ($password_wish eq "---") {
        $plain_password=&get_plain_password($role,@passwort_zeichen);
    } else {
-       $plain_password=$wunsch_passwort;
+       $plain_password=$password_wish;
    }
 
    # Abbruch, wenn nicht der richtige loginname angelegt wird
@@ -474,8 +474,8 @@ while(<SOPHOMORIXADD>){
                     plain_password=>$plain_password,
                     unid=>$unid,
                     ou=>$ou,
-                    wunsch_id=>$wunsch_id,
-                    wunsch_gid=>$wunsch_gid,
+                    uidnumber_wish=>$uidnumber_wish,
+                    gidnumber_wish=>$gidnumber_wish,
                     role=>$role,
                     type=>"adminclass",
                     school_token=>$school_token,
@@ -498,11 +498,11 @@ while(<SOPHOMORIXADD>){
    #                      $epoche_jetzt,
    #                      $time_stamp_AD,
    #                      "",
-   #                      $wunsch_id,
+   #                      $uidnumber_wish,
    #                      undef,
    #                      undef,
    #                      undef,
-   #                      $wunsch_gid
+   #                      $gidnumber_wish
    #                     );
 
     # 2. Add the class (db and dirs,links, ...)
