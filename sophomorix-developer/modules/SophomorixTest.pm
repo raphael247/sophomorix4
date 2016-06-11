@@ -114,6 +114,10 @@ sub AD_test_object {
     my $ser_pri_name =$arg_ref->{servicePrincipalName};
     my $sn =$arg_ref->{sn};
     my $description =$arg_ref->{description};
+    my $uidnumber =$arg_ref->{uidNumber};
+
+    # group
+    my $gidnumber =$arg_ref->{gidNumber};
 
     # sophomorix user
     my $s_admin_class = $arg_ref->{sophomorixAdminClass};
@@ -161,7 +165,7 @@ sub AD_test_object {
     my $count = $mesg->count;
 
     # Testing object existence
-    is ($count,1, "*** Found 1 Object: $dn");
+    is ($count,1, "****** Found 1 Object: $dn");
    
     if ($count==1){
         # Testing attributes
@@ -200,6 +204,28 @@ sub AD_test_object {
         if (defined $description){
             is ($entry->get_value ('description'),$description,
 		"  * description is $description");
+        }
+        if (defined $uidnumber){
+            my $min=9999;
+            my $max=3000000;
+            my $uidnumber_sys=$entry->get_value ('uidNumber');
+            my $uidnumber_ok=0;
+            if($uidnumber_sys > $min and $uidnumber_sys < $max){
+                $uidnumber_ok=1;
+            }
+            is ($uidnumber_ok,1,
+		"  * uidNumber $uidnumber_sys between $max and $min");
+        }
+        if (defined $gidnumber){
+            my $min=9999;
+            my $max=3000000;
+            my $gidnumber_sys=$entry->get_value ('gidNumber');
+            my $gidnumber_ok=0;
+            if($gidnumber_sys > $min and $gidnumber_sys < $max){
+                $gidnumber_ok=1;
+            }
+            is ($gidnumber_ok,1,
+		"  * gidNumber $gidnumber_sys between $max and $min");
         }
         if (defined $upn){
             is ($entry->get_value ('userPrincipalName'),$upn,
