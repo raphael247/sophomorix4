@@ -54,6 +54,8 @@ $Data::Dumper::Terse = 1;
             AD_group_list
             AD_object_move
             AD_debug_logdump
+            next_free_uidnumber_set
+            next_free_uidnumber_get
             );
 
 sub AD_get_passwd {
@@ -392,11 +394,14 @@ sub AD_user_create {
     if (not defined $unid){
         $unid="---";
     }
-    if (not defined $uidnumber_wish){
-        $uidnumber_wish="---";
+    if (not defined $uidnumber_wish or $uidnumber_wish eq "---"){
+        $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
     }
+
     if (not defined $gidnumber_wish){
         $gidnumber_wish="---";
+    } elsif ($gidnumber_wish eq "---"){
+	$gidnumber_wish="23456"; # ???
     }
     if ($tolerationdate eq "---"){
         $tolerationdate=$DevelConf::default_date;
@@ -440,7 +445,7 @@ sub AD_user_create {
         print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
         print "   Group:              $group\n"; # lehrer oder klasse
-        print "   Unix-gid:           $gidnumber_wish\n"; # lehrer oder klasse
+        print "   Unix-gidNumber:     $gidnumber_wish\n"; # lehrer oder klasse
         #print "   GECOS:              $gecos\n";
         #print "   Login (to check):   $login_name_to_check\n";
         print "   Login (check OK):   $login\n";
@@ -450,7 +455,7 @@ sub AD_user_create {
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
-        print "   Unix-id:            $uidnumber_wish\n";
+        print "   Unix-uidNumber:     $uidnumber_wish\n";
     }
 
     $ldap->add($dn_class,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -477,6 +482,7 @@ sub AD_user_create {
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    userAccountControl => '512',
+                   uidNumber => $uidnumber_wish,
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
                                      'user' ],
@@ -2403,6 +2409,54 @@ sub AD_debug_logdump {
             print Dumper(\$message);
         }
     }
+}
+
+
+sub next_free_uidnumber_set {
+    my ($ldap,$root_dse,$uidnumber) = @_;
+    # test for numbers ??? 0-9
+    if (not defined $uidnumber){
+       $uidnumber="10000";
+    }
+    print "* setting uidNumber to file/ldap: $uidnumber\n";
+    system("echo $uidnumber > $DevelConf::next_free_uidnumber_file");
+}
+
+
+sub next_free_uidnumber_get {
+    # _prop : proposed number
+    my ($ldap,$root_dse) = @_;
+    my $uidnumber_free;
+    if (not -e $DevelConf::next_free_uidnumber_file){
+        &next_free_uidnumber_set($ldap,$root_dse,"10000");
+    }
+    my $uidnumber_prop= `cat $DevelConf::next_free_uidnumber_file`;
+    chomp($uidnumber_prop);
+    print "* getting uidNumber from file/ldap: $uidnumber_prop\n";
+    my $count=1;
+    until ($count==0){
+        print "   * Testing uidNumber <$uidnumber_prop>\n";
+        my $filter="(&(objectclass=user) (uidNumber=".$uidnumber_prop."))"; 
+        print "      * Filter: $filter\n";
+   
+        my $mesg = $ldap->search(
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attr => ['cn']
+                            );
+        $count = $mesg->count;
+        print "      * Hits: $count\n";
+        if ($count>0){
+            $uidnumber_prop++;
+        } else {
+            $uidnumber_free=$uidnumber_prop;
+        }
+    }
+    print "Next Free uidNumber is: $uidnumber_free\n";
+    my $uidnumber_free_next=$uidnumber_free+1;
+    &next_free_uidnumber_set($ldap,$root_dse,$uidnumber_free_next);
+    return $uidnumber_free;
 }
 
 

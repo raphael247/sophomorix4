@@ -59,13 +59,26 @@ libnns winbind tut nicht
 
 uidnumbers:
 
-- bei mirgation die ale setzen (uidnumber und gidnumer)
+Todo: im ldap abspeichern/abrufen (momentan in /etc/sophomorix/user/...)
+
+- bei mirgation die ale setzen (uidNumber und gidNumer)
 - beim neu anzulegenden user, ein eigenen Zähler hochzählen
   limit.
+  (Defaultmäsig beginnen uidNumber/gidNumer bei etwa 3.000.000)
+   Bei jedem ausgeführten id-Befehl wird die uidnumber um 2 erhöht.
+   (scheinbar wird sie dynamisch erzeugt) 
   gruppe/user:
      gidnumer/uidnumer: gidNumber
      msSFU30NisDomain: linuxmuster ( bei LINUXMUSER.LOCAL)
 
+Tests nach migration:
+
+- Bei welchen/wievielen Usern kann man sich mit dem firstpassword einloggen
+  sophomorix-passwd --test-firstpassword
+
+- uidNumber und gidNumber testen mit:
+  id user (output parsen) und mit den Daten vor der Migration vergleichen
+  -> Fehler melden: 
 
 
 
