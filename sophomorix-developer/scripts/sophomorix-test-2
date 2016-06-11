@@ -200,6 +200,7 @@ if ($test_ws_1==1){
                    givenName=>"Exam",
                    name=>"bsz-j1008p01",
                    sAMAccountname=>"bsz-j1008p01",
+                   uidNumber=>"-1",
                    sn=>"Account",
                    sophomorixAdminClass => "bsz-j1008",
                    sophomorixExitAdminClass => "unknown",
@@ -216,6 +217,7 @@ if ($test_ws_1==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-j1008",
+                   gidNumber=>"-1",
                    sophomorixStatus=>"P",
                    sophomorixType=>"room",
                    memberOf => "bsz-examaccounts",
@@ -224,6 +226,7 @@ if ($test_ws_1==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
                    sAMAccountname=>"bsz-examaccounts",
+                   gidNumber=>"-1",
                    memberOf => "global-examaccounts",
                   });
 
