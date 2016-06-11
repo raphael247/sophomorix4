@@ -377,7 +377,6 @@ sub AD_user_create {
     my $plain_password = $arg_ref->{plain_password};
     my $unid = $arg_ref->{unid};
     my $uidnumber_wish = $arg_ref->{uidnumber_wish};
-    my $gidnumber_wish = $arg_ref->{gidnumber_wish};
     my $ou = $arg_ref->{ou};
     my $school_token = $arg_ref->{school_token};
     my $role = $arg_ref->{role};
@@ -398,11 +397,6 @@ sub AD_user_create {
         $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
     }
 
-    if (not defined $gidnumber_wish){
-        $gidnumber_wish="---";
-    } elsif ($gidnumber_wish eq "---"){
-	$gidnumber_wish="23456"; # ???
-    }
     if ($tolerationdate eq "---"){
         $tolerationdate=$DevelConf::default_date;
     }
@@ -445,7 +439,6 @@ sub AD_user_create {
         print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
         print "   Group:              $group\n"; # lehrer oder klasse
-        print "   Unix-gidNumber:     $gidnumber_wish\n"; # lehrer oder klasse
         #print "   GECOS:              $gecos\n";
         #print "   Login (to check):   $login_name_to_check\n";
         print "   Login (check OK):   $login\n";
@@ -2110,6 +2103,11 @@ sub AD_group_create {
     my $creationdate = $arg_ref->{creationdate};
     my $status = $arg_ref->{status};
     my $joinable = $arg_ref->{joinable};
+    my $gidnumber_wish = $arg_ref->{gidnumber_wish};
+
+    if (not defined $gidnumber_wish or $gidnumber_wish eq "---"){
+        $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    }
 
     if (not defined $joinable){
         $joinable="FALSE";    
@@ -2125,12 +2123,13 @@ sub AD_group_create {
     if ($count==0){
         # adding the group
         &Sophomorix::SophomorixBase::print_title("Creating Group (begin):");
-        print("   DN:            $dn\n");
-        print("   Target:        $target_branch\n");
-        print("   Group:         $group\n");
-        print("   Type:          $type\n");
-        print("   Joinable:      $joinable\n");
-        print "   Creationdate:  $creationdate\n";
+        print("   DN:              $dn\n");
+        print("   Target:          $target_branch\n");
+        print("   Group:           $group\n");
+        print "   Unix-uidNumber:  $uidnumber_wish\n";
+        print("   Type:            $type\n");
+        print("   Joinable:        $joinable\n");
+        print "   Creationdate:    $creationdate\n";
 
         # Create target branch
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -2154,6 +2153,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
+                                    gidNumber => $gidnumber_wish,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -2457,6 +2457,54 @@ sub next_free_uidnumber_get {
     my $uidnumber_free_next=$uidnumber_free+1;
     &next_free_uidnumber_set($ldap,$root_dse,$uidnumber_free_next);
     return $uidnumber_free;
+}
+
+
+sub next_free_gidnumber_set {
+    my ($ldap,$root_dse,$gidnumber) = @_;
+    # test for numbers ??? 0-9
+    if (not defined $gidnumber){
+       $gidnumber="10000";
+    }
+    print "* setting gidnumber to file/ldap: $gidnumber\n";
+    system("echo $gidnumber > $DevelConf::next_free_gidnumber_file");
+}
+
+
+sub next_free_gidnumber_get {
+    # _prop : proposed number
+    my ($ldap,$root_dse) = @_;
+    my $gidnumber_free;
+    if (not -e $DevelConf::next_free_gidnumber_file){
+        &next_free_gidnumber_set($ldap,$root_dse,"10000");
+    }
+    my $gidnumber_prop= `cat $DevelConf::next_free_gidnumber_file`;
+    chomp($gidnumber_prop);
+    print "* getting gidNumber from file/ldap: $gidnumber_prop\n";
+    my $count=1;
+    until ($count==0){
+        print "   * Testing gidNumber <$gidnumber_prop>\n";
+        my $filter="(&(objectclass=user) (gidnumber=".$gidnumber_prop."))"; 
+        print "      * Filter: $filter\n";
+   
+        my $mesg = $ldap->search(
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attr => ['cn']
+                            );
+        $count = $mesg->count;
+        print "      * Hits: $count\n";
+        if ($count>0){
+            $gidnumber_prop++;
+        } else {
+            $gidnumber_free=$gidnumber_prop;
+        }
+    }
+    print "Next Free gidNumber is: $gidnumber_free\n";
+    my $gidnumber_free_next=$gidnumber_free+1;
+    &next_free_gidnumber_set($ldap,$root_dse,$gidnumber_free_next);
+    return $gidnumber_free;
 }
 
 
