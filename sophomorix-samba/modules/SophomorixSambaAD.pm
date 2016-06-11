@@ -792,6 +792,7 @@ sub AD_ou_add {
     my $ou = $arg_ref->{ou};
     my $token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
+    my $gidnumber_wish;
 
     $ou=&AD_get_ou_tokened($ou);
     if ($token eq "---"){
@@ -842,6 +843,7 @@ sub AD_ou_add {
     # create parent
     my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $dn_group,
                          attr => [
                            cn   => $group,
@@ -857,6 +859,7 @@ sub AD_ou_add {
                            sophomorixMailalias => "FALSE",
                            sophomorixMaillist => "FALSE",
                            description => "LML Teachers $ou",
+                           gidNumber => $gidnumber_wish,
                            objectclass => ['top',
                                              'group' ],
                          ]
@@ -874,6 +877,7 @@ sub AD_ou_add {
     # create parent
     $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $dn_group,
                          attr => [
                              cn   => $group,
@@ -889,6 +893,7 @@ sub AD_ou_add {
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
                              description => "LML Students $ou",
+                             gidNumber => $gidnumber_wish,
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -905,6 +910,7 @@ sub AD_ou_add {
     # create parent
     $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $dn_group,
                          attr => [
                              cn   => $group,
@@ -920,6 +926,7 @@ sub AD_ou_add {
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
                              description => "LML ExamAccounts $ou",
+                             gidNumber => $gidnumber_wish,
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -932,6 +939,7 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $dn_group,
                          attr => [
                              cn   => $group,
@@ -947,6 +955,7 @@ sub AD_ou_add {
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
                              description => "LML Wifigroup $ou",
+                             gidNumber => $gidnumber_wish,
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -958,6 +967,7 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $dn_group,
                          attr => [
                              cn   => $group,
@@ -973,6 +983,7 @@ sub AD_ou_add {
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
                              description => "LML Internetaccess $ou",
+                             gidNumber => $gidnumber_wish,
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -1006,6 +1017,7 @@ sub AD_ou_add {
 
     # students in Groups,OU=GLOBAL
     my $global_dn_group="CN=global-".$DevelConf::student.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $global_dn_group,
                          attr => [
                              cn => "global-".$DevelConf::student,
@@ -1021,6 +1033,7 @@ sub AD_ou_add {
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
                              description => "LML Global Students",
+                             gidNumber => $gidnumber_wish,
                              objectclass => ['top',
                                                'group' ],
                          ]
@@ -1030,6 +1043,7 @@ sub AD_ou_add {
     }
     # teachers in Groups,OU=GLOBAL
     $global_dn_group="CN=global-".$DevelConf::teacher.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $global_dn_group,
                          attr => [
                              cn => "global-".$DevelConf::teacher,
@@ -1045,12 +1059,14 @@ sub AD_ou_add {
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
                              description => "LML Global Teachers",
+                             gidNumber => $gidnumber_wish,
                              objectclass => ['top',
                                                'group' ],
                          ]
                      );
     # ExamAccounts in Groups,OU=GLOBAL
     $global_dn_group="CN=global-".$DevelConf::examaccount.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
+    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     $result = $ldap->add( $global_dn_group,
                          attr => [
                              cn => "global-".$DevelConf::examaccount,
@@ -1065,6 +1081,7 @@ sub AD_ou_add {
                              sophomorixMailQuota=> "-1",
                              sophomorixMailalias => "FALSE",
                              sophomorixMaillist => "FALSE",
+                             gidNumber => $gidnumber_wish,
                              description => "LML Global ExamAccounts",
                              objectclass => ['top',
                                                'group' ],
