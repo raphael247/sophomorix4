@@ -57,6 +57,8 @@ $Data::Dumper::Terse = 1;
             AD_login_test
             next_free_uidnumber_set
             next_free_uidnumber_get
+            next_free_gidnumber_set
+            next_free_gidnumber_get
             );
 
 sub AD_get_passwd {
@@ -1245,6 +1247,7 @@ sub AD_class_fetch {
         if($Conf::log_level>=2 or $info==1){
             # adminclass attributes
 	    my $description = $entry->get_value('description');
+	    my $gidnumber = $entry->get_value('gidNumber');
 	    my $quota = $entry->get_value('sophomorixQuota');
             my $mailquota = $entry->get_value('sophomorixMailQuota');
             my $mailalias = $entry->get_value('sophomorixMailAlias');
@@ -1349,7 +1352,7 @@ sub AD_class_fetch {
             }
 
             # left column in printout
-            my @project_attr=("gidnumber: ???",
+            my @project_attr=("gidnumber: $gidnumber",
                               "Description:",
                               " $description",
                               "Quota: ${quota} MB",
@@ -1460,6 +1463,7 @@ sub AD_project_fetch {
         if($Conf::log_level>=2 or $info==1){
             # project attributes
 	    my $description = $entry->get_value('description');
+	    my $gidnumber = $entry->get_value('gidNumber');
 	    my $addquota = $entry->get_value('sophomorixAddQuota');
             my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
             my $mailalias = $entry->get_value('sophomorixMailAlias');
@@ -1564,7 +1568,7 @@ sub AD_project_fetch {
             }
 
             # left column in printout
-            my @project_attr=("gidnumber: ???",
+            my @project_attr=("gidnumber: $gidnumber",
                               "Description:",
                               " $description",
                               "AddQuota: ${addquota} MB",
@@ -1935,7 +1939,7 @@ sub AD_project_sync_members {
 
 sub AD_group_list {
     # show==0 return list of project dn's
-    # show==1 print ist, no return
+    # show==1 print list, no return
     my ($ldap,$root_dse,$type,$show) = @_;
     my $filter;
     if ($type eq "project"){
@@ -2123,10 +2127,6 @@ sub AD_group_create {
     my $joinable = $arg_ref->{joinable};
     my $gidnumber_wish = $arg_ref->{gidnumber_wish};
 
-    if (not defined $gidnumber_wish or $gidnumber_wish eq "---"){
-        $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    }
-
     if (not defined $joinable){
         $joinable="FALSE";    
     }
@@ -2141,10 +2141,13 @@ sub AD_group_create {
     if ($count==0){
         # adding the group
         &Sophomorix::SophomorixBase::print_title("Creating Group (begin):");
+        if (not defined $gidnumber_wish or $gidnumber_wish eq "---"){
+            $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+        }
         print("   DN:              $dn\n");
         print("   Target:          $target_branch\n");
         print("   Group:           $group\n");
-        print "   Unix-uidNumber:  $uidnumber_wish\n";
+        print "   Unix-gidNumber:  $gidnumber_wish\n";
         print("   Type:            $type\n");
         print("   Joinable:        $joinable\n");
         print "   Creationdate:    $creationdate\n";
