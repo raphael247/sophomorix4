@@ -156,7 +156,7 @@ my $testopt=GetOptions(
 # Setting the filters
 my $ou_filter="";
 my $school_token_filter="";
-my $user_filter=();
+my $user_filter="";
 if ($ou ne ""){
     $ou_filter="(sophomorixSchoolname=$ou)";
 }
@@ -321,7 +321,7 @@ if ($test_firstpassword==1){
         my $samaccount=$entry->get_value ('sAMAccountName');
         print "* $samaccount: $dn\n";
         $count_tested++;
-        my $res=&AD_login_test($ldap,$root_dse,$samaccount);
+        my $res=&AD_login_test($ldap,$root_dse,$dn);
         if ($res==0){
             print "   * Login with firstpassword OK!\n";
             $count_success++;

@@ -31,6 +31,7 @@ $Data::Dumper::Terse = 1;
             AD_workstations_any
             AD_examaccounts_any
             run_command
+
             );
 
 
@@ -168,6 +169,21 @@ sub AD_test_object {
     is ($count,1, "****** Found 1 Object: $dn");
    
     if ($count==1){
+        # 
+        my @object_classes=$entry->get_value ('objectClass');
+        my $objectclass=""; # user, group, ...
+        foreach my $oc (@object_classes){
+            if ($oc eq "group"){
+                $objectclass="group";
+            } elsif ($oc eq "user"){
+                $objectclass="user";
+            } elsif ($oc eq "computer"){
+                $objectclass="computer";
+            }
+        }
+        print "*********** objectClass: $objectclass\n";
+
+
         # Testing attributes
         if (defined $cn){
             is ($entry->get_value ('cn'),$cn,
@@ -419,6 +435,13 @@ sub AD_test_object {
         if (defined $member_of){
             &test_multivalue($member_of,"memberOf",$entry,$sam_account);
         }
+        ##################################################
+        if ($objectclass eq "user"){
+            my $res=&Sophomorix::SophomorixSambaAD::AD_login_test($ldap,$root_dse,$dn);
+            my $firstpass=$entry->get_value ('sophomorixFirstPassword');
+            is ($res,0,"  * Login OK (pwd=$firstpass): $dn");
+	}
+
         # ##################################################
         # # membeOf
         # if (defined $member_of and $not_member_of){

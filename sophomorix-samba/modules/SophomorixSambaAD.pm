@@ -2431,9 +2431,10 @@ sub AD_debug_logdump {
 
 
 sub AD_login_test {
-    my ($ldap,$root_dse,$user)=@_;
+    my ($ldap,$root_dse,$dn)=@_;
+    #my ($ldap,$root_dse,$user)=@_;
     #print "User: >$user<\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    #my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     #print "Count: $count $dn\n";
     my $filter="(cn=*)";
     my $mesg = $ldap->search(
@@ -2444,12 +2445,14 @@ sub AD_login_test {
                             );
     my $entry = $mesg->entry(0);
     my $firstpassword = $entry->get_value('sophomorixFirstPassword');
+    my $samaccount = $entry->get_value('sAMAccountName');
     if (not defined $firstpassword){
         return -1;
     }
     #print "FIRST: $firstpassword";
     #print "Testing login of user $user with password $firstpassword\n";
-    my $command="smbclient -L localhost --user=$user%$firstpassword > /dev/null 2>&1 ";
+    #my $command="smbclient -L localhost --user=$user%$firstpassword > /dev/null 2>&1 ";
+    my $command="smbclient -L localhost --user=$samaccount%$firstpassword > /dev/null 2>&1 ";
     print "   # $command\n";
     my $result=system($command);
     return $result;
