@@ -307,7 +307,7 @@ my @passwort_zeichen=&get_passwd_charlist();
 
 
 # Datei mit den Schülern, die nicht angelegt wurden
-open(NOCHANLEGEN,">$add_file_new") 
+open(STILLTOADD,">$add_file_new") 
     || die "ERROR: $!";
 open(SOPHOMORIXADD,"$add_file") 
     || die "ERROR: $!";
@@ -414,7 +414,7 @@ while(<SOPHOMORIXADD>){
    if ($loginname ne "") {
      if ($login_name_to_check ne $loginname) {
         print "##### $login_name_to_check wird nicht angelegt!\n";
-        print NOCHANLEGEN "$_\n";
+        print STILLTOADD "$_\n";
         next;
      }
    }
@@ -423,7 +423,7 @@ while(<SOPHOMORIXADD>){
    if ($gruppe ne "") {
      if ($class_group ne $gruppe) {
         print "$login_name_to_check ($class_group) wird nicht angelegt!\n";
-        print NOCHANLEGEN "$_\n";
+        print STILLTOADD "$_\n";
         next;
      }
    }
@@ -598,7 +598,7 @@ while(<SOPHOMORIXADD>){
 }
 
 close(SOPHOMORIXADD);
-close(NOCHANLEGEN);
+close(STILLTOADD);
 
 ############################################################
 # print logs
