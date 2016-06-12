@@ -232,7 +232,7 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 # Setting the filters
 my $ou_filter="";
 my $school_token_filter="";
-my $user_filter=();
+my $user_filter="";
 if ($ou ne ""){
     $ou_filter="(sophomorixSchoolname=$ou)";
 }
