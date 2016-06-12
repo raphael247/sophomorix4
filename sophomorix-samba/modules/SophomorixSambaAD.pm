@@ -2451,7 +2451,7 @@ sub AD_login_test {
     if (not defined $firstpassword){
         return -1;
     }
-    my $command="smbclient -L localhost --user=$samaccount%$firstpassword > /dev/null 2>&1 ";
+    my $command="smbclient -L localhost --user=$samaccount%'$firstpassword' > /dev/null 2>&1 ";
     print "   # $command\n";
     my $result=system($command);
     return $result;
