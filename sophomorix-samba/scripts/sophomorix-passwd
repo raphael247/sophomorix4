@@ -336,11 +336,11 @@ if ($test_firstpassword==1){
         } elsif ( $res==-1) {
             print "   * No firstpassword found!\n";
             $count_nofirstpass++;
-            push @nofirst, "No firstpassword found: $dn\n";
+            push @nofirst, "No Password: $dn\n";
         } else {
             print "   * ERROR logging in with firstpassword: $res\n";
             $count_fail++;
-            push @fail, "Failed Login: $dn\n";
+            push @fail, "Failed: $dn\n";
         }
     }
     &print_title("Test result:");
