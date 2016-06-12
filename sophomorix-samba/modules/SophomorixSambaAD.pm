@@ -54,6 +54,7 @@ $Data::Dumper::Terse = 1;
             AD_group_list
             AD_object_move
             AD_debug_logdump
+            AD_login_test
             next_free_uidnumber_set
             next_free_uidnumber_get
             );
@@ -2426,6 +2427,32 @@ sub AD_debug_logdump {
             print Dumper(\$message);
         }
     }
+}
+
+
+sub AD_login_test {
+    my ($ldap,$root_dse,$user)=@_;
+    #print "User: >$user<\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    #print "Count: $count $dn\n";
+    my $filter="(cn=*)";
+    my $mesg = $ldap->search(
+                      base   => $dn,
+                      scope => 'base',
+                      filter => $filter,
+                      attr => ['sophomorixFirstPassword']
+                            );
+    my $entry = $mesg->entry(0);
+    my $firstpassword = $entry->get_value('sophomorixFirstPassword');
+    if (not defined $firstpassword){
+        return -1;
+    }
+    #print "FIRST: $firstpassword";
+    #print "Testing login of user $user with password $firstpassword\n";
+    my $command="smbclient -L localhost --user=$user%$firstpassword > /dev/null 2>&1 ";
+    print "   # $command\n";
+    my $result=system($command);
+    return $result;
 }
 
 
