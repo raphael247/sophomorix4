@@ -54,6 +54,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_group_list
                                  get_forbidden_logins
+                                 next_free_gidnumber_set
+                                 next_free_gidnumber_get
                                     );
 my @arguments = @ARGV;
 
@@ -69,6 +71,8 @@ my $help=0;
 my $info=0;
 my $class="";
 my $create=0;
+my $gidnumber=-1;
+my $gidnumber_wish;
 my $kill=0;
 my $ou="---";
 my $school_token="---";
@@ -101,6 +105,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "class|c=s" => \$class,
            "create" => \$create,
+           "gidnumber=i" => \$gidnumber,
            "kill" => \$kill,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
@@ -161,7 +166,7 @@ Changing an adminclass:
     --removeadmins user1,user2,user3, ...
 
 This is for migration/testing/fixing only:
-  --create --class <adminclass>
+  --create --class <adminclass> --gidnumber <num>
   --creationdate <20150529093330.0Z> (only for migration)
   --members user1,user2,user3, ... 
   --addmembers user1,user2,user3, ...
@@ -206,27 +211,36 @@ if ($class ne "" and $info==1){
 # Programmbeginn
 # ===========================================================================
 
+
 # --create --class <name>
 ############################################################
 if ($create==1 and $class ne ""){
-  &AD_ou_add({ldap=>$ldap,
-              root_dse=>$root_dse,
-              ou=>$ou,
-              school_token=>$school_token,
-              creationdate=>$time_stamp_AD,
-            });
-  my $group_token=&AD_get_name_tokened($class,$school_token,"adminclass");
-  &AD_group_create({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    ou=>$ou,
-                    school_token=>$school_token,
-                    group=>$group_token,
-                    description=>$group_token,
-                    type=>"adminclass",
-                    status=>"P",
-                    creationdate=>$time_stamp_AD,
-                    joinable=>"TRUE",
-                    hidden=>"FALSE",
+    # --gidnumber
+    ############################################################
+    if ($gidnumber==-1){
+       $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    } else {
+	$gidnumber_wish=$gidnumber;
+    }
+   &AD_ou_add({ldap=>$ldap,
+               root_dse=>$root_dse,
+               ou=>$ou,
+               school_token=>$school_token,
+               creationdate=>$time_stamp_AD,
+             });
+   my $group_token=&AD_get_name_tokened($class,$school_token,"adminclass");
+   &AD_group_create({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     ou=>$ou,
+                     school_token=>$school_token,
+                     group=>$group_token,
+                     description=>$group_token,
+                     type=>"adminclass",
+                     status=>"P",
+                     creationdate=>$time_stamp_AD,
+                     joinable=>"TRUE",
+                     hidden=>"FALSE",
+                     gidnumber_wish=>$gidnumber_wish,
                   });
 }
 

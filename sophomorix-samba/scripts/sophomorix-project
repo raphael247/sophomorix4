@@ -73,6 +73,8 @@ $Conf::log_level=1;
 
 my $project="";
 my $create=0;
+my $gidnumber=-1;
+my $gidnumber_wish;
 my $kill=0;
 my $ou="---";
 my $school_token="---";
@@ -129,6 +131,7 @@ my $testopt=GetOptions(
 #           "user|user-info|u" => \$user_info,
 #           "admininfo" => \$admininfo,
            "create" => \$create,
+           "gidnumber=i" => \$gidnumber,
            "kill" => \$kill,
            "verbose|v+" => \$Conf::log_level,
            "join!" => \$join,
@@ -249,6 +252,7 @@ Getting information:
 
 Changing/creating/killing a project:
   --create -p projectname
+  --create -p projectname --gidnumber num  (for migration only)
   --kill -p projectname
 
   -p <project>, / --project <project> 
@@ -565,22 +569,30 @@ if ($project eq "" and $update_from_file ne ""){
 # --create --project <name>
 ############################################################
 if ($create==1 and $project ne ""){
-  &AD_ou_add({ldap=>$ldap,
-              root_dse=>$root_dse,
-              ou=>$ou,
-              school_token=>$school_token,
-              creationdate=>$time_stamp_AD,
-            });
-  my $group_token=&AD_get_name_tokened($project,$school_token,"project");
-  &AD_group_create({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    ou=>$ou,
-                    school_token=>$school_token,
-                    group=>$group_token,
-                    description=>$group_token,
-                    type=>"project",
-                    status=>"P",
-                    creationdate=>$time_stamp_AD,
+    # --gidnumber
+    ############################################################
+    if ($gidnumber==-1){
+       $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    } else {
+	$gidnumber_wish=$gidnumber;
+    }
+   &AD_ou_add({ldap=>$ldap,
+               root_dse=>$root_dse,
+               ou=>$ou,
+               school_token=>$school_token,
+               creationdate=>$time_stamp_AD,
+             });
+   my $group_token=&AD_get_name_tokened($project,$school_token,"project");
+   &AD_group_create({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     ou=>$ou,
+                     school_token=>$school_token,
+                     group=>$group_token,
+                     description=>$group_token,
+                     type=>"project",
+                     status=>"P",
+                     creationdate=>$time_stamp_AD,
+                     gidnumber_wish=>$gidnumber_wish,
                   });
 }
 
