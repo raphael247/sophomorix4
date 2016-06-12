@@ -305,11 +305,14 @@ if ($test_firstpassword==1){
     my $count_success=0;
     my $count_fail=0;
     my $count_nofirstpass=0;
+    my @success=();
+    my @fail=();
+    my @nofirst=();
     print "Testing all Accounts if firstpassword works\n";
     # search for all users
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $ou_filter $school_token_filter $user_filter)"; 
     if($Conf::log_level>=2){
-        print "Filter: $filter\n";
+        print "Filter to find users: $filter\n";
     }
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -323,24 +326,36 @@ if ($test_firstpassword==1){
         my $entry = $mesg->entry($index);
         my $dn=$entry->dn();
         my $samaccount=$entry->get_value ('sAMAccountName');
-        print "* $samaccount: $dn\n";
         $count_tested++;
+        print "* $count_tested) $samaccount: $dn\n";
         my $res=&AD_login_test($ldap,$root_dse,$dn);
         if ($res==0){
             print "   * Login with firstpassword OK!\n";
             $count_success++;
+            push @success, "OK: $dn\n";
         } elsif ( $res==-1) {
             print "   * No firstpassword found!\n";
             $count_nofirstpass++;
+            push @nofirst, "No firstpassword found: $dn\n";
         } else {
             print "   * ERROR logging in with firstpassword: $res\n";
             $count_fail++;
+            push @fail, "Failed Login: $dn\n";
         }
     }
     &print_title("Test result:");
+    if($Conf::log_level>=2){
+        @success = sort @success;
+	@fail = sort @fail;
+	@nofirst = sort @nofirst;
+        foreach my $line (@success,@fail,@nofirst){
+            print "$line";
+        } 
+	&print_line;
+    }
     print "$count_tested tested:  $count_success OK,",
-          "  $count_fail with errors,",
-          " $count_nofirstpass without firstpassword attribute\n";
+          "  $count_fail Failed Logins,",
+          " $count_nofirstpass Without Firstpassword Attribute\n";
 }
 
 # # use the charlist of SophomorixBase
