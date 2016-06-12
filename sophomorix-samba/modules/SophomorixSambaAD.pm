@@ -2431,11 +2431,10 @@ sub AD_debug_logdump {
 
 
 sub AD_login_test {
+    # return 0: success
+    # return -1: nor firstpassword found
+    # return >0: Error code of smbclient command
     my ($ldap,$root_dse,$dn)=@_;
-    #my ($ldap,$root_dse,$user)=@_;
-    #print "User: >$user<\n";
-    #my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
-    #print "Count: $count $dn\n";
     my $filter="(cn=*)";
     my $mesg = $ldap->search(
                       base   => $dn,
@@ -2449,9 +2448,6 @@ sub AD_login_test {
     if (not defined $firstpassword){
         return -1;
     }
-    #print "FIRST: $firstpassword";
-    #print "Testing login of user $user with password $firstpassword\n";
-    #my $command="smbclient -L localhost --user=$user%$firstpassword > /dev/null 2>&1 ";
     my $command="smbclient -L localhost --user=$samaccount%$firstpassword > /dev/null 2>&1 ";
     print "   # $command\n";
     my $result=system($command);
