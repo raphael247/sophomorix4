@@ -6,19 +6,80 @@ sophomorix4/Samba4 weekly Nr. 7  (xx.06.2016)
 
 Info über Entwicklungs-Entscheidungen
 ------------------------------------------------------------
+Eigene Entscheidungen:
+--------------------------------------------
+Versteckte Klassen (z.B. Haumeisterklasse, usw.):
+ - es gibt nicht mehr den Schulklassentyp 'hiddenclass' für Klassen
+   sondern ein Attribut 'sophomorixHidden'. das z.B. auch bei 
+   Projekten, Räumen und andere Gruppen gesetzt werden kann
+
+
+
+Resultate des Entwicklertreffens am 10.6.16:
+---------------------------------------------
+- Dateisystem für linuxmusternet 7 ist ext4
+
+- User und Gruppennamen dürfen ab samba 4 leider nicht mehr gleich lauten
+
+- DNS: Arbeitsteilung 
+  A) Das linuxmuster-base-Paket erzeugt je nach Netzwerkkonfiguration
+     eine Datei mit erforederlichen DNS-Zonen
+  B) sophomorix-device sorgt dafür, dass diese DNS-Zonen existieren
+     und nicht mehr erforderliche DNS-Zonen gelöscht werden
+     Außerdem macht es DNS Einträge.
+- Nach Abklärung mit SerNet versuchen wir uidNumber und gidNumber
+  bei der Migration zu übernehmen 
+
+- Migration
+  A) Die Migration legt das Gesamt-Backup zu Grunde
+  B) Für eine schnellmigration/Migration mit geringer downtime
+     wird folgendes Vorgehen angeboten:
+     1) Backup OHNE /home und linbo images (geringe Datenmenge)
+        Damit kann der neue Server hochgezogen werden
+     2) Nachsyncen der Daten in /home und linbo images
+     3) linuxmusternet6 server: login/mailenpfang verhindern
+     4) nachsyncen der Daten in /home
+     5) umschalten auf neuen Server (IP, reboot, ...)
+
+- Schulkonsole:
+  - Ziel: Schulkonsole soll dasselbe anzeigen wie sophomorixBefehle
+  - Die Schulkonsole greift NICHT schreibend auf Samba AD zu.
+    -> ALLE Änderungen im AD laufen über sophomorix-Befehle
+  - Die Schule greift möglichst nicht lesend auf Samba AD
+    -> AD-abfragen werden über sophomorix-Befehle gemacht,
+       deren output geparst wird
+    -> alle abfragenden sophomorix-Befehle bekommen die option
+       --porcelain (ähnlich wie bei git), die einen über viele 
+       Versionen einfach zu parsenden output erzeugen
+    -> der nicht --porcelain output wird evtl. mit Farben 
+       aufgewertet (z.B. ERROR in rot usw.)  
+
+- User ID-Mapping:
+  Tut jetzt. Es hat ein Paket gefehlt 
+  id, ls -l, ....
+  getent passwd| group tut nicht (muss wohl so sein)
 
 
 Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 ------------------------------------------------------------
-
+- Verzeichnis-Hirarchie festlegen
+  (Pfade von $HOME der user, Tauschverzeichnisse, ...)
+- Gibt es weiter Daten, die in AD landen sollen?
+  (Druckerquota, Schulkonsole, ...)
+- Welche Administratoren soll es geben?
+  - brauchen sie eine uidNumber für Unix?
 
 Was habe ich seit dem letzten Weekly erledigt/verändert?
 ----------------------------------------------------------------------
+Migration:
+ - wurde weiter gebugfixt.
+ - uidnumber/gidnumer Übernahme
 
 
 Was mache ich als nächstes?
 ----------------------------------------------------------------------
-
+sophomorix-passwd: optionen zum laufen bringen
+sophomorix-device: DNS Einträge erstellen
 
 Kleinere Aufgaben, bei denen ich unterstützung brauchen könnte:
 ----------------------------------------------------------------------
@@ -26,7 +87,6 @@ Kleinere Aufgaben, bei denen ich unterstützung brauchen könnte:
  wenn jemand etwas übernehmen/recherchieren möchte)
 
   - Migration testen
-  - dns in samba
   - nscd: brauchts den nscd noch bei Ubuntu Xenial und samba 4?
 
 

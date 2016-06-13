@@ -23,7 +23,7 @@ wie testet man, obs tut?
 
 Schulkonsole: 
 Wo soll aufgeschrieben werden, wie user usw. abgefragt werden müssen, ...
-
+-> --porcelain output
 
 Idee:
 
@@ -53,7 +53,14 @@ drucker in devices.txt mit anderer nummer
 index definieren im schema
 
 
-id_mapping
+id_mapping zeigen
+
+# ldbsearch -H /var/lib/samba/private/idmap.ldb
+
+NT_STATUS_INVALID_SID
+siehe https://lists.samba.org/archive/samba-technical/2011-November/080319.html
+
+
 
 libnns winbind tut nicht
 
@@ -73,12 +80,41 @@ Todo: im ldap abspeichern/abrufen (momentan in /etc/sophomorix/user/...)
 
 Tests nach migration:
 
-- Bei welchen/wievielen Usern kann man sich mit dem firstpassword einloggen
+- OK: Bei welchen/wievielen Usern kann man sich mit dem firstpassword einloggen
   sophomorix-passwd --test-firstpassword
 
 - uidNumber und gidNumber testen mit:
   id user (output parsen) und mit den Daten vor der Migration vergleichen
   -> Fehler melden: 
+
+- Dürfen unix gid und uid dieselben vorkommen? 
+
+
+
+
+
+funktion create userlist neu schreiben:
+
+parameter:
+
+loginnamenliste
+klassenliste (auch lehrer)
+alle role students
+alle role teacher
+default: eingeschränkt alle ou's
+
+
+
+Idee:
+
+viele befehle brauchen eine ou als option
+
+sinnvoll wäre:
+
+wenn mehrschulsystem konfiguriert ist, 
+dann wird in den Befehlen die option --ou gefordert
+ODER: 1) es wird IMMER ou gefordert
+      2) wenn man nur eine hat, kann eine defeult OU in der config gesetzt werden 
 
 
 
