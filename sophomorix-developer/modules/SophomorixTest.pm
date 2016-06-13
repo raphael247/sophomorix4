@@ -222,26 +222,36 @@ sub AD_test_object {
 		"  * description is $description");
         }
         if (defined $uidnumber){
-            my $min=9999;
-            my $max=3000000;
             my $uidnumber_sys=$entry->get_value ('uidNumber');
-            my $uidnumber_ok=0;
-            if($uidnumber_sys > $min and $uidnumber_sys < $max){
-                $uidnumber_ok=1;
+            if ($uidnumber==-1){
+                my $min=9999;
+                my $max=3000000;
+                my $uidnumber_ok=0;
+                if($uidnumber_sys > $min and $uidnumber_sys < $max){
+                    $uidnumber_ok=1;
+                }
+                is ($uidnumber_ok,1,
+		    "  * uidNumber $uidnumber_sys between $max and $min");
+            } else {
+                is ($uidnumber_sys,$uidnumber,
+		    "  * uidNumber is $uidnumber");
             }
-            is ($uidnumber_ok,1,
-		"  * uidNumber $uidnumber_sys between $max and $min");
         }
         if (defined $gidnumber){
-            my $min=9999;
-            my $max=3000000;
             my $gidnumber_sys=$entry->get_value ('gidNumber');
-            my $gidnumber_ok=0;
-            if($gidnumber_sys > $min and $gidnumber_sys < $max){
-                $gidnumber_ok=1;
+            if ($gidnumber==-1){
+                my $min=9999;
+                my $max=3000000;
+                my $gidnumber_ok=0;
+                if($gidnumber_sys > $min and $gidnumber_sys < $max){
+                    $gidnumber_ok=1;
+                }
+                is ($gidnumber_ok,1,
+		    "  * gidNumber $gidnumber_sys between $max and $min");
+            } else {
+                is ($gidnumber_sys,$gidnumber,
+		    "  * gidNumber is $gidnumber");
             }
-            is ($gidnumber_ok,1,
-		"  * gidNumber $gidnumber_sys between $max and $min");
         }
         if (defined $upn){
             is ($entry->get_value ('userPrincipalName'),$upn,
