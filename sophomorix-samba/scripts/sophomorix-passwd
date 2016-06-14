@@ -51,6 +51,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
+                                 AD_user_update
                                  AD_group_create
                                  AD_group_addmember
                                  AD_group_update
@@ -85,6 +86,7 @@ my $info=0;
 my $ou="";
 my $school_token="";
 my $test_firstpassword=0;
+my $set_firstpassword="";
 
 my $user="";
 my $classes="";
@@ -145,6 +147,7 @@ my $testopt=GetOptions(
            "shell|loginshell=s" => \$shell,
            "force" => \$force,
            "test-firstpassword" => \$test_firstpassword,
+           "set-firstpassword=s" => \$set_firstpassword,
            "info|i" => \$info,
            "help|h" => \$help
           );
@@ -212,7 +215,11 @@ Create userlist:
   --project project1,project2,... 
   -r room1,room2,...   /  --rooms room1,room2,...
 
+
 Testing stuff:
+  --set-firstpassword 
+  --set-firstpassword -u user
+
   --test-firstpassword 
   --test-firstpassword -u user
 
@@ -299,7 +306,7 @@ if ($info==1) {
 &log_script_start(@arguments);
 
 
-# --test-firstpasswords
+# --test-firstpassword
 if ($test_firstpassword==1){
     my $count_tested=0;
     my $count_success=0;
@@ -357,6 +364,42 @@ if ($test_firstpassword==1){
           "  $count_fail Failed Logins,",
           " $count_nofirstpass Without Firstpassword Attribute\n";
 }
+
+
+
+############################################################
+# --set-firstpassword
+if ($set_firstpassword ne ""){
+    print "Setting firstpassword of users to: $set_firstpassword\n";
+    # search for all users
+    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $ou_filter $school_token_filter $user_filter)"; 
+    if($Conf::log_level>=2){
+        print "Filter to find users: $filter\n";
+    }
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['cn']
+                            );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn=$entry->dn();
+        my $samaccount=$entry->get_value ('sAMAccountName');
+        my $user_count=$index+1;
+        &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$samaccount,
+                     user_count=>$user_count,
+                     firstpassword=>$set_firstpassword,
+                   });
+
+    }
+}
+
 
 # # use the charlist of SophomorixBase
 # my @chars=&get_passwd_charlist();
