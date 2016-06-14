@@ -503,33 +503,95 @@ sub AD_user_update {
     my $birthdate = $arg_ref->{birthdate};
     my $user_count = $arg_ref->{user_count};
     my $user = $arg_ref->{user};
+    my $firstpassword = $arg_ref->{firstpassword};
 
-    # calculate missing attributes
-    my $display_name = $firstname_utf8." ".$surname_utf8;
+    my $displayname;
+    # hash of what to replace
+    my $replace=();
 
-    if($Conf::log_level>=1){
-        print "\n";
-        &Sophomorix::SophomorixBase::print_title(
-              "Updating User $user_count : $user");
-        print "   DN:                 $dn\n";
-        print "   Surname(ASCII):     $surname_ascii\n";
-        print "   Surname(UTF8):      $surname_utf8\n";
-        print "   Firstname(ASCII):   $firstname_ascii\n";
-        print "   Firstname(UTF8):    $firstname_utf8\n";
-        print "   Birthday:           $birthdate\n";
+    if (defined $firstname_utf8 and 
+        defined $surname_utf8 and
+        defined $firstname_ascii and
+        defined $surname_ascii){
+        # ok if all 4 are defined
+    } elsif (not defined $firstname_utf8 and 
+             not defined $surname_utf8 and
+             not defined $firstname_ascii and
+             not defined $surname_ascii){
+        # ok if none are defined
+    } else {
+        print "ERROR updating $user -> givenName,sn,sophomorixFirstnameASCII,sophomorixSurnameASCII\n";
+        return;
     }
 
-    my $mesg = $ldap->modify( $dn,
-		      replace => {
-                          sophomorixFirstnameASCII => $firstname_ascii,
-                          sophomorixSurnameASCII => $surname_ascii,
-                          sophomorixBirthdate => $birthdate,
-                          givenName => $firstname_utf8,
-                          sn => $surname_utf8,
-                          displayName => [$display_name],
 
-                      }
+    print "\n";
+    &Sophomorix::SophomorixBase::print_title(
+          "Updating User $user_count : $user");
+    print "   DN: $dn\n";
+
+
+
+    if (defined $firstname_utf8){
+        $replace{'givenName'}=$firstname_utf8;
+        print "   givenName:                 $firstname_utf8\n";
+    }
+    if (defined $surname_utf8){
+        $replace{'sn'}=$surname_utf8;
+        print "   sn:                        $surname_utf8\n";
+    }
+    if (defined $firstname_utf8 and $surname_utf8){
+        $display_name = $firstname_utf8." ".$surname_utf8;
+        $replace{'displayName'}=$display_name;
+        print "   displayName:               $display_name\n";
+    }
+    if (defined $firstname_ascii){
+        $replace{'sophomorixFirstnameASCII'}=$firstname_ascii;
+        print "   sophomorixFirstnameASCII:  $firstname_ascii\n";
+    }
+    if (defined $surname_ascii){
+        $replace{'sophomorixSurnameASCII'}=$surname_ascii;
+        print "   sophomorixSurnameASCII:    $surname_ascii\n";
+    }
+    if (defined $birthdate){
+        $replace{'sophomorixBirthdate'}=$birthdate;
+        print "   sophomorixBirthdate:       $birthdate\n";
+    }
+    if (defined $firstpassword){
+        $replace{'sophomorixFirstpassword'}=$firstpassword;
+        print "   Firstpassword:             $firstpassword\n";
+    }
+#    # calculate missing attributes
+#    my $display_name = $firstname_utf8." ".$surname_utf8;
+
+#    if($Conf::log_level>=1){
+#        print "\n";
+#        &Sophomorix::SophomorixBase::print_title(
+#              "Updating User $user_count : $user");
+#        print "   DN:                 $dn\n";
+#        print "   Surname(ASCII):     $surname_ascii\n";
+#        print "   Surname(UTF8):      $surname_utf8\n";
+#        print "   Firstname(ASCII):   $firstname_ascii\n";
+#        print "   Firstname(UTF8):    $firstname_utf8\n";
+#        print "   Birthday:           $birthdate\n";
+#    }
+
+    my $mesg = $ldap->modify( $dn,
+		      replace => { %replace }
                );
+
+
+#    my $mesg = $ldap->modify( $dn,
+#		      replace => {
+#                          sophomorixFirstnameASCII => $firstname_ascii,
+#                          sophomorixSurnameASCII => $surname_ascii,
+#                          sophomorixBirthdate => $birthdate,
+#                          givenName => $firstname_utf8,
+#                          sn => $surname_utf8,
+#                          displayName => [$display_name],
+#
+#                      }
+#               );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 }
 
