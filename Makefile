@@ -228,6 +228,7 @@ install-vampire:
 	### install-vampire
 	@install -d -m755 -oroot -groot $(VAMPIRECONF)
 	@install -oroot -groot --mode=0644 sophomorix-vampire/config-dump-vampire-common/migration-6-to-7.conf $(VAMPIRECONF)
+	@install -oroot -groot --mode=0644 sophomorix-vampire/ldif/ldif-pwdload.ldif.template $(VAMPIRECONF)
 
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-vampire/scripts/sophomorix-vampire $(DESTDIR)/usr/sbin
