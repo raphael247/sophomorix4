@@ -83,6 +83,9 @@ my $create_class_adminadd_script=0;
 my $class_adminadd_script_input="/data/root/sophomorix-dump-viewdumps/memberdata_view.sql";
 my $class_adminadd_script_output="/root/sophomorix-vampire-classes-adminadd.sh";
 
+# --verify-uid-gid
+my $verify_uid_gid=0;
+
 my $missig_files_count=0;
 my $overwriting_files_count=0;
 # ===========================================================================
@@ -101,6 +104,7 @@ my $testopt=GetOptions(
            "create-project-script" => \$create_project_script,
            "create-class-script" => \$create_class_script,
            "create-class-adminadd-script" => \$create_class_adminadd_script,
+           "verify-uid-gid" => \$verify_uid_gid,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -805,7 +809,63 @@ if ($create_project_script==1){
     system("chmod 755 $project_script_output");
 }
 
+# --verify-uid-gid
+if ($verify_uid_gid==1){
+    print "Verifying if uidNumbers and gidNumber are correct (using command: id)\n";
+    my @loglines=();
+    my %gid_seen=();
+    my ($ldap,$root_dse) = &AD_bind_admin();
+    print "Importing user passwords\n";
+    open(ADD,"<$sophomorix_add_output") || die "ERROR: $!";
+    my $lines=0;
+    my $errors=0;
+    while (<ADD>){
+        $lines++;
+        chomp();
+        my (@add)=split(/::/);
+        my $group=$add[0];
+        my $user=$add[2];
+        my $uidnumber=$add[4];
+        my $gidnumber=$add[5];
 
+        # testing user -> uidNumber
+        my $uid_full_sys = getpwuid($uidnumber);
+        my ($tring,$uid_sys)=split(/\\/,$uid_full_sys);
+        if ($uid_sys eq $user){
+            print "OK: uidNumber $uidnumber is user $uid_sys\n";
+        } else {
+            $errors++;
+            print "ERROR: $uidnumber and $user\n";
+            push @loglines, 
+              "user $user and uidNumber $uidnumber with problems (check with: # id $user)\n";
+        }
+ 
+        # testing primary group -> gidNumber
+        if (not exists $gid_seen{$gidnumber}){
+            $gid_seen{$gidnumber}="seen";
+            my $gid_full_sys = getgrgid($gidnumber);
+            my ($tring,$gid_sys)=split(/\\/,$gid_full_sys);
+            #print "$gid_full_sys $gid_sys     $gidnumber\n ";
+            if ($gid_sys eq $group){
+                print "   OK: gidNumber $gidnumber is group $gid_sys\n";
+            } else {
+                $errors++;
+                print "ERROR: $gidnumber and $group\n";
+                push @loglines, 
+                  "group $group and gidNumber $gidnumber with problems (check with: # id $user)\n";
+            }
+        }
+    }
+
+
+    
+
+
+    print "\n$errors ERRORS:\n";
+    foreach my $line (@loglines){
+        print "  * $line";
+    }
+}
 
 
 
