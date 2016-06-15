@@ -54,8 +54,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_group_list
                                  get_forbidden_logins
-                                 next_free_gidnumber_set
-                                 next_free_gidnumber_get
                                     );
 my @arguments = @ARGV;
 
@@ -71,8 +69,8 @@ my $help=0;
 my $info=0;
 my $class="";
 my $create=0;
-my $gidnumber=-1;
-my $gidnumber_wish;
+my $gidnumber_wish="---"; # used on creation of class
+my $set_gidnumber; # used on update
 my $kill=0;
 my $ou="---";
 my $school_token="---";
@@ -87,7 +85,6 @@ my $join;
 my $hide;
 my $maxmembers;
 my $creationdate;
-my $set_gidnumber;
 
 my $members;
 my $addmembers;
@@ -106,7 +103,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "class|c=s" => \$class,
            "create" => \$create,
-           "gidnumber=i" => \$gidnumber,
+           "gidnumber=i" => \$gidnumber_wish,
            "kill" => \$kill,
            "ou=s" => \$ou,
            "school-token=s" => \$school_token,
@@ -218,13 +215,6 @@ if ($class ne "" and $info==1){
 # --create --class <name>
 ############################################################
 if ($create==1 and $class ne ""){
-    # --gidnumber
-    ############################################################
-    if ($gidnumber==-1){
-       $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    } else {
-	$gidnumber_wish=$gidnumber;
-    }
    &AD_ou_add({ldap=>$ldap,
                root_dse=>$root_dse,
                ou=>$ou,
@@ -380,7 +370,7 @@ if (defined $creationdate){
 }
 
 # --set-gidnumber <num>
-if (defined $gidnumber){
+if (defined $set_gidnumber){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
