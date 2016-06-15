@@ -1745,6 +1745,7 @@ sub AD_group_update {
     my $membergroups = $arg_ref->{membergroups};
     my $admingroups = $arg_ref->{admingroups};
     my $creationdate = $arg_ref->{creationdate};
+    my $gidnumber = $arg_ref->{gidnumber};
 
     my $sync_members=0;
 
@@ -1812,6 +1813,11 @@ sub AD_group_update {
     if (defined $creationdate){
         print "   * Setting sophomorixCreationDate to $creationdate\n";
         my $mesg = $ldap->modify($dn,replace => {sophomorixCreationDate => $creationdate}); 
+    }
+    # gidnumber   
+    if (defined $gidnumber){
+        print "   * Setting gidNumber to $gidnumber\n";
+        my $mesg = $ldap->modify($dn,replace => {gidNumber => $gidnumber}); 
     }
     # members   
     if (defined $members){

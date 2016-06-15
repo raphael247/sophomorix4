@@ -87,6 +87,7 @@ my $join;
 my $hide;
 my $maxmembers;
 my $creationdate;
+my $set_gidnumber;
 
 my $members;
 my $addmembers;
@@ -115,6 +116,7 @@ my $testopt=GetOptions(
            "status=s" => \$status,
            "maxmembers=s" => \$maxmembers,
            "creationdate=s" => \$creationdate,
+           "set-gidnumber=i" => \$set_gidnumber,
            "mailalias!" => \$mailalias,
            "maillist!" => \$maillist,
            "join!" => \$join,
@@ -168,6 +170,7 @@ Changing an adminclass:
 This is for migration/testing/fixing only:
   --create --class <adminclass> --gidnumber <num>
   --creationdate <20150529093330.0Z> (only for migration)
+  --set-gidnumber <num>
   --members user1,user2,user3, ... 
   --addmembers user1,user2,user3, ...
   --removemembers user1,user2,user3, ...
@@ -370,6 +373,16 @@ if (defined $creationdate){
                       dn=>$dn_class,
                       type=>"adminclass",
                       creationdate=>$creationdate,
+                    });
+}
+
+# --set-gidnumber <num>
+if (defined $gidnumber){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      gidnumber=>$set_gidnumber,
                     });
 }
 
