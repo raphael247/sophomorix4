@@ -866,7 +866,8 @@ sub AD_ou_add {
     }
 
     my $dn="OU=".$ou.",".$root_dse;
-    # provide that a ou SCHOOLNAME exists
+
+    # providing ou SCHOOLNAME
     my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     if($Conf::log_level>=2){
@@ -903,29 +904,48 @@ sub AD_ou_add {
     }
     # create parent
     my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    # create group
-    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $dn_group,
-                         attr => [
-                           cn   => $group,
-                           sAMAccountName => $group,
-                           sophomorixCreationDate => $creationdate,
-                           sophomorixStatus => "P",
-                           sophomorixType => "adminclass",
-                           sophomorixJoinable=>"TRUE",
-                           sophomorixHidden => "FALSE",
-                           sophomorixMaxmembers=> "0",
-                           sophomorixQuota=> "---",
-                           sophomorixMailQuota=> "-1",
-                           sophomorixMailalias => "FALSE",
-                           sophomorixMaillist => "FALSE",
-                           description => "LML Teachers $ou",
-                           gidNumber => $gidnumber_wish,
-                           objectclass => ['top',
-                                             'group' ],
-                         ]
-                     );
 
+    # create group
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      group=>$group,
+                      description=>"LML Teachers $ou",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+#}
+
+
+### del start
+    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    # $result = $ldap->add( $dn_group,
+    #                      attr => [
+#    #                        cn   => $group,
+#    #                        sAMAccountName => $group,
+#    #                        sophomorixCreationDate => $creationdate,
+#    #                        sophomorixStatus => "P",
+#    #                        sophomorixType => "adminclass",
+#    #                        sophomorixJoinable=>"TRUE",
+#    #                        sophomorixHidden => "FALSE",
+#    #                        sophomorixMaxmembers=> "0",
+#    #                        sophomorixQuota=> "---",
+#    #                        sophomorixMailQuota=> "-1",
+#    #                        sophomorixMailalias => "FALSE",
+#    #                        sophomorixMaillist => "FALSE",
+    #                        description => "LML Teachers $ou",
+    #                        gidNumber => $gidnumber_wish,
+    #                        objectclass => ['top',
+    #                                          'group' ],
+    #                      ]
+    #                  );
+### del end
     # <token>-students
     $group=$token.$DevelConf::student;
 
@@ -938,27 +958,42 @@ sub AD_ou_add {
     # create parent
     $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
-    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $dn_group,
-                         attr => [
-                             cn   => $group,
-                             sAMAccountName => $group,
-                             sophomorixCreationDate => $creationdate,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             description => "LML Students $ou",
-                             gidNumber => $gidnumber_wish,
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      group=>$group,
+                      description=>"LML Students $ou",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+
+    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    # $result = $ldap->add( $dn_group,
+    #                      attr => [
+    #                          cn   => $group,
+    #                          sAMAccountName => $group,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          description => "LML Students $ou",
+    #                          gidNumber => $gidnumber_wish,
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
 
     # <token>-examaccounts
     $group=$token.$DevelConf::examaccount;
@@ -971,27 +1006,43 @@ sub AD_ou_add {
     # create parent
     $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
-    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $dn_group,
-                         attr => [
-                             cn   => $group,
-                             sAMAccountName => $group,
-                             sophomorixCreationDate => $creationdate,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             description => "LML ExamAccounts $ou",
-                             gidNumber => $gidnumber_wish,
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      group=>$group,
+                      description=>"LML Examaccounts $ou",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+
+
+    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    # $result = $ldap->add( $dn_group,
+    #                      attr => [
+    #                          cn   => $group,
+    #                          sAMAccountName => $group,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          description => "LML ExamAccounts $ou",
+    #                          gidNumber => $gidnumber_wish,
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
 
 
     # <token>-wifi
@@ -1000,27 +1051,42 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
-    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $dn_group,
-                         attr => [
-                             cn   => $group,
-                             sAMAccountName => $group,
-                             sophomorixCreationDate => $creationdate,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             description => "LML Wifigroup $ou",
-                             gidNumber => $gidnumber_wish,
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
+    # create group
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      group=>$group,
+                      description=>"LML Wifigroup $ou",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    # $result = $ldap->add( $dn_group,
+    #                      attr => [
+    #                          cn   => $group,
+    #                          sAMAccountName => $group,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          description => "LML Wifigroup $ou",
+    #                          gidNumber => $gidnumber_wish,
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
 
     # <token>-internet
     $group=$token.$DevelConf::AD_internet_group;
@@ -1028,31 +1094,42 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
-    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $dn_group,
-                         attr => [
-                             cn   => $group,
-                             sophomorixCreationDate => $creationdate,
-                             sAMAccountName => $group,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             description => "LML Internetaccess $ou",
-                             gidNumber => $gidnumber_wish,
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
-
-
-
-
+    # create group
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      group=>$group,
+                      description=>"LML Internetaccess $ou",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    # $result = $ldap->add( $dn_group,
+    #                      attr => [
+    #                          cn   => $group,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sAMAccountName => $group,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          description => "LML Internetaccess $ou",
+    #                          gidNumber => $gidnumber_wish,
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
     ############################################################
     # OU=GLOBAL
     { # start: make the following vars for OU=GLOBAL local vars
@@ -1078,76 +1155,125 @@ sub AD_ou_add {
 
     # students in Groups,OU=GLOBAL
     my $global_dn_group="CN=global-".$DevelConf::student.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
-    $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $global_dn_group,
-                         attr => [
-                             cn => "global-".$DevelConf::student,
-                             sAMAccountName => "global-".$DevelConf::student,
-                             sophomorixCreationDate => $creationdate,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             description => "LML Global Students",
-                             gidNumber => $gidnumber_wish,
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
+    # create group
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$global_dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      cn=>"global-".$DevelConf::student,
+                      group=>"global-".$DevelConf::student,
+                      description=>"LML Global Students",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    # $result = $ldap->add( $global_dn_group,
+    #                      attr => [
+    #                          cn => "global-".$DevelConf::student,
+    #                          sAMAccountName => "global-".$DevelConf::student,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          description => "LML Global Students",
+    #                          gidNumber => $gidnumber_wish,
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
     if($Conf::log_level>=2){
         print "   * Adding OU=SOPHOMOROX global-groups ...\n";
     }
     # teachers in Groups,OU=GLOBAL
     $global_dn_group="CN=global-".$DevelConf::teacher.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $global_dn_group,
-                         attr => [
-                             cn => "global-".$DevelConf::teacher,
-                             sAMAccountName => "global-".$DevelConf::teacher,
-                             sophomorixCreationDate => $creationdate,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             description => "LML Global Teachers",
-                             gidNumber => $gidnumber_wish,
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
+    # create group
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$global_dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      cn=>"global-".$DevelConf::teacher,
+                      group=>"global-".$DevelConf::teacher,
+                      description=>"LML Global Teachers",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+
+    # $result = $ldap->add( $global_dn_group,
+    #                      attr => [
+    #                          cn => "global-".$DevelConf::teacher,
+    #                          sAMAccountName => "global-".$DevelConf::teacher,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          description => "LML Global Teachers",
+    #                          gidNumber => $gidnumber_wish,
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
     # ExamAccounts in Groups,OU=GLOBAL
     $global_dn_group="CN=global-".$DevelConf::examaccount.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    $result = $ldap->add( $global_dn_group,
-                         attr => [
-                             cn => "global-".$DevelConf::examaccount,
-                             sAMAccountName => "global-".$DevelConf::examaccount,
-                             sophomorixCreationDate => $creationdate,
-                             sophomorixStatus => "P",
-                             sophomorixType => "adminclass",
-                             sophomorixJoinable=>"TRUE",
-                             sophomorixHidden => "FALSE",
-                             sophomorixMaxmembers=> "0",
-                             sophomorixQuota=> "---",
-                             sophomorixMailQuota=> "-1",
-                             sophomorixMailalias => "FALSE",
-                             sophomorixMaillist => "FALSE",
-                             gidNumber => $gidnumber_wish,
-                             description => "LML Global ExamAccounts",
-                             objectclass => ['top',
-                                               'group' ],
-                         ]
-                     );
+    # create group
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn_wish=>$global_dn_group,
+                      ou=>"unused together with dn_wish",
+                      school_token=>$token,
+                      cn=>"global-".$DevelConf::examaccount,
+                      group=>"global-".$DevelConf::examaccount,
+                      description=>"LML Global ExamAccounts",
+                      type=>"adminclass",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"TRUE",
+                      hidden=>"FALSE",
+                      gidnumber_wish=>$gidnumber_wish,
+                  });
+    # $result = $ldap->add( $global_dn_group,
+    #                      attr => [
+    #                          cn => "global-".$DevelConf::examaccount,
+    #                          sAMAccountName => "global-".$DevelConf::examaccount,
+    #                          sophomorixCreationDate => $creationdate,
+    #                          sophomorixStatus => "P",
+    #                          sophomorixType => "adminclass",
+    #                          sophomorixJoinable=>"TRUE",
+    #                          sophomorixHidden => "FALSE",
+    #                          sophomorixMaxmembers=> "0",
+    #                          sophomorixQuota=> "---",
+    #                          sophomorixMailQuota=> "-1",
+    #                          sophomorixMailalias => "FALSE",
+    #                          sophomorixMaillist => "FALSE",
+    #                          gidNumber => $gidnumber_wish,
+    #                          description => "LML Global ExamAccounts",
+    #                          objectclass => ['top',
+    #                                            'group' ],
+    #                      ]
+    #                  );
 
     } # end: make the following vars for OU=GLOBAL local vars
     &AD_debug_logdump($result,2,(caller(0))[3]);
@@ -2190,17 +2316,28 @@ sub AD_group_create {
     my $status = $arg_ref->{status};
     my $joinable = $arg_ref->{joinable};
     my $gidnumber_wish = $arg_ref->{gidnumber_wish};
+    my $dn_wish = $arg_ref->{dn_wish};
+    my $cn = $arg_ref->{cn};
 
     if (not defined $joinable){
         $joinable="FALSE";    
     }
+
+    if (not defined $cn){
+        $cn=$group;    
+    }
+
     $ou=&AD_get_ou_tokened($ou);
 
     # calculate missing Attributes
     my $container=&AD_get_container($type,$group);
     my $target_branch=$container."OU=".$ou.",".$root_dse;
-    my $dn = "CN=".$group.",".$container."OU=".$ou.",".$root_dse;
 
+    my $dn = "CN=".$group.",".$container."OU=".$ou.",".$root_dse;
+    if (defined $dn_wish){
+        # override DN
+        $dn=$dn_wish;
+    }
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
         # adding the group
@@ -2223,7 +2360,7 @@ sub AD_group_create {
         # Create object
         my $result = $ldap->add( $dn,
                                 attr => [
-                                    cn   => $group,
+                                    cn   => $cn,
                                     description => $description,
                                     sAMAccountName => $group,
                                     sophomorixCreationDate => $creationdate, 
@@ -2261,12 +2398,15 @@ sub AD_group_create {
             # a group like 7a, 7b
             #print "Student class of the school: $group\n";
             my $token_students=&AD_get_name_tokened($DevelConf::student,$school_token,"adminclass");
-            # add the group to <token>-students
-            &AD_group_addmember({ldap => $ldap,
-                                 root_dse => $root_dse, 
-                                 group => $token_students,
-                                 addgroup => $group,
-                               });
+  
+            if ($token_students ne $group){ # do not add group to itself
+                # add the group to <token>-students
+                &AD_group_addmember({ldap => $ldap,
+                                     root_dse => $root_dse, 
+                                     group => $token_students,
+                                     addgroup => $group,
+                                   });
+            }
             # add group <token>-students to global-students
             &AD_group_addmember({ldap => $ldap,
                                  root_dse => $root_dse, 
