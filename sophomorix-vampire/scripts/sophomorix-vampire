@@ -35,6 +35,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_group_list
+                                 AD_object_search
                                     );
 
 my @arguments = @ARGV;
@@ -67,6 +68,11 @@ my $create_add_file=0;
 my $sophomorix_add_input_sql="/data/root/sophomorix-dump-viewdumps/userdata_view.sql";
 my $sophomorix_add_output="/root/sophomorix.add";
 
+# --import-user-passwords
+my $import_user_passwords=0;
+my $import_user_pwd_ldif_template="/usr/share/sophomorix-vampire/ldif-pwdload.ldif.template";
+my $import_user_pwd_ldif="/root/sophomorix-vampire-import-pwd.ldif";
+
 # --create-project-script
 my $create_project_script=0;
 my $project_script_input="/data/root/sophomorix-dump.projects";
@@ -91,6 +97,7 @@ my $testopt=GetOptions(
            "analyze" => \$analyze,
            "datadir=s" => \$datadir,
            "create-add-file" => \$create_add_file,
+           "import-user-passwords" => \$import_user_passwords,
            "create-project-script" => \$create_project_script,
            "create-class-script" => \$create_class_script,
            "create-class-adminadd-script" => \$create_class_adminadd_script,
@@ -143,17 +150,19 @@ Vampire data into the new server V7:
    # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
    # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
    # sophomorix-add (Add the users)
-4. Create admin add script for classes and run it:
+4. Import the hashed passwords into AD (if you want users to keep their password) 
+   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --import-user-passwords
+5. Create script for adminclasses and run it:
    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
    # /root/sophomorix-vampire-classes-adminadd.sh
-5. Create project script and run it:
+6. Create project script and run it:
    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
    # /root/sophomorix-vampire-projects.sh
-6. Copy configuration files into new server:
+7. Copy configuration files into new server:
    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
-7. Import the workstations (later use linuxmuster command)
+8. Import the workstations (later use linuxmuster command)
    # sophomorix-device
-8. Manually do the rest (will be automated):
+9. Manually do the rest (will be automated):
    Copy files in /etc/sophomorix/user/mail/* to new server.
 
 Getting information:
@@ -512,10 +521,7 @@ if ($create_add_file==1){
                 $class=$line{'gid'};
             }
    
-            # passwords
-            # not concerted:
-            # my $unicodePwd=$line{"sambantpassword"};
-            # 
+            # password hashes are converted to utf8
             my $unicodePwd=`/usr/sbin/sophomorix-vampire-pwdconvert $line{"sambantpassword"}`;
             chomp($unicodePwd);
             # create_line
@@ -555,6 +561,63 @@ if ($create_add_file==1){
         my $line_part=substr($line,0,65);
         print "  LINE: $line_part ...\n";
     }
+}
+
+
+##################################################
+# --import_user_passwords
+if ($import_user_passwords==1){
+    my @loglines=();
+    my ($ldap,$root_dse) = &AD_bind_admin();
+    print "Importing user passwords\n";
+    open(ADD,"<$sophomorix_add_output") || die "ERROR: $!";
+    my $lines=0;
+    my $errors=0;
+    while (<ADD>){
+        $lines++;
+        chomp();
+        my (@add)=split(/::/);
+        my $samaccount=$add[2];
+        my $firstpassword=$add[3];
+        my $pass=$add[16];
+        my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$samaccount);
+        print "\n";
+        print "$lines) $samaccount:  imorting Hash: $pass\n";
+        print "   DN: $dn\n";
+
+        # creating ldif file
+        open(LDIF,">$import_user_pwd_ldif")|| die "ERROR: $!";
+	print LDIF "dn: $dn\n";
+        print LDIF "changetype: modify\n";
+        print LDIF "replace: unicodePwd\n";
+        print LDIF "unicodePwd:: $pass\n";
+        close(LDIF);
+
+        # load ldif file
+        my $com="ldbmodify -H /var/lib/samba/private/sam.ldb --controls=local_oid:1.3.6.1.4.1.7165.4.3.12:0 $import_user_pwd_ldif";
+        my $res=system($com);
+        if (not $res==0){
+            $errors++;
+            print "ERROR: $res returned\n";
+            push @loglines, "Not updated Hash (Return: $res): $samaccount\n";
+        }
+
+        # update first password
+        my $firstpwd_set_command="sophomorix-passwd --set-firstpassword \"$firstpassword\" -u $samaccount";
+        print "   $firstpwd_set_command\n";
+        my $ret=system($firstpwd_set_command);
+        if (not $res==0){
+            $errors++;
+            print "ERROR: $ret returned\n";
+            push @loglines, "Not updated Firstpassword (Return: $ret): $samaccount\n";
+        }
+
+    }
+    print "\n$errors ERRORS:\n";
+    foreach my $line (@loglines){
+        print "  * $line";
+    }
+    &AD_unbind_admin($ldap);
 }
 
 ##################################################
