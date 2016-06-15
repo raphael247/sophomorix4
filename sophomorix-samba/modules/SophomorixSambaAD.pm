@@ -524,13 +524,9 @@ sub AD_user_update {
         return;
     }
 
-
-    print "\n";
     &Sophomorix::SophomorixBase::print_title(
           "Updating User $user_count : $user");
     print "   DN: $dn\n";
-
-
 
     if (defined $firstname_utf8){
         $replace{'givenName'}=$firstname_utf8;

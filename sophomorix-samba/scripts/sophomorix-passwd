@@ -370,7 +370,6 @@ if ($test_firstpassword==1){
 ############################################################
 # --set-firstpassword
 if ($set_firstpassword ne ""){
-    print "Setting firstpassword of users to: $set_firstpassword\n";
     # search for all users
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $ou_filter $school_token_filter $user_filter)"; 
     if($Conf::log_level>=2){
