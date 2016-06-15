@@ -620,6 +620,9 @@ if ($count>1){
     print "\n$count Projects found.\n";
     print "Specify the school-token to choose a project\n\n";
     exit $count;
+} elsif ($count==0){
+    print "\nERROR retrieving project $project: $count project found.\n\n";
+    exit $count;
 }
 
 

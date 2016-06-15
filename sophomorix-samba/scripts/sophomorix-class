@@ -266,8 +266,11 @@ if ($kill==1 and $class ne ""){
 my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
 
 if ($count>1){
-    print "\n$count Projects found.\n";
+    print "\n$count classes found.\n";
     print "Specify the school-token to choose a project\n\n";
+    exit $count;
+} elsif ($count==0){
+    print "\nERROR retrieving class $class: $count class found.\n\n";
     exit $count;
 }
 
