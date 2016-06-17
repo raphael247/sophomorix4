@@ -160,6 +160,7 @@ install-sophomorix-samba:
 # installing configs for root
 	@install -d -m755 -oroot -groot $(CONF)/user
 	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix.conf $(CONF)/user
+	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix-schools.conf $(CONF)/user
 #	@install -oroot -groot --mode=0600 sophomorix-samba/config/quota.txt $(CONF)/user
 #	@install -oroot -groot --mode=0600 sophomorix-samba/config/mailquota.txt $(CONF)/user
 	@install -d -m755 -oroot -groot $(CONF)/project
@@ -173,6 +174,7 @@ install-sophomorix-samba:
 # configs for developers
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-devel.conf $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-RoleType.conf $(DEVELCONF)/devel
 #	@install -oroot -groot --mode=0644 sophomorix-base/config-devel/sophomorix-support.conf $(DEVELCONF)/devel
 #	@install -oroot -groot --mode=0600 sophomorix-base/config-devel/repair.directories $(DEVELCONF)/devel
 #	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/repair-directories-alt
