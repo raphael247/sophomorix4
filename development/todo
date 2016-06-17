@@ -1,3 +1,39 @@
+Bugs after moving to xenial
+- membeships of the default groups are not correct
+   --> add tests
+
+- migration:
+first test if 
+remove group teachers first in classes.sh if existing
+then recreate it with uid=10000
+or: add gobal and  
+
+
+
+wbinfo:
+wbinfo -u    (listet alle user)
+wbinfo -g    (listet alle groups)
+
+'Zeile' aus passwd
+   wbinfo -i USER
+   wbinfo --user-info=USERNAME
+'Zeile' aus group
+wbinfo --group-info=GROUPNAME
+
+Alle gidnumbers of user
+wbinfo -r USER
+wbinfo --user-groups=USER
+
+wbinfo --pam-logon=sch42%'LinuxMuster!' (test pam login)
+wbinfo --krb5auth=sch42%'LinuxMuster!'  (authenticat using kerberos)
+
+wbinfo --all-domains
+   BUILTIN
+   LINUXMUSTER
+
+
+
+
 Questions:
 show/hidden bei klassen ist Attribut
 (es gibt keine hiddenclass mehr)
@@ -56,6 +92,26 @@ index definieren im schema
 id_mapping zeigen
 
 # ldbsearch -H /var/lib/samba/private/idmap.ldb
+
+Edit idmap.ldb: (https://wiki.samba.org/index.php/User_and_Group_management)
+
+UID-Mapping:
+1) Find sid with
+   # wbinfo --name-to-sid <user>
+   # wbinfo -n <user>
+   ---> sid
+2) # wbinfo --sid-to-uid <sid from 1)>
+   # wbinfo -S <sid from 1)>
+   ---> uidnumber
+3) ldbedit -e emacs -H /var/lib/samba/private/idmap.ldb objectsid=<sid from 1)>
+
+
+GID-Mapping
+4) # wbinfo --user-sids=<usersid from 1)>
+   The first is the user sid
+   Then group sids follow
+
+
 
 NT_STATUS_INVALID_SID
 siehe https://lists.samba.org/archive/samba-technical/2011-November/080319.html
@@ -249,6 +305,10 @@ new:
    unicodePwd
   
 Migration:
+
+die mit AD_ou_add angelegten gruppen müssen eine gid bekommen
+teachers: 10000 bei migration
+
 
 add ldif file that updates
 unicodePwd AND sophomorixFirstPassword
