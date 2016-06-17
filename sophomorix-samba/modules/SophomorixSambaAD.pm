@@ -389,6 +389,12 @@ sub AD_user_create {
     my $deactivationdate = $arg_ref->{deactivationdate};
     my $status = $arg_ref->{status};
 
+    if($Conf::log_level>=1){
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title(
+              "Creating User $user_count : $login");
+    }
+
     # set defaults if not defined
     if (not defined $identifier){
         $identifier="---";
@@ -425,9 +431,9 @@ sub AD_user_create {
     my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
 
     if($Conf::log_level>=1){
-        print "\n";
-        &Sophomorix::SophomorixBase::print_title(
-              "Creating User $user_count : $login");
+#        print "\n";
+#        &Sophomorix::SophomorixBase::print_title(
+#              "Creating User $user_count : $login");
         print "   DN:                 $dn\n";
         print "   DN(Parent):         $dn_class\n";
         print "   Surname(ASCII):     $surname_ascii\n";
@@ -920,32 +926,7 @@ sub AD_ou_add {
                       hidden=>"FALSE",
                       gidnumber_wish=>$gidnumber_wish,
                   });
-#}
 
-
-### del start
-    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    # $result = $ldap->add( $dn_group,
-    #                      attr => [
-#    #                        cn   => $group,
-#    #                        sAMAccountName => $group,
-#    #                        sophomorixCreationDate => $creationdate,
-#    #                        sophomorixStatus => "P",
-#    #                        sophomorixType => "adminclass",
-#    #                        sophomorixJoinable=>"TRUE",
-#    #                        sophomorixHidden => "FALSE",
-#    #                        sophomorixMaxmembers=> "0",
-#    #                        sophomorixQuota=> "---",
-#    #                        sophomorixMailQuota=> "-1",
-#    #                        sophomorixMailalias => "FALSE",
-#    #                        sophomorixMaillist => "FALSE",
-    #                        description => "LML Teachers $ou",
-    #                        gidNumber => $gidnumber_wish,
-    #                        objectclass => ['top',
-    #                                          'group' ],
-    #                      ]
-    #                  );
-### del end
     # <token>-students
     $group=$token.$DevelConf::student;
 
@@ -973,28 +954,6 @@ sub AD_ou_add {
                       gidnumber_wish=>$gidnumber_wish,
                   });
 
-    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    # $result = $ldap->add( $dn_group,
-    #                      attr => [
-    #                          cn   => $group,
-    #                          sAMAccountName => $group,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          description => "LML Students $ou",
-    #                          gidNumber => $gidnumber_wish,
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
-
     # <token>-examaccounts
     $group=$token.$DevelConf::examaccount;
     $target_branch="OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
@@ -1021,30 +980,6 @@ sub AD_ou_add {
                       gidnumber_wish=>$gidnumber_wish,
                   });
 
-
-    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    # $result = $ldap->add( $dn_group,
-    #                      attr => [
-    #                          cn   => $group,
-    #                          sAMAccountName => $group,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          description => "LML ExamAccounts $ou",
-    #                          gidNumber => $gidnumber_wish,
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
-
-
     # <token>-wifi
     $group=$token.$DevelConf::AD_wifi_group;
     $dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
@@ -1066,27 +1001,6 @@ sub AD_ou_add {
                       hidden=>"FALSE",
                       gidnumber_wish=>$gidnumber_wish,
                   });
-    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    # $result = $ldap->add( $dn_group,
-    #                      attr => [
-    #                          cn   => $group,
-    #                          sAMAccountName => $group,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          description => "LML Wifigroup $ou",
-    #                          gidNumber => $gidnumber_wish,
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
 
     # <token>-internet
     $group=$token.$DevelConf::AD_internet_group;
@@ -1109,27 +1023,7 @@ sub AD_ou_add {
                       hidden=>"FALSE",
                       gidnumber_wish=>$gidnumber_wish,
                   });
-    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    # $result = $ldap->add( $dn_group,
-    #                      attr => [
-    #                          cn   => $group,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sAMAccountName => $group,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          description => "LML Internetaccess $ou",
-    #                          gidNumber => $gidnumber_wish,
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
+
     ############################################################
     # OU=GLOBAL
     { # start: make the following vars for OU=GLOBAL local vars
@@ -1171,30 +1065,11 @@ sub AD_ou_add {
                       hidden=>"FALSE",
                       gidnumber_wish=>$gidnumber_wish,
                   });
-    # $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
-    # $result = $ldap->add( $global_dn_group,
-    #                      attr => [
-    #                          cn => "global-".$DevelConf::student,
-    #                          sAMAccountName => "global-".$DevelConf::student,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          description => "LML Global Students",
-    #                          gidNumber => $gidnumber_wish,
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
+
     if($Conf::log_level>=2){
         print "   * Adding OU=SOPHOMOROX global-groups ...\n";
     }
+
     # teachers in Groups,OU=GLOBAL
     $global_dn_group="CN=global-".$DevelConf::teacher.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
@@ -1215,26 +1090,6 @@ sub AD_ou_add {
                       gidnumber_wish=>$gidnumber_wish,
                   });
 
-    # $result = $ldap->add( $global_dn_group,
-    #                      attr => [
-    #                          cn => "global-".$DevelConf::teacher,
-    #                          sAMAccountName => "global-".$DevelConf::teacher,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          description => "LML Global Teachers",
-    #                          gidNumber => $gidnumber_wish,
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
     # ExamAccounts in Groups,OU=GLOBAL
     $global_dn_group="CN=global-".$DevelConf::examaccount.",".$DevelConf::AD_globalgroup_ou.",".$global_dn;
     $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
@@ -1254,26 +1109,6 @@ sub AD_ou_add {
                       hidden=>"FALSE",
                       gidnumber_wish=>$gidnumber_wish,
                   });
-    # $result = $ldap->add( $global_dn_group,
-    #                      attr => [
-    #                          cn => "global-".$DevelConf::examaccount,
-    #                          sAMAccountName => "global-".$DevelConf::examaccount,
-    #                          sophomorixCreationDate => $creationdate,
-    #                          sophomorixStatus => "P",
-    #                          sophomorixType => "adminclass",
-    #                          sophomorixJoinable=>"TRUE",
-    #                          sophomorixHidden => "FALSE",
-    #                          sophomorixMaxmembers=> "0",
-    #                          sophomorixQuota=> "---",
-    #                          sophomorixMailQuota=> "-1",
-    #                          sophomorixMailalias => "FALSE",
-    #                          sophomorixMaillist => "FALSE",
-    #                          gidNumber => $gidnumber_wish,
-    #                          description => "LML Global ExamAccounts",
-    #                          objectclass => ['top',
-    #                                            'group' ],
-    #                      ]
-    #                  );
 
     } # end: make the following vars for OU=GLOBAL local vars
     &AD_debug_logdump($result,2,(caller(0))[3]);
@@ -2668,7 +2503,7 @@ sub next_free_uidnumber_set {
     if (not defined $uidnumber){
        $uidnumber="10000";
     }
-    print "* setting uidNumber to file/ldap: $uidnumber\n";
+    #print "* setting uidNumber to file/ldap: $uidnumber\n";
     system("echo $uidnumber > $DevelConf::next_free_uidnumber_file");
 }
 
@@ -2682,13 +2517,12 @@ sub next_free_uidnumber_get {
     }
     my $uidnumber_prop= `cat $DevelConf::next_free_uidnumber_file`;
     chomp($uidnumber_prop);
-    print "* getting uidNumber from file/ldap: $uidnumber_prop\n";
+    #print "* getting uidNumber from file/ldap: $uidnumber_prop\n";
     my $count=1;
     until ($count==0){
-        print "   * Testing uidNumber <$uidnumber_prop>\n";
+        #print "   * Testing uidNumber <$uidnumber_prop>\n";
         my $filter="(&(objectclass=user) (uidNumber=".$uidnumber_prop."))"; 
-        print "      * Filter: $filter\n";
-   
+        #print "      * Filter: $filter\n";
         my $mesg = $ldap->search(
                           base   => $root_dse,
                           scope => 'sub',
@@ -2696,14 +2530,14 @@ sub next_free_uidnumber_get {
                           attr => ['cn']
                             );
         $count = $mesg->count;
-        print "      * Hits: $count\n";
+        #print "      * Hits: $count\n";
         if ($count>0){
             $uidnumber_prop++;
         } else {
             $uidnumber_free=$uidnumber_prop;
         }
     }
-    print "Next Free uidNumber is: $uidnumber_free\n";
+    &Sophomorix::SophomorixBase::print_title("Next Free uidNumber is: $uidnumber_free");
     my $uidnumber_free_next=$uidnumber_free+1;
     &next_free_uidnumber_set($ldap,$root_dse,$uidnumber_free_next);
     return $uidnumber_free;
@@ -2716,7 +2550,7 @@ sub next_free_gidnumber_set {
     if (not defined $gidnumber){
        $gidnumber="10000";
     }
-    print "* setting gidnumber to file/ldap: $gidnumber\n";
+    #print "* setting gidnumber to file/ldap: $gidnumber\n";
     system("echo $gidnumber > $DevelConf::next_free_gidnumber_file");
 }
 
@@ -2730,28 +2564,27 @@ sub next_free_gidnumber_get {
     }
     my $gidnumber_prop= `cat $DevelConf::next_free_gidnumber_file`;
     chomp($gidnumber_prop);
-    print "* getting gidNumber from file/ldap: $gidnumber_prop\n";
+    #print "* getting gidNumber from file/ldap: $gidnumber_prop\n";
     my $count=1;
     until ($count==0){
-        print "   * Testing gidNumber <$gidnumber_prop>\n";
+        #print "   * Testing gidNumber <$gidnumber_prop>\n";
         my $filter="(&(objectclass=user) (gidnumber=".$gidnumber_prop."))"; 
-        print "      * Filter: $filter\n";
-   
-        my $mesg = $ldap->search(
+        #print "      * Filter: $filter\n";
+           my $mesg = $ldap->search(
                           base   => $root_dse,
                           scope => 'sub',
                           filter => $filter,
                           attr => ['cn']
                             );
         $count = $mesg->count;
-        print "      * Hits: $count\n";
+        #print "      * Hits: $count\n";
         if ($count>0){
             $gidnumber_prop++;
         } else {
             $gidnumber_free=$gidnumber_prop;
         }
     }
-    print "Next Free gidNumber is: $gidnumber_free\n";
+    &Sophomorix::SophomorixBase::print_title("Next Free gidNumber is: $gidnumber_free");
     my $gidnumber_free_next=$gidnumber_free+1;
     &next_free_gidnumber_set($ldap,$root_dse,$gidnumber_free_next);
     return $gidnumber_free;
