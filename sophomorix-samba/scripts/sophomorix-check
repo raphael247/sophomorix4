@@ -56,7 +56,6 @@ my $user_count=0;
 
 
 my @loglines=();
-my %sophomorix_config=();
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -84,7 +83,7 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-%sophomorix_config=&config_sophomorix_read();
+my %sophomorix_config=&config_sophomorix_read();
 
 
 

@@ -87,6 +87,8 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
+# Reading Configuration
+my %sophomorix_config=&config_sophomorix_read();
 
 # --help
 if ($help==1) {
