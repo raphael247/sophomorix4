@@ -33,6 +33,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
+                                 config_sophomorix_read
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -45,6 +46,9 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_get_name_tokened
                                  get_forbidden_logins
+                                 AD_login_test
+                                 next_free_uidnumber_set
+                                 next_free_uidnumber_get
                                     );
 
 
@@ -60,6 +64,9 @@ my $testopt=GetOptions(
            "help|h" => \$help
           );
 
+# Reading Configuration
+my %sophomorix_config=&config_sophomorix_read();
+
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 
@@ -67,33 +74,12 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 # BEGIN: Test code goes here
 ############################################################
 
+print "Start\n";
 
+&function("Text",\%sophomorix_config);
 
-#my $user="lordjo42";
-
-#my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$user);
-my $ou="schule";
-my $token="sch";
-#&AD_ou_add($ldap,$root_dse,$ou,$token);
-  &AD_ou_add({ldap=>$ldap,
-              root_dse=>$root_dse,
-              ou=>$ou,
-              school_token=>$token,
-             # type=>"adminclass",    
-             # status=>"P",
-             # creationdate=>$creationdate,
-             });
-#print "$count):   $dn\n";
-
-
-
-#use POSIX;
-#print strftime("%Z", localtime()), "\n";
-
-#use DateTime::TimeZone;
-
-#print DateTime::TimeZone->new( name => 'local' )->name();
-
+print "The newly hash contains the stuff added to :\n";
+print Dumper(%sophomorix_config);
 
 ############################################################
 # END: Test code goes here
@@ -101,3 +87,10 @@ my $token="sch";
 
 &AD_unbind_admin($ldap);
 
+sub function {
+    my ($value,$ref_sophomorix_config)=@_;
+    print "Der Text: $value\n";
+    print "From the hash: $ref_sophomorix_config->{'user_files'}{'students.csv'}{RT_OU_SUB_SECONDARY}\n";
+    # adding something to the referenced hash: 
+    $ref_sophomorix_config->{'user_files'}{'students.csv'}{HALLO}="wach";
+}
