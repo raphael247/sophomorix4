@@ -20,6 +20,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_end
                                  log_script_exit
                                  check_options
+                                 config_sophomorix_read
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -87,7 +88,8 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
-
+# Reading Configuration
+my %sophomorix_config=&config_sophomorix_read();
 
 # --help
 if ($help==1) {

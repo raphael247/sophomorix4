@@ -106,6 +106,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
+                                 config_sophomorix_read
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -236,6 +237,9 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt);
+
+# Reading Configuration
+my %sophomorix_config=&config_sophomorix_read();
 
 #&check_connections();
 my ($ldap,$root_dse) = &AD_bind_admin();

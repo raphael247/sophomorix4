@@ -35,6 +35,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
+                                 config_sophomorix_read
                                  remove_from_list
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -131,6 +132,9 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt);
+
+# Reading Configuration
+my %sophomorix_config=&config_sophomorix_read();
 
 # --help
 if ($help==1) {
