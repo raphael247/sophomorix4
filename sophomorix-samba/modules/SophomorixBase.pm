@@ -32,6 +32,7 @@ require Exporter;
             get_passwd_charlist
             get_plain_password
             check_options
+            config_sophomorix_read
             );
 
 
@@ -79,6 +80,13 @@ sub remove_from_list {
     return @stripped;
 }
 
+
+sub remove_whitespace {
+    my ($string)=@_;
+    $string=~s/^\s+//g;# remove leading whitespace
+    $string=~s/\s+$//g;# remove trailing whitespace
+    return $string;    
+}
 
 # time stamps
 ######################################################################
@@ -217,6 +225,127 @@ sub read_lockfile {
 }
 
 
+
+# reding configuration files
+######################################################################
+sub config_sophomorix_read {
+    my %sophomorix_config=();
+    # SCHOOLS    
+    open(SCHOOLS,"$DevelConf::file_conf_school") || 
+         die "ERROR: $DevelConf::file_conf_school not found!";
+    while (<SCHOOLS>){
+        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            next;
+        }
+        chomp();
+        my ($file,$school_ou,$filterscript,
+            $encoding,$encoding_force,
+            $surname_chars,$firstname_chars,$reverse,
+            $random_pwd,$pwd_legth)=split(/::/);
+            #$sophomorix_config{'user_files'}{$file};
+            $sophomorix_config{'user_files'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
+            $sophomorix_config{'user_files'}{$file}{OU_TOP}=$school_ou;
+            $sophomorix_config{'user_files'}{$file}{ENCODING}=$encoding;
+            $sophomorix_config{'user_files'}{$file}{ENCODING_FORCE}=$encoding_force;
+            $sophomorix_config{'user_files'}{$file}{SURNAME_CHARS}=$surname_chars;
+            $sophomorix_config{'user_files'}{$file}{FIRSTNAME_CHARS}=$firstname_chars;
+            $sophomorix_config{'user_files'}{$file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
+            $sophomorix_config{'user_files'}{$file}{RANDOM_PWD}=$random_pwd;
+            $sophomorix_config{'user_files'}{$file}{PWD_LENGTH}=$pwd_legth;
+        # calc status
+        if (-e $sophomorix_config{'user_files'}{$file}{PATH_ABS}){
+            $sophomorix_config{'user_files'}{$file}{STATUS}="EXISTING";
+        } else {
+            $sophomorix_config{'user_files'}{$file}{STATUS}="NONEXISTING";
+	}
+            
+    }
+    close(SCHOOLS);
+
+    # RoleType
+    open(ROLETYPE,"$DevelConf::file_conf_roletype") || 
+         die "ERROR: $DevelConf::file_conf_roletype not found!";
+    while (<ROLETYPE>){
+        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            next;
+        }
+        chomp();
+        my ($user,$primary,$secondary,$tertiary,$quaternary)=split(/\|\|/);
+        my ($applies_to,$sophomorix_role)=split(/::/,$user);
+        my ($sophomorix_type_primary,$group_primary,$ou_sub_primary)=split(/::/,$primary);
+        my ($sophomorix_type_secondary,$group_secondary,$ou_sub_secondary)=split(/::/,$secondary);
+        my ($sophomorix_type_tertiary,$group_tertiary,$ou_sub_tertiary)=split(/::/,$tertiary);
+        my ($sophomorix_type_quaternary,$group_quaternary,$ou_sub_quaternary)=split(/::/,$quaternary);
+
+        $applies_to=&remove_whitespace($applies_to);
+        $applies_to=~s/^\*\.//g;# remove leading asterisk and dot
+
+        # user
+        $sophomorix_role=&remove_whitespace($sophomorix_role);
+        # primary group
+        $sophomorix_type_primary=&remove_whitespace($sophomorix_type_primary);
+        $group_primary=&remove_whitespace($group_primary);
+        $ou_sub_primary=&remove_whitespace($ou_sub_primary);
+        # secondary group
+        $sophomorix_type_secondary=&remove_whitespace($sophomorix_type_secondary);
+        $group_secondary=&remove_whitespace($group_secondary);
+        $ou_sub_secondary=&remove_whitespace($ou_sub_secondary);
+        # tertiary group
+        $sophomorix_type_tertiary=&remove_whitespace($sophomorix_type_tertiary);
+        $group_tertiary=&remove_whitespace($group_tertiary);
+        $ou_sub_tertiary=&remove_whitespace($ou_sub_tertiary);
+        # quaternary group
+        $sophomorix_type_quaternary=&remove_whitespace($sophomorix_type_quaternary);
+        $group_quaternary=&remove_whitespace($group_quaternary);
+        $ou_sub_quaternary=&remove_whitespace($ou_sub_quaternary);
+
+  
+        # experimental warning: foreach my $key (keys $sophomorix_config{'user_files'}) {
+        foreach my $key (keys %{$sophomorix_config{'user_files'}}) {
+            $apply_key=$key; # apply key has abc.students.csv stripped to students.csv
+            my $dots=$apply_key=~tr/\.//;
+            if ($dots==2){
+		#print "$dots dots in $key\n";
+                my ($token,$typename,$extension)=split(/\./,$apply_key);
+                $apply_key=$typename.".".$extension;
+                $group_primary=~s/^\*-/${token}-/g;
+                $group_secondary=~s/^\*-/${token}-/g;
+            } elsif ($dots==1){
+		#print "$dots dots in $key\n";
+                $group_primary=~s/^\*-//g;
+                $group_secondary=~s/^\*-//g;
+            } else {
+                print "\nERROR: $dots dots in $key\n\n";
+                exit;
+            }
+            
+            #print "              Key: <$key> ---> <$apply_key>\n";
+            if ($apply_key eq $applies_to){
+                # user
+                $sophomorix_config{'user_files'}{$key}{RT_sophomorixRole}=$sophomorix_role;
+                # primary group
+                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
+                $sophomorix_config{'user_files'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
+                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_PRIMARY}=$ou_sub_primary;
+                # secondary group
+                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
+                $sophomorix_config{'user_files'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
+                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_SECONDARY}=$ou_sub_secondary;
+                # tertiary group
+                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
+                $sophomorix_config{'user_files'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
+                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_TERTIARY}=$ou_sub_tertiary;
+                # quaternary group
+                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
+                $sophomorix_config{'user_files'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
+                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_QUATERNARY}=$ou_sub_quaternary;
+            }
+        }
+    }
+    close(ROLETYPE);
+    return %sophomorix_config; 
+}
+ 
 
 
 
@@ -474,6 +603,8 @@ sub create_plain_password {
     print "Password OK: $password\n";
     return $password;
 }
+
+
 
 
 

@@ -1,0 +1,163 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-check) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_ou_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_ou_tokened
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_object_search
+                                 get_forbidden_logins
+                                    );
+
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+my $user_count=0;
+
+
+my @loglines=();
+my %sophomorix_config=();
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $lock=0;
+my $unlock=0;
+
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "info|i" => \$info,
+           "lock" => \$lock,
+           "unlock" => \$unlock,
+           "help|h" => \$help
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# Reading Configuration
+%sophomorix_config=&config_sophomorix_read();
+
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-check checks the configured user files and finds out which users should be added, updated, moved and killed
+
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+  --lock / --unlock
+
+Please see the sophomorix-check(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+# --unlock
+if ($unlock==1) {
+    &unlock_sophomorix();
+    exit;
+}
+
+# --lock
+if ($lock==1) {
+    &lock_sophomorix("lock",0,@arguments);
+    exit;
+}
+
+
+
+
+
+# --info
+if ($info==1) {
+       print Dumper(%sophomorix_config);
+       exit;
+   }
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+
+
+&log_script_start(@arguments);
+
+
+################################################################################
+# Start
+################################################################################
+
+&AD_unbind_admin($ldap);
+
+
+
+
+
+
+&log_script_end(@arguments);
+
+################################################################################
+# Subroutinen
+################################################################################
+
+
+
+
+
