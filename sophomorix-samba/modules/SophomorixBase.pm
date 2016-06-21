@@ -366,8 +366,6 @@ sub config_sophomorix_read {
             if ($dots==2){
                 ($token_file,$type_file,$extension_file)=split(/\./,$user_file);
 		#print "  * $dots dots in $key ($token_file)\n";
-#                $group_primary=~s/^\*-/${token_file}-/g;
-#                $group_secondary=~s/^\*-/${token_file}-/g;
                 $group_primary=~s/^\*-//g;
                 $group_secondary=~s/^\*-//g;
             } elsif ($dots==1){
@@ -381,9 +379,6 @@ sub config_sophomorix_read {
                 exit;
             }
             my $matchname_of_user_file=$type_file.".".$extension_file;
-            #print "  * Token file: $token_file\n";
-            #print "  * Type file:  $type_file\n";
-            #print "  * Ext file:  $extension_file\n";
             print "  * Testing if File $key (stripped to <$matchname_of_user_file>) matches to <$roletype_file> (from RoleType)\n";
             print "   PRI: $group_primary   SEC: $group_secondary\n";
             if ($matchname_of_user_file eq $roletype_file){
