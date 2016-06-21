@@ -873,8 +873,8 @@ sub AD_ou_add {
     }
 
     # old:
-    #my $dn="OU=".$ou.",".$root_dse;
-    #print "OLD: DN: $dn\n";
+    my $dn="OU=".$ou.",".$root_dse;
+    print "OLD: DN: $dn\n";
     # New get top of school
     #my $dn=$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
     #print "DN: $dn\n";
@@ -931,13 +931,17 @@ sub AD_ou_add {
     #my $custom=$DevelConf::AD_custom_ou.",".$dn;
     #$result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
-    return;
+
+    # create school ou's from DevelConf
+
 
     # Adding some groups
     # <token>-teachers
     my $group=$token.$DevelConf::teacher;
     my $target_branch="OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
     my $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
+    print "$target_branch\n";
+    return;
 
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";

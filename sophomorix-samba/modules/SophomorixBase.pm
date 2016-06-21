@@ -271,10 +271,14 @@ sub config_sophomorix_read {
             $sophomorix_config{'school_token'}{$token}=$school_ou;
             $sophomorix_config{'ou'}{$school_ou}{SCHOOL_TOKEN}=$token;
             $sophomorix_config{'ou'}{$school_ou}{PREFIX}=$token."-";
+            $sophomorix_config{'user_file'}{$file}{SCHOOL_TOKEN}=$token;
+            $sophomorix_config{'user_file'}{$file}{PREFIX}=$token."-";
         } elsif ($dots==1){
             $sophomorix_config{'school_token'}{''}=$DevelConf::AD_school_ou;
             $sophomorix_config{'ou'}{$school_ou}{SCHOOL_TOKEN}="";
             $sophomorix_config{'ou'}{$school_ou}{PREFIX}="";
+            $sophomorix_config{'user_file'}{$file}{SCHOOL_TOKEN}="";
+            $sophomorix_config{'user_file'}{$file}{PREFIX}="";
         }
 
         # adding ou stuff
@@ -297,15 +301,14 @@ sub config_sophomorix_read {
         }
         chomp();
         my ($user,$primary,$secondary,$tertiary,$quaternary)=split(/\|\|/);
-        my ($applies_to,$sophomorix_role)=split(/::/,$user);
+        my ($roletype_file,$sophomorix_role)=split(/::/,$user);
         my ($sophomorix_type_primary,$group_primary,$ou_sub_primary)=split(/::/,$primary);
         my ($sophomorix_type_secondary,$group_secondary,$ou_sub_secondary)=split(/::/,$secondary);
         my ($sophomorix_type_tertiary,$group_tertiary,$ou_sub_tertiary)=split(/::/,$tertiary);
         my ($sophomorix_type_quaternary,$group_quaternary,$ou_sub_quaternary)=split(/::/,$quaternary);
 
-        $applies_to=&remove_whitespace($applies_to);
-        $applies_to=~s/^\*\.//g;# remove leading asterisk and dot
-
+        $roletype_file=&remove_whitespace($roletype_file);
+        $roletype_file=~s/^\*\.//g;# remove leading asterisk and dot
         # user
         $sophomorix_role=&remove_whitespace($sophomorix_role);
         # primary group
@@ -338,8 +341,6 @@ sub config_sophomorix_read {
         if ($ou_sub_quaternary ne ""){
             $sophomorix_config{'sub_ou'}{'RT_GLOBAL_OU'}{$ou_sub_quaternary}="from RoleType";
         } 
-        # create list of groups that are needed to create from sophomorix-RoleType.conf:
-
 
         # adding 
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
@@ -353,58 +354,90 @@ sub config_sophomorix_read {
         # remember for the following commented line:
         # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
         foreach my $key (keys %{$sophomorix_config{'user_file'}}) {
+            print "\n\nRoletype name: <$roletype_file>\n";
+            print "User File:     <$key>\n";
+            my $user_file=$key;
+            my $token_file="";
+            my $type_file="";
+            my $extension_file="";
+
             $apply_key=$key; # apply key has abc.students.csv stripped to students.csv
             my $dots=$apply_key=~tr/\.//;
             if ($dots==2){
-		#print "$dots dots in $key\n";
-                my ($token,$typename,$extension)=split(/\./,$apply_key);
-                $apply_key=$typename.".".$extension;
-                $group_primary=~s/^\*-/${token}-/g;
-                $group_secondary=~s/^\*-/${token}-/g;
+                ($token_file,$type_file,$extension_file)=split(/\./,$user_file);
+		#print "  * $dots dots in $key ($token_file)\n";
+#                $group_primary=~s/^\*-/${token_file}-/g;
+#                $group_secondary=~s/^\*-/${token_file}-/g;
+                $group_primary=~s/^\*-//g;
+                $group_secondary=~s/^\*-//g;
             } elsif ($dots==1){
-		#print "$dots dots in $key\n";
+                $token_file="";
+                ($type_file,$extension_file)=split(/\./,$user_file);
+		#print "  * $dots dots in $key\n";
                 $group_primary=~s/^\*-//g;
                 $group_secondary=~s/^\*-//g;
             } else {
                 print "\nERROR: $dots dots in $key\n\n";
                 exit;
             }
-            
-            #print "              Key: <$key> ---> <$apply_key>\n";
-            if ($apply_key eq $applies_to){
+            my $matchname_of_user_file=$type_file.".".$extension_file;
+            #print "  * Token file: $token_file\n";
+            #print "  * Type file:  $type_file\n";
+            #print "  * Ext file:  $extension_file\n";
+            print "  * Testing if File $key (stripped to <$matchname_of_user_file>) matches to <$roletype_file> (from RoleType)\n";
+            print "   PRI: $group_primary   SEC: $group_secondary\n";
+            if ($matchname_of_user_file eq $roletype_file){
+                print "Inserting ...\n";
                 my $ou_file=$sophomorix_config{'user_file'}{$key}{OU};
                 # user
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixRole}=$sophomorix_role;
 
                 # primary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
-                $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
-                if ($group_primary ne "" and not $group_primary=~m/multi$/ ){
-                    $sophomorix_config{'ou'}{$ou_file}{GROUPLEVEL}{$group_primary}="primary";
-                    $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group_primary}=
-                    $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};;
-                }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_PRIMARY}=
                     $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                if ($group_primary ne "" and not $group_primary eq "multi"){
+                    # add with prefix
+                    my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_primary;
+		    print "GROUP: $group\n";
+                    $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="primary";
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
+                        $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$group}=
+                      "OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                } else {
+                    # "" or "multi"
+                    print "GROUP: $group_primary\n";
+                    $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
+                }
+
 
                 # secondary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
-                $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
-                if ($group_secondary ne ""){
-                    $sophomorix_config{'ou'}{$ou_file}{GROUPLEVEL}{$group_secondary}="secondary";
-                    $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group_secondary}=
-                    $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
-                }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_SECONDARY}=
                     $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                if ($group_secondary ne "" and not $group_secondary eq "multi"){
+                    # add with prefix
+                    my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_secondary;
+                    print "GROUP: $group\n";
+                    $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
+                        $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                } else {
+                    # "" or "multi"
+                    print "GROUP: $group_secondary\n";
+                    $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
+                }
 
                 # tertiary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
-                if ($group_tertiary ne ""){
-                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUPLEVEL}{$group_tertiary}="tertiary";
+                if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
-                    $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                        $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                 }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
@@ -413,13 +446,15 @@ sub config_sophomorix_read {
                 # quaternary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
-                if ($group_quaternary ne ""){
-                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUPLEVEL}{$group_quaternary}="quaternary";
+                if ($group_quaternary ne "" and not $group_quaternary eq "multi"){
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
-                    $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                        $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                 }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_QUATERNARY}=
                     $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+            } else {
+                print "No match. Nothing to do!\n";
             }
         }
     }
