@@ -394,13 +394,13 @@ sub config_sophomorix_read {
                 if ($group_primary ne "" and not $group_primary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_primary;
-		    print "GROUP: $group\n";
-                    $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group;
+                    my $dn_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+		    print "GROUP: $group ($dn_group)\n";
+                      $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="primary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
-                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$group}=
-                      "OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$dn_group}=$group;
                 } else {
                     # "" or "multi"
                     print "GROUP: $group_primary\n";
@@ -415,11 +415,13 @@ sub config_sophomorix_read {
                 if ($group_secondary ne "" and not $group_secondary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_secondary;
+                    my $dn_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     print "GROUP: $group\n";
                     $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$dn_group}=$group;
                 } else {
                     # "" or "multi"
                     print "GROUP: $group_secondary\n";
@@ -433,6 +435,8 @@ sub config_sophomorix_read {
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$group_tertiary}=
+                      "OU=".$group_tertiary.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                 }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};

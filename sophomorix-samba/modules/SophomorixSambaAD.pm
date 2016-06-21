@@ -899,16 +899,18 @@ sub AD_ou_add {
                      attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # create school ou's from Roletype
-    foreach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}) {
-        my $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
-        print "      * DN: $dn\n";
-        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    # experimentalforeach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}) {
+    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}}) {
+        $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
+        print "      * DN: $dn (RT_SCHOOL_OU)\n";
+        #$result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
     # create school ou's from DevelConf
-    foreach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}) {
+#    foreach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}) {
+    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}}) {
         my $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
-        print "      * DN: $dn\n";
+        print "      * DN: $dn (DEVELCONF_SCHOOL_OU)\n";
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
@@ -932,38 +934,44 @@ sub AD_ou_add {
     #$result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
 
-    # create school ou's from DevelConf
+    # create ou's for groups
+#    foreach my $ou (keys $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_OU'}) {
+    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_OU'}}) {
+        #my $dn=$ref_sophomorix_config->{'ou'}{$ou};
+        #my $dn="ts";
+        print "      * DN: $dn\n";
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
 
+    
 
     # Adding some groups
     # <token>-teachers
     my $group=$token.$DevelConf::teacher;
     my $target_branch="OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
     my $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
-    print "$target_branch\n";
-    return;
 
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
     # create parent
-    my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # create group
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn_wish=>$dn_group,
-                      ou=>"unused together with dn_wish",
-                      school_token=>$token,
-                      group=>$group,
-                      description=>"LML Teachers $ou",
-                      type=>"adminclass",
-                      status=>"P",
-                      creationdate=>$creationdate,
-                      joinable=>"TRUE",
-                      hidden=>"FALSE",
-                      gidnumber_wish=>$gidnumber_wish,
-                  });
+    # &AD_group_create({ldap=>$ldap,
+    #                   root_dse=>$root_dse,
+    #                   dn_wish=>$dn_group,
+    #                   ou=>"unused together with dn_wish",
+    #                   school_token=>$token,
+    #                   group=>$group,
+    #                   description=>"LML Teachers $ou",
+    #                   type=>"adminclass",
+    #                   status=>"P",
+    #                   creationdate=>$creationdate,
+    #                   joinable=>"TRUE",
+    #                   hidden=>"FALSE",
+    #                   gidnumber_wish=>$gidnumber_wish,
+    #               });
 
     # <token>-students
     $group=$token.$DevelConf::student;
@@ -975,22 +983,22 @@ sub AD_ou_add {
         print "   * Adding group $group\n";
     }
     # create parent
-    $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #$target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn_wish=>$dn_group,
-                      ou=>"unused together with dn_wish",
-                      school_token=>$token,
-                      group=>$group,
-                      description=>"LML Students $ou",
-                      type=>"adminclass",
-                      status=>"P",
-                      creationdate=>$creationdate,
-                      joinable=>"TRUE",
-                      hidden=>"FALSE",
-                      gidnumber_wish=>$gidnumber_wish,
-                  });
+    # &AD_group_create({ldap=>$ldap,
+    #                   root_dse=>$root_dse,
+    #                   dn_wish=>$dn_group,
+    #                   ou=>"unused together with dn_wish",
+    #                   school_token=>$token,
+    #                   group=>$group,
+    #                   description=>"LML Students $ou",
+    #                   type=>"adminclass",
+    #                   status=>"P",
+    #                   creationdate=>$creationdate,
+    #                   joinable=>"TRUE",
+    #                   hidden=>"FALSE",
+    #                   gidnumber_wish=>$gidnumber_wish,
+    #               });
 
     # <token>-examaccounts
     $group=$token.$DevelConf::examaccount;
@@ -1000,23 +1008,26 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
+    print "$target_branch\n";
+
+    return;
     # create parent
-    $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+#    $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn_wish=>$dn_group,
-                      ou=>"unused together with dn_wish",
-                      school_token=>$token,
-                      group=>$group,
-                      description=>"LML Examaccounts $ou",
-                      type=>"adminclass",
-                      status=>"P",
-                      creationdate=>$creationdate,
-                      joinable=>"TRUE",
-                      hidden=>"FALSE",
-                      gidnumber_wish=>$gidnumber_wish,
-                  });
+    # &AD_group_create({ldap=>$ldap,
+    #                   root_dse=>$root_dse,
+    #                   dn_wish=>$dn_group,
+    #                   ou=>"unused together with dn_wish",
+    #                   school_token=>$token,
+    #                   group=>$group,
+    #                   description=>"LML Examaccounts $ou",
+    #                   type=>"adminclass",
+    #                   status=>"P",
+    #                   creationdate=>$creationdate,
+    #                   joinable=>"TRUE",
+    #                   hidden=>"FALSE",
+    #                   gidnumber_wish=>$gidnumber_wish,
+    #               });
 
     # <token>-wifi
     $group=$token.$DevelConf::AD_wifi_group;
@@ -1025,20 +1036,20 @@ sub AD_ou_add {
         print "   * Adding group $group\n";
     }
     # create group
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn_wish=>$dn_group,
-                      ou=>"unused together with dn_wish",
-                      school_token=>$token,
-                      group=>$group,
-                      description=>"LML Wifigroup $ou",
-                      type=>"adminclass",
-                      status=>"P",
-                      creationdate=>$creationdate,
-                      joinable=>"TRUE",
-                      hidden=>"FALSE",
-                      gidnumber_wish=>$gidnumber_wish,
-                  });
+    # &AD_group_create({ldap=>$ldap,
+    #                   root_dse=>$root_dse,
+    #                   dn_wish=>$dn_group,
+    #                   ou=>"unused together with dn_wish",
+    #                   school_token=>$token,
+    #                   group=>$group,
+    #                   description=>"LML Wifigroup $ou",
+    #                   type=>"adminclass",
+    #                   status=>"P",
+    #                   creationdate=>$creationdate,
+    #                   joinable=>"TRUE",
+    #                   hidden=>"FALSE",
+    #                   gidnumber_wish=>$gidnumber_wish,
+    #               });
 
     # <token>-internet
     $group=$token.$DevelConf::AD_internet_group;
@@ -1047,21 +1058,21 @@ sub AD_ou_add {
         print "   * Adding group $group\n";
     }
     # create group
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn_wish=>$dn_group,
-                      ou=>"unused together with dn_wish",
-                      school_token=>$token,
-                      group=>$group,
-                      description=>"LML Internetaccess $ou",
-                      type=>"adminclass",
-                      status=>"P",
-                      creationdate=>$creationdate,
-                      joinable=>"TRUE",
-                      hidden=>"FALSE",
-                      gidnumber_wish=>$gidnumber_wish,
-                  });
-
+    # &AD_group_create({ldap=>$ldap,
+    #                   root_dse=>$root_dse,
+    #                   dn_wish=>$dn_group,
+    #                   ou=>"unused together with dn_wish",
+    #                   school_token=>$token,
+    #                   group=>$group,
+    #                   description=>"LML Internetaccess $ou",
+    #                   type=>"adminclass",
+    #                   status=>"P",
+    #                   creationdate=>$creationdate,
+    #                   joinable=>"TRUE",
+    #                   hidden=>"FALSE",
+    #                   gidnumber_wish=>$gidnumber_wish,
+    #               });
+    return;
     ############################################################
     # OU=GLOBAL
     { # start: make the following vars for OU=GLOBAL local vars
