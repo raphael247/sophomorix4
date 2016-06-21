@@ -247,6 +247,7 @@ sub config_sophomorix_read {
             $random_pwd,$pwd_legth)=split(/::/);
 
             $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
+            $sophomorix_config{'user_file'}{$file}{OU}=$school_ou;
             $sophomorix_config{'user_file'}{$file}{OU_TOP}="OU=".$school_ou.",".$root_dse;
             $sophomorix_config{'user_file'}{$file}{OU_TOP_GLOBAL}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
             $sophomorix_config{'user_file'}{$file}{ENCODING}=$encoding;
@@ -263,7 +264,6 @@ sub config_sophomorix_read {
             $sophomorix_config{'user_file'}{$file}{STATUS}="NONEXISTING";
 	}
 
-
         # calc school_token
         my $dots=$file=~tr/\.//;
         if ($dots==2){
@@ -277,20 +277,15 @@ sub config_sophomorix_read {
             $sophomorix_config{'ou'}{$school_ou}{PREFIX}="";
         }
 
-
-
         # adding ou stuff
         $sophomorix_config{'ou'}{$school_ou}{OU_TOP}="OU=".$school_ou.",".$root_dse;
-
-            
     }
     # adding global stuff
-    $sophomorix_config{'ou'}{'GLOBAL'}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
-    $sophomorix_config{'ou'}{'GLOBAL'}{SCHOOL_TOKEN}="";
-    $sophomorix_config{'ou'}{'GLOBAL'}{PREFIX}="";
-
-
+    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
+    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL_TOKEN}="";
+    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
     close(SCHOOLS);
+
 
     ##################################################
     # RoleType
@@ -330,7 +325,31 @@ sub config_sophomorix_read {
         $group_quaternary=&remove_whitespace($group_quaternary);
         $ou_sub_quaternary=&remove_whitespace($ou_sub_quaternary);
 
-        
+        # create list of sub ou's that are needed to create from sophomorix-RoleType.conf:
+        if ($ou_sub_primary ne ""){
+            $sophomorix_config{'sub_ou'}{'RT_SCHOOL_OU'}{$ou_sub_primary}="from RoleType";
+        }
+        if ($ou_sub_secondary ne ""){
+            $sophomorix_config{'sub_ou'}{'RT_SCHOOL_OU'}{$ou_sub_secondary}="from RoleType";
+        }
+        if ($ou_sub_tertiary ne ""){
+            $sophomorix_config{'sub_ou'}{'RT_GLOBAL_OU'}{$ou_sub_tertiary}="from RoleType";
+        }
+        if ($ou_sub_quaternary ne ""){
+            $sophomorix_config{'sub_ou'}{'RT_GLOBAL_OU'}{$ou_sub_quaternary}="from RoleType";
+        } 
+        # create list of groups that are needed to create from sophomorix-RoleType.conf:
+
+
+        # adding 
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
+       
         # remember for the following commented line:
         # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
         foreach my $key (keys %{$sophomorix_config{'user_file'}}) {
@@ -353,26 +372,52 @@ sub config_sophomorix_read {
             
             #print "              Key: <$key> ---> <$apply_key>\n";
             if ($apply_key eq $applies_to){
+                my $ou_file=$sophomorix_config{'user_file'}{$key}{OU};
                 # user
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixRole}=$sophomorix_role;
+
                 # primary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
+                if ($group_primary ne "" and not $group_primary=~m/multi$/ ){
+                    $sophomorix_config{'ou'}{$ou_file}{GROUPLEVEL}{$group_primary}="primary";
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group_primary}=
+                    $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};;
+                }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_PRIMARY}=
                     $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+
                 # secondary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
+                if ($group_secondary ne ""){
+                    $sophomorix_config{'ou'}{$ou_file}{GROUPLEVEL}{$group_secondary}="secondary";
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group_secondary}=
+                    $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_SECONDARY}=
                     $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+
                 # tertiary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
+                if ($group_tertiary ne ""){
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUPLEVEL}{$group_tertiary}="tertiary";
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
+                    $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+
+
                 # quaternary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
+                if ($group_quaternary ne ""){
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUPLEVEL}{$group_quaternary}="quaternary";
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
+                    $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_QUATERNARY}=
                     $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
             }

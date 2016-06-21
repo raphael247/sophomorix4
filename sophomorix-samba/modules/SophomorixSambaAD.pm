@@ -875,11 +875,12 @@ sub AD_ou_add {
     # old:
     #my $dn="OU=".$ou.",".$root_dse;
     #print "OLD: DN: $dn\n";
-    # New
-    my $dn=$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
-    print "DN: $dn\n";
+    # New get top of school
+    #my $dn=$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
+    #print "DN: $dn\n";
     # providing OU_TOP of school
-    my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    my $result = $ldap->add($ref_sophomorix_config->{'ou'}{$ou}{OU_TOP},
+                        attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     if($Conf::log_level>=2){
         print "   * Adding sub ou's ...\n";
@@ -892,28 +893,45 @@ sub AD_ou_add {
     #my $student=$DevelConf::AD_student_ou.",".$dn;
     #$result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # new: OU from hash
-    my $student=$DevelConf::AD_student_ou.",".$dn;
-    print "$student\n";   
-#$result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $student=$DevelConf::AD_student_ou.",".$dn;
+    #print "$student\n";   
+    $result = $ldap->add($ref_sophomorix_config->{'ou'}{$ou}{RT_students},
+                     attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
-    return;
+    # create school ou's from Roletype
+    foreach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}) {
+        my $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
+        print "      * DN: $dn\n";
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
 
-    my $teacher=$DevelConf::AD_teacher_ou.",".$dn;
-    $result = $ldap->add($teacher,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    my $workstation=$DevelConf::AD_computer_ou.",".$dn;
-    $result = $ldap->add($workstation,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    my $examaccount=$DevelConf::AD_examaccount_ou.",".$dn;
-    $result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    # create school ou's from DevelConf
+    foreach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}) {
+        my $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
+        print "      * DN: $dn\n";
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
+
+#    my $teacher=$DevelConf::AD_teacher_ou.",".$dn;
+#    $result = $ldap->add($teacher,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+
+    #my $workstation=$DevelConf::AD_computer_ou.",".$dn;
+    #$result = $ldap->add($workstation,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $examaccount=$DevelConf::AD_examaccount_ou.",".$dn;
+    #$result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # other
-    my $project=$DevelConf::AD_project_ou.",".$dn;
-    $result = $ldap->add($project,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    my $management=$DevelConf::AD_management_ou.",".$dn;
-    $result = $ldap->add($management,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    my $printer=$DevelConf::AD_printer_ou.",".$dn;
-    $result = $ldap->add($printer,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    my $custom=$DevelConf::AD_custom_ou.",".$dn;
-    $result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $project=$DevelConf::AD_project_ou.",".$dn;
+    #$result = $ldap->add($project,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $management=$DevelConf::AD_management_ou.",".$dn;
+    #$result = $ldap->add($management,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $printer=$DevelConf::AD_printer_ou.",".$dn;
+    #$result = $ldap->add($printer,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #my $custom=$DevelConf::AD_custom_ou.",".$dn;
+    #$result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+    return;
 
     # Adding some groups
     # <token>-teachers
