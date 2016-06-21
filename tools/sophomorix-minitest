@@ -47,6 +47,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  get_forbidden_logins
                                  AD_login_test
+AD_get_ou_tokened
                                  next_free_uidnumber_set
                                  next_free_uidnumber_get
                                     );
@@ -65,10 +66,8 @@ my $testopt=GetOptions(
           );
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
-
-
 my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 ############################################################
 # BEGIN: Test code goes here
@@ -81,6 +80,20 @@ print "Start\n";
 print "The newly hash contains the stuff added to :\n";
 print Dumper(%sophomorix_config);
 
+# geht nur ohne ->
+#print "$sophomorix_config{'user_file'}{'students.csv'}{HALLO}\n";
+
+         &AD_ou_add({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     ou=>"TESTOU",
+                     school_token=>"test",
+                     creationdate=>"19700101000000.0Z",
+                     sophomorix_config=>\%sophomorix_config,
+                   });
+
+
+#my $test=&AD_get_ou_tokened("TU");
+#print "TEST: $test\n";
 ############################################################
 # END: Test code goes here
 ############################################################
@@ -90,7 +103,7 @@ print Dumper(%sophomorix_config);
 sub function {
     my ($value,$ref_sophomorix_config)=@_;
     print "Der Text: $value\n";
-    print "From the hash: $ref_sophomorix_config->{'user_files'}{'students.csv'}{RT_OU_SUB_SECONDARY}\n";
-    # adding something to the referenced hash: 
-    $ref_sophomorix_config->{'user_files'}{'students.csv'}{HALLO}="wach";
+    print "From the hash: $ref_sophomorix_config->{'user_file'}{'students.csv'}{RT_OU_SUB_SECONDARY}\n";
+    # adding something to the referenced hash: geht nur mit ->
+    $ref_sophomorix_config->{'user_file'}{'students.csv'}{HALLO}="wach";
 }

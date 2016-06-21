@@ -229,7 +229,10 @@ sub read_lockfile {
 # reding configuration files
 ######################################################################
 sub config_sophomorix_read {
+    my ($ldap,$root_dse)=@_;
     my %sophomorix_config=();
+
+    ##################################################
     # SCHOOLS    
     open(SCHOOLS,"$DevelConf::file_conf_school") || 
          die "ERROR: $DevelConf::file_conf_school not found!";
@@ -242,26 +245,54 @@ sub config_sophomorix_read {
             $encoding,$encoding_force,
             $surname_chars,$firstname_chars,$reverse,
             $random_pwd,$pwd_legth)=split(/::/);
-            #$sophomorix_config{'user_files'}{$file};
-            $sophomorix_config{'user_files'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
-            $sophomorix_config{'user_files'}{$file}{OU_TOP}=$school_ou;
-            $sophomorix_config{'user_files'}{$file}{ENCODING}=$encoding;
-            $sophomorix_config{'user_files'}{$file}{ENCODING_FORCE}=$encoding_force;
-            $sophomorix_config{'user_files'}{$file}{SURNAME_CHARS}=$surname_chars;
-            $sophomorix_config{'user_files'}{$file}{FIRSTNAME_CHARS}=$firstname_chars;
-            $sophomorix_config{'user_files'}{$file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
-            $sophomorix_config{'user_files'}{$file}{RANDOM_PWD}=$random_pwd;
-            $sophomorix_config{'user_files'}{$file}{PWD_LENGTH}=$pwd_legth;
+
+            $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
+            $sophomorix_config{'user_file'}{$file}{OU_TOP}="OU=".$school_ou.",".$root_dse;
+            $sophomorix_config{'user_file'}{$file}{OU_TOP_GLOBAL}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
+            $sophomorix_config{'user_file'}{$file}{ENCODING}=$encoding;
+            $sophomorix_config{'user_file'}{$file}{ENCODING_FORCE}=$encoding_force;
+            $sophomorix_config{'user_file'}{$file}{SURNAME_CHARS}=$surname_chars;
+            $sophomorix_config{'user_file'}{$file}{FIRSTNAME_CHARS}=$firstname_chars;
+            $sophomorix_config{'user_file'}{$file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
+            $sophomorix_config{'user_file'}{$file}{RANDOM_PWD}=$random_pwd;
+            $sophomorix_config{'user_file'}{$file}{PWD_LENGTH}=$pwd_legth;
         # calc status
-        if (-e $sophomorix_config{'user_files'}{$file}{PATH_ABS}){
-            $sophomorix_config{'user_files'}{$file}{STATUS}="EXISTING";
+        if (-e $sophomorix_config{'user_file'}{$file}{PATH_ABS}){
+            $sophomorix_config{'user_file'}{$file}{STATUS}="EXISTING";
         } else {
-            $sophomorix_config{'user_files'}{$file}{STATUS}="NONEXISTING";
+            $sophomorix_config{'user_file'}{$file}{STATUS}="NONEXISTING";
 	}
+
+
+        # calc school_token
+        my $dots=$file=~tr/\.//;
+        if ($dots==2){
+            my ($token,$string1,$extension)=split(/\./,$file);
+            $sophomorix_config{'school_token'}{$token}=$school_ou;
+            $sophomorix_config{'ou'}{$school_ou}{SCHOOL_TOKEN}=$token;
+            $sophomorix_config{'ou'}{$school_ou}{PREFIX}=$token."-";
+        } elsif ($dots==1){
+            $sophomorix_config{'school_token'}{''}=$DevelConf::AD_school_ou;
+            $sophomorix_config{'ou'}{$school_ou}{SCHOOL_TOKEN}="";
+            $sophomorix_config{'ou'}{$school_ou}{PREFIX}="";
+        }
+
+
+
+        # adding ou stuff
+        $sophomorix_config{'ou'}{$school_ou}{OU_TOP}="OU=".$school_ou.",".$root_dse;
+
             
     }
+    # adding global stuff
+    $sophomorix_config{'ou'}{'GLOBAL'}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
+    $sophomorix_config{'ou'}{'GLOBAL'}{SCHOOL_TOKEN}="";
+    $sophomorix_config{'ou'}{'GLOBAL'}{PREFIX}="";
+
+
     close(SCHOOLS);
 
+    ##################################################
     # RoleType
     open(ROLETYPE,"$DevelConf::file_conf_roletype") || 
          die "ERROR: $DevelConf::file_conf_roletype not found!";
@@ -299,9 +330,10 @@ sub config_sophomorix_read {
         $group_quaternary=&remove_whitespace($group_quaternary);
         $ou_sub_quaternary=&remove_whitespace($ou_sub_quaternary);
 
-  
-        # experimental warning: foreach my $key (keys $sophomorix_config{'user_files'}) {
-        foreach my $key (keys %{$sophomorix_config{'user_files'}}) {
+        
+        # remember for the following commented line:
+        # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
+        foreach my $key (keys %{$sophomorix_config{'user_file'}}) {
             $apply_key=$key; # apply key has abc.students.csv stripped to students.csv
             my $dots=$apply_key=~tr/\.//;
             if ($dots==2){
@@ -322,23 +354,27 @@ sub config_sophomorix_read {
             #print "              Key: <$key> ---> <$apply_key>\n";
             if ($apply_key eq $applies_to){
                 # user
-                $sophomorix_config{'user_files'}{$key}{RT_sophomorixRole}=$sophomorix_role;
+                $sophomorix_config{'user_file'}{$key}{RT_sophomorixRole}=$sophomorix_role;
                 # primary group
-                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
-                $sophomorix_config{'user_files'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
-                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_PRIMARY}=$ou_sub_primary;
+                $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
+                $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
+                $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_PRIMARY}=
+                    $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                 # secondary group
-                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
-                $sophomorix_config{'user_files'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
-                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_SECONDARY}=$ou_sub_secondary;
+                $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
+                $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
+                $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_SECONDARY}=
+                    $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                 # tertiary group
-                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
-                $sophomorix_config{'user_files'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
-                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_TERTIARY}=$ou_sub_tertiary;
+                $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
+                $sophomorix_config{'user_file'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
+                $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
+                    $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                 # quaternary group
-                $sophomorix_config{'user_files'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
-                $sophomorix_config{'user_files'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
-                $sophomorix_config{'user_files'}{$key}{RT_OU_SUB_QUATERNARY}=$ou_sub_quaternary;
+                $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
+                $sophomorix_config{'user_file'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
+                $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_QUATERNARY}=
+                    $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
             }
         }
     }

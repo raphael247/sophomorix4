@@ -749,7 +749,7 @@ sub AD_get_ou_tokened {
     if ($ou eq "---"){ # use default OU: SCHOOL
         # remove OU= from configured value
         my $string=$DevelConf::AD_school_ou;
-        $string=~s/^OU=//;
+        #$string=~s/^OU=//;
         $ou=$string;
     }
     return $ou;
@@ -859,6 +859,7 @@ sub AD_ou_add {
     my $ou = $arg_ref->{ou};
     my $token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $gidnumber_wish;
 
     $ou=&AD_get_ou_tokened($ou);
@@ -871,17 +872,32 @@ sub AD_ou_add {
         print "Adding OU=$ou ($token) ...\n";
     }
 
-    my $dn="OU=".$ou.",".$root_dse;
-
-    # providing ou SCHOOLNAME
+    # old:
+    #my $dn="OU=".$ou.",".$root_dse;
+    #print "OLD: DN: $dn\n";
+    # New
+    my $dn=$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
+    print "DN: $dn\n";
+    # providing OU_TOP of school
     my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     if($Conf::log_level>=2){
         print "   * Adding sub ou's ...\n";
     }
+
+
     # ou's for users
+
+    # old: OU=Students from develconf
+    #my $student=$DevelConf::AD_student_ou.",".$dn;
+    #$result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    # new: OU from hash
     my $student=$DevelConf::AD_student_ou.",".$dn;
-    $result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    print "$student\n";   
+#$result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+    return;
+
     my $teacher=$DevelConf::AD_teacher_ou.",".$dn;
     $result = $ldap->add($teacher,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $workstation=$DevelConf::AD_computer_ou.",".$dn;
