@@ -883,7 +883,7 @@ sub AD_ou_add {
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     if($Conf::log_level>=2){
-        print "   * Adding sub ou's ...\n";
+        print "   * Adding sub ou's for OU=$ou ...\n";
     }
 
 
@@ -944,16 +944,44 @@ sub AD_ou_add {
     }
 
     
+    if($Conf::log_level>=2){
+        print "   * Adding groups for OU=$ou ...\n";
+    }
+
+    # create groups
+    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_CN'}}) {
+        #my $dn=$ref_sophomorix_config->{'ou'}{$ou};
+        #my $dn="ts";
+        print "      * DN: $dn\n";
+        #$result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
+
+    
+    if($Conf::log_level>=2){
+        print "   * Adding groups for OU=$DevelConf::AD_global_ou ...\n";
+    }
+
+    # create groups
+    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
+        #my $dn=$ref_sophomorix_config->{'ou'}{$ou};
+        #my $dn="ts";
+        print "      * DN: $dn\n";
+        #$result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
+
+    
+
+
 
     # Adding some groups
     # <token>-teachers
-    my $group=$token.$DevelConf::teacher;
-    my $target_branch="OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
-    my $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
+    #my $group=$token.$DevelConf::teacher;
+    #my $target_branch="OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
+    #my $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_teacher_ou.",".$dn;
 
-    if($Conf::log_level>=2){
-        print "   * Adding group $group\n";
-    }
+    #if($Conf::log_level>=2){
+    #    print "   * Adding group $group\n";
+    #}
     # create parent
     #my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
@@ -974,14 +1002,14 @@ sub AD_ou_add {
     #               });
 
     # <token>-students
-    $group=$token.$DevelConf::student;
+    #$group=$token.$DevelConf::student;#
 
-    $target_branch="OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
-    $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
+    #$target_branch="OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
+    #$dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_student_ou.",".$dn;
 
-    if($Conf::log_level>=2){
-        print "   * Adding group $group\n";
-    }
+    #if($Conf::log_level>=2){
+    #    print "   * Adding group $group\n";
+    #}
     # create parent
     #$target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
@@ -1001,16 +1029,13 @@ sub AD_ou_add {
     #               });
 
     # <token>-examaccounts
-    $group=$token.$DevelConf::examaccount;
-    $target_branch="OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
-    $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
+#    $group=$token.$DevelConf::examaccount;
+#    $target_branch="OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
+#    $dn_group="CN=".$group.",OU=".$group.",".$DevelConf::AD_examaccount_ou.",".$dn;
 
-    if($Conf::log_level>=2){
-        print "   * Adding group $group\n";
-    }
-    print "$target_branch\n";
-
-    return;
+#    if($Conf::log_level>=2){
+#        print "   * Adding group $group\n";
+#    }
     # create parent
 #    $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     # create group
@@ -1029,10 +1054,15 @@ sub AD_ou_add {
     #                   gidnumber_wish=>$gidnumber_wish,
     #               });
 
-    # <token>-wifi
-    $group=$token.$DevelConf::AD_wifi_group;
-    $dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
-    if($Conf::log_level>=2){
+    ## <token>-wifi
+    #$group=$token.$DevelConf::AD_wifi_group;
+    #$dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
+
+
+    return;
+
+ 
+   if($Conf::log_level>=2){
         print "   * Adding group $group\n";
     }
     # create group
@@ -1072,7 +1102,6 @@ sub AD_ou_add {
     #                   hidden=>"FALSE",
     #                   gidnumber_wish=>$gidnumber_wish,
     #               });
-    return;
     ############################################################
     # OU=GLOBAL
     { # start: make the following vars for OU=GLOBAL local vars
@@ -1080,7 +1109,8 @@ sub AD_ou_add {
     if($Conf::log_level>=2){
         print "Adding $global_dn\n";
     }
-    $result = $ldap->add($global_dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    #$result = $ldap->add($global_dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    return;
 
     if($Conf::log_level>=2){
         print "   * Adding sub ou's ...\n";

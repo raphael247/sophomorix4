@@ -396,13 +396,15 @@ sub config_sophomorix_read {
                 if ($group_primary ne "" and not $group_primary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_primary;
-                    my $dn_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
-		    print "GROUP: $group ($dn_group)\n";
+                    my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                    my $cn_group="CN=".$group.",".$ou_group;
+		    print "GROUP: $group ($ou_group)\n";
                       $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="primary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
-                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$dn_group}=$group;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
                     print "GROUP: $group_primary\n";
@@ -417,13 +419,15 @@ sub config_sophomorix_read {
                 if ($group_secondary ne "" and not $group_secondary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_secondary;
-                    my $dn_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                    my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                    my $cn_group="CN=".$group.",".$ou_group;
                     print "GROUP: $group\n";
                     $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
-                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$dn_group}=$group;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
                     print "GROUP: $group_secondary\n";
@@ -436,18 +440,20 @@ sub config_sophomorix_read {
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                 if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
-		    my $dn_group="OU=".$group_tertiary.",".$ou_sub_tertiary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
-                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$dn_group}=$group_tertiary;
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
                 }
 
                 # quaternary group
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
                 if ($group_quaternary ne "" and not $group_quaternary eq "multi"){
-		    my $dn_group="OU=".$group_quaternary.",".$ou_sub_quaternary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+		    my $ou_group="OU=".$group_quaternary.",".$ou_sub_quaternary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
                         $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
@@ -465,20 +471,56 @@ sub config_sophomorix_read {
     # examaccounts
     foreach my $ou (keys %{$sophomorix_config{'ou'}}) {
         if ($ou eq $DevelConf::AD_global_ou){
-            my $ou_exam="OU=global-examaccounts".",".
-                    $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="global-examaccounts";
-            $sophomorix_config{'ou'}{$ou}{GROUP}{'global-examaccounts'}=
-                $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{'global-examaccounts'}="none";
+            # GLOBAL
+            my @grouplist=("examaccounts","wifi","internet");
+            foreach my $group (@grouplist){
+                my $sub_ou;
+                if ($group eq "examaccounts"){
+                    $sub_ou=$DevelConf::AD_examaccount_ou;
+                } else {
+                    $sub_ou=$DevelConf::AD_globalgroup_ou;
+                }
+
+
+
+                #??????????????????????????????????????????????????????????????????
+                my $ou_group="OU=global-".$group.",".
+                        $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+                #my $group_prefix=$sophomorix_config{'ou'}{$ou}{PREFIX}.$group;
+                my $cn_group="CN=global-".$group.",".$ou_group;
+                $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_group}="global-".$group;
+                $sophomorix_config{'ou'}{$ou}{GROUP_CN}{$cn_group}="global-".$group;
+                $sophomorix_config{'ou'}{$ou}{GROUP}{"global-".$group}=
+                    $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+                $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{"global-".$group}="none";
+            }
+            # my $ou_exam="OU=global-examaccounts".",".
+            #         $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+            # my $cn_exam="CN=global-examaccounts,".$ou_exam;
+            # $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="global-examaccounts";
+            # $sophomorix_config{'ou'}{$ou}{GROUP_CN}{$cn_exam}="global-examaccounts";
+            # $sophomorix_config{'ou'}{$ou}{GROUP}{'global-examaccounts'}=
+            #     $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+            # $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{'global-examaccounts'}="none";
         } else {
-            my $ou_exam="OU=".$sophomorix_config{'ou'}{$ou}{PREFIX}."examaccounts".",".
-                    $DevelConf::AD_examaccount_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            my $group_exam=$sophomorix_config{'ou'}{$ou}{PREFIX}."examaccounts";
-            $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="$group_exam";
-            $sophomorix_config{'ou'}{$ou}{GROUP}{$group_exam}=
-                $DevelConf::AD_examaccount_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{$group_exam}="none";
+            my @grouplist=("examaccounts","wifi","internet");
+            foreach my $group (@grouplist){
+                my $sub_ou;
+                if ($group eq "examaccounts"){
+                    $sub_ou=$DevelConf::AD_examaccount_ou;
+                } else {
+                    $sub_ou=$DevelConf::AD_globalgroup_ou;
+                }
+                my $ou_group="OU=".$sophomorix_config{'ou'}{$ou}{PREFIX}.$group.",".
+                        $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+                my $group_prefix=$sophomorix_config{'ou'}{$ou}{PREFIX}.$group;
+                my $cn_group="CN=".$group_prefix.",".$ou_group;
+                $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_group}="$group_prefix";
+                $sophomorix_config{'ou'}{$ou}{GROUP_CN}{$cn_group}="$group_prefix";
+                $sophomorix_config{'ou'}{$ou}{GROUP}{$group_prefix}=
+                    $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+                $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
+            }
         }
     }
     close(ROLETYPE);
