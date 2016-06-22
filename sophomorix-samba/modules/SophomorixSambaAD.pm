@@ -903,7 +903,7 @@ sub AD_ou_add {
     foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}}) {
         $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU)\n";
-        #$result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
     # create school ou's from DevelConf
