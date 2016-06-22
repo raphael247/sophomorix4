@@ -440,7 +440,8 @@ sub config_sophomorix_read {
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                 if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
-		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.",".
+                                 $sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
@@ -453,12 +454,14 @@ sub config_sophomorix_read {
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
                 if ($group_quaternary ne "" and not $group_quaternary eq "multi"){
-		    my $ou_group="OU=".$group_quaternary.",".$ou_sub_quaternary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+		    my $ou_group="OU=".$group_quaternary.",".$ou_sub_quaternary.",".
+                                 $sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
+                    my $cn_group="CN=".$group_quaternary.",".$ou_group;
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
                         $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$group_quaternary}=
-                      "OU=".$group_quaternary.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
+                      "OU=".$group_quaternary.",".$ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                 }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_QUATERNARY}=
                     $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
@@ -480,8 +483,6 @@ sub config_sophomorix_read {
                 } else {
                     $sub_ou=$DevelConf::AD_globalgroup_ou;
                 }
-
-
 
                 #??????????????????????????????????????????????????????????????????
                 my $ou_group="OU=global-".$group.",".
