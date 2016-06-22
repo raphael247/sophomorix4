@@ -436,8 +436,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                 if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
-#		    my $dn_group="OU=".$group_tertiary.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
-		    my $dn_group="OU=".$group_tertiary.",".$ou_sub_tertiary.",".$DevelConf::AD_global_ou;
+		    my $dn_group="OU=".$group_tertiary.",".$ou_sub_tertiary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
@@ -448,6 +447,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
                 $sophomorix_config{'user_file'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
                 if ($group_quaternary ne "" and not $group_quaternary eq "multi"){
+		    my $dn_group="OU=".$group_quaternary.",".$ou_sub_quaternary.$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
                         $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
@@ -456,21 +456,29 @@ sub config_sophomorix_read {
                 }
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_QUATERNARY}=
                     $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
-
             } else {
                 print "No match. Nothing to do!\n";
             }
         }
     }
+
+    # examaccounts
     foreach my $ou (keys %{$sophomorix_config{'ou'}}) {
         if ($ou eq $DevelConf::AD_global_ou){
             my $ou_exam="OU=global-examaccounts".",".
                     $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
             $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="global-examaccounts";
+            $sophomorix_config{'ou'}{$ou}{GROUP}{'global-examaccounts'}=
+                $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+            $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{'global-examaccounts'}="none";
         } else {
             my $ou_exam="OU=".$sophomorix_config{'ou'}{$ou}{PREFIX}."examaccounts".",".
                     $DevelConf::AD_examaccount_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="";
+            my $group_exam=$sophomorix_config{'ou'}{$ou}{PREFIX}."examaccounts";
+            $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="$group_exam";
+            $sophomorix_config{'ou'}{$ou}{GROUP}{$group_exam}=
+                $DevelConf::AD_examaccount_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
+            $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{$group_exam}="none";
         }
     }
     close(ROLETYPE);
