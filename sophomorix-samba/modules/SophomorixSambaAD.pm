@@ -1103,10 +1103,47 @@ sub AD_ou_add {
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
-#    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_OU'}}) {
-#        print "      * DN: $dn (GROUP_OU)\n";
-#        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-#    }
+    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_OU'}}) {
+        print "      * DN: $dn (GROUP_OU)\n";
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
+
+
+    ############################################################
+    # OU=*    
+    if($Conf::log_level>=2){
+        print "   * Adding OU's for default groups in OU=$ou ...\n";
+    }
+    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
+        print "      * DN: $dn (GROUP_CN)\n";
+        # create ou for group
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        my $group=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
+        my $description=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$group};
+        my $type=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
+        my $school_token=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'SCHOOL_TOKEN'};
+        print "GROUP: $group\n";
+        print "   OU: $DevelConf::AD_global_ou\n";
+        print "TOKEN: $school_token\n";
+        print "DESC.: $description\n";
+        print "Type:  $type\n";
+        # create
+         &AD_group_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           dn_wish=>$dn,
+                           ou=>$DevelConf::AD_global_ou,
+                           school_token=>$school_token,
+                           group=>$group,
+                           description=>$description,
+                           type=>$type,
+                           status=>"P",
+                           creationdate=>$creationdate,
+                           joinable=>"TRUE",
+                           hidden=>"FALSE",
+                         });
+    }
+
+
 
 
     return;
