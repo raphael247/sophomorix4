@@ -346,7 +346,7 @@ sub config_sophomorix_read {
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
@@ -474,13 +474,14 @@ sub config_sophomorix_read {
     # examaccounts
     foreach my $ou (keys %{$sophomorix_config{'ou'}}) {
         if ($ou eq $DevelConf::AD_global_ou){
-            # GLOBAL
+            # OU=GLOBAL
             my @grouplist=("examaccounts","wifi","internet");
             foreach my $group (@grouplist){
                 my $sub_ou;
                 if ($group eq "examaccounts"){
                     $sub_ou=$DevelConf::AD_examaccount_ou;
                 } else {
+                    # wifi, internet
                     $sub_ou=$DevelConf::AD_globalgroup_ou;
                 }
 
@@ -504,13 +505,15 @@ sub config_sophomorix_read {
             #     $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
             # $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{'global-examaccounts'}="none";
         } else {
+            # OU=...
             my @grouplist=("examaccounts","wifi","internet");
             foreach my $group (@grouplist){
                 my $sub_ou;
                 if ($group eq "examaccounts"){
                     $sub_ou=$DevelConf::AD_examaccount_ou;
                 } else {
-                    $sub_ou=$DevelConf::AD_globalgroup_ou;
+                    # wifi, internet
+                    $sub_ou=$DevelConf::AD_management_ou;
                 }
                 my $ou_group="OU=".$sophomorix_config{'ou'}{$ou}{PREFIX}.$group.",".
                         $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
