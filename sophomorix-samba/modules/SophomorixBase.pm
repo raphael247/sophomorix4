@@ -401,6 +401,8 @@ sub config_sophomorix_read {
 		    print "GROUP: $group ($ou_group)\n";
                       $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="primary";
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_TYPE}{$group}=$sophomorix_type_primary;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_DESCRIPTION}{$group}="$key -> primary group";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
@@ -424,6 +426,8 @@ sub config_sophomorix_read {
                     print "GROUP: $group\n";
                     $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_TYPE}{$group}=$sophomorix_type_secondary;
+                    $sophomorix_config{'ou'}{$ou_file}{GROUP_DESCRIPTION}{$group}="$key -> secondary group";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
@@ -444,6 +448,8 @@ sub config_sophomorix_read {
                                  $sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
@@ -458,6 +464,8 @@ sub config_sophomorix_read {
                                  $sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     my $cn_group="CN=".$group_quaternary.",".$ou_group;
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_quaternary}=$sophomorix_type_quaternary;
+                    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_quaternary}="$key -> quaternary group";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
                         $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$group_quaternary}=
@@ -495,6 +503,8 @@ sub config_sophomorix_read {
                 $sophomorix_config{'ou'}{$ou}{GROUP}{"global-".$group}=
                     $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
                 $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{"global-".$group}="none";
+                $sophomorix_config{'ou'}{$ou}{GROUP_TYPE}{"global-".$group}="ouglobalclass";
+                $sophomorix_config{'ou'}{$ou}{GROUP_DESCRIPTION}{"global-".$group}="LML Examaccounts";
             }
             # my $ou_exam="OU=global-examaccounts".",".
             #         $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
@@ -524,6 +534,8 @@ sub config_sophomorix_read {
                 $sophomorix_config{'ou'}{$ou}{GROUP}{$group_prefix}=
                     $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
                 $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
+                $sophomorix_config{'ou'}{$ou}{GROUP_TYPE}{$group_prefix}="ouclass";
+                $sophomorix_config{'ou'}{$ou}{GROUP_DESCRIPTION}{$group_prefix}="LML $ou $group";
             }
         }
     }

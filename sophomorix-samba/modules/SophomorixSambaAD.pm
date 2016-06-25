@@ -868,104 +868,85 @@ sub AD_ou_add {
     } else {
         $token=$token."-";
     }
-    if($Conf::log_level>=2){
-        print "Adding OU=$ou ($token) ...\n";
-    }
 
-    # old:
-    my $dn="OU=".$ou.",".$root_dse;
-    print "OLD: DN: $dn\n";
-    # New get top of school
-    #my $dn=$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
-    #print "DN: $dn\n";
+    &Sophomorix::SophomorixBase::print_title("Adding OU=$ou ($token) ...");
+
     # providing OU_TOP of school
     my $result = $ldap->add($ref_sophomorix_config->{'ou'}{$ou}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
+    ############################################################
+    # sub ou's for OU=*    
     if($Conf::log_level>=2){
         print "   * Adding sub ou's for OU=$ou ...\n";
     }
 
-
-    # ou's for users
-
-    # old: OU=Students from develconf
-    #my $student=$DevelConf::AD_student_ou.",".$dn;
-    #$result = $ldap->add($student,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    # new: OU from hash
-    #my $student=$DevelConf::AD_student_ou.",".$dn;
-    #print "$student\n";   
-    $result = $ldap->add($ref_sophomorix_config->{'ou'}{$ou}{RT_students},
-                     attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
-    # create school ou's from Roletype
-    # experimentalforeach my $sub_ou (keys $ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}) {
     foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}}) {
         $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU)\n";
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
-    # create school ou's from DevelConf
     foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}}) {
         my $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
         print "      * DN: $dn (DEVELCONF_SCHOOL_OU)\n";
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
-#    my $teacher=$DevelConf::AD_teacher_ou.",".$dn;
-#    $result = $ldap->add($teacher,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
-
-    #my $workstation=$DevelConf::AD_computer_ou.",".$dn;
-    #$result = $ldap->add($workstation,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    #my $examaccount=$DevelConf::AD_examaccount_ou.",".$dn;
-    #$result = $ldap->add($examaccount,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
-    # other
-    #my $project=$DevelConf::AD_project_ou.",".$dn;
-    #$result = $ldap->add($project,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    #my $management=$DevelConf::AD_management_ou.",".$dn;
-    #$result = $ldap->add($management,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    #my $printer=$DevelConf::AD_printer_ou.",".$dn;
-    #$result = $ldap->add($printer,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-    #my $custom=$DevelConf::AD_custom_ou.",".$dn;
-    #$result = $ldap->add($custom,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
-
-    # create ou's for groups
-#    foreach my $ou (keys $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_OU'}) {
     foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_OU'}}) {
-        #my $dn=$ref_sophomorix_config->{'ou'}{$ou};
-        #my $dn="ts";
-        print "      * DN: $dn\n";
+        print "      * DN: $dn (GROUP_OU)\n";
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
-    
+    ############################################################
+    # OU=*    
     if($Conf::log_level>=2){
-        print "   * Adding groups for OU=$ou ...\n";
+        print "   * Adding OU's for default groups in OU=$ou ...\n";
     }
-
-    # create groups
     foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_CN'}}) {
-        #my $dn=$ref_sophomorix_config->{'ou'}{$ou};
-        #my $dn="ts";
-        print "      * DN: $dn\n";
+        print "      * DN: $dn (GROUP_CN)\n";
+        # create ou for group
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        my $group=$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_CN'}{$dn};
+        my $description=$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_DESCRIPTION'}{$group};
+        my $type=$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_TYPE'}{$group};
+        my $school_token=$ref_sophomorix_config->{'ou'}{$ou}{'SCHOOL_TOKEN'};
+        print "GROUP: $group\n";
+        print "   OU: $ou\n";
+        print "TOKEN: $school_token\n";
+        print "DESC.: $description\n";
+        print "Type:  $type\n";
+
+        # create
+         &AD_group_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           dn_wish=>$dn,
+                           ou=>$ou,
+                           school_token=>$school_token,
+                           group=>$group,
+                           description=>$description,
+                           type=>$type,
+                           status=>"P",
+                           creationdate=>$creationdate,
+                           joinable=>"TRUE",
+                           hidden=>"FALSE",
+                         });
     }
 
-    
+
+    ############################################################
+    # OU=GLOBAL
     if($Conf::log_level>=2){
-        print "   * Adding groups for OU=$DevelConf::AD_global_ou ...\n";
+        print "   * Adding OU's for default groups in OU=$DevelConf::AD_global_ou ...\n";
     }
 
     # create groups
     foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
-        #my $dn=$ref_sophomorix_config->{'ou'}{$ou};
-        #my $dn="ts";
-        print "      * DN: $dn\n";
+        print "      * DN: $dn (GROUP_CN)\n";
+        # create ou for group
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        # create group
+
     }
 
     
@@ -985,20 +966,20 @@ sub AD_ou_add {
     #my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     # create group
-    # &AD_group_create({ldap=>$ldap,
-    #                   root_dse=>$root_dse,
-    #                   dn_wish=>$dn_group,
-    #                   ou=>"unused together with dn_wish",
-    #                   school_token=>$token,
-    #                   group=>$group,
-    #                   description=>"LML Teachers $ou",
-    #                   type=>"adminclass",
-    #                   status=>"P",
-    #                   creationdate=>$creationdate,
-    #                   joinable=>"TRUE",
-    #                   hidden=>"FALSE",
-    #                   gidnumber_wish=>$gidnumber_wish,
-    #               });
+     # &AD_group_create({ldap=>$ldap,
+     #                   root_dse=>$root_dse,
+     #                   dn_wish=>$dn_group,
+     #                   ou=>"unused together with dn_wish",
+     #                   school_token=>$token,
+     #                   group=>$group,
+     #                   description=>"LML Teachers $ou",
+     #                   type=>"adminclass",
+     #                   status=>"P",
+     #                   creationdate=>$creationdate,
+     #                   joinable=>"TRUE",
+     #                   hidden=>"FALSE",
+     #                   gidnumber_wish=>$gidnumber_wish,
+     #               });
 
     # <token>-students
     #$group=$token.$DevelConf::student;#
@@ -2258,13 +2239,14 @@ sub AD_group_create {
         if (not defined $gidnumber_wish or $gidnumber_wish eq "---"){
             $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
         }
-        print("   DN:              $dn\n");
-        print("   Target:          $target_branch\n");
-        print("   Group:           $group\n");
+        print "   DN:              $dn\n";
+        print "   Target:          $target_branch\n";
+        print "   Group:           $group\n";
         print "   Unix-gidNumber:  $gidnumber_wish\n";
-        print("   Type:            $type\n");
-        print("   Joinable:        $joinable\n");
+        print "   Type:            $type\n";
+        print "   Joinable:        $joinable\n";
         print "   Creationdate:    $creationdate\n";
+        print "   Description:     $description\n";
 
         # Create target branch
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
