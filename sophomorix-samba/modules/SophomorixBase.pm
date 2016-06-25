@@ -342,7 +342,7 @@ sub config_sophomorix_read {
             $sophomorix_config{'sub_ou'}{'RT_GLOBAL_OU'}{$ou_sub_quaternary}="from RoleType";
         } 
 
-        # adding 
+        # adding school
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
@@ -350,6 +350,15 @@ sub config_sophomorix_read {
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
+       
+        # adding global
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
 
 

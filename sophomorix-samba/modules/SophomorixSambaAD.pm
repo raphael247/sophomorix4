@@ -911,12 +911,11 @@ sub AD_ou_add {
         my $description=$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_TYPE'}{$group};
         my $school_token=$ref_sophomorix_config->{'ou'}{$ou}{'SCHOOL_TOKEN'};
-        print "GROUP: $group\n";
-        print "   OU: $ou\n";
-        print "TOKEN: $school_token\n";
-        print "DESC.: $description\n";
-        print "Type:  $type\n";
-
+#        print "GROUP: $group\n";
+#        print "   OU: $ou\n";
+#        print "TOKEN: $school_token\n";
+#        print "DESC.: $description\n";
+#        print "Type:  $type\n";
         # create
          &AD_group_create({ldap=>$ldap,
                            root_dse=>$root_dse,
@@ -936,18 +935,18 @@ sub AD_ou_add {
 
     ############################################################
     # OU=GLOBAL
-    if($Conf::log_level>=2){
-        print "   * Adding OU's for default groups in OU=$DevelConf::AD_global_ou ...\n";
-    }
+#    if($Conf::log_level>=2){
+#        print "   * Adding OU's for default groups in OU=$DevelConf::AD_global_ou ...\n";
+#    }
 
     # create groups
-    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
-        print "      * DN: $dn (GROUP_CN)\n";
-        # create ou for group
-        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-        # create group
-
-    }
+#    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
+#        print "      * DN: $dn (GROUP_CN)\n";
+#        # create ou for group
+#        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+#        # create group
+#
+#    }
 
     
 
@@ -1039,12 +1038,9 @@ sub AD_ou_add {
     #$dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
 
 
-    return;
-
- 
-   if($Conf::log_level>=2){
-        print "   * Adding group $group\n";
-    }
+   #if($Conf::log_level>=2){
+   #     print "   * Adding group $group\n";
+   # }
     # create group
     # &AD_group_create({ldap=>$ldap,
     #                   root_dse=>$root_dse,
@@ -1062,11 +1058,11 @@ sub AD_ou_add {
     #               });
 
     # <token>-internet
-    $group=$token.$DevelConf::AD_internet_group;
-    $dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
-    if($Conf::log_level>=2){
-        print "   * Adding group $group\n";
-    }
+#    $group=$token.$DevelConf::AD_internet_group;
+#    $dn_group="CN=".$group.",".$DevelConf::AD_management_ou.",".$dn;
+#    if($Conf::log_level>=2){
+#        print "   * Adding group $group\n";
+#    }
     # create group
     # &AD_group_create({ldap=>$ldap,
     #                   root_dse=>$root_dse,
@@ -1084,6 +1080,39 @@ sub AD_ou_add {
     #               });
     ############################################################
     # OU=GLOBAL
+    # providing OU_TOP of school
+    my $result = $ldap->add($ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{OU_TOP},
+                        attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+    ############################################################
+    # sub ou's for OU=*    
+    if($Conf::log_level>=2){
+        print "   * Adding sub ou's for OU=$DevelConf::AD_global_ou ...\n";
+    }
+
+    
+    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_GLOBAL_OU'}}) {
+        $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{OU_TOP};
+        print "      * DN: $dn (RT_GLOBAL_OU)\n";
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
+
+   foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}}) {
+        my $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{OU_TOP};
+        print "      * DN: $dn (DEVELCONF_GLOBAL_OU)\n";
+        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    }
+
+#    foreach my $dn (keys %{$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_OU'}}) {
+#        print "      * DN: $dn (GROUP_OU)\n";
+#        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+#    }
+
+
+    return;
+
+ 
+
     { # start: make the following vars for OU=GLOBAL local vars
     my $global_dn=$DevelConf::AD_global_ou.",".$root_dse;
     if($Conf::log_level>=2){
