@@ -388,6 +388,7 @@ sub AD_user_create {
     my $tolerationdate = $arg_ref->{tolerationdate};
     my $deactivationdate = $arg_ref->{deactivationdate};
     my $status = $arg_ref->{status};
+    my $file = $arg_ref->{file};
 
     if($Conf::log_level>=1){
         print "\n";
@@ -458,6 +459,7 @@ sub AD_user_create {
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
         print "   Unix-uidNumber:     $uidnumber_wish\n";
+        print "   File:               $file\n";
     }
 
     $ldap->add($dn_class,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -831,6 +833,8 @@ sub AD_get_container {
     # group container
     }  elsif ($role eq "adminclass"){
         $container=$group_strg.$DevelConf::AD_student_ou;
+    }  elsif ($role eq "teacherclass"){
+        $container=$group_strg.$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "project"){
         $container=$DevelConf::AD_project_ou;
     }  elsif ($role eq "sophomorix-group"){
@@ -2278,6 +2282,7 @@ sub AD_group_create {
     my $gidnumber_wish = $arg_ref->{gidnumber_wish};
     my $dn_wish = $arg_ref->{dn_wish};
     my $cn = $arg_ref->{cn};
+    my $file = $arg_ref->{file};
 
     if (not defined $joinable){
         $joinable="FALSE";    
@@ -2285,6 +2290,9 @@ sub AD_group_create {
 
     if (not defined $cn){
         $cn=$group;    
+    }
+    if (not defined $file){
+        $file="none";    
     }
 
     $ou=&AD_get_ou_tokened($ou);
@@ -2313,6 +2321,7 @@ sub AD_group_create {
         print "   Joinable:        $joinable\n";
         print "   Creationdate:    $creationdate\n";
         print "   Description:     $description\n";
+        print "   File:            $file\n";
 
         # Create target branch
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -2347,34 +2356,36 @@ sub AD_group_create {
         print "   * Group $group exists already ($count results)\n";
     }
     if ($type eq "adminclass"){
-        my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school_token,"adminclass");
-        if ($group eq $teacher_group_expected){
+        # a group like 7a, 7b
+        #print "Student class of the school: $group\n";
+        my $token_students=&AD_get_name_tokened($DevelConf::student,$school_token,"adminclass");
+  
+        if ($token_students ne $group){ # do not add group to itself
+            # add the group to <token>-students
+            &AD_group_addmember({ldap => $ldap,
+                                 root_dse => $root_dse, 
+                                 group => $token_students,
+                                 addgroup => $group,
+                               });
+        }
+        # add group <token>-students to global-students
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => "global-".$DevelConf::student,
+                             addgroup => $token_students,
+                           });
+    } elsif ($type eq "teacherclass"){
+        #my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school_token,"adminclass");
+        #if ($group eq $teacher_group_expected){
             # add <token>-teachers to global-teachers
             &AD_group_addmember({ldap => $ldap,
                                  root_dse => $root_dse, 
                                  group => "global-".$DevelConf::teacher,
                                  addgroup => $group,
                                });
-        } else {
-            # a group like 7a, 7b
-            #print "Student class of the school: $group\n";
-            my $token_students=&AD_get_name_tokened($DevelConf::student,$school_token,"adminclass");
-  
-            if ($token_students ne $group){ # do not add group to itself
-                # add the group to <token>-students
-                &AD_group_addmember({ldap => $ldap,
-                                     root_dse => $root_dse, 
-                                     group => $token_students,
-                                     addgroup => $group,
-                                   });
-            }
-            # add group <token>-students to global-students
-            &AD_group_addmember({ldap => $ldap,
-                                 root_dse => $root_dse, 
-                                 group => "global-".$DevelConf::student,
-                                 addgroup => $token_students,
-                               });
-        }
+
+
+        #} else {
     } elsif ($type eq "room"){
         my $token_examaccounts=$school_token."-".$DevelConf::examaccount;
         # add the room to <token>-examaccounts
