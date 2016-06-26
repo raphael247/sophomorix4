@@ -515,14 +515,6 @@ sub config_sophomorix_read {
                 $sophomorix_config{'ou'}{$ou}{GROUP_TYPE}{"global-".$group}="ouglobalclass";
                 $sophomorix_config{'ou'}{$ou}{GROUP_DESCRIPTION}{"global-".$group}="LML Examaccounts";
             }
-            # my $ou_exam="OU=global-examaccounts".",".
-            #         $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            # my $cn_exam="CN=global-examaccounts,".$ou_exam;
-            # $sophomorix_config{'ou'}{$ou}{GROUP_OU}{$ou_exam}="global-examaccounts";
-            # $sophomorix_config{'ou'}{$ou}{GROUP_CN}{$cn_exam}="global-examaccounts";
-            # $sophomorix_config{'ou'}{$ou}{GROUP}{'global-examaccounts'}=
-            #     $DevelConf::AD_globalgroup_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
-            # $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{'global-examaccounts'}="none";
         } else {
             # OU=...
             my @grouplist=("examaccounts","wifi","internet");
