@@ -204,14 +204,14 @@ if ($info==1) {
 
    my @sorted_lines = sort {
        my @a_fields = split /::/, $a;
-       my @aa_fields = split /;/, $a_fields[1];
+       my @aa_fields = split /;/, $a_fields[2];
 
        my @b_fields = split /::/, $b;
-       my @bb_fields = split /;/, $b_fields[1];
+       my @bb_fields = split /;/, $b_fields[2];
 
-       $a_fields[0] cmp $b_fields[0]  # string sort on 1st field, then
+       $a_fields[1] cmp $b_fields[1]  # string sort on 1st field, then
          ||
-       $aa_fields[0] cmp $bb_fields[0]  # string sort on 2nd field
+       $aa_fields[2] cmp $bb_fields[2]  # string sort on 2nd field
          ||
        $aa_fields[1] cmp $bb_fields[1]  # string sort on 3rd field
    } @lines;
