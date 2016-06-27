@@ -83,7 +83,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
+my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 
 
@@ -133,7 +134,6 @@ if ($info==1) {
        exit;
    }
 
-my ($ldap,$root_dse) = &AD_bind_admin();
 
 
 

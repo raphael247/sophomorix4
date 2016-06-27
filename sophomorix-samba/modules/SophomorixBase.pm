@@ -412,6 +412,9 @@ sub config_sophomorix_read {
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="primary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_TYPE}{$group}=$sophomorix_type_primary;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_DESCRIPTION}{$group}="$key -> primary group";
+                    if ($group_tertiary ne ""){
+                        $sophomorix_config{'ou'}{$ou_file}{GROUP_MEMBER}{$group}=$group_tertiary;
+                    }
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
@@ -437,6 +440,9 @@ sub config_sophomorix_read {
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_TYPE}{$group}=$sophomorix_type_secondary;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_DESCRIPTION}{$group}="$key -> secondary group";
+                    if ($group_tertiary ne ""){
+                        $sophomorix_config{'ou'}{$ou_file}{GROUP_MEMBER}{$group}=$group_tertiary;
+                    }
                     $sophomorix_config{'ou'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_secondary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
@@ -459,6 +465,9 @@ sub config_sophomorix_read {
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
+                    if ($group_quaternary ne ""){
+                        $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_MEMBER}{$group_tertiary}=$group_quaternary;
+                    }
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
                     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
