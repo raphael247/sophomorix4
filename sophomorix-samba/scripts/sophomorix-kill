@@ -86,7 +86,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
+my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
 if ($help==1) {
@@ -133,9 +134,6 @@ if ($loginname ne "") {
   #
   print "Loginname $loginname angegeben.\n";
 }
-
-
-my ($ldap,$root_dse) = &AD_bind_admin();
 
 &log_script_start(@arguments);
 

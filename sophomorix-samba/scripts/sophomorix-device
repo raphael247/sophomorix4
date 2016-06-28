@@ -239,10 +239,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
-
-#&check_connections();
 my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # ===========================================================================
 # --help
@@ -601,6 +599,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                     ou=>$ou,
                     school_token=>$school_token,
                     creationdate=>$time_stamp_AD,
+                    sophomorix_config=>\%sophomorix_config,
              });
         # remember ou
         $ou_created{$ou}="already created";

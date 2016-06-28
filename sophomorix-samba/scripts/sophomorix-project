@@ -175,7 +175,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
+my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # # help if no project is given
 # # and no useful option
@@ -356,10 +357,6 @@ if ($tree==1) {
     # }
     exit;
 }
-
-
-
-my ($ldap,$root_dse) = &AD_bind_admin();
 
 
 
@@ -584,6 +581,7 @@ if ($create==1 and $project ne ""){
                ou=>$ou,
                school_token=>$school_token,
                creationdate=>$time_stamp_AD,
+               sophomorix_config=>\%sophomorix_config,
              });
    my $group_token=&AD_get_name_tokened($project,$school_token,"project");
    &AD_group_create({ldap=>$ldap,

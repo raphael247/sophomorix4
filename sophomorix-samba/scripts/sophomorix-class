@@ -134,7 +134,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
+my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
 if ($help==1) {
@@ -191,9 +192,6 @@ Please see the sophomorix-class(8) man pages for full documentation
 # config values
 ############################################################
 
-my ($ldap,$root_dse) = &AD_bind_admin();
-
-
 # --info
 # show all class when no specific class is given
 if ($info==1 and $class eq ""){
@@ -224,6 +222,7 @@ if ($create==1 and $class ne ""){
                ou=>$ou,
                school_token=>$school_token,
                creationdate=>$time_stamp_AD,
+               sophomorix_config=>\%sophomorix_config,
              });
    my $group_token=&AD_get_name_tokened($class,$school_token,"adminclass");
    &AD_group_create({ldap=>$ldap,

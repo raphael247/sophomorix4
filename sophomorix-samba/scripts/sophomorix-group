@@ -89,7 +89,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my %sophomorix_config=&config_sophomorix_read();
+my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
 if ($help==1) {
@@ -125,8 +126,6 @@ Please see the sophomorix-group(8) man pages for full documentation
 
 
 
-my ($ldap,$root_dse) = &AD_bind_admin();
-
 # --info
 if ($info==1){
     &AD_group_list($ldap,$root_dse,"sophomorix-group",1);
@@ -158,6 +157,7 @@ if ($create==1 and $group ne ""){
                 ou=>$ou,
                 school_token=>$school_token,
                 creationdate=>$time_stamp_AD,
+                sophomorix_config=>\%sophomorix_config,
               }); 
     my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-group");
     &AD_group_create({ldap=>$ldap,
