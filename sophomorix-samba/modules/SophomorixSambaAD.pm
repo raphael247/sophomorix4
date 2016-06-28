@@ -614,6 +614,9 @@ sub AD_user_move {
     my $school_token_new = $arg_ref->{school_token_new};
     my $role_new = $arg_ref->{role};
     my $creationdate = $arg_ref->{creationdate};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+#    my %sophomorix_config=%$ref_sophomorix_config;
 
     # calculate
     my $group_type_old;
@@ -656,17 +659,18 @@ sub AD_user_move {
     }
 
     # make sure OU and tree exists
-#    if (not exists $ou_created{$ou_new}){
-#         # create new ou
+    if (not exists $ou_created{$ou_new}){
+         # create new ou
          &AD_ou_add({ldap=>$ldap,
                      root_dse=>$root_dse,
                      ou=>$ou_new,
                      school_token=>$school_token_new,
                      creationdate=>$creationdate,
+                     sophomorix_config=>$ref_sophomorix_config,
                    });
-#         # remember new ou to add it only once
-#         $ou_created{$ou_new}="already created";
-#     }
+         # remember new ou to add it only once
+         $ou_created{$ou_new}="already created";
+     }
 
     # make sure new group exits
     &AD_group_create({ldap=>$ldap,
