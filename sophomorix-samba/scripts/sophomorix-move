@@ -326,7 +326,13 @@ while(<USERVERSETZEN>){
 
     my $group_token_old=&AD_get_name_tokened($alte_klasse,$school_token_old,"adminclass");
     my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_token_new,"adminclass");
-
+    my $type;
+    if (defined $sophomorix_config{'ou'}{$ou_new}{'GROUP_TYPE'}{$group_token_new}){
+        $type=$sophomorix_config{'ou'}{$ou_new}{'GROUP_TYPE'}{$group_token_new};
+    } else {
+        $type="adminclass";
+    }
+    print "TYPE vor move: $type\n";
     &AD_user_move({ldap=>$ldap,
                    root_dse=>$root_dse,
                    user=>$login_versetzen,
@@ -337,7 +343,7 @@ while(<USERVERSETZEN>){
                    ou_new=>$ou_new,
                    school_token_old=>$school_token_old,
                    school_token_new=>$school_token_new,
-                   type=>"adminclass",
+                   type=>$type,
                    role=>$role,
                    creationdate=>$time_stamp_AD,
                    sophomorix_config=>\%sophomorix_config,

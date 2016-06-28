@@ -613,10 +613,9 @@ sub AD_user_move {
     my $school_token_old = $arg_ref->{school_token_old};
     my $school_token_new = $arg_ref->{school_token_new};
     my $role_new = $arg_ref->{role};
+    my $type = $arg_ref->{type};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-
-#    my %sophomorix_config=%$ref_sophomorix_config;
 
     # calculate
     my $group_type_old;
@@ -673,13 +672,19 @@ sub AD_user_move {
      }
 
     # make sure new group exits
+    #my $type;
+    if (not defined $type){
+#        $type=$sophomorix_config{'ou'}{$ou_new}{'GROUP_TYPE'}{$group_new};
+#    } else {
+        $type="adminclass";
+    }
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       group=>$group_new,
                       description=>$group_new,
                       ou=>$ou_new,
                       school_token=>$school_token_new,
-                      type=>"adminclass",
+                      type=>$type,
                       joinable=>"TRUE",
                       status=>"P",
                       creationdate=>$creationdate,
@@ -2400,9 +2405,23 @@ sub AD_login_test {
     if (not defined $firstpassword){
         return -1;
     }
-    my $command="smbclient -L localhost --user=$samaccount%'$firstpassword' > /dev/null 2>&1 ";
+
+    # smbclient test
+    #my $command="smbclient -L localhost --user=$samaccount%'$firstpassword' > /dev/null 2>&1 ";
+    #print "   # $command\n";
+    #my $result=system($command);
+
+    # pam login
+    my $command="wbinfo --pam-logon=$samaccount%'$firstpassword' > /dev/null 2>&1 ";
     print "   # $command\n";
     my $result=system($command);
+
+    # kerberos login
+    #my $command="wbinfo --krb5auth=$samaccount%'$firstpassword'' > /dev/null 2>&1 ";
+    #print "   # $command\n";
+    #my $result=system($command);
+
+
     return $result;
 }
 
