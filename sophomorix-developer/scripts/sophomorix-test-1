@@ -103,6 +103,10 @@ Created users or groups might clash with users or groups already added.
 It is recommended that sophomorix-test-1  is only run on test servers without 
 existing users and groups.
 
+  - Failed tests will show when not running on an empty system.
+  - Created OU\'s will not be deleted at the end of test. 
+
+
 Options
   -h  / --help
 
@@ -1778,8 +1782,8 @@ if ($kill==1 or $test_kill==1){
         &run_command("cp -v $file_kill_test $file_kill");
         &run_command("sophomorix-kill -i");
         &run_command("sophomorix-kill $verbose_options");
-        # removing adminclasses
-        #&run_command("sophomorix-class --kill --class teachers $verbose_options");
+        # removing adminclasses,teacherclasses
+        &run_command("sophomorix-class --kill --class teachers $verbose_options");
         &run_command("sophomorix-class --kill --class m7ab $verbose_options");
         &run_command("sophomorix-class --kill --class m8cd $verbose_options");
         &run_command("sophomorix-class --kill --class uni-12abc $verbose_options");
