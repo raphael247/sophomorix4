@@ -1002,17 +1002,14 @@ sub AD_ou_add {
                          });
     }
     # all groups created, add some memberships
-    #$sophomorix_config{'ou'}{$ou}{GROUP}{"global-".$group}
-foreach my $group (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}}) {
-    print "GRUPPE: $group -> $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}{$group}\n";
-}
-#    &AD_group_addmember({ldap => $ldap,
-#                         root_dse => $root_dse, 
-#                         group => $cn,
-#                         addgroup => $key,
-#                        }); 
-
-
+    foreach my $group (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}}) {
+        print "GRUPPE: $group -> $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}{$group}\n";
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}{$group},
+                             addgroup => $group,
+                            }); 
+    }
 }
 
 

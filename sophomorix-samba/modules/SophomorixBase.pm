@@ -546,6 +546,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
                 $sophomorix_config{'ou'}{$ou}{GROUP_TYPE}{$group_prefix}="ouclass";
                 $sophomorix_config{'ou'}{$ou}{GROUP_DESCRIPTION}{$group_prefix}="LML $ou $group";
+                $sophomorix_config{'ou'}{$ou}{GROUP_MEMBER}{$group_prefix}="global-".$group;
             }
         }
     }
