@@ -851,6 +851,28 @@ if ($add==1 or $test_add==1){
 
     ##### Testing the global groups
     &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-wifi,OU=global-wifi,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-wifi",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouglobalclass",
+                   sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-wifi,uni-wifi,wifi,",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-internet,OU=global-internet,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-internet",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouglobalclass",
+                   sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-internet,uni-internet,internet,",
+                  });
+    &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-examaccounts,OU=global-examaccounts,OU=ExamAccounts,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-examaccounts",
                    gidNumber=>"-1",
