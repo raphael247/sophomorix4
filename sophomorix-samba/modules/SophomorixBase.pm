@@ -231,7 +231,7 @@ sub read_lockfile {
 sub config_sophomorix_read {
     my ($ldap,$root_dse)=@_;
     my %sophomorix_config=();
-
+    &print_title("Reading $DevelConf::file_conf_school");
     ##################################################
     # SCHOOLS    
     open(SCHOOLS,"$DevelConf::file_conf_school") || 
@@ -293,6 +293,7 @@ sub config_sophomorix_read {
 
     ##################################################
     # RoleType
+    &print_title("Reading $DevelConf::file_conf_roletype");
     open(ROLETYPE,"$DevelConf::file_conf_roletype") || 
          die "ERROR: $DevelConf::file_conf_roletype not found!";
     while (<ROLETYPE>){
@@ -365,8 +366,11 @@ sub config_sophomorix_read {
         # remember for the following commented line:
         # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
         foreach my $key (keys %{$sophomorix_config{'user_file'}}) {
-            print "\n\nRoletype name: <$roletype_file>\n";
-            print "User File:     <$key>\n";
+            if($Conf::log_level>=3){
+                print "\n";
+                print "* Name in RoleType file: $roletype_file\n";
+                print "* Name in schools.conf:  $key\n";
+            }
             my $user_file=$key;
             my $token_file="";
             my $type_file="";
@@ -390,10 +394,13 @@ sub config_sophomorix_read {
                 exit;
             }
             my $matchname_of_user_file=$type_file.".".$extension_file;
-            print "  * Testing if File $key (stripped to <$matchname_of_user_file>) matches to <$roletype_file> (from RoleType)\n";
-            print "   PRI: $group_primary   SEC: $group_secondary\n";
+            if($Conf::log_level>=3){
+                print "* Testing if $key (stripped to $matchname_of_user_file) matches $roletype_file (RoleType)\n";
+            }
             if ($matchname_of_user_file eq $roletype_file){
-                print "Inserting ...\n";
+                if($Conf::log_level>=3){
+                    print "* Match: Inserting data...\n";
+                }
                 my $ou_file=$sophomorix_config{'user_file'}{$key}{OU};
                 # user
                 $sophomorix_config{'user_file'}{$key}{RT_sophomorixRole}=$sophomorix_role;
@@ -407,7 +414,7 @@ sub config_sophomorix_read {
                     my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_primary;
                     my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     my $cn_group="CN=".$group.",".$ou_group;
-		    print "GROUP: $group ($ou_group)\n";
+		    #print "GROUP: $group ($ou_group)\n";
                       $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="primary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_TYPE}{$group}=$sophomorix_type_primary;
@@ -421,7 +428,7 @@ sub config_sophomorix_read {
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
-                    print "GROUP: $group_primary\n";
+                    #print "GROUP: $group_primary\n";
                     $sophomorix_config{'user_file'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
                 }
 
@@ -435,7 +442,7 @@ sub config_sophomorix_read {
                     my $group=$sophomorix_config{'user_file'}{$key}{PREFIX}.$group_secondary;
                     my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP};
                     my $cn_group="CN=".$group.",".$ou_group;
-                    print "GROUP: $group\n";
+                    # print "GROUP: $group\n";
                     $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group;
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_TYPE}{$group}=$sophomorix_type_secondary;
@@ -449,7 +456,7 @@ sub config_sophomorix_read {
                     $sophomorix_config{'ou'}{$ou_file}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
-                    print "GROUP: $group_secondary\n";
+                    #print "GROUP: $group_secondary\n";
                     $sophomorix_config{'user_file'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
                 }
 
@@ -492,7 +499,9 @@ sub config_sophomorix_read {
                 $sophomorix_config{'user_file'}{$key}{RT_OU_SUB_QUATERNARY}=
                     $ou_sub_quaternary.",".$sophomorix_config{'user_file'}{$key}{OU_TOP_GLOBAL};
             } else {
-                print "No match. Nothing to do!\n";
+                if($Conf::log_level>=3){
+                    print "No match. Nothing to do!\n";
+                }
             }
         }
     }
@@ -510,8 +519,6 @@ sub config_sophomorix_read {
                     # wifi, internet
                     $sub_ou=$DevelConf::AD_globalgroup_ou;
                 }
-
-                #??????????????????????????????????????????????????????????????????
                 my $ou_group="OU=global-".$group.",".
                         $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
                 #my $group_prefix=$sophomorix_config{'ou'}{$ou}{PREFIX}.$group;
