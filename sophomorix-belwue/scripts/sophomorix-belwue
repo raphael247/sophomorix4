@@ -1,0 +1,179 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-belwue) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+#use IMAP::Admin;
+#use DBI;
+use Net::LDAP;
+
+
+my @arguments = @ARGV;
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+
+my $passwd_file_belwue="/etc/sophomorix/belwue.pwd";
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# Reading Configuration
+my ($ldap) = &AD_bind_admin();
+print "HERE\n";
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-belwue
+
+Options
+  -h  / --help
+  -i  / --info
+  -v  / --verbose
+  -vv / --verbose --verbose
+
+
+Please see the sophomorix-belwue(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+
+# --info
+if ($info==1) {
+
+
+
+
+
+}
+
+
+
+    my $base="CN=mail.bszleo.de";
+    my $filter="(cn=*)";
+    my $mesg = $ldap->search(
+                      base   => $base,
+                      scope => 'sub',
+                      filter => $filter,
+                           );
+
+
+    my $max = $mesg->count; 
+    my $count = $mesg->count;
+print "RES: $count\n";
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn=$entry->dn();
+        my $uid=$entry->get_value('uid');
+        my $given=$entry->get_value('givenName');
+        my $sn=$entry->get_value('sn');
+        my $server=$entry->get_value('hostServer');
+	print "dn: $dn\n";
+	print "   * uid: $uid\n";
+	print "   * givenName: $given\n";
+	print "   * sn: $sn\n";
+	print "   * server: $server\n";
+}
+
+    my ($entry,@entries) = $mesg->entries;
+    my $dn = $entry->dn();
+    print "   * DN: $dn\n";
+
+
+
+##################################################
+sub AD_bind_admin {
+    my ($smb_pwd)=&AD_get_passwd();
+    my $host="ldaps://mbox1.belwue.de:636";
+
+
+    # check connection to Samba4 AD
+    if($Conf::log_level>=3){
+        print "   Checking Samba4 AD connection ...\n";
+    }
+
+    # bind
+    my $admin_dn="admin\@mail.bszleo.de";
+    print "HOST:  $host\n";
+    print "ADMIN: $admin_dn\n";
+    print "PASS: $smb_pwd\n";
+    my $ldap = Net::LDAP->new($host);
+
+    my $mesg = $ldap->bind($admin_dn, password => $smb_pwd);
+    # show errors from bind
+    $mesg->code && die $mesg->error;
+
+    # Testing if sophomorix schema is present
+    # ldbsearch -H ldap://localhost -UAdministrator%Muster! -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User
+    return ($ldap);
+}
+
+
+
+sub AD_unbind_admin {
+    my ($ldap) = @_;
+    my $mesg = $ldap->unbind();
+    #  show errors from unbind
+    $mesg->code && die $mesg->error;
+}
+
+######################################################################
+# error, when options are not given correctly
+sub  check_options{
+   my ($parse_ergebnis) = @_;
+   if (not $parse_ergebnis==1){
+      my @list = split(/\//,$0);
+      my $scriptname = pop @list;
+      print "\nYou have made a mistake, when specifying options.\n"; 
+      print "See error message above. \n\n";
+      print "... $scriptname is terminating.\n\n";
+      exit;
+   } else {
+      if($Conf::log_level>=3){
+         print "All options  were recognized.\n";
+      }
+   }
+}
+
+sub AD_get_passwd {
+    my $smb_pwd="";
+    if (-e $passwd_file_belwue) {
+        open (SECRET, $passwd_file_belwue);
+        while(<SECRET>){
+            $smb_pwd=$_;
+            chomp($smb_pwd);
+        }
+        close(SECRET);
+    } else {
+        print "Password of belwue mail administrator must ",
+               "be in $passwd_file_belwue\n";
+        exit;
+    }
+    return($smb_pwd);
+}
+
