@@ -41,6 +41,7 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 my %config=&read_config($config_file);
+my %belwue=();
 
 # calculate connect data
 my $base="CN=mail.bszleo.de";
@@ -121,9 +122,18 @@ my $mesg = $ldap->search(
 	print "   * sn:          $sn\n";
 	print "   * uid:         $uid\n";
         print "\n";
+        # ??????????????? maillist or uid
+
+        $belwue{'uid'}{$uid}{'CN'}=$cn;
+        $belwue{'uid'}{$uid}{'givenName'}=$given;
+        $belwue{'uid'}{$uid}{'hostServer'}=$server;
+        $belwue{'uid'}{$uid}{'mail'}=$mail;
+        $belwue{'uid'}{$uid}{'sn'}=$sn;
+        $belwue{'uid'}{$uid}{'uid'}=$uid;
     }
 
 #print Dumper(\$mesg);
+print Dumper(\%belwue);
 
 &unbind_admin($ldap); 
 
