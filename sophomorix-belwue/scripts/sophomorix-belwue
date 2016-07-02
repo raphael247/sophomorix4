@@ -11,7 +11,11 @@ use Getopt::Long;
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
-
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 
 my @arguments = @ARGV;
 
@@ -24,7 +28,7 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 
-my $passwd_file_belwue="/etc/sophomorix/belwue.pwd";
+my $config_file="/etc/sophomorix/belwue.conf";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -36,9 +40,24 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
+my %config=&read_config($config_file);
+
+# calculate connect data
+my $base="CN=mail.bszleo.de";
+$config{'connect'}{BASE}="CN=".$config{'config'}{'BASE'};
+$config{'connect'}{SCOPE}="sub";
+$config{'connect'}{FILTER}="(cn=*)";
+$config{'connect'}{HOST}=$config{'config'}{PROTOCOL}."://".
+                         $config{'config'}{SERVER}.":".
+                         $config{'config'}{PORT};
+$config{'connect'}{ADMIN}=$config{'config'}{USER};
+$config{'connect'}{PASSWORD}=$config{'config'}{PASSWORD};
+
+#print Dumper(%config);
+
 # Reading Configuration
-my ($ldap) = &AD_bind_admin();
-print "HERE\n";
+my ($ldap) = &bind_admin();
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -54,7 +73,6 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
-
 Please see the sophomorix-belwue(8) man pages for full documentation
 ');
    print "\n";
@@ -67,80 +85,86 @@ Please see the sophomorix-belwue(8) man pages for full documentation
 if ($info==1) {
 
 
-
-
-
 }
 
+##################################################
+# Script starts here
+##################################################
 
-
-    my $base="CN=mail.bszleo.de";
-    my $filter="(cn=*)";
-    my $mesg = $ldap->search(
-                      base   => $base,
-                      scope => 'sub',
-                      filter => $filter,
-                           );
-
+my $mesg = $ldap->search(
+                   base   => $config{'connect'}{BASE},
+                   scope => $config{'connect'}{SCOPE},
+                   filter => $config{'connect'}{FILTER},
+                        );
 
     my $max = $mesg->count; 
     my $count = $mesg->count;
-print "RES: $count\n";
     for( my $index = 0 ; $index < $max ; $index++) {
+        my $num=$index+1;
         my $entry = $mesg->entry($index);
         my $dn=$entry->dn();
         my $uid=$entry->get_value('uid');
+        my $cn=$entry->get_value('cn');
         my $given=$entry->get_value('givenName');
         my $sn=$entry->get_value('sn');
         my $server=$entry->get_value('hostServer');
-	print "dn: $dn\n";
-	print "   * uid: $uid\n";
-	print "   * givenName: $given\n";
-	print "   * sn: $sn\n";
-	print "   * server: $server\n";
-}
+        my $mail=$entry->get_value('mail');
 
-    my ($entry,@entries) = $mesg->entries;
-    my $dn = $entry->dn();
-    print "   * DN: $dn\n";
+        if (not defined $given){
+            $given="";
+        }
+	print "$num) dn: $dn\n";
+	print "   * cn:          $cn\n";
+	print "   * givenName:   $given\n";
+	print "   * hostServer:  $server\n";
+	print "   * mail:        $mail\n";
+	print "   * sn:          $sn\n";
+	print "   * uid:         $uid\n";
+        print "\n";
+    }
+
+#print Dumper(\$mesg);
+
+&unbind_admin($ldap); 
 
 
 
-##################################################
-sub AD_bind_admin {
-    my ($smb_pwd)=&AD_get_passwd();
-    my $host="ldaps://mbox1.belwue.de:636";
 
 
-    # check connection to Samba4 AD
+
+######################################################################
+sub bind_admin {
+    # check connection 
     if($Conf::log_level>=3){
-        print "   Checking Samba4 AD connection ...\n";
+        print "   Checking Belwue connection ...\n";
     }
 
     # bind
-    my $admin_dn="admin\@mail.bszleo.de";
-    print "HOST:  $host\n";
-    print "ADMIN: $admin_dn\n";
-    print "PASS: $smb_pwd\n";
-    my $ldap = Net::LDAP->new($host);
+    if($Conf::log_level>=3){
+        print "HOST:  $config{'connect'}{HOST} \n";
+        print "ADMIN: $config{'connect'}{ADMIN} \n";
+        print "PASS:  $config{'connect'}{PASSWORD}\n";
+    }
+    my $ldap = Net::LDAP->new($config{'connect'}{HOST});
 
-    my $mesg = $ldap->bind($admin_dn, password => $smb_pwd);
+    my $mesg = $ldap->bind($config{'connect'}{ADMIN}, 
+                      password => $config{'connect'}{PASSWORD});
     # show errors from bind
     $mesg->code && die $mesg->error;
-
-    # Testing if sophomorix schema is present
-    # ldbsearch -H ldap://localhost -UAdministrator%Muster! -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User
     return ($ldap);
 }
 
 
 
-sub AD_unbind_admin {
+######################################################################
+sub unbind_admin {
     my ($ldap) = @_;
     my $mesg = $ldap->unbind();
     #  show errors from unbind
     $mesg->code && die $mesg->error;
 }
+
+
 
 ######################################################################
 # error, when options are not given correctly
@@ -160,20 +184,33 @@ sub  check_options{
    }
 }
 
-sub AD_get_passwd {
-    my $smb_pwd="";
-    if (-e $passwd_file_belwue) {
-        open (SECRET, $passwd_file_belwue);
+
+
+######################################################################
+sub read_config {
+    my %config=();
+    my ($file) = @_;
+    if (-e $file) {
+        open (SECRET, $file);
         while(<SECRET>){
-            $smb_pwd=$_;
-            chomp($smb_pwd);
+            my ($key,$value)=split(/=/);
+            $key=~s/^\s+//g;# remove leading whitespace
+            $key=~s/\s+$//g;# remove trailing whitespace
+            $value=~s/^\s+//g;# remove leading whitespace
+            $value=~s/\s+$//g;# remove trailing whitespace
+            $config{'config'}{$key}=$value;
         }
         close(SECRET);
     } else {
-        print "Password of belwue mail administrator must ",
-               "be in $passwd_file_belwue\n";
+        print "Config File $file must be created with:\n";
+        print "  PASSWORD=xyz\n";
+        print "  USER=admin\@mail.bszleo.de\n";
+        print "  SERVER=mbox1.belwue.de\n";
+        print "  BASE=mail.bszleo.de\n";
+        print "  PORT=636\n";
+        print "  PROTOCOL=ldaps\n";
         exit;
     }
-    return($smb_pwd);
+    return %config;
 }
 
