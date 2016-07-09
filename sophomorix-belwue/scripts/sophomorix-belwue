@@ -33,6 +33,7 @@ my $config_file="/etc/sophomorix/belwue.conf";
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
+           "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
           );
 
@@ -42,6 +43,7 @@ my $testopt=GetOptions(
 
 my %config=&read_config($config_file);
 my %belwue=();
+my @accounts_short=();
 
 # calculate connect data
 my $base="CN=mail.bszleo.de";
@@ -114,15 +116,19 @@ my $mesg = $ldap->search(
         if (not defined $given){
             $given="";
         }
-	print "$num) dn: $dn\n";
-	print "   * cn:          $cn\n";
-	print "   * givenName:   $given\n";
-	print "   * hostServer:  $server\n";
-	print "   * mail:        $mail\n";
-	print "   * sn:          $sn\n";
-	print "   * uid:         $uid\n";
-        print "\n";
-        # ??????????????? maillist or uid
+        if($Conf::log_level>=2){
+	    print "$num) dn: $dn\n";
+	    print "   * cn:          $cn\n";
+	    print "   * givenName:   $given\n";
+	    print "   * hostServer:  $server\n";
+	    print "   * mail:        $mail\n";
+	    print "   * sn:          $sn\n";
+	    print "   * uid:         $uid\n";
+            print "\n";
+            # ??????????????? maillist or uid
+        } else {
+            push @accounts_short,$uid;
+        }
 
         $belwue{'uid'}{$uid}{'CN'}=$cn;
         $belwue{'uid'}{$uid}{'givenName'}=$given;
@@ -133,7 +139,17 @@ my $mesg = $ldap->search(
     }
 
 #print Dumper(\$mesg);
-print Dumper(\%belwue);
+if($Conf::log_level>=2){
+    print Dumper(\%belwue);
+}
+
+if ($Conf::log_level==1){
+    @accounts_short = sort @accounts_short;
+    foreach my $uid (@accounts_short){
+        print "$uid\n";
+    }
+}
+
 
 &unbind_admin($ldap); 
 
