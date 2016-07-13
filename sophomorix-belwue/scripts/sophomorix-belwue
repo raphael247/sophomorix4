@@ -10,7 +10,9 @@ use strict;
 use Getopt::Long;
 #use IMAP::Admin;
 #use DBI;
+
 use HTML::TableExtract;
+
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -28,25 +30,40 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $ldap_fetch=1;
+my $no_ldap_fetch=0;
 
 my $config_file="/etc/sophomorix/belwue.conf";
 my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
+my $belwue_mailboxes="/var/log/sophomorix/belwue.multimailboxes";
+my $belwue_maillist="/var/log/sophomorix/belwue.maillists";
+my $belwue_aliases="/var/log/sophomorix/belwue.aliases";
 
+system("mkdir -p /var/log/sophomorix"); 
 
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
+           "no-ldap|noldap" => \$no_ldap_fetch,
           );
 
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
+if ($no_ldap_fetch==1){
+    $ldap_fetch=0;
+}
+
 my %config=&read_config($config_file);
 my %belwue=();
 my @accounts_short=();
+
+my @multi_mailboxes=();
+my @aliases=();
+my @maillists=();
 
 # calculate connect data
 my $base="CN=mail.bszleo.de";
@@ -60,10 +77,7 @@ $config{'connect'}{HOST}=$config{'config'}{PROTOCOL}."://".
 $config{'connect'}{ADMIN}=$config{'config'}{USER};
 $config{'connect'}{PASSWORD}=$config{'config'}{PASSWORD};
 
-print Dumper(%config);
-
-# Reading Configuration
-my ($ldap) = &bind_admin();
+#print Dumper(%config);
 
 # --help
 if ($help==1) {
@@ -98,6 +112,8 @@ if ($info==1) {
 # Script starts here
 ##################################################
 
+if ($ldap_fetch==1){
+my ($ldap) = &bind_admin();
 my $mesg = $ldap->search(
                    base   => $config{'connect'}{BASE},
                    scope => $config{'connect'}{SCOPE},
@@ -130,49 +146,133 @@ my $mesg = $ldap->search(
 	    print "   * uid:         $uid\n";
             print "\n";
             # ??????????????? maillist or uid
-        } else {
-            push @accounts_short,$uid;
         }
 
-        $belwue{'uid'}{$uid}{'CN'}=$cn;
-        $belwue{'uid'}{$uid}{'givenName'}=$given;
-        $belwue{'uid'}{$uid}{'hostServer'}=$server;
-        $belwue{'uid'}{$uid}{'mail'}=$mail;
-        $belwue{'uid'}{$uid}{'sn'}=$sn;
-        $belwue{'uid'}{$uid}{'uid'}=$uid;
-    }
+        #$belwue{'ldap'}{$uid}{'CN'}=$cn;
+        #$belwue{'ldap'}{$uid}{'givenName'}=$given;
+        #$belwue{'ldap'}{$uid}{'hostServer'}=$server;
+        #$belwue{'ldap'}{$uid}{'mail'}=$mail;
+        #$belwue{'ldap'}{$uid}{'sn'}=$sn;
+        #$belwue{'ldap'}{$uid}{'uid'}=$uid;
 
-#print Dumper(\$mesg);
-if($Conf::log_level>=2){
-    print Dumper(\%belwue);
-}
-
-if ($Conf::log_level==1){
-    @accounts_short = sort @accounts_short;
-    foreach my $uid (@accounts_short){
-        print "$uid\n";
+        $belwue{'objects'}{$uid}{'CN'}=$cn;
+        $belwue{'objects'}{$uid}{'givenName'}=$given;
+        $belwue{'objects'}{$uid}{'hostServer'}=$server;
+        $belwue{'objects'}{$uid}{'mail'}=$mail;
+        $belwue{'objects'}{$uid}{'sn'}=$sn;
+        $belwue{'objects'}{$uid}{'uid'}=$uid;
     }
-}
 
 
 &unbind_admin($ldap); 
-
+} else {
+    print "\n##### Skipping Connection to belwue ldap address book\n\n";
+    #&print_title("Skipping Connection to belwue ldap address book");
+}
 
 ############################################################
 # download 
 system("mkdir -p $belwue_downloads");
+
+
+
+# object list
 my $download_objects_command="wget --http-user=admin ".
        "--http-password=$config{'connect'}{PASSWORD} ".
        "--output-document=$belwue_downloads/objects.html ".
 #       "--auth-no-challenge ".
-       "https://mbox1.belwue.de:9010/DomainAdmin/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}";
+       "https://mbox1.belwue.de:9010/DomainAdmin/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}q";
 
 # --output-file=logfile
 
 
 print "WGET: $download_objects_command\n";
-#my $return=system($download_objects_command);
-#print "RET: $return\n";
+my $return=system($download_objects_command);
+print "RET: $return\n";
+
+
+# maillist members:
+# example Netzwerker
+# https://mbox1.belwue.de:9010/DomainAdmin/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=mail.bszleo.de&&listName=netzwerker&
+
+
+
+# parsing
+
+# file to parse
+my $html_doc = "$belwue_downloads/objects.html";
+print "\nParsing $html_doc\n\n";
+
+# list of headers
+my $table_headers = [ 'Objekt', 'Typ','Speicher','Letzter Zugriff' ];
+
+# constructor
+my $table_extract = HTML::TableExtract->new(headers => $table_headers);
+
+$table_extract->parse_file($html_doc);
+my ($table) = $table_extract->tables;
+
+
+
+foreach my $row ($table->rows) {
+    my ($object,$type,$storage,$access)=@$row;
+    if (not defined $access){
+        $access="never";
+    }
+    # add to types
+    if ($type eq "Mailingliste"){
+        $belwue{'maillist'}{$object}=$type;
+        push @maillists, $object;
+    } elsif ($type eq "Alias"){
+        $belwue{'alias'}{$object}=$storage;
+        $belwue{'alias_reverse'}{$storage}=$object;
+        # aliases are in storage
+        $belwue{'objects'}{$storage}{'alias'}=$object;
+        push @aliases, $object;
+
+    } elsif ($type eq "Multi-Mailbox"){
+        $belwue{'multimailbox'}{$object}{'type'}="Multi-Mailbox";
+        $belwue{'multimailbox'}{$object}{'storage'}=$storage;
+        $belwue{'multimailbox'}{$object}{'access'}=$access;
+
+        push @multi_mailboxes, $object;
+    } else {
+        print "Unknown object $type\n";
+
+    }
+    #print "LINE: $object,$type,$storage,$access\n";
+}
+
+# write data into iles
+open (BOX, ">$belwue_mailboxes");
+open (ALIAS, ">$belwue_aliases");
+open (LIST, ">$belwue_maillist");
+
+@multi_mailboxes = sort @multi_mailboxes;
+foreach my $uid (@multi_mailboxes){
+    print BOX "$uid\n";
+}
+
+@maillists = sort @maillists;
+foreach my $list (@maillists){
+    print LIST "$list\n";
+}
+
+@aliases = sort @aliases;
+foreach my $alias (@aliases){
+    print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
+}
+
+close(BOX);
+close(ALIAS);
+close(LIST);
+
+if($Conf::log_level>=2){
+    print Dumper(\%belwue);
+}
+
+
+
 
 
 
