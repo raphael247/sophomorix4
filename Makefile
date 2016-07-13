@@ -82,7 +82,7 @@ TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
 #TOOLS=$(DESTDIR)/root/sophomorix-developer
 
 
-all: install-sophomorix-samba install-virusscan install-developer install-vampire install-dump
+all: install-sophomorix-samba install-virusscan install-developer install-vampire install-dump install-belwue-mail
 
 help:
 	@echo ' '
@@ -243,6 +243,12 @@ install-dump:
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-dump/scripts/sophomorix-dump $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-dump/scripts/sophomorix-dump-postgres-views.sh $(DESTDIR)/usr/sbin
+
+install-belwue-mail:
+	### install-belwue-mail
+	@install -d $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-belwue/scripts/sophomorix-belwue $(DESTDIR)/usr/sbin
+
 
 
 

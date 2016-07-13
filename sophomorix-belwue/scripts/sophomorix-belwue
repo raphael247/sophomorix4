@@ -10,6 +10,7 @@ use strict;
 use Getopt::Long;
 #use IMAP::Admin;
 #use DBI;
+use HTML::TableExtract;
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -29,6 +30,8 @@ my $help=0;
 my $info=0;
 
 my $config_file="/etc/sophomorix/belwue.conf";
+my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
+
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -48,6 +51,7 @@ my @accounts_short=();
 # calculate connect data
 my $base="CN=mail.bszleo.de";
 $config{'connect'}{BASE}="CN=".$config{'config'}{'BASE'};
+$config{'connect'}{BASESIMPLE}=$config{'config'}{'BASE'};
 $config{'connect'}{SCOPE}="sub";
 $config{'connect'}{FILTER}="(cn=*)";
 $config{'connect'}{HOST}=$config{'config'}{PROTOCOL}."://".
@@ -56,7 +60,7 @@ $config{'connect'}{HOST}=$config{'config'}{PROTOCOL}."://".
 $config{'connect'}{ADMIN}=$config{'config'}{USER};
 $config{'connect'}{PASSWORD}=$config{'config'}{PASSWORD};
 
-#print Dumper(%config);
+print Dumper(%config);
 
 # Reading Configuration
 my ($ldap) = &bind_admin();
@@ -154,7 +158,21 @@ if ($Conf::log_level==1){
 &unbind_admin($ldap); 
 
 
+############################################################
+# download 
+system("mkdir -p $belwue_downloads");
+my $download_objects_command="wget --http-user=admin ".
+       "--http-password=$config{'connect'}{PASSWORD} ".
+       "--output-document=$belwue_downloads/objects.html ".
+#       "--auth-no-challenge ".
+       "https://mbox1.belwue.de:9010/DomainAdmin/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}";
 
+# --output-file=logfile
+
+
+print "WGET: $download_objects_command\n";
+#my $return=system($download_objects_command);
+#print "RET: $return\n";
 
 
 
