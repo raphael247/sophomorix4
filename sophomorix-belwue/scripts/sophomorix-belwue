@@ -223,6 +223,9 @@ foreach my $row ($table->rows) {
     if ($type eq "Mailingliste"){
         $belwue{'maillist'}{$object}=$type;
         push @maillists, $object;
+        
+
+
     } elsif ($type eq "Alias"){
         $belwue{'alias'}{$object}=$storage;
         $belwue{'alias_reverse'}{$storage}=$object;
@@ -249,18 +252,24 @@ open (ALIAS, ">$belwue_aliases");
 open (LIST, ">$belwue_maillist");
 
 @multi_mailboxes = sort @multi_mailboxes;
+print "\nMultiMailboxen:\n";
 foreach my $uid (@multi_mailboxes){
     print BOX "$uid\n";
+    print "   * $uid\n";
 }
 
 @maillists = sort @maillists;
+print "\nMailing Listen:\n";
 foreach my $list (@maillists){
     print LIST "$list\n";
+    print "   * $list\n";
 }
 
 @aliases = sort @aliases;
+print "\nMail Aliase:\n";
 foreach my $alias (@aliases){
     print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
+    print "   * $alias --> $belwue{'alias'}{$alias}\n";
 }
 
 close(BOX);
