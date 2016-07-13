@@ -35,11 +35,11 @@ my $no_ldap_fetch=0;
 
 my $config_file="/etc/sophomorix/belwue.conf";
 my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
-my $belwue_mailboxes="/var/log/sophomorix/belwue.multimailboxes";
-my $belwue_maillist="/var/log/sophomorix/belwue.maillists";
-my $belwue_aliases="/var/log/sophomorix/belwue.aliases";
+my $belwue_mailboxes="/var/lib/sophomorix/belwue/belwue.multimailboxes";
+my $belwue_maillist="/var/lib/sophomorix/belwue/belwue.maillists";
+my $belwue_aliases="/var/lib/sophomorix/belwue/belwue.aliases";
 
-system("mkdir -p /var/log/sophomorix"); 
+system("mkdir -p /var/lib/sophomorix/belwue"); 
 
 # Parsen der Optionen
 my $testopt=GetOptions(
