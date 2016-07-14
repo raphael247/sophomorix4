@@ -10,7 +10,7 @@ use strict;
 use Getopt::Long;
 #use IMAP::Admin;
 #use DBI;
-
+#use utf8;
 use HTML::TableExtract;
 
 use Net::LDAP;
@@ -113,6 +113,7 @@ if ($info==1) {
 ##################################################
 
 if ($ldap_fetch==1){
+print "Accessing Belwue addressbook via ldap\n";
 my ($ldap) = &bind_admin();
 my $mesg = $ldap->search(
                    base   => $config{'connect'}{BASE},
@@ -145,7 +146,6 @@ my $mesg = $ldap->search(
 	    print "   * sn:          $sn\n";
 	    print "   * uid:         $uid\n";
             print "\n";
-            # ??????????????? maillist or uid
         }
 
         #$belwue{'ldap'}{$uid}{'CN'}=$cn;
@@ -171,48 +171,42 @@ my $mesg = $ldap->search(
 }
 
 ############################################################
-# download 
+# downloading
+############################################################ 
+
+print "Downloading and parsing html files:\n";
 system("mkdir -p $belwue_downloads");
 
-
-
 # object list
-my $download_objects_command="wget --http-user=admin ".
+my $download_objects_command="wget -q --http-user=admin ".
        "--http-password=$config{'connect'}{PASSWORD} ".
        "--output-document=$belwue_downloads/objects.html ".
-#       "--auth-no-challenge ".
-       "https://mbox1.belwue.de:9010/DomainAdmin/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}q";
-
-# --output-file=logfile
+       "\"https://mbox1.belwue.de:9010/DomainAdmin/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
 
 
-print "WGET: $download_objects_command\n";
+if($Conf::log_level>=2){
+   print "\nWGET: $download_objects_command\n\n";
+}
 my $return=system($download_objects_command);
-print "RET: $return\n";
+&wget_return($return,"Objects");
 
 
-# maillist members:
-# example Netzwerker
-# https://mbox1.belwue.de:9010/DomainAdmin/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=mail.bszleo.de&&listName=netzwerker&
-
-
-
+############################################################
 # parsing
+############################################################
 
 # file to parse
 my $html_doc = "$belwue_downloads/objects.html";
-print "\nParsing $html_doc\n\n";
+print "   * Parsing $html_doc\n";
 
 # list of headers
 my $table_headers = [ 'Objekt', 'Typ','Speicher','Letzter Zugriff' ];
 
 # constructor
 my $table_extract = HTML::TableExtract->new(headers => $table_headers);
-
+$table_extract->utf8_mode(1);
 $table_extract->parse_file($html_doc);
 my ($table) = $table_extract->tables;
-
-
 
 foreach my $row ($table->rows) {
     my ($object,$type,$storage,$access)=@$row;
@@ -221,11 +215,47 @@ foreach my $row ($table->rows) {
     }
     # add to types
     if ($type eq "Mailingliste"){
-        $belwue{'maillist'}{$object}=$type;
+        $belwue{'maillist'}{$object}{'type'}=$type;
         push @maillists, $object;
-        
+        ############################################################
+        # downloading maillist data
+        ############################################################
+        my $download_list_command="wget -q --http-user=admin ".
+        "--http-password=$config{'connect'}{PASSWORD} ".
+        "--output-document=$belwue_downloads/$object.html ".
+        "\"https://mbox1.belwue.de:9010/DomainAdmin/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+        if($Conf::log_level>=2){
+            print "\nWGET: $download_list_command\n\n";
+        }
+        my $return=system($download_list_command);
+        &wget_return($return,$object);
 
+        ############################################################
+        # parsing maillist data
+        ############################################################
+        my $html_doc = "$belwue_downloads/$object.html";
+        print "   * Parsing $html_doc\n";
 
+        # list of headers
+        # Umlaut in header does nor work
+#        my $table_headers = [ 'Email','Zustellungsart','Anmeldezeit','Nachrichten zurückgewiesene','Angezeigter Name' ];
+        my $table_headers = [ 'Email', 'Zustellungsart', 'Anmeldezeit'];
+
+        # constructor
+        my $table_extract = HTML::TableExtract->new(headers => $table_headers);
+        $table_extract->utf8_mode(1);
+        $table_extract->parse_file($html_doc);
+        my ($table) = $table_extract->tables;
+        foreach my $row ($table->rows) {
+            my ($member_email,$type,$time,$bounced,$displayname)=@$row;
+            #print "$object: $member_email  $type  $time\n";
+            $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
+            push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
+        }
+        # sort the memberlist if not empty
+        if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
+            @{ $belwue{'maillist'}{$object}{'memberlist'} } = sort @{ $belwue{'maillist'}{$object}{'memberlist'}  };
+        }
     } elsif ($type eq "Alias"){
         $belwue{'alias'}{$object}=$storage;
         $belwue{'alias_reverse'}{$storage}=$object;
@@ -241,12 +271,14 @@ foreach my $row ($table->rows) {
         push @multi_mailboxes, $object;
     } else {
         print "Unknown object $type\n";
-
     }
-    #print "LINE: $object,$type,$storage,$access\n";
 }
 
-# write data into iles
+
+
+############################################################
+# printout data/write data into files
+############################################################
 open (BOX, ">$belwue_mailboxes");
 open (ALIAS, ">$belwue_aliases");
 open (LIST, ">$belwue_maillist");
@@ -261,8 +293,12 @@ foreach my $uid (@multi_mailboxes){
 @maillists = sort @maillists;
 print "\nMailing Listen:\n";
 foreach my $list (@maillists){
-    print LIST "$list\n";
+    my $member_string=join(",",@{ $belwue{'maillist'}{$list}{'memberlist'} });
+    print LIST "$list:$member_string\n";
     print "   * $list\n";
+    foreach my $member ( @{ $belwue{'maillist'}{$list}{'memberlist'} } ){
+        print "     --> $member\n";
+    }
 }
 
 @aliases = sort @aliases;
@@ -282,10 +318,10 @@ if($Conf::log_level>=2){
 
 
 
+############################################################
+# subs
+############################################################
 
-
-
-######################################################################
 sub bind_admin {
     # check connection 
     if($Conf::log_level>=3){
@@ -335,6 +371,19 @@ sub  check_options{
          print "All options  were recognized.\n";
       }
    }
+}
+
+
+
+######################################################################
+sub wget_return {
+    my ($return,$object)=@_;
+    if ($return==0){
+        print "   * Succesfully downloded html page for $object\n";
+    } else {
+        print "   * ERROR downloading $object: wget returned error code $return\n";
+        exit;
+    }
 }
 
 
