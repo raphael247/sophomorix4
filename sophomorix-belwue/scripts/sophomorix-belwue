@@ -32,12 +32,28 @@ my $help=0;
 my $info=0;
 my $ldap_fetch=1;
 my $no_ldap_fetch=0;
+my $copy_to_teachershare=0;
+my $create_login_data=0;
+my $dump_belwue_data=0;
+
+# ?????? should be in confi hash from sever
+my $belwue_url="https://mbox1.belwue.de:9010/DomainAdmin";
 
 my $config_file="/etc/sophomorix/belwue-mail/belwue.conf";
 my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
 my $belwue_mailboxes="/var/lib/sophomorix/belwue/belwue.multimailboxes";
 my $belwue_maillist="/var/lib/sophomorix/belwue/belwue.maillists";
 my $belwue_aliases="/var/lib/sophomorix/belwue/belwue.aliases";
+
+# copy-to-teachershare
+# ???????????????? read a directory instead od file
+my $readfile="/root/belwue-mailaccounts-utf8.txt";
+
+my $targetdir="/var/lib/sophomorix/belwue-copy-to-teachershare";
+my $targetsubdir="/var/lib/sophomorix/belwue-copy-to-teachershare/logindata";
+
+
+
 
 system("mkdir -p /var/lib/sophomorix/belwue"); 
 
@@ -46,16 +62,15 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
-           "no-ldap|noldap" => \$no_ldap_fetch,
+           "dump-belwue-data" => \$dump_belwue_data,
+           "create_login_data" => \$create_login_data,
+           "copy-to-teachershare" => \$copy_to_teachershare,
           );
 
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
-if ($no_ldap_fetch==1){
-    $ldap_fetch=0;
-}
 
 my %config=&read_config($config_file);
 my %belwue=();
@@ -94,6 +109,10 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
+  --dump-belwue-data
+  --create-login-data
+  --copy-to-teachershare
+
 Please see the sophomorix-belwue(8) man pages for full documentation
 ');
    print "\n";
@@ -112,7 +131,8 @@ if ($info==1) {
 # Script starts here
 ##################################################
 
-if ($ldap_fetch==1){
+# --dump-belwue-data
+if ($dump_belwue_data==1){
 print "Accessing Belwue addressbook via ldap\n";
 my ($ldap) = &bind_admin();
 my $mesg = $ldap->search(
@@ -165,10 +185,8 @@ my $mesg = $ldap->search(
 
 
 &unbind_admin($ldap); 
-} else {
-    print "\n##### Skipping Connection to belwue ldap address book\n\n";
-    #&print_title("Skipping Connection to belwue ldap address book");
-}
+
+
 
 ############################################################
 # downloading
@@ -181,7 +199,7 @@ system("mkdir -p $belwue_downloads");
 my $download_objects_command="wget -q --http-user=admin ".
        "--http-password=$config{'connect'}{PASSWORD} ".
        "--output-document=$belwue_downloads/objects.html ".
-       "\"https://mbox1.belwue.de:9010/DomainAdmin/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
+       "\"$belwue_url/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
 
 
 if($Conf::log_level>=2){
@@ -223,7 +241,7 @@ foreach my $row ($table->rows) {
         my $download_list_command="wget -q --http-user=admin ".
         "--http-password=$config{'connect'}{PASSWORD} ".
         "--output-document=$belwue_downloads/$object.html ".
-        "\"https://mbox1.belwue.de:9010/DomainAdmin/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+        "\"$belwue_url/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
         if($Conf::log_level>=2){
             print "\nWGET: $download_list_command\n\n";
         }
@@ -314,6 +332,57 @@ close(LIST);
 
 if($Conf::log_level>=2){
     print Dumper(\%belwue);
+}
+
+} 
+
+
+
+
+# --create-login-data
+if($create_login_data){
+    system("mkdir -p $targetsubdir"); 
+
+    open(FILE,"$readfile") || 
+              die "Fehler: $readfile not found!";
+    while(<FILE>){
+        chomp();
+        my ($uid,$realname,$type,$pass,$storage,$alias)=split(/\t/);
+        if ($uid eq "Name" and $realname eq "Realname"){
+            next;
+        }
+        print "UID=$uid\n";
+        system("mkdir -p $targetdir/${uid}");
+        open(USER,">$targetdir/${uid}/${uid}-belwue-login.txt") || 
+              die "Fehler: $targetdir not found!";
+        print USER "\n";
+        print USER "Zugangsdatenfür die Emailadresse: ${uid}\@$config{'config'}{BASE}\n";
+        print USER "                           Alias: $alias\@$config{'config'}{BASE}\n";
+        print USER "\n";
+        print USER "Belwue-Mail-URL:  https://$config{'config'}{SERVER}\n";
+        print USER "Benutzername:     ${uid}\@$config{'config'}{BASE}\n";
+        print USER "Erst-Password:    $pass\n";
+        print USER "Erst-Mailquota:   $storage\n";
+        print USER "Mailbox-Typ:      $type\n";
+        print USER "Adressbuch-Name:  $realname\n";
+        print USER "\n";
+        close(USER);
+        system("chown ${uid}.root $targetdir/${uid}/${uid}-belwue-login.txt");
+        system("chmod 0400 $targetdir/${uid}/${uid}-belwue-login.txt");
+    }
+    close(FILE);
+
+}
+
+
+# --copy-to-teachershare
+if($copy_to_teachershare){
+    print "To be done\n"
+}
+
+
+if($Conf::log_level>=2){
+    print Dumper(%config);
 }
 
 
