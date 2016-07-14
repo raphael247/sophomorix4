@@ -133,9 +133,12 @@ if ($info==1) {
 
 # --dump-belwue-data
 if ($dump_belwue_data==1){
-print "Accessing Belwue addressbook via ldap\n";
-my ($ldap) = &bind_admin();
-my $mesg = $ldap->search(
+    ############################################################
+    # ldap address book
+    ############################################################ 
+    print "Accessing Belwue addressbook via ldap\n";
+    my ($ldap) = &bind_admin();
+    my $mesg = $ldap->search(
                    base   => $config{'connect'}{BASE},
                    scope => $config{'connect'}{SCOPE},
                    filter => $config{'connect'}{FILTER},
@@ -182,158 +185,150 @@ my $mesg = $ldap->search(
         $belwue{'objects'}{$uid}{'sn'}=$sn;
         $belwue{'objects'}{$uid}{'uid'}=$uid;
     }
+    &unbind_admin($ldap); 
+    ############################################################
+    # downloading
+    ############################################################ 
+    print "Downloading and parsing html files:\n";
+    system("mkdir -p $belwue_downloads");
 
+    # object list
+    my $download_objects_command="wget -q --http-user=admin ".
+         "--http-password=$config{'connect'}{PASSWORD} ".
+         "--output-document=$belwue_downloads/objects.html ".
+         "\"$belwue_url/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
 
-&unbind_admin($ldap); 
-
-
-
-############################################################
-# downloading
-############################################################ 
-
-print "Downloading and parsing html files:\n";
-system("mkdir -p $belwue_downloads");
-
-# object list
-my $download_objects_command="wget -q --http-user=admin ".
-       "--http-password=$config{'connect'}{PASSWORD} ".
-       "--output-document=$belwue_downloads/objects.html ".
-       "\"$belwue_url/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
-
-
-if($Conf::log_level>=2){
-   print "\nWGET: $download_objects_command\n\n";
-}
-my $return=system($download_objects_command);
-&wget_return($return,"Objects");
-
-
-############################################################
-# parsing
-############################################################
-
-# file to parse
-my $html_doc = "$belwue_downloads/objects.html";
-print "   * Parsing $html_doc\n";
-
-# list of headers
-my $table_headers = [ 'Objekt', 'Typ','Speicher','Letzter Zugriff' ];
-
-# constructor
-my $table_extract = HTML::TableExtract->new(headers => $table_headers);
-$table_extract->utf8_mode(1);
-$table_extract->parse_file($html_doc);
-my ($table) = $table_extract->tables;
-
-foreach my $row ($table->rows) {
-    my ($object,$type,$storage,$access)=@$row;
-    if (not defined $access){
-        $access="never";
+   if($Conf::log_level>=2){
+       print "\nWGET: $download_objects_command\n\n";
     }
-    # add to types
-    if ($type eq "Mailingliste"){
-        $belwue{'maillist'}{$object}{'type'}=$type;
-        push @maillists, $object;
-        ############################################################
-        # downloading maillist data
-        ############################################################
-        my $download_list_command="wget -q --http-user=admin ".
-        "--http-password=$config{'connect'}{PASSWORD} ".
-        "--output-document=$belwue_downloads/$object.html ".
-        "\"$belwue_url/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
-        if($Conf::log_level>=2){
-            print "\nWGET: $download_list_command\n\n";
+    my $return=system($download_objects_command);
+    &wget_return($return,"Objects");
+
+    ############################################################
+    # parsing
+    ############################################################
+
+    # file to parse
+    my $html_doc = "$belwue_downloads/objects.html";
+    print "   * Parsing $html_doc\n";
+
+    # list of headers
+    my $table_headers = [ 'Objekt', 'Typ','Speicher','Letzter Zugriff' ];
+
+    # constructor
+    my $table_extract = HTML::TableExtract->new(headers => $table_headers);
+    $table_extract->utf8_mode(1);
+    $table_extract->parse_file($html_doc);
+    my ($table) = $table_extract->tables;
+
+    foreach my $row ($table->rows) {
+        my ($object,$type,$storage,$access)=@$row;
+        if (not defined $access){
+            $access="never";
         }
-        my $return=system($download_list_command);
-        &wget_return($return,$object);
+        # add to types
+        if ($type eq "Mailingliste"){
+            $belwue{'maillist'}{$object}{'type'}=$type;
+            push @maillists, $object;
+            ############################################################
+            # downloading maillist data
+            ############################################################
+            my $download_list_command="wget -q --http-user=admin ".
+                "--http-password=$config{'connect'}{PASSWORD} ".
+                "--output-document=$belwue_downloads/$object.html ".
+                "\"$belwue_url/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+            if($Conf::log_level>=2){
+                print "\nWGET: $download_list_command\n\n";
+            }
+            my $return=system($download_list_command);
+            &wget_return($return,$object);
 
-        ############################################################
-        # parsing maillist data
-        ############################################################
-        my $html_doc = "$belwue_downloads/$object.html";
-        print "   * Parsing $html_doc\n";
+            ############################################################
+            # parsing maillist data
+            ############################################################
+            my $html_doc = "$belwue_downloads/$object.html";
+            print "   * Parsing $html_doc\n";
 
-        # list of headers
-        # Umlaut in header does nor work
-#        my $table_headers = [ 'Email','Zustellungsart','Anmeldezeit','Nachrichten zurückgewiesene','Angezeigter Name' ];
-        my $table_headers = [ 'Email', 'Zustellungsart', 'Anmeldezeit'];
+            # list of headers
+            # Umlaut in header does nor work
+#            my $table_headers = [ 'Email','Zustellungsart','Anmeldezeit','Nachrichten zurückgewiesene','Angezeigter Name' ];
+            my $table_headers = [ 'Email', 'Zustellungsart', 'Anmeldezeit'];
 
-        # constructor
-        my $table_extract = HTML::TableExtract->new(headers => $table_headers);
-        $table_extract->utf8_mode(1);
-        $table_extract->parse_file($html_doc);
-        my ($table) = $table_extract->tables;
-        foreach my $row ($table->rows) {
-            my ($member_email,$type,$time,$bounced,$displayname)=@$row;
-            #print "$object: $member_email  $type  $time\n";
-            $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
-            push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
+            # constructor
+            my $table_extract = HTML::TableExtract->new(headers => $table_headers);
+            $table_extract->utf8_mode(1);
+            $table_extract->parse_file($html_doc);
+            my ($table) = $table_extract->tables;
+            foreach my $row ($table->rows) {
+                my ($member_email,$type,$time,$bounced,$displayname)=@$row;
+                #print "$object: $member_email  $type  $time\n";
+                $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
+                push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
+            }
+            # sort the memberlist if not empty
+            if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
+                 @{ $belwue{'maillist'}{$object}{'memberlist'} } = sort @{ $belwue{'maillist'}{$object}{'memberlist'}  };
+            }
+        } elsif ($type eq "Alias"){
+            $belwue{'alias'}{$object}=$storage;
+            $belwue{'alias_reverse'}{$storage}=$object;
+            # aliases are in storage
+            $belwue{'objects'}{$storage}{'alias'}=$object;
+            push @aliases, $object;
+        } elsif ($type eq "Multi-Mailbox"){
+            $belwue{'multimailbox'}{$object}{'type'}="Multi-Mailbox";
+            $belwue{'multimailbox'}{$object}{'storage'}=$storage;
+            $belwue{'multimailbox'}{$object}{'access'}=$access;
+            push @multi_mailboxes, $object;
+        } else {
+            print "Unknown object $type\n";
         }
-        # sort the memberlist if not empty
-        if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
-            @{ $belwue{'maillist'}{$object}{'memberlist'} } = sort @{ $belwue{'maillist'}{$object}{'memberlist'}  };
-        }
-    } elsif ($type eq "Alias"){
-        $belwue{'alias'}{$object}=$storage;
-        $belwue{'alias_reverse'}{$storage}=$object;
-        # aliases are in storage
-        $belwue{'objects'}{$storage}{'alias'}=$object;
-        push @aliases, $object;
-
-    } elsif ($type eq "Multi-Mailbox"){
-        $belwue{'multimailbox'}{$object}{'type'}="Multi-Mailbox";
-        $belwue{'multimailbox'}{$object}{'storage'}=$storage;
-        $belwue{'multimailbox'}{$object}{'access'}=$access;
-
-        push @multi_mailboxes, $object;
-    } else {
-        print "Unknown object $type\n";
     }
-}
+    ############################################################
+    # printout data/write data into files
+    ############################################################
+    open (BOX, ">$belwue_mailboxes");
+    open (ALIAS, ">$belwue_aliases");
+    open (LIST, ">$belwue_maillist");
 
-
-
-############################################################
-# printout data/write data into files
-############################################################
-open (BOX, ">$belwue_mailboxes");
-open (ALIAS, ">$belwue_aliases");
-open (LIST, ">$belwue_maillist");
-
-@multi_mailboxes = sort @multi_mailboxes;
-print "\nMultiMailboxen:\n";
-foreach my $uid (@multi_mailboxes){
-    print BOX "$uid\n";
-    print "   * $uid\n";
-}
-
-@maillists = sort @maillists;
-print "\nMailing Listen:\n";
-foreach my $list (@maillists){
-    my $member_string=join(",",@{ $belwue{'maillist'}{$list}{'memberlist'} });
-    print LIST "$list:$member_string\n";
-    print "   * $list\n";
-    foreach my $member ( @{ $belwue{'maillist'}{$list}{'memberlist'} } ){
-        print "     --> $member\n";
+    @multi_mailboxes = sort @multi_mailboxes;
+    print "\nMultiMailboxen:\n";
+    my $num_mbox=1;
+    foreach my $uid (@multi_mailboxes){
+        print BOX "$uid\n";
+        print "   $num_mbox) $uid\n";
+        $num_mbox++;
     }
-}
 
-@aliases = sort @aliases;
-print "\nMail Aliase:\n";
-foreach my $alias (@aliases){
-    print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
-    print "   * $alias --> $belwue{'alias'}{$alias}\n";
-}
+    @maillists = sort @maillists;
+    print "\nMailing Listen:\n";
+    foreach my $list (@maillists){
+        my $member_string=join(",",@{ $belwue{'maillist'}{$list}{'memberlist'} });
+        print LIST "$list:$member_string\n";
+        print "   * $list\n";
+        my $num_list=1;
+        foreach my $member ( @{ $belwue{'maillist'}{$list}{'memberlist'} } ){
+            print "     $num_list) --> $member\n";
+            $num_list++;
+        }
+    }
 
-close(BOX);
-close(ALIAS);
-close(LIST);
+    @aliases = sort @aliases;
+    print "\nMail Aliase:\n";
+    my $num=1;
+    foreach my $alias (@aliases){
+        print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
+        print "   $num) $alias --> $belwue{'alias'}{$alias}\n";
+        $num++
+    }
 
-if($Conf::log_level>=2){
-    print Dumper(\%belwue);
-}
+    close(BOX);
+    close(ALIAS);
+    close(LIST);
 
+    if($Conf::log_level>=2){
+        print Dumper(\%belwue);
+    }
 } 
 
 
