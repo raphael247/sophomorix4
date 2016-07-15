@@ -36,9 +36,6 @@ my $copy_to_teachershare=0;
 my $create_login_data="";
 my $dump_belwue_data=0;
 
-# ?????? should be in config hash from sever
-#my $belwue_url="https://mbox1.belwue.de:9010/DomainAdmin";
-
 my $config_file="/etc/sophomorix/belwue-mail/belwue.conf";
 my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
 my $belwue_mailboxes="/var/lib/sophomorix/belwue/belwue.multimailboxes";
@@ -73,7 +70,6 @@ my @aliases=();
 my @maillists=();
 
 # calculate connect data
-my $base="CN=mail.bszleo.de";
 $config{'connect'}{BASE}="CN=".$config{'config'}{'BASE'};
 $config{'connect'}{BASESIMPLE}=$config{'config'}{'BASE'};
 $config{'connect'}{SCOPE}="sub";
@@ -229,7 +225,7 @@ if ($dump_belwue_data==1){
             my $download_list_command="wget -q --http-user=admin ".
                 "--http-password=$config{'connect'}{PASSWORD} ".
                 "--output-document=$belwue_downloads/$object.html ".
-                "\"$config{'connect'}{ADMINURL}/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+                "\"$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
             if($Conf::log_level>=2){
                 print "\nWGET: $download_list_command\n\n";
             }
