@@ -33,11 +33,11 @@ my $info=0;
 my $ldap_fetch=1;
 my $no_ldap_fetch=0;
 my $copy_to_teachershare=0;
-my $create_login_data=0;
+my $create_login_data="";
 my $dump_belwue_data=0;
 
-# ?????? should be in confi hash from sever
-my $belwue_url="https://mbox1.belwue.de:9010/DomainAdmin";
+# ?????? should be in config hash from sever
+#my $belwue_url="https://mbox1.belwue.de:9010/DomainAdmin";
 
 my $config_file="/etc/sophomorix/belwue-mail/belwue.conf";
 my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
@@ -46,14 +46,8 @@ my $belwue_maillist="/var/lib/sophomorix/belwue/belwue.maillists";
 my $belwue_aliases="/var/lib/sophomorix/belwue/belwue.aliases";
 
 # copy-to-teachershare
-# ???????????????? read a directory instead od file
-my $readfile="/root/belwue-mailaccounts-utf8.txt";
-
 my $targetdir="/var/lib/sophomorix/belwue-copy-to-teachershare";
 my $targetsubdir="/var/lib/sophomorix/belwue-copy-to-teachershare/logindata";
-
-
-
 
 system("mkdir -p /var/lib/sophomorix/belwue"); 
 
@@ -63,14 +57,12 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
            "dump-belwue-data" => \$dump_belwue_data,
-           "create-login-data" => \$create_login_data,
+           "create-login-data=s" => \$create_login_data,
            "copy-to-teachershare" => \$copy_to_teachershare,
           );
 
-
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
-
 
 my %config=&read_config($config_file);
 my %belwue=();
@@ -89,7 +81,8 @@ $config{'connect'}{FILTER}="(cn=*)";
 $config{'connect'}{HOST}=$config{'config'}{PROTOCOL}."://".
                          $config{'config'}{SERVER}.":".
                          $config{'config'}{PORT};
-$config{'connect'}{ADMIN}=$config{'config'}{USER};
+$config{'connect'}{ADMINUSER}=$config{'config'}{ADMINUSER};
+$config{'connect'}{ADMINURL}=$config{'config'}{ADMINURL};
 $config{'connect'}{PASSWORD}=$config{'config'}{PASSWORD};
 
 #print Dumper(%config);
@@ -110,7 +103,7 @@ Options
   -vv / --verbose --verbose
 
   --dump-belwue-data
-  --create-login-data
+  --create-login-data /path/to/file
   --copy-to-teachershare
 
 Please see the sophomorix-belwue(8) man pages for full documentation
@@ -196,7 +189,7 @@ if ($dump_belwue_data==1){
     my $download_objects_command="wget -q --http-user=admin ".
          "--http-password=$config{'connect'}{PASSWORD} ".
          "--output-document=$belwue_downloads/objects.html ".
-         "\"$belwue_url/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
+         "\"$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
 
    if($Conf::log_level>=2){
        print "\nWGET: $download_objects_command\n\n";
@@ -236,7 +229,7 @@ if ($dump_belwue_data==1){
             my $download_list_command="wget -q --http-user=admin ".
                 "--http-password=$config{'connect'}{PASSWORD} ".
                 "--output-document=$belwue_downloads/$object.html ".
-                "\"$belwue_url/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+                "\"$config{'connect'}{ADMINURL}/mail.bszleo.de/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
             if($Conf::log_level>=2){
                 print "\nWGET: $download_list_command\n\n";
             }
@@ -335,26 +328,26 @@ if ($dump_belwue_data==1){
 
 
 # --create-login-data
-if($create_login_data){
+if($create_login_data ne ""){
     system("mkdir -p $targetsubdir"); 
 
-    open(FILE,"$readfile") || 
-              die "Fehler: $readfile not found!";
+    open(FILE,"$create_login_data") || 
+              die "ERROR: $create_login_data not found!";
     while(<FILE>){
         chomp();
         my ($uid,$realname,$type,$pass,$storage,$alias)=split(/\t/);
         if ($uid eq "Name" and $realname eq "Realname"){
             next;
         }
-        print "UID=$uid\n";
+        print "   * $uid\n";
         system("mkdir -p $targetdir/${uid}");
         open(USER,">$targetdir/${uid}/${uid}-belwue-login.txt") || 
-              die "Fehler: $targetdir not found!";
+              die "ERROR: $targetdir not found!";
         print USER "\n";
         print USER "Zugangsdaten für die Emailadresse: ${uid}\@$config{'config'}{BASE}\n";
         print USER "                            Alias: $alias\@$config{'config'}{BASE}\n";
         print USER "\n";
-        print USER "Belwue-Mail-URL:  https://$config{'config'}{SERVER}\n";
+        #print USER "Belwue-Mail-URL:  https://$config{'config'}{SERVER}\n";
         print USER "Benutzername:     ${uid}\@$config{'config'}{BASE}\n";
         print USER "Erst-Password:    $pass\n";
         print USER "Erst-Mailquota:   $storage\n";
@@ -394,13 +387,13 @@ sub bind_admin {
 
     # bind
     if($Conf::log_level>=3){
-        print "HOST:  $config{'connect'}{HOST} \n";
-        print "ADMIN: $config{'connect'}{ADMIN} \n";
-        print "PASS:  $config{'connect'}{PASSWORD}\n";
+        print "HOST:      $config{'connect'}{HOST} \n";
+        print "ADMINUSER: $config{'connect'}{ADMINUSER} \n";
+        print "PASS:      $config{'connect'}{PASSWORD}\n";
     }
     my $ldap = Net::LDAP->new($config{'connect'}{HOST});
 
-    my $mesg = $ldap->bind($config{'connect'}{ADMIN}, 
+    my $mesg = $ldap->bind($config{'connect'}{ADMINUSER}, 
                       password => $config{'connect'}{PASSWORD});
     # show errors from bind
     $mesg->code && die $mesg->error;
@@ -470,7 +463,8 @@ sub read_config {
     } else {
         print "Config File $file must be created with:\n";
         print "  PASSWORD=xyz\n";
-        print "  USER=admin\@mail.bszleo.de\n";
+        print "  ADMINUSER=admin\@mail.bszleo.de\n";
+        print "  ADMINURL=admin\@mail.bszleo.de\n";
         print "  SERVER=mbox1.belwue.de\n";
         print "  BASE=mail.bszleo.de\n";
         print "  PORT=636\n";
