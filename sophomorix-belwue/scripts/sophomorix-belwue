@@ -63,7 +63,7 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
            "dump-belwue-data" => \$dump_belwue_data,
-           "create_login_data" => \$create_login_data,
+           "create-login-data" => \$create_login_data,
            "copy-to-teachershare" => \$copy_to_teachershare,
           );
 
@@ -356,8 +356,8 @@ if($create_login_data){
         open(USER,">$targetdir/${uid}/${uid}-belwue-login.txt") || 
               die "Fehler: $targetdir not found!";
         print USER "\n";
-        print USER "Zugangsdatenfür die Emailadresse: ${uid}\@$config{'config'}{BASE}\n";
-        print USER "                           Alias: $alias\@$config{'config'}{BASE}\n";
+        print USER "Zugangsdaten für die Emailadresse: ${uid}\@$config{'config'}{BASE}\n";
+        print USER "                            Alias: $alias\@$config{'config'}{BASE}\n";
         print USER "\n";
         print USER "Belwue-Mail-URL:  https://$config{'config'}{SERVER}\n";
         print USER "Benutzername:     ${uid}\@$config{'config'}{BASE}\n";
