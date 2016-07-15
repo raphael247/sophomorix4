@@ -1,6 +1,38 @@
 sophomorix-samba für linuxmuster.net 7 --- Weekly x
 
 ############################################################
+sophomorix4/Samba4 weekly Nr. 8  (xx.06.2016)
+############################################################
+
+- Dateirechteänderung via Funktion
+  (erstmal mit setfacl, später evtl. unc-pfad verfolgen)
+
+globale projekte in GLOBAL ermöglichen
+
+
+- ldap
+  - gruppe schulkuerzel
+    in der alle students,teachers, printer, ... drin sind
+  - $-accounts in Gruppen?
+
+  - Gruppe school,global,bsz,vhs, ...
+    in der alle students,teachhers, workstations, ... drin sind
+    
+  - management Gruppen, die in ALLEN gruppen sind
+    global-management  (GLOBAL) global-admin
+       bsz-management  (BSZLEO)    bsz-admin
+           management  (SCHOOL)        admin   
+
+Felder im ldap:
+
+SophomorixUserPermissions
+  - Multivalue
+  - positivliste, was ein user in der Schulkonsole darf
+sophomorixWebuiDashboard
+  - single Value
+  - beeinhaltet ca. 10-zeiliger Text 
+
+############################################################
 sophomorix4/Samba4 weekly Nr. 7  (xx.06.2016)
 ############################################################
 
