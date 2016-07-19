@@ -325,7 +325,9 @@ if ($dump_belwue_data==1){
 
 # --create-login-data
 if($create_login_data ne ""){
-    system("mkdir -p $targetsubdir"); 
+    # remove old data        
+    system("rm -rf $targetdir"); 
+    system("mkdir -p $targetdir"); 
 
     open(FILE,"$create_login_data") || 
               die "ERROR: $create_login_data not found!";
@@ -337,7 +339,7 @@ if($create_login_data ne ""){
         }
         print "   * $uid\n";
         system("mkdir -p $targetdir/${uid}");
-        open(USER,">$targetdir/${uid}/${uid}-belwue-login.txt") || 
+        open(USER,">$targetdir/${uid}/${uid}-mail-login.txt") || 
               die "ERROR: $targetdir not found!";
         print USER "\n";
         print USER "Zugangsdaten für die Emailadresse: ${uid}\@$config{'config'}{BASE}\n";
@@ -351,8 +353,10 @@ if($create_login_data ne ""){
         print USER "Adressbuch-Name:  $realname\n";
         print USER "\n";
         close(USER);
-        system("chown ${uid}.root $targetdir/${uid}/${uid}-belwue-login.txt");
-        system("chmod 0400 $targetdir/${uid}/${uid}-belwue-login.txt");
+        system("chown ${uid}.root $targetdir/${uid}");
+        system("chmod 0700 $targetdir/${uid}");
+        system("chown ${uid}.root $targetdir/${uid}/${uid}-mail-login.txt");
+        system("chmod 0600 $targetdir/${uid}/${uid}-mail-login.txt");
     }
     close(FILE);
     print "Login-Data created in $targetdir\n";
@@ -361,7 +365,12 @@ if($create_login_data ne ""){
 
 # --copy-to-teachershare
 if($copy_to_teachershare){
-    print "To be done\n"
+	my $copy_command="rsync -av ${targetdir}/ ".
+          "$config{'config'}{TEACHERUSER}\@".
+          "$config{'config'}{TEACHERSERVER}:".
+          "$config{'config'}{TEACHERSERVERDIR}";
+    print "$copy_command\n";
+    system($copy_command);
 }
 
 
