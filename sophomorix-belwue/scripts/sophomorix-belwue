@@ -297,6 +297,9 @@ if ($dump_belwue_data==1){
         print "   * $list\n";
         my $num_list=1;
         foreach my $member ( @{ $belwue{'maillist'}{$list}{'memberlist'} } ){
+            if (not defined $member){
+                next;
+            } 
             print "     $num_list) --> $member\n";
             $num_list++;
         }
