@@ -251,8 +251,10 @@ if ($dump_belwue_data==1){
             foreach my $row ($table->rows) {
                 my ($member_email,$type,$time,$bounced,$displayname)=@$row;
                 #print "$object: $member_email  $type  $time\n";
-                $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
-                push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
+                if ($type ne "Abonnement aufheben"){
+                    $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
+                    push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
+                }
             }
             # sort the memberlist if not empty
             if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
