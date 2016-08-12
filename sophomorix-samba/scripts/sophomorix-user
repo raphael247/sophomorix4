@@ -123,7 +123,6 @@ my $old_uid="";
 my $new_uid="";
 my $old_mailbox="";
 my $new_mailbox="";
-my $auth=0;
 my $new_class="";
 my $list_teachers_by_year=0;
 
@@ -155,7 +154,6 @@ my $testopt=GetOptions(
        "empty-password" => \$empty_password,
        "scheduled-toleration=s" => \$sc_toleration,
        "t|teacher=s" => \$teacher,
-       "auth|ldap" => \$auth,
        "list-teachers-by-year" => \$list_teachers_by_year,
        "new-class|newclass=s" => \$new_class,
           );
@@ -198,11 +196,11 @@ Changing status of a user:
   -A user   /   --activate user
   -U user   /   --usable user
 
-
 -> continue here
 
   --list-teachers-by-year
 
+Todo:
 Changing loginname of a user:
   --old-uid oldlogin --new-uid newlogin
   (WARNING: This is Alpha!!! This will never work 100%!)
@@ -210,24 +208,24 @@ Changing loginname of a user:
             cyrus and imap will be restartet!
   --> Do this at night!
   
+Todo:
 Moving the mailbox of a user:
   (This is included in --old-uid oldlogin --new-uid newlogin.
   It should never be necessary to move the mailbox by itself)
   --old-mailbox oldlogin --new-mailbox newlogin
   --> Do this only when you know what to do!
 
-Changing class of a user (that is not in scheler.txt)
+Todo:
+Changing class of a user (that is not in students.csv)
   -u user --newclass newclass
   (to move user, sophomorix-move must be called)
 
-
+Todo:
 Actions:
   --reset-user user1,user2,...
   --reset-user user1,user2,... --empty-password
-  --teacher teacher --scheduled-toleration yyyy-mm--dd
+  --teacher teacher --scheduled-toleration yyyy-mm-dd
   --kill-all-users
-  
-
 
 Please see the sophomorix-user(8) man pages for full documentation
 ');
@@ -462,208 +460,208 @@ if ($info==1){
 &log_script_start(@arguments);
 
 
-#--user user --new-class class
-if ($user ne "" and $new_class ne ""){
-    my ($home,
-        $type,
-        $gecos,
-        $group,
-        $uidnumber,
-        $sambahomepath,
-        $firstpassword,
-        $sambaacctflags,
-        $exitadminclass,
-        $sambahomedrive,
-        $sambakickofftime,
-        $sambalmpassword,
-        $sambalogofftime,
-        $sambalogontime,
-        $sambantpassword,
-        $sambaprimarygroupsid,
-        $sambapwdcanchange,
-        $sambapwdlastset,
-        $sambapwdmustchange,
-        $sambasid,
-        $surname,
-        $firstname,
-        $userpassword,
-        $loginshell,
-        $gidnumber,
-        $sophomorixstatus) = &fetchdata_from_account($user);
+# #--user user --new-class class
+# if ($user ne "" and $new_class ne ""){
+#     my ($home,
+#         $type,
+#         $gecos,
+#         $group,
+#         $uidnumber,
+#         $sambahomepath,
+#         $firstpassword,
+#         $sambaacctflags,
+#         $exitadminclass,
+#         $sambahomedrive,
+#         $sambakickofftime,
+#         $sambalmpassword,
+#         $sambalogofftime,
+#         $sambalogontime,
+#         $sambantpassword,
+#         $sambaprimarygroupsid,
+#         $sambapwdcanchange,
+#         $sambapwdlastset,
+#         $sambapwdmustchange,
+#         $sambasid,
+#         $surname,
+#         $firstname,
+#         $userpassword,
+#         $loginshell,
+#         $gidnumber,
+#         $sophomorixstatus) = &fetchdata_from_account($user);
 
-    my $file=${DevelConf::path_result}."/sophomorix.move";
-    print "   Old class:  $group \n";
-    print "   New class:  $new_class \n";
-    print "   Old Status: $sophomorixstatus \n";
-    my $line=$user."::".$group."::".$new_class."::".$sophomorixstatus."\n";
-    print "   New Line:   $line";
+#     my $file=${DevelConf::path_result}."/sophomorix.move";
+#     print "   Old class:  $group \n";
+#     print "   New class:  $new_class \n";
+#     print "   Old Status: $sophomorixstatus \n";
+#     my $line=$user."::".$group."::".$new_class."::".$sophomorixstatus."\n";
+#     print "   New Line:   $line";
 
-    my $seen=0;
-    my $line_seen="";
-    open (MOVE, "$file");
-    while(<MOVE>) {
-        #print $_;
-        my ($uid,$rest) = split(/::/,$_);
-        #print "<$uid>\n";
-        if ($user eq $uid){
-            $seen=1;
-            $line_seen=$_;
-        }
-    }
-    close (MOVE);
-    if ($seen==0){
-        print "Creating new entry in $file\n";
-        # append line
-        open (MOVE, ">>$file");
-        print MOVE $line;
-        close (MOVE);
-    } else {
-        print "\nWARNING: Cannot create entry in $file\n";
-        print "$user has scheduled action: $line_seen\n";
-    }
+#     my $seen=0;
+#     my $line_seen="";
+#     open (MOVE, "$file");
+#     while(<MOVE>) {
+#         #print $_;
+#         my ($uid,$rest) = split(/::/,$_);
+#         #print "<$uid>\n";
+#         if ($user eq $uid){
+#             $seen=1;
+#             $line_seen=$_;
+#         }
+#     }
+#     close (MOVE);
+#     if ($seen==0){
+#         print "Creating new entry in $file\n";
+#         # append line
+#         open (MOVE, ">>$file");
+#         print MOVE $line;
+#         close (MOVE);
+#     } else {
+#         print "\nWARNING: Cannot create entry in $file\n";
+#         print "$user has scheduled action: $line_seen\n";
+#     }
 
-    &log_script_exit("",0,1,0,@arguments);
-}
-
-
-
-# --old-uid oldlogin --new-uid newlogin
-if ($old_uid ne "" and $new_uid ne ""){
-
-    my %forbidden_login_hash=&forbidden_login_hash();
-
-    if (exists($forbidden_login_hash{$new_uid})){
-        &log_script_exit("ERROR: New login $new_uid exists in the system",
-                         1,1,0,@arguments);
-    }
-
-    # Fetch old data
-    my ($old_home,$old_type,$old_gecos,$old_group,$old_uidnumber,
-       $old_sambahomepath) = &fetchdata_from_account($old_uid);
-
-    if ($old_home eq ""){
-        &log_script_exit("Could not find old-uid $old_uid",
-                         1,1,0,@arguments);
-    }
-    my $dbh=&db_connect();
-    my ($old_dn)= $dbh->selectrow_array( "SELECT dn
-                                         FROM ldap_entries 
-                                         WHERE dn LIKE 'uid=$old_uid%'
-                                        ");
-    # changing stuff
-    my $new_home_update=$old_home;
-    $new_home_update=~s/\/${old_uid}$/\/${new_uid}/;
-    my $new_dn_update=$old_dn;
-    $new_dn_update=~s/uid=${old_uid},/uid=${new_uid},/;
-
-    print "1) Updating $old_uid to $new_uid in the sophomorix database\n";
-    &update_user_db_entry($old_uid,"Uid=$new_uid");
-    my $sql="UPDATE ldap_entries SET dn='$new_dn_update'
-             WHERE dn='$old_dn'";
-    if($Conf::log_level>=3){
-              print "\nSQL: $sql\n";
-    }
-    $dbh->do($sql);
-    &update_uid_ldap($old_uid,$new_uid);
-
-    print "2) Moving homedir.\n";
-    system("mv $old_home $new_home_update");
-
-    print "3) Renaming mailbox: $old_uid --> $new_uid\n";
-    &move_mailbox($old_uid,$new_uid);
-
-    print "4) Updating Horde database not supported\n";
-
-    print "5) Updating lehrer.txt if $old_uid is a teacher\n";
-    if ($old_type eq "teacher"){
-        &lehrer_ordnen($old_uid,$new_uid);
-    }
-
-    print "6) Updating /etc/aliases:\n";
-
-    system("${DevelConf::path_sbin}/sophomorix-mail --skiplock");
-    # log
-    &append_login_rename_log("man-rename-login",
-                           $old_uid,
-                           $new_uid,
-                           $old_uidnumber,
-                         );
-    print "... done!\n";
+#     &log_script_exit("",0,1,0,@arguments);
+# }
 
 
-    # Fetch new data
-    my ($new_home_db,$new_type,$new_gecos,$new_group,$new_uidnumber,
-       $new_sambahomepath_db) = &fetchdata_from_account($new_uid);
-    my ($new_dn_db)= $dbh->selectrow_array( "SELECT dn
-                                         FROM ldap_entries 
-                                         WHERE dn LIKE 'uid=$new_uid%'
-                                        ");
-    my $id_result_old="";
-    if (system("id $old_uid > /dev/null 2>&1")){
-        $id_result_old="$old_uid (nonexisting,OK)";
-    } else {
-        $id_result_old="$old_uid (existing,ERROR)";
-    };
-    my $id_result_new="";
-    if (system("id $new_uid > /dev/null 2>&1")){
-        $id_result_new="$new_uid (nonexisting,ERROR)";
-    } else {
-        $id_result_new="$new_uid (existing,OK)";
-    };
 
-    my $old_home_result="";
-    if (-d $old_home){
-	$old_home_result=$old_home." (exists,ERROR)";
-    } else {
-	$old_home_result=$old_home." (nonexisting,OK)";
-    }
-    my $new_home_result="";
-    if (-d $new_home_db){
-	$new_home_result=$new_home_db." (exists,OK)";
-    } else {
-	$new_home_result=$new_home_db." (nonexisting,ERROR)";
-    }
+# # --old-uid oldlogin --new-uid newlogin
+# if ($old_uid ne "" and $new_uid ne ""){
 
-    # Path to mailbox
-    my $old_initial= substr $old_uid,0,1;
-    my $new_initial= substr $new_uid,0,1;
-    my $old_mailbox_dir="/var/spool/cyrus/mail/".$old_initial."/user/".$old_uid;
-    my $new_mailbox_dir="/var/spool/cyrus/mail/".$new_initial."/user/".$new_uid;
-    my $old_mailbox_dir_result="";
-    my $new_mailbox_dir_result="";
+#     my %forbidden_login_hash=&forbidden_login_hash();
 
-    if (-d $old_mailbox_dir){
-	$old_mailbox_dir_result=$old_mailbox_dir." (exists, ERROR)";
-    } else {
-	$old_mailbox_dir_result=$old_mailbox_dir." (nonexisting, OK)";
-    }
-    if (-d $new_mailbox_dir){
-	$new_mailbox_dir_result=$new_mailbox_dir." (exists, OK)";
-    } else {
-	$new_mailbox_dir_result=$new_mailbox_dir." (nonexisting, ERROR)";
-    }
+#     if (exists($forbidden_login_hash{$new_uid})){
+#         &log_script_exit("ERROR: New login $new_uid exists in the system",
+#                          1,1,0,@arguments);
+#     }
 
-    # ????? /var/lib/cyrus/lock/w/user/wei.lock bleibt erhalten
+#     # Fetch old data
+#     my ($old_home,$old_type,$old_gecos,$old_group,$old_uidnumber,
+#        $old_sambahomepath) = &fetchdata_from_account($old_uid);
 
-    # print results
-    print "Checking success:\n";
-    print " Unix Acount:\n";
-    print "    OLD: $id_result_old\n";
-    print "    NEW: $id_result_new\n";
-    print " LDAP DN:\n";
-    print "    OLD: $old_dn\n";
-    print "    NEW: $new_dn_db\n";
-    print " UNIX home:\n";
-    print "    OLD: $old_home_result\n";
-    print "    NEW: $new_home_result\n";
-    print " SAMBA home:\n";
-    print "    OLD: $old_sambahomepath\n";
-    print "    NEW: $new_sambahomepath_db\n";
-    print " CYRUS mailbox dir:\n";
-    print "    OLD: $old_mailbox_dir_result\n";
-    print "    NEW: $new_mailbox_dir_result\n";
-    &log_script_exit("",0,1,0,@arguments);
-}
+#     if ($old_home eq ""){
+#         &log_script_exit("Could not find old-uid $old_uid",
+#                          1,1,0,@arguments);
+#     }
+#     my $dbh=&db_connect();
+#     my ($old_dn)= $dbh->selectrow_array( "SELECT dn
+#                                          FROM ldap_entries 
+#                                          WHERE dn LIKE 'uid=$old_uid%'
+#                                         ");
+#     # changing stuff
+#     my $new_home_update=$old_home;
+#     $new_home_update=~s/\/${old_uid}$/\/${new_uid}/;
+#     my $new_dn_update=$old_dn;
+#     $new_dn_update=~s/uid=${old_uid},/uid=${new_uid},/;
+
+#     print "1) Updating $old_uid to $new_uid in the sophomorix database\n";
+#     &update_user_db_entry($old_uid,"Uid=$new_uid");
+#     my $sql="UPDATE ldap_entries SET dn='$new_dn_update'
+#              WHERE dn='$old_dn'";
+#     if($Conf::log_level>=3){
+#               print "\nSQL: $sql\n";
+#     }
+#     $dbh->do($sql);
+#     &update_uid_ldap($old_uid,$new_uid);
+
+#     print "2) Moving homedir.\n";
+#     system("mv $old_home $new_home_update");
+
+#     print "3) Renaming mailbox: $old_uid --> $new_uid\n";
+#     &move_mailbox($old_uid,$new_uid);
+
+#     print "4) Updating Horde database not supported\n";
+
+#     print "5) Updating lehrer.txt if $old_uid is a teacher\n";
+#     if ($old_type eq "teacher"){
+#         &lehrer_ordnen($old_uid,$new_uid);
+#     }
+
+#     print "6) Updating /etc/aliases:\n";
+
+#     system("${DevelConf::path_sbin}/sophomorix-mail --skiplock");
+#     # log
+#     &append_login_rename_log("man-rename-login",
+#                            $old_uid,
+#                            $new_uid,
+#                            $old_uidnumber,
+#                          );
+#     print "... done!\n";
+
+
+#     # Fetch new data
+#     my ($new_home_db,$new_type,$new_gecos,$new_group,$new_uidnumber,
+#        $new_sambahomepath_db) = &fetchdata_from_account($new_uid);
+#     my ($new_dn_db)= $dbh->selectrow_array( "SELECT dn
+#                                          FROM ldap_entries 
+#                                          WHERE dn LIKE 'uid=$new_uid%'
+#                                         ");
+#     my $id_result_old="";
+#     if (system("id $old_uid > /dev/null 2>&1")){
+#         $id_result_old="$old_uid (nonexisting,OK)";
+#     } else {
+#         $id_result_old="$old_uid (existing,ERROR)";
+#     };
+#     my $id_result_new="";
+#     if (system("id $new_uid > /dev/null 2>&1")){
+#         $id_result_new="$new_uid (nonexisting,ERROR)";
+#     } else {
+#         $id_result_new="$new_uid (existing,OK)";
+#     };
+
+#     my $old_home_result="";
+#     if (-d $old_home){
+# 	$old_home_result=$old_home." (exists,ERROR)";
+#     } else {
+# 	$old_home_result=$old_home." (nonexisting,OK)";
+#     }
+#     my $new_home_result="";
+#     if (-d $new_home_db){
+# 	$new_home_result=$new_home_db." (exists,OK)";
+#     } else {
+# 	$new_home_result=$new_home_db." (nonexisting,ERROR)";
+#     }
+
+#     # Path to mailbox
+#     my $old_initial= substr $old_uid,0,1;
+#     my $new_initial= substr $new_uid,0,1;
+#     my $old_mailbox_dir="/var/spool/cyrus/mail/".$old_initial."/user/".$old_uid;
+#     my $new_mailbox_dir="/var/spool/cyrus/mail/".$new_initial."/user/".$new_uid;
+#     my $old_mailbox_dir_result="";
+#     my $new_mailbox_dir_result="";
+
+#     if (-d $old_mailbox_dir){
+# 	$old_mailbox_dir_result=$old_mailbox_dir." (exists, ERROR)";
+#     } else {
+# 	$old_mailbox_dir_result=$old_mailbox_dir." (nonexisting, OK)";
+#     }
+#     if (-d $new_mailbox_dir){
+# 	$new_mailbox_dir_result=$new_mailbox_dir." (exists, OK)";
+#     } else {
+# 	$new_mailbox_dir_result=$new_mailbox_dir." (nonexisting, ERROR)";
+#     }
+
+#     # ????? /var/lib/cyrus/lock/w/user/wei.lock bleibt erhalten
+
+#     # print results
+#     print "Checking success:\n";
+#     print " Unix Acount:\n";
+#     print "    OLD: $id_result_old\n";
+#     print "    NEW: $id_result_new\n";
+#     print " LDAP DN:\n";
+#     print "    OLD: $old_dn\n";
+#     print "    NEW: $new_dn_db\n";
+#     print " UNIX home:\n";
+#     print "    OLD: $old_home_result\n";
+#     print "    NEW: $new_home_result\n";
+#     print " SAMBA home:\n";
+#     print "    OLD: $old_sambahomepath\n";
+#     print "    NEW: $new_sambahomepath_db\n";
+#     print " CYRUS mailbox dir:\n";
+#     print "    OLD: $old_mailbox_dir_result\n";
+#     print "    NEW: $new_mailbox_dir_result\n";
+#     &log_script_exit("",0,1,0,@arguments);
+# }
 
 
 # -F user / --freeze user
@@ -745,6 +743,8 @@ if ($removable ne ""){
                      dn=>$dn,
                      user=>$removable,
                      status=>"R",
+#                     tolerationdate=> $tolerationdate=$DevelConf::default_date,
+#                     deactivationdate=> $deactivationdate=$DevelConf::default_date,
                      user_count=>"",
                    });
     &log_script_exit("",0,1,0,@arguments);
@@ -869,118 +869,118 @@ if ($old_mailbox ne "" and $new_mailbox ne ""){
 
 
 
-# --kill-all-users
-if ($kill_all_users==1){
-    print "\n\n I will kill all users in 5 seconds!!\n";
-    sleep 1;
-    print "\n\n Hit Ctrl-C to abort!\n\n\n";
-    sleep 5;
-    my @teachers=&fetchstudents_from_adminclass(${DevelConf::teacher});
-    my @students=&Sophomorix::SophomorixAPI::fetchstudents_from_school();
-    my @users=(@teachers,@students);
+# # --kill-all-users
+# if ($kill_all_users==1){
+#     print "\n\n I will kill all users in 5 seconds!!\n";
+#     sleep 1;
+#     print "\n\n Hit Ctrl-C to abort!\n\n\n";
+#     sleep 5;
+#     my @teachers=&fetchstudents_from_adminclass(${DevelConf::teacher});
+#     my @students=&Sophomorix::SophomorixAPI::fetchstudents_from_school();
+#     my @users=(@teachers,@students);
 
-    my $count=0;
-    my $max=$#users;
-    foreach my $user_kill (@users){
-        $count++;
-        print "Mark $user_kill as killable. ($count/$max) \n";
-        system("sophomorix-user -K $user_kill");
-    }
-    # kein nscd_stop, da exit folgt.
-    &log_script_exit("",0,1,0,@arguments);
-}
+#     my $count=0;
+#     my $max=$#users;
+#     foreach my $user_kill (@users){
+#         $count++;
+#         print "Mark $user_kill as killable. ($count/$max) \n";
+#         system("sophomorix-user -K $user_kill");
+#     }
+#     # kein nscd_stop, da exit folgt.
+#     &log_script_exit("",0,1,0,@arguments);
+# }
 
 
 
-# --teacher teacher --scheduled-toleration
-if ($teacher ne"" and $sc_toleration ne "empty"){
-    # check if it is really an account
-    my ($home,$type,$gecos,$group,$uidnumber)=&fetchdata_from_account($teacher);
+# # --teacher teacher --scheduled-toleration
+# if ($teacher ne"" and $sc_toleration ne "empty"){
+#     # check if it is really an account
+#     my ($home,$type,$gecos,$group,$uidnumber)=&fetchdata_from_account($teacher);
  
-    if ($type ne "teacher"){
-        &log_script_exit("$teacher is NOT a valid username of type teacher",
-                         1,1,0,@arguments);
-    } else {
-        print "   - $teacher is a valid username and of type 'teacher'\n";
-    }
+#     if ($type ne "teacher"){
+#         &log_script_exit("$teacher is NOT a valid username of type teacher",
+#                          1,1,0,@arguments);
+#     } else {
+#         print "   - $teacher is a valid username and of type 'teacher'\n";
+#     }
 
 
-    # check date
-    my ($year,$month,$day)=split(/-/,$sc_toleration);
-    # define values, so that check_date does not throw errors 
-    if (not defined $year){
-        $year=9.99;
-    }
-    if (not defined $month){
-        $month=100;
-    }
-    if (not defined $day ){
-        $day=100;
-    }
-    if ($year eq ""){
-        $year=9.99;
-    }
-    if ($month eq ""){
-        $month=100;
-    }
-    if ($day eq "" ){
-        $day=100;
-    }
+#     # check date
+#     my ($year,$month,$day)=split(/-/,$sc_toleration);
+#     # define values, so that check_date does not throw errors 
+#     if (not defined $year){
+#         $year=9.99;
+#     }
+#     if (not defined $month){
+#         $month=100;
+#     }
+#     if (not defined $day ){
+#         $day=100;
+#     }
+#     if ($year eq ""){
+#         $year=9.99;
+#     }
+#     if ($month eq ""){
+#         $month=100;
+#     }
+#     if ($day eq "" ){
+#         $day=100;
+#     }
 
-    # check if date exists
-    # return 1 when valid
-    # return 0 when invalid
-    my $return=check_date($year,$month,$day);
+#     # check if date exists
+#     # return 1 when valid
+#     # return 0 when invalid
+#     my $return=check_date($year,$month,$day);
 
-    # if date is completely empty, allow this to clear the date in the db
-    if ($sc_toleration eq ""){
-        $return=1;
-    }    
+#     # if date is completely empty, allow this to clear the date in the db
+#     if ($sc_toleration eq ""){
+#         $return=1;
+#     }    
 
-    if ($return==0){
-        print "Date $sc_toleration is not a valid date ",
-              "(use this syntax: 2012-04-22)\n";
-    } else {
-        $sc_toleration=&date_pg2perl($sc_toleration);
-	print "   - $sc_toleration is a valid date.\n";
-        # set scheduled-toletration for the account
-        if ($sc_toleration eq ""){
-            print "Removing ScheduledToleration date for $teacher \n";
-        } else {
-            print "Setting ScheduledToleration date for $teacher to $sc_toleration\n";
-        }
-        &update_user_db_entry($teacher, 
-                              "ScheduledToleration=$sc_toleration");
-    }
-    &log_script_exit("",0,1,0,@arguments);
-}
+#     if ($return==0){
+#         print "Date $sc_toleration is not a valid date ",
+#               "(use this syntax: 2012-04-22)\n";
+#     } else {
+#         $sc_toleration=&date_pg2perl($sc_toleration);
+# 	print "   - $sc_toleration is a valid date.\n";
+#         # set scheduled-toletration for the account
+#         if ($sc_toleration eq ""){
+#             print "Removing ScheduledToleration date for $teacher \n";
+#         } else {
+#             print "Setting ScheduledToleration date for $teacher to $sc_toleration\n";
+#         }
+#         &update_user_db_entry($teacher, 
+#                               "ScheduledToleration=$sc_toleration");
+#     }
+#     &log_script_exit("",0,1,0,@arguments);
+# }
 
 
-# --reset-user
-if ($reset_user ne""){
-    my @users=split(/,/, $reset_user);
-    # repair.directories einlesen
-    &get_alle_verzeichnis_rechte();
-    # fetch permission for all homes
-    &fetch_repairhome();
-    foreach my $user (@users){
-        # check if it is really an account
-        if (getpwnam("$user")){
-            print "Resetting the account of $user:\n";
-	    print "   - $user is a valid username.\n";
-        } else {
-            &log_script_exit("$user is not a valid username",
-                         1,1,0,@arguments);
-        }
-        # reset the account
-        &reset_user($user);
-        if ($empty_password==1){
-            print "   Setting empty password for $user\n";
-            &set_sophomorix_passwd($user,"");
-        }
-    }
-    &log_script_exit("",0,1,0,@arguments);
-}
+# # --reset-user
+# if ($reset_user ne""){
+#     my @users=split(/,/, $reset_user);
+#     # repair.directories einlesen
+#     &get_alle_verzeichnis_rechte();
+#     # fetch permission for all homes
+#     &fetch_repairhome();
+#     foreach my $user (@users){
+#         # check if it is really an account
+#         if (getpwnam("$user")){
+#             print "Resetting the account of $user:\n";
+# 	    print "   - $user is a valid username.\n";
+#         } else {
+#             &log_script_exit("$user is not a valid username",
+#                          1,1,0,@arguments);
+#         }
+#         # reset the account
+#         &reset_user($user);
+#         if ($empty_password==1){
+#             print "   Setting empty password for $user\n";
+#             &set_sophomorix_passwd($user,"");
+#         }
+#     }
+#     &log_script_exit("",0,1,0,@arguments);
+# }
 
 
 
@@ -1027,7 +1027,8 @@ if ($user ne ""){
         }
     }
 } elsif ($list_teachers_by_year==1){
-    &list_teachers_by_year();
+    print "... still to do!\n";
+    #&list_teachers_by_year();
 }
 
 
