@@ -107,8 +107,8 @@ my $info=0;
 my $help=0;
 my $empty_password=0;
 
-my $webui_dashboard="";
-my $comment="";
+my $webui_dashboard;
+my $comment;
 my $freeze="";
 my $permanent="";
 my $removable="";
@@ -676,7 +676,7 @@ if ($info==1){
 
 
 # -user <user> --comment "Test for comment"
-if ($user ne "" and $comment ne ""){
+if ($user ne "" and defined $comment){
     print "Updating comment for user $user:\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     &AD_user_update({ldap=>$ldap,
@@ -690,7 +690,7 @@ if ($user ne "" and $comment ne ""){
 }
 
 # -user <user> --webui-dashboard "String"
-if ($user ne "" and $webui_dashboard ne ""){
+if ($user ne "" and defined $webui_dashboard){
     print "Updating webui-dashboard for user $user:\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     &AD_user_update({ldap=>$ldap,

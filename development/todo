@@ -366,6 +366,13 @@ nach sophomorix.add muss
 Scripts
 ############################################################
 
+Allgemein:
+
+Man kann wohl nicht eine unicode string mit "" (empty) füllen
+-> Attribute entfernen? wenn --comment ""
+-> oder was sonst reinschreiben?
+
+
 
 
 AD_group_addmember
@@ -478,7 +485,10 @@ sophomorix-useradd
   - replace default password 'linux' with 'LinuxMuster!'
   - maybe put all options for adding users  to sophomorix-add
 
-sophomorix-add:   call sophomorix-print correctly 
+sophomorix-add:   
+call sophomorix-print correctly 
+--user --comment "" does not work ()
+--user --webui-dashboard "" does not work
 
 sophomorix.add:
 -> are there umlaute allowed in sophomorix.add at the moment?

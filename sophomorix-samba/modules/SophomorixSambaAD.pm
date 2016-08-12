@@ -521,6 +521,8 @@ sub AD_user_update {
     my $displayname;
     # hash of what to replace
     my $replace=();
+    # list of what to delete
+    my @delete=();
 
     if (defined $firstname_utf8 and 
         defined $surname_utf8 and
@@ -575,46 +577,36 @@ sub AD_user_update {
         print "   sophomorixStatus:          $status\n";
     }
     if (defined $comment){
-        $replace{'sophomorixComment'}=$comment;
+        if ($comment eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixComment";
+        } else {
+            $replace{'sophomorixComment'}=$comment;
+        }
         print "   sophomorixComment:         $comment\n";
     }
     if (defined $webui_dashboard){
-        $replace{'sophomorixWebuiDashboard'}=$webui_dashboard;
+        if ($webui_dashboard eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixWebuiDashboard";
+        } else {
+            $replace{'sophomorixWebuiDashboard'}=$webui_dashboard;
+        }
         print "   sophomorixWebuiDashboard:  $webui_dashboard\n";
     }
 
-#    # calculate missing attributes
-#    my $display_name = $firstname_utf8." ".$surname_utf8;
-
-#    if($Conf::log_level>=1){
-#        print "\n";
-#        &Sophomorix::SophomorixBase::print_title(
-#              "Updating User $user_count : $user");
-#        print "   DN:                 $dn\n";
-#        print "   Surname(ASCII):     $surname_ascii\n";
-#        print "   Surname(UTF8):      $surname_utf8\n";
-#        print "   Firstname(ASCII):   $firstname_ascii\n";
-#        print "   Firstname(UTF8):    $firstname_utf8\n";
-#        print "   Birthday:           $birthdate\n";
-#    }
-
+    # modify
     my $mesg = $ldap->modify( $dn,
 		      replace => { %replace }
                );
-
-
-#    my $mesg = $ldap->modify( $dn,
-#		      replace => {
-#                          sophomorixFirstnameASCII => $firstname_ascii,
-#                          sophomorixSurnameASCII => $surname_ascii,
-#                          sophomorixBirthdate => $birthdate,
-#                          givenName => $firstname_utf8,
-#                          sn => $surname_utf8,
-#                          displayName => [$display_name],
-#
-#                      }
-#               );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+     
+    # delete
+    my $mesg2 = $ldap->modify( $dn, 
+                       delete => [@delete]
+                );
+    &AD_debug_logdump($mesg2,2,(caller(0))[3]);
 }
 
 
