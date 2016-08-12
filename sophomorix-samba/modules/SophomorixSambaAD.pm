@@ -516,6 +516,7 @@ sub AD_user_update {
     my $firstpassword = $arg_ref->{firstpassword};
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
+    my $webui_dashboard = $arg_ref->{webui_dashboard};
 
     my $displayname;
     # hash of what to replace
@@ -577,6 +578,11 @@ sub AD_user_update {
         $replace{'sophomorixComment'}=$comment;
         print "   sophomorixComment:         $comment\n";
     }
+    if (defined $webui_dashboard){
+        $replace{'sophomorixWebuiDashboard'}=$webui_dashboard;
+        print "   sophomorixWebuiDashboard:  $webui_dashboard\n";
+    }
+
 #    # calculate missing attributes
 #    my $display_name = $firstname_utf8." ".$surname_utf8;
 

@@ -107,6 +107,7 @@ my $info=0;
 my $help=0;
 my $empty_password=0;
 
+my $webui_dashboard="";
 my $comment="";
 my $freeze="";
 my $permanent="";
@@ -140,6 +141,7 @@ my $testopt=GetOptions(
        "u|user=s" => \$user,
 
        "comment=s" => \$comment,
+       "webui-dashboard=s" => \$webui_dashboard,
 
        "F|freeze=s" => \$freeze,
        "P|permanent=s" => \$permanent,
@@ -198,6 +200,12 @@ Changing status of a user:
   -K user   /   --killable user
   -A user   /   --activate user
   -U user   /   --usable user
+
+Updating comment of a user:
+  --user <user> --comment "This is the comment"
+
+Updating WebuiDashboard of a user:
+  --user <user> --webui-dashboard "Webui Dashboard String"
 
 -> continue here
 
@@ -667,6 +675,35 @@ if ($info==1){
 # }
 
 
+# -user <user> --comment "Test for comment"
+if ($user ne "" and $comment ne ""){
+    print "Updating comment for user $user:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     comment=>$comment,
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+# -user <user> --webui-dashboard "String"
+if ($user ne "" and $webui_dashboard ne ""){
+    print "Updating webui-dashboard for user $user:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     webui_dashboard=>$webui_dashboard,
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
 # -F user / --freeze user
 if ($freeze ne ""){
     print "Freezing the account of $freeze:\n";
@@ -681,19 +718,6 @@ if ($freeze ne ""){
     &log_script_exit("",0,1,0,@arguments);
 }
 
-# -user <user> --comment "Test for comment"
-if ($user ne "" and $comment ne ""){
-    print "Updating comment for user $user:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
-    &AD_user_update({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     dn=>$dn,
-                     user=>$user,
-                     comment=>$comment,
-                     user_count=>"",
-                   });
-    &log_script_exit("",0,1,0,@arguments);
-}
 
 # # --freeze
 # if ($freeze ne""){
