@@ -475,6 +475,7 @@ sub AD_user_create {
                    sophomorixUnid => $unid,
                    sophomorixStatus => $status,
                    sophomorixAdminClass => $group,    
+                   sophomorixAdminFile => $file,    
                    sophomorixFirstPassword => $plain_password, 
                    sophomorixFirstnameASCII => $firstname_ascii,
                    sophomorixSurnameASCII  => $surname_ascii,
