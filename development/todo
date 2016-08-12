@@ -9,13 +9,17 @@ aber user auftreten: einfach zeile ignorieren
 
 
 Neues Attribut im ldap:
-sophomorixAdminFile students.csv, abc.students.csv, ...
+OK: sophomorixAdminFile students.csv, abc.students.csv, ...
+    ? updaten, wenn user in anderem File auftaucht? -> Ja
+
 Kommentarfeld zu einem User:
-sophomorixComment
-... kann gelöscht werden ab ....
+
+OK: sophomorixComment
+OK: default: "created by sophomorix"
+... tests schreiben
 --> Wieviel Platz hat man in so einem Feld?
 --> sophomorix user --show comments:
-    Zeigt alle Kommentare
+    Zeigt alle (non default) Kommentare
 
 Bugs after moving to xenial
 - membeships of the default groups are not correct
@@ -400,7 +404,8 @@ option sync memberships: go throuh all projects and sync memberships
 
 
 sophomorix-user
- options to change status
+ OK: options to change status
+     Todo: update dates
  option to list new teachers
 how to handle users that are organised in wrong school
   i.e. sophomorisSchoolname is BSZLEO an they are in OU=SCHOOL 
