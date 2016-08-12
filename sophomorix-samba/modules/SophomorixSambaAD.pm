@@ -513,6 +513,8 @@ sub AD_user_update {
     my $user_count = $arg_ref->{user_count};
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword};
+    my $status = $arg_ref->{status};
+    my $comment = $arg_ref->{comment};
 
     my $displayname;
     # hash of what to replace
@@ -534,7 +536,7 @@ sub AD_user_update {
     }
 
     &Sophomorix::SophomorixBase::print_title(
-          "Updating User $user_count : $user");
+          "Updating User ${user_count}: $user");
     print "   DN: $dn\n";
 
     if (defined $firstname_utf8){
@@ -565,6 +567,14 @@ sub AD_user_update {
     if (defined $firstpassword){
         $replace{'sophomorixFirstpassword'}=$firstpassword;
         print "   Firstpassword:             $firstpassword\n";
+    }
+    if (defined $status){
+        $replace{'sophomorixStatus'}=$status;
+        print "   sophomorixStatus:          $status\n";
+    }
+    if (defined $comment){
+        $replace{'sophomorixComment'}=$commnt;
+        print "   sophomorixComment:         $comment\n";
     }
 #    # calculate missing attributes
 #    my $display_name = $firstname_utf8." ".$surname_utf8;

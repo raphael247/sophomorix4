@@ -38,6 +38,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
+                                 AD_user_update
                                  AD_group_create
                                  AD_group_kill
                                  AD_group_addmember
@@ -105,12 +106,15 @@ $Conf::log_level=1;
 my $info=0;
 my $help=0;
 my $empty_password=0;
+
 my $freeze="";
 my $permanent="";
 my $removable="";
 my $killable="";
-my $kill_all_users=0;
 my $activate="";
+my $usable="";
+
+my $kill_all_users=0;
 my $teacher="";
 my $sc_toleration="empty";
 my $reset_user="";
@@ -134,16 +138,19 @@ my $testopt=GetOptions(
        "ou=s" => \$ou,
        "school-token=s" => \$school_token,
        "u|user=s" => \$user,
+
        "F|freeze=s" => \$freeze,
        "P|permanent=s" => \$permanent,
        "R|removable=s" => \$removable,
        "K|killable=s" => \$killable,
+       "A|activate=s" => \$activate,
+       "U|usable=s" => \$usable,
+
        "old-uid=s" => \$old_uid,
        "new-uid=s" => \$new_uid,
        "old-mailbox=s" => \$old_mailbox,
        "new-mailbox=s" => \$new_mailbox,
        "kill-all-users" => \$kill_all_users,
-       "A|activate=s" => \$activate,
        "reset-user=s" => \$reset_user,
        "empty-password" => \$empty_password,
        "scheduled-toleration=s" => \$sc_toleration,
@@ -183,16 +190,18 @@ Choose the school:
   --ou <SCHOOL>, --ou "*"
   --school-token <prefix>, --school-token "*"
 
--> continue here
-
-  --list-teachers-by-year
-
 Changing status of a user:
   -F user   /   --freeze user
   -P user   /   --permanent user
   -R user   /   --removable user
   -K user   /   --killable user
   -A user   /   --activate user
+  -U user   /   --usable user
+
+
+-> continue here
+
+  --list-teachers-by-year
 
 Changing loginname of a user:
   --old-uid oldlogin --new-uid newlogin
@@ -657,6 +666,199 @@ if ($old_uid ne "" and $new_uid ne ""){
 }
 
 
+# -F user / --freeze user
+if ($freeze ne ""){
+    print "Freezing the account of $freeze:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$freeze);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$freeze,
+                     status=>"F",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+# # --freeze
+# if ($freeze ne""){
+#     # check if it is really an account
+#     if (getpwnam("$freeze")){
+#         print "Freezing the account of $freeze:\n";
+# 	print "   - $freeze is a valid username.\n";
+#     } else {
+#         &log_script_exit("$freeze is not a valid username",
+#                          1,1,0,@arguments);
+#     }
+#     # doing the freeze
+#     &update_user_db_entry($freeze, 
+#                           "Status=F",
+#        #                   "TolerationDate=",
+#        #                   "DeactivationDate="
+#                          );
+#     &user_deaktivieren($freeze);
+#     &log_script_exit("",0,1,0,@arguments);
+# }
+
+
+# -P user / --permanent user
+if ($permanent ne ""){
+    print "Making the account of $permanent permanent:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$permanent);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$permanent,
+                     status=>"P",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+# # --permanent
+# if ($permanent ne""){
+#     # check if it is really an account
+#     if (getpwnam("$permanent")){
+#         print "Making the account of $permanent permanent:\n";
+# 	print "   - $permanent is a valid username.\n";
+#     } else {
+#         &log_script_exit("$permanent is not a valid username",
+#                          1,1,0,@arguments);
+#     }
+#     # making the account permanent
+#     &update_user_db_entry($permanent, 
+#                           "Status=P",
+#     #                      "TolerationDate=",
+#     #                      "DeactivationDate="
+#                          );
+#     &user_reaktivieren($permanent);
+#     &log_script_exit("",0,1,0,@arguments);
+# }
+
+
+# -R user / --removable user
+if ($removable ne ""){
+    print "Making the account of $removable removable by sophomorix-kill:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$removable);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$removable,
+                     status=>"R",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# # --removable
+# if ($removable ne""){
+#     # check if it is really an account
+#     if (getpwnam("$removable")){
+#         print "Making the account of $removable removable by sophomorix-kill:\n";
+# 	print "   - $removable is a valid username.\n";
+#     } else {
+#         &log_script_exit("$removable is not a valid username",
+#                          1,1,0,@arguments);
+#     }
+#     # doing the removable
+#     &update_user_db_entry($removable, 
+#                           "Status=R",
+#                           "TolerationDate=01.01.1970",
+#                           "DeactivationDate=01.01.1970");
+#     &user_deaktivieren($removable);
+#     &log_script_exit("",0,1,0,@arguments);
+# }
+
+
+
+# -K user / --killable user
+if ($killable ne ""){
+    print "Making the account of $killable killable by sophomorix-kill:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$killable);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$killable,
+                     status=>"K",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+# # --killable
+# if ($killable ne""){
+#     # check if it is really an account
+#     if (&check_sophomorix_user("$killable")==1){
+#         print "Making the account of $killable killable by sophomorix-kill:\n";
+# 	print "   - $killable is a valid username.\n";
+#     } else {
+#         &log_script_exit("$killable is not a valid username",
+#                          1,1,0,@arguments);
+#     }
+#     # doing the killable
+#     &update_user_db_entry($killable, 
+#                           "Status=K",
+#  #                         "TolerationDate=01.01.1970",
+#  #                         "DeactivationDate=01.01.1970"
+#                          );
+#     &user_deaktivieren($killable);
+#     &log_script_exit("",0,1,0,@arguments);
+# }
+
+
+# -A user / --activate user
+if ($activate ne ""){
+    print "Actvating the account of $activate:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$activate);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$activate,
+                     status=>"A",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# # --activate
+# if ($activate ne""){
+#     # check if it is really an account
+#     if (getpwnam("$activate")){
+#         print "Actvating the account of $activate:\n";
+# 	print "   - $activate is a valid username.\n";
+#     } else {
+#         &log_script_exit("$activate is not a valid username",
+#                          1,1,0,@arguments);
+#     }
+#     # activating the account
+#     &update_user_db_entry($activate, 
+#                           "Status=A",
+#                           "TolerationDate=$today",
+#                           "DeactivationDate=");
+#     &user_reaktivieren($activate);
+#     &log_script_exit("",0,1,0,@arguments);
+# }
+
+
+# -U user / --usable user
+if ($usable ne ""){
+    print "Setting the account of $usable to usable:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$usable);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$usable,
+                     status=>"U",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+
 # --old-mailbox oldlogin --new-mailbox newlogin
 if ($old_mailbox ne "" and $new_mailbox ne ""){
     print "Renaming mailbox: $old_mailbox --> $new_mailbox\n";
@@ -665,94 +867,6 @@ if ($old_mailbox ne "" and $new_mailbox ne ""){
 }
 
 
-
-
-# --freeze
-if ($freeze ne""){
-    # check if it is really an account
-    if (getpwnam("$freeze")){
-        print "Freezing the account of $freeze:\n";
-	print "   - $freeze is a valid username.\n";
-    } else {
-        &log_script_exit("$freeze is not a valid username",
-                         1,1,0,@arguments);
-    }
-    # doing the freeze
-    &update_user_db_entry($freeze, 
-                          "Status=F",
-       #                   "TolerationDate=",
-       #                   "DeactivationDate="
-                         );
-    &user_deaktivieren($freeze);
-    &log_script_exit("",0,1,0,@arguments);
-}
-
-
-
-# --permanent
-if ($permanent ne""){
-    # check if it is really an account
-    if (getpwnam("$permanent")){
-        print "Making the account of $permanent permanent:\n";
-	print "   - $permanent is a valid username.\n";
-    } else {
-        &log_script_exit("$permanent is not a valid username",
-                         1,1,0,@arguments);
-    }
-    # making the account permanent
-    &update_user_db_entry($permanent, 
-                          "Status=P",
-    #                      "TolerationDate=",
-    #                      "DeactivationDate="
-                         );
-    &user_reaktivieren($permanent);
-    &log_script_exit("",0,1,0,@arguments);
-}
-
-
-
-
-# --removable
-if ($removable ne""){
-    # check if it is really an account
-    if (getpwnam("$removable")){
-        print "Making the account of $removable removable by sophomorix-kill:\n";
-	print "   - $removable is a valid username.\n";
-    } else {
-        &log_script_exit("$removable is not a valid username",
-                         1,1,0,@arguments);
-    }
-    # doing the removable
-    &update_user_db_entry($removable, 
-                          "Status=R",
-                          "TolerationDate=01.01.1970",
-                          "DeactivationDate=01.01.1970");
-    &user_deaktivieren($removable);
-    &log_script_exit("",0,1,0,@arguments);
-}
-
-
-
-
-# --killable
-if ($killable ne""){
-    # check if it is really an account
-    if (&check_sophomorix_user("$killable")==1){
-        print "Making the account of $killable killable by sophomorix-kill:\n";
-	print "   - $killable is a valid username.\n";
-    } else {
-        &log_script_exit("$killable is not a valid username",
-                         1,1,0,@arguments);
-    }
-    # doing the killable
-    &update_user_db_entry($killable, 
-                          "Status=K",
- #                         "TolerationDate=01.01.1970",
- #                         "DeactivationDate=01.01.1970"
-                         );
-    &user_deaktivieren($killable);
-    &log_script_exit("",0,1,0,@arguments);
-}
 
 
 # --kill-all-users
@@ -773,27 +887,6 @@ if ($kill_all_users==1){
         system("sophomorix-user -K $user_kill");
     }
     # kein nscd_stop, da exit folgt.
-    &log_script_exit("",0,1,0,@arguments);
-}
-
-
-
-# --activate
-if ($activate ne""){
-    # check if it is really an account
-    if (getpwnam("$activate")){
-        print "Actvating the account of $activate:\n";
-	print "   - $activate is a valid username.\n";
-    } else {
-        &log_script_exit("$activate is not a valid username",
-                         1,1,0,@arguments);
-    }
-    # activating the account
-    &update_user_db_entry($activate, 
-                          "Status=A",
-                          "TolerationDate=$today",
-                          "DeactivationDate=");
-    &user_reaktivieren($activate);
     &log_script_exit("",0,1,0,@arguments);
 }
 
