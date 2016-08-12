@@ -574,7 +574,7 @@ sub AD_user_update {
         print "   sophomorixStatus:          $status\n";
     }
     if (defined $comment){
-        $replace{'sophomorixComment'}=$commnt;
+        $replace{'sophomorixComment'}=$comment;
         print "   sophomorixComment:         $comment\n";
     }
 #    # calculate missing attributes

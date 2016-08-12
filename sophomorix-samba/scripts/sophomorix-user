@@ -107,6 +107,7 @@ my $info=0;
 my $help=0;
 my $empty_password=0;
 
+my $comment="";
 my $freeze="";
 my $permanent="";
 my $removable="";
@@ -137,6 +138,8 @@ my $testopt=GetOptions(
        "ou=s" => \$ou,
        "school-token=s" => \$school_token,
        "u|user=s" => \$user,
+
+       "comment=s" => \$comment,
 
        "F|freeze=s" => \$freeze,
        "P|permanent=s" => \$permanent,
@@ -673,6 +676,20 @@ if ($freeze ne ""){
                      dn=>$dn,
                      user=>$freeze,
                      status=>"F",
+                     user_count=>"",
+                   });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+# -user <user> --comment "Test for comment"
+if ($user ne "" and $comment ne ""){
+    print "Updating comment for user $user:\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     comment=>$comment,
                      user_count=>"",
                    });
     &log_script_exit("",0,1,0,@arguments);
