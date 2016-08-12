@@ -486,6 +486,7 @@ sub AD_user_create {
                    sophomorixCreationDate => $creationdate, 
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
+                   sophomorixComment => "created by sophomorix", 
                    userAccountControl => '512',
                    uidNumber => $uidnumber_wish,
                    objectclass => ['top', 'person',
