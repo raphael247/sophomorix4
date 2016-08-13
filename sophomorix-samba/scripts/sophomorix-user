@@ -113,12 +113,12 @@ my $add_user_permissions;
 my $remove_user_permissions;
 
 my $comment;
-my $freeze="";
-my $permanent="";
-my $removable="";
-my $killable="";
-my $activate="";
-my $usable="";
+my $freeze=0;
+my $permanent=0;
+my $removable=0;
+my $killable=0;
+my $activate=0;
+my $usable=0;
 
 my $kill_all_users=0;
 my $teacher="";
@@ -150,12 +150,12 @@ my $testopt=GetOptions(
        "add-user-permissions=s" => \$add_user_permissions,
        "remove-user-permissions=s" => \$remove_user_permissions,
 
-       "F|freeze=s" => \$freeze,
-       "P|permanent=s" => \$permanent,
-       "R|removable=s" => \$removable,
-       "K|killable=s" => \$killable,
-       "A|activate=s" => \$activate,
-       "U|usable=s" => \$usable,
+       "F|freeze" => \$freeze,
+       "P|permanent" => \$permanent,
+       "R|removable" => \$removable,
+       "K|killable" => \$killable,
+       "A|activate" => \$activate,
+       "U|usable" => \$usable,
 
        "old-uid=s" => \$old_uid,
        "new-uid=s" => \$new_uid,
@@ -201,12 +201,12 @@ Choose the school:
   --school-token <prefix>, --school-token "*"
 
 Changing status of a user:
-  -F user   /   --freeze user
-  -P user   /   --permanent user
-  -R user   /   --removable user
-  -K user   /   --killable user
-  -A user   /   --activate user
-  -U user   /   --usable user
+  -F --user <user>  /   --freeze --user <user>
+  -P --user <user>  /   --permanent --user <user>
+  -R --user <user>  /   --removable --user <user>
+  -K --user <user>  /   --killable --user <user>
+  -A --user <user>  /   --activate --user <user>
+  -U --user <user>  /   --usable --user <user>
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
@@ -690,10 +690,10 @@ if ($user eq "" and $info==1){
 # Standard: suchen nach string
 ######################################################################
 
-if ($user eq "" and $list_teachers_by_year==0){
-   print "I don't know what to search for! (searchstring is empty)\n";
-   &log_script_exit("",0,1,0,@arguments);
-}
+#if ($user eq "" and $list_teachers_by_year==0){
+#   print "I don't know what to search for! (searchstring is empty)\n";
+#   &log_script_exit("",0,1,0,@arguments);
+#}
 
 
 # --info --user <user>
@@ -824,13 +824,13 @@ if (defined $remove_user_permissions){
 
 
 
-# -F user / --freeze user
-if ($freeze ne ""){
-    print "Freezing the account of $freeze:\n";
+# -F --user <user> / --freeze --user <user>
+if ($freeze==1){
+    print "Freezing the account of $user:\n";
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$freeze,
+                     user=>$user,
                      status=>"F",
                      user_count=>"",
                    });
@@ -858,13 +858,13 @@ if ($freeze ne ""){
 # }
 
 
-# -P user / --permanent user
-if ($permanent ne ""){
-    print "Making the account of $permanent permanent:\n";
+# -P --user <user> / --permanent --user <user>
+if ($permanent==1){
+    print "Making the account of $user permanent:\n";
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$permanent,
+                     user=>$user,
                      status=>"P",
                      user_count=>"",
                    });
@@ -891,13 +891,13 @@ if ($permanent ne ""){
 # }
 
 
-# -R user / --removable user
-if ($removable ne ""){
-    print "Making the account of $removable removable by sophomorix-kill:\n";
+# -R --user  <user> / --removable --user <user>
+if ($removable==1){
+    print "Making the account of $user removable by sophomorix-kill:\n";
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$removable,
+                     user=>$user,
                      status=>"R",
 #                     tolerationdate=> $tolerationdate=$DevelConf::default_date,
 #                     deactivationdate=> $deactivationdate=$DevelConf::default_date,
@@ -927,13 +927,13 @@ if ($removable ne ""){
 
 
 
-# -K user / --killable user
-if ($killable ne ""){
-    print "Making the account of $killable killable by sophomorix-kill:\n";
+# -K --user <user> / --killable --user <user>
+if ($killable==1){
+    print "Making the account of $user killable by sophomorix-kill:\n";
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$killable,
+                     user=>$user,
                      status=>"K",
                      user_count=>"",
                    });
@@ -960,13 +960,13 @@ if ($killable ne ""){
 # }
 
 
-# -A user / --activate user
-if ($activate ne ""){
-    print "Actvating the account of $activate:\n";
+# -A --user <user> / --activate --user <user>
+if ($activate==1){
+    print "Actvating the account of $user:\n";
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$activate,
+                     user=>$user,
                      status=>"A",
                      user_count=>"",
                    });
@@ -993,13 +993,13 @@ if ($activate ne ""){
 # }
 
 
-# -U user / --usable user
-if ($usable ne ""){
-    print "Setting the account of $usable to usable:\n";
+# -U --user <user> / --usable --user <user>
+if ($usable==1){
+    print "Setting the account of $user to usable:\n";
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$usable,
+                     user=>$user,
                      status=>"U",
                      user_count=>"",
                    });

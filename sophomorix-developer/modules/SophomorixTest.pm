@@ -133,6 +133,10 @@ sub AD_test_object {
     my $s_creationdate = $arg_ref->{sophomorixCreationDate};
     my $s_tolerationdate = $arg_ref->{sophomorixTolerationDate};
     my $s_deactivationdate = $arg_ref->{sophomorixDeactivationDate};
+    my $s_comment = $arg_ref->{sophomorixComment};
+    my $s_webui = $arg_ref->{sophomorixWebuiDashboard};
+    my $s_user_permissions = $arg_ref->{sophomorixUserPermissions};
+
 
     # sophomorix group
     my $s_type = $arg_ref->{sophomorixType};
@@ -357,6 +361,14 @@ sub AD_test_object {
             is ($date,$DevelConf::default_date,
 		"  * sophomorixDeactivationDate $date is default date $DevelConf::default_date ");
         }
+        if (defined $s_comment){
+            is ($entry->get_value ('sophomorixComment'),$s_comment,
+		"  * sophomorixComment is $s_comment");
+        }
+        if (defined $s_webui){
+            is ($entry->get_value ('sophomorixWebuiDashboard'),$s_webui,
+		"  * sophomorixWebuiDashboard is $s_webui");
+        }
 
         ##################################################
         # servicePrincipalName
@@ -386,7 +398,10 @@ sub AD_test_object {
         }
 
 
-
+        ##################################################
+        if (defined $s_user_permissions){
+            &test_multivalue($s_user_permissions,"sophomorixUserPermissions",$entry,$sam_account);
+        }
 
         ##################################################
         if (defined $s_admins){
