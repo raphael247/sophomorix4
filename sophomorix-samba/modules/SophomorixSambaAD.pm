@@ -517,7 +517,9 @@ sub AD_user_update {
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
+    my $user_permissions = $arg_ref->{user_permissions};
 
+  
     my $displayname;
     # hash of what to replace
     my $replace=();
@@ -594,6 +596,14 @@ sub AD_user_update {
         }
         print "   sophomorixWebuiDashboard:  $webui_dashboard\n";
     }
+    if (defined $user_permissions){
+        my @user_permissions=split(/,/,$user_permissions);
+        @user_permissions = reverse @user_permissions;
+        print "   * Setting sophomorixUserPermissions to: @user_permissions\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixUserPermissions' => \@user_permissions }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+
 
     # modify
     my $mesg = $ldap->modify( $dn,
@@ -1702,7 +1712,7 @@ sub AD_group_update {
         my @members=split(/,/,$members);
         @members = reverse @members;
         @members = &_keep_object_class_only($ldap,$root_dse,"user",@members);
-        print "   * Setting sophomorixMembers to @members\n";
+        print "   * Setting sophomorixMembers to: @members\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixMembers' => \@members }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         $sync_members++;
@@ -1712,7 +1722,7 @@ sub AD_group_update {
         my @admins=split(/,/,$admins);
         @admins = reverse @admins;
         @admins = &_keep_object_class_only($ldap,$root_dse,"user",@admins);
-        print "   * Setting sophomorixAdmins to @admins\n";
+        print "   * Setting sophomorixAdmins to: @admins\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmins' => \@admins }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         $sync_members++;
@@ -1722,7 +1732,7 @@ sub AD_group_update {
         my @membergroups=split(/,/,$membergroups);
         @membergroups = reverse @membergroups;
         @membergroups = &_keep_object_class_only($ldap,$root_dse,"group",@membergroups);
-        print "   * Setting sophomorixMemberGroups to @membergroups\n";
+        print "   * Setting sophomorixMemberGroups to: @membergroups\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixMemberGroups' => \@membergroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         $sync_members++;
@@ -1732,7 +1742,7 @@ sub AD_group_update {
         my @admingroups=split(/,/,$admingroups);
         @admingroups = reverse @admingroups;
         @admingroups = &_keep_object_class_only($ldap,$root_dse,"group",@admingroups);
-        print "   * Setting sophomorixAdmingroups to @admingroups\n";
+        print "   * Setting sophomorixAdmingroups to: @admingroups\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         $sync_members++;

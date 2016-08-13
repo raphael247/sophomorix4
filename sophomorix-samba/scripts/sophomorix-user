@@ -108,6 +108,10 @@ my $help=0;
 my $empty_password=0;
 
 my $webui_dashboard;
+my $user_permissions;
+my $add_user_permissions;
+my $remove_user_permissions;
+
 my $comment;
 my $freeze="";
 my $permanent="";
@@ -142,6 +146,9 @@ my $testopt=GetOptions(
 
        "comment=s" => \$comment,
        "webui-dashboard=s" => \$webui_dashboard,
+       "user-permissions=s" => \$user_permissions,
+       "add-user-permissions=s" => \$add_user_permissions,
+       "remove-user-permissions=s" => \$remove_user_permissions,
 
        "F|freeze=s" => \$freeze,
        "P|permanent=s" => \$permanent,
@@ -206,6 +213,11 @@ Updating comment of a user:
 
 Updating WebuiDashboard of a user:
   --user <user> --webui-dashboard "Webui Dashboard String"
+  --user <user> --user-permissions permission1,permission2,permission3, ... 
+  --user <user> --add-user-permissions permission1,permission2,permission3, ...
+  --user <user> --remove-user-permissions permission1,permission2,permission3, ...
+
+
 
 -> continue here
 
@@ -702,6 +714,64 @@ if ($user ne "" and defined $webui_dashboard){
                    });
     &log_script_exit("",0,1,0,@arguments);
 }
+
+
+
+
+# user-permissions
+# --user-permissions permission1,permission2,permission3, ... 
+if (defined $user_permissions and $user ne ""){
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    &AD_user_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn,
+                      user=>$user,
+                      user_permissions=>$user_permissions,
+                      user_count=>"1",
+                    });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# --add-user-permissions permission1,permission2,permission3, ...
+if (defined $add_user_permissions and $user ne ""){
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    my @add_user_permissions=split(/,/,$add_user_permissions);
+    my @old_user_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixUserPermissions");
+    my @user_permissions = uniq(@old_user_permissions,@add_user_permissions); 
+    my $user_permissions=join(",",@user_permissions);
+    &AD_user_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn,
+                      user=>$user,
+                      user_permissions=>$user_permissions,
+                      user_count=>"1",
+                    });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# --remove-user-permissions permission1,permission2,permission3, ...
+if (defined $remove_user_permissions){
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    my @old_user_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixUserPermissions");
+    my @user_permissions = &remove_from_list($remove_user_permissions,@old_user_permissions);
+    my $user_permissions=join(",",@user_permissions);
+    &AD_user_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn,
+                      user=>$user,
+                      user_permissions=>$user_permissions,
+                      user_count=>"1",
+                    });
+    &log_script_exit("",0,1,0,@arguments);
+}
+
+
+
+
+
+
 
 
 # -F user / --freeze user
