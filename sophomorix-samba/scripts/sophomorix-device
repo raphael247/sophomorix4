@@ -200,7 +200,8 @@ my @class_rooms=();
 
 my $set_computer_passwords=0;
 
-my $host_workstation=$DevelConf::path_conf_host."/devices.csv";
+my $file="devices.csv";
+my $host_workstation=$DevelConf::path_conf_host."/".$file;
 my $host_classrooms=$DevelConf::path_conf_host."/classrooms";
 
 
@@ -641,6 +642,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                          tolerationdate=>"---",
                          deactivationdate=>"---",
                          status=>"P",
+                         file=>$file,
                        });
         $add_count++;
         # make sure that the room exists
