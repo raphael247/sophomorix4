@@ -4,36 +4,9 @@ sophomorix-samba für linuxmuster.net 7 --- Weekly x
 sophomorix4/Samba4 weekly Nr. 8  (xx.06.2016)
 ############################################################
 
-- Dateirechteänderung via Funktion
-  (erstmal mit setfacl, später evtl. unc-pfad verfolgen)
-
-globale projekte in GLOBAL ermöglichen
-
-
-- ldap
-  - gruppe schulkuerzel
-    in der alle students,teachers, printer, ... drin sind
-  - $-accounts in Gruppen?
-
-  - Gruppe school,global,bsz,vhs, ...
-    in der alle students,teachhers, workstations, ... drin sind
-    
-  - management Gruppen, die in ALLEN gruppen sind
-    global-management  (GLOBAL) global-admin
-       bsz-management  (BSZLEO)    bsz-admin
-           management  (SCHOOL)        admin   
-
-Felder im ldap:
-
-SophomorixUserPermissions
-  - Multivalue
-  - positivliste, was ein user in der Schulkonsole darf
-sophomorixWebuiDashboard
-  - single Value
-  - beeinhaltet ca. 10-zeiliger Text 
 
 ############################################################
-sophomorix4/Samba4 weekly Nr. 7  (xx.06.2016)
+sophomorix4/Samba4 weekly Nr. 7  (13.08.2016)
 ############################################################
 
 
@@ -48,8 +21,26 @@ Versteckte Klassen (z.B. Haumeisterklasse, usw.):
 
 
 
-Resultate des Entwicklertreffens am 10.6.16:
+Resultate des Entwicklertreffens am 10.6.16 und 15.7.16:
 ---------------------------------------------
+- Dateirechteänderung via Funktion
+  (erstmal mit setfacl, später evtl. unc-pfad verfolgen)
+
+- globale projekte in GLOBAL ermöglichen
+
+- ldap
+  - gruppe schulkuerzel
+    in der alle students,teachers, printer, ... drin sind
+  - $-accounts in Gruppen?
+
+  - Gruppe school,global,bsz,vhs, ...
+    in der alle students,teachhers, workstations, ... drin sind
+    
+  - management Gruppen, die in ALLEN gruppen sind
+    global-management  (GLOBAL) global-admin
+       bsz-management  (BSZLEO)    bsz-admin
+           management  (SCHOOL)        admin   
+
 - Dateisystem für linuxmusternet 7 ist ext4
 
 - User und Gruppennamen dürfen ab samba 4 leider nicht mehr gleich lauten
@@ -109,13 +100,24 @@ Entwicklungs-Entscheidungen, die bald anstehen/Diskussion
 
 Was habe ich seit dem letzten Weekly erledigt/verändert?
 ----------------------------------------------------------------------
+Neue Felder im ldap:
+  sophomorixUserPermissions
+    - Multivalue
+    - positivliste, was ein user in der Schulkonsole darf
+  sophomorixWebuiDashboard
+    - single Value
+    - beeinhaltet ca. 10-zeiliger Text 
+  sophomorixComment
+    - Kommentar zum user (für den admin)
+
 Migration:
- - wurde weiter gebugfixt.
- - uidnumber/gidnumer Übernahme
+  - wurde weiter gebugfixt.
+  - uidnumber/gidnumer Übernahme
 
 
 Was mache ich als nächstes?
 ----------------------------------------------------------------------
+admin Gruppen
 sophomorix-passwd: optionen zum laufen bringen
 sophomorix-device: DNS Einträge erstellen
 
