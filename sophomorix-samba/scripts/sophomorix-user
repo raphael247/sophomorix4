@@ -276,7 +276,7 @@ if ($user ne ""){
 
 
 # --info
-if ($info==1){
+if ($user eq "" and $info==1){
     ##################################################
     # vars for results
     my %results=();
@@ -686,11 +686,70 @@ if ($info==1){
 #     &log_script_exit("",0,1,0,@arguments);
 # }
 
+######################################################################
+# Standard: suchen nach string
+######################################################################
 
+if ($user eq "" and $list_teachers_by_year==0){
+   print "I don't know what to search for! (searchstring is empty)\n";
+   &log_script_exit("",0,1,0,@arguments);
+}
+
+
+# --info --user <user>
+if ($user ne "" and $info==1){
+    my $filter="(&(objectclass=user) $user_filter $ou_filter $school_token_filter)"; 
+    if($Conf::log_level>=2){
+        print "Filter: $filter\n";
+    }
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['cn']
+	);
+    my $number = $mesg->count;
+    if ($number==0){
+        print "\n";
+        print "No results found in this search\n";
+    } else {
+        my $count=0;
+        foreach my $entry ($mesg->all_entries) {
+            $count++; 
+            my $sam = $entry->get_value ('sAMAccountName');
+            print "\n";
+            &print_title("User $count: $sam");
+            $entry->dump; 
+        }
+    }
+    exit;
+} elsif ($list_teachers_by_year==1){
+    print "... still to do!\n";
+    #&list_teachers_by_year();
+    exit;
+}
+
+
+
+
+# get dn if user exists and continue
+############################################################
+my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+
+if ($count>1){
+    print "\n$count users found. Cannot modify more than one user!\n";
+    print "Dont use * and stuff like this\n\n";
+    exit $count;
+} elsif ($count==0){
+    print "\nERROR retrieving user $user: $count users found.\n\n";
+    exit $count;
+}
+
+
+############################################################
 # -user <user> --comment "Test for comment"
 if ($user ne "" and defined $comment){
     print "Updating comment for user $user:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -698,13 +757,11 @@ if ($user ne "" and defined $comment){
                      comment=>$comment,
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 # -user <user> --webui-dashboard "String"
 if ($user ne "" and defined $webui_dashboard){
     print "Updating webui-dashboard for user $user:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -712,7 +769,6 @@ if ($user ne "" and defined $webui_dashboard){
                      webui_dashboard=>$webui_dashboard,
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
@@ -721,21 +777,18 @@ if ($user ne "" and defined $webui_dashboard){
 # user-permissions
 # --user-permissions permission1,permission2,permission3, ... 
 if (defined $user_permissions and $user ne ""){
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     &AD_user_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn,
                       user=>$user,
                       user_permissions=>$user_permissions,
-                      user_count=>"1",
+                      user_count=>"",
                     });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
 # --add-user-permissions permission1,permission2,permission3, ...
 if (defined $add_user_permissions and $user ne ""){
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     my @add_user_permissions=split(/,/,$add_user_permissions);
     my @old_user_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixUserPermissions");
     my @user_permissions = uniq(@old_user_permissions,@add_user_permissions); 
@@ -745,15 +798,13 @@ if (defined $add_user_permissions and $user ne ""){
                       dn=>$dn,
                       user=>$user,
                       user_permissions=>$user_permissions,
-                      user_count=>"1",
+                      user_count=>"",
                     });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
 # --remove-user-permissions permission1,permission2,permission3, ...
 if (defined $remove_user_permissions){
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
     my @old_user_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixUserPermissions");
     my @user_permissions = &remove_from_list($remove_user_permissions,@old_user_permissions);
     my $user_permissions=join(",",@user_permissions);
@@ -762,9 +813,8 @@ if (defined $remove_user_permissions){
                       dn=>$dn,
                       user=>$user,
                       user_permissions=>$user_permissions,
-                      user_count=>"1",
+                      user_count=>"",
                     });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
@@ -777,7 +827,6 @@ if (defined $remove_user_permissions){
 # -F user / --freeze user
 if ($freeze ne ""){
     print "Freezing the account of $freeze:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$freeze);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -785,7 +834,6 @@ if ($freeze ne ""){
                      status=>"F",
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
@@ -813,7 +861,6 @@ if ($freeze ne ""){
 # -P user / --permanent user
 if ($permanent ne ""){
     print "Making the account of $permanent permanent:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$permanent);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -821,7 +868,6 @@ if ($permanent ne ""){
                      status=>"P",
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 # # --permanent
@@ -848,7 +894,6 @@ if ($permanent ne ""){
 # -R user / --removable user
 if ($removable ne ""){
     print "Making the account of $removable removable by sophomorix-kill:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$removable);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -858,7 +903,6 @@ if ($removable ne ""){
 #                     deactivationdate=> $deactivationdate=$DevelConf::default_date,
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
@@ -886,7 +930,6 @@ if ($removable ne ""){
 # -K user / --killable user
 if ($killable ne ""){
     print "Making the account of $killable killable by sophomorix-kill:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$killable);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -894,7 +937,6 @@ if ($killable ne ""){
                      status=>"K",
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 # # --killable
@@ -921,7 +963,6 @@ if ($killable ne ""){
 # -A user / --activate user
 if ($activate ne ""){
     print "Actvating the account of $activate:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$activate);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -929,7 +970,6 @@ if ($activate ne ""){
                      status=>"A",
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
@@ -956,7 +996,6 @@ if ($activate ne ""){
 # -U user / --usable user
 if ($usable ne ""){
     print "Setting the account of $usable to usable:\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$usable);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -964,18 +1003,17 @@ if ($usable ne ""){
                      status=>"U",
                      user_count=>"",
                    });
-    &log_script_exit("",0,1,0,@arguments);
 }
 
 
 
 
-# --old-mailbox oldlogin --new-mailbox newlogin
-if ($old_mailbox ne "" and $new_mailbox ne ""){
-    print "Renaming mailbox: $old_mailbox --> $new_mailbox\n";
-    &move_mailbox($old_mailbox,$new_mailbox);
-    &log_script_exit("",0,1,0,@arguments);
-}
+# # --old-mailbox oldlogin --new-mailbox newlogin
+# if ($old_mailbox ne "" and $new_mailbox ne ""){
+#     print "Renaming mailbox: $old_mailbox --> $new_mailbox\n";
+#     &move_mailbox($old_mailbox,$new_mailbox);
+#     &log_script_exit("",0,1,0,@arguments);
+# }
 
 
 
@@ -1096,51 +1134,10 @@ if ($old_mailbox ne "" and $new_mailbox ne ""){
 
 
 
-######################################################################
-# Standard: suchen nach string
-######################################################################
-
-if ($user eq "" and $list_teachers_by_year==0){
-   print "I don't know what to search for! (searchstring is empty)\n";
-   &log_script_exit("",0,1,0,@arguments);
-}
 
 
 
 
-
-############################################################
-# Start
-############################################################
-if ($user ne ""){
-    my $filter="(&(objectclass=user) $user_filter $ou_filter $school_token_filter)"; 
-    if($Conf::log_level>=2){
-        print "Filter: $filter\n";
-    }
-    my $mesg = $ldap->search(
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attr => ['cn']
-	);
-    my $number = $mesg->count;
-    if ($number==0){
-        print "\n";
-        print "No results found in this search\n";
-    } else {
-        my $count=0;
-        foreach my $entry ($mesg->all_entries) {
-            $count++; 
-            my $sam = $entry->get_value ('sAMAccountName');
-            print "\n";
-            &print_title("User $count: $sam");
-            $entry->dump; 
-        }
-    }
-} elsif ($list_teachers_by_year==1){
-    print "... still to do!\n";
-    #&list_teachers_by_year();
-}
 
 
 &AD_unbind_admin($ldap);
