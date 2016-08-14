@@ -213,7 +213,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -261,7 +261,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -309,7 +309,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -357,7 +357,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -394,7 +394,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
                   });
@@ -431,7 +431,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
                   });
@@ -479,7 +479,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -527,7 +527,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -564,7 +564,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers,p_bsz-Chemie-AG23",
                   });
@@ -601,7 +601,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers,p_bsz-Chemie-AG23",
                   });
@@ -647,7 +647,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
                   });
@@ -686,38 +686,60 @@ if ($test_add_pro==1){
 
     ##### Testing the global groups
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-examaccounts,OU=Groups,OU=GLOBAL,".$root_dse,
+                   dn=>"CN=global-wifi,OU=global-wifi,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-wifi",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouglobalclass",
+                   sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-wifi,uni-wifi,wifi,",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-internet,OU=global-internet,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-internet",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouglobalclass",
+                   sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-internet,uni-internet,internet,",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-examaccounts,OU=global-examaccounts,OU=ExamAccounts,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-examaccounts",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"ouglobalclass",
                    sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-examaccounts,uni-examaccounts,examaccounts,",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-students,OU=Groups,OU=GLOBAL,".$root_dse,
+                   dn=>"CN=global-students,OU=global-students,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-students",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"globalclass",
                    sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-students,uni-students,students",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
+                   dn=>"CN=global-teachers,OU=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"adminclass",
+                   sophomorixType=>"globalclass",
                    sophomorixHidden=>"FALSE",
+                   memberOf => "",
+                   member => "bsz-teachers,uni-teachers,teachers",
                   });
-
-
-
-
-
-
 
 
     # Projects
