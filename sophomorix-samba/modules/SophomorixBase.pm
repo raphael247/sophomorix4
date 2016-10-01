@@ -231,6 +231,10 @@ sub read_lockfile {
 sub config_sophomorix_read {
     my ($ldap,$root_dse)=@_;
     my %sophomorix_config=();
+    # Adding some defaults:
+    $sophomorix_config{'user_file'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}="adminclass";
+
+
     &print_title("Reading $DevelConf::file_conf_school");
     ##################################################
     # SCHOOLS    

@@ -529,7 +529,8 @@ if ($create_add_file==1){
             my $unicodePwd=`/usr/sbin/sophomorix-vampire-pwdconvert $line{"sambantpassword"}`;
             chomp($unicodePwd);
             # create_line
-            my $line= $class."::".
+            my $line= "vampire.csv"."::".
+                      $class."::".
                       $line{"surname"}.";".
                       $line{"firstname"}.";".
                       $birthdate."::".
