@@ -582,12 +582,12 @@ if ($import_user_passwords==1){
         $lines++;
         chomp();
         my (@add)=split(/::/);
-        my $samaccount=$add[2];
-        my $firstpassword=$add[3];
-        my $pass=$add[16];
+        my $samaccount=$add[3];
+        my $firstpassword=$add[4];
+        my $pass=$add[17];
         my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$samaccount);
         print "\n";
-        print "$lines) $samaccount:  imorting Hash: $pass\n";
+        print "$lines) $samaccount:  importing Hash: $pass\n";
         print "   DN: $dn\n";
 
         # creating ldif file
