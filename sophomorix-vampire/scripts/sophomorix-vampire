@@ -85,6 +85,8 @@ my $class_adminadd_script_output="/root/sophomorix-vampire-classes-adminadd.sh";
 
 # --verify-uid-gid
 my $verify_uid_gid=0;
+my $verify_uid=0;
+my $verify_gid=0;
 
 my $missig_files_count=0;
 my $overwriting_files_count=0;
@@ -105,6 +107,8 @@ my $testopt=GetOptions(
            "create-class-script" => \$create_class_script,
            "create-class-adminadd-script" => \$create_class_adminadd_script,
            "verify-uid-gid" => \$verify_uid_gid,
+           "verify-uid" => \$verify_uid,
+           "verify-gid" => \$verify_gid,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -144,30 +148,33 @@ Dump data on old server V6:
    /root/sophomorix-dump
 
 Vampire data into the new server V7:
-1. Test if dump is complete, read INFO, ERRORS and WARNINGS:
-   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --analyze
-2. Create class script and run it:
-   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-script
-   # /root/sophomorix-vampire-classes.sh
-3. Create file sophomorix.add and add these users:
-   # sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
-   # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
-   # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
-   # sophomorix-add (Add the users)
-4. Import the hashed passwords into AD (if you want users to keep their password) 
-   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --import-user-passwords
-5. Create script for adminclasses and run it:
-   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
-   # /root/sophomorix-vampire-classes-adminadd.sh
-6. Create project script and run it:
-   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
-   # /root/sophomorix-vampire-projects.sh
-7. Copy configuration files into new server:
-   # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
-8. Import the workstations (later use linuxmuster command)
-   # sophomorix-device
-9. Manually do the rest (will be automated):
-   Copy files in /etc/sophomorix/user/mail/* to new server.
+1.  Test if dump is complete, read INFO, ERRORS and WARNINGS:
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --analyze
+2.  Create class script and run it:
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-script
+    # /root/sophomorix-vampire-classes.sh
+3.  Create file sophomorix.add and add these users:
+    # sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
+    # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+    # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
+    # sophomorix-add (Add the users)
+4.  Import the hashed passwords into AD (if you want users to keep their password) 
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --import-user-passwords
+5.  Create script for adminclasses and run it:
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
+    # /root/sophomorix-vampire-classes-adminadd.sh
+6.  Create project script and run it:
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
+    # /root/sophomorix-vampire-projects.sh
+7.  Verify uid and gid of created users ang groups
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-uid
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-gid
+8.  Copy configuration files into new server:
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
+9.  Import the workstations (later use linuxmuster command)
+    # sophomorix-device
+10. Manually do the rest (will be automated):
+    Copy files in /etc/sophomorix/user/mail/* to new server.
 
 Getting information:
   -i / --info
@@ -810,62 +817,138 @@ if ($create_project_script==1){
     system("chmod 755 $project_script_output");
 }
 
-# --verify-uid-gid
-if ($verify_uid_gid==1){
-    print "Verifying if uidNumbers and gidNumber are correct (using command: id)\n";
+
+
+
+# --verify-uid
+if ($verify_uid==1){
+    print "Verifying if uidNumbers are correct (using command: id)\n";
+    my @loglines=();
+    my %uid_seen=();
+    my ($ldap,$root_dse) = &AD_bind_admin();
+    my $lines=0;
+    my $errors=0;
+    open(MEMBER,"<$class_adminadd_script_input") || die "ERROR: $!";
+    while (<MEMBER>){
+        my $line=$_;
+        chomp();
+        my ($user,$uidnumber,$gecos,$adminclass,,$status,$group,$gidnumber)=split(/\|/,$line);
+        $user=~s/^\s+//g;# remove leading whitespace
+        $user=~s/\s+$//g;# remove trailing whitespace
+        $uidnumber=~s/^\s+//g;# remove leading whitespace
+        $uidnumber=~s/\s+$//g;# remove trailing whitespace
+        $gecos=~s/^\s+//g;# remove leading whitespace
+        $gecos=~s/\s+$//g;# remove trailing whitespace
+        $group=~s/^\s+//g;# remove leading whitespace
+        $group=~s/\s+$//g;# remove trailing whitespace
+        $gidnumber=~s/^\s+//g;# remove leading whitespace
+        $gidnumber=~s/\s+$//g;# remove trailing whitespace
+
+        if ($lines==0 or
+            $gecos eq "Computer" or 
+            $gecos eq "ExamAccount" or
+            $user eq "wwwadmin" or
+            $user eq "pgmadmin" or
+            $user eq "domadmin" or
+            $user eq "NextFreeUnixId" or
+            $user eq "administrator"){
+                print "Skipping $user\n";
+                # header is line 0, add to counter to avoid loop
+                if ($lines==0){
+                    $lines=1;
+                }
+                next;
+        }
+
+        #system("id $user > /dev/null");
+
+        # testing user -> uidNumber
+        if (not exists $uid_seen{$uidnumber}){
+            print "$lines) Testing user $user($uidnumber) in group $group($gidnumber)\n";
+            $uid_seen{$uidnumber}="seen";
+            $lines++;
+
+            my $uid_full_sys = getpwuid($uidnumber);
+            my ($string,$uid_sys)=split(/\\/,$uid_full_sys);
+            if ($uid_sys eq $user){
+                print "   OK: uidNumber $uidnumber is user $uid_sys\n";
+            } else {
+                $errors++;
+                print "   ERROR: $uidnumber and $user\n";
+                push @loglines, 
+                  "user $user and uidNumber $uidnumber with problems (check with: # id $user)\n";
+            }
+        } 
+    }
+    print "\n$errors ERRORS:\n";
+    foreach my $line (@loglines){
+        print "  * $line";
+    }
+}
+
+
+
+
+# --verify-gid
+if ($verify_gid==1){
+    print "Verifying if gidNumbers are correct (using command: id)\n";
     my @loglines=();
     my %gid_seen=();
     my ($ldap,$root_dse) = &AD_bind_admin();
-    print "Importing user passwords\n";
-    open(ADD,"<$sophomorix_add_output") || die "ERROR: $!";
     my $lines=0;
     my $errors=0;
-    # while (<ADD>){
-    #     $lines++;
-    #     chomp();
-    #     my (@add)=split(/::/);
-    #     my $group=$add[0];
-    #     my $user=$add[2];
-    #     my $uidnumber=$add[4];
-    #     my $gidnumber=$add[5];
-
-    #     # testing user -> uidNumber
-    #     my $uid_full_sys = getpwuid($uidnumber);
-    #     my ($tring,$uid_sys)=split(/\\/,$uid_full_sys);
-    #     if ($uid_sys eq $user){
-    #         print "OK: uidNumber $uidnumber is user $uid_sys\n";
-    #     } else {
-    #         $errors++;
-    #         print "ERROR: $uidnumber and $user\n";
-    #         push @loglines, 
-    #           "user $user and uidNumber $uidnumber with problems (check with: # id $user)\n";
-    #     }
- 
-    #     # testing primary group -> gidNumber
-    #     if (not exists $gid_seen{$gidnumber}){
-    #         $gid_seen{$gidnumber}="seen";
-    #         my $gid_full_sys = getgrgid($gidnumber);
-    #         my ($tring,$gid_sys)=split(/\\/,$gid_full_sys);
-    #         #print "$gid_full_sys $gid_sys     $gidnumber\n ";
-    #         if ($gid_sys eq $group){
-    #             print "   OK: gidNumber $gidnumber is group $gid_sys\n";
-    #         } else {
-    #             $errors++;
-    #             print "ERROR: $gidnumber and $group\n";
-    #             push @loglines, 
-    #               "group $group and gidNumber $gidnumber with problems (check with: # id $user)\n";
-    #         }
-    #     }
-    # }
-    close(ADD);
-
     open(MEMBER,"<$class_adminadd_script_input") || die "ERROR: $!";
     while (<MEMBER>){
-        $lines++;
-        print"$_";
+        my $line=$_;
         chomp();
-        
-    
+        my ($user,$uidnumber,$gecos,$adminclass,,$status,$group,$gidnumber)=split(/\|/,$line);
+        $user=~s/^\s+//g;# remove leading whitespace
+        $user=~s/\s+$//g;# remove trailing whitespace
+        $uidnumber=~s/^\s+//g;# remove leading whitespace
+        $uidnumber=~s/\s+$//g;# remove trailing whitespace
+        $gecos=~s/^\s+//g;# remove leading whitespace
+        $gecos=~s/\s+$//g;# remove trailing whitespace
+        $group=~s/^\s+//g;# remove leading whitespace
+        $group=~s/\s+$//g;# remove trailing whitespace
+        $gidnumber=~s/^\s+//g;# remove leading whitespace
+        $gidnumber=~s/\s+$//g;# remove trailing whitespace
+
+        if ($lines==0 or
+            $gecos eq "Computer" or 
+            $gecos eq "ExamAccount" or
+            $user eq "wwwadmin" or
+            $user eq "pgmadmin" or
+            $user eq "domadmin" or
+            $user eq "NextFreeUnixId" or
+            $user eq "administrator"){
+                print "Skipping $user\n";
+                # header is line 0, add to counter to avoid loop
+                if ($lines==0){
+                    $lines=1;
+                }
+                next;
+        }
+
+        #system("id $user > /dev/null");
+        # testing primary group -> gidNumber
+        if (not exists $gid_seen{$gidnumber}){
+            print "$lines) Testing group $group($gidnumber)\n";
+            $gid_seen{$gidnumber}="seen";
+            $lines++;
+
+            my $printout =`wbinfo --gid-info $gidnumber` ;
+            my ($gid_full_sys,@rest)=split(/:/,$printout);
+            my ($string,$gid_sys)=split(/\\/,$gid_full_sys);
+            print "GID: $gid_full_sys $gid_sys     $gidnumber\n";
+            if ($gid_sys eq $group){
+                print "   OK: gidNumber $gidnumber is group $gid_sys (check with: # wbinfo --gid-info $gidnumber )\n";
+            } else {
+                $errors++;
+                print "ERROR: $gidnumber and $group\n";
+                push @loglines, 
+                  "group $group and gidNumber $gidnumber with problems (check with: # wbinfo --gid-info $gidnumber)\n";
+            }
+        }
 
     }
     print "\n$errors ERRORS:\n";
@@ -873,6 +956,13 @@ if ($verify_uid_gid==1){
         print "  * $line";
     }
 }
+
+
+
+
+
+
+
 
 
 
