@@ -245,12 +245,13 @@ sub config_sophomorix_read {
             next;
         }
         chomp();
-        my ($file,$school_ou,$filterscript,
+        my ($file,$filetype,$school_ou,$filterscript,
             $encoding,$encoding_force,
             $surname_chars,$firstname_chars,$reverse,
             $random_pwd,$pwd_legth)=split(/::/);
 
             $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
+            $sophomorix_config{'user_file'}{$file}{FILETYPE}=$filetype;
             $sophomorix_config{'user_file'}{$file}{OU}=$school_ou;
             $sophomorix_config{'user_file'}{$file}{OU_TOP}="OU=".$school_ou.",".$root_dse;
             $sophomorix_config{'user_file'}{$file}{OU_TOP_GLOBAL}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
