@@ -23,6 +23,10 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
+
+use File::Basename qw( basename
+                       dirname
+                     );   
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -52,6 +56,9 @@ my $info=0;
 
 # default
 my $datadir="/root/linuxmuster6";
+
+# --restore-config-files
+my $restore_config_files=0;
 
 # --analyze
 my $analyze=0;
@@ -101,6 +108,7 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
            "analyze" => \$analyze,
+           "restore-config-files" => \$restore_config_files,
            "datadir=s" => \$datadir,
            "create-add-file" => \$create_add_file,
            "import-user-passwords" => \$import_user_passwords,
@@ -198,7 +206,7 @@ while(<CONFIG>){
 	next;
     }
     chomp();
-    my ($old_path,$new_path)=split(/::/);
+    my ($old_path,$new_path,$permissions)=split(/::/);
     my $old_path_dump=$datadir."/data".$old_path;
     if (not -f $old_path_dump){
         $missig_files_count++;
@@ -212,10 +220,24 @@ while(<CONFIG>){
         print "   * Exists: $old_path_dump\n";
         print "     Target: $new_path\n";
         if (-e $new_path){
-            print "    WARNING: $new_path\n";
+            print "     Target Exists WARNING: $new_path\n";
             $overwriting_files_count++;
         }
+        # --restore-config-files
+        if ($restore_config_files==1){ 
+            my $parent_dir = dirname($new_path);
+            my $mkdir_command="mkdir -p $parent_dir";
+            print "     $mkdir_command\n";
+            system($mkdir_command);
+            my $command="cp $old_path_dump $new_path";
+            print "     $command\n";
+            system($command);
+            my $permission_command="chmod $permissions $new_path";
+            print "     $permission_command\n";
+            system($permission_command);
+        }
     }
+
 }
 close(CONFIG);
 
@@ -229,7 +251,11 @@ if ($missig_files_count > 0){
     print "ERROR:    $missig_files_count file(s) is missing in the dump!\n";
 }
 if ($overwriting_files_count > 0){
-    print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
+    if ($restore_config_files==1){ 
+        print "$overwriting_files_count file(s) were overwritten!\n";
+    } else {
+        print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
+    }
 }
 print "\n";
 
