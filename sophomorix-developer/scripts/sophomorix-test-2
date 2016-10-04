@@ -152,18 +152,31 @@ if ($full==1){
 
 my $host_workstation=$DevelConf::path_conf_host."/devices.csv";
 my $host_classroom=$DevelConf::path_conf_host."/classrooms";
+my $host_workstation_bsz=$DevelConf::path_conf_host."/bsz.devices.csv";
+my $host_classroom_bsz=$DevelConf::path_conf_host."/bsz.classrooms";
+
 my $testdata="/usr/share/sophomorix-developer/testdata";
 my $wsfile_1=$testdata."/devices.csv-1";
 my $wsfile_2=$testdata."/devices.csv-2";
 my $wsfile_3=$testdata."/devices.csv-3";
 my $wsfile_4=$testdata."/devices.csv-4";
 my $wsfile_5=$testdata."/devices.csv-5";
+my $wsfile_1_bsz=$testdata."/bsz.devices.csv-1";
+my $wsfile_2_bsz=$testdata."/bsz.devices.csv-2";
+my $wsfile_3_bsz=$testdata."/bsz.devices.csv-3";
+my $wsfile_4_bsz=$testdata."/bsz.devices.csv-4";
+my $wsfile_5_bsz=$testdata."/bsz.devices.csv-5";
 
 my $crfile_1=$testdata."/classrooms-1";
 my $crfile_2=$testdata."/classrooms-2";
 my $crfile_3=$testdata."/classrooms-3";
 my $crfile_4=$testdata."/classrooms-4";
 my $crfile_5=$testdata."/classrooms-5";
+my $crfile_1_bsz=$testdata."/bsz.classrooms-1";
+my $crfile_2_bsz=$testdata."/bsz.classrooms-2";
+my $crfile_3_bsz=$testdata."/bsz.classrooms-3";
+my $crfile_4_bsz=$testdata."/bsz.classrooms-4";
+my $crfile_5_bsz=$testdata."/bsz.classrooms-5";
 
 
 
@@ -186,6 +199,8 @@ if ($copy_wsfile_1==1){
     # copy devices.csv-1
     &run_command("cp -v $wsfile_1 $host_workstation");
     &run_command("cp -v $crfile_1 $host_classroom");
+    &run_command("cp -v $wsfile_1_bsz $host_workstation_bsz");
+    &run_command("cp -v $crfile_1_bsz $host_classroom_bsz");
 }
 
 if ($full==1){
@@ -262,6 +277,8 @@ if ($copy_wsfile_2==1){
     # copy devices.csv-2
     &run_command("cp -v $wsfile_2 $host_workstation");
     &run_command("cp -v $crfile_2 $host_classroom");
+    &run_command("cp -v $wsfile_2_bsz $host_workstation_bsz");
+    &run_command("cp -v $crfile_2_bsz $host_classroom_bsz");
 }
 
 
@@ -279,6 +296,8 @@ if ($copy_wsfile_3==1){
     # copy devices.csv-3
     &run_command("cp -v $wsfile_3 $host_workstation");
     &run_command("cp -v $crfile_3 $host_classroom");
+    &run_command("cp -v $wsfile_3_bsz $host_workstation_bsz");
+    &run_command("cp -v $crfile_3_bsz $host_classroom_bsz");
 }
 
 
@@ -296,6 +315,8 @@ if ($copy_wsfile_4==1){
     # copy devices.csv-4
     &run_command("cp -v $wsfile_4 $host_workstation");
     &run_command("cp -v $crfile_4 $host_classroom");
+    &run_command("cp -v $wsfile_4_bsz $host_workstation_bsz");
+    &run_command("cp -v $crfile_4_bsz $host_classroom_bsz");
 }
 
 if ($test_ws_4==1){
@@ -312,6 +333,8 @@ if ($copy_wsfile_5==1){
     # copy devices.csv-5
     &run_command("cp -v $wsfile_5 $host_workstation");
     &run_command("cp -v $crfile_5 $host_classroom");
+    &run_command("cp -v $wsfile_5_bsz $host_workstation_bsz");
+    &run_command("cp -v $crfile_5_bsz $host_classroom_bsz");
 }
 
 if ($full==1){
