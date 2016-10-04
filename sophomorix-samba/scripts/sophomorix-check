@@ -32,6 +32,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 filelist_fetch
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -85,8 +86,9 @@ my $testopt=GetOptions(
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
-
-
+my @filelist=&filelist_fetch({filetype=>"users",
+                              sophomorix_config=>\%sophomorix_config,
+                            });
 
 # --help
 if ($help==1) {
@@ -131,6 +133,11 @@ if ($lock==1) {
 # --info
 if ($info==1) {
        print Dumper(%sophomorix_config);
+       print "\n";
+       &print_title("Reading the following user files:");
+       foreach my $file (@filelist){
+           print "   * $file\n";
+       }
        exit;
    }
 

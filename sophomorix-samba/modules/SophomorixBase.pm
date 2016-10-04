@@ -33,6 +33,7 @@ require Exporter;
             get_plain_password
             check_options
             config_sophomorix_read
+            filelist_fetch
             );
 
 
@@ -241,16 +242,24 @@ sub config_sophomorix_read {
     open(SCHOOLS,"$DevelConf::file_conf_school") || 
          die "ERROR: $DevelConf::file_conf_school not found!";
     while (<SCHOOLS>){
+        $_=~s/\s+$//g;# remove trailing whitespace
         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
             next;
         }
         chomp();
+        if ($_ eq ""){# next on empty line
+            next;
+        }
         my ($file,$filetype,$school_ou,$filterscript,
             $encoding,$encoding_force,
             $surname_chars,$firstname_chars,$reverse,
             $random_pwd,$pwd_legth)=split(/::/);
 
-            $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
+	    if ($filetype eq "users"){
+                $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
+	    } elsif ($filetype eq "devices"){
+                $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_host."/".$file;
+	    }
             $sophomorix_config{'user_file'}{$file}{FILETYPE}=$filetype;
             $sophomorix_config{'user_file'}{$file}{OU}=$school_ou;
             $sophomorix_config{'user_file'}{$file}{OU_TOP}="OU=".$school_ou.",".$root_dse;
@@ -566,6 +575,41 @@ sub config_sophomorix_read {
     return %sophomorix_config; 
 }
  
+
+
+sub filelist_fetch {
+    # listing existing files of the given FILETYPE
+    my ($arg_ref) = @_;
+    my $filetype = $arg_ref->{filetype};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my @filelist=();
+    if($Conf::log_level>=2){
+        &print_title("Testing the following files for handling:");
+    }
+    foreach my $file (keys %{$ref_sophomorix_config->{'user_file'}}) {
+        my $abs_path=$ref_sophomorix_config->{'user_file'}{$file}{'PATH_ABS'};
+        my $filetype_real=$ref_sophomorix_config->{'user_file'}{$file}{'FILETYPE'};
+        if (not defined $abs_path){next}; # i.e. vampire.csv
+        
+        if (-e $abs_path and $filetype_real eq $filetype){
+            push @filelist, $abs_path;
+            if($Conf::log_level>=2){
+                print "  ** $abs_path (existing)\n";
+            }
+        } else {
+            if($Conf::log_level>=2){
+                if (not -e $abs_path){
+                    print "   - $abs_path (nonexisting)\n";
+                } elsif ($filetype_real ne $filetype){
+                    print "   + $abs_path (existing but wrong filetype)\n";
+                }
+            }
+        }
+    }
+    @filelist = sort @filelist;
+    return @filelist;
+}
 
 
 
