@@ -91,7 +91,9 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
-
+use File::Basename qw( basename
+                       dirname
+                     ); 
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -107,6 +109,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 filelist_fetch
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -199,6 +202,7 @@ my %class_rooms=();
 my @class_rooms=();
 
 my $set_computer_passwords=0;
+my $test_dns=0;
 
 my $file="devices.csv";
 my $host_workstation=$DevelConf::path_conf_host."/".$file;
@@ -231,6 +235,7 @@ my $testopt=GetOptions(
        "p|print" => \$print,
        "no-sync" => \$no_sync,
        "set-computer-passwords" => \$set_computer_passwords,
+       "test-dns" => \$test_dns,
        "password=s" => \$password,
        "italc-dir=s" => \$italc_dir,
           );
@@ -242,6 +247,9 @@ my $testopt=GetOptions(
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my @filelist=&filelist_fetch({filetype=>"devices",
+                              sophomorix_config=>\%sophomorix_config,
+                            });
 
 # ===========================================================================
 # --help
@@ -279,6 +287,31 @@ Please see the sophomorix-device(8) man pages for full documentation
 }
 
 
+############################################################################
+# --test-dns     (does not modify system)
+############################################################################
+if ($test_dns==1){
+    &print_title("Testing if DNS works for devices in these files:");
+    foreach my $device_file (@filelist){
+        print "   * $device_file\n";
+    }
+    foreach my $device_file (@filelist){
+        my $filename = basename($device_file);
+        $school_token=$sophomorix_config{'user_file'}{$filename}{'SCHOOL_TOKEN'};
+        open(DEVICES,"$device_file") || 
+             die "ERROR: $device_file not found!";  
+        while(<DEVICES>){
+            &analyze_line($_,$school_token);
+        }
+        close(DEVICES);
+    }
+    print Dumper(%domcomputers_file);
+    print Dumper(%rooms_file);
+    print Dumper(%examaccounts_file);
+    exit;
+}
+
+
 
 
 # ===========================================================================
@@ -301,7 +334,6 @@ my @dns_hosts=();
 # /etc/linuxmuster/workstation
 my %hosts_file=();
 &get_classrooms();
-
 
 
 
