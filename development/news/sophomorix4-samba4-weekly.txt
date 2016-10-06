@@ -4,12 +4,10 @@ sophomorix-samba für linuxmuster.net 7 --- Weekly x
 sophomorix4/Samba4 weekly Nr. 8  (xx.06.2016)
 ############################################################
 
-Autoquota nach migration/oder auch sonst zum setup
-
+??? Autoquota nach migration/oder auch sonst zum setup
 möglicher Automatismus:
-
-0) Datenmigration (oder bei neuem System user anlegen)
-1) Useranzahl, Festppletenplatz ermitteln
+1) Datenmigration (oder bei neuem System user anlegen)
+2) Useranzahl, Festplattenplatz ermitteln
 --> 50-70% des Platzes 'gerecht' quotieren (% als option)
     bei neuem System ist das ein Vorschlag
     Ergebnis: Defaultquota ist festgelegt
@@ -19,6 +17,22 @@ möglicher Automatismus:
     -> Einzelquota (Lehrer) so anpassen, dass jeder z.B. nur 80%
     -> Auflistung: welche user sind überquota und wieviel  
 
+Umgang mit Konfigurationsdateien:
+- bisher /etc/sophomorix/user/sophomorix.conf im Paket
+  Problem 1: bei Änderung in sophomorix.conf wird config-Nachfrage getriggert 
+             -> wenig aktualisierungen von sophomorix.conf
+  Problem 2: neue Variablen werden nur umständlich eingeführt
+----> Mögliche Lösung:
+- jedes Paketuptade triggert in postinstall: sophomorix-setup
+- sophomorix-setup:
+  - erzeugt Konfigurationsdateien, falls fehlend (Installation, neue Schule dazu, ...)
+  - trägt ein/hängt an: Neue Variablen
+    - auskommentiert
+    - einkommentiert, aber so, dass neues Feature off ist
+    - einzelne Zeilen, Kommentar hinter der Zeile: 
+      QUOTA_USE=Yes # using quota on Yes/yes or No/no
+
+ 
 Development-Prinzip:
 
 wie kann man an einer bestimmte Liste von usern etwas ändern:
