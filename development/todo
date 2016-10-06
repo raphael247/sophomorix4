@@ -486,13 +486,7 @@ sophomorix-project
  
 Attributes for a group
 
-adding users:
-  when role student, then put them in subcontainer CN=class,CN=students
 
-
-document format of
-sophomorix.add, .move, .kill
-   - use utf8 in these files 
 
 
 
@@ -506,14 +500,38 @@ call sophomorix-print correctly
 --user --comment "" does not work ()
 --user --webui-dashboard "" does not work
 
-sophomorix.add:
--> are there umlaute allowed in sophomorix.add at the moment?
-- expect sophomorix.add as utf8 encoded with umlaute and others
 
 -> Additional fields 
      DONE school_token
      DONE ou 
 
+
+format of sophomorix.add, .move, .kill
+   - use utf8 in these files 
+   - allow user to be added with special quota
+
+sophomorix-schools.conf
+     use unid in 5th field (yes no)
+       --> sinnvole Warnung in office.report: unid expected 
+     from_age, to-age (instead of from_year to year)
+     expect_login_name (bei teacher.csv: YES, NO: generiere)
+       --> sinnvole Warnung in office.report: login expected 
+
+
+sophomorix-check
+
+--analyze-file /path/to/file --use-filter /path/to filter
+--list-filter (and exit) 
+
+
+sophomorix-quota
+- option --show-non-default-quota
+         --show-non-default-mail-quota
+  zeigt alle vom default abweichende quota von
+  --user
+  --adminclasses
+  --projects
+  evtl. auch einzeln
 
 sophomorix-print:
 
@@ -522,12 +540,21 @@ sophomorix-print:
      - add support for templates
        see pull requests for sophomorix2
 
+sophomorix-howcanihelp
+- unbekannte Vornamen, Nachnamen melde
+- ... 
 
 
 ############################################################
 all scripts
 ############################################################
 
+testen:
+wenn falsche codierung geforced wird, sollte enweder
+- problematische accounts nicht angelegt werden
+- problematische abccounts korrect angelegt werden (fehlerhafte zeichen in utf8 Felder)   
+  Bei richtiger codierung werden fehler behoben
+  
 wenn man mit * sucht: 
 sophomorix-class -i -c class1*
 sophomorix-project -i -c pro*
