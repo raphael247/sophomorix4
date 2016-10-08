@@ -84,6 +84,7 @@ $Term::ANSIColor::AUTORESET = 1;
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use Net::DNS;
 use Net::MAC;
 use Date::Calc qw(check_date);
 use Data::Dumper;
@@ -163,6 +164,7 @@ my $password="";
 
 # where data from workstation file is saved
 my %domcomputers_file=();
+my @domcomputers_file=();
 my %rooms_file=();
 my %examaccounts_file=();
 
@@ -291,6 +293,7 @@ Please see the sophomorix-device(8) man pages for full documentation
 # --test-dns     (does not modify system)
 ############################################################################
 if ($test_dns==1){
+    my $res   = Net::DNS::Resolver->new;
     &print_title("Testing if DNS works for devices in these files:");
     foreach my $device_file (@filelist){
         print "   * $device_file\n";
@@ -305,9 +308,27 @@ if ($test_dns==1){
         }
         close(DEVICES);
     }
-    print Dumper(%domcomputers_file);
-    print Dumper(%rooms_file);
-    print Dumper(%examaccounts_file);
+    #print Dumper(%domcomputers_file);
+    #print Dumper(%rooms_file);
+    #print Dumper(%examaccounts_file);
+    foreach my $host (@domcomputers_file){
+        my $file_ip=$domcomputers_file{$host}{"IP"};
+        my $reply = $res->search($host);
+        if ($reply) {
+            foreach my $rr ($reply->answer) {
+                next unless $rr->type eq "A";
+                #print $rr->address, "\n";
+                if ($file_ip eq $rr->address){
+                    print "OK: $host has IP: ",$rr->address,"\n";
+                } else {
+                    print "ERROR $host has IP: ",$rr->address," (expected was $file_ip)\n";
+                }
+            }
+        } else {
+            # no reply: query failed
+            warn "    * query failed: ", $res->errorstring, " ($host has expected IP $file_ip)\n";
+        }
+    }
     exit;
 }
 
@@ -1027,6 +1048,7 @@ sub analyze_line {
         push @dns_hosts, $host_token;
 
         # save data into hashes for reuse
+        push @domcomputers_file, $host_token;
         $domcomputers_file{$host_token}{"HWK"}=$hwk;
         $domcomputers_file{$host_token}{"MAC"}=$mac;
         $domcomputers_file{$host_token}{"IP"}=$ip;
@@ -1227,7 +1249,9 @@ sub check_ms_software_key {
         print " ($minus_in_string minus signs)\n";
     }
     if ($minus_in_string!=4){
-        print "\nWARNING $host: <$ms_software_key> $name: Not containing 4 minus signs\n\n";
+        if($Conf::log_level>=2){
+            print "\nWARNING $host: <$ms_software_key> $name: Not containing 4 minus signs\n\n";
+        }
     }
 
     my @parts = split(/-/,$ms_software_key);
@@ -1236,8 +1260,10 @@ sub check_ms_software_key {
             print "      Part: <$part> (Length ".length($part).")\n";
         }
         if (length($part)!=5 ) {
-            print "\nWARNING $host: <$ms_software_key> Not a $name:\n";
-            print "   * Part: $part (Length ".length($part)." : Not 5 chacters long)\n\n";
+            if($Conf::log_level>=2){
+                print "\nWARNING $host: <$ms_software_key> Not a $name:\n";
+                print "   * Part: $part (Length ".length($part)." : Not 5 chacters long)\n\n";
+            }
         } 
     }
     return $ms_software_key;
