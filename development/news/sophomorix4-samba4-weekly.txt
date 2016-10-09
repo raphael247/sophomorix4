@@ -4,6 +4,34 @@ sophomorix-samba für linuxmuster.net 7 --- Weekly x
 sophomorix4/Samba4 weekly Nr. 8  (xx.06.2016)
 ############################################################
 
+DNS:
+DNSNode:
+- im DNSNode sind die IP-Informationen binär gespeichert
+- Diese Binäre IP-Informationen anders sich von MS-Server zu MS-Server
+--> Problem 1: mit welcher IP ist ein device im DNS?
+--> Problem 2: wie kann IP angelegt/upgedated werden
+--> Problem 3: Es gibt schon einen haufen MS-default DNSNodes.
+               Die sollten auf keinen Fall gelöscht werden
+---> Lösungen: 
+  * anlegen der DNS-Nodes mit samba-tool
+    (Binäre Berechnung, Passend zur Server Version)
+  * danach wird der DNSNode von sophomorix ergänzt mit:
+    1) adminDescription=SophomorixDNSHost from <*devices.csv>
+    2) cn=RECHNERNAME
+    Beim listen/killen von DNSNodes werden nur die von sophomorix angezeigt/gekillt
+  * Hat ein devices die richtige IP: 
+    Abfrage vor der synchronisation der devices mit DNS 
+    (dauert etwas?? -> testen)
+
+DNSZone:
+
+ähnliches Problem
+* existenz kann aber auch im AD ermittelt werden
+* außer sophomorix gibts nur:
+  * RootDNSServers
+  * linuxmuster.local (oder ähnlich, vom provisioning)
+
+
 ??? Autoquota nach migration/oder auch sonst zum setup
 möglicher Automatismus:
 1) Datenmigration (oder bei neuem System user anlegen)
