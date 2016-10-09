@@ -1,3 +1,18 @@
+Weiter:
+DNS: siehe todotodo
+
+sophomorix-test für dns erweitern
+
+wiki: Konfigurationsdateien bescheiben und in github verlinken 
+Beispieldateien: 
+  sophomorix.conf
+  *.school.conf
+Diese von sophomorix-check -i einlesen
+
+
+
+
+
 Passwortänderung erzwingen, wie geht das?
 sollte auf gruppen , ... anwendbar sein.
 
@@ -88,10 +103,6 @@ wenn eine gruppe für einen user mit der rolle teacher anlegt wird, dann ists ei
 samba4 Fragen:
 Gibts Useranzahlbeschränkung?
 User und Gruppennamen gleich? Geht das?
-
-DNS:
-
-wie testet man, obs tut?
 
 Schulkonsole: 
 Wo soll aufgeschrieben werden, wie user usw. abgefragt werden müssen, ...
@@ -258,19 +269,36 @@ samba-tool user setpassword Administrator
 DNS
 ############################################################
 
+abhängigkeiten 
+todotodo
+1) zusätzlich erstellen
+
+%devices{'file'}{'device'}{$name} usw, wie bisher 
+                                  + examaccount TRUE/FALSE
+                                  + dnszone
+%devices{'file'}{'room'}{$name} usw, wie bisher
+
+%devices{'system'}{'device'}
+%devices{'system'}{'room'}
+
+neu dazu: 
+school-token,filename zu jedem %devices{'file'}{'device'}
+
+2) statt auf die alten hashes zu verweisen, den neuen benutzen
+
+
+
 * Alle bisherigen abfragen??:
-samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --password='Muster!'
+  samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --password='Muster!'
+  sophomorix-device --dns-show (nur sophomorix nodes und zones)
 
 * DNS-Einträge anlegen:
-  # samba-tool dns add localhost linuxmuster.local j1010-p01 A 10.16.100.1 --password='Muster!' -U Administrator
-                               
+  # samba-tool dns add localhost linuxmuster.local j1010p01 A 10.16.100.1 --password='Muster!' -U Administrator
 
   This adds: DN: DC=j1010-p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
   ObjectClass: dnsNode
   The IP 10.16.1.100 is in Attribute dnsRecord, Binary last 4 Bytes
-  -> zu jedem dieser dnsNode können z.B. die Attribute cn, adminDescription, ... hinzugefügt werden
-     Hier könnte man "sophomorix-Host" eintragen, um später nur von sophomorix verwaltete Host wieder zu löschen
-
+  -> Zusatzattribute zu dnsNode können z.B. die Attribute cn, adminDescription, 
 
   # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password='Muster!' -U Administrator
          100.16.10  -> Erste 3 Oktetts in umgekehrter Reihenfolge
@@ -279,16 +307,11 @@ samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --passwo
                        -> Momentan: 2. oktett der server IP (IP aus Datei)
                        -> Final: aus den setup-Daten /var/linuxmuster, ... legt thomas eine zonendatei an.
                     100 kommt von der Rechner IP
-
+  ?????????????? Zeilenweise bei lesen nach %devices{'file'} zu jedem node eine Zone festlegen
   This adds: 
   DN: DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
   ObjectClass: dnsZone
-  -> zu jeder dieser dnsZone können z.B. die Attribute cn, adminDescription, ... hinzugefügt werden
-     Hier könnte man "sophomorixDNSZone" eintragen, um später nur von sophomorix verwaltete Zones wieder zu löschen
-
-
-  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR j1010-p01.linuxmuster.local --password=Muster! -U Administrator
-
+  -> Zusatzattribute zu dnsZone können z.B. die Attribute cn, adminDescription, 
 
 
   Deleting DNSNode with samba tool:
