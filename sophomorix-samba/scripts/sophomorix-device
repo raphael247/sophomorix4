@@ -354,15 +354,19 @@ if ($test_dns==1){
 &print_title("Asking the system for exam and computer accounts ...");
 
 #my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &get_sys_workstations();
-my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &AD_computer_fetch($ldap,$root_dse);
-
-#exit;
-
+my ($ref_domcomputers,
+    $ref_rooms,
+    $ref_examaccounts,
+    $ref_dnszones,
+    $ref_dnshosts) = &AD_computer_fetch($ldap,$root_dse);
 
 # system
 my %domcomputers_system = %$ref_domcomputers;
 my %rooms_system = %$ref_rooms;
 my %examaccounts_system = %$ref_examaccounts; 
+my %dnszones_system = %$ref_dnszones; 
+my %dnshosts_system = %$ref_dnshosts; 
+
 my @dns_hosts=();
 
 # /etc/linuxmuster/workstation
@@ -644,6 +648,10 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
+
+    print Dumper(%dnshosts_system);
+
+
     exit;
 } 
 

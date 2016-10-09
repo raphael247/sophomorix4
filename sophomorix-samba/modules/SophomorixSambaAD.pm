@@ -1156,11 +1156,57 @@ sub AD_computer_fetch {
 
 
 
+    # DNS Zones
+    # key: host$ (lowercase)
+    # Value: $IP
+    my %dnszones_system = ();
+    # dnshosts from ldap
+    # ??????????????????????????????????????????????????
+
+
+
+
+
+    # DNS Hosts
+    # key: host$ (lowercase)
+    # Value: $IP
+    my %dnshosts_system = ();
+    # dnshosts from ldap
+    # ???????????????????????????????????????????????????
+    my $base="DC=DomainDnsZones,".$root_dse;
+
+    print ">$base<\n";
+    #exit;
+    $mesg = $ldap->search( # perform a search
+                base   => $base,
+                scope => 'sub',
+                filter => '(objectClass=dnsNode)',
+#                filter => '(&(objectClass=dnsNode)(cn=sophomorixHost))',
+#                filter => '(&(objectClass=dnsNode)(adminDescription=sophomorixHost))',
+                attrs => ['dc']
+                         );
+
+    my $max_user = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_user Workstations found in AD");
+
+     for( my $index = 0 ; $index < $max_user ; $index++) {
+         my $entry = $mesg->entry($index);
+         if($Conf::log_level>=2){
+             print "   * ",$entry->get_value('dc'),"\n";
+         }
+         $dnshosts_system{$entry->get_value('dc')}="domcomputers";
+     }
+
+
+
+
 
 
     return(\%domcomputers_system, 
            \%rooms_system, 
            \%examaccounts_system, 
+           \%dnszones_system, 
+           \%dnshosts_system, 
           );
 }
 
