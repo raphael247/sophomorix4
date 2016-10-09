@@ -308,9 +308,11 @@ if ($test_dns==1){
         }
         close(DEVICES);
     }
-    #print Dumper(%domcomputers_file);
-    #print Dumper(%rooms_file);
-    #print Dumper(%examaccounts_file);
+    if($Conf::log_level>=2){
+        print Dumper(%domcomputers_file);
+        print Dumper(%rooms_file);
+        print Dumper(%examaccounts_file);
+    }
     foreach my $host (@domcomputers_file){
         my $file_ip=$domcomputers_file{$host}{"IP"};
         my $reply = $res->search($host);
