@@ -1159,23 +1159,21 @@ sub analyze_line {
             &push_add_computer($line_correct);
         }
         # check dns host
-print "HERE TEST: $host_token\n";
-         if (not exists $dnshosts_system{$host_token} ){
-             # nonexisting --> add account
-             &push_add_dnshost($line_correct);
-         } elsif (exists $dnshosts_system{$host_token} ){
-             my $ip_system=$dnshosts_system{$host_token};
-             my $ip_file=$domcomputers_file{$host_token}{"IP"};
-             if ($ip_system ne $ip_file){
-                 # recreate dns entry
-                 &push_kill_dnshost($line_correct);
-                 &push_add_dnshost($line_correct);
-                 print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
-             } else {
-                 print "OK: $host_token exists with $ip_system (= $ip_file from file)\n";
-
-             }
-         }
+        if (not exists $dnshosts_system{$host_token} ){
+            # nonexisting --> add account
+            &push_add_dnshost($line_correct);
+        } elsif (exists $dnshosts_system{$host_token} ){
+            my $ip_system=$dnshosts_system{$host_token};
+            my $ip_file=$domcomputers_file{$host_token}{"IP"};
+            if ($ip_system ne $ip_file){
+                # recreate dns entry
+                &push_kill_dnshost($line_correct);
+                &push_add_dnshost($line_correct);
+                print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
+            } else {
+                print "OK: $host_token exists with $ip_system (= $ip_file from file)\n";
+            }
+        }
     }
 }
 
