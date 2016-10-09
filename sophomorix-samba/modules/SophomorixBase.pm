@@ -892,6 +892,26 @@ sub  check_options{
    }
 }
 
+# dns queries
+######################################################################
+
+sub dns_query_ip {
+    my ($res,$host)=@_;
+
+    my $ip=$host;
+    my $reply = $res->search($host);
+    if ($reply) {
+        foreach my $rr ($reply->answer) {
+            next unless $rr->type eq "A";
+            return $rr->address;
+        }
+    } else {
+        # no reply: query failed
+        return $res->errorstring;
+    }
+    #return $ip;
+}
+
 
 # encoding, recoding stuff
 ######################################################################

@@ -1160,9 +1160,29 @@ sub AD_computer_fetch {
     # key: host$ (lowercase)
     # Value: $IP
     my %dnszones_system = ();
-    # dnshosts from ldap
+    # dnszones from ldap
     # ??????????????????????????????????????????????????
+    my $base_zones="DC=DomainDnsZones,".$root_dse;
+    $mesg = $ldap->search( # perform a search
+                base   => $base_zones,
+                scope => 'sub',
+                filter => '(objectClass=dnsZone)',
+#                filter => '(&(objectClass=dnsZone)(cn=sophomorixDNSZone))',
+#                filter => '(&(objectClass=dnsZone)(adminDescription=sophomorixDNSZone))',
+                attrs => ['dc','dnsZone']
+                         );
 
+    my $max_zone = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_user Workstations found in AD");
+
+    for( my $index = 0 ; $index < $max_zone ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $zone=$entry->get_value('dc');
+        if($Conf::log_level>=2){
+            print "   * ",$entry->get_value('dc'),"\n";
+        }
+        $dnszones_system{$entry->get_value('dc')}="seen";
+    }
 
 
 
@@ -1173,34 +1193,31 @@ sub AD_computer_fetch {
     my %dnshosts_system = ();
     # dnshosts from ldap
     # ???????????????????????????????????????????????????
-    my $base="DC=DomainDnsZones,".$root_dse;
-
-    print ">$base<\n";
+    my $base_hosts="DC=DomainDnsZones,".$root_dse;
+    my $res   = Net::DNS::Resolver->new;
     #exit;
     $mesg = $ldap->search( # perform a search
-                base   => $base,
+                base   => $base_hosts,
                 scope => 'sub',
                 filter => '(objectClass=dnsNode)',
 #                filter => '(&(objectClass=dnsNode)(cn=sophomorixHost))',
 #                filter => '(&(objectClass=dnsNode)(adminDescription=sophomorixHost))',
-                attrs => ['dc']
+                attrs => ['dc','dnsRecord']
                          );
 
-    my $max_user = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_user Workstations found in AD");
+    my $max_host = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_host Workstations found in AD");
 
-     for( my $index = 0 ; $index < $max_user ; $index++) {
-         my $entry = $mesg->entry($index);
-         if($Conf::log_level>=2){
-             print "   * ",$entry->get_value('dc'),"\n";
-         }
-         $dnshosts_system{$entry->get_value('dc')}="domcomputers";
-     }
-
-
-
-
-
+    for( my $index = 0 ; $index < $max_host ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $host=$entry->get_value('dc');
+        if($Conf::log_level>=2){
+            print "   * ",$entry->get_value('dc'),"\n";
+        }
+        # get ip from dns, because in AD its binary (last 4 Bytes)
+        my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$host);
+        $dnshosts_system{$entry->get_value('dc')}=$ip;
+    }
 
     return(\%domcomputers_system, 
            \%rooms_system, 

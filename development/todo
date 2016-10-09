@@ -266,8 +266,10 @@ samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --passwo
                                
 
   This adds: DN: DC=j1010-p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
-  More??? where ist the IP 10.16.1.100 in ldap
-  
+  ObjectClass: dnsNode
+  The IP 10.16.1.100 is in Attribute dnsRecord, Binary last 4 Bytes
+  -> zu jedem dieser dnsNode können z.B. die Attribute cn, adminDescription, ... hinzugefügt werden
+     Hier könnte man "sophomorix-Host" eintragen, um später nur von sophomorix verwaltete Host wieder zu löschen
 
 
   # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password='Muster!' -U Administrator
@@ -278,7 +280,18 @@ samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --passwo
                        -> Final: aus den setup-Daten /var/linuxmuster, ... legt thomas eine zonendatei an.
                     100 kommt von der Rechner IP
 
+  This adds: 
+  DN: DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
+  ObjectClass: dnsZone
+  -> zu jeder dieser dnsZone können z.B. die Attribute cn, adminDescription, ... hinzugefügt werden
+     Hier könnte man "sophomorixDNSZone" eintragen, um später nur von sophomorix verwaltete Zones wieder zu löschen
+
+
   # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR j1010-p01.linuxmuster.lokal --password=Muster! -U Administrator
+
+sophomorix-device --dns-zones-list   -> List dnszones, mark sophomorixZones, hosts, ...
+sophomorix-device --dns-hosts-list   -> List hosts, ip, ....
+
 
 
 #INFO# samba-tool dns serverinfo localhost
