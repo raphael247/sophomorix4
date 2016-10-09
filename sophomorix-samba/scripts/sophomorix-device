@@ -440,7 +440,7 @@ if ($dns_show==1 or $dns_kill==1){
                 &AD_dns_kill({ldap=>$ldap, 
                               root_dse=>$root_dse,
                               dns_zone=>$zone,
-                              dns_host=>$name,
+                              dns_node=>$name,
                               dns_ipv4=>$ipv4,
                               smb_pwd=>$smb_pwd,
                             });
@@ -482,7 +482,7 @@ my %examaccounts_system = %$ref_examaccounts;
 my %dnszones_system = %$ref_dnszones; 
 my %dnshosts_system = %$ref_dnshosts; 
 
-my @dns_hosts=();
+my @dns_nodes=();
 
 # /etc/linuxmuster/workstation
 my %hosts_file=();
@@ -756,14 +756,14 @@ if($no_sync==1){
     print "\n";
     $count=$#killing_dnshosts+1;
     &print_title("DNS-Hosts that must be killed: ($count)");
-    foreach my $dns_host (@killing_dnshosts){
-        print "KILL: $dns_host\n";
+    foreach my $dns_node (@killing_dnshosts){
+        print "KILL: $dns_node\n";
     }
     print "\n";
     $count=$#adding_dnshosts+1;
     &print_title("DNS-Hosts that must be added: ($count)");
-    foreach my $dns_host (@adding_dnshosts){
-        print "ADD: $dns_host\n";
+    foreach my $dns_node (@adding_dnshosts){
+        print "ADD: $dns_node\n";
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
@@ -788,29 +788,6 @@ if($no_sync==1){
 # calculate according to file
 $ou="BSZLEO";
 $school_token="bsz";
-
-
-if ($no_sync==0){ # $no_sync==0 -> SYNC
-    # build the DNS
-    &print_title("Rebuilding the DNS ...");
-    foreach my $host (@dns_hosts){
-        print "   DNS for: $host\n";
-        print "        IP: $domcomputers_file{$host}{'IP'}\n";
-        print "       Rev: ???\n";
-        my $command_1="samba-tool ... 1";
-        my $command_2="samba-tool ... 2";
-        my $command_3="samba-tool ... 3";
-
-        print "   $command_1\n";
-        print "   $command_2\n";
-        print "   $command_3\n";
-
-
-
-        print "\n";
-    }
-}
-
 
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
@@ -927,22 +904,22 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     # DNS Hosts
     &print_title("Killing DNS Hosts:");
-    my $dns_host_count=1;
-    foreach my $dns_host (@killing_dnshosts){
+    my $dns_node_count=1;
+    foreach my $dns_node (@killing_dnshosts){
 
-        $dns_host_count++;
+        $dns_node_count++;
         
     }
 
     &print_title("Adding DNS Hosts:");
-    $dns_host_count=1;
+    $dns_node_count=1;
     foreach my $dns_line (@adding_dnshosts){
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
                         dns_line=>$dns_line,
                         smb_pwd=>$smb_pwd,
                            });
-        $dns_host_count++;
+        $dns_node_count++;
     }
 
 
@@ -1238,7 +1215,7 @@ sub analyze_line {
 	}
 
         # save for DNS
-        push @dns_hosts, $host_token;
+        push @dns_nodes, $host_token;
 
         # save data into hashes for reuse
         push @domcomputers_file, $host_token;

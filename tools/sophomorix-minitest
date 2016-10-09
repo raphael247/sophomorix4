@@ -47,7 +47,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  get_forbidden_logins
                                  AD_login_test
-AD_get_ou_tokened
+                                 AD_get_ou_tokened
+                                 AD_dns_zonecreate
                                  next_free_uidnumber_set
                                  next_free_uidnumber_get
                                     );
@@ -75,21 +76,33 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 print "Start\n";
 
-&function("Text",\%sophomorix_config);
+my $zone="101.16.10.in-addr.arpa";
+my $smb_pwd="Muster!";
 
-print "The newly hash contains the stuff added to :\n";
-print Dumper(%sophomorix_config);
+&AD_dns_zonecreate({ldap=>$ldap, 
+                              root_dse=>$root_dse,
+                              dns_zone=>$zone,
+                              smb_pwd=>$smb_pwd,
+                            });
 
-# geht nur ohne ->
-#print "$sophomorix_config{'user_file'}{'students.csv'}{HALLO}\n";
+# &function("Text",\%sophomorix_config);
 
-         &AD_ou_add({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     ou=>"UNIVERSITÄT",
-                     school_token=>"uni",
-                     creationdate=>"19700101000000.0Z",
-                     sophomorix_config=>\%sophomorix_config,
-                   });
+# print "The newly hash contains the stuff added to :\n";
+# print Dumper(%sophomorix_config);
+
+# # geht nur ohne ->
+# #print "$sophomorix_config{'user_file'}{'students.csv'}{HALLO}\n";
+
+#          &AD_ou_add({ldap=>$ldap,
+#                      root_dse=>$root_dse,
+#                      ou=>"UNIVERSITÄT",
+#                      school_token=>"uni",
+#                      creationdate=>"19700101000000.0Z",
+#                      sophomorix_config=>\%sophomorix_config,
+#                    });
+
+
+
 
 
 #my $test=&AD_get_ou_tokened("TU");

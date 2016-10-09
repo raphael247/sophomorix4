@@ -57,6 +57,7 @@ $Data::Dumper::Terse = 1;
             AD_login_test
             AD_dns_get
             AD_dns_create
+            AD_dns_zonecreate
             AD_dns_kill
             AD_dns_zonekill
             next_free_uidnumber_set
@@ -178,6 +179,8 @@ sub AD_dns_get {
     return $dns_name;
 }
 
+
+
 sub AD_dns_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -185,7 +188,7 @@ sub AD_dns_create {
     my $smb_pwd = $arg_ref->{smb_pwd};
     my $dns_server = $arg_ref->{dns_server};
     my $dns_zone = $arg_ref->{dns_zone};
-    my $dns_host = $arg_ref->{dns_host};
+    my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
     my $dns_admin_description = $arg_ref->{dns_admin_description};
@@ -193,17 +196,17 @@ sub AD_dns_create {
     my $filename = $arg_ref->{filename};
     my $dns_line = $arg_ref->{dns_line};
 
-    # extract host from line (my become obsolete) ?????????????????ß
-    if (defined $dns_line and not defined $dns_host){
+    # extract host from line (may become obsolete) ?????????????????ß
+    if (defined $dns_line and not defined $dns_node){
         my @items = split(/;/,$dns_line);
-        $dns_host=$items[1];
+        $dns_node=$items[1];
         $dns_ipv4=$items[4];
     }
 
     if($Conf::log_level>=1){
         print "\n";
         &Sophomorix::SophomorixBase::print_title(
-              "Creating DNS record: $dns_host");
+              "Creating DNS Node: $dns_node");
     } 
 
     # set defaults if not defined
@@ -214,7 +217,7 @@ sub AD_dns_create {
         $dns_admin_description=$DevelConf::dns_entry_prefix_string." from ".$filename;
     }
     if (not defined $dns_cn){
-        $dns_cn=$dns_host;
+        $dns_cn=$dns_node;
     }
     if (not defined $dns_server){
         $dns_server="localhost";
@@ -226,32 +229,80 @@ sub AD_dns_create {
         $dns_zone=&AD_dns_get($root_dse);
     }
     
-    # adding dns entry with samba-tool
-    my $command="  samba-tool dns add $dns_server $dns_zone $dns_host $dns_type $dns_ipv4".
+    # adding dnsNode with samba-tool
+    my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
                 " --password='$smb_pwd' -U Administrator";
     print "$command\n";
     system($command);
 
-    # adding comments to recognize the entry as created by sophomorix
-    my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_host);
-    print "   * Adding Comments to DNS Host $dns_host\n";
+    # adding comments to recognize the DNS Node as created by sophomorix
+    my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node);
+    print "   * Adding Comments to DNS Node $dns_node\n";
 
     if ($count > 0){
-             print "   * dnsNode $dns_host exists ($count results)\n";
-             my $mesg = $ldap->modify( $dn_exist_dnshost,
-     	        	       add => {
-                                   adminDescription => $dns_admin_description,
-                                   cn => $dns_cn,
-                                      }
-                                     );
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
-             #my $command="samba-tool group addmembers ". $group." ".$adduser;
-             #print "   # $command\n";
-             #system($command);
+             print "   * dnsNode $dns_node exists ($count results)\n";
+             my $mesg = $ldap->modify( $dn_exist_dnshost, add => {
+                                       adminDescription => $dns_admin_description,
+                                       cn => $dns_cn,
+                                      });
+             &AD_debug_logdump($mesg,2,(caller(0))[3]);
              return;
          }
-
 }
+
+
+
+sub AD_dns_zonecreate {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $smb_pwd = $arg_ref->{smb_pwd};
+    my $dns_server = $arg_ref->{dns_server};
+    my $dns_zone = $arg_ref->{dns_zone};
+    my $dns_admin_description = $arg_ref->{dns_admin_description};
+    my $dns_cn = $arg_ref->{dns_cn};
+    my $filename = $arg_ref->{filename};
+
+    if($Conf::log_level>=1){
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title(
+              "Creating DNSZone: $dns_zone");
+    } 
+
+    # set defaults if not defined
+    if (not defined $filename){
+        $filename="---";
+    }
+     if (not defined $dns_admin_description){
+        $dns_admin_description=$DevelConf::dns_zone_prefix_string." from ".$filename;
+    }
+    if (not defined $dns_cn){
+        $dns_cn=$dns_zone;
+    }
+    if (not defined $dns_server){
+        $dns_server="localhost";
+    }
+
+    # adding dnsNode with samba-tool
+    my $command="  samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U Administrator";
+    print "$command\n";
+    system($command);
+
+    # adding comments to recognize the DNS Zone as created by sophomorix
+    my ($count,$dn_exist_dnszone,$cn_exist_dnszone)=&AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
+    print "   * Adding Comments to DNS Zone $dns_zone\n";
+
+    if ($count > 0){
+             print "   * dnsZone $dns_zone exists ($count results)\n";
+             my $mesg = $ldap->modify($dn_exist_dnszone, add => {
+                                      adminDescription => $dns_admin_description,
+                                      cn => $dns_cn,
+                                     });
+             &AD_debug_logdump($mesg,2,(caller(0))[3]);
+             return;
+         }
+}
+
 
 
 sub AD_dns_kill {
@@ -261,7 +312,7 @@ sub AD_dns_kill {
     my $smb_pwd = $arg_ref->{smb_pwd};
     my $dns_server = $arg_ref->{dns_server};
     my $dns_zone = $arg_ref->{dns_zone};
-    my $dns_host = $arg_ref->{dns_host};
+    my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
 
@@ -272,7 +323,7 @@ sub AD_dns_kill {
         $dns_type="A";
     }
 
-    my $command="samba-tool dns delete $dns_server $dns_zone $dns_host $dns_type $dns_ipv4 --password='$smb_pwd' -U Administrator";
+    my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U Administrator";
     print "     * $command\n";
     system($command);
 }
