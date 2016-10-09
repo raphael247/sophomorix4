@@ -215,10 +215,21 @@ my %host_seen=();
 my %mac_seen=();
 my %ip_seen=();
 
-my @adding_examaccount=();
-my @killing_examaccount=();
-my @adding_computer=();
-my @killing_computer=();
+ # ExamAccounts
+my @adding_examaccounts=();
+my @killing_examaccounts=();
+
+# Computers
+my @adding_computers=();
+my @killing_computers=();
+
+# DNS-Zones
+my @adding_dns_zones=();
+my @killing_dns_zones=();
+
+# DNS-Hosts
+my @adding_dns_hosts=();
+my @killing_dns_hosts=();
 
 my %pxe = qw(ml ok
             );
@@ -582,26 +593,56 @@ while (my ($computer,$room) = each %domcomputers_system){
 
 if($no_sync==1){
     # show info about what will be done
+
+    # ExamAccounts
     print "\n";
     &print_title("Examaccounts that must be killed:");
-    foreach my $ws (@killing_examaccount){
+    foreach my $ws (@killing_examaccounts){
         print "KILL: $ws\n";
     }
     print "\n";
     &print_title("Examaccounts that must be added:");
-    foreach my $ws (@adding_examaccount){
+    foreach my $ws (@adding_examaccounts){
         print "ADD: $ws\n";
     }
+
+    # Computers
     print "\n";
-    &print_title("Workstations that must be killed:");
-    foreach my $ws (@killing_computer){
+    &print_title("Computers that must be killed:");
+    foreach my $ws (@killing_computers){
         print "KILL: $ws\n";
     }
     print "\n";
-    &print_title("Workstations that must be added:");
-    foreach my $ws (@adding_computer){
+    &print_title("Computers that must be added:");
+    foreach my $ws (@adding_computers){
         print "ADD: $ws\n";
     }
+
+
+    # DNS Zones
+    print "\n";
+    &print_title("DNS-Zones that must be killed:");
+    foreach my $dns_zone (@killing_dns_zones){
+        print "KILL: $dns_zone\n";
+    }
+    print "\n";
+    &print_title("DNS-Zones that must be added:");
+    foreach my $dns_zone (@adding_dns_zones){
+        print "ADD: $dns_zone\n";
+    }
+
+    # DNS Hosts
+    print "\n";
+    &print_title("DNS-Hosts that must be killed:");
+    foreach my $dns_host (@killing_dns_hosts){
+        print "KILL: $dns_host\n";
+    }
+    print "\n";
+    &print_title("DNS-Hosts that must be added:");
+    foreach my $dns_host (@adding_dns_hosts){
+        print "ADD: $dns_host\n";
+    }
+
     print "\n--no-sync  finished. Nothing changed!\n";
     exit;
 } 
@@ -662,7 +703,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
     &print_title("Killing ExamAccounts:");
     my $kill_count=1;
-    foreach my $exam_account (@killing_examaccount){
+    foreach my $exam_account (@killing_examaccounts){
         print "   * Killing ExamAccount $exam_account ...\n";
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,
@@ -673,7 +714,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
     &print_title("Adding ExamAccounts:");
     my $add_count=1;
-    foreach my $exam_account (@adding_examaccount){
+    foreach my $exam_account (@adding_examaccounts){
         my $role="examaccount";
         my ($room,$user,@rest)=split(/;/,$exam_account);
         $plain_password=&get_plain_password($role,@passwort_zeichen);
@@ -726,7 +767,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
     &print_title("Killing Workstations:");
     my $count=1;
-    foreach my $computer (@killing_computer){
+    foreach my $computer (@killing_computers){
         &AD_computer_kill({ldap=>$ldap,
                            root_dse=>$root_dse,
                            workstation=>$computer,
@@ -737,7 +778,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
     &print_title("Adding Workstations:");
     my $ws_count=1;
-    foreach my $computer (@adding_computer){
+    foreach my $computer (@adding_computers){
         my ($room,$user,@rest)=split(/;/,$computer);
         # using saved, tokened values
         my $room_saved=$domcomputers_file{$user}{'ROOM'};
@@ -1407,28 +1448,28 @@ sub get_sys_workstations {
 
 sub push_add_examaccount {
     my ($add) = @_;
-    push @adding_examaccount, $add;
+    push @adding_examaccounts, $add;
 }
 
 
 
 sub push_kill_examaccount {
     my ($kill) = @_;
-    push @killing_examaccount, $kill;
+    push @killing_examaccounts, $kill;
 }
 
 
 
 sub push_add_computer {
     my ($add) = @_;
-    push @adding_computer, $add;
+    push @adding_computers, $add;
 }
 
 
 
 sub push_kill_computer {
     my ($kill) = @_;
-    push @killing_computer, $kill;
+    push @killing_computers, $kill;
 }
 
 
