@@ -131,6 +131,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_dns_create
                                  AD_dns_kill
+                                 AD_dns_zonekill
                                  get_forbidden_logins
                                     );
 
@@ -377,7 +378,6 @@ if ($dns_show==1 or $dns_kill==1){
     my $res   = Net::DNS::Resolver->new;
     my @zonelist=();
     my %zonehash=();
-    my @node_delete=(); # samba-tool command to delete node
     my @zone_delete=(); # samba-tool command to delete node
 
     # Fetch DNSZones and their DN
@@ -430,23 +430,34 @@ if ($dns_show==1 or $dns_kill==1){
                       filter => $filter,
                       attr => ['cn']
                             );
-    my $max_node = $mesg->count;
-    for( my $index = 0 ; $index < $max_node ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $name=$entry->get_value('name');
-        my $ipv4=&Sophomorix::SophomorixBase::dns_query_ip($res,$name);
-        print "   * $name  ->  $ipv4\n";
-        if ($dns_kill==1){
-            &AD_dns_kill({ldap=>$ldap, 
-                          root_dse=>$root_dse,
-                          dns_zone=>$zone,
-                          dns_host=>$name,
-                          dns_ipv4=>$ipv4,
-                          smb_pwd=>$smb_pwd,
-                        });
+        my $max_node = $mesg->count;
+        for( my $index = 0 ; $index < $max_node ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $name=$entry->get_value('name');
+            my $ipv4=&Sophomorix::SophomorixBase::dns_query_ip($res,$name);
+            print "   * $name  ->  $ipv4\n";
+            if ($dns_kill==1){
+                &AD_dns_kill({ldap=>$ldap, 
+                              root_dse=>$root_dse,
+                              dns_zone=>$zone,
+                              dns_host=>$name,
+                              dns_ipv4=>$ipv4,
+                              smb_pwd=>$smb_pwd,
+                            });
+           }
         }
-    }
-        $zone_count++;
+        if ($dns_kill==1){
+            if ($zone ne $root_dns){
+            &AD_dns_zonekill({ldap=>$ldap, 
+                              root_dse=>$root_dse,
+                              dns_zone=>$zone,
+                              smb_pwd=>$smb_pwd,
+                            });
+            } else {
+                print "   * Skipping killing provisioned zone $zone\n";
+            }
+            $zone_count++;
+        }
     }
     exit;
 }

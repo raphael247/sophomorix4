@@ -273,13 +273,26 @@ sub AD_dns_kill {
     }
 
     my $command="samba-tool dns delete $dns_server $dns_zone $dns_host $dns_type $dns_ipv4 --password='$smb_pwd' -U Administrator";
-    print "     $command\n";
+    print "     * $command\n";
     system($command);
 }
 
 
 sub AD_dns_zonekill {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $smb_pwd = $arg_ref->{smb_pwd};
+    my $dns_server = $arg_ref->{dns_server};
+    my $dns_zone = $arg_ref->{dns_zone};
 
+    if (not defined $dns_server){
+        $dns_server="localhost";
+    }
+
+    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U Administrator";
+    print "   * $command\n";
+    system($command);
 }
 
 
