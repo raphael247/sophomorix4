@@ -114,6 +114,7 @@ use Sophomorix::SophomorixBase qw(
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
+                                 AD_get_passwd
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
@@ -125,6 +126,9 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_computer_fetch
                                  AD_user_kill
                                  AD_computer_kill
+                                 AD_dns_get
+                                 AD_dns_create
+                                 AD_dns_kill
                                  get_forbidden_logins
                                     );
 
@@ -146,7 +150,6 @@ my $birthdate="1970-01-01";
 my $time_stamp_AD=&time_stamp_AD();
 my @passwort_zeichen=&get_passwd_charlist();
 my $plain_password="";
-
 
 # ou's that have been created in this script
 my $ou="";
@@ -205,6 +208,9 @@ my @class_rooms=();
 
 my $set_computer_passwords=0;
 my $test_dns=0;
+my $dns_test=0;
+my $dns_show=0;
+my $dns_kill=0;
 
 my $file="devices.csv";
 my $host_workstation=$DevelConf::path_conf_host."/".$file;
@@ -248,7 +254,7 @@ my $testopt=GetOptions(
        "p|print" => \$print,
        "no-sync" => \$no_sync,
        "set-computer-passwords" => \$set_computer_passwords,
-       "test-dns" => \$test_dns,
+       "dns-test" => \$dns_test,
        "password=s" => \$password,
        "italc-dir=s" => \$italc_dir,
           );
@@ -258,7 +264,9 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
+my $smb_pwd=&AD_get_passwd(); # needed for using samba-tool
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
@@ -300,10 +308,15 @@ Please see the sophomorix-device(8) man pages for full documentation
 }
 
 
+# get this info from multischool.conf
+# ??????????????????????????????????????
+$school_token="bsz";
+
+
 ############################################################################
-# --test-dns     (does not modify system)
+# --dns-test     (does not modify system)
 ############################################################################
-if ($test_dns==1){
+if ($dns_test==1){
     my $res   = Net::DNS::Resolver->new;
     &print_title("Testing if DNS works for devices in these files:");
     foreach my $device_file (@filelist){
@@ -325,8 +338,8 @@ if ($test_dns==1){
         print Dumper(%examaccounts_file);
     }
     foreach my $host (@domcomputers_file){
-        my $file_ip=$domcomputers_file{$host}{"IP"};
-        my $reply = $res->search($host);
+      my $file_ip=$domcomputers_file{$host}{"IP"};
+      my $reply = $res->search($host);
         if ($reply) {
             foreach my $rr ($reply->answer) {
                 next unless $rr->type eq "A";
@@ -550,9 +563,6 @@ if (not -e ${host_workstation}){
     exit 1;
 }
 
-# get this info from multischool.conf
-# ??????????????????????????????????????
-$school_token="bsz";
 
 
 open(WORKSTATION,"<${host_workstation}");
@@ -811,6 +821,31 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         #system("/usr/sbin/sophomorix-useradd --computer $u_comp");
         #system("/usr/sbin/sophomorix-passwd --force -u $u_comp --pass $pass");
     }
+
+
+    # DNS Hosts
+    &print_title("Killing DNS Hosts:");
+    my $dns_host_count=1;
+    foreach my $dns_host (@killing_dnshosts){
+
+        $dns_host_count++;
+        
+    }
+
+    &print_title("Adding DNS Hosts:");
+    $dns_host_count=1;
+    foreach my $dns_line (@adding_dnshosts){
+        &AD_dns_create({ldap=>$ldap, 
+                        root_dse=>$root_dse,
+                        dns_line=>$dns_line,
+                        smb_pwd=>$smb_pwd,
+                           });
+        $dns_host_count++;
+    }
+
+
+
+
     &log_script_exit("",0,1,0,@arguments);
 }
 

@@ -27,9 +27,9 @@ $Data::Dumper::Terse = 1;
 
 @EXPORT_OK = qw( );
 @EXPORT = qw(
+            AD_get_passwd
             AD_bind_admin
             AD_unbind_admin
-            AD_dns_get
             AD_user_create
             AD_user_update
             AD_computer_create
@@ -55,6 +55,9 @@ $Data::Dumper::Terse = 1;
             AD_object_move
             AD_debug_logdump
             AD_login_test
+            AD_dns_get
+            AD_dns_create
+            AD_dns_kill
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -172,6 +175,88 @@ sub AD_dns_get {
         print "$caller RootDSE: $root_dse -> DNS: $dns_name\n";
     }
     return $dns_name;
+}
+
+sub AD_dns_create {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $smb_pwd = $arg_ref->{smb_pwd};
+    my $dns_server = $arg_ref->{dns_server};
+    my $dns_zone = $arg_ref->{dns_zone};
+    my $dns_host = $arg_ref->{dns_host};
+    my $dns_ipv4 = $arg_ref->{dns_ipv4};
+    my $dns_type = $arg_ref->{dns_type};
+    my $dns_admin_description = $arg_ref->{dns_admin_description};
+    my $dns_cn = $arg_ref->{dns_cn};
+    my $filename = $arg_ref->{filename};
+    my $dns_line = $arg_ref->{dns_line};
+
+    # extract host from line (my become obsolete) ?????????????????ß
+    if (defined $dns_line and not defined $dns_host){
+        my @items = split(/;/,$dns_line);
+        $dns_host=$items[1];
+        $dns_ipv4=$items[4];
+    }
+
+    if($Conf::log_level>=1){
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title(
+              "Creating DNS record: $dns_host");
+    } 
+
+
+    # set defaults if not defined
+    if (not defined $filename){
+        $filename="---";
+    }
+     if (not defined $dns_admin_description){
+        $dns_admin_description=$DevelConf::dns_entry_prefix_string." from ".$filename;
+    }
+    if (not defined $dns_cn){
+        $dns_cn=$dns_host;
+    }
+    if (not defined $dns_server){
+        $dns_server="localhost";
+    }
+    if (not defined $dns_type){
+        $dns_type="A";
+    }
+    if (not defined $dns_zone){
+        $dns_zone=&AD_dns_get($root_dse);
+        #$dns_zone="linuxmuster.local"; # will be obsolete ?????????????????????????
+    }
+    
+    # addind dns entry with samba-tool
+    my $command="  samba-tool dns add $dns_server $dns_zone $dns_host $dns_type $dns_ipv4".
+                " --password='$smb_pwd' -U Administrator";
+	print "$command\n";
+    system($command);
+
+    # adding comments to recognize the entry as created by sophomorix
+    my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_host);
+    print "   * Adding Comments to DNS Host $dns_host\n";
+
+    if ($count > 0){
+             print "   * dnsNode $dns_host exists ($count results)\n";
+             my $mesg = $ldap->modify( $dn_exist_dnshost,
+     	        	       add => {
+                                   adminDescription => $dns_admin_description,
+                                   cn => $dns_cn,
+                                      }
+                                     );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+             #my $command="samba-tool group addmembers ". $group." ".$adduser;
+             #print "   # $command\n";
+             #system($command);
+             return;
+         }
+
+}
+
+
+sub AD_dns_kill {
+
 }
 
 
@@ -1050,9 +1135,18 @@ sub AD_object_search {
     # check if object exists
     # (&(objectclass=user)(cn=pete)
     # (&(objectclass=group)(cn=7a)
-    my $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
+    my $filter;
+    my $base;
+    if ($objectclass eq "dnsNode"){
+        # searching dnsNode
+        $base="DC=DomainDnsZones,".$root_dse;
+        $filter="(&(objectclass=".$objectclass.") (name=".$name."))"; 
+    } else {
+        $base=$root_dse;
+        $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
+    }
     my $mesg = $ldap->search(
-                      base   => $root_dse,
+                      base   => $base,
                       scope => 'sub',
                       filter => $filter,
                       attr => ['cn']
@@ -1063,8 +1157,12 @@ sub AD_object_search {
         # process first entry
         my ($entry,@entries) = $mesg->entries;
         my $dn = $entry->dn();
-        my $cn = $entry->get_value ('cn');
-        $cn="CN=".$cn;
+        if (defined $entry->get_value ('cn')){
+            my $cn = $entry->get_value ('cn');
+            $cn="CN=".$cn;
+        } else {
+            $cn="CN=---";
+        } 
         my $info="no sophomorix info available (Role, Type)";
         if ($objectclass eq "group"){
             $info = $entry->get_value ('sophomorixType');
@@ -1076,6 +1174,8 @@ sub AD_object_search {
         return (0,"","");
     }
 }
+
+
 
 sub AD_computer_fetch {
     my ($ldap,$root_dse) = @_;
