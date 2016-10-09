@@ -4,6 +4,18 @@ sophomorix-samba für linuxmuster.net 7 --- Weekly x
 sophomorix4/Samba4 weekly Nr. 8  (xx.06.2016)
 ############################################################
 
+Multischool Handling:
+
+wenn mehrere admins student.csv, devices.csv, ... anlegen.
+Dann kann es vorkommen, dass
+  * in einer anderen Schule etwas vermurkst ist
+Wenn dann über alle Dateien sophomorix-check lauft/add/move... gibts Probleme
+* nur mit einer Schule checken, macht nicht immer Sinn: Schulwechsel
+* Idee: sophomorix-check speichert hashes aller userfiles
+  s*-add, ... brechen ab, wenn eines der userfiles inzwischen verändert wurde
+* ...
+
+
 DNS:
 DNSNode:
 - im DNSNode sind die IP-Informationen binär gespeichert
