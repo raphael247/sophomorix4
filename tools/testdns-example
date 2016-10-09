@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use Net::DNS;
+
+
+# query for the name server
+my $res1   = Net::DNS::Resolver->new;
+my $reply = $res1->query("", "NS");
+if ($reply) {
+    foreach $rr (grep { $_->type eq 'NS' } $reply->answer) {
+        print $rr->nsdname, "\n";
+    }
+}
+else {
+    warn "query failed: ", $res1->errorstring, "\n";
+}
+
+
+
+
+# search in dns
+#my $host="j1010p01";
+my $host="j1010p01.linuxmuster.local";
+my $res   = Net::DNS::Resolver->new;
+#my $reply = $res->search("j1010p01.linuxmuster.local");
+my $reply = $res->search($host);
+if ($reply) {
+    foreach my $rr ($reply->answer) {
+        next unless $rr->type eq "A";
+        print "$host   has the IP   ",$rr->address, "\n";
+    }
+} else {
+    warn "query failed: ", $res->errorstring, "\n";
+}
+
+
+
+
