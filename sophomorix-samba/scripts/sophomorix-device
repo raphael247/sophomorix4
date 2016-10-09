@@ -110,6 +110,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 dns_query_ip
                                  filelist_fetch
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -301,7 +302,7 @@ Managing accounts:
 
 Managing DNS:
   --dns-test (do DNS queries for devices in files)
-  --dns-kill (remove all DNS-Nodes and DNS-Zones created by sophomorix)
+  --dns-kill (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
   --dns-show (show DNS-Nodes and DNS-Zones created by sophomorix)
 
 Managing italc:
@@ -367,22 +368,17 @@ if ($dns_test==1){
 }
 
 
-############################################################################
-# --dns-kill 
-############################################################################
-
-if ($dns_kill==1){
-
-}
 
 ############################################################################
-# --dns-show 
+# --dns-show / --dns-kill
 ############################################################################
 
-if ($dns_show==1){
+if ($dns_show==1 or $dns_kill==1){
+    my $res   = Net::DNS::Resolver->new;
     my @zonelist=();
     my %zonehash=();
-
+    my @node_delete=(); # samba-tool command to delete node
+    my @zone_delete=(); # samba-tool command to delete node
 
     # Fetch DNSZones and their DN
     my $base="DC=DomainDnsZones,".$root_dse;
@@ -396,22 +392,33 @@ if ($dns_show==1){
     my $max_zone = $mesg->count;
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
-        push @zonelist, $entry->get_value('name');
-        my ($count,$dn_dns_zone,$cn_dns_zone,$info)=&AD_object_search($ldap,$root_dse,"dnsZone",$entry->get_value('name'));
-        print "$dn_dns_zone\n";
-        $zonehash{$entry->get_value('name')}{'DN'}=$dn_dns_zone;
-        $zonehash{$entry->get_value('name')}{'CN'}=$cn_dns_zone;
-        $zonehash{$entry->get_value('name')}{'count'}=$count;
-        $zonehash{$entry->get_value('name')}{'adminDescription'}=$info;
-    }
-    print Dumper(%zonehash);
-    #exit;
+        my $admin_description=$entry->get_value('adminDescription');
+        my $zone_name=$entry->get_value('name');
+        if (defined $admin_description and # attribute is defined
+           $admin_description=~m/^$DevelConf::dns_zone_prefix_string/ and # attribute starts with prefix
+           $zone_name ne $root_dns # do not add $root_dns 
+           ){
+            # list of sophomorix DNSZones without $root_dns
+            # these Zones will be deleted
+            push @zonelist, $zone_name;
 
+        }
+        my ($count,$dn_dns_zone,$cn_dns_zone,$info)=&AD_object_search($ldap,$root_dse,"dnsZone",$zone_name);
+        $zonehash{$zone_name}{'DN'}=$dn_dns_zone;
+        $zonehash{$zone_name}{'CN'}=$cn_dns_zone;
+        $zonehash{$zone_name}{'count'}=$count;
+        $zonehash{$zone_name}{'adminDescription'}=$info;
+    }
+    # add the $root_dns zone (will not be deleted later)
+    unshift @zonelist, $root_dns;
+
+    #print Dumper(%zonehash);
+    #exit;
  
     # print output starts here
-    my $count=1;
+    my $zone_count=1;
     foreach my $zone (@zonelist){
-        &Sophomorix::SophomorixBase::print_title("DNSZone $count) $zone:");
+        &Sophomorix::SophomorixBase::print_title("DNSZone $zone_count) $zone:");
         # DNSNodes in this DNSZone
         my $base=$zonehash{$zone}{'DN'};
         my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
@@ -426,13 +433,20 @@ if ($dns_show==1){
     my $max_node = $mesg->count;
     for( my $index = 0 ; $index < $max_node ; $index++) {
         my $entry = $mesg->entry($index);
-        print "   * ",$entry->get_value('name'),"\n";
+        my $name=$entry->get_value('name');
+        my $ipv4=&Sophomorix::SophomorixBase::dns_query_ip($res,$name);
+        print "   * $name  ->  $ipv4\n";
+        if ($dns_kill==1){
+            &AD_dns_kill({ldap=>$ldap, 
+                          root_dse=>$root_dse,
+                          dns_zone=>$zone,
+                          dns_host=>$name,
+                          dns_ipv4=>$ipv4,
+                          smb_pwd=>$smb_pwd,
+                        });
+        }
     }
-
-
-
-
-        $count++;
+        $zone_count++;
     }
     exit;
 }

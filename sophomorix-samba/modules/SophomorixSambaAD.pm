@@ -58,6 +58,7 @@ $Data::Dumper::Terse = 1;
             AD_dns_get
             AD_dns_create
             AD_dns_kill
+            AD_dns_zonekill
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -254,6 +255,30 @@ sub AD_dns_create {
 
 
 sub AD_dns_kill {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $smb_pwd = $arg_ref->{smb_pwd};
+    my $dns_server = $arg_ref->{dns_server};
+    my $dns_zone = $arg_ref->{dns_zone};
+    my $dns_host = $arg_ref->{dns_host};
+    my $dns_ipv4 = $arg_ref->{dns_ipv4};
+    my $dns_type = $arg_ref->{dns_type};
+
+    if (not defined $dns_server){
+        $dns_server="localhost";
+    }
+    if (not defined $dns_type){
+        $dns_type="A";
+    }
+
+    my $command="samba-tool dns delete $dns_server $dns_zone $dns_host $dns_type $dns_ipv4 --password='$smb_pwd' -U Administrator";
+    print "     $command\n";
+    system($command);
+}
+
+
+sub AD_dns_zonekill {
 
 }
 

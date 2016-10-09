@@ -287,11 +287,12 @@ samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --passwo
      Hier könnte man "sophomorixDNSZone" eintragen, um später nur von sophomorix verwaltete Zones wieder zu löschen
 
 
-  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR j1010-p01.linuxmuster.lokal --password=Muster! -U Administrator
+  # samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR j1010-p01.linuxmuster.local --password=Muster! -U Administrator
 
-sophomorix-device --dns-zones-list   -> List dnszones, mark sophomorixZones, hosts, ...
-sophomorix-device --dns-hosts-list   -> List hosts, ip, ....
 
+
+  Deleting DNSNode with samba tool:
+  # samba-tool dns delete localhost linuxmuster.local bsz-j1010p20 A 10.171.210.20 --password="Muster!" -U Administrator
 
 
 #INFO# samba-tool dns serverinfo localhost

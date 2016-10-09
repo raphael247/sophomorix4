@@ -34,6 +34,7 @@ require Exporter;
             check_options
             config_sophomorix_read
             filelist_fetch
+            dns_query_ip
             );
 
 
