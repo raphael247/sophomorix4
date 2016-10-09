@@ -224,12 +224,12 @@ my @adding_computers=();
 my @killing_computers=();
 
 # DNS-Zones
-my @adding_dns_zones=();
-my @killing_dns_zones=();
+my @adding_dnszones=();
+my @killing_dnszones=();
 
 # DNS-Hosts
-my @adding_dns_hosts=();
-my @killing_dns_hosts=();
+my @adding_dnshosts=();
+my @killing_dnshosts=();
 
 my %pxe = qw(ml ok
             );
@@ -597,62 +597,66 @@ while (my ($computer,$room) = each %domcomputers_system){
 
 if($no_sync==1){
     # show info about what will be done
-
+    my $count=0;
     # ExamAccounts
     print "\n";
-    &print_title("Examaccounts that must be killed:");
+    $count=$#killing_examaccounts+1;
+    &print_title("Examaccounts that must be killed ($count):");
     foreach my $ws (@killing_examaccounts){
         print "KILL: $ws\n";
     }
     print "\n";
-    &print_title("Examaccounts that must be added:");
+    $count=$#adding_examaccounts+1;
+    &print_title("Examaccounts that must be added ($count):");
     foreach my $ws (@adding_examaccounts){
         print "ADD: $ws\n";
     }
 
     # Computers
     print "\n";
-    &print_title("Computers that must be killed:");
+    $count=$#killing_computers+1;
+    &print_title("Computers that must be killed: ($count)");
     foreach my $ws (@killing_computers){
         print "KILL: $ws\n";
     }
     print "\n";
-    &print_title("Computers that must be added:");
+    $count=$#adding_computers+1;
+    &print_title("Computers that must be added: ($count)");
     foreach my $ws (@adding_computers){
         print "ADD: $ws\n";
     }
 
-
     # DNS Zones
     print "\n";
-    &print_title("DNS-Zones that must be killed:");
-    foreach my $dns_zone (@killing_dns_zones){
+    $count=$#killing_dnszones+1;
+    &print_title("DNS-Zones that must be killed: ($count)");
+    foreach my $dns_zone (@killing_dnszones){
         print "KILL: $dns_zone\n";
     }
     print "\n";
-    &print_title("DNS-Zones that must be added:");
-    foreach my $dns_zone (@adding_dns_zones){
+    $count=$#adding_dnszones+1;
+    &print_title("DNS-Zones that must be added: ($count)");
+    foreach my $dns_zone (@adding_dnszones){
         print "ADD: $dns_zone\n";
     }
 
     # DNS Hosts
     print "\n";
-    &print_title("DNS-Hosts that must be killed:");
-    foreach my $dns_host (@killing_dns_hosts){
+    $count=$#killing_dnshosts+1;
+    &print_title("DNS-Hosts that must be killed: ($count)");
+    foreach my $dns_host (@killing_dnshosts){
         print "KILL: $dns_host\n";
     }
     print "\n";
-    &print_title("DNS-Hosts that must be added:");
-    foreach my $dns_host (@adding_dns_hosts){
+    $count=$#adding_dnshosts+1;
+    &print_title("DNS-Hosts that must be added: ($count)");
+    foreach my $dns_host (@adding_dnshosts){
         print "ADD: $dns_host\n";
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-
-    print Dumper(%dnszones_system);
+    #print Dumper(%dnszones_system);
     #print Dumper(%dnshosts_system);
-
-
     exit;
 } 
 
@@ -1154,6 +1158,24 @@ sub analyze_line {
             # nonexisting --> add account
             &push_add_computer($line_correct);
         }
+        # check dns host
+print "HERE TEST: $host_token\n";
+         if (not exists $dnshosts_system{$host_token} ){
+             # nonexisting --> add account
+             &push_add_dnshost($line_correct);
+         } elsif (exists $dnshosts_system{$host_token} ){
+             my $ip_system=$dnshosts_system{$host_token};
+             my $ip_file=$domcomputers_file{$host_token}{"IP"};
+             if ($ip_system ne $ip_file){
+                 # recreate dns entry
+                 &push_kill_dnshost($line_correct);
+                 &push_add_dnshost($line_correct);
+                 print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
+             } else {
+                 print "OK: $host_token exists with $ip_system (= $ip_file from file)\n";
+
+             }
+         }
     }
 }
 
@@ -1479,6 +1501,34 @@ sub push_add_computer {
 sub push_kill_computer {
     my ($kill) = @_;
     push @killing_computers, $kill;
+}
+
+
+
+sub push_add_dnshost {
+    my ($add) = @_;
+    push @adding_dnshosts, $add;
+}
+
+
+
+sub push_kill_dnshost {
+    my ($kill) = @_;
+    push @killing_dnshosts, $kill;
+}
+
+
+
+sub push_add_dnszone {
+    my ($add) = @_;
+    push @adding_dnszones, $add;
+}
+
+
+
+sub push_kill_dnszone {
+    my ($kill) = @_;
+    push @killing_dnszones, $kill;
 }
 
 
