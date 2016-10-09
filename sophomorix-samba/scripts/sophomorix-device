@@ -124,6 +124,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
                                  AD_computer_fetch
+                                 AD_object_search
                                  AD_user_kill
                                  AD_computer_kill
                                  AD_dns_get
@@ -255,6 +256,8 @@ my $testopt=GetOptions(
        "no-sync" => \$no_sync,
        "set-computer-passwords" => \$set_computer_passwords,
        "dns-test" => \$dns_test,
+       "dns-kill" => \$dns_kill,
+       "dns-show" => \$dns_show,
        "password=s" => \$password,
        "italc-dir=s" => \$italc_dir,
           );
@@ -295,6 +298,11 @@ Options:
 Managing accounts:
   --set-computer-passwords  (set computer passwords to 12345678)
   --password password       (use password instead of 12345678)
+
+Managing DNS:
+  --dns-test (do DNS queries for devices in files)
+  --dns-kill (remove all DNS-Nodes and DNS-Zones created by sophomorix)
+  --dns-show (show DNS-Nodes and DNS-Zones created by sophomorix)
 
 Managing italc:
   --italc-dir /path/to/dir  (create italc files in /path/to/dir:
@@ -359,6 +367,75 @@ if ($dns_test==1){
 }
 
 
+############################################################################
+# --dns-kill 
+############################################################################
+
+if ($dns_kill==1){
+
+}
+
+############################################################################
+# --dns-show 
+############################################################################
+
+if ($dns_show==1){
+    my @zonelist=();
+    my %zonehash=();
+
+
+    # Fetch DNSZones and their DN
+    my $base="DC=DomainDnsZones,".$root_dse;
+    my $filter="(&(objectclass=dnsZone) (name=*))";
+    my $mesg = $ldap->search(
+                      base   => $base,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['cn']
+                            );
+    my $max_zone = $mesg->count;
+    for( my $index = 0 ; $index < $max_zone ; $index++) {
+        my $entry = $mesg->entry($index);
+        push @zonelist, $entry->get_value('name');
+        my ($count,$dn_dns_zone,$cn_dns_zone,$info)=&AD_object_search($ldap,$root_dse,"dnsZone",$entry->get_value('name'));
+        print "$dn_dns_zone\n";
+        $zonehash{$entry->get_value('name')}{'DN'}=$dn_dns_zone;
+        $zonehash{$entry->get_value('name')}{'CN'}=$cn_dns_zone;
+        $zonehash{$entry->get_value('name')}{'count'}=$count;
+        $zonehash{$entry->get_value('name')}{'adminDescription'}=$info;
+    }
+    print Dumper(%zonehash);
+    #exit;
+
+ 
+    # print output starts here
+    my $count=1;
+    foreach my $zone (@zonelist){
+        &Sophomorix::SophomorixBase::print_title("DNSZone $count) $zone:");
+        # DNSNodes in this DNSZone
+        my $base=$zonehash{$zone}{'DN'};
+        my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
+                   $DevelConf::dns_entry_prefix_string.
+                   "*))";
+        my $mesg = $ldap->search(
+                      base   => $base,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['cn']
+                            );
+    my $max_node = $mesg->count;
+    for( my $index = 0 ; $index < $max_node ; $index++) {
+        my $entry = $mesg->entry($index);
+        print "   * ",$entry->get_value('name'),"\n";
+    }
+
+
+
+
+        $count++;
+    }
+    exit;
+}
 
 
 # ===========================================================================

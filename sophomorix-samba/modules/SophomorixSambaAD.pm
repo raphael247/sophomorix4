@@ -205,7 +205,6 @@ sub AD_dns_create {
               "Creating DNS record: $dns_host");
     } 
 
-
     # set defaults if not defined
     if (not defined $filename){
         $filename="---";
@@ -224,13 +223,12 @@ sub AD_dns_create {
     }
     if (not defined $dns_zone){
         $dns_zone=&AD_dns_get($root_dse);
-        #$dns_zone="linuxmuster.local"; # will be obsolete ?????????????????????????
     }
     
-    # addind dns entry with samba-tool
+    # adding dns entry with samba-tool
     my $command="  samba-tool dns add $dns_server $dns_zone $dns_host $dns_type $dns_ipv4".
                 " --password='$smb_pwd' -U Administrator";
-	print "$command\n";
+    print "$command\n";
     system($command);
 
     # adding comments to recognize the entry as created by sophomorix
@@ -1137,7 +1135,7 @@ sub AD_object_search {
     # (&(objectclass=group)(cn=7a)
     my $filter;
     my $base;
-    if ($objectclass eq "dnsNode"){
+    if ($objectclass eq "dnsNode" or $objectclass eq "dnsZone"){
         # searching dnsNode
         $base="DC=DomainDnsZones,".$root_dse;
         $filter="(&(objectclass=".$objectclass.") (name=".$name."))"; 
@@ -1157,8 +1155,9 @@ sub AD_object_search {
         # process first entry
         my ($entry,@entries) = $mesg->entries;
         my $dn = $entry->dn();
+        my $cn;
         if (defined $entry->get_value ('cn')){
-            my $cn = $entry->get_value ('cn');
+            $cn = $entry->get_value ('cn');
             $cn="CN=".$cn;
         } else {
             $cn="CN=---";
@@ -1168,6 +1167,10 @@ sub AD_object_search {
             $info = $entry->get_value ('sophomorixType');
         } elsif ($objectclass eq "user"){
             $info = $entry->get_value ('sophomorixRole');
+        } elsif ($objectclass eq "dnsZone"){
+            $info = $entry->get_value ('adminDescription');
+        } elsif ($objectclass eq "dnsNode"){
+            $info = $entry->get_value ('adminDescription');
         }
         return ($count,$dn,$cn,$info);
     } else {
