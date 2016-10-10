@@ -21,17 +21,17 @@ use MIME::Base64;
 
 
 # Reading configuration file
-my $conf="/etc/sophomorix/user/sophomorix.conf";
-if (not -e $conf){
-    print "ERROR: $conf not found!\n";
-    exit;
-}
-
-{ package Conf ; do "$conf" 
-  || die "ERROR: sophomorix.conf could not be processed (syntax error?)\n" 
-}
+#my $conf="/etc/sophomorix/user/sophomorix.conf";
+#if (not -e $conf){
+#    print "ERROR: $conf not found!\n";
+#    exit;
+#}
+#
+#{ package Conf ; do "$conf" 
+#  || die "ERROR: sophomorix.conf could not be processed (syntax error?)\n" 
+#}
 # Use this variables with $Conf::Variablenname (without 'my' in sophomorix.conf)
-
+$Conf::lang="de";
 
 
 

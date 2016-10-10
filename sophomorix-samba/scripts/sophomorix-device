@@ -334,7 +334,7 @@ if ($dns_test==1){
     }
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
-        $school_token=$sophomorix_config{'user_file'}{$filename}{'SCHOOL_TOKEN'};
+        $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL_TOKEN'};
         open(DEVICES,"$device_file") || 
              die "ERROR: $device_file not found!";  
         while(<DEVICES>){
