@@ -319,11 +319,13 @@ sub config_sophomorix_read {
                 if ($school eq "school"){
                     $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'ou'}{$value}{PREFIX}="";
+                    $sophomorix_config{'ou'}{$value}{POSTFIX}="";
                     $sophomorix_config{'ou'}{$value}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
                 } else {
                     $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}=$school;
                     $sophomorix_config{'ou'}{$value}{PREFIX}=$school."-";
+                    $sophomorix_config{'ou'}{$value}{POSTFIX}="-".$school;
                     $sophomorix_config{'ou'}{$value}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
@@ -336,12 +338,14 @@ sub config_sophomorix_read {
                     $token_file=$file;
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PREFIX}="";
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{POSTFIX}="-".$school;
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
@@ -365,12 +369,14 @@ sub config_sophomorix_read {
                     $token_file=$file;
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}="";
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{POSTFIX}="-".$school;
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
@@ -384,12 +390,14 @@ sub config_sophomorix_read {
                     $token_file=$file;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}="";
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="-".$school;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
