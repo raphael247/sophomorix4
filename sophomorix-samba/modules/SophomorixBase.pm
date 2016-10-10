@@ -360,16 +360,26 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILETYPE}="users";
             } elsif ($var eq "CLASS_FILE"){
                 my ($file,$rest)=split(/::/,$value);
-                my $token_file=$school.".".$file;
+                my $token_file;
+                if ($school eq "school"){
+                    $token_file=$file;
+                } else {
+                    $token_file=$school.".".$file;
+                }
                 my $abs_path=$DevelConf::path_conf_user."/".$token_file;
                 $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PATH_ABS}=$abs_path;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILETYPE}="classes";
+                $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{FILETYPE}="classes";
             } elsif ($var eq "DEVICE_FILE"){
                 my ($file,$rest)=split(/::/,$value);
-                my $token_file=$school.".".$file;
-                my $abs_path=$DevelConf::path_conf_user."/".$token_file;
+                my $token_file;
+                if ($school eq "school"){
+                    $token_file=$file;
+                } else {
+                    $token_file=$school.".".$file;
+                }
+                my $abs_path=$DevelConf::path_conf_host."/".$token_file;
                 $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$abs_path;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILETYPE}="devices";
+                $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{FILETYPE}="devices";
             } else {
                 print "<$var> is not a valid variable name\n";
                 exit;
@@ -761,14 +771,26 @@ sub filelist_fetch {
     my ($arg_ref) = @_;
     my $filetype = $arg_ref->{filetype};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $file_key;
+
+    if ($filetype eq "devices"){
+	$file_key="DEVICE_FILE";
+    } elsif ($filetype eq "classes"){
+	$file_key="CLASS_FILE";
+    } elsif ($filetype eq "users"){
+	$file_key="USER_FILE";
+    } else {
+        print "ERROR: unknown filetype $filetype\n";
+        exit;
+    }
 
     my @filelist=();
     if($Conf::log_level>=2){
         &print_title("Testing the following files for handling:");
     }
-    foreach my $file (keys %{$ref_sophomorix_config->{'FILES'}{'USER_FILE'}}) {
-        my $abs_path=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PATH_ABS'};
-        my $filetype_real=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FILETYPE'};
+    foreach my $file (keys %{$ref_sophomorix_config->{'FILES'}{$file_key}}) {
+        my $abs_path=$ref_sophomorix_config->{'FILES'}{$file_key}{$file}{'PATH_ABS'};
+        my $filetype_real=$ref_sophomorix_config->{'FILES'}{$file_key}{$file}{'FILETYPE'};
         if (not defined $abs_path){next}; # i.e. vampire.csv
         
         if (-e $abs_path and $filetype_real eq $filetype){

@@ -620,6 +620,12 @@ if ($print==1){
 # --info (does not modify system)
 # ===========================================================================
 if ($info==1){
+    print "\n";
+    &print_title("Reading the following user files:");
+    foreach my $file (@filelist){
+        print "   * $file\n";
+    }
+
     # fetch and sort rooms
     my @rooms=();
     while (my ($room,$v) = each %rooms_system){
