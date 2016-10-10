@@ -242,13 +242,13 @@ sub config_sophomorix_read {
     $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
         "adminclass";
     # default school
-    $sophomorix_config{'SCHOOLS'}{'school'}{'OU'}="SCHOOL"; 
+    $sophomorix_config{'SCHOOLS'}{'school'}{'OU'}=$DevelConf::AD_school_ou; 
     $sophomorix_config{'SCHOOLS'}{'school'}{'CONF_FILE'}=
         $DevelConf::file_conf_default_school; 
     $sophomorix_config{'SCHOOLS'}{'school'}{'SCHOOL_NAME'}=
         "School"; 
     $sophomorix_config{'SCHOOLS'}{'school'}{'OU_TOP'}=
-        "OU=SCHOOL,".$root_dse; 
+        $DevelConf::AD_school_ou.",".$root_dse; 
 
     ##################################################
     # sophomorix.conf 
@@ -302,12 +302,9 @@ sub config_sophomorix_read {
                 next;
             }
 
-#	    print "HERE: $token_file\n";
             my ($var,$value)=split(/=/);
             $var=&remove_whitespace($var);
             $value=&remove_whitespace($value);
-
-
 
             if ($var eq "SCHOOL_NAME" or
                 $var eq "QUOTA_DEFAULT_TEACHER" or
@@ -402,6 +399,15 @@ sub config_sophomorix_read {
 
 
     }
+    # GLOBAL
+    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
+    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL_TOKEN}="";
+    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
+    # SCHOOL
+    $sophomorix_config{'ou'}{'SCHOOL'}{OU_TOP}="OU=".$DevelConf::AD_school_ou.",".$root_dse;
+    $sophomorix_config{'ou'}{'SCHOOL'}{SCHOOL_TOKEN}="";
+    $sophomorix_config{'ou'}{'SCHOOL'}{PREFIX}="";
+
     #print Dumper(%sophomorix_config);
     #exit;
 # dann alle aufrufe umstellen
@@ -593,9 +599,6 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixRole}=$sophomorix_role;
 
                 # primary group
-		print "HERE: $key";
-print "HERE: $sophomorix_type_primary";
-
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
                     $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
