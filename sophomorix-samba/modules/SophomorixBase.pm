@@ -363,8 +363,16 @@ sub config_sophomorix_read {
                 my $token_file;
                 if ($school eq "school"){
                     $token_file=$file;
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
+                        $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
+                        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
                 my $abs_path=$DevelConf::path_conf_user."/".$token_file;
                 $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PATH_ABS}=$abs_path;
@@ -374,8 +382,16 @@ sub config_sophomorix_read {
                 my $token_file;
                 if ($school eq "school"){
                     $token_file=$file;
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
+                        $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}=$school."-";
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
+                        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
                 my $abs_path=$DevelConf::path_conf_host."/".$token_file;
                 $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$abs_path;
