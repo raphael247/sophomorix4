@@ -158,6 +158,7 @@ my $plain_password="";
 my $ou="";
 my $role="";
 my $school_token="";
+my $prefix="";
 my %ou_created=();
 $ou_created{$ou}="created";
 
@@ -335,10 +336,11 @@ if ($dns_test==1){
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
         $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
-        open(DEVICES,"$device_file") || 
+        $prefix=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'PREFIX'};
+       open(DEVICES,"$device_file") || 
              die "ERROR: $device_file not found!";  
         while(<DEVICES>){
-            &analyze_line($_,$school_token);
+            &analyze_line($_,$school_token,$prefix);
         }
         close(DEVICES);
     }
@@ -672,13 +674,24 @@ if (not -e ${host_workstation}){
 }
 
 
-
-open(WORKSTATION,"<${host_workstation}");
-while(<WORKSTATION>){
-    &analyze_line($_,$school_token);
+# new checking all files
+foreach my $device_file (@filelist){
+    my $filename = basename($device_file);
+    $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
+    $prefix=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'PREFIX'};
+    open(DEVICES,"$device_file") || 
+         die "ERROR: $device_file not found!";  
+    while(<DEVICES>){
+        &analyze_line($_,$school_token,$prefix);
+    }
+    close(DEVICES);
 }
-
-close(WORKSTATION);
+#old
+#open(WORKSTATION,"<${host_workstation}");
+#while(<WORKSTATION>){
+#    &analyze_line($_,$school_token,$prefix);
+#}
+#close(WORKSTATION);
 
 # syntax OK: -> 0
 #return 0;
@@ -1173,7 +1186,7 @@ exit 0;
 # subs
 # ===========================================================================
 sub analyze_line {
-    my ($line,$school_token) = @_;
+    my ($line,$school_token,$prefix) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
