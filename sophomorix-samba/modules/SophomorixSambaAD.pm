@@ -1272,6 +1272,7 @@ sub AD_object_search {
 sub AD_computer_fetch {
     my ($ldap,$root_dse) = @_;
     my %devices=();
+    ##################################################
     # domcomputers
     # key: host$ (lowercase)
     # Value: $room (lml6: always domcomputers)
@@ -1284,36 +1285,63 @@ sub AD_computer_fetch {
                    attrs => ['sAMAccountName',
                              'sophomorixSchoolPrefix',
                              'sophomorixSchoolname',
-                             'sophomorixRole']
-                         );
+                             'sophomorixAdminFile',
+                             'sophomorixRole',
+                            ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
-        if($Conf::log_level>=2){
-            print "   * ",$entry->get_value('sAMAccountName'),"\n";
-        }
         my $sam=$entry->get_value('sAMAccountName');
         my $prefix=$entry->get_value('sophomorixSchoolPrefix');
         my $role=$entry->get_value('sophomorixRole');
         my $sn=$entry->get_value('sophomorixSchoolname');
+        my $file=$entry->get_value('sophomorixAdminFile');
         $devices_system{'domcomputers'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
         $devices_system{'domcomputers'}{$sam}{'sophomorixRole'}=$role;
         $devices_system{'domcomputers'}{$sam}{'sophomorixSchoolname'}=$sn;
+        $devices_system{'domcomputers'}{$sam}{'sophomorixAdminFile'}=$file;
+        if($Conf::log_level>=2){
+            print "   * $sam\n";
+        }
+        # old
         $domcomputers_system{$sam}="domcomputers";
     }
 
+    ##################################################
     # rooms
     # key: room/group
     # Value: 'seen'
     my %rooms_system = ();
 
-# remove that later ????????????????????????????????
-#   print "These rooms were manually added:\n"; 
-#  $rooms_system{"bsz-j1008"}="seen";
-#   $rooms_system{"bsz-j1010"}="seen";
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => '(&(objectClass=group)(sophomorixType=room))',
+                   attrs => ['sAMAccountName',
+                             'sophomorixStatus',
+                             'sophomorixType',
+                            ]);
+    $max_room = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title(
+        "$max_room sophomorix Rooms found in AD");
+    for( my $index = 0 ; $index < $max_room ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $type=$entry->get_value('sophomorixType');
+        my $stat=$entry->get_value('sophomorixStatus');
+        $devices_system{'Rooms'}{$sam}{'room'}=$sam;
+        $devices_system{'Rooms'}{$sam}{'sophomorixStatus'}=$stat;
+        $devices_system{'Rooms'}{$sam}{'sophomorixType'}=$type;
+        if($Conf::log_level>=2){
+            print "   * $sam\n";
+        }
+        # old
+        $rooms_system{$sam}="room";
+    }
 
 
+    ##################################################
     # ExamAccounts
     # key:   Account name i.e. j1008p01  
     # Value: room/group i.e. j1008
@@ -1323,8 +1351,9 @@ sub AD_computer_fetch {
                    base   => $root_dse,
                    scope => 'sub',
                    filter => '(&(objectClass=user)(sophomorixRole=examaccount))',
-                   attrs => ['sAMAccountName',"sophomorixAdminClass"]
-                         );
+                   attrs => ['sAMAccountName',
+                             'sophomorixAdminClass',
+                            ]);
     $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
     for( my $index = 0 ; $index < $max_user ; $index++) {
@@ -1333,39 +1362,54 @@ sub AD_computer_fetch {
             print "   * ",$entry->get_value('sAMAccountName'),
                   "  in Room  ".$entry->get_value('sophomorixAdminClass')."\n";
         }
-        $examaccounts_system{$entry->get_value('sAMAccountName')}=$entry->get_value('sophomorixAdminClass');
+        my $sam=$entry->get_value('sAMAccountName');
+        my $room=$entry->get_value('sophomorixAdminClass');
+        $devices_system{'ExamAccounts'}{$sam}{'room'}=$room;
+        $devices_system{'ExamAccounts'}{$sam}{'sophomorixAdminClass'}=$room;
+        # old
+        $examaccounts_system{$sam}=$room;
     }
 
+    ##################################################
     # DNS Zones
     # key: host$ (lowercase)
     # Value: $IP
     my %dnszones_system = ();
-    # dnszones from ldap
+    # sophomorix DNSZones from ldap
     my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
                     $DevelConf::dns_zone_prefix_string.
                     "*))";
-    #my $filter="(objectClass=dnsZone)";
+    # All DNS Zones from ldap
+    #my $filter_zone="(objectClass=dnsZone)";
     my $base_zones="DC=DomainDnsZones,".$root_dse;
     $mesg = $ldap->search( # perform a search
                 base   => $base_zones,
                 scope => 'sub',
                 filter => $filter_zone,
-                attrs => ['dc','dnsZone']
-                         );
+                attrs => ['name',
+                          'dc',
+                          'dnsZone',
+                          'adminDescription',
+                         ]);
     my $max_zone = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
         "$max_zone sophomorix DNS Zones found in AD");
-
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
         my $zone=$entry->get_value('dc');
+        my $name=$entry->get_value('name');
+        my $desc=$entry->get_value('adminDescription');
+        $devices_system{'DNSZones'}{$zone}{'name'}=$name;
+        $devices_system{'DNSZones'}{$zone}{'adminDescription'}=$desc;
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('dc'),"\n";
         }
-        $dnszones_system{$entry->get_value('dc')}="seen";
+        # old
+        $dnszones_system{$entry->get_value('dc')}=$name;
     }
 
-    # DNS Hosts
+    ##################################################
+    # DNS Nodes
     # key: host$ (lowercase)
     # Value: $IP
     my %dnshosts_system = ();
@@ -1378,19 +1422,27 @@ sub AD_computer_fetch {
                 base   => $base_hosts,
                 scope => 'sub',
                 filter => $filter_node,
-                attrs => ['dc','dnsRecord']
-                         );
+                attrs => ['dc',
+                          'dnsRecord',
+                          'adminDescription',#
+                         ]);
     my $max_node = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
        "$max_node sophomorix DNS Nodes found in AD");
     for( my $index = 0 ; $index < $max_node ; $index++) {
         my $entry = $mesg->entry($index);
-        my $host=$entry->get_value('dc');
+        my $dc=$entry->get_value('dc');
+        # get ip from dns, because in AD its binary (last 4 Bytes)
+        my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+        my $record=$entry->get_value('dnsRecord');
+        my $desc=$entry->get_value('adminDescription');
+        $devices_system{'DNSNodes'}{$dc}{'dnsNode'}=$dc;
+        $devices_system{'DNSNodes'}{$dc}{'IP'}=$ip;
+        $devices_system{'DNSNodes'}{$dc}{'adminDescription'}=$desc;
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('dc'),"\n";
         }
-        # get ip from dns, because in AD its binary (last 4 Bytes)
-        my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$host);
+        # old
         $dnshosts_system{$entry->get_value('dc')}=$ip;
     }
 
