@@ -1404,9 +1404,9 @@ sub AD_computer_fetch {
         my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
         my $record=$entry->get_value('dnsRecord');
         my $desc=$entry->get_value('adminDescription');
-        $devices_system{'DNSNodes'}{$dc}{'dnsNode'}=$dc;
-        $devices_system{'DNSNodes'}{$dc}{'IPv4'}=$ip;
-        $devices_system{'DNSNodes'}{$dc}{'adminDescription'}=$desc;
+        $devices_system{'dnsNodes'}{$dc}{'dnsNode'}=$dc;
+        $devices_system{'dnsNodes'}{$dc}{'IPv4'}=$ip;
+        $devices_system{'dnsNodes'}{$dc}{'adminDescription'}=$desc;
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('dc'),"\n";
         }

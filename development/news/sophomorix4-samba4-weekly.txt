@@ -19,20 +19,20 @@ Wenn dann über alle Dateien sophomorix-check lauft/add/move... gibts Probleme
 
 
 DNS:
-DNSNode:
-- im DNSNode sind die IP-Informationen binär gespeichert
+dnsNode:
+- im dnsNode sind die IP-Informationen binär gespeichert
 - Diese Binäre IP-Informationen anders sich von MS-Server zu MS-Server
 --> Problem 1: mit welcher IP ist ein device im DNS?
 --> Problem 2: wie kann IP angelegt/upgedated werden
---> Problem 3: Es gibt schon einen haufen MS-default DNSNodes.
+--> Problem 3: Es gibt schon einen haufen MS-default dnsNodes.
                Die sollten auf keinen Fall gelöscht werden
 ---> Lösungen: 
   * anlegen der DNS-Nodes mit samba-tool
     (Binäre Berechnung, Passend zur Server Version)
-  * danach wird der DNSNode von sophomorix ergänzt mit:
-    1) adminDescription=SophomorixDNSNode from <*devices.csv>
+  * danach wird der dnsNode von sophomorix ergänzt mit:
+    1) adminDescription=SophomorixdnsNode from <*devices.csv>
     2) cn=RECHNERNAME
-    Beim listen/killen von DNSNodes werden nur die von sophomorix angezeigt/gekillt
+    Beim listen/killen von dnsNodes werden nur die von sophomorix angezeigt/gekillt
   * Hat ein devices die richtige IP: 
     Abfrage vor der synchronisation der devices mit DNS 
     (dauert etwas?? -> testen)

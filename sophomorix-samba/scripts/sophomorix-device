@@ -419,7 +419,7 @@ if ($dns_show==1 or $dns_kill==1){
     my $zone_count=1;
     foreach my $zone (@zonelist){
         &Sophomorix::SophomorixBase::print_title("DNSZone $zone_count) $zone:");
-        # DNSNodes in this DNSZone
+        # dnsNodes in this DNSZone
         my $base=$zonehash{$zone}{'DN'};
         my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
                    $DevelConf::dns_entry_prefix_string.
@@ -681,7 +681,7 @@ foreach my $device_file (@filelist){
 # Decide what must be done
 ############################################################################
 
-# examaccounts to kill
+# ExamAccounts to kill
 foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
     if (not exists $devices_file{'domcomputers'}{$examaccount}){
         # host is not in file anymore
@@ -696,6 +696,16 @@ foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
         &push_kill_computer($computer);
     }
 }
+
+# DNS Node to kill
+foreach my $dnsnode (keys %{$devices_system{'dnsNodes'}}) {
+    print "HERE: $dnsnode\n";
+    if (not exists $devices_file{'dnsNodes'}{$dnsnode}){
+        # host is not in file anymore
+        &push_kill_dnsnode($dnsnode);
+    }
+}
+
 
 ############################################################################
 if($no_sync==1){
@@ -759,6 +769,7 @@ if($no_sync==1){
 
     print "\n--no-sync  finished. Nothing changed!\n";
     #print Dumper(%devices_file);
+    #print Dumper(%devices_system);
     exit;
 } 
 
@@ -1214,6 +1225,8 @@ sub analyze_line {
         $devices_file{'domcomputers'}{$host_token}{'ACCOUNT'}=$account_flag;
         $devices_file{'domcomputers'}{$host_token}{'WORKSTATION'}=$ws_token;
         $devices_file{'domcomputers'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
+        $devices_file{'dnsNodes'}{$host_token}=$ip;
+
         $devices_file{'rooms'}{$room_token}{'HOSTS'}{$host_token}="seen";
         $devices_file{'rooms'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'rooms'}{$room_token}{'IPv4'}{$ip}="seen";
@@ -1258,11 +1271,11 @@ sub analyze_line {
             &push_add_computer($line_correct);
         }
         # check dns host
-        if (not exists $devices_system{'DNSNodes'}{$host_token} ){
+        if (not exists $devices_system{'dnsNodes'}{$host_token} ){
             # nonexisting --> add account
             &push_add_dnsnode($line_correct);
-        } elsif (exists $devices_system{'DNSNodes'}{$host_token} ){
-            my $ip_system=$devices_system{'DNSNodes'}{$host_token}{'IPv4'};
+        } elsif (exists $devices_system{'dnsNodes'}{$host_token} ){
+            my $ip_system=$devices_system{'dnsNodes'}{$host_token}{'IPv4'};
             my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
