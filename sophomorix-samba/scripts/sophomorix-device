@@ -72,17 +72,12 @@
 use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
-#use Schedule::at;
-#use String::Approx 'amatch';
 use Sophomorix::SophomorixConfig;
-#use Sophomorix::SophomorixBase;
 use Time::Local;
 use Time::localtime;
 use Term::ANSIColor qw(:constants); # farbiger Text RED, BLUE, ...
 # nach jedem Printbefehl wieder auf Standardfarbe zurücksetzen
 $Term::ANSIColor::AUTORESET = 1;
-#use IMAP::Admin;
-#use DBI;
 use Net::LDAP;
 use Net::DNS;
 use Net::MAC;
@@ -665,21 +660,15 @@ if ($info==1){
 
 
 
-# ===========================================================================
+############################################################################
 # checking data
-# ===========================================================================
-&print_title("Checking $host_workstation for syntax errors ...");
-if (not -e ${host_workstation}){
-    print "\n$host_workstation does not exist\n\n";
-    exit 1;
-}
 
-
-# new checking all files
+# reading and checking all device files
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
     $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
     $prefix=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'PREFIX'};
+    &print_title("Reading $device_file");
     open(DEVICES,"$device_file") || 
          die "ERROR: $device_file not found!";  
     while(<DEVICES>){
@@ -688,16 +677,15 @@ foreach my $device_file (@filelist){
     close(DEVICES);
 }
 
-&print_title("... No syntax errors in $host_workstation!");
 
-
-# ===========================================================================
-# What will be done
-# ===========================================================================
+############################################################################
+# Decide what must be done
+############################################################################
 
 # examaccounts to kill
 foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
-    if (not exists $hosts_file{$examaccount}){
+    if (not exists $devices_file{'domcomputers'}{$examaccount}){
+#    if (not exists $hosts_file{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
     }
@@ -705,14 +693,14 @@ foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
 
 # computers to kill
 foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
-    if (not exists $hosts_file{$computer}){
+    if (not exists $devices_file{'computer'}{$computer}){
+#    if (not exists $hosts_file{$computer}){
         # host is not in file anymore
         &push_kill_computer($computer);
     }
 }
 
-
-
+############################################################################
 if($no_sync==1){
     # show info about what will be done
     my $count=0;
@@ -774,6 +762,7 @@ if($no_sync==1){
 
     print "\n--no-sync  finished. Nothing changed!\n";
 #    print Dumper(%devices_file);
+#    print Dumper(%hosts_file);
     exit;
 } 
 
@@ -789,11 +778,6 @@ if($no_sync==1){
 # ===========================================================================
 # Synchronizing ExamAccounts and Workstations
 # ===========================================================================
-
-# calculate according to file
-#$ou="BSZLEO";
-#$school_token="bsz";
-
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     if (not exists $ou_created{$ou}){
@@ -1253,8 +1237,11 @@ sub analyze_line {
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
-            $hosts_file{$host_token}=$line_correct;
-            $hosts_file{$ws_token_account}=$line_correct;
+            $devices_file{'domcomputers'}{$host_token}{'LINE'}=$line_correct;
+            $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
+
+            #$hosts_file{$host_token}=$line_correct;
+            #$hosts_file{$ws_token_account}=$line_correct;
         } else {
             # no need to check that it should be added
             return;
