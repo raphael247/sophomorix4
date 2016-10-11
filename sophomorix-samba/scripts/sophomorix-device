@@ -382,7 +382,7 @@ if ($dns_show==1 or $dns_kill==1){
     my %zonehash=();
     my @zone_delete=(); # samba-tool command to delete node
 
-    # Fetch DNSZones and their DN
+    # Fetch dnsZones and their DN
     my $base="DC=DomainDnsZones,".$root_dse;
     my $filter="(&(objectclass=dnsZone) (name=*))";
     my $mesg = $ldap->search(
@@ -400,7 +400,7 @@ if ($dns_show==1 or $dns_kill==1){
            $admin_description=~m/^$DevelConf::dns_zone_prefix_string/ and # attribute starts with prefix
            $zone_name ne $root_dns # do not add $root_dns 
            ){
-            # list of sophomorix DNSZones without $root_dns
+            # list of sophomorix dnsZones without $root_dns
             # these Zones will be deleted
             push @zonelist, $zone_name;
 
@@ -418,8 +418,8 @@ if ($dns_show==1 or $dns_kill==1){
     # print output starts here
     my $zone_count=1;
     foreach my $zone (@zonelist){
-        &Sophomorix::SophomorixBase::print_title("DNSZone $zone_count) $zone:");
-        # dnsNodes in this DNSZone
+        &Sophomorix::SophomorixBase::print_title("dnsZone $zone_count) $zone:");
+        # dnsNodes in this dnsZone
         my $base=$zonehash{$zone}{'DN'};
         my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
                    $DevelConf::dns_entry_prefix_string.
@@ -769,6 +769,7 @@ if($no_sync==1){
     print "\n--no-sync  finished. Nothing changed!\n";
     #print Dumper(%devices_file);
     #print Dumper(%devices_system);
+    #print Dumper(%devices_system{'dnsNodes'});
     exit;
 } 
 
@@ -901,17 +902,14 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Killing dnsNodes:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
-## ??????????????????? read data from hash
-#        &AD_dns_kill({ldap=>$ldap, 
-#                      root_dse=>$root_dse,
-#                      dns_zone=>$zone,
-#                      dns_node=>$name,
-#                      dns_ipv4=>$ipv4,
-#                      smb_pwd=>$smb_pwd,
-#                    });
-
+        &AD_dns_kill({ldap=>$ldap, 
+                      root_dse=>$root_dse,
+                      dns_zone=>$devices_system{'dnsNodes'}{$dns_node}{'dnsZone'},
+                      dns_node=>$dns_node,
+                      dns_ipv4=>$devices_system{'dnsNodes'}{$dns_node}{'IPv4'},
+                      smb_pwd=>$smb_pwd,
+                    });
         $dns_node_count++;
-        
     }
 
     &print_title("Adding dnsNodes:");

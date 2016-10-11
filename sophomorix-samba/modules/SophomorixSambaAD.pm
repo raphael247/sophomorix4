@@ -266,7 +266,7 @@ sub AD_dns_zonecreate {
     if($Conf::log_level>=1){
         print "\n";
         &Sophomorix::SophomorixBase::print_title(
-              "Creating DNSZone: $dns_zone");
+              "Creating dnsZone: $dns_zone");
     } 
 
     # set defaults if not defined
@@ -1271,6 +1271,7 @@ sub AD_object_search {
 
 sub AD_computer_fetch {
     my ($ldap,$root_dse) = @_;
+    my $root_dns=&AD_dns_get($root_dse);
     my %devices=();
     ##################################################
     # sophomorix domcomputers from ldap
@@ -1349,7 +1350,8 @@ sub AD_computer_fetch {
         $devices_system{'ExamAccounts'}{$sam}{'sophomorixAdminClass'}=$room;
     }
     ##################################################
-    # sophomorix DNSZones from ldap
+    # sophomorix dnsZones from ldap
+ 
     my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
                     $DevelConf::dns_zone_prefix_string.
                     "*))";
@@ -1373,15 +1375,29 @@ sub AD_computer_fetch {
         my $zone=$entry->get_value('dc');
         my $name=$entry->get_value('name');
         my $desc=$entry->get_value('adminDescription');
-        $devices_system{'DNSZones'}{$zone}{'name'}=$name;
-        $devices_system{'DNSZones'}{$zone}{'adminDescription'}=$desc;
+        $devices_system{'dnsZones'}{$zone}{'name'}=$name;
+        $devices_system{'dnsZones'}{$zone}{'adminDescription'}=$desc;
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('dc'),"\n";
         }
     }
+
+
+    # make sure default Zone is in list:
+    $devices_system{'dnsZones'}{$root_dns}{'name'}=$root_dns;
+
+    # go through all dnsZones
+    foreach my $dns_zone (keys %{$devices_system{'dnsZones'}}) {
+        print "ZONE: $dns_zone\n";
+        my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
+            &AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
+
+
     ##################################################
     # sophomorix dnsNodes from ldap
-    my $base_hosts="DC=DomainDnsZones,".$root_dse;
+    #my $base_hosts="DC=DomainDnsZones,".$root_dse;
+    my $base_hosts=$dn_dns_zone;
+
     my $res   = Net::DNS::Resolver->new;
     my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
                     $DevelConf::dns_entry_prefix_string.
@@ -1392,7 +1408,7 @@ sub AD_computer_fetch {
                 filter => $filter_node,
                 attrs => ['dc',
                           'dnsRecord',
-                          'adminDescription',#
+                          'adminDescription',
                          ]);
     my $max_node = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -1405,12 +1421,19 @@ sub AD_computer_fetch {
         my $record=$entry->get_value('dnsRecord');
         my $desc=$entry->get_value('adminDescription');
         $devices_system{'dnsNodes'}{$dc}{'dnsNode'}=$dc;
+        $devices_system{'dnsNodes'}{$dc}{'dnsZone'}=$dns_zone;
         $devices_system{'dnsNodes'}{$dc}{'IPv4'}=$ip;
         $devices_system{'dnsNodes'}{$dc}{'adminDescription'}=$desc;
         if($Conf::log_level>=2){
-            print "   * ",$entry->get_value('dc'),"\n";
+            print "   * $dc\n";
         }
     }
+
+
+
+
+    }
+
 
     return(\%devices_system);
 }
