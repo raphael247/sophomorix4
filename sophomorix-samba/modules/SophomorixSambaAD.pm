@@ -1273,11 +1273,7 @@ sub AD_computer_fetch {
     my ($ldap,$root_dse) = @_;
     my %devices=();
     ##################################################
-    # domcomputers
-    # key: host$ (lowercase)
-    # Value: $room (lml6: always domcomputers)
-    my %domcomputers_system = ();
-    # domcomputers from ldap
+    # sophomorix domcomputers from ldap
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -1304,16 +1300,9 @@ sub AD_computer_fetch {
         if($Conf::log_level>=2){
             print "   * $sam\n";
         }
-        # old
-        $domcomputers_system{$sam}="domcomputers";
     }
-
     ##################################################
-    # rooms
-    # key: room/group
-    # Value: 'seen'
-    my %rooms_system = ();
-
+    # sophomorix rooms from ldap
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -1336,17 +1325,10 @@ sub AD_computer_fetch {
         if($Conf::log_level>=2){
             print "   * $sam\n";
         }
-        # old
-        $rooms_system{$sam}="room";
+
     }
-
-
     ##################################################
-    # ExamAccounts
-    # key:   Account name i.e. j1008p01  
-    # Value: room/group i.e. j1008
-    my %examaccounts_system = ();
-    # examaccounts from ldap
+    # sophomorix ExamAccounts from ldap
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -1366,15 +1348,8 @@ sub AD_computer_fetch {
         my $room=$entry->get_value('sophomorixAdminClass');
         $devices_system{'ExamAccounts'}{$sam}{'room'}=$room;
         $devices_system{'ExamAccounts'}{$sam}{'sophomorixAdminClass'}=$room;
-        # old
-        $examaccounts_system{$sam}=$room;
     }
-
     ##################################################
-    # DNS Zones
-    # key: host$ (lowercase)
-    # Value: $IP
-    my %dnszones_system = ();
     # sophomorix DNSZones from ldap
     my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
                     $DevelConf::dns_zone_prefix_string.
@@ -1404,15 +1379,9 @@ sub AD_computer_fetch {
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('dc'),"\n";
         }
-        # old
-        $dnszones_system{$entry->get_value('dc')}=$name;
     }
-
     ##################################################
-    # DNS Nodes
-    # key: host$ (lowercase)
-    # Value: $IP
-    my %dnshosts_system = ();
+    # sophomorix DNS Nodes from ldap
     my $base_hosts="DC=DomainDnsZones,".$root_dse;
     my $res   = Net::DNS::Resolver->new;
     my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
@@ -1442,18 +1411,8 @@ sub AD_computer_fetch {
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('dc'),"\n";
         }
-        # old
-        $dnshosts_system{$entry->get_value('dc')}=$ip;
     }
 
-# old
-    # return(\%domcomputers_system, 
-    #        \%rooms_system, 
-    #        \%examaccounts_system, 
-    #        \%dnszones_system, 
-    #        \%dnshosts_system,
-    #        \%devices_system,
-    #       );
     return(\%devices_system);
 }
 

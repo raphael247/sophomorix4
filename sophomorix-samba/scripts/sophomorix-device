@@ -473,21 +473,8 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 &print_title("Asking the system for Computers/ExamAccounts and DNS data ...");
 
-# my ($ref_domcomputers,
-#     $ref_rooms,
-#     $ref_examaccounts,
-#     $ref_dnszones,
-#     $ref_dnshosts,
-#     $ref_devices) = &AD_computer_fetch($ldap,$root_dse);
-
+# fetch system data
 my ($ref_devices) = &AD_computer_fetch($ldap,$root_dse);
-
-# system
-#my %domcomputers_system = %$ref_domcomputers;
-#my %rooms_system = %$ref_rooms;
-#my %examaccounts_system = %$ref_examaccounts; 
-#my %dnszones_system = %$ref_dnszones; 
-#my %dnshosts_system = %$ref_dnshosts; 
 my %devices_system= %$ref_devices; 
 
 my @dns_nodes=();
@@ -710,7 +697,6 @@ foreach my $device_file (@filelist){
 
 # examaccounts to kill
 foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
-#while (my ($examaccount,$room) = each %examaccounts_system){
     if (not exists $hosts_file{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
@@ -718,9 +704,7 @@ foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
 }
 
 # computers to kill
-
 foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
-#while (my ($computer,$room) = each %domcomputers_system){
     if (not exists $hosts_file{$computer}){
         # host is not in file anymore
         &push_kill_computer($computer);
@@ -789,13 +773,6 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-#    print Dumper(%domcomputers_system);
-#    print Dumper(%rooms_system);
-#    print Dumper(%examaccounts_system);
-#    print Dumper(%dnszones_system);
-#    print Dumper(%dnshosts_system);
-#    print Dumper(%devices_system);
-
 #    print Dumper(%devices_file);
     exit;
 } 
@@ -970,17 +947,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 # ===========================================================================
 if ($set_computer_passwords==1){
     print "Setting password for all Computer accounts:\n";
-#    my ($ref_domcomputers,
-#        $ref_rooms,
-#        $ref_examaccounts) = &get_sys_workstations();
-    my ($ref_domcomputers,
-        $ref_rooms,
-        $ref_examaccounts) = &AD_computer_fetch();
-    # system
-    #my %domcomputers_system = %$ref_domcomputers;
+    my ($ref_devices) = &AD_computer_fetch();
     my $count=1;
     foreach my $comp (keys %{$devices_system{'domcomputers'}}) {
-#    while (my ($comp,$v) = each %domcomputers_system){
         my $pw;
         if ($password ne ""){
             # password by option
@@ -1293,12 +1262,10 @@ sub analyze_line {
 
         # check examaccount
         if (not exists $devices_system{'ExamAccounts'}){
-#        if (not exists $examaccounts_system{$host_token}){
             # nonexisting --> add account
             &push_add_examaccount($line_correct);
         } else {
             if ($devices_system{'ExamAccounts'}{$host_token}{'room'} ne $room_token){
-#            if ($examaccounts_system{$host_token} ne $room_token){
                 # exists in wrong room ---> kill/add account
                 &push_kill_examaccount($host_token);
                 &push_add_examaccount($line_correct);
@@ -1306,20 +1273,16 @@ sub analyze_line {
         } 
 
         # check computer account
-        # if (not exists $domcomputers_system{$ws_token_account} ){
         if (not exists $devices_system{'domcomputers'}{$ws_token_account} ){
             # nonexisting --> add account
             &push_add_computer($line_correct);
         }
         # check dns host
         if (not exists $devices_system{'DNSNodes'}{$host_token} ){
-#        if (not exists $dnshosts_system{$host_token} ){
             # nonexisting --> add account
             &push_add_dnshost($line_correct);
         } elsif (exists $devices_system{'DNSNodes'}{$host_token} ){
-#        } elsif (exists $dnshosts_system{$host_token} ){
             my $ip_system=$devices_system{'DNSNodes'}{$host_token}{'IPv4'};
-#            my $ip_system=$dnshosts_system{$host_token};
             my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
