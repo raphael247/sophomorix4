@@ -220,11 +220,11 @@ my @killing_examaccounts=();
 my @adding_computers=();
 my @killing_computers=();
 
-# DNS Zones
+# dnsZones
 my @adding_dnszones=();
 my @killing_dnszones=();
 
-# DNS Nodes
+# dnsNodes
 my @adding_dnsnodes=();
 my @killing_dnsnodes=();
 
@@ -697,9 +697,8 @@ foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
     }
 }
 
-# DNS Node to kill
+# dnsNodes to kill
 foreach my $dnsnode (keys %{$devices_system{'dnsNodes'}}) {
-    print "HERE: $dnsnode\n";
     if (not exists $devices_file{'dnsNodes'}{$dnsnode}){
         # host is not in file anymore
         &push_kill_dnsnode($dnsnode);
@@ -739,7 +738,7 @@ if($no_sync==1){
         print "ADD: $ws\n";
     }
 
-    # DNS Zones
+    # dnsZones
     print "\n";
     $count=$#killing_dnszones+1;
     &print_title("DNS-Zones that must be killed: ($count)");
@@ -753,7 +752,7 @@ if($no_sync==1){
         print "ADD: $dns_zone\n";
     }
 
-    # DNS Hosts
+    # dnsNodes
     print "\n";
     $count=$#killing_dnsnodes+1;
     &print_title("DNS-Hosts that must be killed: ($count)");
@@ -898,8 +897,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
 
 
-    # DNS Hosts
-    &print_title("Killing DNS Hosts:");
+    # dnsNodes
+    &print_title("Killing dnsNodes:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
 ## ??????????????????? read data from hash
@@ -915,7 +914,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         
     }
 
-    &print_title("Adding DNS Hosts:");
+    &print_title("Adding dnsNodes:");
     $dns_node_count=1;
     foreach my $dns_line (@adding_dnsnodes){
         &AD_dns_create({ldap=>$ldap, 
@@ -1270,7 +1269,7 @@ sub analyze_line {
             # nonexisting --> add account
             &push_add_computer($line_correct);
         }
-        # check dns host
+        # check dnsNode
         if (not exists $devices_system{'dnsNodes'}{$host_token} ){
             # nonexisting --> add account
             &push_add_dnsnode($line_correct);

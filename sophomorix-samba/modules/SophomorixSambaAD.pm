@@ -206,7 +206,7 @@ sub AD_dns_create {
     if($Conf::log_level>=1){
         print "\n";
         &Sophomorix::SophomorixBase::print_title(
-              "Creating DNS Node: $dns_node");
+              "Creating dnsNode: $dns_node");
     } 
 
     # set defaults if not defined
@@ -235,9 +235,9 @@ sub AD_dns_create {
     print "$command\n";
     system($command);
 
-    # adding comments to recognize the DNS Node as created by sophomorix
+    # adding comments to recognize the dnsNode as created by sophomorix
     my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node);
-    print "   * Adding Comments to DNS Node $dns_node\n";
+    print "   * Adding Comments to dnsNode $dns_node\n";
 
     if ($count > 0){
              print "   * dnsNode $dns_node exists ($count results)\n";
@@ -288,9 +288,9 @@ sub AD_dns_zonecreate {
     print "$command\n";
     system($command);
 
-    # adding comments to recognize the DNS Zone as created by sophomorix
+    # adding comments to recognize the dnsZone as created by sophomorix
     my ($count,$dn_exist_dnszone,$cn_exist_dnszone)=&AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
-    print "   * Adding Comments to DNS Zone $dns_zone\n";
+    print "   * Adding Comments to dnsZone $dns_zone\n";
 
     if ($count > 0){
              print "   * dnsZone $dns_zone exists ($count results)\n";
@@ -1353,7 +1353,7 @@ sub AD_computer_fetch {
     my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
                     $DevelConf::dns_zone_prefix_string.
                     "*))";
-    # All DNS Zones from ldap
+    # All dnsZones from ldap
     #my $filter_zone="(objectClass=dnsZone)";
     my $base_zones="DC=DomainDnsZones,".$root_dse;
     $mesg = $ldap->search( # perform a search
@@ -1367,7 +1367,7 @@ sub AD_computer_fetch {
                          ]);
     my $max_zone = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
-        "$max_zone sophomorix DNS Zones found in AD");
+        "$max_zone sophomorix dnsZones found in AD");
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
         my $zone=$entry->get_value('dc');
@@ -1380,7 +1380,7 @@ sub AD_computer_fetch {
         }
     }
     ##################################################
-    # sophomorix DNS Nodes from ldap
+    # sophomorix dnsNodes from ldap
     my $base_hosts="DC=DomainDnsZones,".$root_dse;
     my $res   = Net::DNS::Resolver->new;
     my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
@@ -1396,7 +1396,7 @@ sub AD_computer_fetch {
                          ]);
     my $max_node = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
-       "$max_node sophomorix DNS Nodes found in AD");
+       "$max_node sophomorix dnsNodes found in AD");
     for( my $index = 0 ; $index < $max_node ; $index++) {
         my $entry = $mesg->entry($index);
         my $dc=$entry->get_value('dc');
