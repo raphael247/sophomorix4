@@ -393,6 +393,8 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{'school'}{OU_TOP};
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
+                        $sophomorix_config{'SCHOOLS'}{'school'}{OU};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
@@ -400,6 +402,8 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="-".$school;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
+                        $sophomorix_config{'SCHOOLS'}{$school}{OU};
                 }
                 my $abs_path=$DevelConf::path_conf_host."/".$token_file;
                 $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$abs_path;

@@ -266,6 +266,13 @@ my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
                             });
 
+#print Dumper(\%sophomorix_config{'FILES'});
+#my $resulthash=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'bsz.devices.csv'}{'OU'};
+#print "HASH: >$resulthash<\n";
+#my $resulthash2=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'devices.csv'}{'PREFIX'};
+# print "HASH: >$resulthash2<\n";
+#exit;
+
 ############################################################################
 # --help
 ############################################################################
@@ -335,11 +342,11 @@ if ($dns_test==1){
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
         $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
-        $prefix=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'PREFIX'};
+        $ou=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'OU'};
        open(DEVICES,"$device_file") || 
              die "ERROR: $device_file not found!";  
         while(<DEVICES>){
-            &analyze_line($_,$school_token,$prefix);
+            &analyze_line($_,$device_file,$filename,$school_token,$ou);
         }
         close(DEVICES);
     }
@@ -666,12 +673,12 @@ if ($info==1){
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
     $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
-    $prefix=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'PREFIX'};
+    $ou=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'OU'};
     &print_title("Reading $device_file");
     open(DEVICES,"$device_file") || 
          die "ERROR: $device_file not found!";  
     while(<DEVICES>){
-        &analyze_line($_,$school_token,$prefix);
+        &analyze_line($_,$device_file,$filename,$school_token,$ou);
     }
     close(DEVICES);
 }
@@ -693,6 +700,7 @@ foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
 foreach my $examaccount (keys %{$devices_file{'domcomputers'}}) {
     if (not exists $devices_system{'ExamAccounts'}{$examaccount}){
         # host is not in system
+        #&push_add_examaccount($devices_file{'domcomputers'}{$examaccount}{'LINE'});
         &push_add_examaccount($examaccount);
     }
 # falscher raum
@@ -783,7 +791,7 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    #print Dumper(%devices_file{'ExamAccounts'});
+    #print Dumper(%devices_file{'domcomputers'});
     #print Dumper(%devices_file);
     #print Dumper(%devices_system);
     #print Dumper(%devices_system{'ExamAccounts'});
@@ -830,25 +838,29 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Adding ExamAccounts:");
     my $add_count=1;
     foreach my $exam_account (@adding_examaccounts){
+	print "ACC: >$exam_account< >$devices_file{'domcomputers'}{$exam_account}{'SCHOOL_TOKEN'}<\n";
         my $role="examaccount";
-        my ($room,$user,@rest)=split(/;/,$exam_account);
+        #my ($room,$user,@rest)=split(/;/,$exam_account);
         $plain_password=&get_plain_password($role,@passwort_zeichen);
-	print "USER:  $user   ROOM:  $room\n";
         &AD_user_create({ldap=>$ldap, 
                          root_dse=>$root_dse,
                          user_count=>$add_count,
-                         login=>$user,
-                         group=>$room,
+#                         login=>$user,
+                         login=>$exam_account,
+#                         group=>$room,
+                         group=>$devices_file{'domcomputers'}{$exam_account}{'ROOM'},
                          firstname_ascii=>"Exam",
                          surname_ascii=>"Account",
                          firstname_utf8=>"Exam",
                          surname_utf8=>"Account",
                          birthdate=>$birthdate,
                          plain_password=>$plain_password,
-                         ou=>$ou,
+#                         ou=>$ou,
+                         ou=>$devices_file{'domcomputers'}{$exam_account}{'OU'},
                          role=>"examaccount",
                          type=>"room",
-                         school_token=>$school_token,
+#                         school_token=>$school_token,
+                         school_token=>$devices_file{'domcomputers'}{$exam_account}{'SCHOOL_TOKEN'},
                          creationdate=>$time_stamp_AD,
                          tolerationdate=>"---",
                          deactivationdate=>"---",
@@ -858,7 +870,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         $add_count++;
         # make sure that the room exists
         # use the saved, tokened value
-        my $room_saved=$devices_file{'domcomputers'}{$user}{'ROOM'};
+        my $room_saved=$devices_file{'domcomputers'}{$exam_account}{'ROOM'};
         my $examaccount_token=$school_token."-".$DevelConf::examaccount;
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
@@ -874,7 +886,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
                              group => $room_saved,
-                             addmember => $user,
+                             addmember => $exam_account,
                             });   
         #system("/usr/sbin/sophomorix-useradd --examaccount $u --unix-group $g");
         #system("/usr/sbin/sophomorix-passwd -u $u --random --hide");
@@ -1178,7 +1190,7 @@ exit 0;
 # subs
 # ===========================================================================
 sub analyze_line {
-    my ($line,$school_token,$prefix) = @_;
+    my ($line,$device_file,$filename,$school_token,$ou) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -1239,6 +1251,10 @@ sub analyze_line {
         $devices_file{'domcomputers'}{$host_token}{'ACCOUNT'}=$account_flag;
         $devices_file{'domcomputers'}{$host_token}{'WORKSTATION'}=$ws_token;
         $devices_file{'domcomputers'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
+        $devices_file{'domcomputers'}{$host_token}{'SCHOOL_TOKEN'}=$school_token;
+        $devices_file{'domcomputers'}{$host_token}{'OU'}=$ou;
+        $devices_file{'domcomputers'}{$host_token}{'PATH_ABS'}=$device_file;
+        $devices_file{'domcomputers'}{$host_token}{'FILENAME'}=$filename;
         $devices_file{'dnsNodes'}{$host_token}=$ip;
 
         $devices_file{'rooms'}{$room_token}{'HOSTS'}{$host_token}="seen";

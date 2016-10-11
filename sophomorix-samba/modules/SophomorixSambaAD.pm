@@ -490,6 +490,7 @@ sub AD_computer_create {
         print "   Name:                  $name\n";
         print "   Room:                  $room\n";
         print "   OU:                    $ou\n";
+        print "   SchoolToken:           $school_token\n";
         print "   sAMAccountName:        $smb_name\n";
         print "   dNSHostName:           $dns_name\n";
         foreach my $entry (@service_principal_name){
