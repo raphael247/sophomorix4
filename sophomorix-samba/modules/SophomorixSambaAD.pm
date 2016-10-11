@@ -1350,13 +1350,12 @@ sub AD_computer_fetch {
         $devices_system{'ExamAccounts'}{$sam}{'sophomorixAdminClass'}=$room;
     }
     ##################################################
-    # sophomorix dnsZones from ldap
- 
-    my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
-                    $DevelConf::dns_zone_prefix_string.
-                    "*))";
+    ## sophomorix dnsZones and default Zone from ldap
+    #my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
+    #                $DevelConf::dns_zone_prefix_string.
+    #                "*))";
     # All dnsZones from ldap
-    #my $filter_zone="(objectClass=dnsZone)";
+    my $filter_zone="(objectClass=dnsZone)";
     my $base_zones="DC=DomainDnsZones,".$root_dse;
     $mesg = $ldap->search( # perform a search
                 base   => $base_zones,
@@ -1369,10 +1368,13 @@ sub AD_computer_fetch {
                          ]);
     my $max_zone = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
-        "$max_zone sophomorix dnsZones found in AD");
+        "$max_zone sophomorix dnsZones found (RootDNSServers skipped)");
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
         my $zone=$entry->get_value('dc');
+        if ($zone eq "RootDNSServers"){
+            next;
+        }
         my $name=$entry->get_value('name');
         my $desc=$entry->get_value('adminDescription');
         $devices_system{'dnsZones'}{$zone}{'name'}=$name;
@@ -1382,58 +1384,44 @@ sub AD_computer_fetch {
         }
     }
 
-
-    # make sure default Zone is in list:
-    $devices_system{'dnsZones'}{$root_dns}{'name'}=$root_dns;
-
+    ##################################################
+    # sophomorix dnsNodes from ldap by dnsZone
     # go through all dnsZones
     foreach my $dns_zone (keys %{$devices_system{'dnsZones'}}) {
-        print "ZONE: $dns_zone\n";
         my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
             &AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
-
-
-    ##################################################
-    # sophomorix dnsNodes from ldap
-    #my $base_hosts="DC=DomainDnsZones,".$root_dse;
-    my $base_hosts=$dn_dns_zone;
-
-    my $res   = Net::DNS::Resolver->new;
-    my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
-                    $DevelConf::dns_entry_prefix_string.
-                    "*))";
-    $mesg = $ldap->search( # perform a search
-                base   => $base_hosts,
-                scope => 'sub',
-                filter => $filter_node,
-                attrs => ['dc',
-                          'dnsRecord',
-                          'adminDescription',
-                         ]);
-    my $max_node = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title(
-       "$max_node sophomorix dnsNodes found in AD");
-    for( my $index = 0 ; $index < $max_node ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $dc=$entry->get_value('dc');
-        # get ip from dns, because in AD its binary (last 4 Bytes)
-        my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
-        my $record=$entry->get_value('dnsRecord');
-        my $desc=$entry->get_value('adminDescription');
-        $devices_system{'dnsNodes'}{$dc}{'dnsNode'}=$dc;
-        $devices_system{'dnsNodes'}{$dc}{'dnsZone'}=$dns_zone;
-        $devices_system{'dnsNodes'}{$dc}{'IPv4'}=$ip;
-        $devices_system{'dnsNodes'}{$dc}{'adminDescription'}=$desc;
-        if($Conf::log_level>=2){
-            print "   * $dc\n";
+        my $base_hosts=$dn_dns_zone;
+        my $res   = Net::DNS::Resolver->new;
+        my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
+                         $DevelConf::dns_entry_prefix_string.
+                        "*))";
+        $mesg = $ldap->search( # perform a search
+                       base   => $base_hosts,
+                       scope => 'sub',
+                       filter => $filter_node,
+                       attrs => ['dc',
+                                 'dnsRecord',
+                                 'adminDescription',
+                             ]);
+        my $max_node = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+           "$max_node sophomorix dnsNodes found in AD");
+        for( my $index = 0 ; $index < $max_node ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dc=$entry->get_value('dc');
+            # get ip from dns, because in AD its binary (last 4 Bytes)
+            my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+            my $record=$entry->get_value('dnsRecord');
+            my $desc=$entry->get_value('adminDescription');
+            $devices_system{'dnsNodes'}{$dc}{'dnsNode'}=$dc;
+            $devices_system{'dnsNodes'}{$dc}{'dnsZone'}=$dns_zone;
+            $devices_system{'dnsNodes'}{$dc}{'IPv4'}=$ip;
+            $devices_system{'dnsNodes'}{$dc}{'adminDescription'}=$desc;
+            if($Conf::log_level>=2){
+                print "   * $dc\n";
+            }
         }
     }
-
-
-
-
-    }
-
 
     return(\%devices_system);
 }

@@ -689,6 +689,22 @@ foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
     }
 }
 
+# ExamAccounts to add
+foreach my $examaccount (keys %{$devices_file{'domcomputers'}}) {
+    if (not exists $devices_system{'ExamAccounts'}{$examaccount}){
+        # host is not in system
+        &push_add_examaccount($examaccount);
+    }
+# falscher raum
+#            if ($devices_system{'ExamAccounts'}{$host_token}{'room'} ne $room_token){
+#                # exists in wrong room ---> kill/add account
+#                &push_kill_examaccount($host_token);
+#                &push_add_examaccount($line_correct);
+#            }
+
+
+}
+
 # computers to kill
 foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
     if (not exists $devices_file{'computer'}{$computer}){
@@ -767,9 +783,10 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
+    #print Dumper(%devices_file{'ExamAccounts'});
     #print Dumper(%devices_file);
     #print Dumper(%devices_system);
-    #print Dumper(%devices_system{'dnsNodes'});
+    #print Dumper(%devices_system{'ExamAccounts'});
     exit;
 } 
 
@@ -1250,17 +1267,17 @@ sub analyze_line {
             return;
         }
 
-        # check examaccount
-        if (not exists $devices_system{'ExamAccounts'}){
-            # nonexisting --> add account
-            &push_add_examaccount($line_correct);
-        } else {
-            if ($devices_system{'ExamAccounts'}{$host_token}{'room'} ne $room_token){
-                # exists in wrong room ---> kill/add account
-                &push_kill_examaccount($host_token);
-                &push_add_examaccount($line_correct);
-            }
-        } 
+#        # check examaccount
+#        if (not exists $devices_system{'ExamAccounts'}){
+#            # nonexisting --> add account
+#            &push_add_examaccount($line_correct);
+#        } else {
+#            if ($devices_system{'ExamAccounts'}{$host_token}{'room'} ne $room_token){
+#                # exists in wrong room ---> kill/add account
+#                &push_kill_examaccount($host_token);
+#                &push_add_examaccount($line_correct);
+#            }
+#        } 
 
         # check computer account
         if (not exists $devices_system{'domcomputers'}{$ws_token_account} ){
