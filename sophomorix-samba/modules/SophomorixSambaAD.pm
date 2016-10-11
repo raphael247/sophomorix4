@@ -1446,13 +1446,15 @@ sub AD_computer_fetch {
         $dnshosts_system{$entry->get_value('dc')}=$ip;
     }
 
-    return(\%domcomputers_system, 
-           \%rooms_system, 
-           \%examaccounts_system, 
-           \%dnszones_system, 
-           \%dnshosts_system,
-           \%devices_system,
-          );
+# old
+    # return(\%domcomputers_system, 
+    #        \%rooms_system, 
+    #        \%examaccounts_system, 
+    #        \%dnszones_system, 
+    #        \%dnshosts_system,
+    #        \%devices_system,
+    #       );
+    return(\%devices_system);
 }
 
 

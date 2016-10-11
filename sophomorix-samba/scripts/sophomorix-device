@@ -473,12 +473,14 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 &print_title("Asking the system for Computers/ExamAccounts and DNS data ...");
 
-my ($ref_domcomputers,
-    $ref_rooms,
-    $ref_examaccounts,
-    $ref_dnszones,
-    $ref_dnshosts,
-    $ref_devices) = &AD_computer_fetch($ldap,$root_dse);
+# my ($ref_domcomputers,
+#     $ref_rooms,
+#     $ref_examaccounts,
+#     $ref_dnszones,
+#     $ref_dnshosts,
+#     $ref_devices) = &AD_computer_fetch($ldap,$root_dse);
+
+my ($ref_devices) = &AD_computer_fetch($ldap,$root_dse);
 
 # system
 #my %domcomputers_system = %$ref_domcomputers;
