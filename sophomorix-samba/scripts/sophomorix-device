@@ -168,13 +168,7 @@ my $pass="12345678";
 my $password="";
 
 # where data from workstation file is saved
-# old
-#my %domcomputers_file=();
-my @domcomputers_file=();
-#my %rooms_file=();
-#my %examaccounts_file=();
-
-# new: one hash for all
+my @domcomputers_file=(); # list ordered
 my %devices_file=();
 
 
@@ -355,13 +349,10 @@ if ($dns_test==1){
         close(DEVICES);
     }
     if($Conf::log_level>=2){
-#        print Dumper(%domcomputers_file);
-#        print Dumper(%rooms_file);
-#        print Dumper(%examaccounts_file);
+        print Dumper(%devices_file);
     }
     foreach my $host (@domcomputers_file){
       my $file_ip=$devices_file{'domcomputers'}{$host}{"IPv4"};
-      #my $file_ip=$domcomputers_file{$host}{"IP"};
       my $reply = $res->search($host);
         if ($reply) {
             foreach my $rr ($reply->answer) {
@@ -710,10 +701,6 @@ foreach my $device_file (@filelist){
 
 &print_title("... No syntax errors in $host_workstation!");
 
-#print Dumper(\%domcomputers_file);
-#print Dumper(\%rooms_file);
-#print Dumper(\%examaccounts_file);
-
 
 # ===========================================================================
 # What will be done
@@ -807,8 +794,6 @@ if($no_sync==1){
 #    print Dumper(%dnshosts_system);
 #    print Dumper(%devices_system);
 
-#    print Dumper(%domcomputers_file);
-#    print Dumper(%rooms_file);
 #    print Dumper(%devices_file);
     exit;
 } 
@@ -887,7 +872,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         # make sure that the room exists
         # use the saved, tokened value
         my $room_saved=$devices_file{'domcomputers'}{$user}{'ROOM'};
-        #my $room_saved=$domcomputers_file{$user}{'ROOM'};
         my $examaccount_token=$school_token."-".$DevelConf::examaccount;
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
@@ -926,9 +910,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my ($room,$user,@rest)=split(/;/,$computer);
         # using saved, tokened values
         my $room_saved=$devices_file{'domcomputers'}{$user}{'ROOM'};
-#        my $room_saved=$domcomputers_file{$user}{'ROOM'};
         my $ws_saved=$devices_file{'domcomputers'}{$user}{'WORKSTATION'};
-#        my $ws_saved=$domcomputers_file{$user}{'WORKSTATION'};
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
                              ws_count=>$ws_count,
@@ -1270,22 +1252,6 @@ sub analyze_line {
         # save for DNS
         push @dns_nodes, $host_token;
 
-        # save data into hashes for reuse
-#        push @domcomputers_file, $host_token;
-#        $domcomputers_file{$host_token}{"HWK"}=$hwk;
-#        $domcomputers_file{$host_token}{"MAC"}=$mac;
-#        $domcomputers_file{$host_token}{"IP"}=$ip;
-#        $domcomputers_file{$host_token}{"MS_OFFICE_KEY"}=$ms_office_key;
-#        $domcomputers_file{$host_token}{"MS_WINDOWS_KEY"}=$ms_windows_key;
-#        $domcomputers_file{$host_token}{"ROOM"}=$room_token;
-#        $domcomputers_file{$host_token}{"ACCOUNT"}=$account_flag;
-#        $domcomputers_file{$host_token}{"WORKSTATION"}=$ws_token;
-#        $domcomputers_file{$host_token}{"WORKSTATION_DOLLAR"}=$ws_token_account;
-
-#        $rooms_file{$room_token}{"HOSTS"}{$host_token}="seen";
-#        $rooms_file{$room_token}{"MAC"}{$mac}="seen";
-#        $rooms_file{$room_token}{"IP"}{$ip}="seen";
-
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
         $devices_file{'domcomputers'}{$host_token}{'HWK'}=$hwk;
@@ -1297,14 +1263,9 @@ sub analyze_line {
         $devices_file{'domcomputers'}{$host_token}{'ACCOUNT'}=$account_flag;
         $devices_file{'domcomputers'}{$host_token}{'WORKSTATION'}=$ws_token;
         $devices_file{'domcomputers'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
-
         $devices_file{'rooms'}{$room_token}{'HOSTS'}{$host_token}="seen";
         $devices_file{'rooms'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'rooms'}{$room_token}{'IPv4'}{$ip}="seen";
-
-        # $rooms_file{$room_token}{"HOSTS"}{$host_token}="seen";
-        # $rooms_file{$room_token}{"MAC"}{$mac}="seen";
-        # $rooms_file{$room_token}{"IP"}{$ip}="seen";
 
         # line is correct
         my $line_correct=$room_token.";".$host_token.";".$hwk.";".$mac.";".
@@ -1358,7 +1319,6 @@ sub analyze_line {
             my $ip_system=$devices_system{'DNSNodes'}{$host_token}{'IPv4'};
 #            my $ip_system=$dnshosts_system{$host_token};
             my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
-#            my $ip_file=$domcomputers_file{$host_token}{"IP"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
                 &push_kill_dnshost($line_correct);
