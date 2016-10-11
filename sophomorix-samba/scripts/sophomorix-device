@@ -491,7 +491,7 @@ my ($ref_domcomputers,
 # system
 #my %domcomputers_system = %$ref_domcomputers;
 #my %rooms_system = %$ref_rooms;
-my %examaccounts_system = %$ref_examaccounts; 
+#my %examaccounts_system = %$ref_examaccounts; 
 my %dnszones_system = %$ref_dnszones; 
 my %dnshosts_system = %$ref_dnshosts; 
 my %devices_system= %$ref_devices; 
@@ -719,7 +719,8 @@ foreach my $device_file (@filelist){
 # ===========================================================================
 
 # examaccounts to kill
-while (my ($examaccount,$room) = each %examaccounts_system){
+foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
+#while (my ($examaccount,$room) = each %examaccounts_system){
     if (not exists $hosts_file{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
@@ -1300,11 +1301,13 @@ sub analyze_line {
         }
 
         # check examaccount
-        if (not exists $examaccounts_system{$host_token}){
+        if (not exists $devices_system{'ExamAccounts'}){
+#        if (not exists $examaccounts_system{$host_token}){
             # nonexisting --> add account
             &push_add_examaccount($line_correct);
         } else {
-            if ($examaccounts_system{$host_token} ne $room_token){
+            if ($devices_system{'ExamAccounts'}{$host_token}{'room'} ne $room_token){
+#            if ($examaccounts_system{$host_token} ne $room_token){
                 # exists in wrong room ---> kill/add account
                 &push_kill_examaccount($host_token);
                 &push_add_examaccount($line_correct);
