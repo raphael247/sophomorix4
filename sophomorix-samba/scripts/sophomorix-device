@@ -1280,14 +1280,14 @@ sub analyze_line {
         # check dns host
         if (not exists $devices_system{'DNSNodes'}{$host_token} ){
             # nonexisting --> add account
-            &push_add_dnshost($line_correct);
+            &push_add_dnsnode($line_correct);
         } elsif (exists $devices_system{'DNSNodes'}{$host_token} ){
             my $ip_system=$devices_system{'DNSNodes'}{$host_token}{'IPv4'};
             my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
-                &push_kill_dnshost($line_correct);
-                &push_add_dnshost($line_correct);
+                &push_kill_dnsnode($line_correct);
+                &push_add_dnsnode($line_correct);
                 print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
             } else {
                 if($Conf::log_level>=3){
@@ -1513,90 +1513,6 @@ sub check_option {
 
 
 
-
-
-# old
-# sub get_sys_workstations {
-#     my %domcomputers_system = ();
-#     my %rooms_system = ();
-#     my %examaccounts_system = ();
-
-#     my $dbh=&db_connect();
-
-#     # domcomputers
-
-#     # select the columns that i need
-#     my $sth= $dbh->prepare( "SELECT uid,gid,homedirectory 
-#                                FROM userdata 
-#                               WHERE gid='domcomputers'" );
-#     $sth->execute();
-
-#     my $array_ref = $sth->fetchall_arrayref();
-
-#     foreach my $row (@$array_ref){
-#         # split the array, to give better names
-#         # or use numbers and look in the SELECT statement
-#         my $account_type="",
-
-#         my ($domcomputer,
-#             $room,
-#             $home,
-#            ) = @$row;
-#         #print "\n";
-#         #print "Host:  $domcomputer\n";
-#         #print "Room:  $room\n";
-#         #print "Home:  $home\n";
-#         $domcomputers_system{$domcomputer}=$room;
-#     }
-
-#     # examaccounts
-
-#     # select the columns that i need
-#     my $sth2= $dbh->prepare( "SELECT uid,gid,homedirectory 
-#                                FROM userdata 
-#                               WHERE homedirectory LIKE '/home/workstations%'" );
-#     $sth2->execute();
-
-#     my $array_ref2 = $sth2->fetchall_arrayref();
-
-#     foreach my $row (@$array_ref2){
-#         # split the array, to give better names
-#         # or use numbers and look in the SELECT statement
-#         my $account_type="",
-
-#         my ($exam_account,
-#             $room,
-#             $home,
-#            ) = @$row;
-#         #print "\n";
-#         #print "EXAM:  $exam_account\n";
-#         #print "Room:  $room\n";
-#         #print "Home:  $home\n";
-#         $examaccounts_system{$exam_account}=$room;
-#         $rooms_system{$room}="seen";
-#     }
-
-
-
-#     # room sortieren
-
-
-
-#     # &db_disconnect($dbh);
-#     &AD_unbind_admin($ldap);
-
-
-#     # returns some Hashes, as a list
-#     # 1:  workstation - room
-#     # 2:  room - workstation
-#     return(\%domcomputers_system, 
-#            \%rooms_system, 
-#            \%examaccounts_system, 
-#           );
-# }
-
-
-
 sub push_add_examaccount {
     my ($add) = @_;
     push @adding_examaccounts, $add;
@@ -1625,14 +1541,14 @@ sub push_kill_computer {
 
 
 
-sub push_add_dnshost {
+sub push_add_dnsnode {
     my ($add) = @_;
     push @adding_dnshosts, $add;
 }
 
 
 
-sub push_kill_dnshost {
+sub push_kill_dnsnode {
     my ($kill) = @_;
     push @killing_dnshosts, $kill;
 }
