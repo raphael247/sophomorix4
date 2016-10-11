@@ -493,7 +493,7 @@ my ($ref_domcomputers,
 #my %rooms_system = %$ref_rooms;
 #my %examaccounts_system = %$ref_examaccounts; 
 #my %dnszones_system = %$ref_dnszones; 
-my %dnshosts_system = %$ref_dnshosts; 
+#my %dnshosts_system = %$ref_dnshosts; 
 my %devices_system= %$ref_devices; 
 
 my @dns_nodes=();
@@ -1321,11 +1321,14 @@ sub analyze_line {
             &push_add_computer($line_correct);
         }
         # check dns host
-        if (not exists $dnshosts_system{$host_token} ){
+        if (not exists $devices_system{'DNSNodes'}{$host_token} ){
+#        if (not exists $dnshosts_system{$host_token} ){
             # nonexisting --> add account
             &push_add_dnshost($line_correct);
-        } elsif (exists $dnshosts_system{$host_token} ){
-            my $ip_system=$dnshosts_system{$host_token};
+        } elsif (exists $devices_system{'DNSNodes'}{$host_token} ){
+#        } elsif (exists $dnshosts_system{$host_token} ){
+            my $ip_system=$devices_system{'DNSNodes'}{$host_token}{'IPv4'};
+#            my $ip_system=$dnshosts_system{$host_token};
             my $ip_file=$domcomputers_file{$host_token}{"IP"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
