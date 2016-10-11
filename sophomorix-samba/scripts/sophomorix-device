@@ -169,9 +169,9 @@ my $password="";
 
 # where data from workstation file is saved
 # old
-my %domcomputers_file=();
+#my %domcomputers_file=();
 my @domcomputers_file=();
-my %rooms_file=();
+#my %rooms_file=();
 #my %examaccounts_file=();
 
 # new: one hash for all
@@ -355,8 +355,8 @@ if ($dns_test==1){
         close(DEVICES);
     }
     if($Conf::log_level>=2){
-        print Dumper(%domcomputers_file);
-        print Dumper(%rooms_file);
+#        print Dumper(%domcomputers_file);
+#        print Dumper(%rooms_file);
 #        print Dumper(%examaccounts_file);
     }
     foreach my $host (@domcomputers_file){
@@ -809,8 +809,6 @@ if($no_sync==1){
 
 #    print Dumper(%domcomputers_file);
 #    print Dumper(%rooms_file);
-#    print Dumper(%dnszones_file);
-#    print Dumper(%dnshosts_file);
 #    print Dumper(%devices_file);
     exit;
 } 
@@ -1273,20 +1271,20 @@ sub analyze_line {
         push @dns_nodes, $host_token;
 
         # save data into hashes for reuse
-        push @domcomputers_file, $host_token;
-        $domcomputers_file{$host_token}{"HWK"}=$hwk;
-        $domcomputers_file{$host_token}{"MAC"}=$mac;
-        $domcomputers_file{$host_token}{"IP"}=$ip;
-        $domcomputers_file{$host_token}{"MS_OFFICE_KEY"}=$ms_office_key;
-        $domcomputers_file{$host_token}{"MS_WINDOWS_KEY"}=$ms_windows_key;
-        $domcomputers_file{$host_token}{"ROOM"}=$room_token;
-        $domcomputers_file{$host_token}{"ACCOUNT"}=$account_flag;
-        $domcomputers_file{$host_token}{"WORKSTATION"}=$ws_token;
-        $domcomputers_file{$host_token}{"WORKSTATION_DOLLAR"}=$ws_token_account;
+#        push @domcomputers_file, $host_token;
+#        $domcomputers_file{$host_token}{"HWK"}=$hwk;
+#        $domcomputers_file{$host_token}{"MAC"}=$mac;
+#        $domcomputers_file{$host_token}{"IP"}=$ip;
+#        $domcomputers_file{$host_token}{"MS_OFFICE_KEY"}=$ms_office_key;
+#        $domcomputers_file{$host_token}{"MS_WINDOWS_KEY"}=$ms_windows_key;
+#        $domcomputers_file{$host_token}{"ROOM"}=$room_token;
+#        $domcomputers_file{$host_token}{"ACCOUNT"}=$account_flag;
+#        $domcomputers_file{$host_token}{"WORKSTATION"}=$ws_token;
+#        $domcomputers_file{$host_token}{"WORKSTATION_DOLLAR"}=$ws_token_account;
 
-        $rooms_file{$room_token}{"HOSTS"}{$host_token}="seen";
-        $rooms_file{$room_token}{"MAC"}{$mac}="seen";
-        $rooms_file{$room_token}{"IP"}{$ip}="seen";
+#        $rooms_file{$room_token}{"HOSTS"}{$host_token}="seen";
+#        $rooms_file{$room_token}{"MAC"}{$mac}="seen";
+#        $rooms_file{$room_token}{"IP"}{$ip}="seen";
 
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
