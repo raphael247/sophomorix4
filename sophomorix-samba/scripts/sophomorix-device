@@ -475,7 +475,6 @@ my %devices_system= %$ref_devices;
 my @dns_nodes=();
 
 # /etc/linuxmuster/classroom
-my %hosts_file=();
 &get_classrooms();
 
 
@@ -685,7 +684,6 @@ foreach my $device_file (@filelist){
 # examaccounts to kill
 foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
     if (not exists $devices_file{'domcomputers'}{$examaccount}){
-#    if (not exists $hosts_file{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
     }
@@ -694,7 +692,6 @@ foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
 # computers to kill
 foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
     if (not exists $devices_file{'computer'}{$computer}){
-#    if (not exists $hosts_file{$computer}){
         # host is not in file anymore
         &push_kill_computer($computer);
     }
@@ -762,7 +759,6 @@ if($no_sync==1){
 
     print "\n--no-sync  finished. Nothing changed!\n";
 #    print Dumper(%devices_file);
-#    print Dumper(%hosts_file);
     exit;
 } 
 
@@ -1239,9 +1235,6 @@ sub analyze_line {
         if ($account_flag==1){
             $devices_file{'domcomputers'}{$host_token}{'LINE'}=$line_correct;
             $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
-
-            #$hosts_file{$host_token}=$line_correct;
-            #$hosts_file{$ws_token_account}=$line_correct;
         } else {
             # no need to check that it should be added
             return;
