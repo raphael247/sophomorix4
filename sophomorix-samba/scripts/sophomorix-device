@@ -168,10 +168,15 @@ my $pass="12345678";
 my $password="";
 
 # where data from workstation file is saved
+# old
 my %domcomputers_file=();
 my @domcomputers_file=();
 my %rooms_file=();
 my %examaccounts_file=();
+
+# new: one hash for all
+my %devices_file=();
+
 
 # italc
 # my $italc_owner="root";
@@ -480,7 +485,8 @@ my ($ref_domcomputers,
     $ref_rooms,
     $ref_examaccounts,
     $ref_dnszones,
-    $ref_dnshosts) = &AD_computer_fetch($ldap,$root_dse);
+    $ref_dnshosts,
+    $ref_devices) = &AD_computer_fetch($ldap,$root_dse);
 
 # system
 my %domcomputers_system = %$ref_domcomputers;
@@ -488,6 +494,7 @@ my %rooms_system = %$ref_rooms;
 my %examaccounts_system = %$ref_examaccounts; 
 my %dnszones_system = %$ref_dnszones; 
 my %dnshosts_system = %$ref_dnshosts; 
+my %devices_system= %$ref_devices; 
 
 my @dns_nodes=();
 
@@ -789,8 +796,12 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    #print Dumper(%dnszones_system);
-    #print Dumper(%dnshosts_system);
+    print Dumper(%domcomputers_system);
+#    print Dumper(%rooms_system);
+#    print Dumper(%examaccounts_system);
+#    print Dumper(%dnszones_system);
+#    print Dumper(%dnshosts_system);
+    print Dumper(%devices_system);
     exit;
 } 
 
@@ -928,6 +939,14 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Killing DNS Hosts:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnshosts){
+## ??????????????????? read data from hash
+#        &AD_dns_kill({ldap=>$ldap, 
+#                      root_dse=>$root_dse,
+#                      dns_zone=>$zone,
+#                      dns_node=>$name,
+#                      dns_ipv4=>$ipv4,
+#                      smb_pwd=>$smb_pwd,
+#                    });
 
         $dns_node_count++;
         

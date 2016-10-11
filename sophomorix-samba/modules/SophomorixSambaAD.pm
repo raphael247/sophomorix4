@@ -1271,6 +1271,7 @@ sub AD_object_search {
 
 sub AD_computer_fetch {
     my ($ldap,$root_dse) = @_;
+    my %devices=();
     # domcomputers
     # key: host$ (lowercase)
     # Value: $room (lml6: always domcomputers)
@@ -1280,7 +1281,10 @@ sub AD_computer_fetch {
                    base   => $root_dse,
                    scope => 'sub',
                    filter => '(&(objectClass=computer)(sophomorixRole=computer))',
-                   attrs => ['sAMAccountName']
+                   attrs => ['sAMAccountName',
+                             'sophomorixSchoolPrefix',
+                             'sophomorixSchoolname',
+                             'sophomorixRole']
                          );
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
@@ -1289,7 +1293,14 @@ sub AD_computer_fetch {
         if($Conf::log_level>=2){
             print "   * ",$entry->get_value('sAMAccountName'),"\n";
         }
-        $domcomputers_system{$entry->get_value('sAMAccountName')}="domcomputers";
+        my $sam=$entry->get_value('sAMAccountName');
+        my $prefix=$entry->get_value('sophomorixSchoolPrefix');
+        my $role=$entry->get_value('sophomorixRole');
+        my $sn=$entry->get_value('sophomorixSchoolname');
+        $devices_system{'domcomputers'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+        $devices_system{'domcomputers'}{$sam}{'sophomorixRole'}=$role;
+        $devices_system{'domcomputers'}{$sam}{'sophomorixSchoolname'}=$sn;
+        $domcomputers_system{$sam}="domcomputers";
     }
 
     # rooms
@@ -1330,15 +1341,15 @@ sub AD_computer_fetch {
     # Value: $IP
     my %dnszones_system = ();
     # dnszones from ldap
-    my $filter="(&(objectClass=dnsZone)(adminDescription=".
-               $DevelConf::dns_zone_prefix_string.
-               "*))";
+    my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
+                    $DevelConf::dns_zone_prefix_string.
+                    "*))";
     #my $filter="(objectClass=dnsZone)";
     my $base_zones="DC=DomainDnsZones,".$root_dse;
     $mesg = $ldap->search( # perform a search
                 base   => $base_zones,
                 scope => 'sub',
-                filter => $filter,
+                filter => $filter_zone,
                 attrs => ['dc','dnsZone']
                          );
     my $max_zone = $mesg->count; 
@@ -1360,13 +1371,13 @@ sub AD_computer_fetch {
     my %dnshosts_system = ();
     my $base_hosts="DC=DomainDnsZones,".$root_dse;
     my $res   = Net::DNS::Resolver->new;
-    my $filter="(&(objectClass=dnsNode)(adminDescription=".
-               $DevelConf::dns_entry_prefix_string.
-               "*))";
+    my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
+                    $DevelConf::dns_entry_prefix_string.
+                    "*))";
     $mesg = $ldap->search( # perform a search
                 base   => $base_hosts,
                 scope => 'sub',
-                filter => $filter,
+                filter => $filter_node,
                 attrs => ['dc','dnsRecord']
                          );
     my $max_node = $mesg->count; 
@@ -1387,7 +1398,8 @@ sub AD_computer_fetch {
            \%rooms_system, 
            \%examaccounts_system, 
            \%dnszones_system, 
-           \%dnshosts_system, 
+           \%dnshosts_system,
+           \%devices_system,
           );
 }
 
