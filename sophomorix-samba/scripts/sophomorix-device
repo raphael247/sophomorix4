@@ -163,12 +163,9 @@ my $prefix="";
 my %ou_created=();
 $ou_created{$ou}="created";
 
-
 my $print=0;
 my $pass="12345678";
 my $password="";
-
-
 
 # where data from workstation file is saved
 my %domcomputers_file=();
@@ -177,35 +174,31 @@ my %rooms_file=();
 my %examaccounts_file=();
 
 # italc
-
-my $italc_owner="root";
-
-my $italc_dir="";
-
-my $italc_conf_dir="/etc/sophomorix/italc";
-my $italc_conf=$italc_conf_dir."/italcrooms.conf";
-my $italc_key_dir=$italc_conf_dir."/private";
-my $italc_key_dir_admin=$italc_key_dir."/admin";
-my $italc_key_dir_supporter=$italc_key_dir."/supporter";
-my $italc_key_dir_teacher=$italc_key_dir."/teacher";
-
-# italc
-my $w_coord=169;
-my $h_coord=126;
-my $x_coord="xxxxxxxxxxxx";
-my $y_coord="yyyyyyyyyyyy";
-my @x_coord=(0,171,342,513,0,171,342,513,
-             0,171,342,513,0,171,342,513,
-             0,171,342,513,0,171,342,513,
-             0,171,342,513,0,171,342,513,
-             0,171,342,513,0,171,342,513); # max 40 hosts
-my @y_coord=(0,0,0,0,128,128,128,128,
-             256,256,256,256,384,384,384,384,
-             512,512,512,512,640,640,640,640,
-             768,768,768,768,896,896,896,896,
-             1024,1024,1024,1024,1152,1152,1152,1152); # max 40 hosts
-my %italc_rooms=();
-my @italc_rooms=();
+# my $italc_owner="root";
+# my $italc_dir="";
+# my $italc_conf_dir="/etc/sophomorix/italc";
+# my $italc_conf=$italc_conf_dir."/italcrooms.conf";
+# my $italc_key_dir=$italc_conf_dir."/private";
+# my $italc_key_dir_admin=$italc_key_dir."/admin";
+# my $italc_key_dir_supporter=$italc_key_dir."/supporter";
+# my $italc_key_dir_teacher=$italc_key_dir."/teacher";
+# # italc
+# my $w_coord=169;
+# my $h_coord=126;
+# my $x_coord="xxxxxxxxxxxx";
+# my $y_coord="yyyyyyyyyyyy";
+# my @x_coord=(0,171,342,513,0,171,342,513,
+#              0,171,342,513,0,171,342,513,
+#              0,171,342,513,0,171,342,513,
+#              0,171,342,513,0,171,342,513,
+#              0,171,342,513,0,171,342,513); # max 40 hosts
+# my @y_coord=(0,0,0,0,128,128,128,128,
+#              256,256,256,256,384,384,384,384,
+#              512,512,512,512,640,640,640,640,
+#              768,768,768,768,896,896,896,896,
+#              1024,1024,1024,1024,1152,1152,1152,1152); # max 40 hosts
+# my %italc_rooms=();
+# my @italc_rooms=();
 
 # classrooms
 my %class_rooms=();
@@ -220,7 +213,6 @@ my $dns_kill=0;
 my $file="devices.csv";
 my $host_workstation=$DevelConf::path_conf_host."/".$file;
 my $host_classrooms=$DevelConf::path_conf_host."/classrooms";
-
 
 my %host_seen=();
 my %mac_seen=();
@@ -264,7 +256,7 @@ my $testopt=GetOptions(
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
        "password=s" => \$password,
-       "italc-dir=s" => \$italc_dir,
+#       "italc-dir=s" => \$italc_dir,
           );
 
 
@@ -310,9 +302,9 @@ Managing DNS:
   --dns-kill (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
   --dns-show (show DNS-Nodes and DNS-Zones created by sophomorix)
 
-Managing italc:
-  --italc-dir /path/to/dir  (create italc files in /path/to/dir:
-                             italcroom/globalconfig.xml)
+Obsolete: Managing italc:
+          --italc-dir /path/to/dir  (create italc files in /path/to/dir:
+                                   italcroom/globalconfig.xml)
 
 
 Please see the sophomorix-device(8) man pages for full documentation
@@ -482,7 +474,7 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 # fetching data
 # ===========================================================================
-&print_title("Asking the system for exam and computer accounts ...");
+&print_title("Asking the system for Computers/ExamAccounts and DNS data ...");
 
 my ($ref_domcomputers,
     $ref_rooms,
@@ -991,195 +983,195 @@ if ($set_computer_passwords==1){
 
 
 
-# ===========================================================================
-# --italc-dir  (create config files for italc)
-# ===========================================================================
-if ($italc_dir ne ""){
-    print "Creating italc files in $italc_dir\n";
-    system("mkdir -p $italc_dir");
-    system("chown $italc_owner.${DevelConf::teacher} $italc_dir");
-    system("chmod 0755 $italc_dir");
+# # ===========================================================================
+# # --italc-dir  (create config files for italc)
+# # ===========================================================================
+# if ($italc_dir ne ""){
+#     print "Creating italc files in $italc_dir\n";
+#     system("mkdir -p $italc_dir");
+#     system("chown $italc_owner.${DevelConf::teacher} $italc_dir");
+#     system("chmod 0755 $italc_dir");
 
-    my $file_global="globalconfig.xml";
-    my $file_personal="personalconfig.xml";
-    my $dir_snapshots="snapshots";
+#     my $file_global="globalconfig.xml";
+#     my $file_personal="personalconfig.xml";
+#     my $dir_snapshots="snapshots";
 
-    foreach my $room (@italc_rooms){
-        my @teacher_hosts=();
-        my $classroom_name=$italc_rooms{$room}{'NAME'};
-        my $master_host=$italc_rooms{$room}{'MASTER'};
+#     foreach my $room (@italc_rooms){
+#         my @teacher_hosts=();
+#         my $classroom_name=$italc_rooms{$room}{'NAME'};
+#         my $master_host=$italc_rooms{$room}{'MASTER'};
 
-        my $italc_parent=$italc_dir."/".$room;
-        my $italc_file_global=$italc_parent."/".$file_global;
-        my $italc_file_personal=$italc_parent."/".$file_personal;
-        my $italc_snapshots_dir=$italc_parent."/".$dir_snapshots;
+#         my $italc_parent=$italc_dir."/".$room;
+#         my $italc_file_global=$italc_parent."/".$file_global;
+#         my $italc_file_personal=$italc_parent."/".$file_personal;
+#         my $italc_snapshots_dir=$italc_parent."/".$dir_snapshots;
 
-        system("mkdir -p $italc_parent");
-        system("chown $italc_owner.${DevelConf::teacher} $italc_parent");
-        system("chmod 0755 $italc_parent");
+#         system("mkdir -p $italc_parent");
+#         system("chown $italc_owner.${DevelConf::teacher} $italc_parent");
+#         system("chmod 0755 $italc_parent");
 
-        system("mkdir -p $italc_snapshots_dir");
-        system("chmod 0777 $italc_snapshots_dir");
+#         system("mkdir -p $italc_snapshots_dir");
+#         system("chmod 0777 $italc_snapshots_dir");
 
-        print "Creating $italc_file_global for italcroom $room ...\n";
-        open(ITALCGLOBAL, ">$italc_file_global");
-        print ITALCGLOBAL '<?xml version="1.0"?>'."\n";
-        print ITALCGLOBAL '<!DOCTYPE italc-config-file>'."\n";
-        print ITALCGLOBAL '<globalclientconfig version="1.0.7" >'."\n";
-        print ITALCGLOBAL '  <body>'."\n";
-        print ITALCGLOBAL '    <classroom name="'.$classroom_name.'" >'."\n";
+#         print "Creating $italc_file_global for italcroom $room ...\n";
+#         open(ITALCGLOBAL, ">$italc_file_global");
+#         print ITALCGLOBAL '<?xml version="1.0"?>'."\n";
+#         print ITALCGLOBAL '<!DOCTYPE italc-config-file>'."\n";
+#         print ITALCGLOBAL '<globalclientconfig version="1.0.7" >'."\n";
+#         print ITALCGLOBAL '  <body>'."\n";
+#         print ITALCGLOBAL '    <classroom name="'.$classroom_name.'" >'."\n";
 
-        print "Creating $italc_file_personal for italcroom $room ...\n";
-        open(ITALCPERSONAL, ">$italc_file_personal");
-        print ITALCPERSONAL '<?xml version="1.0"?>'."\n";
-        print ITALCPERSONAL '<!DOCTYPE italc-config-file>'."\n";
-        print ITALCPERSONAL '<personalconfig version="1.0.7" >'."\n";
-        print ITALCPERSONAL '  <head>'."\n";
+#         print "Creating $italc_file_personal for italcroom $room ...\n";
+#         open(ITALCPERSONAL, ">$italc_file_personal");
+#         print ITALCPERSONAL '<?xml version="1.0"?>'."\n";
+#         print ITALCPERSONAL '<!DOCTYPE italc-config-file>'."\n";
+#         print ITALCPERSONAL '<personalconfig version="1.0.7" >'."\n";
+#         print ITALCPERSONAL '  <head>'."\n";
 
-        my @host_list_global=();
-        my @host_list_personal=();
-        my %host_lines_global=();
-        my %host_lines_personal=();
-        for my $host ( keys %{ $rooms_file{$room}{"HOSTS"} } ) {
-            my $ip=$domcomputers_file{$host}{"IP"};
-            my $mac=$domcomputers_file{$host}{"MAC"};
-            my $account_flag=$domcomputers_file{$host}{"ACCOUNT"};
-            # type? 0/1 
-            my $type=0;
-            if (exists $italc_rooms{$room}{"$host"}{'TYPE'}){
-               if ($italc_rooms{$room}{"$host"}{'TYPE'} eq "teacher host"){
-		    $type=1;
-                    # remember teacher hosts
-                    push @teacher_hosts, $host;
-                }
-            }
+#         my @host_list_global=();
+#         my @host_list_personal=();
+#         my %host_lines_global=();
+#         my %host_lines_personal=();
+#         for my $host ( keys %{ $rooms_file{$room}{"HOSTS"} } ) {
+#             my $ip=$domcomputers_file{$host}{"IP"};
+#             my $mac=$domcomputers_file{$host}{"MAC"};
+#             my $account_flag=$domcomputers_file{$host}{"ACCOUNT"};
+#             # type? 0/1 
+#             my $type=0;
+#             if (exists $italc_rooms{$room}{"$host"}{'TYPE'}){
+#                if ($italc_rooms{$room}{"$host"}{'TYPE'} eq "teacher host"){
+# 		    $type=1;
+#                     # remember teacher hosts
+#                     push @teacher_hosts, $host;
+#                 }
+#             }
 
-            # visible? yes/no
-            my $visible="yes";
-            if (exists $italc_rooms{$room}{"$host"}{'INVISIBLE'}){
-               if ($italc_rooms{$room}{"$host"}{'INVISIBLE'} eq "yes"){
-                    $visible="no";
-                }
-            }
+#             # visible? yes/no
+#             my $visible="yes";
+#             if (exists $italc_rooms{$room}{"$host"}{'INVISIBLE'}){
+#                if ($italc_rooms{$room}{"$host"}{'INVISIBLE'} eq "yes"){
+#                     $visible="no";
+#                 }
+#             }
 
-            # id is 6 digits of MAC-address converted to decimal
-            # more digits are not suppoorted bay italc 1.0.7
-            # perl can calculate lager hex numbers.
-            # warnings must be be disabled if you need more 
-            # -> see beginning of script: no warnings ....
-            my $hex_mac=$mac;
-            $hex_mac=~s/://g;
-            $hex_mac=substr($hex_mac,6,6);
-	    my $dec_mac =  hex($hex_mac);
-            my $id=$dec_mac;
+#             # id is 6 digits of MAC-address converted to decimal
+#             # more digits are not suppoorted bay italc 1.0.7
+#             # perl can calculate lager hex numbers.
+#             # warnings must be be disabled if you need more 
+#             # -> see beginning of script: no warnings ....
+#             my $hex_mac=$mac;
+#             $hex_mac=~s/://g;
+#             $hex_mac=substr($hex_mac,6,6);
+# 	    my $dec_mac =  hex($hex_mac);
+#             my $id=$dec_mac;
 
-            my $line_global="      <client localip=\"".$ip."\" ".
-                                              "mac=\"".$mac."\" ".
-                                             "type=\"".$type."\" ".
-                                               "id=\"".$id."\" ".
-                                             "name=\"".$host."\" ".
-                            "/>\n";
-            my $line_personal="      <client w=\"".$w_coord."\" ".
-                                            "x=\"".$x_coord."\" ".
-                                            "y=\"".$y_coord."\" ".
-                                            "h=\"".$h_coord."\" ".
-                                      "visible=\"".$visible."\" ".
-                                           "id=\"".$id."\" ".
-                              "/> <!-- $host -->\n";
-            if ($account_flag eq "1"){
-                # for sorting
-                push @host_list_global, $host;
-                push @host_list_personal, $host;
-                # save lines for later use
-                $host_lines_global{$host}=$line_global;
-                $host_lines_personal{$host}=$line_personal;
-            } else {
-                # no account flag -> no italc account 
-            }
-        }
+#             my $line_global="      <client localip=\"".$ip."\" ".
+#                                               "mac=\"".$mac."\" ".
+#                                              "type=\"".$type."\" ".
+#                                                "id=\"".$id."\" ".
+#                                              "name=\"".$host."\" ".
+#                             "/>\n";
+#             my $line_personal="      <client w=\"".$w_coord."\" ".
+#                                             "x=\"".$x_coord."\" ".
+#                                             "y=\"".$y_coord."\" ".
+#                                             "h=\"".$h_coord."\" ".
+#                                       "visible=\"".$visible."\" ".
+#                                            "id=\"".$id."\" ".
+#                               "/> <!-- $host -->\n";
+#             if ($account_flag eq "1"){
+#                 # for sorting
+#                 push @host_list_global, $host;
+#                 push @host_list_personal, $host;
+#                 # save lines for later use
+#                 $host_lines_global{$host}=$line_global;
+#                 $host_lines_personal{$host}=$line_personal;
+#             } else {
+#                 # no account flag -> no italc account 
+#             }
+#         }
 
-        @host_list_global = sort @host_list_global;
-        @host_list_personal = sort @host_list_personal;
+#         @host_list_global = sort @host_list_global;
+#         @host_list_personal = sort @host_list_personal;
 
-        foreach my $host (@host_list_global){
-		print ITALCGLOBAL "$host_lines_global{$host}";
-        }
+#         foreach my $host (@host_list_global){
+# 		print ITALCGLOBAL "$host_lines_global{$host}";
+#         }
         
-        # italc global file
-        print ITALCGLOBAL '    </classroom>'."\n";
-        print ITALCGLOBAL '  </body>'."\n";
-        print ITALCGLOBAL '</globalclientconfig>'."\n";
-        close(ITALCGLOBAL);
-        system("chown $italc_owner.${DevelConf::teacher} $italc_file_global");
-        system("chmod 0755 $italc_file_global");
+#         # italc global file
+#         print ITALCGLOBAL '    </classroom>'."\n";
+#         print ITALCGLOBAL '  </body>'."\n";
+#         print ITALCGLOBAL '</globalclientconfig>'."\n";
+#         close(ITALCGLOBAL);
+#         system("chown $italc_owner.${DevelConf::teacher} $italc_file_global");
+#         system("chmod 0755 $italc_file_global");
 
-        # italc personal file
-        my $master_ip=$domcomputers_file{$master_host}{"IP"};
-        print ITALCPERSONAL '  <globalsettings '.
-                            "demo-master-ip=\"".$master_ip."\" ".
-                            'opened-tab="5" '.
-                            'demoquality="0" '.
-                            'defaultdomain="" '.
-                            'role="1" '.
-                            'demo-net-iface="eth0" '.
-                            'client-update-interval="1" '.
-                            'wincfg="AAAA/wAAAAD9AAAAAAAABAAAAAJfAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AdABvAG8AbABiAGEAcgEAAAAAAAAEAAAAAAAAAAAA" '.
-                            'notooltips="0" '.
-                            'win-height="663" '.
-                            'win-x="0" '.
-                            'ismaximized="1" '.
-                            'win-y="0" '.
-                            'clientdoubleclickaction="0" '.
-                            'win-width="1024" '.
-                            'showUserColumn="0" />'."\n";
-        print ITALCPERSONAL '  </head>'."\n";
-        print ITALCPERSONAL '  <body>'."\n";
-        print ITALCPERSONAL '    <classroom name="'.$classroom_name.'" >'."\n";
-        my $host_index=0; # index for array: index=0 --> first element
-        foreach my $host (@host_list_personal){
-	    my $line_to_print=$host_lines_personal{$host};
-            # replace coordinates
-            $line_to_print=~s/$x_coord/$x_coord[$host_index]/g;
-            $line_to_print=~s/$y_coord/$y_coord[$host_index]/g;
-            print ITALCPERSONAL "$line_to_print";
-            # old: print unmodified
-	    #print ITALCPERSONAL "$host_lines_personal{$host}";
-            $host_index++;
-        }
-        print ITALCPERSONAL '    </classroom>'."\n";
-        print ITALCPERSONAL '  </body>'."\n";
-        print ITALCPERSONAL '</personalconfig>'."\n";
-        close(ITALCPERSONAL);
-        system("chown $italc_owner.${DevelConf::teacher} $italc_file_personal");
-        system("chmod 0755 $italc_file_personal");
+#         # italc personal file
+#         my $master_ip=$domcomputers_file{$master_host}{"IP"};
+#         print ITALCPERSONAL '  <globalsettings '.
+#                             "demo-master-ip=\"".$master_ip."\" ".
+#                             'opened-tab="5" '.
+#                             'demoquality="0" '.
+#                             'defaultdomain="" '.
+#                             'role="1" '.
+#                             'demo-net-iface="eth0" '.
+#                             'client-update-interval="1" '.
+#                             'wincfg="AAAA/wAAAAD9AAAAAAAABAAAAAJfAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AdABvAG8AbABiAGEAcgEAAAAAAAAEAAAAAAAAAAAA" '.
+#                             'notooltips="0" '.
+#                             'win-height="663" '.
+#                             'win-x="0" '.
+#                             'ismaximized="1" '.
+#                             'win-y="0" '.
+#                             'clientdoubleclickaction="0" '.
+#                             'win-width="1024" '.
+#                             'showUserColumn="0" />'."\n";
+#         print ITALCPERSONAL '  </head>'."\n";
+#         print ITALCPERSONAL '  <body>'."\n";
+#         print ITALCPERSONAL '    <classroom name="'.$classroom_name.'" >'."\n";
+#         my $host_index=0; # index for array: index=0 --> first element
+#         foreach my $host (@host_list_personal){
+# 	    my $line_to_print=$host_lines_personal{$host};
+#             # replace coordinates
+#             $line_to_print=~s/$x_coord/$x_coord[$host_index]/g;
+#             $line_to_print=~s/$y_coord/$y_coord[$host_index]/g;
+#             print ITALCPERSONAL "$line_to_print";
+#             # old: print unmodified
+# 	    #print ITALCPERSONAL "$host_lines_personal{$host}";
+#             $host_index++;
+#         }
+#         print ITALCPERSONAL '    </classroom>'."\n";
+#         print ITALCPERSONAL '  </body>'."\n";
+#         print ITALCPERSONAL '</personalconfig>'."\n";
+#         close(ITALCPERSONAL);
+#         system("chown $italc_owner.${DevelConf::teacher} $italc_file_personal");
+#         system("chmod 0755 $italc_file_personal");
 
-        foreach my $teacher_host (@teacher_hosts){
-            # create links for teacher hosts
-            system("cd $italc_dir; ln -s $room $teacher_host");
-        }
-    }
+#         foreach my $teacher_host (@teacher_hosts){
+#             # create links for teacher hosts
+#             system("cd $italc_dir; ln -s $room $teacher_host");
+#         }
+#     }
 
-    # copying the keys
-    print "* Copying italc keys to $italc_dir\n";
-    system("cp -r $italc_key_dir $italc_dir");
-    system("chown -R $italc_owner.${DevelConf::teacher} $italc_dir");
-    if (-e "${italc_key_dir_admin}/key"){
-        system("chmod 440 ${italc_key_dir_admin}/key");
-    } else {
-        print "\nPlease add a key ${italc_key_dir_admin}/key!\n\n";
-    }
-    if (-e "${italc_key_dir_supporter}/key"){
-        system("chmod 440 ${italc_key_dir_supporter}/key");
-    } else {
-        print "\nPlease add a key ${italc_key_dir_supporter}/key!\n\n";
-    }
-    if (-e "${italc_key_dir_teacher}/key"){
-        system("chmod 440 ${italc_key_dir_teacher}/key");
-    } else {
-        print "\nPlease add a key ${italc_key_dir_teacher}/key!\n\n";
-    }
-    &log_script_end(@arguments);
-}
+#     # copying the keys
+#     print "* Copying italc keys to $italc_dir\n";
+#     system("cp -r $italc_key_dir $italc_dir");
+#     system("chown -R $italc_owner.${DevelConf::teacher} $italc_dir");
+#     if (-e "${italc_key_dir_admin}/key"){
+#         system("chmod 440 ${italc_key_dir_admin}/key");
+#     } else {
+#         print "\nPlease add a key ${italc_key_dir_admin}/key!\n\n";
+#     }
+#     if (-e "${italc_key_dir_supporter}/key"){
+#         system("chmod 440 ${italc_key_dir_supporter}/key");
+#     } else {
+#         print "\nPlease add a key ${italc_key_dir_supporter}/key!\n\n";
+#     }
+#     if (-e "${italc_key_dir_teacher}/key"){
+#         system("chmod 440 ${italc_key_dir_teacher}/key");
+#     } else {
+#         print "\nPlease add a key ${italc_key_dir_teacher}/key!\n\n";
+#     }
+#     &log_script_end(@arguments);
+# }
 
 
 
@@ -1315,7 +1307,10 @@ sub analyze_line {
                 &push_add_dnshost($line_correct);
                 print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
             } else {
-                print "OK: $host_token exists with $ip_system (= $ip_file from file)\n";
+                if($Conf::log_level>=3){
+                    print "OK: $host_token exists with $ip_system",
+                          " (= $ip_file from file)\n";
+                }
             }
         }
     }
@@ -1702,86 +1697,86 @@ sub get_classrooms {
 
 
 
-sub get_italcrooms {
-    print "* Fetching italc rooms from $italc_conf:\n";
-    #if (not -e $italc_conf_dir){
-    #    system("mkdir -p $italc_conf_dir");
-    #}
-    if (not -e $italc_conf){
-        &log_script_exit("$italc_conf is missing",1,1,0,@arguments);
-        exit;
-    } 
-    if (not -e $italc_key_dir_admin){
-        system("mkdir -p $italc_key_dir_admin");
-    }
-    if (not -e $italc_key_dir_supporter){
-        system("mkdir -p $italc_key_dir_supporter");
-    }
-    if (not -e $italc_key_dir_teacher){
-        system("mkdir -p $italc_key_dir_teacher");
-    }
-    open(ITALCROOM, "<$italc_conf");
-    while(<ITALCROOM>){
-        chomp();
-        s/ //g;
-        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-            next;
-        }
-        if($_ eq ""){ 
-            next;
-        }
+# sub get_italcrooms {
+#     print "* Fetching italc rooms from $italc_conf:\n";
+#     #if (not -e $italc_conf_dir){
+#     #    system("mkdir -p $italc_conf_dir");
+#     #}
+#     if (not -e $italc_conf){
+#         &log_script_exit("$italc_conf is missing",1,1,0,@arguments);
+#         exit;
+#     } 
+#     if (not -e $italc_key_dir_admin){
+#         system("mkdir -p $italc_key_dir_admin");
+#     }
+#     if (not -e $italc_key_dir_supporter){
+#         system("mkdir -p $italc_key_dir_supporter");
+#     }
+#     if (not -e $italc_key_dir_teacher){
+#         system("mkdir -p $italc_key_dir_teacher");
+#     }
+#     open(ITALCROOM, "<$italc_conf");
+#     while(<ITALCROOM>){
+#         chomp();
+#         s/ //g;
+#         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+#             next;
+#         }
+#         if($_ eq ""){ 
+#             next;
+#         }
 
-        my $line=$_;
-        my ($room,$italc_classroom_name,
-            $host_string,$invisible_host_string) = split(/:/,$line);
-        if($Conf::log_level>=2){
-            print "   * $room\n";
-        }
+#         my $line=$_;
+#         my ($room,$italc_classroom_name,
+#             $host_string,$invisible_host_string) = split(/:/,$line);
+#         if($Conf::log_level>=2){
+#             print "   * $room\n";
+#         }
 
-        # room
-        push @italc_rooms, $room;
+#         # room
+#         push @italc_rooms, $room;
 
-        # classroom name
-        if ($italc_classroom_name eq ""){
-            $italc_classroom_name=$room;
-        } 
-        $italc_rooms{$room}{'NAME'}=$italc_classroom_name;
+#         # classroom name
+#         if ($italc_classroom_name eq ""){
+#             $italc_classroom_name=$room;
+#         } 
+#         $italc_rooms{$room}{'NAME'}=$italc_classroom_name;
 
-        # hosts that can use italc
-        if (not defined $host_string or $host_string eq ""){
-            $italc_rooms{$room}="seen";
-            # ERROR: italc rooms must have a master
-            &log_script_exit("$room without master (italc)",1,1,0,@arguments);
-        } else {
-            my @teacher_hosts = split(/,/,$host_string);
-            my $i=1;
-            foreach my $host (@teacher_hosts){
-                if($Conf::log_level>=2){
-                    print "      * $host is teacher host (type=1)\n";
-                }
-                $italc_rooms{$room}{"$host"}{'TYPE'}="teacher host";
-                if ($i==1){
-                    #remember first entry
-                    $italc_rooms{$room}{'MASTER'}="$host";
-                }
-                $i++;
-            }
-        }
+#         # hosts that can use italc
+#         if (not defined $host_string or $host_string eq ""){
+#             $italc_rooms{$room}="seen";
+#             # ERROR: italc rooms must have a master
+#             &log_script_exit("$room without master (italc)",1,1,0,@arguments);
+#         } else {
+#             my @teacher_hosts = split(/,/,$host_string);
+#             my $i=1;
+#             foreach my $host (@teacher_hosts){
+#                 if($Conf::log_level>=2){
+#                     print "      * $host is teacher host (type=1)\n";
+#                 }
+#                 $italc_rooms{$room}{"$host"}{'TYPE'}="teacher host";
+#                 if ($i==1){
+#                     #remember first entry
+#                     $italc_rooms{$room}{'MASTER'}="$host";
+#                 }
+#                 $i++;
+#             }
+#         }
 
-        # invisible hosts
-        if (not defined $invisible_host_string or 
-                        $invisible_host_string eq ""){
-            # do nothing
-        } else {
-            my @invisible_hosts = split(/,/,$invisible_host_string);
-            foreach my $host (@invisible_hosts){
-                if($Conf::log_level>=2){
-                    print "      * $host is an invisible host (visible=no)\n";
-                }
-                $italc_rooms{$room}{"$host"}{'INVISIBLE'}="yes";
-            }
-        }
-    }
-    close(ITALCROOM);
-}
+#         # invisible hosts
+#         if (not defined $invisible_host_string or 
+#                         $invisible_host_string eq ""){
+#             # do nothing
+#         } else {
+#             my @invisible_hosts = split(/,/,$invisible_host_string);
+#             foreach my $host (@invisible_hosts){
+#                 if($Conf::log_level>=2){
+#                     print "      * $host is an invisible host (visible=no)\n";
+#                 }
+#                 $italc_rooms{$room}{"$host"}{'INVISIBLE'}="yes";
+#             }
+#         }
+#     }
+#     close(ITALCROOM);
+# }
 
