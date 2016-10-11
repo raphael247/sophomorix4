@@ -225,13 +225,13 @@ my @killing_examaccounts=();
 my @adding_computers=();
 my @killing_computers=();
 
-# DNS-Zones
+# DNS Zones
 my @adding_dnszones=();
 my @killing_dnszones=();
 
-# DNS-Hosts
-my @adding_dnshosts=();
-my @killing_dnshosts=();
+# DNS Nodes
+my @adding_dnsnodes=();
+my @killing_dnsnodes=();
 
 my %pxe = qw(ml ok
             );
@@ -760,15 +760,15 @@ if($no_sync==1){
 
     # DNS Hosts
     print "\n";
-    $count=$#killing_dnshosts+1;
+    $count=$#killing_dnsnodes+1;
     &print_title("DNS-Hosts that must be killed: ($count)");
-    foreach my $dns_node (@killing_dnshosts){
+    foreach my $dns_node (@killing_dnsnodes){
         print "KILL: $dns_node\n";
     }
     print "\n";
-    $count=$#adding_dnshosts+1;
+    $count=$#adding_dnsnodes+1;
     &print_title("DNS-Hosts that must be added: ($count)");
-    foreach my $dns_node (@adding_dnshosts){
+    foreach my $dns_node (@adding_dnsnodes){
         print "ADD: $dns_node\n";
     }
 
@@ -910,7 +910,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # DNS Hosts
     &print_title("Killing DNS Hosts:");
     my $dns_node_count=1;
-    foreach my $dns_node (@killing_dnshosts){
+    foreach my $dns_node (@killing_dnsnodes){
 ## ??????????????????? read data from hash
 #        &AD_dns_kill({ldap=>$ldap, 
 #                      root_dse=>$root_dse,
@@ -926,7 +926,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     &print_title("Adding DNS Hosts:");
     $dns_node_count=1;
-    foreach my $dns_line (@adding_dnshosts){
+    foreach my $dns_line (@adding_dnsnodes){
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
                         dns_line=>$dns_line,
@@ -1543,14 +1543,14 @@ sub push_kill_computer {
 
 sub push_add_dnsnode {
     my ($add) = @_;
-    push @adding_dnshosts, $add;
+    push @adding_dnsnodes, $add;
 }
 
 
 
 sub push_kill_dnsnode {
     my ($kill) = @_;
-    push @killing_dnshosts, $kill;
+    push @killing_dnsnodes, $kill;
 }
 
 
