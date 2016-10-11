@@ -172,7 +172,7 @@ my $password="";
 my %domcomputers_file=();
 my @domcomputers_file=();
 my %rooms_file=();
-my %examaccounts_file=();
+#my %examaccounts_file=();
 
 # new: one hash for all
 my %devices_file=();
@@ -357,7 +357,7 @@ if ($dns_test==1){
     if($Conf::log_level>=2){
         print Dumper(%domcomputers_file);
         print Dumper(%rooms_file);
-        print Dumper(%examaccounts_file);
+#        print Dumper(%examaccounts_file);
     }
     foreach my $host (@domcomputers_file){
       my $file_ip=$devices_file{'domcomputers'}{$host}{"IPv4"};
@@ -808,8 +808,7 @@ if($no_sync==1){
 #    print Dumper(%devices_system);
 
 #    print Dumper(%domcomputers_file);
-    print Dumper(%rooms_file);
-#    print Dumper(%examaccounts_file);
+#    print Dumper(%rooms_file);
 #    print Dumper(%dnszones_file);
 #    print Dumper(%dnshosts_file);
 #    print Dumper(%devices_file);
