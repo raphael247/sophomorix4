@@ -682,7 +682,7 @@ foreach my $device_file (@filelist){
 ############################################################################
 
 # examaccounts to kill
-foreach my $examaccount (keys %{$devices_system{'ExamAccount'}}) {
+foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
     if (not exists $devices_file{'domcomputers'}{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
@@ -758,7 +758,7 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-#    print Dumper(%devices_file);
+    #print Dumper(%devices_file);
     exit;
 } 
 

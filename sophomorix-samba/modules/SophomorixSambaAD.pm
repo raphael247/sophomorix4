@@ -1340,12 +1340,11 @@ sub AD_computer_fetch {
     &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
-        if($Conf::log_level>=2){
-            print "   * ",$entry->get_value('sAMAccountName'),
-                  "  in Room  ".$entry->get_value('sophomorixAdminClass')."\n";
-        }
         my $sam=$entry->get_value('sAMAccountName');
         my $room=$entry->get_value('sophomorixAdminClass');
+        if($Conf::log_level>=2){
+            print "   * $sam in Room $room\n";
+        }
         $devices_system{'ExamAccounts'}{$sam}{'room'}=$room;
         $devices_system{'ExamAccounts'}{$sam}{'sophomorixAdminClass'}=$room;
     }
