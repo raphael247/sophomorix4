@@ -148,6 +148,7 @@ chomp($today);
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $list_files=0;
 my $no_sync=0;
 my $birthdate="1970-01-01";
 my $time_stamp_AD=&time_stamp_AD();
@@ -255,6 +256,7 @@ my $testopt=GetOptions(
        "verbose|v+" => \$Conf::log_level,
        "help|h" => \$help,
        "i|info" => \$info,
+       "list-files" => \$list_files,
        "p|print" => \$print,
        "no-sync" => \$no_sync,
        "set-computer-passwords" => \$set_computer_passwords,
@@ -278,23 +280,24 @@ my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
                             });
 
-# ===========================================================================
+############################################################################
 # --help
-# ===========================================================================
+############################################################################
 if ($help==1) {
    # Scriptname ermitteln
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
-sophomorix-device adds the DomainComputer and Examaccount 
-  from ');
-   print "$host_workstation";
-   print('
+sophomorix-device adds Devices to the system:
+    DomainComputerAccount
+    Examaccount
+    DNS entries 
 
 Options:
   -h   /  --help
   -i   /  --info
+  --list-files              (list processed files and exit)
   -v   /  --verbose
   -vv  /  --verbose --verbose
 
@@ -319,9 +322,19 @@ Please see the sophomorix-device(8) man pages for full documentation
 }
 
 
-# get this info from multischool.conf
-# ??????????????????????????????????????
-#$school_token="bsz";
+
+############################################################################
+# --list-files (does not modify system)
+############################################################################
+if ($list_files==1){
+    print "\n";
+    &print_title("Reading the following device files:");
+    foreach my $file (@filelist){
+        print "   * $file\n";
+    }
+    exit;
+}
+
 
 
 ############################################################################
@@ -359,12 +372,15 @@ if ($dns_test==1){
                 if ($file_ip eq $rr->address){
                     print "OK: $host has IP: ",$rr->address,"\n";
                 } else {
-                    print "ERROR $host has IP: ",$rr->address," (expected was $file_ip)\n";
+                    print "ERROR $host has IP: ",
+                           $rr->address," (expected was $file_ip)\n";
                 }
             }
         } else {
             # no reply: query failed
-            warn "    * query failed: ", $res->errorstring, " ($host has expected IP $file_ip)\n";
+            warn "    * query failed: ", 
+                 $res->errorstring, 
+                 " ($host has expected IP $file_ip)\n";
         }
     }
     exit;
@@ -405,7 +421,8 @@ if ($dns_show==1 or $dns_kill==1){
             push @zonelist, $zone_name;
 
         }
-        my ($count,$dn_dns_zone,$cn_dns_zone,$info)=&AD_object_search($ldap,$root_dse,"dnsZone",$zone_name);
+        my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
+            &AD_object_search($ldap,$root_dse,"dnsZone",$zone_name);
         $zonehash{$zone_name}{'DN'}=$dn_dns_zone;
         $zonehash{$zone_name}{'CN'}=$cn_dns_zone;
         $zonehash{$zone_name}{'count'}=$count;
@@ -414,9 +431,6 @@ if ($dns_show==1 or $dns_kill==1){
     # add the $root_dns zone (will not be deleted later)
     unshift @zonelist, $root_dns;
 
-    #print Dumper(%zonehash);
-    #exit;
- 
     # print output starts here
     my $zone_count=1;
     foreach my $zone (@zonelist){
@@ -470,7 +484,6 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 &print_title("Asking the system for exam and computer accounts ...");
 
-#my ($ref_domcomputers,$ref_rooms,$ref_examaccounts) = &get_sys_workstations();
 my ($ref_domcomputers,
     $ref_rooms,
     $ref_examaccounts,
@@ -486,180 +499,188 @@ my %dnshosts_system = %$ref_dnshosts;
 
 my @dns_nodes=();
 
-# /etc/linuxmuster/workstation
+# /etc/linuxmuster/classroom
 my %hosts_file=();
 &get_classrooms();
 
 
 
-
-# ===========================================================================
-# --print     (does not modify system)
-# ===========================================================================
 if ($print==1){
-    if (not -e ${host_workstation}){
-        print "\n$host_workstation does not exist\n\n";
-        exit 1;
-    }
-
-    my $admins="";
-    if (defined $Conf::admins_print){
-        if ($Conf::admins_print ne ""){
-	    $admins=$Conf::admins_print;
-        }
-    }
-
-    my $out_base="/etc/linuxmuster/workstations_formatted";
-    my $out_dir="/etc/linuxmuster";
-    my $out_file="$out_base".".tex";
-    my $out_file_dvi="$out_base".".dvi";
-    my @line=();
-    my $host=0; # counter for the hosts
-    # draw a horizontal line in the table after this many lines of text
-    my $hor_lines=5; 
-    my $line_count=1;
-
-    print "Writing to $out_file";
-    open(TEX, ">$out_file");
-
-    print TEX '\documentclass[a4paper, twoside]{article}',"\n",
-          '\usepackage{longtable}',"\n",
-          '\usepackage{ngerman}',"\n",
-          '\usepackage{layout}',"\n",
-          '\usepackage{fancyhdr}',"\n",
-          '\usepackage{lastpage}',"\n",
-          '\setlength{\oddsidemargin}{-5mm}',"\n",
-          '\setlength{\evensidemargin}{-16.8mm}',"\n",
-          '\setlength{\textwidth}{180mm}',"\n",
-          '\setlength{\textheight}{255mm}',"\n",
-          '\setlength{\topmargin}{-20mm}',"\n",
-          '\pagestyle{fancy}',"\n",
-          "\\lhead{$Conf::schul_name}","\n",
-          "\\rhead{Seite \\thepage/\\pageref{LastPage}}","\n",
-          "\\cfoot{$admins}","\n",
-          '\pagestyle{fancy}',"\n",
-          '\renewcommand{\baselinestretch}{1.2}',"\n\n",
-
-          '\begin{document}',"\n\n",
-          # show layout of page
-          # '\layout',"\n\n",
-          '\begin{longtable}{|r|c|c|c|c|c|} ',"\n",
-          '   \caption*{\large \bfseries Rechner und ',
-          '             Drucker ',
-          "($Conf::schul_name)",
-          '}\\\\ \\hline',"\n",
-          '   \bfseries Nr. & \bfseries DNS-Name & \bfseries Raum & ',
-          '      \bfseries HW-Klasse & \bfseries IP-Adresse & ',
-          '      \bfseries MAC-Adresse \\\\ \hline \hline',"\n",
-          '   \endhead',"\n",
-          '      \hline \multicolumn{6}{r}{Fortsetzung auf der n\"{a}chsten Seite ...}',"\n",
-          '   \endfoot',"\n",
-          '      \hline ',"\n",
-          '   \endlastfoot',"\n";
-
-    open(IN, "<${host_workstation}");
-    while(<IN>){
-        chomp();
-        my $line=$_;
-        if ($line eq "") {
-	    next;
-        } elsif(/^\#\#/){
-	    print "Comment $line \n";
-        } elsif (/^\#/){
-	    print "Header $line \n";
-            s/^\#//g;
-            if ($line eq "") {
-	        next;
-            }
-            $line=&latexize_string($line);
-            print TEX "\\hline \\hline  ",
-                 "\\multicolumn{6}{|l|}{\\rule{0mm}{4mm}\\bfseries $line}",
-                 " \\\\ \\hline ","\n";
-        } else {
-            @line = split(/;/);
-            $host++;
-            $host=&latexize_string($host);
-            $line[1]=&latexize_string($line[1]);
-            $line[2]=&latexize_string($line[2]);
-            $line[3]=&latexize_string($line[3]);
-            $line[4]=&latexize_string($line[4]);
-            $line="$host & $line[1] & $line[0] & $line[2]".
-                  " & $line[4] & \\texttt{$line[3]} \\\\ ";
-            print TEX $line; 
-            # Horizontal lines
-             if ($line_count==$hor_lines){
-                 print TEX ' \hline',"\n";
-                 $line_count=0;
-             } else {
-                 print TEX "\n";
-             }
-             $line_count++;
-        }
-    }
-    close(IN);
-
-    print TEX '\end{longtable}',"\n";
-    print TEX "\\textbf{$host Rechner/Drucker sind im p\"{a}dagogischen ",
-              "Netz ($Conf::schul_name).} \n \n";
-    print TEX "Ausdruck: \\today .",
-              "\n \n",
-              "\\textbf{Die Netzwerkadministratoren:}",
-              "\n",
-              "$admins","\n";
-    print TEX "\n",'\end{document}',"\n";
-    close(TEX);
-
-    # latex
-    system("cd $out_dir; latex $out_file");
-    system("cd $out_dir; latex $out_file");
-    system("cd $out_dir; dvips $out_file_dvi");
+    print "--print not working\n";
     exit;
 }
 
+# # ===========================================================================
+# # --print     (does not modify system)
+# # ===========================================================================
+# if ($print==1){
+#     if (not -e ${host_workstation}){
+#         print "\n$host_workstation does not exist\n\n";
+#         exit 1;
+#     }
+
+#     my $admins="";
+#     if (defined $Conf::admins_print){
+#         if ($Conf::admins_print ne ""){
+# 	    $admins=$Conf::admins_print;
+#         }
+#     }
+
+#     my $out_base="/etc/linuxmuster/workstations_formatted";
+#     my $out_dir="/etc/linuxmuster";
+#     my $out_file="$out_base".".tex";
+#     my $out_file_dvi="$out_base".".dvi";
+#     my @line=();
+#     my $host=0; # counter for the hosts
+#     # draw a horizontal line in the table after this many lines of text
+#     my $hor_lines=5; 
+#     my $line_count=1;
+
+#     print "Writing to $out_file";
+#     open(TEX, ">$out_file");
+
+#     print TEX '\documentclass[a4paper, twoside]{article}',"\n",
+#           '\usepackage{longtable}',"\n",
+#           '\usepackage{ngerman}',"\n",
+#           '\usepackage{layout}',"\n",
+#           '\usepackage{fancyhdr}',"\n",
+#           '\usepackage{lastpage}',"\n",
+#           '\setlength{\oddsidemargin}{-5mm}',"\n",
+#           '\setlength{\evensidemargin}{-16.8mm}',"\n",
+#           '\setlength{\textwidth}{180mm}',"\n",
+#           '\setlength{\textheight}{255mm}',"\n",
+#           '\setlength{\topmargin}{-20mm}',"\n",
+#           '\pagestyle{fancy}',"\n",
+#           "\\lhead{$Conf::schul_name}","\n",
+#           "\\rhead{Seite \\thepage/\\pageref{LastPage}}","\n",
+#           "\\cfoot{$admins}","\n",
+#           '\pagestyle{fancy}',"\n",
+#           '\renewcommand{\baselinestretch}{1.2}',"\n\n",
+
+#           '\begin{document}',"\n\n",
+#           # show layout of page
+#           # '\layout',"\n\n",
+#           '\begin{longtable}{|r|c|c|c|c|c|} ',"\n",
+#           '   \caption*{\large \bfseries Rechner und ',
+#           '             Drucker ',
+#           "($Conf::schul_name)",
+#           '}\\\\ \\hline',"\n",
+#           '   \bfseries Nr. & \bfseries DNS-Name & \bfseries Raum & ',
+#           '      \bfseries HW-Klasse & \bfseries IP-Adresse & ',
+#           '      \bfseries MAC-Adresse \\\\ \hline \hline',"\n",
+#           '   \endhead',"\n",
+#           '      \hline \multicolumn{6}{r}{Fortsetzung auf der n\"{a}chsten Seite ...}',"\n",
+#           '   \endfoot',"\n",
+#           '      \hline ',"\n",
+#           '   \endlastfoot',"\n";
+
+#     open(IN, "<${host_workstation}");
+#     while(<IN>){
+#         chomp();
+#         my $line=$_;
+#         if ($line eq "") {
+# 	    next;
+#         } elsif(/^\#\#/){
+# 	    print "Comment $line \n";
+#         } elsif (/^\#/){
+# 	    print "Header $line \n";
+#             s/^\#//g;
+#             if ($line eq "") {
+# 	        next;
+#             }
+#             $line=&latexize_string($line);
+#             print TEX "\\hline \\hline  ",
+#                  "\\multicolumn{6}{|l|}{\\rule{0mm}{4mm}\\bfseries $line}",
+#                  " \\\\ \\hline ","\n";
+#         } else {
+#             @line = split(/;/);
+#             $host++;
+#             $host=&latexize_string($host);
+#             $line[1]=&latexize_string($line[1]);
+#             $line[2]=&latexize_string($line[2]);
+#             $line[3]=&latexize_string($line[3]);
+#             $line[4]=&latexize_string($line[4]);
+#             $line="$host & $line[1] & $line[0] & $line[2]".
+#                   " & $line[4] & \\texttt{$line[3]} \\\\ ";
+#             print TEX $line; 
+#             # Horizontal lines
+#              if ($line_count==$hor_lines){
+#                  print TEX ' \hline',"\n";
+#                  $line_count=0;
+#              } else {
+#                  print TEX "\n";
+#              }
+#              $line_count++;
+#         }
+#     }
+#     close(IN);
+
+#     print TEX '\end{longtable}',"\n";
+#     print TEX "\\textbf{$host Rechner/Drucker sind im p\"{a}dagogischen ",
+#               "Netz ($Conf::schul_name).} \n \n";
+#     print TEX "Ausdruck: \\today .",
+#               "\n \n",
+#               "\\textbf{Die Netzwerkadministratoren:}",
+#               "\n",
+#               "$admins","\n";
+#     print TEX "\n",'\end{document}',"\n";
+#     close(TEX);
+
+#     # latex
+#     system("cd $out_dir; latex $out_file");
+#     system("cd $out_dir; latex $out_file");
+#     system("cd $out_dir; dvips $out_file_dvi");
+#     exit;
+# }
 
 
-# ===========================================================================
-# --info (does not modify system)
-# ===========================================================================
+
 if ($info==1){
-    print "\n";
-    &print_title("Reading the following user files:");
-    foreach my $file (@filelist){
-        print "   * $file\n";
-    }
-
-    # fetch and sort rooms
-    my @rooms=();
-    while (my ($room,$v) = each %rooms_system){
-        push @rooms, $room;
-    }
-    @rooms = sort @rooms;
-
-    foreach my $room (@rooms){
-        my $classroom="";
-        my $italcroom="";
-        if (exists $class_rooms{$room}){
-            $classroom="(CLASSROOM) ";
-        }
-        if (exists $italc_rooms{$room}){
-            $italcroom="(ITALC ROOM) ";
-        }
-	print "ROOM: $room ${classroom}${italcroom}\n";
-        # fetch and sort examaccounts
-        my @examaccounts=();
-        while (my ($account,$room_entry) = each %examaccounts_system){
-            #print $account , " ", $roomentry, "\n";
-            if ($room_entry eq $room){
-                push @examaccounts,$account;
-            }
-        }
-        @examaccounts = sort @examaccounts;
-        foreach my $account (@examaccounts){
-            print "    HOST: $account\n";
-        }
-    }
-    exit 0;
+    print "--info Not working\n";
+    exit;
 }
+# # ===========================================================================
+# # --info (does not modify system)
+# # ===========================================================================
+# if ($info==1){
+#     print "\n";
+#     &print_title("Reading the following device files:");
+#     foreach my $file (@filelist){
+#         print "   * $file\n";
+#     }
+
+#     # fetch and sort rooms
+#     my @rooms=();
+#     while (my ($room,$v) = each %rooms_system){
+#         push @rooms, $room;
+#     }
+#     @rooms = sort @rooms;
+
+#     foreach my $room (@rooms){
+#         my $classroom="";
+#         my $italcroom="";
+#         if (exists $class_rooms{$room}){
+#             $classroom="(CLASSROOM) ";
+#         }
+#         if (exists $italc_rooms{$room}){
+#             $italcroom="(ITALC ROOM) ";
+#         }
+# 	print "ROOM: $room ${classroom}${italcroom}\n";
+#         # fetch and sort examaccounts
+#         my @examaccounts=();
+#         while (my ($account,$room_entry) = each %examaccounts_system){
+#             #print $account , " ", $roomentry, "\n";
+#             if ($room_entry eq $room){
+#                 push @examaccounts,$account;
+#             }
+#         }
+#         @examaccounts = sort @examaccounts;
+#         foreach my $account (@examaccounts){
+#             print "    HOST: $account\n";
+#         }
+#     }
+#     exit 0;
+# }
 
 
 
@@ -686,16 +707,6 @@ foreach my $device_file (@filelist){
     }
     close(DEVICES);
 }
-#old
-#open(WORKSTATION,"<${host_workstation}");
-#while(<WORKSTATION>){
-#    &analyze_line($_,$school_token,$prefix);
-#}
-#close(WORKSTATION);
-
-# syntax OK: -> 0
-#return 0;
-# systax ERROR -> 1
 
 &print_title("... No syntax errors in $host_workstation!");
 
@@ -805,8 +816,8 @@ if($no_sync==1){
 # ===========================================================================
 
 # calculate according to file
-$ou="BSZLEO";
-$school_token="bsz";
+#$ou="BSZLEO";
+#$school_token="bsz";
 
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
