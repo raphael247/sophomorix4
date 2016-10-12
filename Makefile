@@ -158,12 +158,13 @@ install-sophomorix-samba:
 # group owner is changed in postinst-script to lehrer
 #	@install -oroot -groot --mode=4750 sophomorix-base/scripts-teacher/sophomorix-*[a-z1-9] $(DESTDIR)/usr/bin
 # installing configs for root
+	@install -d -m755 -oroot -groot $(CONF)
 	@install -d -m755 -oroot -groot $(CONF)/user
 #	old
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix.conf $(CONF)/user
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix-schools.conf $(CONF)/user
 #	# New, temporary
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template $(CONF)/user/sophomorix.conf
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template $(CONF)/sophomorix.conf
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template $(CONF)/user/school.conf
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template $(CONF)/user/abc.school.conf
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template $(CONF)/user/bsz.school.conf

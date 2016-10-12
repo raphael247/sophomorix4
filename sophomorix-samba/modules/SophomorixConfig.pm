@@ -21,7 +21,7 @@ use MIME::Base64;
 
 
 # Reading configuration file
-#my $conf="/etc/sophomorix/user/sophomorix.conf";
+#my $conf="/etc/sophomorix/sophomorix.conf";
 #if (not -e $conf){
 #    print "ERROR: $conf not found!\n";
 #    exit;
