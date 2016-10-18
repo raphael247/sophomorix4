@@ -194,14 +194,14 @@ sub AD_dns_create {
     my $dns_admin_description = $arg_ref->{dns_admin_description};
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
-    my $dns_line = $arg_ref->{dns_line};
+#    my $dns_line = $arg_ref->{dns_line};
 
     # extract host from line (may become obsolete) ?????????????????ß
-    if (defined $dns_line and not defined $dns_node){
-        my @items = split(/;/,$dns_line);
-        $dns_node=$items[1];
-        $dns_ipv4=$items[4];
-    }
+#    if (defined $dns_line and not defined $dns_node){
+#        my @items = split(/;/,$dns_line);
+#        $dns_node=$items[1];
+#        $dns_ipv4=$items[4];
+#    }
 
     if($Conf::log_level>=1){
         print "\n";

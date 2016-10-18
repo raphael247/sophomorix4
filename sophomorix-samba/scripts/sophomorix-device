@@ -920,13 +920,15 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         $count++;
         #system("/usr/sbin/sophomorix-kill --killuser $computer");
     }
-    &print_title("Adding Workstations:");
+    &print_title("Adding Computers:");
     my $ws_count=1;
     foreach my $computer (@adding_computers){
-        my ($room,$user,@rest)=split(/;/,$computer);
+        #my ($room,$user,@rest)=split(/;/,$computer);
         # using saved, tokened values
-        my $room_saved=$devices_file{'device'}{$user}{'ROOM'};
-        my $ws_saved=$devices_file{'device'}{$user}{'WORKSTATION'};
+#        my $room_saved=$devices_file{'device'}{$user}{'ROOM'};
+#        my $ws_saved=$devices_file{'device'}{$user}{'WORKSTATION'};
+        my $room_saved=$devices_file{'device'}{$computer}{'ROOM'};
+        my $ws_saved=$devices_file{'device'}{$computer}{'WORKSTATION'};
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
                              ws_count=>$ws_count,
@@ -960,10 +962,13 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     &print_title("Adding dnsNodes:");
     $dns_node_count=1;
-    foreach my $dns_line (@adding_dnsnodes){
+#    foreach my $dns_line (@adding_dnsnodes){
+    foreach my $dns_node (@adding_dnsnodes){
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
-                        dns_line=>$dns_line,
+#                        dns_line=>$dns_line,
+                        dns_node=>$dns_node,
+                        dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
                         smb_pwd=>$smb_pwd,
                            });
         $dns_node_count++;
@@ -1311,12 +1316,14 @@ sub analyze_line {
         # check computer account
         if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$ws_token_account} ){
             # nonexisting --> add account
-            &push_add_computer($line_correct);
+            #&push_add_computer($line_correct);
+            &push_add_computer($ws_token_account);
         }
         # check dnsNode
         if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             # nonexisting --> add account
-            &push_add_dnsnode($line_correct);
+#            &push_add_dnsnode($line_correct);
+            &push_add_dnsnode($host_token);
         } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
             my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
