@@ -1329,10 +1329,10 @@ sub AD_get_AD {
             my $role=$entry->get_value('sophomorixRole');
             my $sn=$entry->get_value('sophomorixSchoolname');
             my $file=$entry->get_value('sophomorixAdminFile');
-            $AD{'objectclass'}{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
-            $AD{'objectclass'}{'computer'}{$sam}{'sophomorixRole'}=$role;
-            $AD{'objectclass'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
-            $AD{'objectclass'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+            $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+            $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixRole'}=$role;
+            $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
+            $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
@@ -1358,10 +1358,10 @@ sub AD_get_AD {
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
-            $AD{'objectclass'}{'group'}{$sam}{'room'}=$sam;
-            $AD{'objectclass'}{'group'}{$sam}{'sophomorixStatus'}=$stat;
-            $AD{'objectclass'}{'group'}{$sam}{'sophomorixType'}=$type;
-            $AD{'lookup'}{'groups_by_type'}{'room'}{$sam}=$type;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
+            #$AD{'lookup'}{'groups_by_type'}{'room'}{$sam}=$type;
 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
@@ -1388,8 +1388,8 @@ sub AD_get_AD {
             if($Conf::log_level>=2){
                 print "   * $sam in Room $room\n";
             }
-            $AD{'objectclass'}{'user'}{$sam}{'room'}=$room;
-            $AD{'objectclass'}{'user'}{$sam}{'sophomorixAdminClass'}=$room;
+            $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'room'}=$room;
+            $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminClass'}=$room;
         }
     }
 
@@ -1422,8 +1422,8 @@ sub AD_get_AD {
             }
             my $name=$entry->get_value('name');
             my $desc=$entry->get_value('adminDescription');
-            $AD{'objectclass'}{'dnsZone'}{$zone}{'name'}=$name;
-            $AD{'objectclass'}{'dnsZone'}{$zone}{'adminDescription'}=$desc;
+            $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
+            $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
             if($Conf::log_level>=2){
                 print "   * ",$entry->get_value('dc'),"\n";
             }
@@ -1435,8 +1435,7 @@ sub AD_get_AD {
     if ($dnsnodes eq "TRUE"){
         # sophomorix dnsNodes from ldap by dnsZone
         # go through all dnsZones
-#        foreach my $dns_zone (keys %{$devices_system{'dnsZones'}}) {
-        foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'} }) {
+        foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string} }) {
 	    print "Zone";
             my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
                 &AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
@@ -1463,10 +1462,10 @@ sub AD_get_AD {
                 my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
                 my $record=$entry->get_value('dnsRecord');
                 my $desc=$entry->get_value('adminDescription');
-                $AD{'objectclass'}{'dnsNode'}{$dc}{'dnsNode'}=$dc;
-                $AD{'objectclass'}{'dnsNode'}{$dc}{'dnsZone'}=$dns_zone;
-                $AD{'objectclass'}{'dnsNode'}{$dc}{'IPv4'}=$ip;
-                $AD{'objectclass'}{'dnsNode'}{$dc}{'adminDescription'}=$desc;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'dnsNode'}=$dc;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'IPv4'}=$ip;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'adminDescription'}=$desc;
                 if($Conf::log_level>=2){
                     print "   * $dc\n";
                 }

@@ -486,11 +486,11 @@ my %devices_system= %$ref_devices;
 
 my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            root_dse=>$root_dse,
-                           computers=>"FALSE",
-                      #     rooms=>"FALSE",
-                            examaccounts=>"FALSE",
-                            dnszones=>"FALSE",
-                            dnsnodes=>"TRUE",
+                           computers=>"TRUE",
+                           rooms=>"TRUE",
+                           examaccounts=>"TRUE",
+                           dnszones=>"TRUE",
+                           dnsnodes=>"TRUE",
              });
 my %AD= %$ref_AD; 
 
