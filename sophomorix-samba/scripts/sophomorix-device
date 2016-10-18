@@ -905,9 +905,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              group => $room_saved,
                              addmember => $exam_account,
                             });   
-        #system("/usr/sbin/sophomorix-useradd --examaccount $u --unix-group $g");
-        #system("/usr/sbin/sophomorix-passwd -u $u --random --hide");
-        #system("/usr/sbin/sophomorix-quota -u $u");
     }
     &print_title("Killing Workstations:");
     my $count=1;
@@ -918,20 +915,12 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                            count=>$count,
                          });
         $count++;
-        #system("/usr/sbin/sophomorix-kill --killuser $computer");
     }
     &print_title("Adding Computers:");
     my $ws_count=1;
     foreach my $computer (@adding_computers){
-        #my ($room,$user,@rest)=split(/;/,$computer);
-        # using saved, tokened values
-#        my $room_saved=$devices_file{'device'}{$user}{'ROOM'};
-#        my $ws_saved=$devices_file{'device'}{$user}{'WORKSTATION'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
-#        my $room_saved=$devices_file{'computer'}{$computer}{'room'};
-#        my $ws_saved=$devices_file{'computer'}{$computer}{'name'};
-	print "<$computer> --> <$room_saved> --> <$ws_saved>\n";
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
                              ws_count=>$ws_count,
@@ -944,8 +933,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              creationdate=>$time_stamp_AD,
                            });
         $ws_count++;
-        #system("/usr/sbin/sophomorix-useradd --computer $u_comp");
-        #system("/usr/sbin/sophomorix-passwd --force -u $u_comp --pass $pass");
     }
 
 
@@ -1311,7 +1298,6 @@ sub analyze_line {
         if ($account_flag==1){
             $devices_file{'device'}{$host_token}{'LINE'}=$line_correct;
             $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
-#            $devices_file{'computer'}{$ws_token_account}{'NAME'}=$host_token;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
