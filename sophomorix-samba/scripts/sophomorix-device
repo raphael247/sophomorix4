@@ -120,6 +120,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
                                  AD_computer_fetch
+                                 AD_get_AD
                                  AD_object_search
                                  AD_user_kill
                                  AD_computer_kill
@@ -475,9 +476,25 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 &print_title("Asking the system for Computers/ExamAccounts and DNS data ...");
 
-# fetch system data
+# fetch system data old
 my ($ref_devices) = &AD_computer_fetch($ldap,$root_dse);
 my %devices_system= %$ref_devices; 
+
+# fetch system data new
+#my ($ref_AD) = &AD_get_AD($ldap,$root_dse);
+
+
+my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           computers=>"FALSE",
+                      #     rooms=>"FALSE",
+                            examaccounts=>"FALSE",
+                            dnszones=>"FALSE",
+                            dnsnodes=>"TRUE",
+             });
+my %AD= %$ref_AD; 
+
+
 
 my @dns_nodes=();
 
@@ -794,7 +811,7 @@ if($no_sync==1){
     #print Dumper(%devices_file{'domcomputers'});
     #print Dumper(%devices_file);
     #print Dumper(%devices_system);
-    #print Dumper(%devices_system{'ExamAccounts'});
+    print Dumper(%AD);
     exit;
 } 
 
