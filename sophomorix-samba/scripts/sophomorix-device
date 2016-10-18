@@ -119,7 +119,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
-                                 AD_computer_fetch
                                  AD_get_AD
                                  AD_object_search
                                  AD_user_kill
@@ -477,13 +476,10 @@ if ($dns_show==1 or $dns_kill==1){
 &print_title("Asking the system for Computers/ExamAccounts and DNS data ...");
 
 # fetch system data old
-my ($ref_devices) = &AD_computer_fetch($ldap,$root_dse);
-my %devices_system= %$ref_devices; 
+#my ($ref_devices) = &AD_computer_fetch($ldap,$root_dse);
+#my %devices_system= %$ref_devices; 
 
 # fetch system data new
-#my ($ref_AD) = &AD_get_AD($ldap,$root_dse);
-
-
 my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            root_dse=>$root_dse,
                            computers=>"TRUE",
@@ -706,7 +702,8 @@ foreach my $device_file (@filelist){
 ############################################################################
 
 # ExamAccounts to kill
-foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
+#foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
+foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
     if (not exists $devices_file{'domcomputers'}{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
@@ -715,7 +712,8 @@ foreach my $examaccount (keys %{$devices_system{'ExamAccounts'}}) {
 
 # ExamAccounts to add
 foreach my $examaccount (keys %{$devices_file{'domcomputers'}}) {
-    if (not exists $devices_system{'ExamAccounts'}{$examaccount}){
+#    if (not exists $devices_system{'ExamAccounts'}{$examaccount}){
+    if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
         # host is not in system
         #&push_add_examaccount($devices_file{'domcomputers'}{$examaccount}{'LINE'});
         &push_add_examaccount($examaccount);
@@ -731,7 +729,8 @@ foreach my $examaccount (keys %{$devices_file{'domcomputers'}}) {
 }
 
 # computers to kill
-foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
+#foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
+foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
     if (not exists $devices_file{'computer'}{$computer}){
         # host is not in file anymore
         &push_kill_computer($computer);
@@ -739,7 +738,8 @@ foreach my $computer (keys %{$devices_system{'domcomputers'}}) {
 }
 
 # dnsNodes to kill
-foreach my $dnsnode (keys %{$devices_system{'dnsNodes'}}) {
+#foreach my $dnsnode (keys %{$devices_system{'dnsNodes'}}) {
+foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}}) {
     if (not exists $devices_file{'dnsNodes'}{$dnsnode}){
         # host is not in file anymore
         &push_kill_dnsnode($dnsnode);
@@ -811,7 +811,8 @@ if($no_sync==1){
     #print Dumper(%devices_file{'domcomputers'});
     #print Dumper(%devices_file);
     #print Dumper(%devices_system);
-    print Dumper(%AD);
+
+#    print Dumper(%AD);
     exit;
 } 
 
@@ -950,9 +951,11 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $dns_node (@killing_dnsnodes){
         &AD_dns_kill({ldap=>$ldap, 
                       root_dse=>$root_dse,
-                      dns_zone=>$devices_system{'dnsNodes'}{$dns_node}{'dnsZone'},
+#                      dns_zone=>$devices_system{'dnsNodes'}{$dns_node}{'dnsZone'},
+                      dns_zone=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dns_node}{'dnsZone'},
                       dns_node=>$dns_node,
-                      dns_ipv4=>$devices_system{'dnsNodes'}{$dns_node}{'IPv4'},
+#                      dns_ipv4=>$devices_system{'dnsNodes'}{$dns_node}{'IPv4'},
+                      dns_ipv4=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dns_node}{'IPv4'},
                       smb_pwd=>$smb_pwd,
                     });
         $dns_node_count++;
@@ -981,9 +984,19 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 # ===========================================================================
 if ($set_computer_passwords==1){
     print "Setting password for all Computer accounts:\n";
-    my ($ref_devices) = &AD_computer_fetch();
+    #my ($ref_devices) = &AD_computer_fetch();
+    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           computers=>"TRUE",
+                           rooms=>"TRUE",
+                           examaccounts=>"TRUE",
+                           dnszones=>"TRUE",
+                           dnsnodes=>"TRUE",
+             });
+
     my $count=1;
-    foreach my $comp (keys %{$devices_system{'domcomputers'}}) {
+#    foreach my $comp (keys %{$devices_system{'domcomputers'}}) {
+    foreach my $comp (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
         my $pw;
         if ($password ne ""){
             # password by option
@@ -1313,16 +1326,20 @@ sub analyze_line {
 #        } 
 
         # check computer account
-        if (not exists $devices_system{'domcomputers'}{$ws_token_account} ){
+#        if (not exists $devices_system{'domcomputers'}{$ws_token_account} ){
+        if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$ws_token_account} ){
             # nonexisting --> add account
             &push_add_computer($line_correct);
         }
         # check dnsNode
-        if (not exists $devices_system{'dnsNodes'}{$host_token} ){
+#        if (not exists $devices_system{'dnsNodes'}{$host_token} ){
+        if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$host_token} ){
             # nonexisting --> add account
             &push_add_dnsnode($line_correct);
-        } elsif (exists $devices_system{'dnsNodes'}{$host_token} ){
-            my $ip_system=$devices_system{'dnsNodes'}{$host_token}{'IPv4'};
+#        } elsif (exists $devices_system{'dnsNodes'}{$host_token} ){
+        } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$host_token} ){
+#            my $ip_system=$devices_system{'dnsNodes'}{$host_token}{'IPv4'};
+            my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$host_token}{'IPv4'};
             my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
