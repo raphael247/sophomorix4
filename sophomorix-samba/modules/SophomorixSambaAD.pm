@@ -480,6 +480,11 @@ sub AD_computer_create {
 #    my $dn = "CN=".$name_token.",".$container."OU=".$ou.",".$root_dse;
     my $dn = "CN=".$name.",".$container."OU=".$ou.",".$root_dse;
 
+    if ($school_token eq ""){
+        # empty token creates error on AD add 
+        $school_token="---";
+    }
+
     if($Conf::log_level>=1){
         &Sophomorix::SophomorixBase::print_title(
               "Creating workstation $ws_count: $name");
@@ -603,6 +608,11 @@ sub AD_user_create {
     my $charmap = Unicode::Map8->new('latin1')  or  die;
     # surround the PW with double quotes and convert it to UTF-16
     my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
+
+    if ($school_token eq ""){
+        # empty token creates error on AD add 
+        $school_token="---";
+    }
 
     if($Conf::log_level>=1){
 #        print "\n";

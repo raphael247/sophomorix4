@@ -309,7 +309,10 @@ sub config_sophomorix_read {
             if ($var eq "SCHOOL_NAME" or
                 $var eq "QUOTA_DEFAULT_TEACHER" or
                 $var eq "QUOTA_DEFAULT_STUDENT" or
-                $var eq "QUOTA_DEFAULT_EXAM"
+                $var eq "QUOTA_DEFAULT_EXAM" or
+                $var eq "MAILQUOTA_DEFAULT_TEACHER" or
+                $var eq "MAILQUOTA_DEFAULT_STUDENT" or
+                $var eq "MAILQUOTA_DEFAULT_EXAM"
                ){
                 $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
             } elsif ($var eq "OU"){
