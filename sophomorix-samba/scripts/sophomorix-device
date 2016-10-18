@@ -354,7 +354,7 @@ if ($dns_test==1){
         print Dumper(%devices_file);
     }
     foreach my $host (@domcomputers_file){
-      my $file_ip=$devices_file{'domcomputers'}{$host}{"IPv4"};
+      my $file_ip=$devices_file{'device'}{$host}{"IPv4"};
       my $reply = $res->search($host);
         if ($reply) {
             foreach my $rr ($reply->answer) {
@@ -699,17 +699,17 @@ foreach my $device_file (@filelist){
 
 # ExamAccounts to kill
 foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
-    if (not exists $devices_file{'domcomputers'}{$examaccount}){
+    if (not exists $devices_file{'device'}{$examaccount}){
         # host is not in file anymore
         &push_kill_examaccount($examaccount);
     }
 }
 
 # ExamAccounts to add
-foreach my $examaccount (keys %{$devices_file{'domcomputers'}}) {
+foreach my $examaccount (keys %{$devices_file{'device'}}) {
     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
         # host is not in system
-        #&push_add_examaccount($devices_file{'domcomputers'}{$examaccount}{'LINE'});
+        #&push_add_examaccount($devices_file{'device'}{$examaccount}{'LINE'});
         &push_add_examaccount($examaccount);
     }
 # falscher raum
@@ -730,9 +730,17 @@ foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
     }
 }
 
+# # computers to add
+# foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
+#     if (not exists $devices_file{'computer'}{$computer}){
+#         # host is not in file anymore
+#         &push_kill_computer($computer);
+#     }
+# }
+
 # dnsNodes to kill
 foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
-    if (not exists $devices_file{'dnsNodes'}{$dnsnode}){
+    if (not exists $devices_file{'dnsNode'}{$dnsnode}){
         # host is not in file anymore
         &push_kill_dnsnode($dnsnode);
     }
@@ -788,19 +796,19 @@ if($no_sync==1){
     # dnsNodes
     print "\n";
     $count=$#killing_dnsnodes+1;
-    &print_title("DNS-Hosts that must be killed: ($count)");
+    &print_title("DNS-Nodes that must be killed: ($count)");
     foreach my $dns_node (@killing_dnsnodes){
         print "KILL: $dns_node\n";
     }
     print "\n";
     $count=$#adding_dnsnodes+1;
-    &print_title("DNS-Hosts that must be added: ($count)");
+    &print_title("DNS-Nodes that must be added: ($count)");
     foreach my $dns_node (@adding_dnsnodes){
         print "ADD: $dns_node\n";
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    #print Dumper(%devices_file{'domcomputers'});
+    #print Dumper(%devices_file{'device'});
     #print Dumper(%devices_file);
 
 #    print Dumper(%AD);
@@ -847,7 +855,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Adding ExamAccounts:");
     my $add_count=1;
     foreach my $exam_account (@adding_examaccounts){
-	print "ACC: >$exam_account< >$devices_file{'domcomputers'}{$exam_account}{'SCHOOL_TOKEN'}<\n";
+	print "ACC: >$exam_account< >$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'}<\n";
         my $role="examaccount";
         #my ($room,$user,@rest)=split(/;/,$exam_account);
         $plain_password=&get_plain_password($role,@passwort_zeichen);
@@ -857,7 +865,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 #                         login=>$user,
                          login=>$exam_account,
 #                         group=>$room,
-                         group=>$devices_file{'domcomputers'}{$exam_account}{'ROOM'},
+                         group=>$devices_file{'device'}{$exam_account}{'ROOM'},
                          firstname_ascii=>"Exam",
                          surname_ascii=>"Account",
                          firstname_utf8=>"Exam",
@@ -865,11 +873,11 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                          birthdate=>$birthdate,
                          plain_password=>$plain_password,
 #                         ou=>$ou,
-                         ou=>$devices_file{'domcomputers'}{$exam_account}{'OU'},
+                         ou=>$devices_file{'device'}{$exam_account}{'OU'},
                          role=>"examaccount",
                          type=>"room",
 #                         school_token=>$school_token,
-                         school_token=>$devices_file{'domcomputers'}{$exam_account}{'SCHOOL_TOKEN'},
+                         school_token=>$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'},
                          creationdate=>$time_stamp_AD,
                          tolerationdate=>"---",
                          deactivationdate=>"---",
@@ -879,7 +887,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         $add_count++;
         # make sure that the room exists
         # use the saved, tokened value
-        my $room_saved=$devices_file{'domcomputers'}{$exam_account}{'ROOM'};
+        my $room_saved=$devices_file{'device'}{$exam_account}{'ROOM'};
         my $examaccount_token=$school_token."-".$DevelConf::examaccount;
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
@@ -917,8 +925,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $computer (@adding_computers){
         my ($room,$user,@rest)=split(/;/,$computer);
         # using saved, tokened values
-        my $room_saved=$devices_file{'domcomputers'}{$user}{'ROOM'};
-        my $ws_saved=$devices_file{'domcomputers'}{$user}{'WORKSTATION'};
+        my $room_saved=$devices_file{'device'}{$user}{'ROOM'};
+        my $ws_saved=$devices_file{'device'}{$user}{'WORKSTATION'};
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
                              ws_count=>$ws_count,
@@ -1259,24 +1267,24 @@ sub analyze_line {
 
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
-        $devices_file{'domcomputers'}{$host_token}{'HWK'}=$hwk;
-        $devices_file{'domcomputers'}{$host_token}{'MAC'}=$mac;
-        $devices_file{'domcomputers'}{$host_token}{'IPv4'}=$ip;
-        $devices_file{'domcomputers'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;
-        $devices_file{'domcomputers'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key;
-        $devices_file{'domcomputers'}{$host_token}{'ROOM'}=$room_token;
-        $devices_file{'domcomputers'}{$host_token}{'ACCOUNT'}=$account_flag;
-        $devices_file{'domcomputers'}{$host_token}{'WORKSTATION'}=$ws_token;
-        $devices_file{'domcomputers'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
-        $devices_file{'domcomputers'}{$host_token}{'SCHOOL_TOKEN'}=$school_token;
-        $devices_file{'domcomputers'}{$host_token}{'OU'}=$ou;
-        $devices_file{'domcomputers'}{$host_token}{'PATH_ABS'}=$device_file;
-        $devices_file{'domcomputers'}{$host_token}{'FILENAME'}=$filename;
-        $devices_file{'dnsNodes'}{$host_token}=$ip;
+        $devices_file{'device'}{$host_token}{'HWK'}=$hwk;
+        $devices_file{'device'}{$host_token}{'MAC'}=$mac;
+        $devices_file{'device'}{$host_token}{'IPv4'}=$ip;
+        $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;
+        $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key;
+        $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
+        $devices_file{'device'}{$host_token}{'ACCOUNT'}=$account_flag;
+        $devices_file{'device'}{$host_token}{'WORKSTATION'}=$ws_token;
+        $devices_file{'device'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
+        $devices_file{'device'}{$host_token}{'SCHOOL_TOKEN'}=$school_token;
+        $devices_file{'device'}{$host_token}{'OU'}=$ou;
+        $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
+        $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
+        $devices_file{'dnsNode'}{$host_token}=$ip;
 
-        $devices_file{'rooms'}{$room_token}{'HOSTS'}{$host_token}="seen";
-        $devices_file{'rooms'}{$room_token}{'MAC'}{$mac}="seen";
-        $devices_file{'rooms'}{$room_token}{'IPv4'}{$ip}="seen";
+        $devices_file{'room'}{$room_token}{'HOSTS'}{$host_token}="seen";
+        $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
+        $devices_file{'room'}{$room_token}{'IPv4'}{$ip}="seen";
 
         # line is correct
         my $line_correct=$room_token.";".$host_token.";".$hwk.";".$mac.";".
@@ -1293,7 +1301,7 @@ sub analyze_line {
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
-            $devices_file{'domcomputers'}{$host_token}{'LINE'}=$line_correct;
+            $devices_file{'device'}{$host_token}{'LINE'}=$line_correct;
             $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
         } else {
             # no need to check that it should be added
@@ -1311,7 +1319,7 @@ sub analyze_line {
             &push_add_dnsnode($line_correct);
         } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
-            my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
+            my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
                 &push_kill_dnsnode($line_correct);
