@@ -214,7 +214,7 @@ sub AD_dns_create {
         $filename="---";
     }
      if (not defined $dns_admin_description){
-        $dns_admin_description=$DevelConf::dns_entry_prefix_string." from ".$filename;
+        $dns_admin_description=$DevelConf::dns_node_prefix_string." from ".$filename;
     }
     if (not defined $dns_cn){
         $dns_cn=$dns_node;
@@ -1440,7 +1440,7 @@ sub AD_get_AD {
             my $base_hosts=$dn_dns_zone;
             my $res   = Net::DNS::Resolver->new;
             my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
-                             $DevelConf::dns_entry_prefix_string.
+                             $DevelConf::dns_node_prefix_string.
                             "*))";
             $mesg = $ldap->search( # perform a search
                            base   => $base_hosts,
@@ -1460,10 +1460,10 @@ sub AD_get_AD {
                 my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
                 my $record=$entry->get_value('dnsRecord');
                 my $desc=$entry->get_value('adminDescription');
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'dnsNode'}=$dc;
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'IPv4'}=$ip;
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dc}{'adminDescription'}=$desc;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=$desc;
                 if($Conf::log_level>=2){
                     print "   * $dc\n";
                 }

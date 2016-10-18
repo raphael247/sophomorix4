@@ -429,7 +429,7 @@ if ($dns_show==1 or $dns_kill==1){
         # dnsNodes in this dnsZone
         my $base=$zonehash{$zone}{'DN'};
         my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
-                   $DevelConf::dns_entry_prefix_string.
+                   $DevelConf::dns_node_prefix_string.
                    "*))";
         my $mesg = $ldap->search(
                       base   => $base,
@@ -731,7 +731,7 @@ foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
 }
 
 # dnsNodes to kill
-foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}}) {
+foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
     if (not exists $devices_file{'dnsNodes'}{$dnsnode}){
         # host is not in file anymore
         &push_kill_dnsnode($dnsnode);
@@ -942,9 +942,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $dns_node (@killing_dnsnodes){
         &AD_dns_kill({ldap=>$ldap, 
                       root_dse=>$root_dse,
-                      dns_zone=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dns_node}{'dnsZone'},
+                      dns_zone=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'dnsZone'},
                       dns_node=>$dns_node,
-                      dns_ipv4=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$dns_node}{'IPv4'},
+                      dns_ipv4=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'},
                       smb_pwd=>$smb_pwd,
                     });
         $dns_node_count++;
@@ -1306,11 +1306,11 @@ sub analyze_line {
             &push_add_computer($line_correct);
         }
         # check dnsNode
-        if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$host_token} ){
+        if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             # nonexisting --> add account
             &push_add_dnsnode($line_correct);
-        } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$host_token} ){
-            my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_entry_prefix_string}{$host_token}{'IPv4'};
+        } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
+            my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
             my $ip_file=$devices_file{'domcomputers'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
