@@ -2453,7 +2453,7 @@ sub AD_group_create {
         # Create target branch
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($target,2,(caller(0))[3]);
-
+	print "HERE: $dn\n";
         # Create object
         my $result = $ldap->add( $dn,
                                 attr => [
@@ -2514,7 +2514,8 @@ sub AD_group_create {
 
         #} else {
     } elsif ($type eq "room"){
-        my $token_examaccounts=$school_token."-".$DevelConf::examaccount;
+        #my $token_examaccounts=$school_token."-".$DevelConf::examaccount;
+        my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school_token,"examaccount");
         # add the room to <token>-examaccounts
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 

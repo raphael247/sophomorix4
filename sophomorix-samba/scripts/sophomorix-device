@@ -185,6 +185,8 @@ my %devices_file=();
 #                       -> MAC 
 # dnsNode  -> $dnsNode  -> $IP
 # computer -> $computer -> ROOM
+#                       -> OU
+#                       -> SCHOOL_TOKEN
 #                       -> WORKSTATION    (capitalized name)
 #                       -> WORKSTATION_DOLLAR (capitalized with $)
 #
@@ -734,8 +736,8 @@ foreach my $examaccount (keys %{$devices_file{'device'}}) {
     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
         # host is not in system
         &push_add_examaccount($examaccount);
-    }
-    # device is not in correct room -> update (kill and add)
+    } else {
+        # device is not in correct room -> update (kill and add)
         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
             $devices_file{'device'}{$examaccount}{'ROOM'}){
             if($Conf::log_level>=2){
@@ -746,6 +748,7 @@ foreach my $examaccount (keys %{$devices_file{'device'}}) {
             &push_kill_examaccount($examaccount);
             &push_add_examaccount($examaccount);
         }
+    }
 }
 
 
@@ -898,6 +901,8 @@ if($no_sync==1){
 # ===========================================================================
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
+    ############################################################
+    # create OU
     if (not exists $ou_created{$ou}){
         # create ou
         &AD_ou_add({ldap=>$ldap,
@@ -910,6 +915,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         # remember ou
         $ou_created{$ou}="already created";
     }
+
+    ############################################################
+    # kill examaccounts
     &print_title("Killing ExamAccounts:");
     my $kill_count=1;
     foreach my $exam_account (@killing_examaccounts){
@@ -921,12 +929,15 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                      });
         #system("/usr/sbin/sophomorix-kill --killuser $exam_account");
     }
+
+    ############################################################
+    # add examaccounts
     &print_title("Adding ExamAccounts:");
     my $add_count=1;
     foreach my $exam_account (@adding_examaccounts){
-	print "ACC: >$exam_account< >$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'}<\n";
         my $role="examaccount";
-        #my ($room,$user,@rest)=split(/;/,$exam_account);
+        my $ou=$devices_file{'device'}{$exam_account}{'OU'};
+        my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'};
         $plain_password=&get_plain_password($role,@passwort_zeichen);
         &AD_user_create({ldap=>$ldap, 
                          root_dse=>$root_dse,
@@ -939,10 +950,10 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                          surname_utf8=>"Account",
                          birthdate=>$birthdate,
                          plain_password=>$plain_password,
-                         ou=>$devices_file{'device'}{$exam_account}{'OU'},
+                         ou=>$ou,
                          role=>"examaccount",
                          type=>"room",
-                         school_token=>$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'},
+                         school_token=>$school_token,
                          creationdate=>$time_stamp_AD,
                          tolerationdate=>"---",
                          deactivationdate=>"---",
@@ -971,6 +982,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              addmember => $exam_account,
                             });   
     }
+
+    ############################################################
+    # Kill the rooms of examaccounts
     &print_title("Killing ExamAccount Rooms:");
     my $kill_room_count=1;
     foreach my $room (@killing_examaccount_rooms){
@@ -983,9 +997,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                   });
     }
 
-
-
-    &print_title("Killing Workstations:");
+    ############################################################
+    # Kill computers
+    &print_title("Killing Computers:");
     my $count=1;
     foreach my $computer (@killing_computers){
         &AD_computer_kill({ldap=>$ldap,
@@ -998,6 +1012,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Adding Computers:");
     my $ws_count=1;
     foreach my $computer (@adding_computers){
+        my $ou=$devices_file{'computer'}{$computer}{'OU'};
+        my $school_token=$devices_file{'computer'}{$computer}{'SCHOOL_TOKEN'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
         &AD_computer_create({ldap=>$ldap, 
@@ -1014,8 +1030,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         $ws_count++;
     }
 
-
-    # dnsNodes
+    ############################################################
+    # Kill dnsNodes
     &print_title("Killing dnsNodes:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
@@ -1029,6 +1045,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         $dns_node_count++;
     }
 
+    ############################################################
+    # Add dnsNodes
     &print_title("Adding dnsNodes:");
     $dns_node_count=1;
     foreach my $dns_node (@adding_dnsnodes){
@@ -1040,9 +1058,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                            });
         $dns_node_count++;
     }
-
-
-
 
     &log_script_exit("",0,1,0,@arguments);
 }
@@ -1358,6 +1373,8 @@ sub analyze_line {
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
+            $devices_file{'computer'}{$ws_token_account}{'OU'}=$ou;
+            $devices_file{'computer'}{$ws_token_account}{'SCHOOL_TOKEN'}=$school_token;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
