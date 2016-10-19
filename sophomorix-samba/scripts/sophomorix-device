@@ -1359,34 +1359,6 @@ sub analyze_line {
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
         }
-#        } else {
-#            # no need to check that it should be added
-#            return;
-#        }
-
-        # check computer account
-	#print "HERE: $ws_token_account\n";
-        #if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$ws_token_account} ){
-        #    # nonexisting --> add account
-        #    &push_add_computer($ws_token_account);
-        #}
-        # check dnsNode
-        #if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
-        #    # nonexisting --> add account
-        #    &push_add_dnsnode($host_token);
-        #} elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
-        #    my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
-        #    my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
-        #    if ($ip_system ne $ip_file){
-        #        # recreate dns entry
-        #        print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
-        #    } else {
-        #        if($Conf::log_level>=3){
-        #            print "OK: $host_token exists with $ip_system",
-        #                  " (= $ip_file from file)\n";
-        #        }
-        #    }
-        #}
     }
 }
 
