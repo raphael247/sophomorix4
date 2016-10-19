@@ -773,6 +773,28 @@ foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_p
     }
 }
 
+# dnsNodes to add
+foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
+    if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
+        # nonexisting --> add account
+        &push_add_dnsnode($dnsnode);
+    } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
+        my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'IPv4'};
+        my $ip_file=$devices_file{'dnsNode'}{$dnsnode};
+        if ($ip_system ne $ip_file){
+            # recreate dns entry
+            print "WARNING: $dnsnode exists with $ip_system, but should be $ip_file\n";
+            &push_kill_dnsnode($dnsnode);
+            &push_add_dnsnode($dnsnode);
+        } else {
+            if($Conf::log_level>=3){
+                print "   OK: $dnsnode exists with $ip_system",
+                      " (= $ip_file from file)\n";
+            }
+        }
+    }
+}
+
 
 ############################################################################
 if($no_sync==1){
@@ -1349,22 +1371,22 @@ sub analyze_line {
         #    &push_add_computer($ws_token_account);
         #}
         # check dnsNode
-        if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
-            # nonexisting --> add account
-            &push_add_dnsnode($host_token);
-        } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
-            my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
-            my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
-            if ($ip_system ne $ip_file){
-                # recreate dns entry
-                print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
-            } else {
-                if($Conf::log_level>=3){
-                    print "OK: $host_token exists with $ip_system",
-                          " (= $ip_file from file)\n";
-                }
-            }
-        }
+        #if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
+        #    # nonexisting --> add account
+        #    &push_add_dnsnode($host_token);
+        #} elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
+        #    my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
+        #    my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
+        #    if ($ip_system ne $ip_file){
+        #        # recreate dns entry
+        #        print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
+        #    } else {
+        #        if($Conf::log_level>=3){
+        #            print "OK: $host_token exists with $ip_system",
+        #                  " (= $ip_file from file)\n";
+        #        }
+        #    }
+        #}
     }
 }
 
