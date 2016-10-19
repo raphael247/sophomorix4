@@ -1380,6 +1380,7 @@ sub AD_get_AD {
                        filter => '(&(objectClass=user)(sophomorixRole=examaccount))',
                        attrs => ['sAMAccountName',
                                  'sophomorixAdminClass',
+                                 'sophomorixAdminFile',
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
@@ -1388,11 +1389,13 @@ sub AD_get_AD {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
             my $room=$entry->get_value('sophomorixAdminClass');
+            my $filename=$entry->get_value('sophomorixAdminFile');
             if($Conf::log_level>=2){
                 print "   * $sam in Room $room\n";
             }
             $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'room'}=$room;
             $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminClass'}=$room;
+            $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminFile'}=$filename;
         }
     }
 

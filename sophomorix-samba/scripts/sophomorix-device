@@ -230,8 +230,8 @@ my $dns_test=0;
 my $dns_show=0;
 my $dns_kill=0;
 
-my $file="devices.csv";
-my $host_workstation=$DevelConf::path_conf_host."/".$file;
+#my $file="devices.csv";
+#my $host_workstation=$DevelConf::path_conf_host."/".$file;
 my $host_classrooms=$DevelConf::path_conf_host."/classrooms";
 
 my %host_seen=();
@@ -748,6 +748,19 @@ foreach my $examaccount (keys %{$devices_file{'device'}}) {
             &push_kill_examaccount($examaccount);
             &push_add_examaccount($examaccount);
         }
+        # sophomorixAdminFile ist not correct
+        if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'} ne 
+            $devices_file{'device'}{$examaccount}{'FILENAME'}){
+            if($Conf::log_level>=2){
+	        print "$examaccount: Was moved from file ",
+                      "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'}",
+                      " to $devices_file{'device'}{$examaccount}{'FILENAME'}\n";
+            }
+            &push_kill_examaccount($examaccount);
+            &push_add_examaccount($examaccount);
+        }
+
+
     }
 }
 
@@ -938,6 +951,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $role="examaccount";
         my $ou=$devices_file{'device'}{$exam_account}{'OU'};
         my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'};
+        my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
         $plain_password=&get_plain_password($role,@passwort_zeichen);
         &AD_user_create({ldap=>$ldap, 
                          root_dse=>$root_dse,
@@ -958,7 +972,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                          tolerationdate=>"---",
                          deactivationdate=>"---",
                          status=>"P",
-                         file=>$file,
+                         file=>$filename,
                        });
         $add_count++;
         # make sure that the room exists

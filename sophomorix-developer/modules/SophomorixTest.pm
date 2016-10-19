@@ -178,6 +178,7 @@ sub AD_test_object {
     my $s_comment = $arg_ref->{sophomorixComment};
     my $s_webui = $arg_ref->{sophomorixWebuiDashboard};
     my $s_user_permissions = $arg_ref->{sophomorixUserPermissions};
+    my $s_admin_file = $arg_ref->{sophomorixAdminFile};
 
 
     # sophomorix group
@@ -338,6 +339,10 @@ sub AD_test_object {
         if (defined $s_school_name){
             is ($entry->get_value ('sophomorixSchoolname'),$s_school_name,
 		"  * sophomorixSchoolname is $s_school_name");
+        }
+        if (defined $s_admin_file){
+            is ($entry->get_value ('sophomorixAdminFile'),$s_admin_file,
+		"  * sophomorixAdminFile is $s_admin_file");
         }
         if (defined $s_type){
             is ($entry->get_value ('sophomorixType'),$s_type,
