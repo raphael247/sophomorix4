@@ -248,7 +248,7 @@ sub config_sophomorix_read {
     $sophomorix_config{'SCHOOLS'}{'school'}{'SCHOOL_NAME'}=
         "School"; 
     $sophomorix_config{'SCHOOLS'}{'school'}{'OU_TOP'}=
-        $DevelConf::AD_school_ou.",".$root_dse; 
+        "OU=".$DevelConf::AD_school_ou.",".$root_dse; 
 
     ##################################################
     # sophomorix.conf 
@@ -641,6 +641,7 @@ sub config_sophomorix_read {
 
                 # primary group
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
+#		print "HER: >$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP}<\n";
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
                     $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 if ($group_primary ne "" and not $group_primary eq "multi"){
