@@ -698,8 +698,8 @@ if ($info==1){
 
 
 ############################################################################
-# checking data
-
+# reading and checking files
+############################################################################
 # reading and checking all device files
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
@@ -727,16 +727,16 @@ foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
     }
 }
 
+
 # ExamAccounts to add
 foreach my $examaccount (keys %{$devices_file{'device'}}) {
     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
         # host is not in system
         &push_add_examaccount($examaccount);
     }
-    # wrong group room
+    # device is not in correct room -> update (kill and add)
         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
             $devices_file{'device'}{$examaccount}{'ROOM'}){
-            # exists in wrong room ---> kill/add account
             if($Conf::log_level>=2){
 	        print "$examaccount: Changed room from ",
                       "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
@@ -746,6 +746,7 @@ foreach my $examaccount (keys %{$devices_file{'device'}}) {
             &push_add_examaccount($examaccount);
         }
 }
+
 
 # ExamAccount rooms to kill
 foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
@@ -764,6 +765,7 @@ foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
     }
 }
 
+
 # computers to add
 foreach my $computer (keys %{$devices_file{'computer'}}) {
     if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$computer} ){
@@ -772,6 +774,7 @@ foreach my $computer (keys %{$devices_file{'computer'}}) {
     }
 }
 
+
 # dnsNodes to kill
 foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
     if (not exists $devices_file{'dnsNode'}{$dnsnode}){
@@ -779,6 +782,7 @@ foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_p
         &push_kill_dnsnode($dnsnode);
     }
 }
+
 
 # dnsNodes to add
 foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
@@ -926,9 +930,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         &AD_user_create({ldap=>$ldap, 
                          root_dse=>$root_dse,
                          user_count=>$add_count,
-#                         login=>$user,
                          login=>$exam_account,
-#                         group=>$room,
                          group=>$devices_file{'device'}{$exam_account}{'ROOM'},
                          firstname_ascii=>"Exam",
                          surname_ascii=>"Account",
@@ -936,11 +938,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                          surname_utf8=>"Account",
                          birthdate=>$birthdate,
                          plain_password=>$plain_password,
-#                         ou=>$ou,
                          ou=>$devices_file{'device'}{$exam_account}{'OU'},
                          role=>"examaccount",
                          type=>"room",
-#                         school_token=>$school_token,
                          school_token=>$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'},
                          creationdate=>$time_stamp_AD,
                          tolerationdate=>"---",
@@ -977,8 +977,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         &AD_group_kill({ldap=>$ldap,
                         root_dse=>$root_dse,
                         group=>$room,
-#                        ou=>$ou,
-#                        school_token=>$school_token,
                         type=>"room",
                         group_count=>$kill_room_count,
                   });
@@ -1032,11 +1030,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     &print_title("Adding dnsNodes:");
     $dns_node_count=1;
-#    foreach my $dns_line (@adding_dnsnodes){
     foreach my $dns_node (@adding_dnsnodes){
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
-#                        dns_line=>$dns_line,
                         dns_node=>$dns_node,
                         dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
                         smb_pwd=>$smb_pwd,
