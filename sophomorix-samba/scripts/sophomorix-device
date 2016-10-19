@@ -757,13 +757,13 @@ foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
     }
 }
 
-# # computers to add
-# foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
-#     if (not exists $devices_file{'computer'}{$computer}){
-#         # host is not in file anymore
-#         &push_kill_computer($computer);
-#     }
-# }
+# computers to add
+foreach my $computer (keys %{$devices_file{'computer'}}) {
+    if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$computer} ){
+        # nonexisting --> add account
+        &push_add_computer($computer);
+    }
+}
 
 # dnsNodes to kill
 foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
@@ -1336,16 +1336,18 @@ sub analyze_line {
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
-        } else {
-            # no need to check that it should be added
-            return;
         }
+#        } else {
+#            # no need to check that it should be added
+#            return;
+#        }
 
         # check computer account
-        if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$ws_token_account} ){
-            # nonexisting --> add account
-            &push_add_computer($ws_token_account);
-        }
+	#print "HERE: $ws_token_account\n";
+        #if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$ws_token_account} ){
+        #    # nonexisting --> add account
+        #    &push_add_computer($ws_token_account);
+        #}
         # check dnsNode
         if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             # nonexisting --> add account
