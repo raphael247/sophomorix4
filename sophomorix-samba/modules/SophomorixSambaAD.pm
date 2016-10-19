@@ -1286,6 +1286,7 @@ sub AD_get_AD {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
 
     my $computers = $arg_ref->{computers};
     if (not defined $computers){$computers="FALSE"};
@@ -1322,6 +1323,7 @@ sub AD_get_AD {
                                   ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
+        $AD{'result'}{'computer'}{'computer'}{'COUNT'}=$max_user;
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -1333,6 +1335,7 @@ sub AD_get_AD {
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixRole'}=$role;
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+            
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
@@ -1350,9 +1353,10 @@ sub AD_get_AD {
                                  'sophomorixStatus',
                                  'sophomorixType',
                                 ]);
-        $max_room = $mesg->count; 
+        my $max_room = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_room sophomorix Rooms found in AD");
+        $AD{'result'}{'group'}{'room'}{'COUNT'}=$max_room;
         for( my $index = 0 ; $index < $max_room ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -1361,8 +1365,6 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
-            #$AD{'lookup'}{'groups_by_type'}{'room'}{$sam}=$type;
-
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
@@ -1379,8 +1381,9 @@ sub AD_get_AD {
                        attrs => ['sAMAccountName',
                                  'sophomorixAdminClass',
                                 ]);
-        $max_user = $mesg->count; 
+        my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
+        $AD{'result'}{'user'}{'examaccount'}{'COUNT'}=$max_user;
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -1412,22 +1415,33 @@ sub AD_get_AD {
                                  'adminDescription',
                                 ]);
         my $max_zone = $mesg->count; 
+        my $sopho_max_zone=$max_zone;
+        my $other_max_zone=0;
         &Sophomorix::SophomorixBase::print_title(
             "$max_zone sophomorix dnsZones found (RootDNSServers skipped)");
         for( my $index = 0 ; $index < $max_zone ; $index++) {
             my $entry = $mesg->entry($index);
             my $zone=$entry->get_value('dc');
-            if ($zone eq "RootDNSServers"){
-                next;
-            }
             my $name=$entry->get_value('name');
             my $desc=$entry->get_value('adminDescription');
-            $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
-            $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
             if($Conf::log_level>=2){
                 print "   * ",$entry->get_value('dc'),"\n";
             }
+            if ($desc=~ m/^${DevelConf::dns_zone_prefix_string}/ or
+                $name eq $root_dns){
+                # shophomorix dnsZone or default dnsZone
+                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
+                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
+            } else {
+                # other dnsZone
+		$sopho_max_zone=$sopho_max_zone-1;
+                $other_max_zone=$other_max_zone+1;
+                $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
+                $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
+            }
         }
+        $AD{'result'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
+        $AD{'result'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
     }
 
 
@@ -1469,6 +1483,7 @@ sub AD_get_AD {
                     print "   * $dc\n";
                 }
             }
+            $AD{'result'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
         }
     }
 
