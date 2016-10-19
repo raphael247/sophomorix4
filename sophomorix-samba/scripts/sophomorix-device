@@ -165,7 +165,28 @@ my $password="";
 # where data from workstation file is saved
 my @domcomputers_file=(); # list ordered
 my %devices_file=();
-
+# device   -> $name     -> ACCOUNT 0/1
+#                       -> FILENAME
+#                       -> HWK
+#                       -> IPv4
+#                       -> MAC
+#                       -> MS_OFFICE_KEY
+#                       -> MS_WINDOWS_KEY
+#                       -> OU
+#                       -> PATH_ABS
+#                       -> ROOM
+#                       -> SCHOOL_TOKEN
+#                       -> WORKSTATION    (capitalized name)
+#                       -> WORKSTATION_DOLLAR (capitalized with $)
+#
+# room     -> $room     -> HOSTS
+#                       -> IPv4
+#                       -> MAC 
+# dnsNode  -> $dnsNode  -> $IP
+# computer -> $computer -> ROOM
+#                       -> WORKSTATION    (capitalized name)
+#                       -> WORKSTATION_DOLLAR (capitalized with $)
+#
 
 # italc
 # my $italc_owner="root";
@@ -215,6 +236,7 @@ my %ip_seen=();
  # ExamAccounts
 my @adding_examaccounts=();
 my @killing_examaccounts=();
+my @killing_examaccount_rooms=();
 
 # Computers
 my @adding_computers=();
@@ -284,7 +306,7 @@ if ($help==1) {
    print('
 sophomorix-device adds Devices to the system:
     DomainComputerAccount
-    Examaccount
+    ExamAccount
     DNS entries 
 
 Options:
@@ -709,7 +731,6 @@ foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
 foreach my $examaccount (keys %{$devices_file{'device'}}) {
     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
         # host is not in system
-        #&push_add_examaccount($devices_file{'device'}{$examaccount}{'LINE'});
         &push_add_examaccount($examaccount);
     }
 # falscher raum
@@ -718,9 +739,16 @@ foreach my $examaccount (keys %{$devices_file{'device'}}) {
 #                &push_kill_examaccount($host_token);
 #                &push_add_examaccount($line_correct);
 #            }
-
-
 }
+
+# ExamAccount rooms to kill
+foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
+    if (not exists $devices_file{'room'}{$room}){
+        # host is not in file anymore
+        &push_kill_examaccount_room($room);
+    }
+}
+
 
 # computers to kill
 foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
@@ -754,16 +782,24 @@ if($no_sync==1){
     # ExamAccounts
     print "\n";
     $count=$#killing_examaccounts+1;
-    &print_title("Examaccounts that must be killed ($count):");
+    &print_title("ExamAccounts that must be killed ($count):");
     foreach my $ws (@killing_examaccounts){
         print "KILL: $ws\n";
     }
     print "\n";
     $count=$#adding_examaccounts+1;
-    &print_title("Examaccounts that must be added ($count):");
+    &print_title("ExamAccounts that must be added ($count):");
     foreach my $ws (@adding_examaccounts){
         print "ADD: $ws\n";
     }
+    print "\n";
+    $count=$#killing_examaccount_rooms+1;
+    &print_title("ExamAccounts rooms that must be killed ($count):");
+    foreach my $room (@killing_examaccount_rooms){
+        print "KILL: $room\n";
+    }
+
+
 
     # Computers
     print "\n";
@@ -1281,23 +1317,23 @@ sub analyze_line {
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'room'}{$room_token}{'IPv4'}{$ip}="seen";
 
-        # line is correct
-        my $line_correct=$room_token.";".$host_token.";".$hwk.";".$mac.";".
-                         $ip.";".$ms_office_key.";".
-                         $ms_windows_key.";".$unused.";".
-                         $sysadmin_field.";".$account_flag.";".
-                         $pxe.";".$option.";";
+#        # line is correct
+#        my $line_correct=$room_token.";".$host_token.";".$hwk.";".$mac.";".
+#                         $ip.";".$ms_office_key.";".
+#                         $ms_windows_key.";".$unused.";".
+#                         $sysadmin_field.";".$account_flag.";".
+#                         $pxe.";".$option.";";
 
-        if($Conf::log_level>=2){
-            print "$line_correct\n\n";
-        }
+#        if($Conf::log_level>=2){
+#            print "$line_correct\n\n";
+#        }
 
         # field 10 decides 
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
-            $devices_file{'device'}{$host_token}{'LINE'}=$line_correct;
-            $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
+#            $devices_file{'device'}{$host_token}{'LINE'}=$line_correct;
+#            $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
@@ -1322,8 +1358,8 @@ sub analyze_line {
             my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
-                &push_kill_dnsnode($line_correct);
-                &push_add_dnsnode($line_correct);
+#                &push_kill_dnsnode($line_correct);
+#                &push_add_dnsnode($line_correct);
                 print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
             } else {
                 if($Conf::log_level>=3){
@@ -1559,6 +1595,13 @@ sub push_add_examaccount {
 sub push_kill_examaccount {
     my ($kill) = @_;
     push @killing_examaccounts, $kill;
+}
+
+
+
+sub push_kill_examaccount_room {
+    my ($kill) = @_;
+    push @killing_examaccount_rooms, $kill;
 }
 
 
