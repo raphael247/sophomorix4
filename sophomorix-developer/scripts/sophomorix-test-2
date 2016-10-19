@@ -34,19 +34,21 @@ use Sophomorix::SophomorixSambaAD qw(
 use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
                                  AD_test_object
-                                 AD_workstations_any
+                                 AD_computers_any
                                  AD_examaccounts_any
+                                 AD_dnsnodes_any
+                                 AD_rooms_any
                                  run_command
                                  );
 
 $Conf::log_level=1;
 my $help=0;
 
-my $copy_wsfile_1=0;
-my $copy_wsfile_2=0;
-my $copy_wsfile_3=0;
-my $copy_wsfile_4=0;
-my $copy_wsfile_5=0;
+my $copy_devfile_1=0;
+my $copy_devfile_2=0;
+my $copy_devfile_3=0;
+my $copy_devfile_4=0;
+my $copy_devfile_5=0;
 my $test_ws_1=0;
 my $test_ws_2=0;
 my $test_ws_3=0;
@@ -71,15 +73,15 @@ my $verbose_options="";
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
-           "copy-wsfile-1" => \$copy_wsfile_1,
+           "copy-wsfile-1" => \$copy_devfile_1,
            "test-ws-1" => \$test_ws_1,
-           "copy-wsfile-2" => \$copy_wsfile_2,
+           "copy-wsfile-2" => \$copy_devfile_2,
            "test-ws-2" => \$test_ws_2,
-           "copy-wsfile-3" => \$copy_wsfile_3,
+           "copy-wsfile-3" => \$copy_devfile_3,
            "test-ws-3" => \$test_ws_3,
-           "copy-wsfile-4" => \$copy_wsfile_4,
+           "copy-wsfile-4" => \$copy_devfile_4,
            "test-ws-4" => \$test_ws_4,
-           "copy-wsfile-5" => \$copy_wsfile_5,
+           "copy-wsfile-5" => \$copy_devfile_5,
            "test-ws-5" => \$test_ws_5,
            "full|f" => \$full,
   );
@@ -143,8 +145,8 @@ Step 2-4 are missing
 ############################################################
 # --full
 if ($full==1){
-    $copy_wsfile_1=1;
-    $copy_wsfile_5=1;
+    $copy_devfile_1=1;
+    $copy_devfile_5=1;
     $test_ws_1=1;
     $test_ws_5=1;
 }
@@ -195,7 +197,7 @@ my $examaccount_token;
 ############################################################
 
 # --copy-wsfile-1
-if ($copy_wsfile_1==1){
+if ($copy_devfile_1==1){
     # copy devices.csv-1
     &run_command("cp -v $wsfile_1 $host_workstation");
     &run_command("cp -v $crfile_1 $host_classroom");
@@ -273,7 +275,7 @@ if ($test_ws_1==1){
 # Step 2
 ############################################################
 # --copy-wsfile-2
-if ($copy_wsfile_2==1){
+if ($copy_devfile_2==1){
     # copy devices.csv-2
     &run_command("cp -v $wsfile_2 $host_workstation");
     &run_command("cp -v $crfile_2 $host_classroom");
@@ -292,7 +294,7 @@ if ($test_ws_2==1){
 # Step 3
 ############################################################
 # --copy-wsfile-3
-if ($copy_wsfile_3==1){
+if ($copy_devfile_3==1){
     # copy devices.csv-3
     &run_command("cp -v $wsfile_3 $host_workstation");
     &run_command("cp -v $crfile_3 $host_classroom");
@@ -311,7 +313,7 @@ if ($test_ws_3==1){
 # Step 4
 ############################################################
 # --copy-wsfile-4
-if ($copy_wsfile_4==1){
+if ($copy_devfile_4==1){
     # copy devices.csv-4
     &run_command("cp -v $wsfile_4 $host_workstation");
     &run_command("cp -v $crfile_4 $host_classroom");
@@ -329,7 +331,7 @@ if ($test_ws_4==1){
 # Step 5  empty file
 ############################################################
 # --copy-wsfile-5
-if ($copy_wsfile_5==1){
+if ($copy_devfile_5==1){
     # copy devices.csv-5
     &run_command("cp -v $wsfile_5 $host_workstation");
     &run_command("cp -v $crfile_5 $host_classroom");
@@ -342,8 +344,10 @@ if ($full==1){
 }
 
 if ($test_ws_5==1){
-    &AD_workstations_any($ldap,$root_dse);
+    &AD_computers_any($ldap,$root_dse);
     &AD_examaccounts_any($ldap,$root_dse);
+    &AD_dnsnodes_any($ldap,$root_dse);
+    &AD_rooms_any($ldap,$root_dse);
 }
 
 

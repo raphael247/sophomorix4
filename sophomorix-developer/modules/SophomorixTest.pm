@@ -28,14 +28,16 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             AD_object_nonexist
             AD_test_object
-            AD_workstations_any
+            AD_computers_any
             AD_examaccounts_any
+            AD_dnsnodes_any
+            AD_rooms_any
             run_command
 
             );
 
 
-sub AD_workstations_any {
+sub AD_computers_any {
     my ($ldap,$root_dse) = @_;
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -44,7 +46,7 @@ sub AD_workstations_any {
                    attrs => ['sAMAccountName']
                          );
     my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All workstations are deleted");
+    is ($max_user,0,"  * All sophomorix computers are deleted");
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         print "   * ",$entry->get_value('sAMAccountName'),"\n";
@@ -66,6 +68,46 @@ sub AD_examaccounts_any {
         my $entry = $mesg->entry($index);
             print "   * ",$entry->get_value('sAMAccountName'),
                   "  sophomorixAdminClass:  ".$entry->get_value('sophomorixAdminClass')."\n";
+    }
+}
+
+
+sub AD_rooms_any {
+    my ($ldap,$root_dse) = @_;
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => '(&(objectClass=group)(sophomorixType=room))',
+                   attrs => ['sAMAccountName',"sophomorixType"]
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,0,"  * All room groups are deleted");
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+            print "   * ",$entry->get_value('sAMAccountName'),
+                  "  sophomorixType:  ".$entry->get_value('sophomorixType')."\n";
+    }
+}
+
+
+sub AD_dnsnodes_any {
+    my ($ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
+                             $DevelConf::dns_node_prefix_string.
+                            "*))";
+
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['dc',"adminDescription"]
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,0,"  * All sophomorix dnsNodes are deleted");
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+            print "   * ",$entry->get_value('dc'),
+                  "  adminDescription:  ".$entry->get_value('adminDescription')."\n";
     }
 }
 
