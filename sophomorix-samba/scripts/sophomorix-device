@@ -732,12 +732,18 @@ foreach my $examaccount (keys %{$devices_file{'device'}}) {
         # host is not in system
         &push_add_examaccount($examaccount);
     }
-# falscher raum
-#            if ($AD{'objectclass'}{'user'}{'examaccount'}{$host_token}{'room'} ne $room_token){
-#                # exists in wrong room ---> kill/add account
-#                &push_kill_examaccount($host_token);
-#                &push_add_examaccount($line_correct);
-#            }
+    # wrong group room
+        if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
+            $devices_file{'device'}{$examaccount}{'ROOM'}){
+            # exists in wrong room ---> kill/add account
+            if($Conf::log_level>=2){
+	        print "$examaccount: Changed room from ",
+                      "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
+                      " to $devices_file{'device'}{$examaccount}{'ROOM'}\n";
+            }
+            &push_kill_examaccount($examaccount);
+            &push_add_examaccount($examaccount);
+        }
 }
 
 # ExamAccount rooms to kill
@@ -868,7 +874,7 @@ if($no_sync==1){
     #print Dumper(%devices_file{'device'});
     #print Dumper(%devices_file);
 
-#    print Dumper(%AD);
+    #print Dumper(%AD);
     exit;
 } 
 
@@ -1287,9 +1293,6 @@ sub analyze_line {
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
-        if($Conf::log_level>=2){
-            print "$line";
-        }
         chomp($line);
         my ($room,
             $host,
@@ -1322,7 +1325,8 @@ sub analyze_line {
         my $room_token=&AD_get_name_tokened($room,$school_token,"roomws");
         my $ws_token=&AD_get_name_tokened($host,$school_token,"workstation");
         my $ws_token_account=$ws_token."\$";
-        if($Conf::log_level>=2){
+        if($Conf::log_level>=3){
+            print "\n$line\n";
             print "ExamAccount: $host  -->  $host_token\n";
             print "Room:        $room  -->  $room_token\n";
             print "Computer:    $host  -->  $ws_token\n";
