@@ -1418,7 +1418,7 @@ sub AD_get_AD {
         my $sopho_max_zone=$max_zone;
         my $other_max_zone=0;
         &Sophomorix::SophomorixBase::print_title(
-            "$max_zone sophomorix dnsZones found (RootDNSServers skipped)");
+            "$max_zone dnsZones found");
         for( my $index = 0 ; $index < $max_zone ; $index++) {
             my $entry = $mesg->entry($index);
             my $zone=$entry->get_value('dc');
@@ -1427,6 +1427,7 @@ sub AD_get_AD {
             if($Conf::log_level>=2){
                 print "   * ",$entry->get_value('dc'),"\n";
             }
+            if (not defined $desc){$desc=""};
             if ($desc=~ m/^${DevelConf::dns_zone_prefix_string}/ or
                 $name eq $root_dns){
                 # shophomorix dnsZone or default dnsZone
@@ -1483,7 +1484,9 @@ sub AD_get_AD {
                     print "   * $dc\n";
                 }
             }
-            $AD{'result'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
+            if (defined $dc){ 
+                $AD{'result'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
+	    }
         }
     }
 
