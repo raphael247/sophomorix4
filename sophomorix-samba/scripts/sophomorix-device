@@ -189,6 +189,8 @@ my %devices_file=();
 #                       -> WORKSTATION_DOLLAR (capitalized with $)
 #
 
+
+
 # italc
 # my $italc_owner="root";
 # my $italc_dir="";
@@ -508,10 +510,6 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            dnsnodes=>"TRUE",
              });
 my %AD= %$ref_AD; 
-
-
-
-my @dns_nodes=();
 
 # /etc/linuxmuster/classroom
 &get_classrooms();
@@ -1310,9 +1308,6 @@ sub analyze_line {
             print "\n";
 	}
 
-        # save for DNS
-        push @dns_nodes, $host_token;
-
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
         $devices_file{'device'}{$host_token}{'HWK'}=$hwk;
@@ -1334,23 +1329,10 @@ sub analyze_line {
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'room'}{$room_token}{'IPv4'}{$ip}="seen";
 
-#        # line is correct
-#        my $line_correct=$room_token.";".$host_token.";".$hwk.";".$mac.";".
-#                         $ip.";".$ms_office_key.";".
-#                         $ms_windows_key.";".$unused.";".
-#                         $sysadmin_field.";".$account_flag.";".
-#                         $pxe.";".$option.";";
-
-#        if($Conf::log_level>=2){
-#            print "$line_correct\n\n";
-#        }
-
         # field 10 decides 
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
-#            $devices_file{'device'}{$host_token}{'LINE'}=$line_correct;
-#            $devices_file{'computer'}{$ws_token_account}{'LINE'}=$line_correct;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
@@ -1362,21 +1344,17 @@ sub analyze_line {
         # check computer account
         if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$ws_token_account} ){
             # nonexisting --> add account
-            #&push_add_computer($line_correct);
             &push_add_computer($ws_token_account);
         }
         # check dnsNode
         if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             # nonexisting --> add account
-#            &push_add_dnsnode($line_correct);
             &push_add_dnsnode($host_token);
         } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token} ){
             my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$host_token}{'IPv4'};
             my $ip_file=$devices_file{'device'}{$host_token}{"IPv4"};
             if ($ip_system ne $ip_file){
                 # recreate dns entry
-#                &push_kill_dnsnode($line_correct);
-#                &push_add_dnsnode($line_correct);
                 print "WARNING: $host_token exists with $ip_system, but should be $ip_file\n";
             } else {
                 if($Conf::log_level>=3){
