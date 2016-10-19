@@ -176,7 +176,7 @@ install-sophomorix-samba:
 #	@install -oroot -groot --mode=0600 sophomorix-samba/config/quota.txt $(CONF)/user
 #	@install -oroot -groot --mode=0600 sophomorix-samba/config/mailquota.txt $(CONF)/user
 	@install -d -m755 -oroot -groot $(CONF)/project
-	@install -d -m755 -oroot -groot $(CONF)/host
+	@install -d -m755 -oroot -groot $(CONF)/device
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/projects.create $(CONF)/project
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/projects.update $(CONF)/project
 # config-templates
