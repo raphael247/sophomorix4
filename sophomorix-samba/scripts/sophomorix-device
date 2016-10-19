@@ -116,6 +116,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_create
                                  AD_computer_create
                                  AD_group_create
+                                 AD_group_kill
                                  AD_group_addmember
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
@@ -942,6 +943,22 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              addmember => $exam_account,
                             });   
     }
+    &print_title("Killing ExamAccount Rooms:");
+    my $kill_room_count=1;
+    foreach my $room (@killing_examaccount_rooms){
+        print "   * Killing ExamAccount Room $room ...\n";
+        &AD_group_kill({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        group=>$room,
+#                        ou=>$ou,
+#                        school_token=>$school_token,
+                        type=>"room",
+                        group_count=>$kill_room_count,
+                  });
+    }
+
+
+
     &print_title("Killing Workstations:");
     my $count=1;
     foreach my $computer (@killing_computers){

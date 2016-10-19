@@ -405,6 +405,7 @@ sub AD_group_kill {
     my $root_dse = $arg_ref->{root_dse};
     my $group = $arg_ref->{group};
     my $type = $arg_ref->{type};
+    my $group_count = $arg_ref->{group_count};
 
     &Sophomorix::SophomorixBase::print_title("Killing Group($type) $group:");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
