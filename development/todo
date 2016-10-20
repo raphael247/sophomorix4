@@ -10,12 +10,7 @@ DEVICE_FILE: alle Namen zulässig
 Bugs sophomorix-device
 
 - variablen umbenennen
-  device: alle
-  computer: einer mit $account
   workstation: begriff vermeiden
-- device dazu
-- device weg
-- examaccount 0 oder 1 -> wechseln
 - Tests schreiben dazu
   sophomorix-test für dns erweitern
 
@@ -49,6 +44,9 @@ AD_get_name_tokened wird ersetzt du sophomorix_has abfrage
 
 
 remove_whitespace überall einsetzten
+
+Passwoort falsch in sophomorix-samba.secret
+--> Abbruch mit aussagekräftiger Fehkermeldung.
 
 
 Passwortänderung erzwingen, wie geht das?
@@ -313,23 +311,7 @@ samba-tool user setpassword Administrator
 DNS
 ############################################################
 
-abhängigkeiten 
-todotodo
-1) zusätzlich erstellen
-
-%devices{'file'}{'device'}{$name} usw, wie bisher 
-                                  + examaccount TRUE/FALSE
-                                  + dnszone
-%devices{'file'}{'room'}{$name} usw, wie bisher
-
-%devices{'system'}{'device'}
-%devices{'system'}{'room'}
-
-neu dazu: 
-school-token,filename zu jedem %devices{'file'}{'device'}
-
-2) statt auf die alten hashes zu verweisen, den neuen benutzen
-
+abhängigkeiten für DNS query testen
 
 
 * Alle bisherigen abfragen??:
