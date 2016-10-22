@@ -596,11 +596,111 @@ sophomorix-schools.conf
      expect_login_name (bei teacher.csv: YES, NO: generiere)
        --> sinnvole Warnung in office.report: login expected 
 
+############################################################
+   
+
 
 sophomorix-check
 
 --analyze-file /path/to/file --use-filter /path/to filter
+
+--extrastudents.csv erzeugt Dateien in ../tmp wie nach Filter
+
 --list-filter (and exit) 
+
+Einlesen der Daten
+
+1) Filter oder Copy anwenden
+   extraclasses -> user generieren
+
+(Ende von sophomorix-check --filter-only)
+
+2) Lauf durch Dateien: 
+
+   A) Einlesen in 
+      %user_file
+
+
+
+      identifier -> <identifier>    FIRSTNAME
+                                    SURNAME
+                                    BIRTH
+                                    UNID
+                                    FILE
+                                    ZEILE_OLD
+                                    ... passwort length, ... auch? was in .update, .move, .add kommen würde?
+                                    COUNT -> wie oft wurde dieser identifier gesehen
+
+     lookup oder Full?      
+     unid  -> <unid> IDENTIFIER ->
+     dateiname -> Zeilennummer -> LINE_ORIG -> unmodifiziert
+                               -> LINE_FIXED -> mod, utf8
+                               -> identifier
+                               -> unid
+                               und später
+                               -> LINE_ADD
+                               -> LINE_UPDATE
+                               -> LINE_MOVE
+                               -> LINE_KILL (gibts nicht)
+     Klassenweise user
+
+
+Zeile alt, Zeile neu
+
+     Identische Zeilen -> log, Warning, ...
+
+
+
+   B) Vornamen (+Nachnamen) auf encoding testen
+
+
+3) Lauf durch den hash, jeder entry
+   mit dem gefundenen encoding
+   FIRSTNAME_UTF8 usw. dazu
+   sowie LINE_FIXED (gibts doppelungen?)
+
+
+4) korrigierte Zeilen ausgeben: *.csv.filter.utf8
+
+(Ende von sophomorix-check --analyze)
+Option (zum debuggen: --show-line students.csv:20
+
+5) Lesen der systemdaten 
+   vorhandene Loginnamenliste erzeugen
+
+6) vergleichen (Reihenfolge)
+   Linien Durchgehen 1-x
+
+   im hash .add .move .kill .update erstellen
+
+   .kill: sofort entfernbar
+   .move: andere Klasse, andere Schule (AD Umbau, Klassen und Gruppenzugehörigkeiten)
+   .update (Account internes update: Namen, Status, Duldung)
+   .add neu hinzu
+
+7) Linien in datei schreiben (wieso nicht gleich?)
+   Deswegen: debuggen
+   Option: --show-line students.csv:20 bzw. --show-line 20    für alle Dateien)
+   Zeigt:
+   students.csv OLD:   ....
+   students.csv NEW
+   sophomorix.add: ... Zeile oder Titel=Rest
+   sophomorix.update:
+   sophomorix.move:
+   sophomorix.kill:
+   System: dump of Values
+
+Problem: eine Zeile kann MEHRERE Zeilen verursachen, z.B. Versetzung UND Namenskorrektur
+??? Zusammenfassen in sophomorix-update (-move gibts dann nicht mehr???)
+Egal in welcher Reihenfolge, es sollte 
+
+
+
+Resultat für Encoding:
+
+A) keine Sonderzeichen -> ASCII
+B) wiederspruch -> UNDETECTABLE
+C) sicher Festgestellt -> UTF(, ...   
 
 
 sophomorix-quota
