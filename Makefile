@@ -52,7 +52,7 @@ DUMPCONF=$(DESTDIR)/usr/share/sophomorix-dump
 VAMPIRECONF=$(DESTDIR)/usr/share/sophomorix-vampire
 
 # Encoding-data
-#ENCODING=$(DESTDIR)/usr/share/sophomorix/encoding-data
+ENCODING=$(DESTDIR)/usr/share/sophomorix/encoding-data
 
 # Language
 LANGUAGE=$(DESTDIR)/usr/share/sophomorix/lang
@@ -206,8 +206,8 @@ install-sophomorix-samba:
 #	@install -d -m755 -oroot -groot $(LANGUAGE)/latex-templates
 #	@install -oroot -groot --mode=0644 sophomorix-base/latex-templates/*.tex $(LANGUAGE)/latex-templates
 # Encoding-data
-#	@install -d -m755 -oroot -groot $(ENCODING)
-#	@install -oroot -groot --mode=0644 sophomorix-base/encoding-data/*.txt $(ENCODING)
+	@install -d -m755 -oroot -groot $(ENCODING)
+	@install -oroot -groot --mode=0644 sophomorix-samba/encoding-data/*.txt $(ENCODING)
 # filter scripts
 #	@install -d -m755 -oroot -groot $(FILTER)
 #	@install -oroot -groot --mode=0755 sophomorix-base/filter/*-filter $(FILTER)

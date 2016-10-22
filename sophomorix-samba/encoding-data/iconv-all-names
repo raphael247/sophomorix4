@@ -1,0 +1,109 @@
+#!/usr/bin/perl -w
+# This script is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@gmx.de
+
+use strict;
+use Text::Iconv;
+
+############################################################
+# README
+############################################################
+#
+# 1. Adding a name to the correct list:
+#     A) Open $file_in in emacs (replace):
+#         emacs <$file_in> 
+#     B) Find that name on an unicoded website 
+#        (i.e. wikipedia -> Edit -> Mark to copy  )
+#     C) Insert the name into emacs/file
+#     D) Run iconv-all-names to create all other target 
+#        encoding files:
+#         firstnames.<enc>.txt
+#         firstname_errors.<enc>.txt
+#
+# 2. Adding a name to errors
+#     A) Lookup the wrong character in a coding Table
+#        i.e. in iso8859-1 (Example: A8)
+#     B) Write the character in a temporary file and 
+#        append suggestion after a colon.
+#        Example: Rene with wrong Accent A8:
+#        echo -e "Ren\xE8: Wrong accent on letter e ?" > file
+#     C) Check the result with emacs 
+#        (Wrong letter should display nicely):
+#        emacs file
+#     D) convert this file to a unicode file uni:
+#        iconv --verbose -f 8859_1 -t utf-8 file -o uni
+#     E) Add/Append the contents of the file to 
+#        firstname_errors.utf8.txt with emacs or:
+#        cat uni >> firstname_errors.utf8.txt
+#     D) Run iconv-all-names to create all other target 
+#        encoding files:
+#         firstnames.<enc>.txt
+#         firstname_errors.<enc>.txt
+#
+
+############################################################
+# Config
+############################################################
+
+
+# the utf8 master file
+my $file_in="./firstnames.utf8.txt";
+my $file_error_in="./firstname_errors.utf8.txt";
+
+# target encodings
+my @target_encodings=(
+                     "ISO_8859-1",
+                     );
+
+
+
+############################################################
+# Program
+############################################################
+
+# correct names
+foreach my $encoding (@target_encodings){
+    # converting the utf8 file to targets
+    my $target_name="./firstnames.".$encoding.".txt";
+    &convert($file_in,$target_name,$encoding);
+}
+
+# error names
+foreach my $encoding (@target_encodings){
+    # converting the utf8 error file to targets
+    my $target_name="./firstname_errors.".$encoding.".txt";
+    &convert($file_error_in,$target_name,$encoding);
+}
+
+
+
+############################################################
+# subs
+############################################################
+
+# Option
+# infile
+# outfile
+# target_encoding
+sub convert {
+    my ($in,$out,$enc) = @_;
+    open(IN, "$in") || die "Fehler: $! $in nicht gefunden!"; 
+    open(OUT, ">$out") || die "Fehler: $! $in nicht gefunden!"; 
+    while (<IN>){
+        chomp();
+        my $inline=$_;
+        print "$inline\n";
+        my $conv = Text::Iconv->new("utf8",$enc);
+        my $outline = $conv->convert($inline);
+        if (defined $outline){
+            print "$inline --> $outline\n";
+            print OUT "$outline\n";
+        } else {
+            print "$inline --> NOT CONVERTABLE\n";
+        }
+    }
+    close(IN);
+    close(OUT);
+}
