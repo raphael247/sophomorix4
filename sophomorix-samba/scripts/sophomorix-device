@@ -182,7 +182,8 @@ my %devices_file=();
 #
 # room     -> $room     -> HOSTS
 #                       -> IPv4
-#                       -> MAC 
+#                       -> MAC
+#                       -> CLASSROOM=TRUE/FALSE 
 # dnsNode  -> $dnsNode  -> $IP
 # computer -> $computer -> ROOM
 #                       -> OU
@@ -222,7 +223,13 @@ my %devices_file=();
 
 # classrooms
 my %class_rooms=();
-my @class_rooms=();
+# ?????????????ß configure classrooms from other
+$class_rooms{'j1010'}="seen";
+$class_rooms{'j1008'}="seen";
+$class_rooms{'bsz-j1010'}="seen";
+$class_rooms{'bsz-j1008'}="seen";
+#my @class_rooms=();
+# my $host_classrooms=$DevelConf::path_conf_host."/classrooms";
 
 my $set_computer_passwords=0;
 my $test_dns=0;
@@ -230,7 +237,6 @@ my $dns_test=0;
 my $dns_show=0;
 my $dns_kill=0;
 
-my $host_classrooms=$DevelConf::path_conf_host."/classrooms";
 
 my %host_seen=();
 my %mac_seen=();
@@ -514,7 +520,7 @@ my %AD= %$ref_AD;
 
 # /etc/linuxmuster/classroom
 # ?????????????????????????
-&get_classrooms();
+#&get_classrooms();
 
 
 
@@ -733,7 +739,13 @@ foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
 foreach my $examaccount (keys %{$devices_file{'device'}}) {
     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
         # host is not in system
-        &push_add_examaccount($examaccount);
+        # examaccounts only for classroom devices and 
+        my $room=$devices_file{'device'}{$examaccount}{'ROOM'};
+        if (exists $class_rooms{$room} and $devices_file{'device'}{$examaccount}{'ACCOUNT'} eq "TRUE"){
+            &push_add_examaccount($examaccount);
+        } else {
+            # not adding
+        }
     } else {
         # device is not in correct room -> update (kill and add)
         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
@@ -891,7 +903,7 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    #print Dumper(%devices_file{'device'});
+    #print Dumper(%devices_file{'devices'});
     #print Dumper(%devices_file);
 
     #print Dumper(%AD);
@@ -1368,7 +1380,11 @@ sub analyze_line {
         $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;
         $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key;
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
-        $devices_file{'device'}{$host_token}{'ACCOUNT'}=$account_flag;
+        if ($account_flag==1){
+            $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
+        } else {
+            $devices_file{'device'}{$host_token}{'ACCOUNT'}="FALSE";
+        }
         $devices_file{'device'}{$host_token}{'WORKSTATION'}=$ws_token;
         $devices_file{'device'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
         $devices_file{'device'}{$host_token}{'SCHOOL_TOKEN'}=$school_token;
@@ -1671,30 +1687,31 @@ sub push_kill_dnszone {
 
 
 
-sub get_classrooms {
-    &print_title("Fetching classrooms from $host_classrooms:");
-    if (not -e $host_classrooms){
-        print "   * File $host_classrooms does not exist!\n";
-        return;
-    } else {
-        print "   * File $host_classrooms exists\n";
-    }
-    open(CLASSROOM, "<$host_classrooms");
-    while(<CLASSROOM>){
-        chomp();
-        s/ //g;
-        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-            next;
-        }
-        my $line=$_;
-        if($Conf::log_level>=2){
-            print "   * $line\n";
-        }
-        push @class_rooms, $line;
-        $class_rooms{$line}="seen";
-    }
-    close(CLASSROOM);
-}
+# sub get_classrooms {
+#     &print_title("Fetching classrooms from $host_classrooms:");
+#     if (not -e $host_classrooms){
+#         print "   * File $host_classrooms does not exist!\n";
+#         return;
+#     } else {
+#         print "   * File $host_classrooms exists\n";
+#     }
+#     open(CLASSROOM, "<$host_classrooms");
+#     while(<CLASSROOM>){
+#         chomp();
+#         s/ //g;
+#         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+#             next;
+#         }
+#         my $line=$_;
+#         if($Conf::log_level>=2){
+#             print "   * $line\n";
+#         }
+# 	print "CLASS <$line>\n";
+#         push @class_rooms, $line;
+#         $class_rooms{$line}="seen";
+#     }
+#     close(CLASSROOM);
+# }
 
 
 

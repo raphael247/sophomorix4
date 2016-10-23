@@ -119,7 +119,12 @@ sub AD_object_nonexist {
     # check if object exists
     # (&(objectclass=user)(cn=pete)
     # (&(objectclass=group)(cn=7a)
-    my $filter="(&(objectclass=".$type.") (cn=".$name."))"; 
+    my $filter;   
+    if ($type eq "examaccount"){
+        $filter="(&(objectclass=user) (cn=".$name.") (sAMAccountname=".$name.") )";
+    } else {
+        $filter="(&(objectclass=".$type.") (cn=".$name."))";
+    } 
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
