@@ -77,6 +77,9 @@ my $list_files=0;
 my $lock=0;
 my $unlock=0;
 my $analyze_encoding="";
+my $show_special_char_lines=0;
+my $non_umlaut=0;
+my @special_char_lines=();
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -86,6 +89,8 @@ my $testopt=GetOptions(
            "lock" => \$lock,
            "analyze-encoding=s" => \$analyze_encoding,
            "unlock" => \$unlock,
+           "show-special-char-lines" => \$show_special_char_lines,
+           "non-umlaut|nonumlaut" => \$non_umlaut,
            "help|h" => \$help,
           );
 
@@ -118,8 +123,13 @@ Options
   --list-files                     (list processed files and exit)
   --lock / --unlock
 
---analyze-encoding /path/to/students.csv
-
+Analyze the encoding of a file:
+  --analyze-encoding /path/to/students.csv
+Analyze the encoding of a file and show Umlaut and other special chars
+  --show-special-char-lines --analyze-encoding /path/to/students.csv
+Analyze the encoding of a file and show special chars (not umlauts)
+  --non-umlaut  --show-special-char-lines --analyze-encoding /path/to/students.csv
+ 
 Please see the sophomorix-check(8) man pages for full documentation
 ');
    print "\n";
@@ -133,14 +143,12 @@ if ($unlock==1) {
     exit;
 }
 
+
 # --lock
 if ($lock==1) {
     &lock_sophomorix("lock",0,@arguments);
     exit;
 }
-
-
-
 
 
 # --info
@@ -153,6 +161,7 @@ if ($info==1) {
        }
        exit;
    }
+
 
 # --list-files
 if ($list_files==1) {
@@ -174,13 +183,26 @@ if ($analyze_encoding ne ""){
     }
     &reading_firstnames();
     &reading_firstname_errors();
-    &analyze_encoding($analyze_encoding);
+    my $enc=&analyze_encoding($analyze_encoding);
+    if ($show_special_char_lines==1){
+        my $count=0;
+	foreach my $line (@special_char_lines){
+            my $conv = Text::Iconv->new($enc,"utf8");
+            my $line_utf8 = $conv->convert($line);
+            if ($non_umlaut==1){
+                # äöüÄÖÜß works because its unicode
+                if ($line_utf8=~/[^äöüÄÖÜßa-zA-Z0-9\-\.;_\/\s]/) { 
+                    $count++;
+                    print "$count)  $line_utf8\n";
+                }
+            } else {
+                    $count++;
+                    print "$count)  $line_utf8\n";
+            }
+        }
+    }
     &log_script_exit("",1,1,0,@arguments);
 }
-
-
-
-
 
 &log_script_start(@arguments);
 
@@ -267,6 +289,7 @@ sub reading_firstname_errors {
 
 
 
+
 sub analyze_encoding {
     my ($file) = @_;
     # set all result counters to 0
@@ -282,12 +305,23 @@ sub analyze_encoding {
     # start to analyze file
     &Sophomorix::SophomorixBase::print_title("Analyzing $file for encoding");
     open(DATAFILE, "$file") || 
-         die "Fehler: $! $analyze_encoding nicht gefunden!"; 
+         die "Fehler: $! $file nicht gefunden!"; 
+    my $count=0;
     while (<DATAFILE>){
+        $count++;
         chomp();
         if ($_ eq ""){
             next;
         }
+        ####################################
+        if ($show_special_char_lines==1){
+            if ($_=~/[^a-zA-Z0-9\-\.;_\/\s]/) { 
+                #print "$_\n";
+                push @special_char_lines, "Line ".$count."   ".$_;
+                #$special_char_lines{$count}=$line;
+            }
+        }
+
         my ($class,$surname,$firstname,$date) = split(/;/);
         # split firstname-field into single firstnames
         # split at 'space' and '-'
@@ -428,6 +462,8 @@ sub analyze_encoding {
     print "+---------------------+--------+--------+--------+\n";
     print "$file:\n",
           "    File-Encoding is $encoding_check_results{$file}{'firstnames'}{'result'}\n"; 
-   close(DATAFILE);
+    print "\n";
+    close(DATAFILE);
+    return $encoding_check_results{$file}{'firstnames'}{'result'};
 }
 
