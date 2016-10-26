@@ -32,6 +32,19 @@ Bugs sophomorix-device
 - unused zones löschen
 - adminDescription und sophomorixAdminFile nutzen bei workstations, computeraccounts$
  
+Geräteverwaltung:
+Wie kommen Ducker in Cups
+Rechner, Drucker, Access Points:
+- lehrernetz/schuelernetz 
+- ist eine Role erforderlich?
+- wo im ldap? dns-admin-description
+
+Zusammenfassung zu Räumen
+
+
+
+
+
 
 Liste zulässiger Dateinamen/Optionen abprüfen beim einlesen der Konfigurationsdateien
 
@@ -597,9 +610,6 @@ sophomorix-schools.conf
        --> sinnvole Warnung in office.report: login expected 
 
 ############################################################
-   
-
-
 sophomorix-check
 
 -- kann man Felderreihenfolge selbst bestimmen?
@@ -712,6 +722,40 @@ Resultat für Encoding:
 A) keine Sonderzeichen -> ASCII
 B) wiederspruch -> UNDETECTABLE
 C) sicher Festgestellt -> UTF(, ...   
+
+Benutzersynchronisation, Reihenfolge:
+
+1) Matches suchen: .update .move
+
+A) unid aus Datei gibts im system 
+     a) alle Daten gleich -> nix tun
+        (evtl aus dem hash löschen, nächste schleife performanter)
+     b) ein paar Daten unterschiedlich 
+          Klasse gleich: *.update
+          Klasse verschieden: *.update und move
+     c) Daten sehr unterschiedlich -> warnung, ohne update
+
+B) unid aus Datei gibts nicht im system, aber in  Dateien
+     a) identifier gleich -> *.update zum unid hochladen 
+        (umstellung auf unid, evtl. option unid hochladen)
+
+     b) ohne unid, identifier gleich, klasse gleich 
+        -> nix tun
+
+     c) identifier ahnlich -> update
+ 
+2) Neue suchen         (mit unid -> .add)
+3) zu Löschende suchen (mit unid -> kill)
+
+4) ohne unid: 
+   Dateien für sophomorix-teach-in erstellen
+   .add, -> .update (tolerate,deactivation date) or .kill
+5) Do it, oder sophomorix-teach-in 
+
+
+
+
+
 
 
 sophomorix-quota
