@@ -139,9 +139,7 @@ sub AD_bind_admin {
                             );
     my $res = $mesg2->count; 
     if ($res!=1){
-        if($Conf::log_level>=2){
             print "   * ERROR: Sophomorix-Schema nonexisting\n";
-        }
         exit;
     } elsif ($res==1){
         if($Conf::log_level>=2){
