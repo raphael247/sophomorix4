@@ -48,6 +48,7 @@ use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
                                  AD_test_object
                                  AD_test_dns
+                                 AD_test_nondns
                                  AD_computers_any
                                  AD_examaccounts_any
                                  AD_dnsnodes_any
@@ -946,43 +947,59 @@ if ($test_ws_5==1){
     # SCHOOL
     &AD_object_nonexist($ldap,$root_dse,"examaccount","j1008p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","J1008P01\$");
+    &AD_test_nondns($res,"j1008p01");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","j1008p02");
     &AD_object_nonexist($ldap,$root_dse,"computer","J1008P02\$");
+    &AD_test_nondns($res,"j1008p02");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1008\$");
+    &AD_test_nondns($res,"laserj1008");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","j1010p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","J1010P01\$");
+    &AD_test_nondns($res,"j1010p01");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","j1010p02");
     &AD_object_nonexist($ldap,$root_dse,"computer","J1010P02\$");
+    &AD_test_nondns($res,"j1010p02");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1010\$");
+    &AD_test_nondns($res,"laser1010");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c001p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","C001P01\$");
+    &AD_test_nondns($res,"c001p01");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c002p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","C002P01\$");
+    &AD_test_nondns($res,"c002p01");
 
     ############################################################
     # bsz
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-j1008p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-J1008P01\$");
+    &AD_test_nondns($res,"bsz-j1008p01");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-j1008p02");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-J1008P02\$");
+    &AD_test_nondns($res,"bsz-j1008p02");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1008\$");
+    &AD_test_nondns($res,"bsz-laser1008");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-j1010p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-J1010P01\$");
+    &AD_test_nondns($res,"bsz-j1010p01");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-j1010p02");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-J1010P02\$");
+    &AD_test_nondns($res,"bsz-j1010p02");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1010\$");
+    &AD_test_nondns($res,"bsz-laser1010");
 
-    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-c001p01");
-    &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-C001P01\$");
-    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-c002p01");
-    &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-C002P01\$");
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
+    &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-D001P01\$");
+    &AD_test_nondns($res,"bsz-d001p01");
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d002p01");
+    &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-D002P01\$");
+    &AD_test_nondns($res,"bsz-d002p01");
 
     &AD_computers_any($ldap,$root_dse);
     &AD_examaccounts_any($ldap,$root_dse);

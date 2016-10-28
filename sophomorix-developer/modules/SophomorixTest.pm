@@ -29,6 +29,7 @@ $Data::Dumper::Terse = 1;
             AD_object_nonexist
             AD_test_object
             AD_test_dns
+            AD_test_nondns
             AD_computers_any
             AD_examaccounts_any
             AD_dnsnodes_any
@@ -66,6 +67,21 @@ sub AD_test_dns {
         }
     } else {
         is (0,1,"  * dns query succesful (1) or not (0)");
+    }
+}
+
+
+sub AD_test_nondns {
+    my ($res,$host)=@_;
+    my $reply = $res->search($host);
+    if ($reply) {
+        foreach my $rr ($reply->answer) {
+            next unless $rr->type eq "A";
+            my $ipv4=$rr->address;
+            is (0,1,"  * $host has no IPv4 (IPv4 is $ipv4, positive dns response");
+        }
+    } else {
+        is (0,0,"  * dns query for $host failed (0) ");
     }
 }
 
