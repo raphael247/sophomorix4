@@ -385,8 +385,8 @@ if ($dns_test==1){
         print Dumper(%devices_file);
     }
     foreach my $host (@domcomputers_file){
-      my $file_ip=$devices_file{'device'}{$host}{"IPv4"};
-      my $reply = $res->search($host);
+        my $file_ip=$devices_file{'device'}{$host}{"IPv4"};
+        my $reply = $res->search($host);
         if ($reply) {
             foreach my $rr ($reply->answer) {
                 next unless $rr->type eq "A";
@@ -395,12 +395,12 @@ if ($dns_test==1){
                     print "OK: $host has IP: ",$rr->address,"\n";
                 } else {
                     print "ERROR $host has IP: ",
-                           $rr->address," (expected was $file_ip)\n";
+                          $rr->address," (expected was $file_ip)\n";
                 }
             }
         } else {
             # no reply: query failed
-            warn "    * query failed: ", 
+             warn "    * query failed: ", 
                  $res->errorstring, 
                  " ($host has expected IP $file_ip)\n";
         }

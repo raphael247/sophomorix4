@@ -28,6 +28,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             AD_object_nonexist
             AD_test_object
+            AD_test_dns
             AD_computers_any
             AD_examaccounts_any
             AD_dnsnodes_any
@@ -52,7 +53,23 @@ sub AD_computers_any {
         print "   * ",$entry->get_value('sAMAccountName'),"\n";
     }
 }
- 
+
+
+
+sub AD_test_dns {
+    my ($res,$host,$ipv4)=@_;
+    my $reply = $res->search($host);
+    if ($reply) {
+        foreach my $rr ($reply->answer) {
+            next unless $rr->type eq "A";
+            is ($rr->address,$ipv4,"  * $host has IPv4 $ipv4 by dns query");
+        }
+    } else {
+        is (0,1,"  * dns query succesful (1) or not (0)");
+    }
+}
+
+
            
 sub AD_examaccounts_any {
     my ($ldap,$root_dse) = @_;
@@ -70,6 +87,8 @@ sub AD_examaccounts_any {
                   "  sophomorixAdminClass:  ".$entry->get_value('sophomorixAdminClass')."\n";
     }
 }
+
+
 
 
 sub AD_rooms_any {
