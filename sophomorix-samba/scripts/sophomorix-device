@@ -925,21 +925,6 @@ if($no_sync==1){
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
-    # create OU
-#    if (not exists $ou_created{$ou}){
-#        # create ou
-#        &AD_ou_add({ldap=>$ldap,
-#                    root_dse=>$root_dse,
-#                    ou=>$ou,
-#                    school_token=>$school_token,
-#                    creationdate=>$time_stamp_AD,
-#                    sophomorix_config=>\%sophomorix_config,
-#             });
-#        # remember ou
-#        $ou_created{$ou}="already created";
-#    }
-
-    ############################################################
     # kill examaccounts
     &print_title("Killing ExamAccounts:");
     my $kill_count=1;
@@ -963,7 +948,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'};
         my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
         $plain_password=&get_plain_password($role,@passwort_zeichen);
-
         if (not exists $ou_created{$ou}){
             # create ou
             &AD_ou_add({ldap=>$ldap,
@@ -976,7 +960,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
             # remember ou
             $ou_created{$ou}="already created";
         }
-
         &AD_user_create({ldap=>$ldap, 
                          root_dse=>$root_dse,
                          user_count=>$add_count,
@@ -1047,6 +1030,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                          });
         $count++;
     }
+
     ############################################################
     # Add computers
     &print_title("Adding Computers:");
