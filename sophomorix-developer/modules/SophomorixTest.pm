@@ -141,6 +141,8 @@ sub AD_object_nonexist {
     my $filter;   
     if ($type eq "examaccount"){
         $filter="(&(objectclass=user) (cn=".$name.") (sAMAccountname=".$name.") )";
+    } elsif ($type eq "computer"){
+        $filter="(&(objectclass=computer) (sAMAccountname=".$name.") )";
     } else {
         $filter="(&(objectclass=".$type.") (cn=".$name."))";
     } 
