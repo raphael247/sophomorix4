@@ -1,8 +1,9 @@
-sophomorix-samba für linuxmuster.net 7 --- Weekly x
+sophomorix-samba für linuxmuster.net 7 --- Weekly 8
 
 ############################################################
-sophomorix4/Samba4 weekly Nr. 8  (xx.06.2016)
+sophomorix4/Samba4 weekly Nr. 9  (xx.11.2016)
 ############################################################
+
 
 Konfigurationsdatei: classrooms
 --> wegfallen lassen
@@ -27,33 +28,6 @@ Wenn dann über alle Dateien sophomorix-check lauft/add/move... gibts Probleme
   s*-add, ... brechen ab, wenn eines der userfiles inzwischen verändert wurde
 * ...
 
-
-DNS:
-dnsNode:
-- im dnsNode sind die IP-Informationen binär gespeichert
-- Diese Binäre IP-Informationen anders sich von MS-Server zu MS-Server
---> Problem 1: mit welcher IP ist ein device im DNS?
---> Problem 2: wie kann IP angelegt/upgedated werden
---> Problem 3: Es gibt schon einen haufen MS-default dnsNodes.
-               Die sollten auf keinen Fall gelöscht werden
----> Lösungen: 
-  * anlegen der DNS-Nodes mit samba-tool
-    (Binäre Berechnung, Passend zur Server Version)
-  * danach wird der dnsNode von sophomorix ergänzt mit:
-    1) adminDescription=SophomorixdnsNode from <*devices.csv>
-    2) cn=RECHNERNAME
-    Beim listen/killen von dnsNodes werden nur die von sophomorix angezeigt/gekillt
-  * Hat ein devices die richtige IP: 
-    Abfrage vor der synchronisation der devices mit DNS 
-    (dauert etwas?? -> testen)
-
-dnsZone:
-
-ähnliches Problem
-* existenz kann aber auch im AD ermittelt werden
-* außer sophomorix gibts nur:
-  * RootDNSServers
-  * linuxmuster.local (oder ähnlich, vom provisioning)
 
 
 ??? Autoquota nach migration/oder auch sonst zum setup
@@ -84,7 +58,8 @@ Umgang mit Konfigurationsdateien:
     - einzelne Zeilen, Kommentar hinter der Zeile: 
       QUOTA_USE=Yes # using quota on Yes/yes or No/no
 
- 
+
+
 Development-Prinzip:
 
 wie kann man an einer bestimmte Liste von usern etwas ändern:
@@ -114,6 +89,101 @@ option zum ändern beliebiger ldap Felder (Feldname angeben)
 - man macht am ldap rum, ...
 - gehr auch mit samba tool/anderen tools? für beliebeige Felder?
 
+
+Momentane Testanleitung:
+----------------------------------------------------------------------
+Es kann getestet werden!
+
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_testinstall
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_migration
+
+### Die weeklys finden sich auf github (von unten nach oben lesen):
+### https://github.com/linuxmuster/sophomorix4/blob/xenial/development/news/sophomorix4-samba4-weekly.txt
+
+
+############################################################
+sophomorix4/Samba4 weekly Nr. 8  (29.10.2016)
+############################################################
+
+Info über Entwicklungs-Entscheidungen
+------------------------------------------------------------
+Konfigurationsdateien für den admin:
+siehe http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_multischool
+
+Was habe ich seit dem letzten Weekly erledigt/verändert?
+----------------------------------------------------------------------
+
+sophomorix-device tut (Nachfolger von import_workstations)
+
+###### DNS:
+dnsNode:
+- im dnsNode sind die IP-Informationen binär gespeichert
+- Diese Binäre IP-Informationen ändert sich von MS-Server zu MS-Server
+  (siehe changelog)
+--> Problem 1: mit welcher IP ist ein device im DNS?
+--> Problem 2: wie kann IP angelegt/upgedated werden
+--> Problem 3: Es gibt schon einen haufen MS-default dnsNodes.
+               Die sollten auf keinen Fall gelöscht werden
+---> Lösungen: 
+  * anlegen der DNS-Nodes mit samba-tool
+    (Binäre Berechnung, Passend zur Server Version)
+  * danach wird der dnsNode von sophomorix ergänzt mit:
+    1) adminDescription=SophomorixdnsNode from <*devices.csv>
+    2) cn=RECHNERNAME
+    Beim listen/killen von dnsNodes werden nur die von sophomorix angezeigt/gekillt
+    (erkennbar an adminDescription=SophomorixdnsNode=*)
+  * Hat ein device die richtige IP: 
+    Abfrage vor der synchronisation der devices mit DNS 
+    -> geht sehr perfomant
+
+dnsZone:
+
+ähnliches Problem
+* existenz kann aber auch im AD ermittelt werden
+* außer sophomorix gibts nur:
+  * RootDNSServers
+  * linuxmuster.local (oder ähnlich, vom provisioning)
+* bisher werden alle dnsNodes in der beim Provisioning anglegten Zone
+  (z.B. linuxmuster.local) angelegt
+* später kommen evtl. weitere Zonen hinzu
+
+sophomorix-test-2
+* Testet im moment das Anlegen und löschen der devices
+* Mehr Tests für Namensänderung, IP-Änderung, ... folgen noch 
+
+##### Konfigurationsdateien für admin
+
+Neues Format und Ort für Konfigurationsdateien:
+
+Gesamt-Konfiguration:  /etc/sophomorix/sophomorix.conf      
+Schulkonfiguration:    /etc/sophomorix/user/*.school.conf
+
+##### sophomorix-check
+
+* liest Gesamt-Konfiguration in einen perl-hash, anzeigbar mit
+  sophomorix-check --info 
+* analysiert einzelne Dateien auf encoding
+
+
+Was mache ich als nächstes?
+----------------------------------------------------------------------
+
+sophomorix-check: sync users
+admin Gruppen anlegen
+sophomorix-passwd: optionen zum laufen bringen
+
+
+Momentane Testanleitung:
+----------------------------------------------------------------------
+Es kann getestet werden!
+
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_testinstall
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_testing
+http://www.linuxmuster.net/wiki/entwicklung:techsheets:samba4_sophomorix_migration
+
+### Die weeklys finden sich auf github (von unten nach oben lesen):
+### https://github.com/linuxmuster/sophomorix4/blob/xenial/development/news/sophomorix4-samba4-weekly.txt
 
 
 ############################################################
