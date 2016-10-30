@@ -5,14 +5,19 @@
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
 # device tests
-# * add 2 computer in 2 rooms in 2 schools and 1 printer (no examaccount)
+# test 1 to 2:
+# OK: * add 2 computer in 2 rooms in 2 schools and 1 printer (no examaccount)
+# OK: * rename a computer in the same room
+# OK: * change ip of computer
+# OK: * update mac adress -> no action so far
+
+
+
 # * add another computer and another printer in each room
 # * move a computer, printer in another room
 # * move a computer, printer in another school (filename must change)
-# * update mac adress -> no action
-# * rename a computer in the same room
+
 # * rename computer AND move it to another room, another school
-# * change ip of computer
 # * make computer to printer and back
 
 
@@ -884,8 +889,645 @@ if ($copy_devfile_2==1){
 
 
 if ($test_ws_2==1){
+    ############################################################
+    # devices.csv
+    ############################################################
+    # j1008p01
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1008p01,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"j1008p01",
+                   sAMAccountname=>"j1008p01",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "j1008",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixAdminFile => "devices.csv",
+                   memberOf => "j1008",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
 
+    # J1008P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=J1008P01,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Computer J1008P01",
+                   name=>"J1008P01",
+                   cn=>"J1008P01",
+                   sAMAccountname=>"J1008P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "J1008P01.".$root_dns,
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   servicePrincipalName => "HOST/J1008P01,".
+                                           "HOST/J1008P01.".$root_dns.",".
+                                           "RestrictedKrbHost/J1008P01,".
+                                           "RestrictedKrbHost/J1008P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"j1008p01","10.170.208.1");
 
+    ############################################################
+    # j1008p02
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"j1008p02",
+                   sAMAccountname=>"j1008p02",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "j1008",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixAdminFile => "devices.csv",
+                   memberOf => "j1008",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # J1008P02$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=J1008P02,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Computer J1008P02",
+                   name=>"J1008P02",
+                   cn=>"J1008P02",
+                   sAMAccountname=>"J1008P02\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "J1008P02.".$root_dns,
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   servicePrincipalName => "HOST/J1008P02,".
+                                           "HOST/J1008P02.".$root_dns.",".
+                                           "RestrictedKrbHost/J1008P02,".
+                                           "RestrictedKrbHost/J1008P02.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"j1008p02","10.170.208.2");
+
+    ############################################################
+    # laser1008
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1008");
+    &AD_object_nonexist($ldap,$root_dse,"computer","LASER1008\$");
+    #dns 
+    &AD_test_dns($res,"laser1008","10.170.208.30");
+
+    ############################################################
+    # j1010p01
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"j1010p01",
+                   sAMAccountname=>"j1010p01",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "j1010",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixAdminFile => "devices.csv",
+                   memberOf => "j1010",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # J1010P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=J1010P01,OU=j1010,OU=Computers,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Computer J1010P01",
+                   name=>"J1010P01",
+                   cn=>"J1010P01",
+                   sAMAccountname=>"J1010P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "J1010P01.".$root_dns,
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   servicePrincipalName => "HOST/J1010P01,".
+                                           "HOST/J1010P01.".$root_dns.",".
+                                           "RestrictedKrbHost/J1010P01,".
+                                           "RestrictedKrbHost/J1010P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"j1010p01","10.170.210.1");
+
+    ############################################################
+    # j1010p02
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"j1010p02",
+                   sAMAccountname=>"j1010p02",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "j1010",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixAdminFile => "devices.csv",
+                   memberOf => "j1010",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   sAMAccountname=>"examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # J1010P02$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=J1010P02,OU=j1010,OU=Computers,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Computer J1010P02",
+                   name=>"J1010P02",
+                   cn=>"J1010P02",
+                   sAMAccountname=>"J1010P02\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "J1010P02.".$root_dns,
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   servicePrincipalName => "HOST/J1010P02,".
+                                           "HOST/J1010P02.".$root_dns.",".
+                                           "RestrictedKrbHost/J1010P02,".
+                                           "RestrictedKrbHost/J1010P02.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"j1010p02","10.170.210.2");
+
+    ############################################################
+    # laser1010
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1010");
+    &AD_object_nonexist($ldap,$root_dse,"computer","LASER1010\$");
+    #dns 
+    &AD_test_dns($res,"laser1010","10.170.210.30");
+
+    ############################################################
+    # c001p01
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","c001p01");
+    # C001P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=C001P01,OU=c001,OU=Computers,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Computer C001P01",
+                   name=>"C001P01",
+                   cn=>"C001P01",
+                   sAMAccountname=>"C001P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "C001P01.".$root_dns,
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   servicePrincipalName => "HOST/C001P01,".
+                                           "HOST/C001P01.".$root_dns.",".
+                                           "RestrictedKrbHost/C001P01,".
+                                           "RestrictedKrbHost/C001P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"c001p01","10.170.1.1");
+
+    ############################################################
+    # c002p01
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","c002p01");
+    # C002P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=C002P01,OU=c002,OU=Computers,OU=SCHOOL,".$root_dse,
+                   #####
+                   displayName=>"Computer C002P01",
+                   name=>"C002P01",
+                   cn=>"C002P01",
+                   sAMAccountname=>"C002P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "C002P01.".$root_dns,
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "SCHOOL",
+                   servicePrincipalName => "HOST/C002P01,".
+                                           "HOST/C002P01.".$root_dns.",".
+                                           "RestrictedKrbHost/C002P01,".
+                                           "RestrictedKrbHost/C002P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"c002p01","10.170.2.1");
+
+    ############################################################
+    # bsz.devices.csv
+    ############################################################
+    # bsz-j1008p01
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"bsz-j1008p01",
+                   sAMAccountname=>"bsz-j1008p01",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "bsz-j1008",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixAdminFile => "bsz.devices.csv",
+                   memberOf => "bsz-j1008",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "bsz-examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # BSZ-J1008P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-J1008P01,OU=bsz-j1008,OU=Computers,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-J1008P01",
+                   name=>"BSZ-J1008P01",
+                   cn=>"BSZ-J1008P01",
+                   sAMAccountname=>"BSZ-J1008P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-J1008P01.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   servicePrincipalName => "HOST/BSZ-J1008P01,".
+                                           "HOST/BSZ-J1008P01.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-J1008P01,".
+                                           "RestrictedKrbHost/BSZ-J1008P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"bsz-j1008p01","10.171.208.1");
+
+    ############################################################
+    # bsz-j1008p02
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"bsz-j1008p02",
+                   sAMAccountname=>"bsz-j1008p02",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "bsz-j1008",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixAdminFile => "bsz.devices.csv",
+                   memberOf => "bsz-j1008",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "bsz-examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # BSZ-J1008P02$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-J1008P02,OU=bsz-j1008,OU=Computers,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-J1008P02",
+                   name=>"BSZ-J1008P02",
+                   cn=>"BSZ-J1008P02",
+                   sAMAccountname=>"BSZ-J1008P02\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-J1008P02.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   servicePrincipalName => "HOST/BSZ-J1008P02,".
+                                           "HOST/BSZ-J1008P02.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-J1008P02,".
+                                           "RestrictedKrbHost/BSZ-J1008P02.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"bsz-j1008p02","10.171.208.2");
+
+    ############################################################
+    # bsz-laser1008
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1008");
+    &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER\$");
+    #dns 
+    &AD_test_dns($res,"bsz-laser1008","10.171.208.30");
+
+    ############################################################
+    # bsz-j1010p01
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"bsz-j1010p01",
+                   sAMAccountname=>"bsz-j1010p01",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "bsz-j1010",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixAdminFile => "bsz.devices.csv",
+                   memberOf => "bsz-j1010",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "bsz-examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # BSZ-J1010P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-J1010P01,OU=bsz-j1010,OU=Computers,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-J1010P01",
+                   name=>"BSZ-J1010P01",
+                   cn=>"BSZ-J1010P01",
+                   sAMAccountname=>"BSZ-J1010P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-J1010P01.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   servicePrincipalName => "HOST/BSZ-J1010P01,".
+                                           "HOST/BSZ-J1010P01.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-J1010P01,".
+                                           "RestrictedKrbHost/BSZ-J1010P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"bsz-j1010p01","10.171.210.1");
+
+    ############################################################
+    # bsz-j1010p02
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Exam Account",
+                   givenName=>"Exam",
+                   name=>"bsz-j1010p02",
+                   sAMAccountname=>"bsz-j1010p02",
+                   uidNumber=>"-1",
+                   sn=>"Account",
+                   sophomorixAdminClass => "bsz-j1010",
+                   sophomorixExitAdminClass => "unknown",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Exam",
+                   sophomorixSurnameASCII  => "Account",
+                   sophomorixRole => "examaccount",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixAdminFile => "bsz.devices.csv",
+                   memberOf => "bsz-j1010",
+                  });
+    ##### Testing the exam accounts room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"room",
+                   memberOf => "bsz-examaccounts",
+                  });
+    ##### Testing the examaccounts <token>-examaccounts group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+                   sAMAccountname=>"bsz-examaccounts",
+                   gidNumber=>"-1",
+                   memberOf => "global-examaccounts",
+                  });
+
+    # BSZ-J1010P02$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-J1010P02,OU=bsz-j1010,OU=Computers,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-J1010P02",
+                   name=>"BSZ-J1010P02",
+                   cn=>"BSZ-J1010P02",
+                   sAMAccountname=>"BSZ-J1010P02\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-J1010P02.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   servicePrincipalName => "HOST/BSZ-J1010P02,".
+                                           "HOST/BSZ-J1010P02.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-J1010P02,".
+                                           "RestrictedKrbHost/BSZ-J1010P02.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"bsz-j1010p02","10.171.210.2");
+
+    ############################################################
+    # bsz-laser1010
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1010");
+    &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1010\$");
+    #dns 
+    &AD_test_dns($res,"bsz-laser1010","10.171.210.30");
+
+    ############################################################
+    # bsz-d001p01
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
+    # BSZ-D001P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-D001P01,OU=bsz-d001,OU=Computers,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-D001P01",
+                   name=>"BSZ-D001P01",
+                   cn=>"BSZ-D001P01",
+                   sAMAccountname=>"BSZ-D001P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-D001P01.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   servicePrincipalName => "HOST/BSZ-D001P01,".
+                                           "HOST/BSZ-D001P01.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-D001P01,".
+                                           "RestrictedKrbHost/BSZ-D001P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"bsz-d001p01","10.171.1.1");
+
+    ############################################################
+    # bsz-d002p01
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d002p01");
+    # BSZ-D002P01$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-D002P01,OU=bsz-d002,OU=Computers,OU=BSZLEO,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-D002P01",
+                   name=>"BSZ-D002P01",
+                   cn=>"BSZ-D002P01",
+                   sAMAccountname=>"BSZ-D002P01\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "computer",
+                   sophomorixStatus=>"P",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-D002P01.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "BSZLEO",
+                   servicePrincipalName => "HOST/BSZ-D002P01,".
+                                           "HOST/BSZ-D002P01.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-D002P01,".
+                                           "RestrictedKrbHost/BSZ-D002P01.".$root_dns.",",
+                  });
+    #dns 
+    &AD_test_dns($res,"bsz-d002p01","10.171.2.1");
 }
 
 
