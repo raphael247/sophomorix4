@@ -377,7 +377,7 @@ if ($dns_test==1){
        open(DEVICES,"$device_file") || 
              die "ERROR: $device_file not found!";  
         while(<DEVICES>){
-            &analyze_line($_,$device_file,$filename,$school_token,$ou);
+            &analyze_device_line($_,$device_file,$filename,$school_token,$ou);
         }
         close(DEVICES);
     }
@@ -716,7 +716,7 @@ foreach my $device_file (@filelist){
     open(DEVICES,"$device_file") || 
          die "ERROR: $device_file not found!";  
     while(<DEVICES>){
-        &analyze_line($_,$device_file,$filename,$school_token,$ou);
+        &analyze_device_line($_,$device_file,$filename,$school_token,$ou);
     }
     close(DEVICES);
 }
@@ -1338,7 +1338,7 @@ exit 0;
 # ===========================================================================
 # subs
 # ===========================================================================
-sub analyze_line {
+sub analyze_device_line {
     my ($line,$device_file,$filename,$school_token,$ou) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
