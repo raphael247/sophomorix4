@@ -17,6 +17,9 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
+use File::Basename qw( basename
+                       dirname
+                     ); 
 use Text::Iconv;
 
 use Sophomorix::SophomorixBase qw(
@@ -56,6 +59,11 @@ my @arguments = @ARGV;
 my $time_stamp_file=&time_stamp_file();
 my $time_stamp_AD=&time_stamp_AD();
 my $user_count=0;
+
+my $ou="";
+my $school_token="";
+my %users_file=();
+
 
 # encoding tests
 my %firstnames_data=();
@@ -213,6 +221,27 @@ if ($analyze_encoding ne ""){
 
 &AD_unbind_admin($ldap);
 
+# reading and checking all user files
+foreach my $user_file (@filelist){
+    my $count=0;
+    my $filename = basename($user_file);
+    $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL_TOKEN'};
+    $ou=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'OU'};
+    &print_title("Reading $user_file");
+    open(USERS,"$user_file") || 
+         die "ERROR: $user_file not found!";  
+    while(<USERS>){
+        $count++;
+        &analyze_user_line($_,$user_file,$filename,$school_token,$ou,$count);
+    }
+    close(USERS);
+}
+
+
+#    if($Conf::log_level>=2){
+        print Dumper(%users_file);
+#    }
+
 
 
 
@@ -223,6 +252,53 @@ if ($analyze_encoding ne ""){
 ################################################################################
 # Subroutinen
 ################################################################################
+
+sub analyze_user_line {
+    my ($line,$device_file,$filename,$school_token,$ou,$count) = @_;
+    if (/^#/ or /^\s*$/){
+        return 0;
+    } else {
+        chomp($line);
+        my ($class,
+            $last,
+            $first,
+            $birthdate,
+            $unid,
+           )=split(/;/,$line);
+        my $class_checked=&check_class($class);
+        my $first_checked=&check_first($first);
+        my $last_checked=&check_last($last);
+        my $birthdate_checked=&check_birthdate($birthdate);
+        $users_file{$filename}{$count}{FIRSTNAME}=$first_checked;
+    }
+}
+
+
+sub check_class {
+    my ($class)=@_;
+    return $class;
+}
+
+
+sub check_first {
+    my ($first)=@_;
+    return $first;
+
+}
+
+
+sub check_last {
+    my ($last)=@_;
+    return $last;
+
+}
+
+
+sub check_birthdate {
+    my ($birthdate)=@_;
+    return $birthdate;
+
+}
 
 
 sub reading_firstnames {
