@@ -275,8 +275,6 @@ sub analyze_user_line {
 
         my $line_new=join(";", ($class,$last,$first,$birthdate,$unid));
 
-        my $line_new=join(";", ($class,$first,$last,$unid));
-#        $users_file{$filename}{$count}{FIRSTNAME}=$first_checked;
         $users_file{'identifier'}{$identifier}{LINE_OLD}=$line;
         $users_file{'identifier'}{$identifier}{LINE_NEW}=$line_new;
         $users_file{'identifier'}{$identifier}{FIRSTNAME}=$first;
@@ -285,6 +283,7 @@ sub analyze_user_line {
         $users_file{'identifier'}{$identifier}{CLASS}=$class;
         $users_file{'identifier'}{$identifier}{UNID}=$unid_raw;
         $users_file{'identifier'}{$identifier}{FILE}=$filename;
+        $users_file{'identifier'}{$identifier}{LINE_COUNT}=$count;
         $users_file{'identifier'}{$identifier}{FILE_ABS}=$file_abs;
 
         # file -> line
