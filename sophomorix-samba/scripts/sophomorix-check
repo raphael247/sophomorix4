@@ -264,15 +264,26 @@ sub analyze_user_line {
             $last_raw,
             $first_raw,
             $birthdate_raw,
-            $unid_raw,
+            $field5,
            )=split(/;/,$line);
+
         my $class=&check_class($class_raw);
         my $first=&check_first($first_raw);
         my $last=&check_last($last_raw);
         my $birthdate=&check_birthdate($birthdate_raw);
-        my $unid=&check_unid($unid_raw);
-        my $identifier=join(";", ($last,$first,$birthdate));
+        my $unid="";
+        my $login="";
+        my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD5};
+        if ($field5_key eq "LOGIN"){
+            $login=&check_login($field5);
+        } elsif ($field5_key eq "UNID"){
+            $unid=&check_unid($field5);
+        }
 
+        # add here more stuff to create sophomorix.add, ...
+        my $role=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
+
+        my $identifier=join(";", ($last,$first,$birthdate));
         my $line_new=join(";", ($class,$last,$first,$birthdate,$unid));
 
         $users_file{'identifier'}{$identifier}{LINE_OLD}=$line;
@@ -281,10 +292,12 @@ sub analyze_user_line {
         $users_file{'identifier'}{$identifier}{LASTNAME}=$last;
         $users_file{'identifier'}{$identifier}{BIRTHDATE}=$birthdate;
         $users_file{'identifier'}{$identifier}{CLASS}=$class;
-        $users_file{'identifier'}{$identifier}{UNID}=$unid_raw;
+        $users_file{'identifier'}{$identifier}{UNID}=$unid;
+        $users_file{'identifier'}{$identifier}{LOGIN}=$login;
         $users_file{'identifier'}{$identifier}{FILE}=$filename;
         $users_file{'identifier'}{$identifier}{LINE_COUNT}=$count;
         $users_file{'identifier'}{$identifier}{FILE_ABS}=$file_abs;
+        $users_file{'identifier'}{$identifier}{ROLE}=$role;
 
         # file -> line
         $users_file{'file'}{$filename}{$count}{'identifier'}=$identifier;
@@ -303,6 +316,11 @@ sub check_class {
     # klassen filtern ?????
     $class=~s/\//$DevelConf::replace_slash_with/g;
 
+    if ($class eq "lehrer" or 
+        $class eq "Lehrer"
+       ){
+        $class=$DevelConf::teacher;
+    }
     return $class;
 }
 
@@ -310,7 +328,6 @@ sub check_class {
 sub check_first {
     my ($first)=@_;
     $first=&remove_whitespace($first);
-print "FI $first\n";
     return $first;
 }
 
@@ -370,6 +387,13 @@ sub check_unid {
     my ($unid)=@_;
     $unid=&remove_whitespace($unid);
     return $unid;
+}
+
+
+sub check_login {
+    my ($login)=@_;
+    $login=&remove_whitespace($login);
+    return $login;
 }
 
 
