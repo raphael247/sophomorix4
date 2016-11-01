@@ -38,6 +38,7 @@ use Sophomorix::SophomorixBase qw(
                                  check_options
                                  config_sophomorix_read
                                  filelist_fetch
+                                 remove_whitespace
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -259,45 +260,113 @@ sub analyze_user_line {
         return 0;
     } else {
         chomp($line);
-        my ($class,
-            $last,
-            $first,
-            $birthdate,
-            $unid,
+        my ($class_raw,
+            $last_raw,
+            $first_raw,
+            $birthdate_raw,
+            $unid_raw,
            )=split(/;/,$line);
-        my $class_checked=&check_class($class);
-        my $first_checked=&check_first($first);
-        my $last_checked=&check_last($last);
-        my $birthdate_checked=&check_birthdate($birthdate);
-        $users_file{$filename}{$count}{FIRSTNAME}=$first_checked;
+        my $class=&check_class($class_raw);
+        my $first=&check_first($first_raw);
+        my $last=&check_last($last_raw);
+        my $birthdate=&check_birthdate($birthdate_raw);
+        my $unid=&check_unid($unid_raw);
+        my $identifier=join(";", ($last,$first,$birthdate));
+
+        my $line_new=join(";", ($class,$first,$last,$unid));
+#        $users_file{$filename}{$count}{FIRSTNAME}=$first_checked;
+        $users_file{'identifier'}{$identifier}{LINE_OLD}=$line;
+        $users_file{'identifier'}{$identifier}{LINE_NEW}=$line;
+        $users_file{'identifier'}{$identifier}{FIRSTNAME}=$first;
+        $users_file{'identifier'}{$identifier}{LASTNAME}=$last;
+        $users_file{'identifier'}{$identifier}{CLASS}=$class;
+        $users_file{'identifier'}{$identifier}{UNID}=$unid_raw;
+        $users_file{'identifier'}{$identifier}{FILE}=$filename;
+
+        # file -> line
+        $users_file{'file'}{$filename}{$count}{'identifier'}=$identifier;
+        $users_file{'file'}{$filename}{$count}{'identifier_worldwide'}=$identifier;
+
     }
 }
 
 
 sub check_class {
     my ($class)=@_;
+    $class=&remove_whitespace($class);
+    # convert to small letters
+    $class=~tr/A-Z/a-z/; 
+    # sternchenklassen filtern ?????
+    # klassen filtern ?????
+    $class=~s/\//$DevelConf::replace_slash_with/g;
+
     return $class;
 }
 
 
 sub check_first {
     my ($first)=@_;
+    $first=&remove_whitespace($first);
+print "FI $first\n";
     return $first;
-
 }
 
 
 sub check_last {
     my ($last)=@_;
+    $last=&remove_whitespace($last);
     return $last;
-
 }
 
 
 sub check_birthdate {
     my ($birthdate)=@_;
-    return $birthdate;
+    $birthdate=&remove_whitespace($birthdate);
+    my $dot_count=$birthdate=~tr/\.//;
+    if ($dot_count==2){
+        if($Conf::log_level>=3){
+            print " ... $dot_count dots in date found ... OK\n";
+	}
+    } elsif ($birthdate eq ""){
+        if($Conf::log_level>=3){
+            print " ... Date is empty, Line not corrupted ...\n";
+	}
+    } else {
+	#$datum_korrupt=1;
+        print " ... $dot_count dots in date found ... ERROR\n";
+	#$datum_korrupt_anzahl++;
+          
+        # Eintrag in report.admin
+        #push (@admin_list_corrupt, "Corrupted Line (" , $punkte_anzahl ,
+        #                  " dots in date):\n" , $_ , "\n\n");
+        # Set tag for Abbruch
+        #$tag = "0"  
+    }
 
+    my ($day,$month,$year)=split(/\./,$birthdate);
+
+    # Instead of undefined use empty string
+    # this avoids errors
+    if (not defined $day){
+        $day="";
+    }
+    if (not defined $month){
+        $month="";
+    }
+    if (not defined $year){
+        $year="";
+    }
+
+    my $birthdate_ok = join(".",($day,$month,$year));
+
+    return $birthdate_ok;
+}
+
+
+sub check_unid {
+    my ($unid)=@_;
+    $unid=&remove_whitespace($unid);
+    return $unid;
 }
 
 

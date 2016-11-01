@@ -40,6 +40,7 @@ $Data::Dumper::Terse = 1;
             config_sophomorix_read
             filelist_fetch
             dns_query_ip
+            remove_whitespace
             );
 
 
