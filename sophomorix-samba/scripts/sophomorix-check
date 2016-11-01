@@ -210,6 +210,7 @@ if ($analyze_encoding ne ""){
             }
         }
     }
+    &print_analyzed_encoding($analyze_encoding);
     &log_script_exit("",1,1,0,@arguments);
 }
 
@@ -221,6 +222,13 @@ if ($analyze_encoding ne ""){
 ################################################################################
 
 &AD_unbind_admin($ldap);
+
+# analyzing encoding of all user files
+&reading_firstnames();
+&reading_firstname_errors();
+foreach my  $user_file (@filelist){
+    &analyze_encoding($user_file);
+}
 
 # reading and checking all user files
 foreach my $user_file (@filelist){
@@ -241,6 +249,7 @@ foreach my $user_file (@filelist){
 
 #    if($Conf::log_level>=2){
         print Dumper(%users_file);
+
 #    }
 
 
@@ -392,7 +401,6 @@ sub check_birthdate {
     }
 
     my $birthdate_ok = join(".",($day,$month,$year));
-
     return $birthdate_ok;
 }
 
@@ -476,8 +484,11 @@ sub reading_firstname_errors {
 
 
 
+
+
 sub analyze_encoding {
     my ($file) = @_;
+    my $filename = basename($file);
     # set all result counters to 0
     foreach my $enc (@encodings_to_check){
         $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc}=0;
@@ -496,13 +507,14 @@ sub analyze_encoding {
     while (<DATAFILE>){
         $count++;
         chomp();
-        if ($_ eq ""){
+        s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
             next;
         }
+
         ####################################
         if ($show_special_char_lines==1){
             if ($_=~/[^a-zA-Z0-9\-\.;_\/\s]/) { 
-                #print "$_\n";
                 push @special_char_lines, "Line ".$count."   ".$_;
                 #$special_char_lines{$count}=$line;
             }
@@ -563,8 +575,6 @@ sub analyze_encoding {
         }
     }
 
-    print "\nEncoding check result for:\n";
-    print "   $file\n";
 
     # calculate sum
     my $oldsum=0;
@@ -576,6 +586,96 @@ sub analyze_encoding {
             $encoding_check_results{$file}{'firstnames'}{'result'}=$enc;
         }
     }
+
+    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
+        $encoding_check_results{$file}{'firstnames'}{'result'};
+
+    # print "\nEncoding check result for:\n";
+    # print "   $file\n";
+
+    # # print valid firstnames
+    # if($Conf::log_level>=2){
+    # print "\nValid firstnames: ",
+    #       "($encoding_check_results{$file}{'firstnames'}{'result'} ---> utf8)\n";
+    # print "==========================================================================\n";
+    # foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} } ){
+    #     printf  "%-20s %-12s %-20s\n",
+    #             $item->{first},
+    #             "--->",
+    #             $item->{first_utf8};
+    # }
+    # print "--------------------------------------------------------------------------\n";
+    # }
+
+    # # print unknown firstnames
+    # print "\n";
+    # print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
+    # print "+------------------------------------------+\n";
+    # foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_unknown'} } ){
+    #     printf  "| %-40s |\n",
+    #             $item->{first},
+    # }
+    # print "+------------------------------------------+\n";
+
+
+    # #  print firstnames with errors
+    # print "\nFirstnames that should be an error (Please report the the School Office):\n";
+    # print "+---------------------------------------------------------------------------+\n";
+    # foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_errors'} } ){
+    #     printf  "| %-15s%-60s|\n",
+    #             $item->{first_utf8},
+    #             $item->{line};
+    #     my $enc_result=$encoding_check_results{$file}{'firstnames'}{'result'};
+    #     printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
+    #     print "+---------------------------------------------------------------------------+\n";
+    # }
+
+
+
+    # # print debug dump
+    # if($Conf::log_level>=3){
+    #     print "Dump of \%encoding_check_results:\n";
+    #     print Dumper(\%encoding_check_results);
+    # }
+
+
+    # # Print Result
+    # print "\n";
+    # print "+---------------------+--------+--------+--------+\n";
+    # printf  "| %-20s|%7s |%7s |%7s |\n",
+    #         "Tested Encodings:",
+    #         "Hits",
+    #         "Errors",
+    #         "Sum";
+    # print "+---------------------+--------+--------+--------+\n";
+    # foreach my $enc (@encodings_to_check){
+    #     printf  "| %-20s|%7s |%7s |%7s |\n",
+    #             $enc,
+    #             $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc},
+    #             $encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc},
+    # 	        $encoding_check_results{$file}{'firstnames'}{'count_sum'}{$enc};
+    # }
+    # print "+---------------------+--------+--------+--------+\n";
+    # printf  "| %-20s|%7s |%7s |%7s |\n",
+    #         "none",
+    #         $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'},
+    #         "",
+    #         "";
+    # print "+---------------------+--------+--------+--------+\n";
+    # print "$file:\n",
+    #       "    File-Encoding is $encoding_check_results{$file}{'firstnames'}{'result'}\n"; 
+    # print "\n";
+    # close(DATAFILE);
+    # return $encoding_check_results{$file}{'firstnames'}{'result'};
+}
+
+
+
+sub print_analyzed_encoding {
+    my ($file) = @_;
+
+    print "\nEncoding check result for:\n";
+    print "   $file\n";
 
     # print valid firstnames
     if($Conf::log_level>=2){
@@ -601,7 +701,6 @@ sub analyze_encoding {
     }
     print "+------------------------------------------+\n";
 
-
     #  print firstnames with errors
     print "\nFirstnames that should be an error (Please report the the School Office):\n";
     print "+---------------------------------------------------------------------------+\n";
@@ -614,14 +713,11 @@ sub analyze_encoding {
         print "+---------------------------------------------------------------------------+\n";
     }
 
-
-
     # print debug dump
     if($Conf::log_level>=3){
         print "Dump of \%encoding_check_results:\n";
         print Dumper(\%encoding_check_results);
     }
-
 
     # Print Result
     print "\n";
@@ -650,6 +746,4 @@ sub analyze_encoding {
           "    File-Encoding is $encoding_check_results{$file}{'firstnames'}{'result'}\n"; 
     print "\n";
     close(DATAFILE);
-    return $encoding_check_results{$file}{'firstnames'}{'result'};
 }
-
