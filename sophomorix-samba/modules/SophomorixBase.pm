@@ -353,6 +353,20 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{BASEFILE}=$file;
+#                if ($file eq "students.csv"){
+#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIELD5}=
+#                       "UNID";
+#                } elsif ($file eq "extrastudents.csv"){
+#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIELD5}=
+#                       "WISH_LOGIN";
+#
+#                } elsif ($file eq "teachers.csv"){
+#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIELD5}=
+#                       "WISH_LOGIN";
+#
+#                }
+
                 my $abs_path=$DevelConf::path_conf_user."/".$token_file;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$abs_path;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}=$enc;
@@ -537,7 +551,7 @@ sub config_sophomorix_read {
         }
         chomp();
         my ($user,$primary,$secondary,$tertiary,$quaternary)=split(/\|\|/);
-        my ($roletype_file,$sophomorix_role)=split(/::/,$user);
+        my ($roletype_file,$sophomorix_field5,$sophomorix_role)=split(/::/,$user);
         my ($sophomorix_type_primary,$group_primary,$ou_sub_primary)=split(/::/,$primary);
         my ($sophomorix_type_secondary,$group_secondary,$ou_sub_secondary)=split(/::/,$secondary);
         my ($sophomorix_type_tertiary,$group_tertiary,$ou_sub_tertiary)=split(/::/,$tertiary);
@@ -547,6 +561,7 @@ sub config_sophomorix_read {
         $roletype_file=~s/^\*\.//g;# remove leading asterisk and dot
         # user
         $sophomorix_role=&remove_whitespace($sophomorix_role);
+        $sophomorix_field5=&remove_whitespace($sophomorix_field5);
         # primary group
         $sophomorix_type_primary=&remove_whitespace($sophomorix_type_primary);
         $group_primary=&remove_whitespace($group_primary);
@@ -601,7 +616,7 @@ sub config_sophomorix_read {
         # remember for the following commented line:
         # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
         foreach my $key (keys %{$sophomorix_config{'FILES'}{'USER_FILE'}}) {
-            if($Conf::log_level>=3){
+           if($Conf::log_level>=3){
                 print "\n";
                 print "* Name in RoleType file: $roletype_file\n";
                 print "* Name in schools.conf:  $key\n";
@@ -637,12 +652,13 @@ sub config_sophomorix_read {
                     print "* Match: Inserting data...\n";
                 }
                 my $ou_file=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU};
+
                 # user
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixRole}=$sophomorix_role;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{FIELD5}=$sophomorix_field5;
 
                 # primary group
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
-#		print "HER: >$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP}<\n";
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
                     $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 if ($group_primary ne "" and not $group_primary eq "multi"){
