@@ -255,7 +255,7 @@ foreach my $user_file (@filelist){
 ################################################################################
 
 sub analyze_user_line {
-    my ($line,$device_file,$filename,$school_token,$ou,$count) = @_;
+    my ($line,$file_abs,$filename,$school_token,$ou,$count) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -282,6 +282,7 @@ sub analyze_user_line {
         $users_file{'identifier'}{$identifier}{CLASS}=$class;
         $users_file{'identifier'}{$identifier}{UNID}=$unid_raw;
         $users_file{'identifier'}{$identifier}{FILE}=$filename;
+        $users_file{'identifier'}{$identifier}{FILE_ABS}=$file_abs;
 
         # file -> line
         $users_file{'file'}{$filename}{$count}{'identifier'}=$identifier;
