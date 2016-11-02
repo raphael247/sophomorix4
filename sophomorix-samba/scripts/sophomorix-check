@@ -232,6 +232,29 @@ if ($analyze_encoding ne ""){
 # Start
 ################################################################################
 
+# copy or filter files
+foreach my  $user_file (@filelist){
+    my $filename = basename($user_file);
+
+    my $source=$user_file;
+    my $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER'};
+    my $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER_SCRIPT'};
+
+    if (-x $filter_script){
+        # script is executable
+        system($filter_script);
+    } elsif ($filter_script =~ m/^\//){
+        # first char is a /
+        &log_script_exit("ERROR: Could not find executable filter script $filter_script",0,1,0,@arguments);
+    } else {
+        print "cp $source $target\n";
+        #system(cp $source $target);
+    }
+
+}
+
+
+#??????????????????? use filtered scripts
 
 # analyzing encoding of all user files
 &reading_firstnames();

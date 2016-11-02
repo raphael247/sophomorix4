@@ -335,7 +335,7 @@ sub config_sophomorix_read {
                 }
                 #$sophomorix_config{'GLOBAL'}{$var}=$value;
             } elsif ($var eq "USER_FILE"){
-                my ($file,$filter,$enc,$enc_force,$sur_chars,$first_chars,
+                my ($file,$filter_script,$enc,$enc_force,$sur_chars,$first_chars,
                     $reverse,$rand_pwd,$pwd_length)=split(/::/,$value);
                 my $token_file;
                 if ($school eq "school"){
@@ -367,8 +367,13 @@ sub config_sophomorix_read {
 #
 #                }
 
-                my $abs_path=$DevelConf::path_conf_user."/".$token_file;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$abs_path;
+                my $path_abs=$DevelConf::path_conf_user."/".$token_file;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$path_abs;
+                my $path_abs_filter=$DevelConf::path_conf_tmp."/".$token_file.".filter";
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER}=$path_abs_filter;
+                my $path_abs_utf8=$DevelConf::path_conf_tmp."/".$token_file.".filter.utf8";
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_UTF8}=$path_abs_utf8;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}=$enc;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING_FORCE}=$enc_force;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SURNAME_CHARS}=$sur_chars;
@@ -398,8 +403,8 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
-                my $abs_path=$DevelConf::path_conf_user."/".$token_file;
-                $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PATH_ABS}=$abs_path;
+                my $path_abs=$DevelConf::path_conf_user."/".$token_file;
+                $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PATH_ABS}=$path_abs;
                 $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{FILETYPE}="classes";
             } elsif ($var eq "DEVICE_FILE"){
                 my ($file,$rest)=split(/::/,$value);
@@ -423,8 +428,8 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU};
                 }
-                my $abs_path=$DevelConf::path_conf_host."/".$token_file;
-                $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$abs_path;
+                my $path_abs=$DevelConf::path_conf_host."/".$token_file;
+                $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$path_abs;
                 $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{FILETYPE}="devices";
             } else {
                 print "<$var> is not a valid variable name\n";
