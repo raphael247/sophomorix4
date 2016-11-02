@@ -497,7 +497,6 @@ sub analyze_encoding {
     $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'}=0;
     $encoding_check_results{$file}{'firstnames'}{'count_errors'}{'none'}=0;
     $encoding_check_results{$file}{'firstnames'}{'result'}="unknown";
-  
 
     # start to analyze file
     &Sophomorix::SophomorixBase::print_title("Analyzing $file for encoding");
@@ -519,7 +518,6 @@ sub analyze_encoding {
                 #$special_char_lines{$count}=$line;
             }
         }
-
         my ($class,$surname,$firstname,$date) = split(/;/);
         # split firstname-field into single firstnames
         # split at 'space' and '-'
@@ -575,7 +573,6 @@ sub analyze_encoding {
         }
     }
 
-
     # calculate sum
     my $oldsum=0;
     foreach my $enc (@encodings_to_check){
@@ -587,93 +584,16 @@ sub analyze_encoding {
         }
     }
 
+    # save result in config hash
     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
         $encoding_check_results{$file}{'firstnames'}{'result'};
-
-    # print "\nEncoding check result for:\n";
-    # print "   $file\n";
-
-    # # print valid firstnames
-    # if($Conf::log_level>=2){
-    # print "\nValid firstnames: ",
-    #       "($encoding_check_results{$file}{'firstnames'}{'result'} ---> utf8)\n";
-    # print "==========================================================================\n";
-    # foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} } ){
-    #     printf  "%-20s %-12s %-20s\n",
-    #             $item->{first},
-    #             "--->",
-    #             $item->{first_utf8};
-    # }
-    # print "--------------------------------------------------------------------------\n";
-    # }
-
-    # # print unknown firstnames
-    # print "\n";
-    # print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
-    # print "+------------------------------------------+\n";
-    # foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_unknown'} } ){
-    #     printf  "| %-40s |\n",
-    #             $item->{first},
-    # }
-    # print "+------------------------------------------+\n";
-
-
-    # #  print firstnames with errors
-    # print "\nFirstnames that should be an error (Please report the the School Office):\n";
-    # print "+---------------------------------------------------------------------------+\n";
-    # foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_errors'} } ){
-    #     printf  "| %-15s%-60s|\n",
-    #             $item->{first_utf8},
-    #             $item->{line};
-    #     my $enc_result=$encoding_check_results{$file}{'firstnames'}{'result'};
-    #     printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
-    #     print "+---------------------------------------------------------------------------+\n";
-    # }
-
-
-
-    # # print debug dump
-    # if($Conf::log_level>=3){
-    #     print "Dump of \%encoding_check_results:\n";
-    #     print Dumper(\%encoding_check_results);
-    # }
-
-
-    # # Print Result
-    # print "\n";
-    # print "+---------------------+--------+--------+--------+\n";
-    # printf  "| %-20s|%7s |%7s |%7s |\n",
-    #         "Tested Encodings:",
-    #         "Hits",
-    #         "Errors",
-    #         "Sum";
-    # print "+---------------------+--------+--------+--------+\n";
-    # foreach my $enc (@encodings_to_check){
-    #     printf  "| %-20s|%7s |%7s |%7s |\n",
-    #             $enc,
-    #             $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc},
-    #             $encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc},
-    # 	        $encoding_check_results{$file}{'firstnames'}{'count_sum'}{$enc};
-    # }
-    # print "+---------------------+--------+--------+--------+\n";
-    # printf  "| %-20s|%7s |%7s |%7s |\n",
-    #         "none",
-    #         $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'},
-    #         "",
-    #         "";
-    # print "+---------------------+--------+--------+--------+\n";
-    # print "$file:\n",
-    #       "    File-Encoding is $encoding_check_results{$file}{'firstnames'}{'result'}\n"; 
-    # print "\n";
-    # close(DATAFILE);
-    # return $encoding_check_results{$file}{'firstnames'}{'result'};
+    return $encoding_check_results{$file}{'firstnames'}{'result'};
 }
 
 
 
 sub print_analyzed_encoding {
     my ($file) = @_;
-
     print "\nEncoding check result for:\n";
     print "   $file\n";
 
