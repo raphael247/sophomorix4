@@ -89,6 +89,7 @@ my $analyze_encoding="";
 my $show_special_char_lines=0;
 my $non_umlaut=0;
 my @special_char_lines=();
+my $follow="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -97,6 +98,7 @@ my $testopt=GetOptions(
            "list-files" => \$list_files,
            "lock" => \$lock,
            "analyze-encoding=s" => \$analyze_encoding,
+           "follow=s" => \$follow,
            "unlock" => \$unlock,
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
@@ -106,6 +108,13 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+# --follow
+my $follow_file="";
+my $follow_line="";
+if ($follow ne ""){
+    ($follow_file,$follow_line)=split(/:/,$follow);
+}
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
@@ -131,6 +140,8 @@ Options
   -i  / --info                     (dump configuration hash)
   --list-files                     (list processed files and exit)
   --lock / --unlock
+
+  --follow filename:linenumber     (show what happens to this line)
 
 Analyze the encoding of a file:
   --analyze-encoding /path/to/students.csv
@@ -247,14 +258,22 @@ foreach my $user_file (@filelist){
 }
 
 
-#    if($Conf::log_level>=2){
+    if($Conf::log_level>=2){
         print Dumper(%users_file);
 
-#    }
+    }
 
 
-
-
+# --follow
+if ($follow ne ""){
+    my $identifier=$users_file{'file'}{$follow_file}{$follow_line}{'identifier'};
+    if (not defined $identifier){
+        print "   * Line $follow_line in file $follow_file contains no usable data\n";
+    } else {
+        print "   * LINE ORIG: $users_file{'identifier'}{$identifier}{LINE_OLD}\n";
+        print "   * LINE UTF8: $users_file{'identifier'}{$identifier}{LINE_NEW}\n";
+    }
+}
 
 &AD_unbind_admin($ldap);
 
