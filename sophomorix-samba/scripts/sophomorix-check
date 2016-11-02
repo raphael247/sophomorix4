@@ -221,7 +221,6 @@ if ($analyze_encoding ne ""){
 # Start
 ################################################################################
 
-&AD_unbind_admin($ldap);
 
 # analyzing encoding of all user files
 &reading_firstnames();
@@ -236,6 +235,7 @@ foreach my $user_file (@filelist){
     my $filename = basename($user_file);
     $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL_TOKEN'};
     $ou=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'OU'};
+    
     &print_title("Reading $user_file");
     open(USERS,"$user_file") || 
          die "ERROR: $user_file not found!";  
@@ -256,6 +256,7 @@ foreach my $user_file (@filelist){
 
 
 
+&AD_unbind_admin($ldap);
 
 &log_script_end(@arguments);
 
@@ -279,6 +280,14 @@ sub analyze_user_line {
         my $class=&check_class($class_raw);
         my $first=&check_first($first_raw);
         my $last=&check_last($last_raw);
+
+        # converting names to utf8
+        my $conv = Text::Iconv->new(
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED},
+            "utf8");
+        my $first_utf8 = $conv->convert($first);
+        my $last_utf8 = $conv->convert($last);
+
         my $birthdate=&check_birthdate($birthdate_raw);
         my $unid="";
         my $login="";
@@ -289,22 +298,18 @@ sub analyze_user_line {
             $unid=&check_unid($field5);
         }
 
-
-
         # todo:
-        # FIRSTNAME_UTF8, LASTNAME_UTF8
         # password creation/passwodrv
 
-
         my $identifier=join(";", ($last,$first,$birthdate));
-        my $line_new=join(";", ($class,$last,$first,$birthdate,$unid));
+        my $line_new=join(";", ($class,$last_utf8,$first_utf8,$birthdate,$unid));
 
         $users_file{'identifier'}{$identifier}{LINE_OLD}=$line;
         $users_file{'identifier'}{$identifier}{LINE_NEW}=$line_new;
         $users_file{'identifier'}{$identifier}{FIRSTNAME}=$first;
-        $users_file{'identifier'}{$identifier}{FIRSTNAME_UTF8}=$first;
+        $users_file{'identifier'}{$identifier}{FIRSTNAME_UTF8}=$first_utf8;
         $users_file{'identifier'}{$identifier}{LASTNAME}=$last;
-        $users_file{'identifier'}{$identifier}{LASTNAME_UTF8}=$last;
+        $users_file{'identifier'}{$identifier}{LASTNAME_UTF8}=$last_utf8;
         $users_file{'identifier'}{$identifier}{BIRTHDATE}=$birthdate;
         $users_file{'identifier'}{$identifier}{CLASS}=$class;
         $users_file{'identifier'}{$identifier}{UNID}=$unid;
@@ -320,7 +325,6 @@ sub analyze_user_line {
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{OU};
         $users_file{'identifier'}{$identifier}{SCHOOL_TOKEN}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL_TOKEN};
-
 
         # file -> line
         $users_file{'file'}{$filename}{$count}{'identifier'}=$identifier;
