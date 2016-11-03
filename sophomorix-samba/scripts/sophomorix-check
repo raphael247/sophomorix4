@@ -203,7 +203,7 @@ if ($analyze_encoding ne ""){
     }
     &reading_firstnames();
     &reading_firstname_errors();
-    my $enc=&analyze_encoding($analyze_encoding);
+    my $enc=&analyze_encoding($analyze_encoding,$analyze_encoding);
     if ($show_special_char_lines==1){
         my $count=0;
 	foreach my $line (@special_char_lines){
@@ -235,22 +235,24 @@ if ($analyze_encoding ne ""){
 # copy or filter files
 foreach my  $user_file (@filelist){
     my $filename = basename($user_file);
-
     my $source=$user_file;
-    my $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER'};
-    my $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER_SCRIPT'};
-
+    my $targer_dir=
+    my $target=
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER'};
+    my $filter_script=
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER_SCRIPT'};
     if (-x $filter_script){
         # script is executable
         system($filter_script);
     } elsif ($filter_script =~ m/^\//){
         # first char is a /
-        &log_script_exit("ERROR: Could not find executable filter script $filter_script",0,1,0,@arguments);
+        my $text="ERROR: Could not find executable filter script $filter_script";
+        &log_script_exit($text,0,1,0,@arguments);
     } else {
+        system("mkdir -p $DevelConf::path_conf_tmp");
         print "cp $source $target\n";
-        #system(cp $source $target);
+        system("cp $source $target");
     }
-
 }
 
 
@@ -260,31 +262,40 @@ foreach my  $user_file (@filelist){
 &reading_firstnames();
 &reading_firstname_errors();
 foreach my  $user_file (@filelist){
-    &analyze_encoding($user_file);
+    my $filename = basename($user_file);
+    my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
+    # file in tmp    
+    &analyze_encoding($user_file,$user_file_tmp);
 }
 
 # reading and checking all user files
 foreach my $user_file (@filelist){
     my $count=0;
     my $filename = basename($user_file);
+    my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
+    # fetching some config data
     $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL_TOKEN'};
     $ou=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'OU'};
+
+    # file in tmp    
     
-    &print_title("Reading $user_file");
-    open(USERS,"$user_file") || 
-         die "ERROR: $user_file not found!";  
+    &print_title("Reading $user_file_tmp");
+    open(USERS,"$user_file_tmp") || 
+         die "ERROR: $user_file_tmp not found!";  
     while(<USERS>){
         $count++;
-        &analyze_user_line($_,$user_file,$filename,$school_token,$ou,$count);
+        &analyze_user_line($_,$user_file,$user_file_tmp,
+                           $filename,$school_token,$ou,$count);
     }
     close(USERS);
 }
 
 
-    if($Conf::log_level>=2){
-        print Dumper(%users_file);
 
-    }
+if($Conf::log_level>=2){
+    print Dumper(%users_file);
+}
+
 
 
 # --follow
@@ -307,7 +318,7 @@ if ($follow ne ""){
 ################################################################################
 
 sub analyze_user_line {
-    my ($line,$file_abs,$filename,$school_token,$ou,$count) = @_;
+    my ($line,$file_abs,$file_abs_tmp,$filename,$school_token,$ou,$count) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -533,8 +544,9 @@ sub reading_firstname_errors {
 
 
 sub analyze_encoding {
-    my ($file) = @_;
+    my ($file,$file_tmp) = @_;
     my $filename = basename($file);
+    my $filename_tmp = basename($file_tmp);
     # set all result counters to 0
     foreach my $enc (@encodings_to_check){
         $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc}=0;
@@ -545,7 +557,7 @@ sub analyze_encoding {
     $encoding_check_results{$file}{'firstnames'}{'result'}="unknown";
 
     # start to analyze file
-    &Sophomorix::SophomorixBase::print_title("Analyzing $file for encoding");
+    &Sophomorix::SophomorixBase::print_title("Encode-analyzing $file");
     open(DATAFILE, "$file") || 
          die "Fehler: $! $file nicht gefunden!"; 
     my $count=0;
