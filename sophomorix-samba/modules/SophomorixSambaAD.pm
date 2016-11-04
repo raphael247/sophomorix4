@@ -1286,6 +1286,9 @@ sub AD_get_AD {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
 
+    my $users = $arg_ref->{users};
+    if (not defined $users){$users="FALSE"};
+
     my $computers = $arg_ref->{computers};
     if (not defined $computers){$computers="FALSE"};
 
@@ -1306,6 +1309,65 @@ sub AD_get_AD {
         $dnszones="TRUE";
     }
 
+    ##################################################
+    if ($users eq "TRUE"){
+        # sophomorix students,teachers from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=user)(sophomorixRole=student))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixAdminClass',
+                                 'givenName',
+                                 'sn',
+                                 'sophomorixFirstnameASCII',
+                                 'sophomorixSurnameASCII',
+                                 'sophomorixBirthdate',
+                                 'sophomorixStatus',
+                                 'sophomorixSchoolname',
+                                 'sophomorixSchoolPrefix',
+                                 'sophomorixAdminFile',
+                                 'sophomorixUnid',
+                                 'sophomorixRole',
+                                ]);
+        my $max_user = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+        $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixAdminClass'}=
+                $entry->get_value('sophomorixAdminClass');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixFirstnameASCII'}=
+                $entry->get_value('sophomorixFirstnameASCII');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixSurnameASCII'}=
+                $entry->get_value('sophomorixSurnameASCII');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'givenName'}=
+                $entry->get_value('givenName');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sn'}=
+                $entry->get_value('sn');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixBirthdate'}=
+                $entry->get_value('sophomorixBirthdate');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixStatus'}=
+                $entry->get_value('sophomorixStatus');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixSchoolname'}=
+                $entry->get_value('sophomorixSchoolname');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixPrefix'}=
+                $entry->get_value('sophomorixPrefix');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixAdminFile'}=
+                $entry->get_value('sophomorixAdminFile');
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixUnid'}=
+                $entry->get_value('sophomorixUnid');
+            # calculate identifiers
+            my $identifier=
+               $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixSurnameASCII'}
+               .";".
+               $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixFirstnameASCII'}
+               .";".
+               $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixBirthdate'};
+            $AD{'objectclass'}{'user'}{'student'}{$sam}{'IDENTIFIER'}=$identifier;
+        }
+    }
     ##################################################
     if ($computers eq "TRUE"){
         # sophomorix computers from ldap

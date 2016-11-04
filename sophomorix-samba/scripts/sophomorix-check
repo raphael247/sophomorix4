@@ -51,6 +51,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_ou_tokened
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
+                                 AD_get_AD
+                                 AD_dns_get
                                  AD_object_search
                                  get_forbidden_logins
                                     );
@@ -118,6 +120,7 @@ if ($follow ne ""){
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
@@ -232,7 +235,9 @@ if ($analyze_encoding ne ""){
 # Start
 ################################################################################
 
+# ============================================================
 # copy or filter files
+# ============================================================
 foreach my  $user_file (@filelist){
     my $filename = basename($user_file);
     my $source=$user_file;
@@ -243,6 +248,8 @@ foreach my  $user_file (@filelist){
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER_SCRIPT'};
     if (-x $filter_script){
         # script is executable
+        system("mkdir -p $DevelConf::path_conf_tmp");
+        print "calling filter script $filter_script\n";
         system($filter_script);
     } elsif ($filter_script =~ m/^\//){
         # first char is a /
@@ -256,9 +263,9 @@ foreach my  $user_file (@filelist){
 }
 
 
-#??????????????????? use filtered scripts
-
+# ============================================================
 # analyzing encoding of all user files
+# ============================================================
 &reading_firstnames();
 &reading_firstname_errors();
 foreach my  $user_file (@filelist){
@@ -268,7 +275,10 @@ foreach my  $user_file (@filelist){
     &analyze_encoding($user_file,$user_file_tmp);
 }
 
+
+# ============================================================
 # reading and checking all user files
+# ============================================================
 foreach my $user_file (@filelist){
     my $count=0;
     my $filename = basename($user_file);
@@ -291,14 +301,15 @@ foreach my $user_file (@filelist){
 }
 
 
-
+# dumping user in files
 if($Conf::log_level>=2){
+    &print_title("Hash \%users_file follows:");
     print Dumper(%users_file);
 }
 
 
-
 # --follow
+# show the line
 if ($follow ne ""){
     my $identifier=$users_file{'file'}{$follow_file}{$follow_line}{'identifier'};
     if (not defined $identifier){
@@ -308,6 +319,34 @@ if ($follow ne ""){
         print "   * LINE UTF8: $users_file{'identifier'}{$identifier}{LINE_NEW}\n";
     }
 }
+
+
+# ============================================================
+# asking AD for users
+# ============================================================
+&print_title("Asking the system for users ...");
+
+# fetch system data
+my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           computers=>"FALSE",
+                           rooms=>"FALSE",
+                           examaccounts=>"TRUE",
+                           users=>"TRUE",
+                           dnszones=>"FALSE",
+                           dnsnodes=>"FALSE",
+             });
+my %AD= %$ref_AD; 
+
+
+# dumping user in AD
+if($Conf::log_level>=2){
+    &print_title("Hash \%AD follows:");
+    print Dumper(%AD);
+}
+
+
 
 &AD_unbind_admin($ldap);
 
