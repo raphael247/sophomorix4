@@ -714,7 +714,7 @@ Option (zum debuggen: --show-line students.csv:20
 
 7) Linien in datei schreiben (wieso nicht gleich?)
    Deswegen: debuggen
-   Option: --show-line students.csv:20 bzw. --show-line 20    für alle Dateien)
+   Option: --follow students.csv:20
    Zeigt:
    students.csv OLD:   ....
    students.csv NEW
@@ -724,9 +724,45 @@ Option (zum debuggen: --show-line students.csv:20
    sophomorix.kill:
    System: dump of Values
 
+
+
+Idee: Zeile für Zeile durchgehen und ermitteln was zu tun ist:
+
+1) exakt passende matches
+- alle Zeilen durchgehen
+- unid match ODER id match
+  -> testen auf move (sub)
+  -> testen auf update (sub)
+-> ohne match: 
+   neu anzulegen im hash: proposed_add
+
+
+2) ermitteln der zu löschenden user
+   neu anzulegen im hash: proposed_delete
+
+3) approx-match der id
+  proposed_add und proposed_delete
+  -> automatisch matchen
+     &automatch_line();
+     -> alle delete durchgehen
+        -> approx-match
+           evtl. ermittel wie approx beide sind 
+  -> testen auf move (sub)
+  -> testen auf update (sub)
+
+- gar kein match zu vorhandenen:
+  -> add
+- übrigbleibende:
+  -> toleration
+  -> deactivation
+  -> kill
+
+
 Problem: eine Zeile kann MEHRERE Zeilen verursachen, z.B. Versetzung UND Namenskorrektur
 ??? Zusammenfassen in sophomorix-update (-move gibts dann nicht mehr???)
 Egal in welcher Reihenfolge, es sollte 
+
+
 
 
 
