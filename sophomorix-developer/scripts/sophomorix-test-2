@@ -899,14 +899,14 @@ if ($test_ws_2==1){
     ############################################################
     # devices.csv
     ############################################################
-    # j1008p01
+    # j1008p03
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008p01,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=j1008p03,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
                    #####
                    displayName=>"Exam Account",
                    givenName=>"Exam",
-                   name=>"j1008p01",
-                   sAMAccountname=>"j1008p01",
+                   name=>"j1008p03",
+                   sAMAccountname=>"j1008p03",
                    uidNumber=>"-1",
                    sn=>"Account",
                    sophomorixAdminClass => "j1008",
@@ -938,28 +938,28 @@ if ($test_ws_2==1){
                    memberOf => "global-examaccounts",
                   });
 
-    # J1008P01$
+    # J1008P03$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1008P01,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1008P03,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
                    #####
-                   displayName=>"Computer J1008P01",
-                   name=>"J1008P01",
-                   cn=>"J1008P01",
-                   sAMAccountname=>"J1008P01\$",
+                   displayName=>"Computer J1008P03",
+                   name=>"J1008P03",
+                   cn=>"J1008P03",
+                   sAMAccountname=>"J1008P03\$",
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "computer",
                    sophomorixStatus=>"P",
                    accountExpires => "9223372036854775807",
-                   dNSHostName => "J1008P01.".$root_dns,
+                   dNSHostName => "J1008P03.".$root_dns,
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "SCHOOL",
-                   servicePrincipalName => "HOST/J1008P01,".
-                                           "HOST/J1008P01.".$root_dns.",".
-                                           "RestrictedKrbHost/J1008P01,".
-                                           "RestrictedKrbHost/J1008P01.".$root_dns.",",
+                   servicePrincipalName => "HOST/J1008P03,".
+                                           "HOST/J1008P03.".$root_dns.",".
+                                           "RestrictedKrbHost/J1008P03,".
+                                           "RestrictedKrbHost/J1008P03.".$root_dns.",",
                   });
     #dns 
-    &AD_test_dns($res,"j1008p01","10.170.208.1");
+    &AD_test_dns($res,"j1008p03","10.170.208.1");
 
     ############################################################
     # j1008p02
@@ -1022,7 +1022,7 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/J1008P02.".$root_dns.",",
                   });
     #dns 
-    &AD_test_dns($res,"j1008p02","10.170.208.2");
+    &AD_test_dns($res,"j1008p02","10.170.208.4");
 
     ############################################################
     # laser1008

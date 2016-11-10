@@ -926,7 +926,7 @@ if($no_sync==1){
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # kill examaccounts
-    &print_title("Killing ExamAccounts:");
+    &print_title("ExamAccounts to be killed:");
     my $kill_count=1;
     foreach my $exam_account (@killing_examaccounts){
         print "   * Killing ExamAccount $exam_account ...\n";
@@ -940,7 +940,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # add examaccounts
-    &print_title("Adding ExamAccounts:");
+    &print_title("ExamAccounts to be added:");
     my $add_count=1;
     foreach my $exam_account (@adding_examaccounts){
         my $role="examaccount";
@@ -1006,7 +1006,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill the rooms of examaccounts
-    &print_title("Killing ExamAccount Rooms:");
+    &print_title("Rooms to be killed:");
     my $kill_room_count=1;
     foreach my $room (@killing_examaccount_rooms){
         print "   * Killing ExamAccount Room $room ...\n";
@@ -1020,7 +1020,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill computers
-    &print_title("Killing Computers:");
+    &print_title("Computers to be killed:");
     my $count=1;
     foreach my $computer (@killing_computers){
         &AD_computer_kill({ldap=>$ldap,
@@ -1033,7 +1033,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Add computers
-    &print_title("Adding Computers:");
+    &print_title("Computers to be added:");
     my $ws_count=1;
     foreach my $computer (@adding_computers){
         my $ou=$devices_file{'computer'}{$computer}{'OU'};
@@ -1068,7 +1068,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill dnsNodes
-    &print_title("Killing dnsNodes:");
+    &print_title("dnsNodes to be killed:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
         &AD_dns_kill({ldap=>$ldap, 
@@ -1083,7 +1083,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Add dnsNodes
-    &print_title("Adding dnsNodes:");
+    &print_title("dnsNodes to be added:");
     $dns_node_count=1;
     foreach my $dns_node (@adding_dnsnodes){
         &AD_dns_create({ldap=>$ldap, 
