@@ -30,5 +30,5 @@ print "$utf8_encoded_json_text\n";
 print "\n";
 print "Here ist the first json object:\n";
 print "$utf8_encoded_json_text2\n";
-print "\n";print "Script end\n";
+print "Script end\n";
 print "\n";
