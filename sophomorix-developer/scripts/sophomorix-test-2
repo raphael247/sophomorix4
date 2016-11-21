@@ -132,7 +132,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-test-2 tests the addition of ExamAccounts and computer accounts.
+sophomorix-test-2 tests the addition of DNSNodes and computer accounts.
 
 Options
   -h  / --help
@@ -176,8 +176,10 @@ Step 3-4 are missing
 # --full
 if ($full==1){
     $copy_devfile_1=1;
+    $copy_devfile_2=1;
     $copy_devfile_5=1;
     $test_ws_1=1;
+    $test_ws_2=1;
     $test_ws_5=1;
 }
 
@@ -243,44 +245,44 @@ if ($test_ws_1==1){
     ############################################################
     # devices.csv
     ############################################################
-    # j1008p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008p01,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1008p01",
-                   sAMAccountname=>"j1008p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1008p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008p01,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1008p01",
+    #                sAMAccountname=>"j1008p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1008P01$
     &AD_test_object({ldap=>$ldap,
@@ -307,43 +309,43 @@ if ($test_ws_1==1){
 
     ############################################################
     # j1008p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1008p02",
-                   sAMAccountname=>"j1008p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1008p02",
+    #                sAMAccountname=>"j1008p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1008P02$
     &AD_test_object({ldap=>$ldap,
@@ -376,44 +378,44 @@ if ($test_ws_1==1){
     &AD_test_dns($res,"laser1008","10.170.208.30");
 
     ############################################################
-    # j1010p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1010p01",
-                   sAMAccountname=>"j1010p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1010p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1010p01",
+    #                sAMAccountname=>"j1010p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1010P01$
     &AD_test_object({ldap=>$ldap,
@@ -439,44 +441,44 @@ if ($test_ws_1==1){
     &AD_test_dns($res,"j1010p01","10.170.210.1");
 
     ############################################################
-    # j1010p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1010p02",
-                   sAMAccountname=>"j1010p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1010p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1010p02",
+    #                sAMAccountname=>"j1010p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1010P02$
     &AD_test_object({ldap=>$ldap,
@@ -563,44 +565,44 @@ if ($test_ws_1==1){
     ############################################################
     # bsz.devices.csv
     ############################################################
-    # bsz-j1008p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1008p01",
-                   sAMAccountname=>"bsz-j1008p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1008p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1008p01",
+    #                sAMAccountname=>"bsz-j1008p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1008P01$
     &AD_test_object({ldap=>$ldap,
@@ -626,44 +628,44 @@ if ($test_ws_1==1){
     &AD_test_dns($res,"bsz-j1008p01","10.171.208.1");
 
     ############################################################
-    # bsz-j1008p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1008p02",
-                   sAMAccountname=>"bsz-j1008p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1008p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1008p02",
+    #                sAMAccountname=>"bsz-j1008p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1008P02$
     &AD_test_object({ldap=>$ldap,
@@ -696,44 +698,44 @@ if ($test_ws_1==1){
     &AD_test_dns($res,"bsz-laser1008","10.171.208.30");
 
     ############################################################
-    # bsz-j1010p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1010p01",
-                   sAMAccountname=>"bsz-j1010p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1010p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1010p01",
+    #                sAMAccountname=>"bsz-j1010p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1010P01$
     &AD_test_object({ldap=>$ldap,
@@ -759,44 +761,44 @@ if ($test_ws_1==1){
     &AD_test_dns($res,"bsz-j1010p01","10.171.210.1");
 
     ############################################################
-    # bsz-j1010p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1010p02",
-                   sAMAccountname=>"bsz-j1010p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1010p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1010p02",
+    #                sAMAccountname=>"bsz-j1010p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1010P02$
     &AD_test_object({ldap=>$ldap,
@@ -894,49 +896,53 @@ if ($copy_devfile_2==1){
     &run_command("cp -v $crfile_2_bsz $host_classroom_bsz");
 }
 
+if ($full==1){
+    &run_command("sophomorix-device $verbose_options");
+}
+
 
 if ($test_ws_2==1){
     ############################################################
     # devices.csv
     ############################################################
-    # j1008p03
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008p03,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1008p03",
-                   sAMAccountname=>"j1008p03",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1008p03
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008p03,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1008p03",
+    #                sAMAccountname=>"j1008p03",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1008P03$
     &AD_test_object({ldap=>$ldap,
@@ -962,44 +968,44 @@ if ($test_ws_2==1){
     &AD_test_dns($res,"j1008p03","10.170.208.1");
 
     ############################################################
-    # j1008p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1008p02",
-                   sAMAccountname=>"j1008p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1008p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1008p02",
+    #                sAMAccountname=>"j1008p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1008P02$
     &AD_test_object({ldap=>$ldap,
@@ -1032,44 +1038,44 @@ if ($test_ws_2==1){
     &AD_test_dns($res,"laser1008","10.170.208.30");
 
     ############################################################
-    # j1010p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1010p01",
-                   sAMAccountname=>"j1010p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1010p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1010p01",
+    #                sAMAccountname=>"j1010p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1010P01$
     &AD_test_object({ldap=>$ldap,
@@ -1095,44 +1101,44 @@ if ($test_ws_2==1){
     &AD_test_dns($res,"j1010p01","10.170.210.1");
 
     ############################################################
-    # j1010p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"j1010p02",
-                   sAMAccountname=>"j1010p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
-                   sophomorixAdminFile => "devices.csv",
-                   memberOf => "j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
-                   sAMAccountname=>"examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # j1010p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"j1010p02",
+    #                sAMAccountname=>"j1010p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "---",
+    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixAdminFile => "devices.csv",
+    #                memberOf => "j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                sAMAccountname=>"examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # J1010P02$
     &AD_test_object({ldap=>$ldap,
@@ -1219,44 +1225,44 @@ if ($test_ws_2==1){
     ############################################################
     # bsz.devices.csv
     ############################################################
-    # bsz-j1008p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1008p01",
-                   sAMAccountname=>"bsz-j1008p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1008p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1008p01",
+    #                sAMAccountname=>"bsz-j1008p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1008P01$
     &AD_test_object({ldap=>$ldap,
@@ -1282,44 +1288,44 @@ if ($test_ws_2==1){
     &AD_test_dns($res,"bsz-j1008p01","10.171.208.1");
 
     ############################################################
-    # bsz-j1008p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1008p02",
-                   sAMAccountname=>"bsz-j1008p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1008",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1008",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1008",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1008p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1008p02",
+    #                sAMAccountname=>"bsz-j1008p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1008",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1008",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1008",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1008P02$
     &AD_test_object({ldap=>$ldap,
@@ -1352,44 +1358,44 @@ if ($test_ws_2==1){
     &AD_test_dns($res,"bsz-laser1008","10.171.208.30");
 
     ############################################################
-    # bsz-j1010p01
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1010p01",
-                   sAMAccountname=>"bsz-j1010p01",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1010p01
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1010p01",
+    #                sAMAccountname=>"bsz-j1010p01",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1010P01$
     &AD_test_object({ldap=>$ldap,
@@ -1415,44 +1421,44 @@ if ($test_ws_2==1){
     &AD_test_dns($res,"bsz-j1010p01","10.171.210.1");
 
     ############################################################
-    # bsz-j1010p02
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   #####
-                   displayName=>"Exam Account",
-                   givenName=>"Exam",
-                   name=>"bsz-j1010p02",
-                   sAMAccountname=>"bsz-j1010p02",
-                   uidNumber=>"-1",
-                   sn=>"Account",
-                   sophomorixAdminClass => "bsz-j1010",
-                   sophomorixExitAdminClass => "unknown",
-                   #sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Exam",
-                   sophomorixSurnameASCII  => "Account",
-                   sophomorixRole => "examaccount",
-                   sophomorixStatus=>"P",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
-                   sophomorixAdminFile => "bsz.devices.csv",
-                   memberOf => "bsz-j1010",
-                  });
-    ##### Testing the exam accounts room
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-j1010",
-                   gidNumber=>"-1",
-                   sophomorixStatus=>"P",
-                   sophomorixType=>"room",
-                   memberOf => "bsz-examaccounts",
-                  });
-    ##### Testing the examaccounts <token>-examaccounts group
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
-                   sAMAccountname=>"bsz-examaccounts",
-                   gidNumber=>"-1",
-                   memberOf => "global-examaccounts",
-                  });
+    # # bsz-j1010p02
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                #####
+    #                displayName=>"Exam Account",
+    #                givenName=>"Exam",
+    #                name=>"bsz-j1010p02",
+    #                sAMAccountname=>"bsz-j1010p02",
+    #                uidNumber=>"-1",
+    #                sn=>"Account",
+    #                sophomorixAdminClass => "bsz-j1010",
+    #                sophomorixExitAdminClass => "unknown",
+    #                #sophomorixFirstPassword => "Muster!",
+    #                sophomorixFirstnameASCII => "Exam",
+    #                sophomorixSurnameASCII  => "Account",
+    #                sophomorixRole => "examaccount",
+    #                sophomorixStatus=>"P",
+    #                sophomorixSchoolPrefix => "bsz",
+    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixAdminFile => "bsz.devices.csv",
+    #                memberOf => "bsz-j1010",
+    #               });
+    # ##### Testing the exam accounts room
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-j1010",
+    #                gidNumber=>"-1",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"room",
+    #                memberOf => "bsz-examaccounts",
+    #               });
+    # ##### Testing the examaccounts <token>-examaccounts group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                sAMAccountname=>"bsz-examaccounts",
+    #                gidNumber=>"-1",
+    #                memberOf => "global-examaccounts",
+    #               });
 
     # BSZ-J1010P02$
     &AD_test_object({ldap=>$ldap,

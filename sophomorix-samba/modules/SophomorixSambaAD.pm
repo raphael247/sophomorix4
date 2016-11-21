@@ -1292,11 +1292,11 @@ sub AD_get_AD {
     my $computers = $arg_ref->{computers};
     if (not defined $computers){$computers="FALSE"};
 
-    my $rooms = $arg_ref->{rooms};
-    if (not defined $rooms){$rooms="FALSE"};
+    #my $rooms = $arg_ref->{rooms};
+    #if (not defined $rooms){$rooms="FALSE"};
 
-    my $examaccounts = $arg_ref->{examaccounts};
-    if (not defined $examaccounts){$examaccounts="FALSE"};
+    #my $examaccounts = $arg_ref->{examaccounts};
+    #if (not defined $examaccounts){$examaccounts="FALSE"};
 
     my $dnszones = $arg_ref->{dnszones};
     if (not defined $dnszones){$dnszones="FALSE"};
@@ -1403,61 +1403,61 @@ sub AD_get_AD {
     }
 
     ##################################################
-    if ($rooms eq "TRUE"){
-        # sophomorixType room from ldap
-        $mesg = $ldap->search( # perform a search
-                       base   => $root_dse,
-                       scope => 'sub',
-                       filter => '(&(objectClass=group)(sophomorixType=room))',
-                       attrs => ['sAMAccountName',
-                                 'sophomorixStatus',
-                                 'sophomorixType',
-                                ]);
-        my $max_room = $mesg->count; 
-        &Sophomorix::SophomorixBase::print_title(
-            "$max_room sophomorix Rooms found in AD");
-        $AD{'result'}{'group'}{'room'}{'COUNT'}=$max_room;
-        for( my $index = 0 ; $index < $max_room ; $index++) {
-            my $entry = $mesg->entry($index);
-            my $sam=$entry->get_value('sAMAccountName');
-            my $type=$entry->get_value('sophomorixType');
-            my $stat=$entry->get_value('sophomorixStatus');
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
-            if($Conf::log_level>=2){
-                print "   * $sam\n";
-            }
-        }
-    }
+    # if ($rooms eq "TRUE"){
+    #     # sophomorixType room from ldap
+    #     $mesg = $ldap->search( # perform a search
+    #                    base   => $root_dse,
+    #                    scope => 'sub',
+    #                    filter => '(&(objectClass=group)(sophomorixType=room))',
+    #                    attrs => ['sAMAccountName',
+    #                              'sophomorixStatus',
+    #                              'sophomorixType',
+    #                             ]);
+    #     my $max_room = $mesg->count; 
+    #     &Sophomorix::SophomorixBase::print_title(
+    #         "$max_room sophomorix Rooms found in AD");
+    #     $AD{'result'}{'group'}{'room'}{'COUNT'}=$max_room;
+    #     for( my $index = 0 ; $index < $max_room ; $index++) {
+    #         my $entry = $mesg->entry($index);
+    #         my $sam=$entry->get_value('sAMAccountName');
+    #         my $type=$entry->get_value('sophomorixType');
+    #         my $stat=$entry->get_value('sophomorixStatus');
+    #         $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
+    #         $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
+    #         $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
+    #         if($Conf::log_level>=2){
+    #             print "   * $sam\n";
+    #         }
+    #     }
+    # }
 
-    ##################################################
-    if ($examaccounts eq "TRUE"){
-        # sophomorix ExamAccounts from ldap
-        $mesg = $ldap->search( # perform a search
-                       base   => $root_dse,
-                       scope => 'sub',
-                       filter => '(&(objectClass=user)(sophomorixRole=examaccount))',
-                       attrs => ['sAMAccountName',
-                                 'sophomorixAdminClass',
-                                 'sophomorixAdminFile',
-                                ]);
-        my $max_user = $mesg->count; 
-        &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
-        $AD{'result'}{'user'}{'examaccount'}{'COUNT'}=$max_user;
-        for( my $index = 0 ; $index < $max_user ; $index++) {
-            my $entry = $mesg->entry($index);
-            my $sam=$entry->get_value('sAMAccountName');
-            my $room=$entry->get_value('sophomorixAdminClass');
-            my $filename=$entry->get_value('sophomorixAdminFile');
-            if($Conf::log_level>=2){
-                print "   * $sam in Room $room\n";
-            }
-            $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'room'}=$room;
-            $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminClass'}=$room;
-            $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminFile'}=$filename;
-        }
-    }
+    # ##################################################
+    # if ($examaccounts eq "TRUE"){
+    #     # sophomorix ExamAccounts from ldap
+    #     $mesg = $ldap->search( # perform a search
+    #                    base   => $root_dse,
+    #                    scope => 'sub',
+    #                    filter => '(&(objectClass=user)(sophomorixRole=examaccount))',
+    #                    attrs => ['sAMAccountName',
+    #                              'sophomorixAdminClass',
+    #                              'sophomorixAdminFile',
+    #                             ]);
+    #     my $max_user = $mesg->count; 
+    #     &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
+    #     $AD{'result'}{'user'}{'examaccount'}{'COUNT'}=$max_user;
+    #     for( my $index = 0 ; $index < $max_user ; $index++) {
+    #         my $entry = $mesg->entry($index);
+    #         my $sam=$entry->get_value('sAMAccountName');
+    #         my $room=$entry->get_value('sophomorixAdminClass');
+    #         my $filename=$entry->get_value('sophomorixAdminFile');
+    #         if($Conf::log_level>=2){
+    #             print "   * $sam in Room $room\n";
+    #         }
+    #         $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'room'}=$room;
+    #         $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminClass'}=$room;
+    #         $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminFile'}=$filename;
+    #     }
+    # }
 
     ##################################################
     if ($dnszones eq "TRUE"){

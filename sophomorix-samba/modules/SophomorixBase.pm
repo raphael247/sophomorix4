@@ -600,7 +600,7 @@ sub config_sophomorix_read {
 
         # adding school
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
 #	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
@@ -609,7 +609,7 @@ sub config_sophomorix_read {
        
         # adding global
 #	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
 #	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
 #	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
 	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
@@ -763,19 +763,20 @@ sub config_sophomorix_read {
         }
     }
 
-    # examaccounts
+    # wifi,internet
     foreach my $ou (keys %{$sophomorix_config{'ou'}}) {
         if ($ou eq $DevelConf::AD_global_ou){
             # OU=GLOBAL
-            my @grouplist=("examaccounts","wifi","internet");
+#            my @grouplist=("examaccounts","wifi","internet");
+            my @grouplist=("wifi","internet");
             foreach my $group (@grouplist){
                 my $sub_ou;
-                if ($group eq "examaccounts"){
-                    $sub_ou=$DevelConf::AD_examaccount_ou;
-                } else {
+#                if ($group eq "examaccounts"){
+#                    $sub_ou=$DevelConf::AD_examaccount_ou;
+#                } else {
                     # wifi, internet
                     $sub_ou=$DevelConf::AD_globalgroup_ou;
-                }
+#                }
                 my $ou_group="OU=global-".$group.",".
                         $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
                 #my $group_prefix=$sophomorix_config{'ou'}{$ou}{PREFIX}.$group;
@@ -786,19 +787,20 @@ sub config_sophomorix_read {
                     $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
                 $sophomorix_config{'ou'}{$ou}{GROUP_LEVEL}{"global-".$group}="none";
                 $sophomorix_config{'ou'}{$ou}{GROUP_TYPE}{"global-".$group}="ouglobalclass";
-                $sophomorix_config{'ou'}{$ou}{GROUP_DESCRIPTION}{"global-".$group}="LML Examaccounts";
+                $sophomorix_config{'ou'}{$ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
             }
         } else {
             # OU=...
-            my @grouplist=("examaccounts","wifi","internet");
+#            my @grouplist=("examaccounts","wifi","internet");
+            my @grouplist=("wifi","internet");
             foreach my $group (@grouplist){
                 my $sub_ou;
-                if ($group eq "examaccounts"){
-                    $sub_ou=$DevelConf::AD_examaccount_ou;
-                } else {
+#                if ($group eq "examaccounts"){
+#                    $sub_ou=$DevelConf::AD_examaccount_ou;
+#                } else {
                     # wifi, internet
                     $sub_ou=$DevelConf::AD_management_ou;
-                }
+#                }
                 my $ou_group="OU=".$sophomorix_config{'ou'}{$ou}{PREFIX}.$group.",".
                         $sub_ou.",".$sophomorix_config{'ou'}{$ou}{OU_TOP};
                 my $group_prefix=$sophomorix_config{'ou'}{$ou}{PREFIX}.$group;
@@ -1096,10 +1098,11 @@ sub get_plain_password {
         } else {
             $password=$DevelConf::teacher_password_default;
         }
-    } elsif ($role eq "examaccount") {
-        # Exam Account 12 chars to avoid login 
-        $password=&create_plain_password(12,@password_chars);
     }
+#    } elsif ($role eq "examaccount") {
+#        # Exam Account 12 chars to avoid login 
+#        $password=&create_plain_password(12,@password_chars);
+#    }
     return $password;
 }
 

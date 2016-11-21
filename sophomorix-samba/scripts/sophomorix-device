@@ -242,10 +242,10 @@ my %host_seen=();
 my %mac_seen=();
 my %ip_seen=();
 
- # ExamAccounts
-my @adding_examaccounts=();
-my @killing_examaccounts=();
-my @killing_examaccount_rooms=();
+# # ExamAccounts
+# my @adding_examaccounts=();
+# my @killing_examaccounts=();
+# my @killing_examaccount_rooms=();
 
 # Computers
 my @adding_computers=();
@@ -315,7 +315,6 @@ if ($help==1) {
    print('
 sophomorix-device adds Devices to the system:
     DomainComputerAccount
-    ExamAccount
     DNS entries 
 
 Options:
@@ -504,15 +503,15 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 # fetching data
 # ===========================================================================
-&print_title("Asking the system for Computers/ExamAccounts and DNS data ...");
+&print_title("Asking the system for Computers and DNS data ...");
 
 # fetch system data
 my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            computers=>"TRUE",
-                           rooms=>"TRUE",
-                           examaccounts=>"TRUE",
+                           #rooms=>"TRUE",
+                           #examaccounts=>"TRUE",
                            dnszones=>"TRUE",
                            dnsnodes=>"TRUE",
              });
@@ -726,62 +725,62 @@ foreach my $device_file (@filelist){
 # Decide what must be done
 ############################################################################
 
-# ExamAccounts to kill
-foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
-    if (not exists $devices_file{'device'}{$examaccount}){
-        # host is not in file anymore
-        &push_kill_examaccount($examaccount);
-    }
-}
+# # ExamAccounts to kill
+# foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
+#     if (not exists $devices_file{'device'}{$examaccount}){
+#         # host is not in file anymore
+#         &push_kill_examaccount($examaccount);
+#     }
+# }
 
 
-# ExamAccounts to add
-foreach my $examaccount (keys %{$devices_file{'device'}}) {
-    if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
-        # host is not in system
-        # examaccounts only for classroom devices and 
-        my $room=$devices_file{'device'}{$examaccount}{'ROOM'};
-        if (exists $class_rooms{$room} and $devices_file{'device'}{$examaccount}{'ACCOUNT'} eq "TRUE"){
-            &push_add_examaccount($examaccount);
-        } else {
-            # not adding
-        }
-    } else {
-        # device is not in correct room -> update (kill and add)
-        if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
-            $devices_file{'device'}{$examaccount}{'ROOM'}){
-            if($Conf::log_level>=2){
-	        print "$examaccount: Changed room from ",
-                      "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
-                      " to $devices_file{'device'}{$examaccount}{'ROOM'}\n";
-            }
-            &push_kill_examaccount($examaccount);
-            &push_add_examaccount($examaccount);
-        }
-        # sophomorixAdminFile ist not correct
-        if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'} ne 
-            $devices_file{'device'}{$examaccount}{'FILENAME'}){
-            if($Conf::log_level>=2){
-	        print "$examaccount: Was moved from file ",
-                      "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'}",
-                      " to $devices_file{'device'}{$examaccount}{'FILENAME'}\n";
-            }
-            &push_kill_examaccount($examaccount);
-            &push_add_examaccount($examaccount);
-        }
+# # ExamAccounts to add
+# foreach my $examaccount (keys %{$devices_file{'device'}}) {
+#     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
+#         # host is not in system
+#         # examaccounts only for classroom devices and 
+#         my $room=$devices_file{'device'}{$examaccount}{'ROOM'};
+#         if (exists $class_rooms{$room} and $devices_file{'device'}{$examaccount}{'ACCOUNT'} eq "TRUE"){
+#             &push_add_examaccount($examaccount);
+#         } else {
+#             # not adding
+#         }
+#     } else {
+#         # device is not in correct room -> update (kill and add)
+#         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
+#             $devices_file{'device'}{$examaccount}{'ROOM'}){
+#             if($Conf::log_level>=2){
+# 	        print "$examaccount: Changed room from ",
+#                       "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
+#                       " to $devices_file{'device'}{$examaccount}{'ROOM'}\n";
+#             }
+#             &push_kill_examaccount($examaccount);
+#             &push_add_examaccount($examaccount);
+#         }
+#         # sophomorixAdminFile ist not correct
+#         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'} ne 
+#             $devices_file{'device'}{$examaccount}{'FILENAME'}){
+#             if($Conf::log_level>=2){
+# 	        print "$examaccount: Was moved from file ",
+#                       "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'}",
+#                       " to $devices_file{'device'}{$examaccount}{'FILENAME'}\n";
+#             }
+#             &push_kill_examaccount($examaccount);
+#             &push_add_examaccount($examaccount);
+#         }
 
 
-    }
-}
+#     }
+# }
 
 
-# ExamAccount rooms to kill
-foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
-    if (not exists $devices_file{'room'}{$room}){
-        # host is not in file anymore
-        &push_kill_examaccount_room($room);
-    }
-}
+# # ExamAccount rooms to kill
+# foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
+#     if (not exists $devices_file{'room'}{$room}){
+#         # host is not in file anymore
+#         &push_kill_examaccount_room($room);
+#     }
+# }
 
 
 # computers to kill
@@ -838,25 +837,25 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 if($no_sync==1){
     # show info about what will be done
     my $count=0;
-    # ExamAccounts
-    print "\n";
-    $count=$#killing_examaccounts+1;
-    &print_title("ExamAccounts that must be killed ($count):");
-    foreach my $ws (@killing_examaccounts){
-        print "KILL: $ws\n";
-    }
-    print "\n";
-    $count=$#adding_examaccounts+1;
-    &print_title("ExamAccounts that must be added ($count):");
-    foreach my $ws (@adding_examaccounts){
-        print "ADD: $ws\n";
-    }
-    print "\n";
-    $count=$#killing_examaccount_rooms+1;
-    &print_title("ExamAccounts rooms that must be killed ($count):");
-    foreach my $room (@killing_examaccount_rooms){
-        print "KILL: $room\n";
-    }
+    # # ExamAccounts
+    # print "\n";
+    # $count=$#killing_examaccounts+1;
+    # &print_title("ExamAccounts that must be killed ($count):");
+    # foreach my $ws (@killing_examaccounts){
+    #     print "KILL: $ws\n";
+    # }
+    # print "\n";
+    # $count=$#adding_examaccounts+1;
+    # &print_title("ExamAccounts that must be added ($count):");
+    # foreach my $ws (@adding_examaccounts){
+    #     print "ADD: $ws\n";
+    # }
+    # print "\n";
+    # $count=$#killing_examaccount_rooms+1;
+    # &print_title("ExamAccounts rooms that must be killed ($count):");
+    # foreach my $room (@killing_examaccount_rooms){
+    #     print "KILL: $room\n";
+    # }
 
 
 
@@ -925,98 +924,98 @@ if($no_sync==1){
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
-    # kill examaccounts
-    &print_title("ExamAccounts to be killed:");
-    my $kill_count=1;
-    foreach my $exam_account (@killing_examaccounts){
-        print "   * Killing ExamAccount $exam_account ...\n";
-        &AD_user_kill({ldap=>$ldap,
-                       root_dse=>$root_dse,
-                       login=>$exam_account,
-                       user_count=>$kill_count,
-                     });
-        #system("/usr/sbin/sophomorix-kill --killuser $exam_account");
-    }
+    # # kill examaccounts
+    # &print_title("ExamAccounts to be killed:");
+    # my $kill_count=1;
+    # foreach my $exam_account (@killing_examaccounts){
+    #     print "   * Killing ExamAccount $exam_account ...\n";
+    #     &AD_user_kill({ldap=>$ldap,
+    #                    root_dse=>$root_dse,
+    #                    login=>$exam_account,
+    #                    user_count=>$kill_count,
+    #                  });
+    #     #system("/usr/sbin/sophomorix-kill --killuser $exam_account");
+    # }
 
     ############################################################
-    # add examaccounts
-    &print_title("ExamAccounts to be added:");
-    my $add_count=1;
-    foreach my $exam_account (@adding_examaccounts){
-        my $role="examaccount";
-        my $ou=$devices_file{'device'}{$exam_account}{'OU'};
-        my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'};
-        my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
-        $plain_password=&get_plain_password($role,@passwort_zeichen);
-        if (not exists $ou_created{$ou}){
-            # create ou
-            &AD_ou_add({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        ou=>$ou,
-                        school_token=>$school_token,
-                        creationdate=>$time_stamp_AD,
-                        sophomorix_config=>\%sophomorix_config,
-                     });
-            # remember ou
-            $ou_created{$ou}="already created";
-        }
-        &AD_user_create({ldap=>$ldap, 
-                         root_dse=>$root_dse,
-                         user_count=>$add_count,
-                         login=>$exam_account,
-                         group=>$devices_file{'device'}{$exam_account}{'ROOM'},
-                         firstname_ascii=>"Exam",
-                         surname_ascii=>"Account",
-                         firstname_utf8=>"Exam",
-                         surname_utf8=>"Account",
-                         birthdate=>$birthdate,
-                         plain_password=>$plain_password,
-                         ou=>$ou,
-                         role=>"examaccount",
-                         type=>"room",
-                         school_token=>$school_token,
-                         creationdate=>$time_stamp_AD,
-                         tolerationdate=>"---",
-                         deactivationdate=>"---",
-                         status=>"P",
-                         file=>$filename,
-                       });
-        $add_count++;
-        # make sure that the room exists
-        # use the saved, tokened value
-        my $room_saved=$devices_file{'device'}{$exam_account}{'ROOM'};
-        my $examaccount_token=$school_token."-".$DevelConf::examaccount;
-        &AD_group_create({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          group=>$room_saved,
-                          description=>$room_saved,
-                          ou=>$ou,
-                          school_token=>$school_token,
-                          status=>"P",
-                          type=>"room",
-                          creationdate=>$time_stamp_AD,
-                         });
-        # add examaccount to its room
-        &AD_group_addmember({ldap => $ldap,
-                             root_dse => $root_dse, 
-                             group => $room_saved,
-                             addmember => $exam_account,
-                            });   
-    }
+    # # add examaccounts
+    # &print_title("ExamAccounts to be added:");
+    # my $add_count=1;
+    # foreach my $exam_account (@adding_examaccounts){
+    #     my $role="examaccount";
+    #     my $ou=$devices_file{'device'}{$exam_account}{'OU'};
+    #     my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'};
+    #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
+    #     $plain_password=&get_plain_password($role,@passwort_zeichen);
+    #     if (not exists $ou_created{$ou}){
+    #         # create ou
+    #         &AD_ou_add({ldap=>$ldap,
+    #                     root_dse=>$root_dse,
+    #                     ou=>$ou,
+    #                     school_token=>$school_token,
+    #                     creationdate=>$time_stamp_AD,
+    #                     sophomorix_config=>\%sophomorix_config,
+    #                  });
+    #         # remember ou
+    #         $ou_created{$ou}="already created";
+    #     }
+    #     &AD_user_create({ldap=>$ldap, 
+    #                      root_dse=>$root_dse,
+    #                      user_count=>$add_count,
+    #                      login=>$exam_account,
+    #                      group=>$devices_file{'device'}{$exam_account}{'ROOM'},
+    #                      firstname_ascii=>"Exam",
+    #                      surname_ascii=>"Account",
+    #                      firstname_utf8=>"Exam",
+    #                      surname_utf8=>"Account",
+    #                      birthdate=>$birthdate,
+    #                      plain_password=>$plain_password,
+    #                      ou=>$ou,
+    #                      role=>"examaccount",
+    #                      type=>"room",
+    #                      school_token=>$school_token,
+    #                      creationdate=>$time_stamp_AD,
+    #                      tolerationdate=>"---",
+    #                      deactivationdate=>"---",
+    #                      status=>"P",
+    #                      file=>$filename,
+    #                    });
+    #     $add_count++;
+    #     # make sure that the room exists
+    #     # use the saved, tokened value
+    #     my $room_saved=$devices_file{'device'}{$exam_account}{'ROOM'};
+    #     my $examaccount_token=$school_token."-".$DevelConf::examaccount;
+    #     &AD_group_create({ldap=>$ldap,
+    #                       root_dse=>$root_dse,
+    #                       group=>$room_saved,
+    #                       description=>$room_saved,
+    #                       ou=>$ou,
+    #                       school_token=>$school_token,
+    #                       status=>"P",
+    #                       type=>"room",
+    #                       creationdate=>$time_stamp_AD,
+    #                      });
+    #     # add examaccount to its room
+    #     &AD_group_addmember({ldap => $ldap,
+    #                          root_dse => $root_dse, 
+    #                          group => $room_saved,
+    #                          addmember => $exam_account,
+    #                         });   
+    # }
 
     ############################################################
-    # Kill the rooms of examaccounts
-    &print_title("Rooms to be killed:");
-    my $kill_room_count=1;
-    foreach my $room (@killing_examaccount_rooms){
-        print "   * Killing ExamAccount Room $room ...\n";
-        &AD_group_kill({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        group=>$room,
-                        type=>"room",
-                        group_count=>$kill_room_count,
-                  });
-    }
+    # # Kill the rooms of examaccounts
+    # &print_title("Rooms to be killed:");
+    # my $kill_room_count=1;
+    # foreach my $room (@killing_examaccount_rooms){
+    #     print "   * Killing ExamAccount Room $room ...\n";
+    #     &AD_group_kill({ldap=>$ldap,
+    #                     root_dse=>$root_dse,
+    #                     group=>$room,
+    #                     type=>"room",
+    #                     group_count=>$kill_room_count,
+    #               });
+    # }
 
     ############################################################
     # Kill computers
@@ -1108,8 +1107,8 @@ if ($set_computer_passwords==1){
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            computers=>"TRUE",
-                           rooms=>"TRUE",
-                           examaccounts=>"TRUE",
+                           #rooms=>"TRUE",
+                           #examaccounts=>"TRUE",
                            dnszones=>"TRUE",
                            dnsnodes=>"TRUE",
              });
@@ -1636,24 +1635,24 @@ sub check_option {
 
 
 
-sub push_add_examaccount {
-    my ($add) = @_;
-    push @adding_examaccounts, $add;
-}
+# sub push_add_examaccount {
+#     my ($add) = @_;
+#     push @adding_examaccounts, $add;
+# }
 
 
 
-sub push_kill_examaccount {
-    my ($kill) = @_;
-    push @killing_examaccounts, $kill;
-}
+# sub push_kill_examaccount {
+#     my ($kill) = @_;
+#     push @killing_examaccounts, $kill;
+# }
 
 
 
-sub push_kill_examaccount_room {
-    my ($kill) = @_;
-    push @killing_examaccount_rooms, $kill;
-}
+# sub push_kill_examaccount_room {
+#     my ($kill) = @_;
+#     push @killing_examaccount_rooms, $kill;
+# }
 
 
 
