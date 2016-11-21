@@ -228,8 +228,6 @@ $class_rooms{'j1010'}="seen";
 $class_rooms{'j1008'}="seen";
 $class_rooms{'bsz-j1010'}="seen";
 $class_rooms{'bsz-j1008'}="seen";
-#my @class_rooms=();
-# my $host_classrooms=$DevelConf::path_conf_host."/classrooms";
 
 my $set_computer_passwords=0;
 my $test_dns=0;
@@ -296,8 +294,8 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
                             });
-
 #print Dumper(\%sophomorix_config{'FILES'});
+print "LIS@filelist"; 
 #my $resulthash=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'bsz.devices.csv'}{'OU'};
 #print "HASH: >$resulthash<\n";
 #my $resulthash2=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'devices.csv'}{'PREFIX'};

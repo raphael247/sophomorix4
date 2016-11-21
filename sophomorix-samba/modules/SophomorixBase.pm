@@ -367,7 +367,6 @@ sub config_sophomorix_read {
 #
 #                }
 
-#                my $path_abs=$DevelConf::path_conf_user."/".$token_file;
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$path_abs;
                 my $path_abs_filter=$DevelConf::path_conf_tmp."/".$token_file.".filter";
@@ -404,7 +403,6 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
-#                my $path_abs=$DevelConf::path_conf_user."/".$token_file;
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
                 $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PATH_ABS}=$path_abs;
                 $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{FILETYPE}="classes";
@@ -430,7 +428,7 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU};
                 }
-                my $path_abs=$DevelConf::path_conf_host."/".$token_file;
+                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
                 $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$path_abs;
                 $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{FILETYPE}="devices";
             } else {
@@ -849,7 +847,7 @@ sub filelist_fetch {
     foreach my $file (keys %{$ref_sophomorix_config->{'FILES'}{$file_key}}) {
         my $abs_path=$ref_sophomorix_config->{'FILES'}{$file_key}{$file}{'PATH_ABS'};
         my $filetype_real=$ref_sophomorix_config->{'FILES'}{$file_key}{$file}{'FILETYPE'};
-        if (not defined $abs_path){next}; # i.e. vampire.csv
+        if (not defined $abs_path){next}; # i.e. vampire.csvFILES
         
         if (-e $abs_path and $filetype_real eq $filetype){
             push @filelist, $abs_path;
