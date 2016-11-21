@@ -2732,19 +2732,19 @@ sub  get_forbidden_logins{
         close(PASS);
     }
 
-    # future groups in schueler.txt
-    my $schueler_file=$DevelConf::path_conf_user."/schueler.txt";
-    if (-e "$schueler_file"){
-        open(STUDENTS, "$schueler_file");
-        while(<STUDENTS>) {
-            my ($group)=split(/;/);
-            chomp($group);
-            if ($group ne ""){
-                $forbidden_logins{$group}="future group $group in schueler.txt";
-   	    }
-         }
-         close(STUDENTS);
-    }
+    # future groups in students.csv
+    #my $schueler_file=$DevelConf::path_conf_user."/schueler.txt";
+    #if (-e "$schueler_file"){
+    #    open(STUDENTS, "$schueler_file");
+    #    while(<STUDENTS>) {
+    #        my ($group)=split(/;/);
+    #        chomp($group);
+    #        if ($group ne ""){
+    #            $forbidden_logins{$group}="future group $group in schueler.txt";
+    # 	    }
+    #     }
+    #     close(STUDENTS);
+    #}
 
     # groups from ldap
     $mesg = $ldap->search( # perform a search

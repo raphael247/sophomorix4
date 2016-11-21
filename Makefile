@@ -159,23 +159,31 @@ install-sophomorix-samba:
 #	@install -oroot -groot --mode=4750 sophomorix-base/scripts-teacher/sophomorix-*[a-z1-9] $(DESTDIR)/usr/bin
 # installing configs for root
 	@install -d -m755 -oroot -groot $(CONF)
-	@install -d -m755 -oroot -groot $(CONF)/user
+#	@install -d -m755 -oroot -groot $(CONF)/user
 #	old
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix.conf $(CONF)/user
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix-schools.conf $(CONF)/user
 #	# New, temporary
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template $(CONF)/sophomorix.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template $(CONF)/user/school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template $(CONF)/user/abc.school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template $(CONF)/user/bsz.school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/uni.school.conf.template $(CONF)/user/uni.school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/lin.school.conf.template $(CONF)/user/lin.school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ghs.school.conf.template $(CONF)/user/ghs.school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/test.school.conf.template $(CONF)/user/test.school.conf
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ltg.school.conf.template $(CONF)/user/ltg.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/default-school
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template $(CONF)/default-school/school.conf
+	@install -d -m755 -oroot -groot $(CONF)/abc
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template $(CONF)/abc/abc.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/bsz
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template $(CONF)/bsz/bsz.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/uni
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/uni.school.conf.template $(CONF)/uni/uni.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/lin
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/lin.school.conf.template $(CONF)/lin/lin.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/ghs
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ghs.school.conf.template $(CONF)/ghs/ghs.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/test
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/test.school.conf.template $(CONF)/test/test.school.conf
+	@install -d -m755 -oroot -groot $(CONF)/ltg
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ltg.school.conf.template $(CONF)/ltg/ltg.school.conf
 #	@install -oroot -groot --mode=0600 sophomorix-samba/config/quota.txt $(CONF)/user
 #	@install -oroot -groot --mode=0600 sophomorix-samba/config/mailquota.txt $(CONF)/user
-	@install -d -m755 -oroot -groot $(CONF)/project
+#	@install -d -m755 -oroot -groot $(CONF)/project
 	@install -d -m755 -oroot -groot $(CONF)/device
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/projects.create $(CONF)/project
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/projects.update $(CONF)/project
