@@ -39,7 +39,7 @@ PERLMOD=$(DESTDIR)/usr/share/perl5/Sophomorix
 #DOCDEBDIR=$(DESTDIR)/usr/share/doc
 
 # configs
-CONF=$(DESTDIR)/etc/sophomorix
+CONF=$(DESTDIR)/etc/linuxmuster/sophomorix
 
 # Schema
 SCHEMA=$(DESTDIR)/usr/share/sophomorix/schema
