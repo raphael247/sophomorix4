@@ -1,3 +1,35 @@
+todo:
+
+ou wegfallen lassen: immer das Token benutzen
+Pfade zu Konfigurationsdateien ändern
+ka siehe unten
+
+
+xls input:
+
+viele Schulen bekommen xls Dateien aus der Schulverwaltung
+für diese filter bereitstellen
+
+Filter evtl. automatisch ermitteln lassen:
+
+alle integrierten Filter durchgehen:
+danach entstandene datei checken:
+
+Erfolgreicher Filter führt zu einer Folgenden Datei
+
+Klassenfeld: klassen, die sich wiederholen
+Vorname: Namen aus Liste
+Nachnamen: Namen aus Liste
+Geburtsdatum: syntax, Ziffern
+unid: muss eindeutig sein
+
+-> Zusatzfelder werden an der selben Stelle im csv angehängt
+-> ermittelter Filter sich merken
+   -> nächstesmal als erstes checken 
+
+
+
+
 Weiter DNS: 
 
 muss hardwareklasse ins AD, wohin?
@@ -21,6 +53,31 @@ USER:FILE: nur aus Roletype.conf
 CLASS_FILE: alle Namen zulässig
 DEVICE_FILE: alle Namen zulässig
 
+Klassenarbeit (exam)
+- neues Feld im ldap
+  -sophomorixExamMode: Inhalt loginame der lehrers, der ihn in KA versetzt hat
+  oder ---
+- zu tun wenn KA gestartet wird:
+  sophomorix-teacher --examuser user1,user2,... --teacher bz
+   macht: 
+   A) sophomorixExamMode=bz
+   B) PWDhash wegsichern (JSON-Objekt)
+   C) Gruppen, in denen user direkt drin ist: sichern (gleiches JSON Objekt)
+      (class, projekt1,projekt2) entfernen
+      Damit wird auch Internet gesperrt
+      (da user aus Internetgruppe herausfällt)
+   D) JSON Objekt wegsichern ins tatsächliches home  
+   E) home wegmoven  bz --> <bz-exam-backup>
+      neues leeres home erzeugen: mkdir bz
+   F) evtl. user nachträglich wieder in die 
+      Gruppe internet für den Internet-Zugang
+
+   G) nach der Anmeldung passwort auf Zufallspasswort setzen
+   ????? wie findet man heraus welcher user an welchem PC angemeldet ist
+   --> LDAP auslesen ? geht das? smbstatus -B
+
+
+
 Bugs sophomorix-device
 
 - variablen umbenennen
@@ -32,8 +89,12 @@ Bugs sophomorix-device
 - unused zones löschen
 - adminDescription und sophomorixAdminFile nutzen bei workstations, computeraccounts$
  
+
+
+
 Geräteverwaltung:
 Wie kommen Ducker in Cups
+- wie bisher: web-gui von cups verwenden, einzeln anlegen
 Rechner, Drucker, Access Points:
 - lehrernetz/schuelernetz 
 - ist eine Role erforderlich?
@@ -319,6 +380,25 @@ mailquota bei user mailquota
 (Oder kann dasselbe attribut nochmals verwendet werden?)
 
 mailalias bei user? oder kann diese Mailadresse schon eingetragen werden
+
+############################################################
+sophomorix-mail
+############################################################
+dovecot statt cyrus
+dovecot 
+
+was macht sophomorix-mail bisher:
+- mailbox anlegen/löschen 
+- info anzeigen:
+  - wieviel speicher genutzt
+  - forwards anzeigen
+- Erstellen von /etc/aliases 
+  aliases
+  maillists
+
+was ist zu tun?
+
+
 
 
 ############################################################
