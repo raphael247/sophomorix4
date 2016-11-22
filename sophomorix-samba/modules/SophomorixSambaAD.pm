@@ -426,7 +426,11 @@ sub AD_computer_create {
     my $room = $arg_ref->{room};
     my $role = $arg_ref->{role};
     my $ws_count = $arg_ref->{ws_count};
-    my $ou = $arg_ref->{ou};
+
+    # ??????????
+    #my $ou = $arg_ref->{ou};
+    my $ou = $arg_ref->{school_token};
+
     my $school_token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
 
@@ -557,7 +561,10 @@ sub AD_user_create {
     my $plain_password = $arg_ref->{plain_password};
     my $unid = $arg_ref->{unid};
     my $uidnumber_wish = $arg_ref->{uidnumber_wish};
-    my $ou = $arg_ref->{ou};
+
+    #my $ou = $arg_ref->{ou};
+    my $ou = $arg_ref->{school_token};
+
     my $school_token = $arg_ref->{school_token};
     my $role = $arg_ref->{role};
     my $type = $arg_ref->{type};
@@ -810,8 +817,12 @@ sub AD_user_move {
     my $user_count = $arg_ref->{user_count};
     my $group_old = $arg_ref->{group_old};
     my $group_new = $arg_ref->{group_new};
-    my $ou_old = $arg_ref->{ou_old};
-    my $ou_new = $arg_ref->{ou_new};
+# ????????
+#    my $ou_old = $arg_ref->{ou_old};
+#    my $ou_new = $arg_ref->{ou_new};
+    my $ou_old = $arg_ref->{school_token_old};
+    my $ou_new = $arg_ref->{school_token_new};
+
     my $school_token_old = $arg_ref->{school_token_old};
     my $school_token_new = $arg_ref->{school_token_new};
     my $role_new = $arg_ref->{role};
@@ -1071,7 +1082,11 @@ sub AD_ou_add {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
-    my $ou = $arg_ref->{ou};
+
+    # ?????????????
+    #my $ou = $arg_ref->{ou};
+    my $ou = $arg_ref->{school_token};
+
     my $token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -1080,6 +1095,7 @@ sub AD_ou_add {
     $ou=&AD_get_ou_tokened($ou);
     if ($token eq "---"){
         $token=""; # OU=SCHOOL
+        $ou=$DevelConf::AD_school_ou;
     } else {
         $token=$token."-";
     }
@@ -1098,7 +1114,7 @@ sub AD_ou_add {
 
     foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}}) {
         $dn=$sub_ou.",".$ref_sophomorix_config->{'ou'}{$ou}{OU_TOP};
-        print "      * DN: $dn (RT_SCHOOL_OU)\n";
+        print "      * DN: $dn (RT_SCHOOL_OU) $ou\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
@@ -2463,7 +2479,10 @@ sub AD_group_create {
     my $root_dse = $arg_ref->{root_dse};
     my $group = $arg_ref->{group};
     my $description = $arg_ref->{description};
-    my $ou = $arg_ref->{ou};
+
+    #my $ou = $arg_ref->{ou};
+    my $ou = $arg_ref->{school_token};
+
     my $type = $arg_ref->{type};
     my $school_token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};

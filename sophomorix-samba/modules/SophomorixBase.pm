@@ -290,6 +290,23 @@ sub config_sophomorix_read {
     # SCHOOLS    
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
+        $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
+        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}="OU=".$school.",".$root_dse;
+
+                 if ($school eq $DevelConf::dir_default_school){
+                     $sophomorix_config{'ou'}{$school}{SCHOOL_TOKEN}="";
+                     $sophomorix_config{'ou'}{$school}{PREFIX}="";
+                     $sophomorix_config{'ou'}{$school}{POSTFIX}="";
+                     $sophomorix_config{'ou'}{$school}{OU_TOP}=
+                         $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+                 } else {
+                     $sophomorix_config{'ou'}{$school}{SCHOOL_TOKEN}=$school;
+                     $sophomorix_config{'ou'}{$school}{PREFIX}=$school."-";
+                     $sophomorix_config{'ou'}{$school}{POSTFIX}="-".$school;
+                     $sophomorix_config{'ou'}{$school}{OU_TOP}=
+                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
+                 }
+
         &print_title("Reading $conf_school");
         open(SCHOOL,"$conf_school") || 
              die "ERROR: $conf_school not found!";
@@ -316,23 +333,23 @@ sub config_sophomorix_read {
                 $var eq "MAILQUOTA_DEFAULT_EXAM"
                ){
                 $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
-            } elsif ($var eq "OU"){
-                $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
-                $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}="OU=".$value.",".$root_dse;
-                #$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP_GLOBAL}="OU=GLOBAL,".$root_dse;
-                if ($school eq $DevelConf::dir_default_school){
-                    $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}="";
-                    $sophomorix_config{'ou'}{$value}{PREFIX}="";
-                    $sophomorix_config{'ou'}{$value}{POSTFIX}="";
-                    $sophomorix_config{'ou'}{$value}{OU_TOP}=
-                        $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
-                } else {
-                    $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}=$school;
-                    $sophomorix_config{'ou'}{$value}{PREFIX}=$school."-";
-                    $sophomorix_config{'ou'}{$value}{POSTFIX}="-".$school;
-                    $sophomorix_config{'ou'}{$value}{OU_TOP}=
-                        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-                }
+            # } elsif ($var eq "OU"){
+            #     $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
+            #     $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}="OU=".$value.",".$root_dse;
+            #     #$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP_GLOBAL}="OU=GLOBAL,".$root_dse;
+            #     if ($school eq $DevelConf::dir_default_school){
+            #         $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}="";
+            #         $sophomorix_config{'ou'}{$value}{PREFIX}="";
+            #         $sophomorix_config{'ou'}{$value}{POSTFIX}="";
+            #         $sophomorix_config{'ou'}{$value}{OU_TOP}=
+            #             $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+            #     } else {
+            #         $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}=$school;
+            #         $sophomorix_config{'ou'}{$value}{PREFIX}=$school."-";
+            #         $sophomorix_config{'ou'}{$value}{POSTFIX}="-".$school;
+            #         $sophomorix_config{'ou'}{$value}{OU_TOP}=
+            #             $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
+            #     }
                 #$sophomorix_config{'GLOBAL'}{$var}=$value;
             } elsif ($var eq "USER_FILE"){
                 my ($file,$filter_script,$enc,$enc_force,$sur_chars,$first_chars,
@@ -465,9 +482,12 @@ sub config_sophomorix_read {
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL_TOKEN}="";
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
-    $sophomorix_config{'ou'}{'SCHOOL'}{OU_TOP}="OU=".$DevelConf::AD_school_ou.",".$root_dse;
-    $sophomorix_config{'ou'}{'SCHOOL'}{SCHOOL_TOKEN}="";
-    $sophomorix_config{'ou'}{'SCHOOL'}{PREFIX}="";
+#    $sophomorix_config{'ou'}{'SCHOOL'}{OU_TOP}="OU=".$DevelConf::AD_school_ou.",".$root_dse;
+#    $sophomorix_config{'ou'}{'SCHOOL'}{SCHOOL_TOKEN}="";
+#    $sophomorix_config{'ou'}{'SCHOOL'}{PREFIX}="";
+    $sophomorix_config{'ou'}{$DevelConf::AD_school_ou}{OU_TOP}="OU=".$DevelConf::AD_school_ou.",".$root_dse;
+    $sophomorix_config{'ou'}{$DevelConf::AD_school_ou}{SCHOOL_TOKEN}="";
+    $sophomorix_config{'ou'}{$DevelConf::AD_school_ou}{PREFIX}="";
 
     #print Dumper(%sophomorix_config);
     #exit;
