@@ -727,6 +727,20 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    memberOf => "uni-teachers,",
                   });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=uni,".$root_dse,
+                   sAMAccountname=>"uni-teachers",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   sophomorixMembers=>"kep42,gal42",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   memberOf => "global-teachers",
+                   member => "kep42,gal42",
+              });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=uni,".$root_dse,
@@ -770,6 +784,20 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    memberOf => "uni-teachers,",
                   });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=uni,".$root_dse,
+                   sAMAccountname=>"uni-teachers",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   sophomorixMembers=>"kep42,gal42",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   memberOf => "global-teachers",
+                   member => "kep42,gal42",
+              });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-teachers,OU=uni-teachers,OU=Teachers,OU=uni,".$root_dse,
@@ -784,6 +812,8 @@ if ($add==1 or $test_add==1){
                    memberOf => "global-teachers",
                    member => "kep42,gal42",
                   });
+
+
     # schneima42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=schneima42,OU=s6ade,OU=Students,OU=default-school,".$root_dse,
