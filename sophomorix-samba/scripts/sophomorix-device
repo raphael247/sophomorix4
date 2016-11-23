@@ -1048,6 +1048,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                      });
             # remember ou
             $ou_created{$ou}="already created";
+        } else {
+            print "   * OU $ou already created\n";
         }
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,

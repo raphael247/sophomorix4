@@ -464,6 +464,8 @@ while(<SOPHOMORIXADD>){
                   });
         # remember ou
         $ou_created{$ou}="already created";
+   } else {
+        print "   * OU $ou already created\n";
    }
    my $group_token=&AD_get_name_tokened($class_group,$school_token,"adminclass");
    my $login_token=&AD_get_name_tokened($login_check_ok,$school_token,$role);

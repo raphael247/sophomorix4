@@ -875,7 +875,6 @@ sub AD_user_move {
         print "   Creationdate:   $creationdate (if new group must be added)\n";
     }
 
-    &Sophomorix::SophomorixBase::print_title("Make sure OU $ou_new exists:");
     # make sure OU and tree exists
     if (not exists $ou_created{$ou_new}){
          # create new ou
@@ -1096,12 +1095,13 @@ sub AD_ou_add {
 
     $ou=&AD_get_ou_tokened($ou);
     if ($token eq "---"){
-        $token=""; # OU=SCHOOL
-        $ou=$DevelConf::AD_school_ou;
+        $token=$DevelConf::dir_default_school;
+        $ou=$DevelConf::dir_default_school;
     } else {
         $token=$token."-";
     }
 
+    print "\n";
     &Sophomorix::SophomorixBase::print_title("Adding OU=$ou ($token) (begin) ...");
 
     # providing OU_TOP of school
@@ -1239,6 +1239,7 @@ sub AD_ou_add {
                             }); 
     }
     &Sophomorix::SophomorixBase::print_title("Adding OU=$ou ($token) (end) ...");
+    print "\n";
 }
 
 
