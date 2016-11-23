@@ -826,13 +826,17 @@ sub AD_user_move {
     my $school_token_old = $arg_ref->{school_token_old};
     my $school_token_new = $arg_ref->{school_token_new};
     my $role_new = $arg_ref->{role};
-    my $type = $arg_ref->{type};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    # calculate
-    my $group_type_old;
+    # read from config
     my $group_type_new;
+    if (defined $ref_sophomorix_config->{'ou'}{$school_token_new}{'GROUP_TYPE'}{$group_new}){
+        $group_type_new=$ref_sophomorix_config->{'ou'}{$school_token_new}{'GROUP_TYPE'}{$group_new};
+    } else{
+        $group_type_new="adminclass";
+    }
+
     my $target_branch;
     $ou_old=&AD_get_ou_tokened($ou_old);
     $ou_new=&AD_get_ou_tokened($ou_new);
@@ -858,18 +862,20 @@ sub AD_user_move {
     }
     if($Conf::log_level>=1){
         print "\n";
-        &Sophomorix::SophomorixBase::print_title("Moving User $user ($user_count):");
+        &Sophomorix::SophomorixBase::print_title("Moving User $user ($user_count),(start):");
 
         print "   DN:             $dn\n";
         print "   Target DN:      $target_branch\n";
         print "   Group (Old):    $group_old\n";
         print "   Group (New):    $group_new\n";
         print "   Role (New):     $role_new\n";
+        print "   Type (New):     $group_type_new\n";
         print "   School(Old):    $school_token_old ($ou_old)\n";
         print "   School(New):    $school_token_new ($ou_new)\n";
         print "   Creationdate:   $creationdate (if new group must be added)\n";
     }
 
+    &Sophomorix::SophomorixBase::print_title("Make sure OU $ou_new exists:");
     # make sure OU and tree exists
     if (not exists $ou_created{$ou_new}){
          # create new ou
@@ -882,22 +888,18 @@ sub AD_user_move {
                    });
          # remember new ou to add it only once
          $ou_created{$ou_new}="already created";
-     }
-
-    # make sure new group exits
-    #my $type;
-    if (not defined $type){
-#        $type=$sophomorix_config{'ou'}{$ou_new}{'GROUP_TYPE'}{$group_new};
-#    } else {
-        $type="adminclass";
+    } else {
+        print "   * OU $ou_new already created\n";
     }
+
+    # make sure new group exists
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       group=>$group_new,
                       description=>$group_new,
                       ou=>$ou_new,
                       school_token=>$school_token_new,
-                      type=>$type,
+                      type=>$group_type_new,
                       joinable=>"TRUE",
                       status=>"P",
                       creationdate=>$creationdate,
@@ -964,7 +966,7 @@ sub AD_user_move {
                      rdn=>$rdn,
                      target_branch=>$target_branch,
                     });
-    &Sophomorix::SophomorixBase::print_title("Moving User $user (end)");
+    &Sophomorix::SophomorixBase::print_title("Moving User $user, (end)");
 }
 
 
@@ -1100,7 +1102,7 @@ sub AD_ou_add {
         $token=$token."-";
     }
 
-    &Sophomorix::SophomorixBase::print_title("Adding OU=$ou ($token) ...");
+    &Sophomorix::SophomorixBase::print_title("Adding OU=$ou ($token) (begin) ...");
 
     # providing OU_TOP of school
     my $result = $ldap->add($ref_sophomorix_config->{'ou'}{$ou}{OU_TOP},
@@ -1230,13 +1232,13 @@ sub AD_ou_add {
     }
     # all groups created, add some memberships
     foreach my $group (keys %{$ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}}) {
-        print "GRUPPE: $group -> $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}{$group}\n";
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
                              group => $ref_sophomorix_config->{'ou'}{$ou}{'GROUP_MEMBER'}{$group},
                              addgroup => $group,
                             }); 
     }
+    &Sophomorix::SophomorixBase::print_title("Adding OU=$ou ($token) (end) ...");
 }
 
 
@@ -2504,6 +2506,8 @@ sub AD_group_create {
         $file="none";    
     }
 
+    &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (begin):");
+
     $ou=&AD_get_ou_tokened($ou);
 
     # calculate missing Attributes
@@ -2518,7 +2522,6 @@ sub AD_group_create {
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
         # adding the group
-        &Sophomorix::SophomorixBase::print_title("Creating Group (begin):");
         if (not defined $gidnumber_wish or $gidnumber_wish eq "---"){
             $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
         }
@@ -2610,7 +2613,7 @@ sub AD_group_create {
                              addgroup => $token_examaccounts,
                            });
     }
-    &Sophomorix::SophomorixBase::print_title("Creating Group (end)");
+    &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     return;
 }
 
@@ -2631,40 +2634,43 @@ sub AD_group_addmember {
         # group does not exist -> exit with warning
         print "   * WARNING: Group $group nonexisting ($count_group results)\n";
         return;
-     }
+    } elsif ($count_group==1){
+        print "   * Group $group exists ($count_group results)\n";
 
-     if (defined $adduser){
-         my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$adduser);
-         print "   * Adding user $adduser to group $group\n";
-         if ($count > 0){
-             print "   * User $adduser exists ($count results)\n";
-             my $mesg = $ldap->modify( $dn_exist_group,
-     	        	       add => {
-                                   member => $dn_exist,
-                                      }
-                                     );
-             &AD_debug_logdump($mesg,2,(caller(0))[3]);
-             #my $command="samba-tool group addmembers ". $group." ".$adduser;
-             #print "   # $command\n";
-             #system($command);
-             return;
+    }
+
+    if (defined $adduser){
+        my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$adduser);
+        print "   * Adding user $adduser to group $group\n";
+        if ($count > 0){
+            print "   * User $adduser exists ($count results)\n";
+            my $mesg = $ldap->modify( $dn_exist_group,
+     	         	      add => {
+                                  member => $dn_exist,
+                                     }
+                                    );
+            &AD_debug_logdump($mesg,2,(caller(0))[3]);
+            #my $command="samba-tool group addmembers ". $group." ".$adduser;
+            #print "   # $command\n";
+            #system($command);
+            return;
          }
-     } elsif (defined $addgroup){
-         print "   * Adding group $addgroup to $group\n";
-         my ($count_group,$dn_exist_addgroup,$cn_exist_addgroup)=&AD_object_search($ldap,$root_dse,"group",$addgroup);
-         if ($count_group > 0){
-             print "   * Group $addgroup exists ($count_group results)\n";
-             my $mesg = $ldap->modify( $dn_exist_group,
-     	    	                   add => {
-                                   member => $dn_exist_addgroup,
-                                   }
-                               );
-             &AD_debug_logdump($mesg,2,(caller(0))[3]);
-             return;
-         }
-     } else {
-         return;
-     }
+    } elsif (defined $addgroup){
+        print "   * Adding group $addgroup to $group\n";
+        my ($count_group,$dn_exist_addgroup,$cn_exist_addgroup)=&AD_object_search($ldap,$root_dse,"group",$addgroup);
+        if ($count_group > 0){
+            print "   * Group $addgroup exists ($count_group results)\n";
+            my $mesg = $ldap->modify( $dn_exist_group,
+     	  	                  add => {
+                                  member => $dn_exist_addgroup,
+                                  }
+                              );
+            &AD_debug_logdump($mesg,2,(caller(0))[3]);
+            return;
+        }
+    } else {
+        return;
+    }
 }
 
 
