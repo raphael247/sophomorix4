@@ -176,14 +176,16 @@ if ($lock==1) {
 
 # --info
 if ($info==1) {
-       print Dumper(%sophomorix_config);
-       print "\n";
-       &print_title("Reading the following user files:");
-       foreach my $file (@filelist){
-           print "   * $file\n";
-       }
-       exit;
-   }
+    print Dumper( %sophomorix_config );
+    # the following line works
+    #print Dumper( %sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}{'uni-teachers'} );
+    print "\n";
+    &print_title("Reading the following user files:");
+    foreach my $file (@filelist){
+        print "   * $file\n";
+    }
+    exit;
+}
 
 
 # --list-files
