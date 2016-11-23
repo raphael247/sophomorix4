@@ -117,7 +117,6 @@ if ($restore_samba ne ""){
         system($command);
     } 
     &samba_start();
-    exit;
 }
 
 
@@ -128,7 +127,6 @@ if ($schema_load==1){
     &samba_stop();
     system("cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges");
     &samba_start();
-    exit;
 }
 
 
@@ -137,7 +135,6 @@ if ($restart ne ""){
     print "\nRestarting samba\n\n";
     &samba_stop();
     &samba_start();
-    exit;
 }
 
 
