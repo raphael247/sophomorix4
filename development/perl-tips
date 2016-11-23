@@ -1,0 +1,40 @@
+Using a value in a perl references hash of hashes:
+############################################################
+
+Using dumper modul:
+
+print Dumper( %sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}......;
+
+
+Taking a value out of a perl hash reference:
+
+$group_type_new=$ref_sophomorix_config->{'ou'}{$school_token_new}{'GROUP_TYPE'}{$group_new};
+
+(Dont forget: ->)
+
+Perl Debugger:
+############################################################
+
+# Make debugger usable:
+apt-get install libterm-readline-perl-perl
+
+
+--- hash of hashes ---
+
+# print hash of hashes (or other complex Data structure):
+x %sophomorix_config
+
+# print part of complex hash (or other complex Data structure):
+x %sophomorix_config{'ou'}
+x %sophomorix_config{'ou'}->{'uni'}
+x %sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}
+
+
+--- reference to hash of hashes ---
+
+# print reference of hash of hashes (or other complex Data structure):
+x $ref_sophomorix_config
+
+# print part of reference of hash of hashes (or other complex Data structure):
+x $ref_sophomorix_config{'ou'}->{'uni'}
+x $ref_sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}
