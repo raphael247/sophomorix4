@@ -971,10 +971,8 @@ sub AD_user_move {
 
 sub AD_get_ou_tokened {
     my ($ou) = @_;
-    if ($ou eq "---"){ # use default OU: SCHOOL
-        # remove OU= from configured value
-        my $string=$DevelConf::AD_school_ou;
-        #$string=~s/^OU=//;
+    if ($ou eq "---"){
+        my $string=$DevelConf::name_default_school;
         $ou=$string;
     }
     return $ou;
@@ -1095,8 +1093,8 @@ sub AD_ou_add {
 
     $ou=&AD_get_ou_tokened($ou);
     if ($token eq "---"){
-        $token=$DevelConf::dir_default_school;
-        $ou=$DevelConf::dir_default_school;
+        $token=$DevelConf::name_default_school;
+        $ou=$DevelConf::name_default_school;
     } else {
         $token=$token."-";
     }

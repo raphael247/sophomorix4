@@ -243,13 +243,13 @@ sub config_sophomorix_read {
     $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
         "adminclass";
     # default school
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{'OU'}=$DevelConf::AD_school_ou; 
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{'CONF_FILE'}=
-        $DevelConf::path_conf_sophomorix."/".$DevelConf::dir_default_school."/school.conf"; 
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{'SCHOOL_NAME'}=
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU'}=$DevelConf::name_default_school; 
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'CONF_FILE'}=
+        $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/school.conf"; 
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'SCHOOL_NAME'}=
         "School"; 
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{'OU_TOP'}=
-        "OU=".$DevelConf::AD_school_ou.",".$root_dse; 
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
+        "OU=".$DevelConf::name_default_school.",".$root_dse; 
 
     ##################################################
     # sophomorix.conf 
@@ -293,12 +293,12 @@ sub config_sophomorix_read {
         $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}="OU=".$school.",".$root_dse;
 
-                 if ($school eq $DevelConf::dir_default_school){
+                 if ($school eq $DevelConf::name_default_school){
                      $sophomorix_config{'ou'}{$school}{SCHOOL_TOKEN}="";
                      $sophomorix_config{'ou'}{$school}{PREFIX}="";
                      $sophomorix_config{'ou'}{$school}{POSTFIX}="";
                      $sophomorix_config{'ou'}{$school}{OU_TOP}=
-                         $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+                         $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
                  } else {
                      $sophomorix_config{'ou'}{$school}{SCHOOL_TOKEN}=$school;
                      $sophomorix_config{'ou'}{$school}{PREFIX}=$school."-";
@@ -337,12 +337,12 @@ sub config_sophomorix_read {
             #     $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
             #     $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}="OU=".$value.",".$root_dse;
             #     #$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP_GLOBAL}="OU=GLOBAL,".$root_dse;
-            #     if ($school eq $DevelConf::dir_default_school){
+            #     if ($school eq $DevelConf::name_default_school){
             #         $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}="";
             #         $sophomorix_config{'ou'}{$value}{PREFIX}="";
             #         $sophomorix_config{'ou'}{$value}{POSTFIX}="";
             #         $sophomorix_config{'ou'}{$value}{OU_TOP}=
-            #             $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+            #             $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
             #     } else {
             #         $sophomorix_config{'ou'}{$value}{SCHOOL_TOKEN}=$school;
             #         $sophomorix_config{'ou'}{$value}{PREFIX}=$school."-";
@@ -355,13 +355,13 @@ sub config_sophomorix_read {
                 my ($file,$filter_script,$enc,$enc_force,$sur_chars,$first_chars,
                     $reverse,$rand_pwd,$pwd_length)=split(/::/,$value);
                 my $token_file;
-                if ($school eq $DevelConf::dir_default_school){
+                if ($school eq $DevelConf::name_default_school){
                     $token_file=$file;
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PREFIX}="";
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
-                        $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
@@ -405,13 +405,13 @@ sub config_sophomorix_read {
             } elsif ($var eq "CLASS_FILE"){
                 my ($file,$rest)=split(/::/,$value);
                 my $token_file;
-                if ($school eq $DevelConf::dir_default_school){
+                if ($school eq $DevelConf::name_default_school){
                     $token_file=$file;
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}="";
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
-                        $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
@@ -426,15 +426,15 @@ sub config_sophomorix_read {
             } elsif ($var eq "DEVICE_FILE"){
                 my ($file,$rest)=split(/::/,$value);
                 my $token_file;
-                if ($school eq $DevelConf::dir_default_school){
+                if ($school eq $DevelConf::name_default_school){
                     $token_file=$file;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}="";
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}="";
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="";
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
-                        $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU_TOP};
+                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
-                        $sophomorix_config{'SCHOOLS'}{$DevelConf::dir_default_school}{OU};
+                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU};
                 } else {
                     $token_file=$school.".".$file;
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL_TOKEN}=$school;
@@ -482,12 +482,12 @@ sub config_sophomorix_read {
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL_TOKEN}="";
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
-#    $sophomorix_config{'ou'}{'SCHOOL'}{OU_TOP}="OU=".$DevelConf::AD_school_ou.",".$root_dse;
+#    $sophomorix_config{'ou'}{'SCHOOL'}{OU_TOP}="OU=".$DevelConf::name_default_school.",".$root_dse;
 #    $sophomorix_config{'ou'}{'SCHOOL'}{SCHOOL_TOKEN}="";
 #    $sophomorix_config{'ou'}{'SCHOOL'}{PREFIX}="";
-    $sophomorix_config{'ou'}{$DevelConf::AD_school_ou}{OU_TOP}="OU=".$DevelConf::AD_school_ou.",".$root_dse;
-    $sophomorix_config{'ou'}{$DevelConf::AD_school_ou}{SCHOOL_TOKEN}="";
-    $sophomorix_config{'ou'}{$DevelConf::AD_school_ou}{PREFIX}="";
+    $sophomorix_config{'ou'}{$DevelConf::name_default_school}{OU_TOP}="OU=".$DevelConf::name_default_school.",".$root_dse;
+    $sophomorix_config{'ou'}{$DevelConf::name_default_school}{SCHOOL_TOKEN}="";
+    $sophomorix_config{'ou'}{$DevelConf::name_default_school}{PREFIX}="";
 
     #print Dumper(%sophomorix_config);
     #exit;
@@ -548,7 +548,7 @@ sub config_sophomorix_read {
 #            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{SCHOOL_TOKEN}=$token;
 #            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{PREFIX}=$token."-";
 #        } elsif ($dots==1){
-#            $sophomorix_config{'school_token'}{''}=$DevelConf::AD_school_ou;
+#            $sophomorix_config{'school_token'}{''}=$DevelConf::name_default_school;
 #            $sophomorix_config{'ou'}{$school_ou}{SCHOOL_TOKEN}="";
 #            $sophomorix_config{'ou'}{$school_ou}{PREFIX}="";
 #            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{SCHOOL_TOKEN}="";
