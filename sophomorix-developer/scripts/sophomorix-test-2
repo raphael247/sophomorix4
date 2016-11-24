@@ -246,7 +246,7 @@ if ($test_ws_1==1){
     ############################################################
     # # j1008p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008p01,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008p01,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -262,13 +262,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -277,7 +277,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -285,7 +285,7 @@ if ($test_ws_1==1){
 
     # J1008P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1008P01,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1008P01,OU=j1008,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1008P01",
                    name=>"J1008P01",
@@ -297,7 +297,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1008P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1008P01,".
                                            "HOST/J1008P01.".$root_dns.",".
                                            "RestrictedKrbHost/J1008P01,".
@@ -309,7 +309,7 @@ if ($test_ws_1==1){
     ############################################################
     # j1008p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -325,13 +325,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -340,7 +340,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -348,7 +348,7 @@ if ($test_ws_1==1){
 
     # J1008P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1008P02,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1008P02,OU=j1008,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1008P02",
                    name=>"J1008P02",
@@ -360,7 +360,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1008P02.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1008P02,".
                                            "HOST/J1008P02.".$root_dns.",".
                                            "RestrictedKrbHost/J1008P02,".
@@ -379,7 +379,7 @@ if ($test_ws_1==1){
     ############################################################
     # # j1010p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -395,13 +395,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -410,7 +410,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -418,7 +418,7 @@ if ($test_ws_1==1){
 
     # J1010P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1010P01,OU=j1010,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1010P01,OU=j1010,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1010P01",
                    name=>"J1010P01",
@@ -430,7 +430,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1010P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1010P01,".
                                            "HOST/J1010P01.".$root_dns.",".
                                            "RestrictedKrbHost/J1010P01,".
@@ -442,7 +442,7 @@ if ($test_ws_1==1){
     ############################################################
     # # j1010p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -458,13 +458,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -473,7 +473,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -481,7 +481,7 @@ if ($test_ws_1==1){
 
     # J1010P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1010P02,OU=j1010,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1010P02,OU=j1010,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1010P02",
                    name=>"J1010P02",
@@ -493,7 +493,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1010P02.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1010P02,".
                                            "HOST/J1010P02.".$root_dns.",".
                                            "RestrictedKrbHost/J1010P02,".
@@ -514,7 +514,7 @@ if ($test_ws_1==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c001p01");
     # C001P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=C001P01,OU=c001,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=C001P01,OU=c001,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer C001P01",
                    name=>"C001P01",
@@ -526,7 +526,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "C001P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/C001P01,".
                                            "HOST/C001P01.".$root_dns.",".
                                            "RestrictedKrbHost/C001P01,".
@@ -540,7 +540,7 @@ if ($test_ws_1==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c002p01");
     # C002P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=C002P01,OU=c002,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=C002P01,OU=c002,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer C002P01",
                    name=>"C002P01",
@@ -552,7 +552,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "C002P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/C002P01,".
                                            "HOST/C002P01.".$root_dns.",".
                                            "RestrictedKrbHost/C002P01,".
@@ -566,7 +566,7 @@ if ($test_ws_1==1){
     ############################################################
     # # bsz-j1008p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -582,13 +582,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -597,7 +597,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -605,7 +605,7 @@ if ($test_ws_1==1){
 
     # BSZ-J1008P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1008P01,OU=bsz-j1008,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1008P01,OU=bsz-j1008,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1008P01",
                    name=>"BSZ-J1008P01",
@@ -617,7 +617,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1008P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1008P01,".
                                            "HOST/BSZ-J1008P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1008P01,".
@@ -629,7 +629,7 @@ if ($test_ws_1==1){
     ############################################################
     # # bsz-j1008p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -645,13 +645,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -660,7 +660,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -668,7 +668,7 @@ if ($test_ws_1==1){
 
     # BSZ-J1008P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1008P02,OU=bsz-j1008,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1008P02,OU=bsz-j1008,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1008P02",
                    name=>"BSZ-J1008P02",
@@ -680,7 +680,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1008P02.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1008P02,".
                                            "HOST/BSZ-J1008P02.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1008P02,".
@@ -699,7 +699,7 @@ if ($test_ws_1==1){
     ############################################################
     # # bsz-j1010p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -715,13 +715,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -730,7 +730,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -738,7 +738,7 @@ if ($test_ws_1==1){
 
     # BSZ-J1010P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1010P01,OU=bsz-j1010,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1010P01,OU=bsz-j1010,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1010P01",
                    name=>"BSZ-J1010P01",
@@ -750,7 +750,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1010P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1010P01,".
                                            "HOST/BSZ-J1010P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1010P01,".
@@ -762,7 +762,7 @@ if ($test_ws_1==1){
     ############################################################
     # # bsz-j1010p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -778,13 +778,13 @@ if ($test_ws_1==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -793,7 +793,7 @@ if ($test_ws_1==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -801,7 +801,7 @@ if ($test_ws_1==1){
 
     # BSZ-J1010P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1010P02,OU=bsz-j1010,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1010P02,OU=bsz-j1010,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1010P02",
                    name=>"BSZ-J1010P02",
@@ -813,7 +813,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1010P02.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1010P02,".
                                            "HOST/BSZ-J1010P02.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1010P02,".
@@ -834,7 +834,7 @@ if ($test_ws_1==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
     # BSZ-D001P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-D001P01,OU=bsz-d001,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-D001P01,OU=bsz-d001,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-D001P01",
                    name=>"BSZ-D001P01",
@@ -846,7 +846,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-D001P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-D001P01,".
                                            "HOST/BSZ-D001P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-D001P01,".
@@ -860,7 +860,7 @@ if ($test_ws_1==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d002p01");
     # BSZ-D002P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-D002P01,OU=bsz-d002,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-D002P01,OU=bsz-d002,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-D002P01",
                    name=>"BSZ-D002P01",
@@ -872,7 +872,7 @@ if ($test_ws_1==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-D002P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-D002P01,".
                                            "HOST/BSZ-D002P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-D002P01,".
@@ -906,7 +906,7 @@ if ($test_ws_2==1){
     ############################################################
     # # j1008p03
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008p03,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008p03,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -922,13 +922,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -937,7 +937,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -945,7 +945,7 @@ if ($test_ws_2==1){
 
     # J1008P03$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1008P03,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1008P03,OU=j1008,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1008P03",
                    name=>"J1008P03",
@@ -957,7 +957,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1008P03.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1008P03,".
                                            "HOST/J1008P03.".$root_dns.",".
                                            "RestrictedKrbHost/J1008P03,".
@@ -969,7 +969,7 @@ if ($test_ws_2==1){
     ############################################################
     # # j1008p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008p02,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -985,13 +985,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1008,OU=j1008,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1000,7 +1000,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1008,7 +1008,7 @@ if ($test_ws_2==1){
 
     # J1008P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1008P02,OU=j1008,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1008P02,OU=j1008,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1008P02",
                    name=>"J1008P02",
@@ -1020,7 +1020,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1008P02.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1008P02,".
                                            "HOST/J1008P02.".$root_dns.",".
                                            "RestrictedKrbHost/J1008P02,".
@@ -1039,7 +1039,7 @@ if ($test_ws_2==1){
     ############################################################
     # # j1010p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010p01,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -1055,13 +1055,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1070,7 +1070,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1078,7 +1078,7 @@ if ($test_ws_2==1){
 
     # J1010P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1010P01,OU=j1010,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1010P01,OU=j1010,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1010P01",
                    name=>"J1010P01",
@@ -1090,7 +1090,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1010P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1010P01,".
                                            "HOST/J1010P01.".$root_dns.",".
                                            "RestrictedKrbHost/J1010P01,".
@@ -1102,7 +1102,7 @@ if ($test_ws_2==1){
     ############################################################
     # # j1010p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010p02,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -1118,13 +1118,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "---",
-    #                sophomorixSchoolname => "SCHOOL",
+    #                sophomorixSchoolname => "default-school",
     #                sophomorixAdminFile => "devices.csv",
     #                memberOf => "j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=j1010,OU=j1010,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1133,7 +1133,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=SCHOOL,".$root_dse,
+    #                dn=>"CN=examaccounts,OU=examaccounts,OU=ExamAccounts,OU=default-school,".$root_dse,
     #                sAMAccountname=>"examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1141,7 +1141,7 @@ if ($test_ws_2==1){
 
     # J1010P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=J1010P02,OU=j1010,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=J1010P02,OU=j1010,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer J1010P02",
                    name=>"J1010P02",
@@ -1153,7 +1153,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "J1010P02.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/J1010P02,".
                                            "HOST/J1010P02.".$root_dns.",".
                                            "RestrictedKrbHost/J1010P02,".
@@ -1174,7 +1174,7 @@ if ($test_ws_2==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c001p01");
     # C001P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=C001P01,OU=c001,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=C001P01,OU=c001,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer C001P01",
                    name=>"C001P01",
@@ -1186,7 +1186,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "C001P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/C001P01,".
                                            "HOST/C001P01.".$root_dns.",".
                                            "RestrictedKrbHost/C001P01,".
@@ -1200,7 +1200,7 @@ if ($test_ws_2==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c002p01");
     # C002P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=C002P01,OU=c002,OU=Computers,OU=SCHOOL,".$root_dse,
+                   dn=>"CN=C002P01,OU=c002,OU=Computers,OU=default-school,".$root_dse,
                    #####
                    displayName=>"Computer C002P01",
                    name=>"C002P01",
@@ -1212,7 +1212,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "C002P01.".$root_dns,
                    sophomorixSchoolPrefix => "---",
-                   sophomorixSchoolname => "SCHOOL",
+                   sophomorixSchoolname => "default-school",
                    servicePrincipalName => "HOST/C002P01,".
                                            "HOST/C002P01.".$root_dns.",".
                                            "RestrictedKrbHost/C002P01,".
@@ -1226,7 +1226,7 @@ if ($test_ws_2==1){
     ############################################################
     # # bsz-j1008p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008p01,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -1242,13 +1242,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1257,7 +1257,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1265,7 +1265,7 @@ if ($test_ws_2==1){
 
     # BSZ-J1008P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1008P01,OU=bsz-j1008,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1008P01,OU=bsz-j1008,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1008P01",
                    name=>"BSZ-J1008P01",
@@ -1277,7 +1277,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1008P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1008P01,".
                                            "HOST/BSZ-J1008P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1008P01,".
@@ -1289,7 +1289,7 @@ if ($test_ws_2==1){
     ############################################################
     # # bsz-j1008p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008p02,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -1305,13 +1305,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1008",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1008,OU=bsz-j1008,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1008",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1320,7 +1320,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1328,7 +1328,7 @@ if ($test_ws_2==1){
 
     # BSZ-J1008P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1008P02,OU=bsz-j1008,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1008P02,OU=bsz-j1008,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1008P02",
                    name=>"BSZ-J1008P02",
@@ -1340,7 +1340,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1008P02.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1008P02,".
                                            "HOST/BSZ-J1008P02.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1008P02,".
@@ -1359,7 +1359,7 @@ if ($test_ws_2==1){
     ############################################################
     # # bsz-j1010p01
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010p01,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -1375,13 +1375,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1390,7 +1390,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1398,7 +1398,7 @@ if ($test_ws_2==1){
 
     # BSZ-J1010P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1010P01,OU=bsz-j1010,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1010P01,OU=bsz-j1010,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1010P01",
                    name=>"BSZ-J1010P01",
@@ -1410,7 +1410,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1010P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1010P01,".
                                            "HOST/BSZ-J1010P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1010P01,".
@@ -1422,7 +1422,7 @@ if ($test_ws_2==1){
     ############################################################
     # # bsz-j1010p02
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010p02,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                #####
     #                displayName=>"Exam Account",
     #                givenName=>"Exam",
@@ -1438,13 +1438,13 @@ if ($test_ws_2==1){
     #                sophomorixRole => "examaccount",
     #                sophomorixStatus=>"P",
     #                sophomorixSchoolPrefix => "bsz",
-    #                sophomorixSchoolname => "BSZLEO",
+    #                sophomorixSchoolname => "bsz",
     #                sophomorixAdminFile => "bsz.devices.csv",
     #                memberOf => "bsz-j1010",
     #               });
     # ##### Testing the exam accounts room
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-j1010,OU=bsz-j1010,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-j1010",
     #                gidNumber=>"-1",
     #                sophomorixStatus=>"P",
@@ -1453,7 +1453,7 @@ if ($test_ws_2==1){
     #               });
     # ##### Testing the examaccounts <token>-examaccounts group
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=BSZLEO,".$root_dse,
+    #                dn=>"CN=bsz-examaccounts,OU=bsz-examaccounts,OU=ExamAccounts,OU=bsz,".$root_dse,
     #                sAMAccountname=>"bsz-examaccounts",
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
@@ -1461,7 +1461,7 @@ if ($test_ws_2==1){
 
     # BSZ-J1010P02$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-J1010P02,OU=bsz-j1010,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-J1010P02,OU=bsz-j1010,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-J1010P02",
                    name=>"BSZ-J1010P02",
@@ -1473,7 +1473,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-J1010P02.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-J1010P02,".
                                            "HOST/BSZ-J1010P02.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-J1010P02,".
@@ -1494,7 +1494,7 @@ if ($test_ws_2==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
     # BSZ-D001P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-D001P01,OU=bsz-d001,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-D001P01,OU=bsz-d001,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-D001P01",
                    name=>"BSZ-D001P01",
@@ -1506,7 +1506,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-D001P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-D001P01,".
                                            "HOST/BSZ-D001P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-D001P01,".
@@ -1520,7 +1520,7 @@ if ($test_ws_2==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d002p01");
     # BSZ-D002P01$
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=BSZ-D002P01,OU=bsz-d002,OU=Computers,OU=BSZLEO,".$root_dse,
+                   dn=>"CN=BSZ-D002P01,OU=bsz-d002,OU=Computers,OU=bsz,".$root_dse,
                    #####
                    displayName=>"Computer BSZ-D002P01",
                    name=>"BSZ-D002P01",
@@ -1532,7 +1532,7 @@ if ($test_ws_2==1){
                    accountExpires => "9223372036854775807",
                    dNSHostName => "BSZ-D002P01.".$root_dns,
                    sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "BSZLEO",
+                   sophomorixSchoolname => "bsz",
                    servicePrincipalName => "HOST/BSZ-D002P01,".
                                            "HOST/BSZ-D002P01.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-D002P01,".
@@ -1598,7 +1598,7 @@ if ($full==1){
 
 if ($test_ws_5==1){
     ############################################################
-    # SCHOOL
+    # default-school
     &AD_object_nonexist($ldap,$root_dse,"examaccount","j1008p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","J1008P01\$");
     &AD_test_nondns($res,"j1008p01");

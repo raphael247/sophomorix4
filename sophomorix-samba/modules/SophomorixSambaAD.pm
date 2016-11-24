@@ -435,57 +435,25 @@ sub AD_computer_create {
     my $creationdate = $arg_ref->{creationdate};
 
     # calculation
-    # make name uppercase
-    #my $name_uppercase=$name;
-    #$name_uppercase=~tr/a-z/A-Z/;
-
-    # make school-token uppercase
-    #my $school_token_uppercase=$school_token;
-    #$school_token_uppercase=~tr/a-z/A-Z/;
-
-
-    # names with tokens
-#    my $room_token=&AD_get_name_tokened($room,$school_token,"roomws");
-#    my $name_token=&AD_get_name_tokened($name,$school_token,"workstation");
-#    my $display_name=$name_token;
-#    my $smb_name=$name_token."\$";
     my $display_name=$name;
     my $smb_name=$name."\$";
 
     # dns
     my $root_dns=&AD_dns_get($root_dse);
 
-    #my @dns_part_stripped=(); # without 'DC='
-    #my @dns_part=split(/,/,$root_dse);
-    #foreach my $part (@dns_part){
-    #    $part=~s/DC=//g;
-    #    #print "PART: $part\n";
-    #    push @dns_part_stripped, $part;
-    #}
-    #my $dns_name = join(".",@dns_part_stripped);
-
-#    $dns_name=$name_token.".".$root_dns;
-#    my @service_principal_name=("HOST/".$name_token,
-#                                "HOST/".$dns_name,
-#                                "RestrictedKrbHost/".$name_token,
-#                                "RestrictedKrbHost/".$dns_name,
-#                               );
     $dns_name=$name.".".$root_dns;
     my @service_principal_name=("HOST/".$name,
                                 "HOST/".$dns_name,
                                 "RestrictedKrbHost/".$name,
                                 "RestrictedKrbHost/".$dns_name,
                                );
-
-#     my $container=&AD_get_container($role,$room_token);
     my $container=&AD_get_container($role,$room);
     my $dn_room = $container."OU=".$ou.",".$root_dse;
-#    my $dn = "CN=".$name_token.",".$container."OU=".$ou.",".$root_dse;
     my $dn = "CN=".$name.",".$container."OU=".$ou.",".$root_dse;
-
-    if ($school_token eq ""){
+    my $prefix=$school_token;
+    if ($school_token eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
-        $school_token="---";
+        $prefix="---";
     }
 
     if($Conf::log_level>=1){
@@ -493,12 +461,11 @@ sub AD_computer_create {
               "Creating workstation $ws_count: $name");
         print "   DN:                    $dn\n";
         print "   DN(Parent):            $dn_room\n";
-#        print "   Name:                  $name_token\n";
-#        print "   Room:                  $room_token\n";
         print "   Name:                  $name\n";
         print "   Room:                  $room\n";
         print "   OU:                    $ou\n";
         print "   SchoolToken:           $school_token\n";
+        print "   Prefix:                $prefix\n";
         print "   sAMAccountName:        $smb_name\n";
         print "   dNSHostName:           $dns_name\n";
         foreach my $entry (@service_principal_name){
@@ -527,7 +494,7 @@ sub AD_computer_create {
 #                   sophomorixFirstnameASCII => $firstname_ascii,
 #                   sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixRole => "computer",
-                   sophomorixSchoolPrefix => $school_token,
+                   sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $ou,
                    sophomorixCreationDate => $creationdate, 
                    userAccountControl => '4096',
@@ -990,7 +957,10 @@ sub AD_get_name_tokened {
         $role eq "workstation" or
         $role eq "project" or
         $role eq "sophomorix-group"){
-        if ($school_token eq "---" or $school_token eq ""){
+        if ($school_token eq "---" 
+            or $school_token eq ""
+            or $school_token eq $DevelConf::name_default_school
+           ){
             # SCHOOL, no multischool
             $name_tokened=$name;
         } else {
@@ -1087,6 +1057,7 @@ sub AD_ou_add {
     my $ou = $arg_ref->{school_token};
 
     my $token = $arg_ref->{school_token};
+
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $gidnumber_wish;

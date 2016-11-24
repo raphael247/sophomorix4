@@ -295,7 +295,6 @@ my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
                             });
 #print Dumper(\%sophomorix_config{'FILES'});
-print "LIS@filelist"; 
 #my $resulthash=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'bsz.devices.csv'}{'OU'};
 #print "HASH: >$resulthash<\n";
 #my $resulthash2=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'devices.csv'}{'PREFIX'};
@@ -900,8 +899,8 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    #print Dumper(%devices_file{'devices'});
-    #print Dumper(%devices_file);
+    #print Dumper(%devices_file{'computer'});
+    print Dumper(%devices_file);
 
     #print Dumper(%AD);
     exit;
@@ -1034,9 +1033,11 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     my $ws_count=1;
     foreach my $computer (@adding_computers){
         my $ou=$devices_file{'computer'}{$computer}{'OU'};
+        $ou=&AD_get_ou_tokened($ou);
         my $school_token=$devices_file{'computer'}{$computer}{'SCHOOL_TOKEN'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
+	print "THIS: <$ou>  <$school_token>\n";
         if (not exists $ou_created{$ou}){
             # create ou
             &AD_ou_add({ldap=>$ldap,
@@ -1371,6 +1372,7 @@ sub analyze_device_line {
 
         # use tokened names 
         my $host_token=&AD_get_name_tokened($host,$school_token,"examaccount");
+
         my $room_token=&AD_get_name_tokened($room,$school_token,"roomws");
         my $ws_token=&AD_get_name_tokened($host,$school_token,"workstation");
         my $ws_token_account=$ws_token."\$";
