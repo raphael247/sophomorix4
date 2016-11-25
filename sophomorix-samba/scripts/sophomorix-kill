@@ -44,7 +44,7 @@ my $login_name_to_kill="";
 my $home_verzeichnis_to_kill="";
 my $linux_gruppe_to_kill="";
 my $school_token="";
-my $ou="";
+#my $ou="";
 my $public_html_to_kill="";
 my $linie_to_kill="";
 #my %protokoll_hash=();
@@ -151,11 +151,11 @@ if ($info==1) {
     my $count=0;
     # Ausgabe der loeschbaren user
     print "\nThe following users can be killed:\n\n";
-    printf "%-11s %-16s %-35s %-12s\n",
+    printf "%-14s%-19s%-40s%-5s\n",
            "Loginname",
            "AdminClass",
            "Identifier",
-           "OU";
+           "School";
     &print_line;
 
     my @lines=();
@@ -190,15 +190,15 @@ if ($info==1) {
        ($identifier_to_kill,
         $login_name_to_kill,
         $linux_gruppe_to_kill,
-        $school_token,
-        $ou)=split(/::/,$line);
+        $school_token
+       )=split(/::/,$line);
        my $group_token=&AD_get_name_tokened($linux_gruppe_to_kill,$school_token,"---");
 
-       printf "%-11s %-16s %-35s %-12s\n",
+       printf "%-14s%-19s%-40s%-5s\n",
               $login_name_to_kill,
               $group_token,
               $identifier_to_kill,
-              $ou;
+              $school_token;
     }
 
     &print_line;
