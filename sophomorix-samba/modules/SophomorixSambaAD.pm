@@ -528,11 +528,7 @@ sub AD_user_create {
     my $plain_password = $arg_ref->{plain_password};
     my $unid = $arg_ref->{unid};
     my $uidnumber_wish = $arg_ref->{uidnumber_wish};
-
-    #my $ou = $arg_ref->{ou};
-    my $ou = $arg_ref->{school_token};
-
-    my $school_token = $arg_ref->{school_token};
+    my $school = $arg_ref->{school_token};
     my $role = $arg_ref->{role};
     my $type = $arg_ref->{type};
     my $creationdate = $arg_ref->{creationdate};
@@ -564,20 +560,20 @@ sub AD_user_create {
     if ($deactivationdate eq "---"){
         $deactivationdate=$DevelConf::default_date;
     }
-    $ou=&AD_get_ou_tokened($ou);
+    $school=&AD_get_ou_tokened($school);
 
     # calculate
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
-    if ($school_token eq $DevelConf::name_default_school){
+    if ($school eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
         $prefix="---";
     }
     my $container=&AD_get_container($role,$group);
 
-    my $dn_class = $container."OU=".$ou.",".$root_dse;
-    my $dn = "cn=".$login.",".$container."OU=".$ou.",".$root_dse;
+    my $dn_class = $container."OU=".$school.",".$root_dse;
+    my $dn = "cn=".$login.",".$container."OU=".$school.",".$root_dse;
  
     # password generation
     # build the conversion map from your local character set to Unicode    
@@ -585,16 +581,13 @@ sub AD_user_create {
     # surround the PW with double quotes and convert it to UTF-16
     my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
 
-    my $prefix=$school_token;
-    if ($school_token eq $DevelConf::name_default_school){
+    my $prefix=$school;
+    if ($school eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
         $prefix="---";
     }
 
     if($Conf::log_level>=1){
-#        print "\n";
-#        &Sophomorix::SophomorixBase::print_title(
-#              "Creating User $user_count : $login");
         print "   DN:                 $dn\n";
         print "   DN(Parent):         $dn_class\n";
         print "   Surname(ASCII):     $surname_ascii\n";
@@ -603,8 +596,8 @@ sub AD_user_create {
         print "   Firstname(UTF8):    $firstname_utf8\n";
         print "   Birthday:           $birthdate\n";
         print "   Identifier:         $identifier\n";
-        print "   OU:                 $ou\n"; # Organisatinal Unit
-        print "   School Token:       $school_token\n"; # Organisatinal Unit
+        print "   OU:                 $school\n"; # Organisatinal Unit
+        print "   School Token:       $school\n"; # Organisatinal Unit
         print "   Role(User):         $role\n";
         print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
@@ -642,7 +635,7 @@ sub AD_user_create {
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
                    sophomorixSchoolPrefix => $prefix,
-                   sophomorixSchoolname => $ou,
+                   sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate, 
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
