@@ -923,7 +923,7 @@ sub AD_get_ou_tokened {
 sub AD_get_name_tokened {
     # $role is: group type / user role
     # prepend <token> or not, depending on the users role/groups type 
-    my ($name,$school_token,$role) = @_;
+    my ($name,$school,$role) = @_;
     my $name_tokened="";
     if ($role eq "adminclass" or
         $role eq "room" or 
@@ -932,9 +932,9 @@ sub AD_get_name_tokened {
         $role eq "workstation" or
         $role eq "project" or
         $role eq "sophomorix-group"){
-        if ($school_token eq "---" 
-            or $school_token eq ""
-            or $school_token eq $DevelConf::name_default_school
+        if ($school eq "---" 
+            or $school eq ""
+            or $school eq $DevelConf::name_default_school
            ){
             # SCHOOL, no multischool
             $name_tokened=$name;
@@ -942,10 +942,10 @@ sub AD_get_name_tokened {
             # multischool
             if ($DevelConf::token_postfix==0){
                 # prefix
-                $name_tokened=$school_token."-".$name;
+                $name_tokened=$school."-".$name;
             } elsif ($DevelConf::token_postfix==1){
                 # postfix
-                $name_tokened=$name."-".$school_token;
+                $name_tokened=$name."-".$school;
             }
         }
         if ($role eq "workstation"){
@@ -963,9 +963,9 @@ sub AD_get_name_tokened {
              $role eq "student"){
         return $name;
     # } elsif ($role eq "project"){
-    #     if ($school_token eq "---" or $school_token eq ""){
+    #     if ($school eq "---" or $school eq ""){
     #         # OU=SCHOOL
-    #         $name_tokened=$school_token."-".$name;
+    #         $name_tokened=$school."-".$name;
     #     } else 
     #     unless ($name_tokened =~ m/^p\_/) { 
     #         # add refix to projects: p_ 
@@ -1081,12 +1081,12 @@ sub AD_ou_add {
         my $group=$ref_sophomorix_config->{'ou'}{$school}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{'ou'}{$school}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{'ou'}{$school}{'GROUP_TYPE'}{$group};
-        my $school_token=$ref_sophomorix_config->{'ou'}{$school}{'SCHOOL_TOKEN'};
+        my $school=$ref_sophomorix_config->{'ou'}{$school}{'SCHOOL'};
         # create
          &AD_group_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            dn_wish=>$dn,
-                           school=>$school_token,
+                           school=>$school,
                            group=>$group,
                            description=>$description,
                            type=>$type,
@@ -1141,12 +1141,12 @@ sub AD_ou_add {
         my $group=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
-        my $school_token=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'SCHOOL_TOKEN'};
+        my $school=$ref_sophomorix_config->{'ou'}{$DevelConf::AD_global_ou}{'SCHOOL'};
         # create
          &AD_group_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            dn_wish=>$dn,
-                           school=>$school_token,
+                           school=>$school,
                            group=>$group,
                            description=>$description,
                            type=>$type,

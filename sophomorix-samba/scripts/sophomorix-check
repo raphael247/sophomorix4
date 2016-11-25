@@ -286,7 +286,7 @@ foreach my $user_file (@filelist){
     my $filename = basename($user_file);
     my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
     # fetching some config data
-    $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL_TOKEN'};
+    $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
     $ou=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'OU'};
 
     # file in tmp    
@@ -417,8 +417,8 @@ sub analyze_user_line {
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
         $users_file{'identifier'}{$identifier}{OU}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{OU};
-        $users_file{'identifier'}{$identifier}{SCHOOL_TOKEN}=
-            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL_TOKEN};
+        $users_file{'identifier'}{$identifier}{SCHOOL}=
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
 
         # file -> line
         $users_file{'file'}{$filename}{$count}{'identifier'}=$identifier;

@@ -176,7 +176,7 @@ my %devices_file=();
 #                       -> OU
 #                       -> PATH_ABS
 #                       -> ROOM
-#                       -> SCHOOL_TOKEN
+#                       -> SCHOOL
 #                       -> WORKSTATION    (capitalized name)
 #                       -> WORKSTATION_DOLLAR (capitalized with $)
 #
@@ -187,7 +187,7 @@ my %devices_file=();
 # dnsNode  -> $dnsNode  -> $IP
 # computer -> $computer -> ROOM
 #                       -> OU
-#                       -> SCHOOL_TOKEN
+#                       -> SCHOOL
 #                       -> WORKSTATION    (capitalized name)
 #                       -> WORKSTATION_DOLLAR (capitalized with $)
 #
@@ -368,7 +368,7 @@ if ($dns_test==1){
     }
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
-        $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
+        $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
         $ou=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'OU'};
        open(DEVICES,"$device_file") || 
              die "ERROR: $device_file not found!";  
@@ -706,7 +706,7 @@ if ($info==1){
 # reading and checking all device files
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
-    $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL_TOKEN'};
+    $school_token=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
     $ou=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'OU'};
     &print_title("Reading $device_file");
     open(DEVICES,"$device_file") || 
@@ -941,7 +941,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # foreach my $exam_account (@adding_examaccounts){
     #     my $role="examaccount";
     #     my $ou=$devices_file{'device'}{$exam_account}{'OU'};
-    #     my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL_TOKEN'};
+    #     my $school_token=$devices_file{'device'}{$exam_account}{'SCHOOL'};
     #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
     #     $plain_password=&get_plain_password($role,@passwort_zeichen);
     #     if (not exists $ou_created{$ou}){
@@ -1034,7 +1034,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $computer (@adding_computers){
         my $ou=$devices_file{'computer'}{$computer}{'OU'};
         $ou=&AD_get_ou_tokened($ou);
-        my $school_token=$devices_file{'computer'}{$computer}{'SCHOOL_TOKEN'};
+        my $school_token=$devices_file{'computer'}{$computer}{'SCHOOL'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
 	print "THIS: <$ou>  <$school_token>\n";
@@ -1398,7 +1398,7 @@ sub analyze_device_line {
         }
         $devices_file{'device'}{$host_token}{'WORKSTATION'}=$ws_token;
         $devices_file{'device'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
-        $devices_file{'device'}{$host_token}{'SCHOOL_TOKEN'}=$school_token;
+        $devices_file{'device'}{$host_token}{'SCHOOL'}=$school_token;
         $devices_file{'device'}{$host_token}{'OU'}=$ou;
         $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
         $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
@@ -1413,7 +1413,7 @@ sub analyze_device_line {
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
             $devices_file{'computer'}{$ws_token_account}{'OU'}=$ou;
-            $devices_file{'computer'}{$ws_token_account}{'SCHOOL_TOKEN'}=$school_token;
+            $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school_token;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
