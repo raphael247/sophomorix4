@@ -431,7 +431,7 @@ sub AD_computer_create {
     my $room = $arg_ref->{room};
     my $role = $arg_ref->{role};
     my $ws_count = $arg_ref->{ws_count};
-    my $school = $arg_ref->{school_token};
+    my $school = $arg_ref->{school};
     my $creationdate = $arg_ref->{creationdate};
 
     # calculation
