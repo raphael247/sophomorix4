@@ -76,13 +76,11 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 print "Start\n";
 
-my $ou_new="BSZLEO";
-my $school_token_new="abc";
+my $school_new="abc";
 
          &AD_ou_add({ldap=>$ldap,
                      root_dse=>$root_dse,
-                     ou=>$ou_new,
-                     school_token=>$school_token_new,
+                     school=>$school_new,
                      creationdate=>$DevelConf::default_date,
                      sophomorix_config=>\%sophomorix_config,
    });

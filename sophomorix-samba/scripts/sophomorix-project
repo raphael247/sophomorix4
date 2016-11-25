@@ -80,7 +80,7 @@ my $gidnumber=-1;
 my $gidnumber_wish;
 my $kill=0;
 my $ou="---";
-my $school_token="---";
+my $school="---";
 
 my $description;
 my $addquota;
@@ -141,7 +141,7 @@ my $testopt=GetOptions(
            "hide!" => \$hide,
 #           "tree" => \$tree,
            "ou=s" => \$ou,
-           "school-token=s" => \$school_token,
+           "school-token=s" => \$school,
            "description=s" => \$description,
            "status=s" => \$status,
 #           "caller=s" => \$caller,
@@ -373,7 +373,7 @@ if ($project eq "" and $info==1){
 # --info --project <project>
 # list project(s) and exit
 if ($project ne "" and $info==1){
-    my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token,$info);
+    my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school,$info);
     exit;
 }
 
@@ -580,14 +580,14 @@ if ($create==1 and $project ne ""){
     }
    &AD_ou_add({ldap=>$ldap,
                root_dse=>$root_dse,
-               school=>$school_token,
+               school=>$school,
                creationdate=>$time_stamp_AD,
                sophomorix_config=>\%sophomorix_config,
              });
-   my $group_token=&AD_get_name_tokened($project,$school_token,"project");
+   my $group_token=&AD_get_name_tokened($project,$school,"project");
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
-                     school=>$school_token,
+                     school=>$school,
                      group=>$group_token,
                      description=>$group_token,
                      type=>"project",
@@ -602,12 +602,10 @@ if ($create==1 and $project ne ""){
 # --kill --project <name>
 ############################################################
 if ($kill==1 and $project ne ""){
-  my $group_token=&AD_get_name_tokened($project,$school_token,"project");
+  my $group_token=&AD_get_name_tokened($project,$school,"project");
   &AD_group_kill({ldap=>$ldap,
                   root_dse=>$root_dse,
                   group=>$group_token,
-                  ou=>$ou,
-                  school_token=>$school_token,
                   type=>"project",
                   });
 }
@@ -615,7 +613,7 @@ if ($kill==1 and $project ne ""){
 
 # get dn if project exists and continue
 ############################################################
-my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school_token,$info);
+my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school,$info);
 
 if ($count>1){
     print "\n$count Projects found.\n";

@@ -43,7 +43,7 @@ my $identifier_to_kill="";
 my $login_name_to_kill="";
 my $home_verzeichnis_to_kill="";
 my $linux_gruppe_to_kill="";
-my $school_token="";
+my $school="";
 my $public_html_to_kill="";
 my $linie_to_kill="";
 #my %protokoll_hash=();
@@ -168,7 +168,7 @@ if ($info==1) {
        ($identifier_to_kill, 
         $login_name_to_kill,
         $linux_gruppe_to_kill,
-        $school_token)=split(/::/);
+        $school)=split(/::/);
        #($linux_gruppe_to_kill)=&pg_get_group_list($login_name_to_kill);
        push @lines, "$_"."::"."$linux_gruppe_to_kill"."\n";
     }
@@ -189,15 +189,15 @@ if ($info==1) {
        ($identifier_to_kill,
         $login_name_to_kill,
         $linux_gruppe_to_kill,
-        $school_token
+        $school
        )=split(/::/,$line);
-       my $group_token=&AD_get_name_tokened($linux_gruppe_to_kill,$school_token,"---");
+       my $group_token=&AD_get_name_tokened($linux_gruppe_to_kill,$school,"---");
 
        printf "%-14s%-19s%-40s%-5s\n",
               $login_name_to_kill,
               $group_token,
               $identifier_to_kill,
-              $school_token;
+              $school;
     }
 
     &print_line;

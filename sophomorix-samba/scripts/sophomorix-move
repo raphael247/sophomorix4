@@ -41,8 +41,8 @@ my $alte_klasse;
 my $neue_klasse;
 my $login_versetzen;
 my $old_status;
-my $school_token_old;
-my $school_token_new;
+my $school_old;
+my $school_new;
 my $role;
 
 my $identifier;
@@ -206,13 +206,13 @@ if ($info==1) {
         $alte_klasse,
         $neue_klasse,
         $old_status,
-        $school_token_old,
-        $school_token_new,
+        $school_old,
+        $school_new,
         $role,
        )=split(/::/,$line);
 
-    my $group_token_old=&AD_get_name_tokened($alte_klasse,$school_token_old,"adminclass");
-    my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_token_new,"adminclass");
+    my $group_token_old=&AD_get_name_tokened($alte_klasse,$school_old,"adminclass");
+    my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_new,"adminclass");
     if (not defined $old_status){$old_status=""};
        # Ausgabe
        printf "%-16s%-19s%-19s%-3s%-6s%-6s\n",
@@ -220,8 +220,8 @@ if ($info==1) {
               $group_token_old, 
               $group_token_new, 
               $old_status,
-              $school_token_old,
-              $school_token_new;
+              $school_old,
+              $school_new;
     }
 
     &print_line;
@@ -267,8 +267,8 @@ while(<USERVERSETZEN>){
      $alte_klasse, 
      $neue_klasse,
      $old_status,
-     $school_token_old,
-     $school_token_new,
+     $school_old,
+     $school_new,
      $role,
     )=split(/::/);
     if (not defined $old_status){$old_status=""};
@@ -318,16 +318,16 @@ while(<USERVERSETZEN>){
      }
    }
 
-    my $group_token_old=&AD_get_name_tokened($alte_klasse,$school_token_old,"adminclass");
-    my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_token_new,"adminclass");
+    my $group_token_old=&AD_get_name_tokened($alte_klasse,$school_old,"adminclass");
+    my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_new,"adminclass");
     &AD_user_move({ldap=>$ldap,
                    root_dse=>$root_dse,
                    user=>$login_versetzen,
                    user_count=>$user_nummer,
                    group_old=>$group_token_old,
                    group_new=>$group_token_new,
-                   school_old=>$school_token_old,
-                   school_new=>$school_token_new,
+                   school_old=>$school_old,
+                   school_new=>$school_new,
                    role=>$role,
                    creationdate=>$time_stamp_AD,
                    sophomorix_config=>\%sophomorix_config,

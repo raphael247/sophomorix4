@@ -53,7 +53,7 @@ my $info=0;
 $Conf::log_level=1;
 
 my $ou="---";
-my $school_token="---";
+my $school="---";
 
 my $group="";
 my $create=0;
@@ -77,7 +77,7 @@ my $testopt=GetOptions(
            "create" => \$create,
            "kill" => \$kill,
            "ou=s" => \$ou,
-           "school-token=s" => \$school_token,
+           "school-token=s" => \$school,
            "addmember=s" => \$addmember,
            "removemember=s" => \$removemember,
            "addgroup=s" => \$addgroup,
@@ -154,14 +154,14 @@ if ($info==1){
 if ($create==1 and $group ne ""){
     &AD_ou_add({ldap=>$ldap,
                 root_dse=>$root_dse,
-                school=>$school_token,
+                school=>$school,
                 creationdate=>$time_stamp_AD,
                 sophomorix_config=>\%sophomorix_config,
               }); 
-    my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-group");
+    my $group_token=&AD_get_name_tokened($group,$school,"sophomorix-group");
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse, 
-                      school=>$school_token,
+                      school=>$school,
                       group=>$group_token,
                       description=>"Created by sophomorix-group",
                       type=>"sophomorix-group",
@@ -174,12 +174,10 @@ if ($create==1 and $group ne ""){
 # --kill --group <name>
 ############################################################
 if ($kill==1 and $group ne ""){
-  my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-group");
+  my $group_token=&AD_get_name_tokened($group,$school,"sophomorix-group");
   &AD_group_kill({ldap=>$ldap,
                   root_dse=>$root_dse,
                   group=>$group_token,
-                  ou=>$ou,
-                  school_token=>$school_token,
                   type=>"sophomorix-group",
                   });
 }

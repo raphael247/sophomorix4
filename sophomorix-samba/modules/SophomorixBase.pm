@@ -334,24 +334,6 @@ sub config_sophomorix_read {
                 $var eq "MAILQUOTA_DEFAULT_EXAM"
                ){
                 $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
-            # } elsif ($var eq "OU"){
-            #     $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
-            #     $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}="OU=".$value.",".$root_dse;
-            #     #$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP_GLOBAL}="OU=GLOBAL,".$root_dse;
-            #     if ($school eq $DevelConf::name_default_school){
-            #         $sophomorix_config{'ou'}{$value}{SCHOOL}=$DevelConf::name_default_school;
-            #         $sophomorix_config{'ou'}{$value}{PREFIX}="";
-            #         $sophomorix_config{'ou'}{$value}{POSTFIX}="";
-            #         $sophomorix_config{'ou'}{$value}{OU_TOP}=
-            #             $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
-            #     } else {
-            #         $sophomorix_config{'ou'}{$value}{SCHOOL}=$school;
-            #         $sophomorix_config{'ou'}{$value}{PREFIX}=$school."-";
-            #         $sophomorix_config{'ou'}{$value}{POSTFIX}="-".$school;
-            #         $sophomorix_config{'ou'}{$value}{OU_TOP}=
-            #             $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-            #     }
-                #$sophomorix_config{'GLOBAL'}{$var}=$value;
             } elsif ($var eq "USER_FILE"){
                 my ($file,$filter_script,$enc,$enc_force,$sur_chars,$first_chars,
                     $reverse,$rand_pwd,$pwd_length)=split(/::/,$value);
@@ -372,19 +354,6 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                 }
-#                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{BASEFILE}=$file;
-#                if ($file eq "students.csv"){
-#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIELD5}=
-#                       "UNID";
-#                } elsif ($file eq "extrastudents.csv"){
-#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIELD5}=
-#                       "WISH_LOGIN";
-#
-#                } elsif ($file eq "teachers.csv"){
-#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIELD5}=
-#                       "WISH_LOGIN";
-#
-#                }
 
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$path_abs;
@@ -456,119 +425,20 @@ sub config_sophomorix_read {
                 print "<$var> is not a valid variable name\n";
                 exit;
             }
-
-            
-
-#        # adding ou stuff
-#        $sophomorix_config{'ou'}{$school_ou}{OU_TOP}="OU=".$school_ou.",".$root_dse;
-#    }
-#    # adding global stuff
-#    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
-#    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL}="";
-#    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
-
-
         }
         close(SCHOOL);
-        # calculation othe stuff
-#        my $token_file=$school.".".$file;
-
-#        my $school_ou=$sophomorix_config{'SCHOOLS'}{$school}{'OU'};
-#        $sophomorix_config{'ou'}{$school_ou}{SCHOOL}=$school;
-#        $sophomorix_config{'ou'}{$school_ou}{PREFIX}=$school."-";
-#        $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL}=$school;
-#        $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PREFIX}=$school."-";
-
-
     }
     # GLOBAL
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL}="";
     $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
-#    $sophomorix_config{'ou'}{'SCHOOL'}{OU_TOP}="OU=".$DevelConf::name_default_school.",".$root_dse;
-#    $sophomorix_config{'ou'}{'SCHOOL'}{SCHOOL}="";
-#    $sophomorix_config{'ou'}{'SCHOOL'}{PREFIX}="";
     $sophomorix_config{'ou'}{$DevelConf::name_default_school}{OU_TOP}="OU=".$DevelConf::name_default_school.",".$root_dse;
     $sophomorix_config{'ou'}{$DevelConf::name_default_school}{SCHOOL}=$DevelConf::name_default_school;
     $sophomorix_config{'ou'}{$DevelConf::name_default_school}{PREFIX}="";
 
     #print Dumper(%sophomorix_config);
     #exit;
-# dann alle aufrufe umstellen
-# als letztes user_file entfernen
-#    exit;
-#    &print_title("Reading $DevelConf::file_conf_school");
-    ##################################################
-    # SCHOOLS    old????????????????????????????????????????
-#    open(SCHOOLS,"$DevelConf::file_conf_school") || 
-#         die "ERROR: $DevelConf::file_conf_school not found!";
-#    while (<SCHOOLS>){
-#        $_=~s/\s+$//g;# remove trailing whitespace
-#        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-#            next;
-#        }
-#        chomp();
-#        if ($_ eq ""){# next on empty line
-#            next;
-#        }
- #       my ($file,$filetype,$school_ou,$filterscript,
- #           $encoding,$encoding_force,
- #           $surname_chars,$firstname_chars,$reverse,
- #           $random_pwd,$pwd_legth)=split(/::/);
-
-#	    if ($filetype eq "users"){
-#                $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_user."/".$file;
-#	    } elsif ($filetype eq "devices"){
-#                $sophomorix_config{'user_file'}{$file}{PATH_ABS}=$DevelConf::path_conf_host."/".$file;
-#	    }
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{FILETYPE}=$filetype;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{OU}=$school_ou;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{OU_TOP}="OU=".$school_ou.",".$root_dse;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{OU_TOP_GLOBAL}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{ENCODING}=$encoding;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{ENCODING_FORCE}=$encoding_force;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{SURNAME_CHARS}=$surname_chars;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{FIRSTNAME_CHARS}=$firstname_chars;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RANDOM_PWD}=$random_pwd;
- #           $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{PWD_LENGTH}=$pwd_legth;
-
-
-# old
-#        # calc status
-#        if (-e $sophomorix_config{'user_file'}{$file}{PATH_ABS}){
-#            $sophomorix_config{'user_file'}{$file}{STATUS}="EXISTING";
-#        } else {
-#            $sophomorix_config{'user_file'}{$file}{STATUS}="NONEXISTING";
-#	}
-#        # calc school_token
-#        my $dots=$file=~tr/\.//;
-#        if ($dots==2){
-#            my ($token,$string1,$extension)=split(/\./,$file);
-#            $sophomorix_config{'school_token'}{$token}=$school_ou;
-#            $sophomorix_config{'ou'}{$school_ou}{SCHOOL}=$token;
-#            $sophomorix_config{'ou'}{$school_ou}{PREFIX}=$token."-";
-#            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{SCHOOL}=$token;
-#            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{PREFIX}=$token."-";
-#        } elsif ($dots==1){
-#            $sophomorix_config{'school_token'}{''}=$DevelConf::name_default_school;
-#            $sophomorix_config{'ou'}{$school_ou}{SCHOOL}="";
-#            $sophomorix_config{'ou'}{$school_ou}{PREFIX}="";
-#            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{SCHOOL}="";
-#            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{PREFIX}="";
-#        }
-#
-#        # adding ou stuff
-#        $sophomorix_config{'ou'}{$school_ou}{OU_TOP}="OU=".$school_ou.",".$root_dse;
-#    }
-#    # adding global stuff
-#    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
-#    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{SCHOOL}="";
-#    $sophomorix_config{'ou'}{$DevelConf::AD_global_ou}{PREFIX}="";
-#    close(SCHOOLS);
-
-
     ##################################################
     # RoleType
     &print_title("Reading $DevelConf::file_conf_roletype");

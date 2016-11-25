@@ -74,7 +74,7 @@ my $gidnumber_wish="---"; # used on creation of class
 my $set_gidnumber; # used on update
 my $kill=0;
 my $ou="---";
-my $school_token="---";
+my $school="---";
 
 my $description;
 my $quota;
@@ -107,7 +107,7 @@ my $testopt=GetOptions(
            "gidnumber=i" => \$gidnumber_wish,
            "kill" => \$kill,
            "ou=s" => \$ou,
-           "school-token=s" => \$school_token,
+           "school-token=s" => \$school,
            "description=s" => \$description,
            "quota=s" => \$quota,
            "mailquota=i" => \$mailquota,
@@ -202,7 +202,7 @@ if ($info==1 and $class eq ""){
 # --info --class name
 # list class(es) and exit
 if ($class ne "" and $info==1){
-    my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
+    my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school,$info);
     exit;
 }
 
@@ -219,15 +219,15 @@ if ($class ne "" and $info==1){
 if ($create==1 and $class ne ""){
    &AD_ou_add({ldap=>$ldap,
                root_dse=>$root_dse,
-               school=>$school_token,
+               school=>$school,
                creationdate=>$time_stamp_AD,
                sophomorix_config=>\%sophomorix_config,
              });
-   my $group_token=&AD_get_name_tokened($class,$school_token,"adminclass");
+   my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
                      ou=>$ou,
-                     school_token=>$school_token,
+                     school=>$school,
                      group=>$group_token,
                      description=>$group_token,
                      type=>"adminclass",
@@ -242,12 +242,10 @@ if ($create==1 and $class ne ""){
 # --kill --class <name>
 ############################################################
 if ($kill==1 and $class ne ""){
-  my $group_token=&AD_get_name_tokened($class,$school_token,"adminclass");
+  my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
   &AD_group_kill({ldap=>$ldap,
                   root_dse=>$root_dse,
                   group=>$group_token,
-                  ou=>$ou,
-                  school_token=>$school_token,
                   type=>"adminclass",
                   });
 }
@@ -255,7 +253,7 @@ if ($kill==1 and $class ne ""){
 
 # get dn if class exists and continue ($info=0)
 ############################################################
-my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school_token,$info);
+my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school,$info);
 
 if ($count>1){
     print "\n$count classes found.\n";

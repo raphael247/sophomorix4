@@ -133,7 +133,7 @@ my $new_class="";
 my $list_teachers_by_year=0;
 
 my $ou="";
-my $school_token="";
+my $school="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -141,7 +141,7 @@ my $testopt=GetOptions(
        "help|h" => \$help,
        "i|info" => \$info,
        "ou=s" => \$ou,
-       "school-token=s" => \$school_token,
+       "school-token=s" => \$school,
        "u|user=s" => \$user,
 
        "comment=s" => \$comment,
@@ -261,13 +261,13 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 # Setting the filters
 my $ou_filter="";
-my $school_token_filter="";
+my $school_filter="";
 my $user_filter="";
 if ($ou ne ""){
     $ou_filter="(sophomorixSchoolname=$ou)";
 }
-if ($school_token ne ""){
-    $school_token_filter="(sophomorixSchoolPrefix=$school_token)";
+if ($school ne ""){
+    $school_filter="(sophomorixSchoolPrefix=$school)";
 }
 if ($user ne ""){
     $user_filter="(sAMAccountName=$user)";
@@ -308,7 +308,7 @@ if ($user eq "" and $info==1){
 
     ##################################################
     # search for all users
-    my $filter="( &(objectclass=user) (cn=*) $ou_filter $school_token_filter)"; 
+    my $filter="( &(objectclass=user) (cn=*) $ou_filter $school_filter)"; 
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
     }
@@ -698,7 +698,7 @@ if ($user eq "" and $info==1){
 
 # --info --user <user>
 if ($user ne "" and $info==1){
-    my $filter="(&(objectclass=user) $user_filter $ou_filter $school_token_filter)"; 
+    my $filter="(&(objectclass=user) $user_filter $ou_filter $school_filter)"; 
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
     }
