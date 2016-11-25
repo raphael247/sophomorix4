@@ -528,7 +528,7 @@ sub AD_user_create {
     my $plain_password = $arg_ref->{plain_password};
     my $unid = $arg_ref->{unid};
     my $uidnumber_wish = $arg_ref->{uidnumber_wish};
-    my $school = $arg_ref->{school_token};
+    my $school = $arg_ref->{school};
     my $role = $arg_ref->{role};
     my $type = $arg_ref->{type};
     my $creationdate = $arg_ref->{creationdate};
