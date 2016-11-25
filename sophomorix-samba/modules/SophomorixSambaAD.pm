@@ -851,8 +851,7 @@ sub AD_user_move {
          # create new ou
          &AD_ou_add({ldap=>$ldap,
                      root_dse=>$root_dse,
-                     ou=>$ou_new,
-                     school_token=>$school_token_new,
+                     school=>$school_token_new,
                      creationdate=>$creationdate,
                      sophomorix_config=>$ref_sophomorix_config,
                    });
@@ -1054,7 +1053,7 @@ sub AD_ou_add {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
-    my $school = $arg_ref->{school_token};
+    my $school = $arg_ref->{school};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $gidnumber_wish;

@@ -1042,8 +1042,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
             # create ou
             &AD_ou_add({ldap=>$ldap,
                         root_dse=>$root_dse,
-                        ou=>$ou,
-                        school_token=>$school_token,
+                        school=>$school_token,
                         creationdate=>$time_stamp_AD,
                         sophomorix_config=>\%sophomorix_config,
                      });
