@@ -43,8 +43,8 @@ my $login_versetzen;
 my $old_status;
 my $school_token_old;
 my $school_token_new;
-my $ou_old;
-my $ou_new;
+#my $ou_old;
+#my $ou_new;
 my $role;
 
 my $identifier;
@@ -179,8 +179,8 @@ if ($info==1) {
     open(USERVERSETZEN,"$move_file") 
             || die "ERROR: $!";
     print "\nThe following users can be moved:\n\n";
-    printf "%-12s %-14s %-14s %-2s %-15s %-16s \n",
-           "Login","OldClass","NewClass","S","OU-old","OU-new";
+    printf "%-15s %-18s %-18s %-2s %-5s %-5s \n",
+           "Login","OldClass","NewClass","S","Sold","Snew";
     &print_line;
 
     my @lines=();
@@ -210,8 +210,8 @@ if ($info==1) {
         $old_status,
         $school_token_old,
         $school_token_new,
-        $ou_old,
-        $ou_new,
+#        $ou_old,
+#        $ou_new,
         $role,
        )=split(/::/,$line);
 
@@ -219,13 +219,13 @@ if ($info==1) {
     my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_token_new,"adminclass");
     if (not defined $old_status){$old_status=""};
        # Ausgabe
-       printf "%-13s%-15s%-15s%-3s%-16s%-17s\n",
+       printf "%-16s%-19s%-19s%-3s%-6s%-6s\n",
               $login_versetzen,
               $group_token_old, 
               $group_token_new, 
               $old_status,
-              $ou_old,
-              $ou_new;
+              $school_token_old,
+              $school_token_new;
     }
 
     &print_line;
@@ -273,8 +273,8 @@ while(<USERVERSETZEN>){
      $old_status,
      $school_token_old,
      $school_token_new,
-     $ou_old,
-     $ou_new,
+#     $ou_old,
+#     $ou_new,
      $role,
     )=split(/::/);
     if (not defined $old_status){$old_status=""};
@@ -332,8 +332,8 @@ while(<USERVERSETZEN>){
                    user_count=>$user_nummer,
                    group_old=>$group_token_old,
                    group_new=>$group_token_new,
-                   ou_old=>$ou_old,
-                   ou_new=>$ou_new,
+#                   ou_old=>$ou_old,
+#                   ou_new=>$ou_new,
                    school_token_old=>$school_token_old,
                    school_token_new=>$school_token_new,
                    role=>$role,
