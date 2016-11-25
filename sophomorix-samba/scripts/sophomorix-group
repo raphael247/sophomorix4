@@ -161,8 +161,7 @@ if ($create==1 and $group ne ""){
     my $group_token=&AD_get_name_tokened($group,$school_token,"sophomorix-group");
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse, 
-                      ou=>$ou,
-                      school_token=>$school_token,
+                      school=>$school_token,
                       group=>$group_token,
                       description=>"Created by sophomorix-group",
                       type=>"sophomorix-group",

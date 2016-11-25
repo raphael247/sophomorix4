@@ -859,8 +859,7 @@ sub AD_user_move {
                       root_dse=>$root_dse,
                       group=>$group_new,
                       description=>$group_new,
-                      ou=>$ou_new,
-                      school_token=>$school_token_new,
+                      school=>$school_token_new,
                       type=>$group_type_new,
                       joinable=>"TRUE",
                       status=>"P",
@@ -1106,8 +1105,7 @@ sub AD_ou_add {
          &AD_group_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            dn_wish=>$dn,
-                           ou=>$school,
-                           school_token=>$school_token,
+                           school=>$school_token,
                            group=>$group,
                            description=>$description,
                            type=>$type,
@@ -1167,8 +1165,7 @@ sub AD_ou_add {
          &AD_group_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            dn_wish=>$dn,
-                           ou=>$DevelConf::AD_global_ou,
-                           school_token=>$school_token,
+                           school=>$school_token,
                            group=>$group,
                            description=>$description,
                            type=>$type,
@@ -2430,13 +2427,7 @@ sub AD_group_create {
     my $root_dse = $arg_ref->{root_dse};
     my $group = $arg_ref->{group};
     my $description = $arg_ref->{description};
-
-    #my $ou = $arg_ref->{ou};
-    #my $ou = $arg_ref->{school_token};
-    #my $school_token = $arg_ref->{school_token};
-    my $school = $arg_ref->{school_token};
-
-
+    my $school = $arg_ref->{school};
     my $type = $arg_ref->{type};
     my $creationdate = $arg_ref->{creationdate};
     my $status = $arg_ref->{status};
@@ -2537,8 +2528,6 @@ sub AD_group_create {
                              addgroup => $token_students,
                            });
     } elsif ($type eq "teacherclass"){
-        #my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school,"adminclass");
-        #if ($group eq $teacher_group_expected){
             # add <token>-teachers to global-teachers
             &AD_group_addmember({ldap => $ldap,
                                  root_dse => $root_dse, 
@@ -2549,7 +2538,6 @@ sub AD_group_create {
 
         #} else {
     } elsif ($type eq "room"){
-        #my $token_examaccounts=$school."-".$DevelConf::examaccount;
         my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
         # add the room to <token>-examaccounts
         &AD_group_addmember({ldap => $ldap,
