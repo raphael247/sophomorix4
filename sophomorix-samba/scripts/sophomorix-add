@@ -75,7 +75,6 @@ my $login_check_ok="";
 my $plain_password="";
 my $file="";
 my $class_group="";
-my $ou="";
 my $school_token="";
 my $role="unknown";
 
@@ -227,7 +226,6 @@ if ($info==1) {
        $uidnumber_wish,
        $gidnumber_wish,
        $unid,
-#       $ou,
        $school_token,
        $role)=split("::",$line);
 
@@ -332,7 +330,6 @@ while(<SOPHOMORIXADD>){
     $uidnumber_wish,
     $gidnumber_wish,
     $unid,
-#    $ou,
     $school_token,
     $role,
     $surname_utf8,
@@ -457,7 +454,6 @@ while(<SOPHOMORIXADD>){
         # create ou
         &AD_ou_add({ldap=>$ldap,
                     root_dse=>$root_dse,
-                    ou=>$school_token,
                     school_token=>$school_token,
                     creationdate=>$time_stamp_AD,
                     sophomorix_config=>\%sophomorix_config,
@@ -483,7 +479,6 @@ while(<SOPHOMORIXADD>){
                     birthdate=>$birthdate,
                     plain_password=>$plain_password,
                     unid=>$unid,
-                    ou=>$school_token,
                     uidnumber_wish=>$uidnumber_wish,
                     gidnumber_wish=>$gidnumber_wish,
                     role=>$role,
@@ -532,7 +527,6 @@ while(<SOPHOMORIXADD>){
   &AD_group_create({ldap=>$ldap,
                     root_dse=>$root_dse,
                     group=>$group_token,
-                    ou=>$school_token,
                     school_token=>$school_token,
                     status=>"P",
                     type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
