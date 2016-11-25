@@ -274,11 +274,11 @@ sub config_sophomorix_read {
             $sophomorix_config{'SCHOOLS'}{$value}{'CONF_FILE'}=
                 $DevelConf::path_conf_sophomorix."/".$value."/".$value.".school.conf";
         } elsif ($var eq "LANG"){
-            $sophomorix_config{'GLOBAL'}{$var}=$value;
+            $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
         } elsif ($var eq "USE_QUOTA"){
-            $sophomorix_config{'GLOBAL'}{$var}=$value;
+            $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
         } elsif ($var eq "ADMINS_PRINT"){
-            $sophomorix_config{'GLOBAL'}{$var}=$value;
+            $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
         } else {
             print "$var is not a valid variable\n";
             exit;
