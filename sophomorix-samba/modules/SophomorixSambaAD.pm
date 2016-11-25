@@ -566,10 +566,6 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
-    if ($school eq $DevelConf::name_default_school){
-        # empty token creates error on AD add 
-        $prefix="---";
-    }
     my $container=&AD_get_container($role,$group);
 
     my $dn_class = $container."OU=".$school.",".$root_dse;
@@ -781,34 +777,34 @@ sub AD_user_move {
     my $user_count = $arg_ref->{user_count};
     my $group_old = $arg_ref->{group_old};
     my $group_new = $arg_ref->{group_new};
-# ????????
-#    my $ou_old = $arg_ref->{ou_old};
-#    my $ou_new = $arg_ref->{ou_new};
-    my $ou_old = $arg_ref->{school_token_old};
-    my $ou_new = $arg_ref->{school_token_new};
-
-    my $school_token_old = $arg_ref->{school_token_old};
-    my $school_token_new = $arg_ref->{school_token_new};
+    my $school_old = $arg_ref->{school_token_old};
+    my $school_new = $arg_ref->{school_token_new};
     my $role_new = $arg_ref->{role};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # read from config
     my $group_type_new;
-    if (defined $ref_sophomorix_config->{'ou'}{$school_token_new}{'GROUP_TYPE'}{$group_new}){
-        $group_type_new=$ref_sophomorix_config->{'ou'}{$school_token_new}{'GROUP_TYPE'}{$group_new};
+    if (defined $ref_sophomorix_config->{'ou'}{$school_new}{'GROUP_TYPE'}{$group_new}){
+        $group_type_new=$ref_sophomorix_config->{'ou'}{$school_new}{'GROUP_TYPE'}{$group_new};
     } else{
         $group_type_new="adminclass";
     }
 
+    my $prefix_new=$school_new;
+    if ($school eq $DevelConf::name_default_school){
+        # empty token creates error on AD add 
+        $prefix_new="---";
+    }
+
     my $target_branch;
-    $ou_old=&AD_get_ou_tokened($ou_old);
-    $ou_new=&AD_get_ou_tokened($ou_new);
+    $school_old=&AD_get_ou_tokened($school_old);
+    $school_new=&AD_get_ou_tokened($school_new);
 
     if ($role_new eq "student"){
-         $target_branch="OU=".$group_new.",OU=Students,OU=".$ou_new.",".$root_dse;
+         $target_branch="OU=".$group_new.",OU=Students,OU=".$school_new.",".$root_dse;
     } elsif ($role_new eq "teacher"){
-         $target_branch="OU=".$group_new.",OU=Teachers,OU=".$ou_new.",".$root_dse;
+         $target_branch="OU=".$group_new.",OU=Teachers,OU=".$school_new.",".$root_dse;
     }
 
     # fetch the dn (where the object really is)
@@ -827,31 +823,31 @@ sub AD_user_move {
     if($Conf::log_level>=1){
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Moving User $user ($user_count),(start):");
-
         print "   DN:             $dn\n";
         print "   Target DN:      $target_branch\n";
         print "   Group (Old):    $group_old\n";
         print "   Group (New):    $group_new\n";
         print "   Role (New):     $role_new\n";
         print "   Type (New):     $group_type_new\n";
-        print "   School(Old):    $school_token_old ($ou_old)\n";
-        print "   School(New):    $school_token_new ($ou_new)\n";
+        print "   School(Old):    $school_old\n";
+        print "   School(New):    $school_new\n";
+        print "   Prefix(New):    $prefix_new\n";
         print "   Creationdate:   $creationdate (if new group must be added)\n";
     }
 
     # make sure OU and tree exists
-    if (not exists $ou_created{$ou_new}){
+    if (not exists $ou_created{$school_new}){
          # create new ou
          &AD_ou_add({ldap=>$ldap,
                      root_dse=>$root_dse,
-                     school=>$school_token_new,
+                     school=>$school_new,
                      creationdate=>$creationdate,
                      sophomorix_config=>$ref_sophomorix_config,
                    });
          # remember new ou to add it only once
-         $ou_created{$ou_new}="already created";
+         $ou_created{$school_new}="already created";
     } else {
-        print "   * OU $ou_new already created\n";
+        print "   * OU $school_new already created\n";
     }
 
     # make sure new group exists
@@ -859,7 +855,7 @@ sub AD_user_move {
                       root_dse=>$root_dse,
                       group=>$group_new,
                       description=>$group_new,
-                      school=>$school_token_new,
+                      school=>$school_new,
                       type=>$group_type_new,
                       joinable=>"TRUE",
                       status=>"P",
@@ -871,13 +867,12 @@ sub AD_user_move {
 		      replace => {
                           sophomorixAdminClass => $group_new,
                           sophomorixExitAdminClass => $group_old,
-                          sophomorixSchoolPrefix => $school_token_new,
-                          sophomorixSchoolname => $ou_new,
+                          sophomorixSchoolPrefix => $prefix_new,
+                          sophomorixSchoolname => $school_new,
                           sophomorixRole => $role_new,
                       }
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
-
 
     # remove user from old group
     my ($count_oldclass,$dn_oldclass,$cn_oldclass,$info_oldclass)=&AD_object_search($ldap,$root_dse,"group",$group_old);
@@ -890,13 +885,6 @@ sub AD_user_move {
                       type=>"adminclass",
                       members=>$members_oldgroup,
                     });
-#    # move user membership to new group
-#    &AD_group_removemember({ldap => $ldap,
-#                            root_dse => $root_dse, 
-#                            group => $group_old,
-#                            removemember => $user,
-#                          });   
-
     # add user to new group 
     my ($count_newclass,$dn_newclass,$cn_newclass,$info_newclass)=&AD_object_search($ldap,$root_dse,"group",$group_new);
     my @old_members_newgroup = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_newclass,"sophomorixMembers");
@@ -910,17 +898,6 @@ sub AD_user_move {
                       type=>"adminclass",
                       members=>$members_newgroup,
                     });
-
-    #&AD_group_addmember({ldap => $ldap,
-    #                     root_dse => $root_dse, 
-    #                     group => $group_new,
-    #                     addmember => $user,
-    #                   }); 
-
-
-
-
-
     # move the object in ldap tree
     &AD_object_move({ldap=>$ldap,
                      dn=>$dn,
