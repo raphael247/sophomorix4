@@ -43,8 +43,6 @@ my $login_versetzen;
 my $old_status;
 my $school_token_old;
 my $school_token_new;
-#my $ou_old;
-#my $ou_new;
 my $role;
 
 my $identifier;
@@ -210,8 +208,6 @@ if ($info==1) {
         $old_status,
         $school_token_old,
         $school_token_new,
-#        $ou_old,
-#        $ou_new,
         $role,
        )=split(/::/,$line);
 
@@ -273,8 +269,6 @@ while(<USERVERSETZEN>){
      $old_status,
      $school_token_old,
      $school_token_new,
-#     $ou_old,
-#     $ou_new,
      $role,
     )=split(/::/);
     if (not defined $old_status){$old_status=""};
@@ -332,8 +326,6 @@ while(<USERVERSETZEN>){
                    user_count=>$user_nummer,
                    group_old=>$group_token_old,
                    group_new=>$group_token_new,
-#                   ou_old=>$ou_old,
-#                   ou_new=>$ou_new,
                    school_token_old=>$school_token_old,
                    school_token_new=>$school_token_new,
                    role=>$role,
