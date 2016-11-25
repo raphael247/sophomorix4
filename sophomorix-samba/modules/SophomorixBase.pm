@@ -480,35 +480,35 @@ sub config_sophomorix_read {
 
         # create list of sub ou's that are needed to create from sophomorix-RoleType.conf:
         if ($ou_sub_primary ne ""){
-            $sophomorix_config{'sub_ou'}{'RT_SCHOOL_OU'}{$ou_sub_primary}="from RoleType";
+            $sophomorix_config{'sub_ou'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_primary}="from RoleType";
         }
         if ($ou_sub_secondary ne ""){
-            $sophomorix_config{'sub_ou'}{'RT_SCHOOL_OU'}{$ou_sub_secondary}="from RoleType";
+            $sophomorix_config{'sub_ou'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_secondary}="from RoleType";
         }
         if ($ou_sub_tertiary ne ""){
-            $sophomorix_config{'sub_ou'}{'RT_GLOBAL_OU'}{$ou_sub_tertiary}="from RoleType";
+            $sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_tertiary}="from RoleType";
         }
         if ($ou_sub_quaternary ne ""){
-            $sophomorix_config{'sub_ou'}{'RT_GLOBAL_OU'}{$ou_sub_quaternary}="from RoleType";
+            $sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_quaternary}="from RoleType";
         } 
 
         # adding school
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
         # adding global
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-#	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
-	$sophomorix_config{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
+#	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
+	$sophomorix_config{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
 
 

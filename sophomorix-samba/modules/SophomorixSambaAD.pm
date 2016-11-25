@@ -1052,13 +1052,13 @@ sub AD_ou_add {
         print "   * Adding sub ou's for OU=$school ...\n";
     }
 
-    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_SCHOOL_OU'}}) {
+    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'SCHOOLS'}{'RT_OU'}}) {
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
-    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_SCHOOL_OU'}}) {
+    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'SCHOOLS'}{'DEVELCONF_OU'}}) {
         my $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (DEVELCONF_SCHOOL_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -1111,13 +1111,13 @@ sub AD_ou_add {
         print "   * Adding sub ou's for OU=$DevelConf::AD_global_ou ...\n";
     }
     
-    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'RT_GLOBAL_OU'}}) {
+    foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{$DevelConf::AD_global_ou}{'RT_OU'}}) {
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$DevelConf::AD_global_ou}{OU_TOP};
         print "      * DN: $dn (RT_GLOBAL_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
 
-   foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{'DEVELCONF_GLOBAL_OU'}}) {
+   foreach my $sub_ou (keys %{$ref_sophomorix_config->{'sub_ou'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}}) {
         my $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$DevelConf::AD_global_ou}{OU_TOP};
         print "      * DN: $dn (DEVELCONF_GLOBAL_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
