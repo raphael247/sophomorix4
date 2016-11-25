@@ -777,8 +777,8 @@ sub AD_user_move {
     my $user_count = $arg_ref->{user_count};
     my $group_old = $arg_ref->{group_old};
     my $group_new = $arg_ref->{group_new};
-    my $school_old = $arg_ref->{school_token_old};
-    my $school_new = $arg_ref->{school_token_new};
+    my $school_old = $arg_ref->{school_old};
+    my $school_new = $arg_ref->{school_new};
     my $role_new = $arg_ref->{role};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
