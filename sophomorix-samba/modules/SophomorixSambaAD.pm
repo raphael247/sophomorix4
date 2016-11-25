@@ -84,6 +84,7 @@ sub AD_get_passwd {
 }
 
 
+
 sub AD_bind_admin {
     my ($smb_pwd)=&AD_get_passwd();
     my $host="ldaps://localhost";
@@ -327,6 +328,7 @@ sub AD_dns_kill {
 }
 
 
+
 sub AD_dns_zonekill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -366,6 +368,7 @@ sub AD_user_kill {
         return;
     }
 }
+
 
 
 sub AD_computer_kill {
@@ -418,6 +421,8 @@ sub AD_group_kill {
     }
 }
 
+
+
 sub AD_computer_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -426,12 +431,7 @@ sub AD_computer_create {
     my $room = $arg_ref->{room};
     my $role = $arg_ref->{role};
     my $ws_count = $arg_ref->{ws_count};
-
-    # ??????????
-    #my $ou = $arg_ref->{ou};
-    my $ou = $arg_ref->{school_token};
-
-    my $school_token = $arg_ref->{school_token};
+    my $school = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
 
     # calculation
@@ -448,10 +448,10 @@ sub AD_computer_create {
                                 "RestrictedKrbHost/".$dns_name,
                                );
     my $container=&AD_get_container($role,$room);
-    my $dn_room = $container."OU=".$ou.",".$root_dse;
-    my $dn = "CN=".$name.",".$container."OU=".$ou.",".$root_dse;
-    my $prefix=$school_token;
-    if ($school_token eq $DevelConf::name_default_school){
+    my $dn_room = $container."OU=".$school.",".$root_dse;
+    my $dn = "CN=".$name.",".$container."OU=".$school.",".$root_dse;
+    my $prefix=$school;
+    if ($school eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
         $prefix="---";
     }
@@ -463,8 +463,7 @@ sub AD_computer_create {
         print "   DN(Parent):            $dn_room\n";
         print "   Name:                  $name\n";
         print "   Room:                  $room\n";
-        print "   OU:                    $ou\n";
-        print "   SchoolToken:           $school_token\n";
+        print "   School:           $school\n";
         print "   Prefix:                $prefix\n";
         print "   sAMAccountName:        $smb_name\n";
         print "   dNSHostName:           $dns_name\n";
@@ -479,7 +478,7 @@ sub AD_computer_create {
                    sAMAccountName => $smb_name,
                    displayName => "Computer ".$display_name,
                    dNSHostName => $dns_name,
-#                   givenName   =s> "Workstation",
+#                   givenName   =s> "Computer",
 #                   sn   => "Account",
 #                   cn   => $name_token,
                    cn   => $name,
@@ -495,7 +494,7 @@ sub AD_computer_create {
 #                   sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixRole => "computer",
                    sophomorixSchoolPrefix => $prefix,
-                   sophomorixSchoolname => $ou,
+                   sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate, 
                    userAccountControl => '4096',
                    instanceType => '4',
@@ -508,7 +507,6 @@ sub AD_computer_create {
     $result->code && warn "Failed to add entry: ", $result->error ;
     &AD_debug_logdump($result,2,(caller(0))[3]);
 }
-
 
 
 
@@ -650,6 +648,7 @@ sub AD_user_create {
 }
 
 
+
 sub AD_user_update {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -767,6 +766,7 @@ sub AD_user_update {
                 );
     &AD_debug_logdump($mesg2,2,(caller(0))[3]);
 }
+
 
 
 sub AD_user_move {
@@ -908,6 +908,7 @@ sub AD_user_move {
 }
 
 
+
 sub AD_get_ou_tokened {
     my ($ou) = @_;
     if ($ou eq "---"){
@@ -916,6 +917,8 @@ sub AD_get_ou_tokened {
     }
     return $ou;
 }
+
+
 
 sub AD_get_name_tokened {
     # $role is: group type / user role
@@ -1015,6 +1018,7 @@ sub AD_get_container {
         $container=$container.",";
     }
 }
+
 
 
 sub AD_ou_add {
@@ -1714,6 +1718,7 @@ sub AD_class_fetch {
 }
 
 
+
 sub AD_project_fetch {
     my ($ldap,$root_dse,$pro,$ou,$school_token,$info) = @_;
     my $dn="";
@@ -1930,6 +1935,7 @@ sub AD_project_fetch {
 }
 
 
+
 sub AD_dn_fetch_multivalue {
     # get multivalue attribute with dn
     my ($ldap,$root_dse,$dn,$attr_name) = @_;
@@ -1943,6 +1949,8 @@ sub AD_dn_fetch_multivalue {
     my @results = sort $entry->get_value($attr_name);
     return @results;
 }
+
+
 
 sub AD_group_update {
     my ($arg_ref) = @_;
@@ -2086,6 +2094,7 @@ sub AD_group_update {
         &AD_project_sync_members($ldap,$root_dse,$dn);
     }
 }
+
 
 
 sub AD_project_sync_members {
@@ -2371,6 +2380,7 @@ sub AD_group_list {
         return @projects_dn;
     }
 }
+
 
 
 sub AD_object_move {
@@ -2740,6 +2750,7 @@ sub AD_debug_logdump {
 }
 
 
+
 sub AD_login_test {
     # return 0: success
     # return -1: nor firstpassword found
@@ -2779,6 +2790,7 @@ sub AD_login_test {
 }
 
 
+
 sub next_free_uidnumber_set {
     my ($ldap,$root_dse,$uidnumber) = @_;
     # test for numbers ??? 0-9
@@ -2788,6 +2800,7 @@ sub next_free_uidnumber_set {
     #print "* setting uidNumber to file/ldap: $uidnumber\n";
     system("echo $uidnumber > $DevelConf::next_free_uidnumber_file");
 }
+
 
 
 sub next_free_uidnumber_get {
@@ -2826,6 +2839,7 @@ sub next_free_uidnumber_get {
 }
 
 
+
 sub next_free_gidnumber_set {
     my ($ldap,$root_dse,$gidnumber) = @_;
     # test for numbers ??? 0-9
@@ -2835,6 +2849,7 @@ sub next_free_gidnumber_set {
     #print "* setting gidnumber to file/ldap: $gidnumber\n";
     system("echo $gidnumber > $DevelConf::next_free_gidnumber_file");
 }
+
 
 
 sub next_free_gidnumber_get {
