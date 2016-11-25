@@ -570,7 +570,10 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
-
+    if ($school_token eq $DevelConf::name_default_school){
+        # empty token creates error on AD add 
+        $prefix="---";
+    }
     my $container=&AD_get_container($role,$group);
 
     my $dn_class = $container."OU=".$ou.",".$root_dse;
@@ -582,9 +585,10 @@ sub AD_user_create {
     # surround the PW with double quotes and convert it to UTF-16
     my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
 
-    if ($school_token eq ""){
+    my $prefix=$school_token;
+    if ($school_token eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
-        $school_token="---";
+        $prefix="---";
     }
 
     if($Conf::log_level>=1){
@@ -637,7 +641,7 @@ sub AD_user_create {
                    sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
-                   sophomorixSchoolPrefix => $school_token,
+                   sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $ou,
                    sophomorixCreationDate => $creationdate, 
                    sophomorixTolerationDate => $tolerationdate, 

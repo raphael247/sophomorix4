@@ -86,7 +86,7 @@ my %forbidden_login_hash=();
 
 # ou's that have been created in this script
 my %ou_created=();
-$ou_created{$ou}="created";
+$ou_created{$school_token}="created";
 
 my $add_file=${DevelConf::path_result}."/sophomorix.add";
 my $add_file_new=${DevelConf::path_result}."/sophomorix.add.new";
@@ -227,7 +227,7 @@ if ($info==1) {
        $uidnumber_wish,
        $gidnumber_wish,
        $unid,
-       $ou,
+#       $ou,
        $school_token,
        $role)=split("::",$line);
 
@@ -332,7 +332,7 @@ while(<SOPHOMORIXADD>){
     $uidnumber_wish,
     $gidnumber_wish,
     $unid,
-    $ou,
+#    $ou,
     $school_token,
     $role,
     $surname_utf8,
@@ -450,22 +450,22 @@ while(<SOPHOMORIXADD>){
    $user_count++;
 
    # --- -> default-school
-   $ou=&AD_get_ou_tokened($ou);
+   $school_token=&AD_get_ou_tokened($school_token);
 
    # 1. Entry in AD
-   if (not exists $ou_created{$ou}){
+   if (not exists $ou_created{$school_token}){
         # create ou
         &AD_ou_add({ldap=>$ldap,
                     root_dse=>$root_dse,
-                    ou=>$ou,
+                    ou=>$school_token,
                     school_token=>$school_token,
                     creationdate=>$time_stamp_AD,
                     sophomorix_config=>\%sophomorix_config,
                   });
         # remember ou
-        $ou_created{$ou}="already created";
+        $ou_created{$school_token}="already created";
    } else {
-        print "   * OU $ou already created\n";
+        print "   * OU $school_token already created\n";
    }
    my $group_token=&AD_get_name_tokened($class_group,$school_token,"adminclass");
    my $login_token=&AD_get_name_tokened($login_check_ok,$school_token,$role);
@@ -483,7 +483,7 @@ while(<SOPHOMORIXADD>){
                     birthdate=>$birthdate,
                     plain_password=>$plain_password,
                     unid=>$unid,
-                    ou=>$ou,
+                    ou=>$school_token,
                     uidnumber_wish=>$uidnumber_wish,
                     gidnumber_wish=>$gidnumber_wish,
                     role=>$role,
@@ -532,7 +532,7 @@ while(<SOPHOMORIXADD>){
   &AD_group_create({ldap=>$ldap,
                     root_dse=>$root_dse,
                     group=>$group_token,
-                    ou=>$ou,
+                    ou=>$school_token,
                     school_token=>$school_token,
                     status=>"P",
                     type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
