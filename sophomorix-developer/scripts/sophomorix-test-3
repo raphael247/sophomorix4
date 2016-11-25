@@ -151,15 +151,15 @@ if ($add_pro==1){
     &run_command("sophomorix-add $verbose_options");
 
     # projects in OU=bsz
-    &run_command("sophomorix-project $verbose_options --create -p mathe23 --ou bsz --school-token bsz");
-    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23 --ou bsz --school-token bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
+    &run_command("sophomorix-project $verbose_options --create -p mathe23 --school bsz");
+    &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23 --school bsz --description 'Chemie AG des Gymnasiums' --addquota 100+60 --addmailquota 200 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
     # projects in OU=default-school
     &run_command("sophomorix-project $verbose_options --create -p mathe23");
     &run_command("sophomorix-project $verbose_options --create -p Chemie-AG23");
 
     # groups in OU=bsz
-    &run_command("sophomorix-group $verbose_options --create --group super6 --ou bsz --school-token bsz");
-    &run_command("sophomorix-group $verbose_options --create --group super7 --ou bsz --school-token bsz");
+    &run_command("sophomorix-group $verbose_options --create --group super6 --school bsz");
+    &run_command("sophomorix-group $verbose_options --create --group super7 --school bsz");
     # groups in OU=default-school
     &run_command("sophomorix-group $verbose_options --create --group super12");
     &run_command("sophomorix-group $verbose_options --create --group super13");
@@ -1783,13 +1783,13 @@ if ($kill_pro==1){
     &run_command("sophomorix-kill -i");
     &run_command("sophomorix-kill $verbose_options");
     # projects
-    &run_command("sophomorix-project $verbose_options --kill -p mathe23 --ou bsz --school-token bsz");
+    &run_command("sophomorix-project $verbose_options --kill -p mathe23 --school bsz");
     &run_command("sophomorix-project $verbose_options --kill -p mathe23");
-    &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG23 --ou bsz --school-token bsz");
+    &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG23 --school bsz");
     &run_command("sophomorix-project $verbose_options --kill -p Chemie-AG23");
     # groups
-    &run_command("sophomorix-group $verbose_options --kill --group super6 --ou bsz --school-token bsz");
-    &run_command("sophomorix-group $verbose_options --kill --group super7 --ou bsz --school-token bsz");
+    &run_command("sophomorix-group $verbose_options --kill --group super6 --school bsz");
+    &run_command("sophomorix-group $verbose_options --kill --group super7 --school bsz");
     &run_command("sophomorix-group $verbose_options --kill --group super12");
     &run_command("sophomorix-group $verbose_options --kill --group super13");
 

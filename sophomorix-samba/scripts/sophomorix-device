@@ -937,21 +937,19 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # my $add_count=1;
     # foreach my $exam_account (@adding_examaccounts){
     #     my $role="examaccount";
-    #     my $ou=$devices_file{'device'}{$exam_account}{'OU'};
     #     my $school=$devices_file{'device'}{$exam_account}{'SCHOOL'};
     #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
     #     $plain_password=&get_plain_password($role,@passwort_zeichen);
-    #     if (not exists $school_created{$ou}){
+    #     if (not exists $school_created{$school}){
     #         # create ou
     #         &AD_ou_add({ldap=>$ldap,
     #                     root_dse=>$root_dse,
-    #                     ou=>$ou,
     #                     school=>$school,
     #                     creationdate=>$time_stamp_AD,
     #                     sophomorix_config=>\%sophomorix_config,
     #                  });
     #         # remember ou
-    #         $school_created{$ou}="already created";
+    #         $school_created{$school}="already created";
     #     }
     #     &AD_user_create({ldap=>$ldap, 
     #                      root_dse=>$root_dse,
@@ -964,7 +962,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #                      surname_utf8=>"Account",
     #                      birthdate=>$birthdate,
     #                      plain_password=>$plain_password,
-    #                      ou=>$ou,
     #                      role=>"examaccount",
     #                      type=>"room",
     #                      school=>$school,
@@ -983,7 +980,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #                       root_dse=>$root_dse,
     #                       group=>$room_saved,
     #                       description=>$room_saved,
-    #                       ou=>$ou,
     #                       school=>$school,
     #                       status=>"P",
     #                       type=>"room",

@@ -83,7 +83,6 @@ my $help=0;
 my $info=0;
 
 
-my $ou="";
 my $school="";
 my $test_firstpassword=0;
 my $set_firstpassword="";
@@ -157,12 +156,8 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Setting the filters
-my $ou_filter="";
 my $school_filter="";
 my $user_filter="";
-if ($ou ne ""){
-    $ou_filter="(sophomorixSchoolname=$ou)";
-}
 if ($school ne ""){
     $school_filter="(sophomorixSchoolPrefix=$school)";
 }
@@ -317,7 +312,7 @@ if ($test_firstpassword==1){
     my @nofirst=();
     print "Testing all Accounts if firstpassword works\n";
     # search for all users
-    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $ou_filter $school_filter $user_filter)"; 
+    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)"; 
     if($Conf::log_level>=2){
         print "Filter to find users: $filter\n";
     }
@@ -371,7 +366,7 @@ if ($test_firstpassword==1){
 # --set-firstpassword
 if ($set_firstpassword ne ""){
     # search for all users
-    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $ou_filter $school_filter $user_filter)"; 
+    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)"; 
     if($Conf::log_level>=2){
         print "Filter to find users: $filter\n";
     }

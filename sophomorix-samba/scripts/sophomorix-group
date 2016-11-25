@@ -52,7 +52,6 @@ my $info=0;
 
 $Conf::log_level=1;
 
-my $ou="---";
 my $school="---";
 
 my $group="";
@@ -76,8 +75,7 @@ my $testopt=GetOptions(
            "group=s" => \$group,
            "create" => \$create,
            "kill" => \$kill,
-           "ou=s" => \$ou,
-           "school-token=s" => \$school,
+           "school=s" => \$school,
            "addmember=s" => \$addmember,
            "removemember=s" => \$removemember,
            "addgroup=s" => \$addgroup,
@@ -108,7 +106,7 @@ Options
   -i  / --info
 
   --create --group name
-  --create --group name --ou MYOU --school-token myo
+  --create --group name  --school myo
 
   --kill --group --group name
 

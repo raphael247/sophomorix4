@@ -73,7 +73,6 @@ my $create=0;
 my $gidnumber_wish="---"; # used on creation of class
 my $set_gidnumber; # used on update
 my $kill=0;
-my $ou="---";
 my $school="---";
 
 my $description;
@@ -106,7 +105,6 @@ my $testopt=GetOptions(
            "create" => \$create,
            "gidnumber=i" => \$gidnumber_wish,
            "kill" => \$kill,
-           "ou=s" => \$ou,
            "school-token=s" => \$school,
            "description=s" => \$description,
            "quota=s" => \$quota,
@@ -202,7 +200,7 @@ if ($info==1 and $class eq ""){
 # --info --class name
 # list class(es) and exit
 if ($class ne "" and $info==1){
-    my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school,$info);
+    my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
     exit;
 }
 
@@ -226,7 +224,6 @@ if ($create==1 and $class ne ""){
    my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
-                     ou=>$ou,
                      school=>$school,
                      group=>$group_token,
                      description=>$group_token,
@@ -253,7 +250,7 @@ if ($kill==1 and $class ne ""){
 
 # get dn if class exists and continue ($info=0)
 ############################################################
-my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$ou,$school,$info);
+my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
 
 if ($count>1){
     print "\n$count classes found.\n";

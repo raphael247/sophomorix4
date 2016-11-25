@@ -79,7 +79,6 @@ my $create=0;
 my $gidnumber=-1;
 my $gidnumber_wish;
 my $kill=0;
-my $ou="---";
 my $school="---";
 
 my $description;
@@ -140,8 +139,7 @@ my $testopt=GetOptions(
            "join!" => \$join,
            "hide!" => \$hide,
 #           "tree" => \$tree,
-           "ou=s" => \$ou,
-           "school-token=s" => \$school,
+           "school=s" => \$school,
            "description=s" => \$description,
            "status=s" => \$status,
 #           "caller=s" => \$caller,
@@ -246,8 +244,7 @@ Options
   -vv / --verbose --verbose
 
 Choose the school:
-  --ou <SCHOOL>
-  --school-token <prefix>
+  --school <school>
 
 Getting information:
   --admininfo
@@ -373,7 +370,7 @@ if ($project eq "" and $info==1){
 # --info --project <project>
 # list project(s) and exit
 if ($project ne "" and $info==1){
-    my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school,$info);
+    my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
     exit;
 }
 
@@ -613,7 +610,7 @@ if ($kill==1 and $project ne ""){
 
 # get dn if project exists and continue
 ############################################################
-my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$ou,$school,$info);
+my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
 
 if ($count>1){
     print "\n$count Projects found.\n";

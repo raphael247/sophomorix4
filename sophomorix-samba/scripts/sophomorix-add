@@ -84,8 +84,8 @@ my @users_for_quota=();
 my %forbidden_login_hash=();
 
 # ou's that have been created in this script
-my %ou_created=();
-$ou_created{$school}="created";
+my %school_created=();
+$school_created{$school}="created";
 
 my $add_file=${DevelConf::path_result}."/sophomorix.add";
 my $add_file_new=${DevelConf::path_result}."/sophomorix.add.new";
@@ -450,7 +450,7 @@ while(<SOPHOMORIXADD>){
    $school=&AD_get_ou_tokened($school);
 
    # 1. Entry in AD
-   if (not exists $ou_created{$school}){
+   if (not exists $school_created{$school}){
         # create ou
         &AD_ou_add({ldap=>$ldap,
                     root_dse=>$root_dse,
@@ -459,7 +459,7 @@ while(<SOPHOMORIXADD>){
                     sophomorix_config=>\%sophomorix_config,
                   });
         # remember ou
-        $ou_created{$school}="already created";
+        $school_created{$school}="already created";
    } else {
         print "   * OU $school already created\n";
    }

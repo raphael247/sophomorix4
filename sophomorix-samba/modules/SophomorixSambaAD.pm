@@ -792,7 +792,7 @@ sub AD_user_move {
     }
 
     my $prefix_new=$school_new;
-    if ($school eq $DevelConf::name_default_school){
+    if ($school_new eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
         $prefix_new="---";
     }
@@ -836,7 +836,7 @@ sub AD_user_move {
     }
 
     # make sure OU and tree exists
-    if (not exists $ou_created{$school_new}){
+    if (not exists $school_created{$school_new}){
          # create new ou
          &AD_ou_add({ldap=>$ldap,
                      root_dse=>$root_dse,
@@ -845,7 +845,7 @@ sub AD_user_move {
                      sophomorix_config=>$ref_sophomorix_config,
                    });
          # remember new ou to add it only once
-         $ou_created{$school_new}="already created";
+         $school_created{$school_new}="already created";
     } else {
         print "   * OU $school_new already created\n";
     }
@@ -1504,7 +1504,7 @@ sub AD_get_AD {
 
 
 sub AD_class_fetch {
-    my ($ldap,$root_dse,$class,$ou,$school,$info) = @_;
+    my ($ldap,$root_dse,$class,$school,$info) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. class7a
     my $adminclass="";  # the option i.e. 'class7*'
@@ -1720,7 +1720,7 @@ sub AD_class_fetch {
 
 
 sub AD_project_fetch {
-    my ($ldap,$root_dse,$pro,$ou,$school,$info) = @_;
+    my ($ldap,$root_dse,$pro,$school,$info) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. p_abt3
     my $project="";     # the option i.e. 'p_abt*'

@@ -132,7 +132,6 @@ my $new_mailbox="";
 my $new_class="";
 my $list_teachers_by_year=0;
 
-my $ou="";
 my $school="";
 
 # Parsen der Optionen
@@ -140,7 +139,6 @@ my $testopt=GetOptions(
        "verbose|v+" => \$Conf::log_level,
        "help|h" => \$help,
        "i|info" => \$info,
-       "ou=s" => \$ou,
        "school-token=s" => \$school,
        "u|user=s" => \$user,
 
@@ -260,12 +258,8 @@ Please see the sophomorix-user(8) man pages for full documentation
 my ($ldap,$root_dse) = &AD_bind_admin();
 
 # Setting the filters
-my $ou_filter="";
 my $school_filter="";
 my $user_filter="";
-if ($ou ne ""){
-    $ou_filter="(sophomorixSchoolname=$ou)";
-}
 if ($school ne ""){
     $school_filter="(sophomorixSchoolPrefix=$school)";
 }
@@ -308,7 +302,7 @@ if ($user eq "" and $info==1){
 
     ##################################################
     # search for all users
-    my $filter="( &(objectclass=user) (cn=*) $ou_filter $school_filter)"; 
+    my $filter="( &(objectclass=user) (cn=*) $school_filter)"; 
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
     }
@@ -698,7 +692,7 @@ if ($user eq "" and $info==1){
 
 # --info --user <user>
 if ($user ne "" and $info==1){
-    my $filter="(&(objectclass=user) $user_filter $ou_filter $school_filter)"; 
+    my $filter="(&(objectclass=user) $user_filter  $school_filter)"; 
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
     }
