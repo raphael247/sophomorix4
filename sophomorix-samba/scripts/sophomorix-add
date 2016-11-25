@@ -75,7 +75,7 @@ my $login_check_ok="";
 my $plain_password="";
 my $file="";
 my $class_group="";
-my $school_token="";
+my $school="";
 my $role="unknown";
 
 my @loglines=();
@@ -85,7 +85,7 @@ my %forbidden_login_hash=();
 
 # ou's that have been created in this script
 my %ou_created=();
-$ou_created{$school_token}="created";
+$ou_created{$school}="created";
 
 my $add_file=${DevelConf::path_result}."/sophomorix.add";
 my $add_file_new=${DevelConf::path_result}."/sophomorix.add.new";
@@ -226,10 +226,10 @@ if ($info==1) {
        $uidnumber_wish,
        $gidnumber_wish,
        $unid,
-       $school_token,
+       $school,
        $role)=split("::",$line);
 
-       my $group_token=&AD_get_name_tokened($class_group,$school_token,"adminclass");
+       my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
 
        my $identifier_cut=substr($identifier,0,28);
        printf "%-11s%-29s%-10s%-6s%-6s%-10s%-10s\n",
@@ -330,7 +330,7 @@ while(<SOPHOMORIXADD>){
     $uidnumber_wish,
     $gidnumber_wish,
     $unid,
-    $school_token,
+    $school,
     $role,
     $surname_utf8,
     $firstname_utf8,
@@ -447,24 +447,24 @@ while(<SOPHOMORIXADD>){
    $user_count++;
 
    # --- -> default-school
-   $school_token=&AD_get_ou_tokened($school_token);
+   $school=&AD_get_ou_tokened($school);
 
    # 1. Entry in AD
-   if (not exists $ou_created{$school_token}){
+   if (not exists $ou_created{$school}){
         # create ou
         &AD_ou_add({ldap=>$ldap,
                     root_dse=>$root_dse,
-                    school_token=>$school_token,
+                    school_token=>$school,
                     creationdate=>$time_stamp_AD,
                     sophomorix_config=>\%sophomorix_config,
                   });
         # remember ou
-        $ou_created{$school_token}="already created";
+        $ou_created{$school}="already created";
    } else {
-        print "   * OU $school_token already created\n";
+        print "   * OU $school already created\n";
    }
-   my $group_token=&AD_get_name_tokened($class_group,$school_token,"adminclass");
-   my $login_token=&AD_get_name_tokened($login_check_ok,$school_token,$role);
+   my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
+   my $login_token=&AD_get_name_tokened($login_check_ok,$school,$role);
 
    &AD_user_create({ldap=>$ldap,
                     root_dse=>$root_dse, 
@@ -483,7 +483,7 @@ while(<SOPHOMORIXADD>){
                     gidnumber_wish=>$gidnumber_wish,
                     role=>$role,
                     type=>"adminclass",
-                    school_token=>$school_token,
+                    school_token=>$school,
                     creationdate=>$creationdate,
                     tolerationdate=>$tolerationdate,
                     deactivationdate=>$deactivationdate,
@@ -527,7 +527,7 @@ while(<SOPHOMORIXADD>){
   &AD_group_create({ldap=>$ldap,
                     root_dse=>$root_dse,
                     group=>$group_token,
-                    school_token=>$school_token,
+                    school_token=>$school,
                     status=>"P",
                     type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
                     joinable=>"TRUE",
@@ -567,7 +567,7 @@ while(<SOPHOMORIXADD>){
 
 #    if ($role eq "student"){
 # not necessary ????????
-#        my $group_token=&AD_get_name_tokened($DevelConf::student,$school_token,"adminclass");
+#        my $group_token=&AD_get_name_tokened($DevelConf::student,$school,"adminclass");
 #        &AD_group_addmember({ldap => $ldap,
 #                             root_dse => $root_dse, 
 #                             group => $DevelConf::student,
@@ -582,8 +582,8 @@ while(<SOPHOMORIXADD>){
         # add token-students to students
    
 #    } elsif ($role eq "teacher"){
-#        #my $group=$school_token."-".$DevelConf::teacher;
-#        my $group_token=&AD_get_name_tokened($DevelConf::teacher,$school_token,"adminclass");
+#        #my $group=$school."-".$DevelConf::teacher;
+#        my $group_token=&AD_get_name_tokened($DevelConf::teacher,$school,"adminclass");
 #        &AD_group_addmember({ldap => $ldap,
 #                             root_dse => $root_dse, 
 #                             group => $DevelConf::teacher,
