@@ -429,9 +429,9 @@ sub config_sophomorix_read {
         close(SCHOOL);
     }
     # GLOBAL
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{SCHOOL}="";
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{PREFIX}="";
+    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}="OU=".$DevelConf::AD_global_ou.",".$root_dse;
+    $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="";
+    $sophomorix_config{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP}="OU=".$DevelConf::name_default_school.",".$root_dse;
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{SCHOOL}=$DevelConf::name_default_school;
@@ -620,16 +620,16 @@ sub config_sophomorix_read {
 		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.",".
                                  $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
                     my $cn_group="CN=".$group_tertiary.",".$ou_group;
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
                     if ($group_quaternary ne ""){
-                        $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_MEMBER}{$group_tertiary}=$group_quaternary;
+                        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_MEMBER}{$group_tertiary}=$group_quaternary;
                     }
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
                 }
 
                 # quaternary group
@@ -639,12 +639,12 @@ sub config_sophomorix_read {
 		    my $ou_group="OU=".$group_quaternary.",".$ou_sub_quaternary.",".
                                  $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
                     my $cn_group="CN=".$group_quaternary.",".$ou_group;
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_quaternary}=$sophomorix_type_quaternary;
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_quaternary}="$key -> quaternary group";
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_quaternary}=$sophomorix_type_quaternary;
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_quaternary}="$key -> quaternary group";
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
                         $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                    $sophomorix_config{'SCHOOLS'}{$DevelConf::AD_global_ou}{GROUP_OU}{$group_quaternary}=
+                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$group_quaternary}=
                       "OU=".$group_quaternary.",".$ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 }
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_QUATERNARY}=
@@ -658,56 +658,48 @@ sub config_sophomorix_read {
     }
 
     # wifi,internet
+    # GLOBAL
+    # my @grouplist=("examaccounts","wifi","internet");
+    my @grouplist=("wifi","internet");
+    foreach my $group (@grouplist){
+        my $sub_ou=$DevelConf::AD_globalgroup_ou;
+ 
+        my $ou_group="OU=global-".$group.",".
+            $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
+        my $cn_group="CN=global-".$group.",".$ou_group;
+        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}="global-".$group;
+        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
+        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{"global-".$group}=
+            $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
+        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{"global-".$group}="none";
+        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="ouglobalclass";
+        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
+    }
+
+    # SCHOOLS
     foreach my $ou (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        if ($ou eq $DevelConf::AD_global_ou){
-            # OU=GLOBAL
-#            my @grouplist=("examaccounts","wifi","internet");
-            my @grouplist=("wifi","internet");
-            foreach my $group (@grouplist){
-                my $sub_ou;
-#                if ($group eq "examaccounts"){
-#                    $sub_ou=$DevelConf::AD_examaccount_ou;
-#                } else {
-                    # wifi, internet
-                    $sub_ou=$DevelConf::AD_globalgroup_ou;
-#                }
-                my $ou_group="OU=global-".$group.",".
-                        $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-                #my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
-                my $cn_group="CN=global-".$group.",".$ou_group;
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_OU}{$ou_group}="global-".$group;
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_CN}{$cn_group}="global-".$group;
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP}{"global-".$group}=
-                    $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_LEVEL}{"global-".$group}="none";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{"global-".$group}="ouglobalclass";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
-            }
-        } else {
-            # OU=...
-#            my @grouplist=("examaccounts","wifi","internet");
-            my @grouplist=("wifi","internet");
-            foreach my $group (@grouplist){
-                my $sub_ou;
-#                if ($group eq "examaccounts"){
-#                    $sub_ou=$DevelConf::AD_examaccount_ou;
-#                } else {
-                    # wifi, internet
-                    $sub_ou=$DevelConf::AD_management_ou;
-#                }
-                my $ou_group="OU=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
-                        $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-                my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
-                my $cn_group="CN=".$group_prefix.",".$ou_group;
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_OU}{$ou_group}="$group_prefix";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_CN}{$cn_group}="$group_prefix";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP}{$group_prefix}=
-                    $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="ouclass";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_DESCRIPTION}{$group_prefix}="LML $ou $group";
-                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_MEMBER}{$group_prefix}="global-".$group;
-            }
+        # my @grouplist=("examaccounts","wifi","internet");
+        my @grouplist=("wifi","internet");
+        foreach my $group (@grouplist){
+            my $sub_ou;
+#           if ($group eq "examaccounts"){
+#               $sub_ou=$DevelConf::AD_examaccount_ou;
+#           } else {
+                # wifi, internet
+                $sub_ou=$DevelConf::AD_management_ou;
+#           }
+            my $ou_group="OU=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
+                   $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
+            my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
+            my $cn_group="CN=".$group_prefix.",".$ou_group;
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_OU}{$ou_group}="$group_prefix";
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_CN}{$cn_group}="$group_prefix";
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP}{$group_prefix}=
+                $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="ouclass";
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_DESCRIPTION}{$group_prefix}="LML $ou $group";
+            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_MEMBER}{$group_prefix}="global-".$group;
         }
     }
     close(ROLETYPE);
