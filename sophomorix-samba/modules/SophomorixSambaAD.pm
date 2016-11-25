@@ -2432,10 +2432,12 @@ sub AD_group_create {
     my $description = $arg_ref->{description};
 
     #my $ou = $arg_ref->{ou};
-    my $ou = $arg_ref->{school_token};
+    #my $ou = $arg_ref->{school_token};
+    #my $school_token = $arg_ref->{school_token};
+    my $school = $arg_ref->{school_token};
+
 
     my $type = $arg_ref->{type};
-    my $school_token = $arg_ref->{school_token};
     my $creationdate = $arg_ref->{creationdate};
     my $status = $arg_ref->{status};
     my $joinable = $arg_ref->{joinable};
@@ -2457,13 +2459,13 @@ sub AD_group_create {
 
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (begin):");
 
-    $ou=&AD_get_ou_tokened($ou);
+    $school=&AD_get_ou_tokened($school);
 
     # calculate missing Attributes
     my $container=&AD_get_container($type,$group);
-    my $target_branch=$container."OU=".$ou.",".$root_dse;
+    my $target_branch=$container."OU=".$school.",".$root_dse;
 
-    my $dn = "CN=".$group.",".$container."OU=".$ou.",".$root_dse;
+    my $dn = "CN=".$group.",".$container."OU=".$school.",".$root_dse;
     if (defined $dn_wish){
         # override DN
         $dn=$dn_wish;
@@ -2518,7 +2520,7 @@ sub AD_group_create {
     if ($type eq "adminclass"){
         # a group like 7a, 7b
         #print "Student class of the school: $group\n";
-        my $token_students=&AD_get_name_tokened($DevelConf::student,$school_token,"adminclass");
+        my $token_students=&AD_get_name_tokened($DevelConf::student,$school,"adminclass");
   
         if ($token_students ne $group){ # do not add group to itself
             # add the group to <token>-students
@@ -2535,7 +2537,7 @@ sub AD_group_create {
                              addgroup => $token_students,
                            });
     } elsif ($type eq "teacherclass"){
-        #my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school_token,"adminclass");
+        #my $teacher_group_expected=&AD_get_name_tokened($DevelConf::teacher,$school,"adminclass");
         #if ($group eq $teacher_group_expected){
             # add <token>-teachers to global-teachers
             &AD_group_addmember({ldap => $ldap,
@@ -2547,8 +2549,8 @@ sub AD_group_create {
 
         #} else {
     } elsif ($type eq "room"){
-        #my $token_examaccounts=$school_token."-".$DevelConf::examaccount;
-        my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school_token,"examaccount");
+        #my $token_examaccounts=$school."-".$DevelConf::examaccount;
+        my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
         # add the room to <token>-examaccounts
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
