@@ -63,7 +63,6 @@ my $time_stamp_file=&time_stamp_file();
 my $time_stamp_AD=&time_stamp_AD();
 my $user_count=0;
 
-my $ou="";
 my $school="";
 my %users_file=();
 
@@ -287,17 +286,15 @@ foreach my $user_file (@filelist){
     my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
     # fetching some config data
     $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
-    $ou=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'OU'};
 
     # file in tmp    
-    
     &print_title("Reading $user_file_tmp");
     open(USERS,"$user_file_tmp") || 
          die "ERROR: $user_file_tmp not found!";  
     while(<USERS>){
         $count++;
         &analyze_user_line($_,$user_file,$user_file_tmp,
-                           $filename,$school,$ou,$count);
+                           $filename,$school,$count);
     }
     close(USERS);
 }
@@ -359,7 +356,7 @@ if($Conf::log_level>=2){
 ################################################################################
 
 sub analyze_user_line {
-    my ($line,$file_abs,$file_abs_tmp,$filename,$school,$ou,$count) = @_;
+    my ($line,$file_abs,$file_abs_tmp,$filename,$school,$count) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
