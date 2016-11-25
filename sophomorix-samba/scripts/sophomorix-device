@@ -151,13 +151,12 @@ my $time_stamp_AD=&time_stamp_AD();
 my @passwort_zeichen=&get_passwd_charlist();
 my $plain_password="";
 
-# ou's that have been created in this script
-my $ou="";
+# schools that have been created in this script
 my $role="";
 my $school="";
 my $prefix="";
-my %ou_created=();
-$ou_created{$ou}="created";
+my %school_created=();
+$school_created{$school}="created";
 
 my $print=0;
 my $pass="12345678";
@@ -369,11 +368,10 @@ if ($dns_test==1){
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
         $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
-        $ou=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'OU'};
        open(DEVICES,"$device_file") || 
              die "ERROR: $device_file not found!";  
         while(<DEVICES>){
-            &analyze_device_line($_,$device_file,$filename,$school,$ou);
+            &analyze_device_line($_,$device_file,$filename,$school);
         }
         close(DEVICES);
     }
@@ -707,12 +705,11 @@ if ($info==1){
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
     $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
-    $ou=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'OU'};
     &print_title("Reading $device_file");
     open(DEVICES,"$device_file") || 
          die "ERROR: $device_file not found!";  
     while(<DEVICES>){
-        &analyze_device_line($_,$device_file,$filename,$school,$ou);
+        &analyze_device_line($_,$device_file,$filename,$school);
     }
     close(DEVICES);
 }
@@ -944,7 +941,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #     my $school=$devices_file{'device'}{$exam_account}{'SCHOOL'};
     #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
     #     $plain_password=&get_plain_password($role,@passwort_zeichen);
-    #     if (not exists $ou_created{$ou}){
+    #     if (not exists $school_created{$ou}){
     #         # create ou
     #         &AD_ou_add({ldap=>$ldap,
     #                     root_dse=>$root_dse,
@@ -954,7 +951,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #                     sophomorix_config=>\%sophomorix_config,
     #                  });
     #         # remember ou
-    #         $ou_created{$ou}="already created";
+    #         $school_created{$ou}="already created";
     #     }
     #     &AD_user_create({ldap=>$ldap, 
     #                      root_dse=>$root_dse,
@@ -1032,13 +1029,10 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Computers to be added:");
     my $ws_count=1;
     foreach my $computer (@adding_computers){
-        my $ou=$devices_file{'computer'}{$computer}{'OU'};
-        $ou=&AD_get_ou_tokened($ou);
         my $school=$devices_file{'computer'}{$computer}{'SCHOOL'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
-	print "THIS: <$ou>  <$school>\n";
-        if (not exists $ou_created{$ou}){
+        if (not exists $school_created{$school}){
             # create ou
             &AD_ou_add({ldap=>$ldap,
                         root_dse=>$root_dse,
@@ -1047,9 +1041,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                         sophomorix_config=>\%sophomorix_config,
                      });
             # remember ou
-            $ou_created{$ou}="already created";
+            $school_created{$school}="already created";
         } else {
-            print "   * OU $ou already created\n";
+            print "   * OU $school already created\n";
         }
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
@@ -1337,7 +1331,7 @@ exit 0;
 # subs
 # ===========================================================================
 sub analyze_device_line {
-    my ($line,$device_file,$filename,$school,$ou) = @_;
+    my ($line,$device_file,$filename,$school) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -1399,7 +1393,6 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'WORKSTATION'}=$ws_token;
         $devices_file{'device'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
         $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
-        $devices_file{'device'}{$host_token}{'OU'}=$ou;
         $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
         $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
         $devices_file{'dnsNode'}{$host_token}=$ip;
@@ -1412,7 +1405,6 @@ sub analyze_device_line {
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
         if ($account_flag==1){
-            $devices_file{'computer'}{$ws_token_account}{'OU'}=$ou;
             $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
