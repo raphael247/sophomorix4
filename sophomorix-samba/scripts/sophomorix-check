@@ -64,7 +64,7 @@ my $time_stamp_AD=&time_stamp_AD();
 my $user_count=0;
 
 my $ou="";
-my $school_token="";
+my $school="";
 my %users_file=();
 
 
@@ -286,7 +286,7 @@ foreach my $user_file (@filelist){
     my $filename = basename($user_file);
     my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
     # fetching some config data
-    $school_token=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
+    $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
     $ou=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'OU'};
 
     # file in tmp    
@@ -297,7 +297,7 @@ foreach my $user_file (@filelist){
     while(<USERS>){
         $count++;
         &analyze_user_line($_,$user_file,$user_file_tmp,
-                           $filename,$school_token,$ou,$count);
+                           $filename,$school,$ou,$count);
     }
     close(USERS);
 }
@@ -359,7 +359,7 @@ if($Conf::log_level>=2){
 ################################################################################
 
 sub analyze_user_line {
-    my ($line,$file_abs,$file_abs_tmp,$filename,$school_token,$ou,$count) = @_;
+    my ($line,$file_abs,$file_abs_tmp,$filename,$school,$ou,$count) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {

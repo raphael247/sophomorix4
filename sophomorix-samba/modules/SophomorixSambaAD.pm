@@ -1504,12 +1504,12 @@ sub AD_get_AD {
 
 
 sub AD_class_fetch {
-    my ($ldap,$root_dse,$class,$ou,$school_token,$info) = @_;
+    my ($ldap,$root_dse,$class,$ou,$school,$info) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. class7a
     my $adminclass="";  # the option i.e. 'class7*'
-    if (defined $school_token){
-        $adminclass=&AD_get_name_tokened($class,$school_token,"adminclass");
+    if (defined $school){
+        $adminclass=&AD_get_name_tokened($class,$school,"adminclass");
     } else {
         $adminclass=&AD_get_name_tokened($class,"---","adminclass");
     }
@@ -1720,13 +1720,13 @@ sub AD_class_fetch {
 
 
 sub AD_project_fetch {
-    my ($ldap,$root_dse,$pro,$ou,$school_token,$info) = @_;
+    my ($ldap,$root_dse,$pro,$ou,$school,$info) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. p_abt3
     my $project="";     # the option i.e. 'p_abt*'
     # projects from ldap
-    if (defined $school_token){
-        $project=&AD_get_name_tokened($pro,$school_token,"project");
+    if (defined $school){
+        $project=&AD_get_name_tokened($pro,$school,"project");
     } else {
         $project=&AD_get_name_tokened($pro,"---","project");
     }
