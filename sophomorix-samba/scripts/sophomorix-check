@@ -85,6 +85,8 @@ my @loglines=();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $dump_files=0;
+my $dump_AD=0;
 my $json=0;
 my $list_files=0;
 my $lock=0;
@@ -99,7 +101,9 @@ my $follow="";
 my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
-           "json+" => \$json,
+           "dump-files" => \$dump_files,
+           "dump-AD" => \$dump_AD,
+           "json|j+" => \$json,
            "list-files" => \$list_files,
            "lock" => \$lock,
            "analyze-encoding=s" => \$analyze_encoding,
@@ -139,11 +143,12 @@ if ($help==1) {
 sophomorix-check checks the configured user files and finds out which users should be added, updated, moved and killed
 
 
-Options
+Options:
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
-  -i  / --info                     (dump configuration hash)
+  -i  / --info
+
   --list-files                     (list processed files and exit)
   --lock / --unlock
 
@@ -155,6 +160,17 @@ Analyze the encoding of a file and show Umlaut and other special chars
   --show-special-char-lines --analyze-encoding /path/to/students.csv
 Analyze the encoding of a file and show special chars (not umlauts)
   --non-umlaut  --show-special-char-lines --analyze-encoding /path/to/students.csv
+
+Dumping data:                     
+  -ij / --info --json              (dump configuration)
+  --dump-files -j                  (dump contents of user files)
+  --dump-AD -j                     (dump AD data)
+
+  -j / --json                      (dump as a nice json object)
+  -jj / --json --json              (dump as a compact json object)
+  -jjj / --json --json --json      (dump as a perl hash)
+
+
  
 Please see the sophomorix-check(8) man pages for full documentation
 ');
@@ -179,20 +195,11 @@ if ($lock==1) {
 
 # --info
 if ($info==1) {
-
-
-
-    if ($json==0){
-        print Dumper( %sophomorix_config );
-        # the following line works
-        #print Dumper( %sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}{'uni-teachers'} );
-    } else {
-        &json_dump({json => $json,
-                    jsoninfo => "CONFIG",
-                    jsoncomment => "The sophomorix configuration",
-                    hash_ref=>\%sophomorix_config,
-                  });
-    }
+    &json_dump({json => $json,
+                jsoninfo => "CONFIG",
+                jsoncomment => "The sophomorix configuration",
+                hash_ref=>\%sophomorix_config,
+               });
     print "\n";
     &print_title("Reading the following user files:");
     foreach my $file (@filelist){
@@ -315,18 +322,13 @@ foreach my $user_file (@filelist){
 }
 
 
-# dumping user in files
-if($Conf::log_level>=2){
-    if ($json==0){
-        &print_title("Hash \%users_file follows:");
-        print Dumper( %users_file );
-    } else {
-        &json_dump({json => $json,
-                    jsoninfo => "USERS",
-                    jsoncomment => "All users read from all user files",
-                    hash_ref=>\%users_file,
-                  });
-    }
+# --dump-files
+if ($dump_files==1){
+    &json_dump({json => $json,
+                jsoninfo => "USERS",
+                jsoncomment => "All users read from all user files",
+                hash_ref=>\%users_file,
+               });
 }
 
 
@@ -362,20 +364,14 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
 my %AD= %$ref_AD; 
 
 
-# dumping user in AD
-if($Conf::log_level>=2){
-    if ($json==0){
-        &print_title("Hash \%AD follows:");
-        print Dumper(%AD);
-    } else {
-        &json_dump({json => $json,
-                    jsoninfo => "SEARCH",
-                    jsoncomment => "AD Content",
-                    hash_ref=>\%AD,
-                  });
-    }
+# --dump-AD
+if ($dump_AD==1){
+    &json_dump({json => $json,
+                jsoninfo => "SEARCH",
+                jsoncomment => "AD Content",
+                hash_ref=>\%AD,
+              });
 }
-
 
 
 &AD_unbind_admin($ldap);

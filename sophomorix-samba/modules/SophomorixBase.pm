@@ -79,18 +79,26 @@ sub json_dump {
       my $jsoncomment = $arg_ref->{jsoncomment};
       my $json = $arg_ref->{json};
       my $hash_ref = $arg_ref->{hash_ref};
-      $hash_ref->{'JSONINFO'}=$jsoninfo;
-      $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
-      my $json_obj = JSON->new->allow_nonref;
       # json 
-      if ($json==1){
-          # compact
-          my $utf8_json_line   = $json_obj->encode( $hash_ref  );
-          print "$utf8_json_line";
-      } elsif ($json==2){
-          # pretty
+      if ($json==0){
+          # be quiet
+      } elsif ($json==1){
+          # pretty output
+          $hash_ref->{'JSONINFO'}=$jsoninfo;
+          $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
+          my $json_obj = JSON->new->allow_nonref;
           my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
           print "$utf8_pretty_printed";
+      } elsif ($json==2){
+          # compact output
+          $hash_ref->{'JSONINFO'}=$jsoninfo;
+          $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
+          my $json_obj = JSON->new->allow_nonref;
+          my $utf8_json_line   = $json_obj->encode( $hash_ref  );
+          print "$utf8_json_line";
+      } elsif ($json==3){
+          &print_title("DUMP: $jsoncomment");
+          print Dumper( $hash_ref );
       }
 }
 
