@@ -17,6 +17,7 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
+use JSON;
 use File::Basename qw( basename
                        dirname
                      ); 
@@ -39,6 +40,7 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  filelist_fetch
                                  remove_whitespace
+                                 json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -83,6 +85,7 @@ my @loglines=();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $list_files=0;
 my $lock=0;
 my $unlock=0;
@@ -96,6 +99,7 @@ my $follow="";
 my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
+           "json+" => \$json,
            "list-files" => \$list_files,
            "lock" => \$lock,
            "analyze-encoding=s" => \$analyze_encoding,
@@ -175,9 +179,20 @@ if ($lock==1) {
 
 # --info
 if ($info==1) {
-    print Dumper( %sophomorix_config );
-    # the following line works
-    #print Dumper( %sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}{'uni-teachers'} );
+
+
+
+    if ($json==0){
+        print Dumper( %sophomorix_config );
+        # the following line works
+        #print Dumper( %sophomorix_config{'ou'}->{'uni'}{'GROUP_TYPE'}{'uni-teachers'} );
+    } else {
+        &json_dump({json => $json,
+                    jsoninfo => "CONFIG",
+                    jsoncomment => "The sophomorix configuration",
+                    hash_ref=>\%sophomorix_config,
+                  });
+    }
     print "\n";
     &print_title("Reading the following user files:");
     foreach my $file (@filelist){
@@ -302,8 +317,16 @@ foreach my $user_file (@filelist){
 
 # dumping user in files
 if($Conf::log_level>=2){
-    &print_title("Hash \%users_file follows:");
-    print Dumper(%users_file);
+    if ($json==0){
+        &print_title("Hash \%users_file follows:");
+        print Dumper( %users_file );
+    } else {
+        &json_dump({json => $json,
+                    jsoninfo => "USERS",
+                    jsoncomment => "All users read from all user files",
+                    hash_ref=>\%users_file,
+                  });
+    }
 }
 
 
@@ -341,8 +364,16 @@ my %AD= %$ref_AD;
 
 # dumping user in AD
 if($Conf::log_level>=2){
-    &print_title("Hash \%AD follows:");
-    print Dumper(%AD);
+    if ($json==0){
+        &print_title("Hash \%AD follows:");
+        print Dumper(%AD);
+    } else {
+        &json_dump({json => $json,
+                    jsoninfo => "SEARCH",
+                    jsoncomment => "AD Content",
+                    hash_ref=>\%AD,
+                  });
+    }
 }
 
 

@@ -41,6 +41,7 @@ $Data::Dumper::Terse = 1;
             filelist_fetch
             dns_query_ip
             remove_whitespace
+            json_dump
             );
 
 
@@ -66,6 +67,31 @@ sub print_title {
    } else {
          printf "#### %-69s####\n",$a;
    }
+}
+
+
+# json stuff
+######################################################################
+
+sub json_dump {
+      my ($arg_ref) = @_;
+      my $jsoninfo = $arg_ref->{jsoninfo};
+      my $jsoncomment = $arg_ref->{jsoncomment};
+      my $json = $arg_ref->{json};
+      my $hash_ref = $arg_ref->{hash_ref};
+      $hash_ref->{'JSONINFO'}=$jsoninfo;
+      $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
+      my $json_obj = JSON->new->allow_nonref;
+      # json 
+      if ($json==1){
+          # compact
+          my $utf8_json_line   = $json_obj->encode( $hash_ref  );
+          print "$utf8_json_line";
+      } elsif ($json==2){
+          # pretty
+          my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
+          print "$utf8_pretty_printed";
+      }
 }
 
 
