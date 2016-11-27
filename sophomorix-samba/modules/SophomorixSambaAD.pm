@@ -570,10 +570,12 @@ sub AD_user_create {
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$root_dse;
  
     # password generation
-    # build the conversion map from your local character set to Unicode    
-    my $charmap = Unicode::Map8->new('latin1')  or  die;
-    # surround the PW with double quotes and convert it to UTF-16
-    my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
+    my $uni_password=&_unipwd_from_plainpwd($plain_password);
+
+    ## build the conversion map from your local character set to Unicode    
+    #my $charmap = Unicode::Map8->new('latin1')  or  die;
+    ## surround the PW with double quotes and convert it to UTF-16
+    #my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
 
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
@@ -662,11 +664,11 @@ sub AD_user_update {
     my $user_count = $arg_ref->{user_count};
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword};
+    my $plain_password = $arg_ref->{plain_password};
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
-
   
     my $displayname;
     # hash of what to replace
@@ -721,6 +723,11 @@ sub AD_user_update {
     if (defined $firstpassword){
         $replace{'sophomorixFirstpassword'}=$firstpassword;
         print "   Firstpassword:             $firstpassword\n";
+    }
+    if (defined $plain_password){
+        my $uni_password=&_unipwd_from_plainpwd($plain_password);
+        $replace{'unicodePwd'}=$uni_password;
+        print "   unicodePwd:                **********\n";
     }
     if (defined $status){
         $replace{'sophomorixStatus'}=$status;
@@ -2927,6 +2934,16 @@ sub _project_info_prefix {
         }
     }
     return @list_prefixed;
+}
+
+sub _unipwd_from_plainpwd{
+    # create string for unicodePwd in AD from $plain_password 
+    my ($plain_password) = @_;
+    # build the conversion map from your local character set to Unicode 
+    my $charmap = Unicode::Map8->new('latin1')  or  die;
+    # surround the PW with double quotes and convert it to UTF-16
+    my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
+    return $uni_password;
 }
 
 

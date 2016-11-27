@@ -85,7 +85,7 @@ my $info=0;
 
 my $school="";
 my $test_firstpassword=0;
-my $set_firstpassword="";
+my $set_firstpassword=0;
 
 my $user="";
 my $classes="";
@@ -146,7 +146,7 @@ my $testopt=GetOptions(
            "shell|loginshell=s" => \$shell,
            "force" => \$force,
            "test-firstpassword" => \$test_firstpassword,
-           "set-firstpassword=s" => \$set_firstpassword,
+           "set-firstpassword" => \$set_firstpassword,
            "info|i" => \$info,
            "help|h" => \$help
           );
@@ -156,11 +156,15 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Setting the filters
+
+# school_filter
 my $school_filter="";
-my $user_filter="";
 if ($school ne ""){
     $school_filter="(sophomorixSchoolPrefix=$school)";
 }
+
+# user filter
+my $user_filter="";
 if ($user ne ""){
     $user_filter="(sAMAccountName=$user)";
 }
@@ -364,7 +368,7 @@ if ($test_firstpassword==1){
 
 ############################################################
 # --set-firstpassword
-if ($set_firstpassword ne ""){
+if ($set_firstpassword==1){
     # search for all users
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)"; 
     if($Conf::log_level>=2){
@@ -374,7 +378,7 @@ if ($set_firstpassword ne ""){
                       base   => $root_dse,
                       scope => 'sub',
                       filter => $filter,
-                      attr => ['cn']
+                      attr => ['sAMAccountName','cn','sophomorixFirstPassword']
                             );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max = $mesg->count;
@@ -382,13 +386,15 @@ if ($set_firstpassword ne ""){
         my $entry = $mesg->entry($index);
         my $dn=$entry->dn();
         my $samaccount=$entry->get_value ('sAMAccountName');
+        my $firstpassword=$entry->get_value ('sophomorixFirstPassword');
         my $user_count=$index+1;
         &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$samaccount,
                      user_count=>$user_count,
-                     firstpassword=>$set_firstpassword,
+                     firstpassword=>$firstpassword,
+                     plain_password=>$firstpassword,
                    });
 
     }
