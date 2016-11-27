@@ -139,15 +139,13 @@ my $testopt=GetOptions(
        "verbose|v+" => \$Conf::log_level,
        "help|h" => \$help,
        "i|info" => \$info,
-       "school-token=s" => \$school,
+       "school=s" => \$school,
        "u|user=s" => \$user,
-
        "comment=s" => \$comment,
        "webui-dashboard=s" => \$webui_dashboard,
        "user-permissions=s" => \$user_permissions,
        "add-user-permissions=s" => \$add_user_permissions,
        "remove-user-permissions=s" => \$remove_user_permissions,
-
        "F|freeze" => \$freeze,
        "P|permanent" => \$permanent,
        "R|removable" => \$removable,
@@ -155,17 +153,17 @@ my $testopt=GetOptions(
        "A|activate" => \$activate,
        "U|usable" => \$usable,
 
-       "old-uid=s" => \$old_uid,
-       "new-uid=s" => \$new_uid,
-       "old-mailbox=s" => \$old_mailbox,
-       "new-mailbox=s" => \$new_mailbox,
-       "kill-all-users" => \$kill_all_users,
-       "reset-user=s" => \$reset_user,
-       "empty-password" => \$empty_password,
-       "scheduled-toleration=s" => \$sc_toleration,
-       "t|teacher=s" => \$teacher,
-       "list-teachers-by-year" => \$list_teachers_by_year,
-       "new-class|newclass=s" => \$new_class,
+#       "old-uid=s" => \$old_uid,
+#       "new-uid=s" => \$new_uid,
+#       "old-mailbox=s" => \$old_mailbox,
+#       "new-mailbox=s" => \$new_mailbox,
+#       "kill-all-users" => \$kill_all_users,
+#       "reset-user=s" => \$reset_user,
+#       "empty-password" => \$empty_password,
+#       "scheduled-toleration=s" => \$sc_toleration,
+#       "t|teacher=s" => \$teacher,
+#       "list-teachers-by-year" => \$list_teachers_by_year,
+#       "new-class|newclass=s" => \$new_class,
           );
 
 
@@ -195,8 +193,7 @@ Grep in the results:
  -u *user* | grep -i --text <strg>
   
 Choose the school:
-  --ou <SCHOOL>, --ou "*"
-  --school-token <prefix>, --school-token "*"
+  --school <school>
 
 Changing status of a user:
   -F --user <user>  /   --freeze --user <user>
@@ -260,7 +257,9 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 # Setting the filters
 my $school_filter="";
 my $user_filter="";
-if ($school ne ""){
+if ($school eq $DevelConf::name_default_school){
+    $school_filter="";
+} elsif ($school ne ""){
     $school_filter="(sophomorixSchoolPrefix=$school)";
 }
 if ($user ne ""){
