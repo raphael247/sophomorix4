@@ -75,8 +75,8 @@ my $create_add_file=0;
 my $sophomorix_add_input_sql="/data/root/sophomorix-dump-viewdumps/userdata_view.sql";
 my $sophomorix_add_output="/root/sophomorix.add";
 
-# --import-user-passwords
-my $import_user_passwords=0;
+# --import-user-password-hashes
+my $import_user_password_hashes=0;
 my $import_user_pwd_ldif_template="/usr/share/sophomorix-vampire/ldif-pwdload.ldif.template";
 my $import_user_pwd_ldif="/root/sophomorix-vampire-import-pwd.ldif";
 
@@ -111,7 +111,7 @@ my $testopt=GetOptions(
            "restore-config-files" => \$restore_config_files,
            "datadir=s" => \$datadir,
            "create-add-file" => \$create_add_file,
-           "import-user-passwords" => \$import_user_passwords,
+           "import-user-password-hashes" => \$import_user_password_hashes,
            "create-project-script" => \$create_project_script,
            "create-class-script" => \$create_class_script,
            "create-class-adminadd-script" => \$create_class_adminadd_script,
@@ -169,7 +169,7 @@ Vampire data into the new server V7:
     # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
     # sophomorix-add (Add the users)
 4.  Import the hashed passwords into AD (if you want users to keep their password) 
-    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --import-user-passwords
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --import-user-password-hashes
 5.  Create script for adminclasses and run it:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
     # /root/sophomorix-vampire-classes-adminadd.sh
@@ -604,11 +604,11 @@ if ($create_add_file==1){
 
 
 ##################################################
-# --import_user_passwords
-if ($import_user_passwords==1){
+# --import-user-password-hashes
+if ($import_user_password_hashes==1){
     my @loglines=();
     my ($ldap,$root_dse) = &AD_bind_admin();
-    print "Importing user passwords\n";
+    print "Importing user password hashes\n";
     open(ADD,"<$sophomorix_add_output") || die "ERROR: $!";
     my $lines=0;
     my $errors=0;
@@ -620,6 +620,9 @@ if ($import_user_passwords==1){
         my $firstpassword=$add[4];
         my $pass=$add[17];
         my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$samaccount);
+        #if (not $samaccount eq "bz2"){
+	#    next;
+        #}
         print "\n";
         print "$lines) $samaccount:  importing Hash: $pass\n";
         print "   DN: $dn\n";
@@ -640,17 +643,6 @@ if ($import_user_passwords==1){
             print "ERROR: $res returned\n";
             push @loglines, "Not updated Hash (Return: $res): $samaccount\n";
         }
-
-        # update first password
-        my $firstpwd_set_command="sophomorix-passwd --set-firstpassword \"$firstpassword\" -u $samaccount";
-        print "   $firstpwd_set_command\n";
-        my $ret=system($firstpwd_set_command);
-        if (not $res==0){
-            $errors++;
-            print "ERROR: $ret returned\n";
-            push @loglines, "Not updated Firstpassword (Return: $ret): $samaccount\n";
-        }
-
     }
     print "\n$errors ERRORS:\n";
     foreach my $line (@loglines){
