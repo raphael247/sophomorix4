@@ -47,6 +47,16 @@ In the AD the school token of the default school is ---
 
 
 
+Weiter acl:
+
+- acls testen auf server
+  -> smbclient, login, 
+     cd ...; cd ...; ls
+UND  ls dir1/dir2/      und weitere möglichkeiten 
+
+perl module:  Filesys-SmbClient 
+
+
 
 Weiter DNS: 
 
@@ -602,6 +612,9 @@ http://www.linuxmuster.net/wiki/anwenderwiki:sophomorix:sophomorix-project
 
 
 
+exam aus userlisting raus:
+  sophomorix-user -i
+
 sub AD_user_move {
 add created schools to list
 
@@ -706,7 +719,42 @@ sophomorix-schools.conf
        --> sinnvole Warnung in office.report: login expected 
 
 ############################################################
+sophomorix-passwd
+
+tun unicode passworter? evtl. in _unipwd_from_plainpwd von latin1 nach utf8 umstellen
+
+Password-length:
+sophomorix-add, sollte mit 
+    samba-tool domain passwordsettings show  (dauer 0,3 sekunden)
+die passwortlänge abfragen (evtl. mehr???) und kürzer Konfigurierte Passwort-Längen 
+ausschließen
+-> Funktion config_sophomorix_read mit option (get_passwordsettings)
+   liest zusätzlich pwd_settings ein (auf performanzgründen nicht immer)
+
+config_sophomorix_read auf hashs als parameter umstellen
+
+
+
+Wenn alte, kurze Passwörter als firstpasswords eingespielt werden (complexity and length abgemildert)
+Dann tut das zurücksetzen of das erstpasswort nicht mehr (wenn abmilderung wieder aufgehoben)
+
+
+Lösungen?
+
+1) bei jedem Firstpasswort LmL! davorsetzen, aber den alten hash einmal einpflegen.
+--> altes pwd tut
+--> wenn zurückgesetzt, dann geht das auch, weil passwort komplex genug
+--> Nachteil: alte ausgedruckte Kärtchen zun nicht
+
+2) BESSER: neue firstpasswords , den complexity rules entsprechend wählen
+--> altes password tut, falls user das noch kennt
+--> falls passwort zurückgesetzt wird, dann auf das neue komplexe
+
+############################################################
 sophomorix-check
+
+--tests:
+
 
 -- kann man Felderreihenfolge selbst bestimmen?
    -> auto im Filter-Feld erstellen
