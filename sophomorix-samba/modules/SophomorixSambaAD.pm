@@ -463,7 +463,7 @@ sub AD_computer_create {
         print "   DN(Parent):            $dn_room\n";
         print "   Name:                  $name\n";
         print "   Room:                  $room\n";
-        print "   School:           $school\n";
+        print "   School:                $school\n";
         print "   Prefix:                $prefix\n";
         print "   sAMAccountName:        $smb_name\n";
         print "   dNSHostName:           $dns_name\n";
