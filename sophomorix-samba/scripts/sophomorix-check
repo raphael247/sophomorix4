@@ -22,7 +22,6 @@ use File::Basename qw( basename
                        dirname
                      ); 
 use Text::Iconv;
-
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -161,6 +160,9 @@ Analyze the encoding of a file and show Umlaut and other special chars
 Analyze the encoding of a file and show special chars (not umlauts)
   --non-umlaut  --show-special-char-lines --analyze-encoding /path/to/students.csv
 
+Usable encodings in school.conf:
+   iconv -l
+
 Dumping data:                     
   -ij / --info --json              (dump configuration)
   --dump-files -j                  (dump contents of user files)
@@ -261,6 +263,7 @@ if ($analyze_encoding ne ""){
 # ============================================================
 # copy or filter files
 # ============================================================
+&Sophomorix::SophomorixBase::print_title("Copying files to $DevelConf::path_conf_tmp");
 foreach my  $user_file (@filelist){
     my $filename = basename($user_file);
     my $source=$user_file;
@@ -280,14 +283,16 @@ foreach my  $user_file (@filelist){
         &log_script_exit($text,0,1,0,@arguments);
     } else {
         system("mkdir -p $DevelConf::path_conf_tmp");
-        print "cp $source $target\n";
+        if($Conf::log_level>=2){
+            print "cp $source\n  ---> $target\n";
+        }
         system("cp $source $target");
     }
 }
 
 
 # ============================================================
-# analyzing encoding of all user files
+# analyzing encoding of all filtered user files in tmp
 # ============================================================
 &reading_firstnames();
 &reading_firstname_errors();
@@ -300,7 +305,7 @@ foreach my  $user_file (@filelist){
 
 
 # ============================================================
-# reading and checking all user files
+# reading and checking all filtered user files
 # ============================================================
 foreach my $user_file (@filelist){
     my $count=0;
@@ -311,12 +316,13 @@ foreach my $user_file (@filelist){
 
     # file in tmp    
     &print_title("Reading $user_file_tmp");
+    my $enc_used=&get_encoding($filename);
     open(USERS,"$user_file_tmp") || 
          die "ERROR: $user_file_tmp not found!";  
     while(<USERS>){
         $count++;
         &analyze_user_line($_,$user_file,$user_file_tmp,
-                           $filename,$school,$count);
+                           $filename,$school,$count,$enc_used);
     }
     close(USERS);
 }
@@ -383,7 +389,7 @@ if ($dump_AD==1){
 ################################################################################
 
 sub analyze_user_line {
-    my ($line,$file_abs,$file_abs_tmp,$filename,$school,$count) = @_;
+    my ($line,$file_abs,$file_abs_tmp,$filename,$school,$count,$enc_used) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -400,9 +406,10 @@ sub analyze_user_line {
         my $last=&check_last($last_raw);
 
         # converting names to utf8
-        my $conv = Text::Iconv->new(
-            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED},
-            "utf8");
+#        my $conv = Text::Iconv->new(
+#            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED},
+#            "utf8");
+        my $conv = Text::Iconv->new($enc_used,"utf8");
         my $first_utf8 = $conv->convert($first);
         my $last_utf8 = $conv->convert($last);
 
@@ -605,11 +612,53 @@ sub reading_firstname_errors {
 
 
 
+sub get_encoding {
+    my ($filename)=@_;
+    my $enc_used;
+    my $enc=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING};
+    my $enc_force=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE};
+    my $enc_checked=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED};
+    print "   * ENCODING:          $enc\n";
+    print "   * ENCODING_FORCE:    $enc_force\n";
+    print "   * ENCODING_CHECKED:  $enc_checked\n";
 
+    # misconfigured *.school.conf: exit
+    if ($enc eq "ERROR_ENCODING"){
+        print "   * Misconfigured ENCODING in configuration file, see \"iconv --list\"\n";
+        exit;
+    }   
+    if ($enc_force eq "ERROR_ENCODING_FORCE"){
+        print "   * Misconfigured ENCODING_FORCE in configuration file\n";
+        exit;
+    }   
+ 
+    # auto setting
+    if ($enc eq "auto" and $enc_force eq "no"){
+        # auto
+        if ($enc_checked eq "unknown"){
+            print "   * ENCODING could not be checked automatically\n";
+            print "   * Set ENCODING to the desired value and ENCODING_FORCE to \"yes\"\n";
+            exit;
+        }
+        $enc_used=$enc_checked;
+    } elsif ($enc ne "auto" and $enc_force eq "no"){
+        # auto mismatch configure
+        print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
+        print "   * Set ENCODING_FORCE to \"yes\" if you know better than sophomorix\n";
+        exit;
+    } elsif ($enc ne "auto" and $enc_force eq "yes"){
+        $enc_used=$enc;
+    }
+
+    print "           ---> Using:  $enc_used\n";
+    return $enc_used;
+}
 
 
 sub analyze_encoding {
     my ($file,$file_tmp) = @_;
+    # $file ist for printout anh path in config hash only
+    # $file_tmp will be analyzed
     my $filename = basename($file);
     my $filename_tmp = basename($file_tmp);
     # set all result counters to 0
@@ -621,10 +670,10 @@ sub analyze_encoding {
     $encoding_check_results{$file}{'firstnames'}{'count_errors'}{'none'}=0;
     $encoding_check_results{$file}{'firstnames'}{'result'}="unknown";
 
-    # start to analyze file
-    &Sophomorix::SophomorixBase::print_title("Encode-analyzing $file");
-    open(DATAFILE, "$file") || 
-         die "Fehler: $! $file nicht gefunden!"; 
+    # start to analyze file_tmp
+    &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
+    open(DATAFILE, "$file_tmp") || 
+         die "Fehler: $! $file_tmp not found!"; 
     my $count=0;
     while (<DATAFILE>){
         $count++;
@@ -706,10 +755,12 @@ sub analyze_encoding {
             $encoding_check_results{$file}{'firstnames'}{'result'}=$enc;
         }
     }
-
     # save result in config hash
     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
         $encoding_check_results{$file}{'firstnames'}{'result'};
+    if($Conf::log_level>=2){
+        print "$file_tmp --> $encoding_check_results{$file}{'firstnames'}{'result'}\n";
+    }
     return $encoding_check_results{$file}{'firstnames'}{'result'};
 }
 
@@ -763,7 +814,7 @@ sub print_analyzed_encoding {
     }
 
     # Print Result
-    print "\n";
+    print "S\n";
     print "+---------------------+--------+--------+--------+\n";
     printf  "| %-20s|%7s |%7s |%7s |\n",
             "Tested Encodings:",

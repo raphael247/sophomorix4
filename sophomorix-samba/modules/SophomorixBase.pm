@@ -273,6 +273,22 @@ sub read_lockfile {
 sub config_sophomorix_read {
     my ($ldap,$root_dse)=@_;
     my %sophomorix_config=();
+
+    # read available encodings from iconv --list
+    my %encodings_set=();
+    my $available_encodings = `iconv --list`;  #Backticks return a string.
+    my @encodings_arr = split /\s+/, $available_encodings;
+    foreach my $coding_orig (@encodings_arr){
+        my $coding=$coding_orig;
+        $coding=~s/\/\/$//g;# remove trailing whitespace
+        #print "<$coding>\n";
+        $sophomorix_config{'ENCODINGS'}{$coding}=$coding_orig;
+        #$encodings_set{$coding}=$coding_orig;
+    }
+    #my %encodings_set = map {lc $_ => undef} @encodings_arr;
+
+
+
     # Adding some defaults:
     $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
         "adminclass";
@@ -396,8 +412,21 @@ sub config_sophomorix_read {
                 my $path_abs_utf8=$DevelConf::path_conf_tmp."/".$token_file.".filter.utf8";
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_UTF8}=$path_abs_utf8;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}=$enc;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING_FORCE}=$enc_force;
+
+                if (exists $sophomorix_config{'ENCODINGS'}{$enc} or $enc eq "auto"){
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}=$enc;
+	        } else {
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}="ERROR_ENCODING";
+                    print "   * WARNING: ENCODING $enc not listed by \"iconv --list\" and not \"auto\"\n";
+                }
+
+                if ($enc_force eq "yes" or $enc_force eq "no"){
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING_FORCE}=$enc_force;
+                } else {
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING_FORCE}="ERROR_ENCODING_FORCE";
+                    print "   * WARNING: ENCODING_FORCE allows only \"yes\" or \"no\"\n";
+                }
+
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SURNAME_CHARS}=$sur_chars;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIRSTNAME_CHARS}=$first_chars;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
