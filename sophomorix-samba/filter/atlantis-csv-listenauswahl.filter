@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
-# $Id$
 # This script converts the cvs dump of Atlantis Listenfilter 
-# to the schueler.txt format
+# to the students.csv format for linuxmuster.net 7
 #
 # This script might be updated after installing an sophomorix-base package.
 # You must copy it by hand to its location and adjust the configuration.
@@ -15,14 +14,14 @@
 # Start configure 
 ############################################################
 
-my $current_year_string="2015/16";
+my $current_year_string="2016/17";
 
 
 
 # keep this settings
-my $source="/etc/sophomorix/user/schueler.txt";
-my $tmp="/var/lib/sophomorix/tmp/schueler.txt.filter.tmp";
-my $target="/var/lib/sophomorix/tmp/schueler.txt.tmp";
+my $source="/etc/linuxmuster/sophomorix/default-school/students.csv";
+my $tmp="/var/lib/sophomorix/tmp/students.csv.filter.tmp-atlantis-csv-listenauswahl.filter";
+my $target="/var/lib/sophomorix/tmp/students.csv.filter";
 
 my %unid_store=();
 
@@ -106,7 +105,7 @@ close(TMP);
 
 
 system("cp $tmp $target");
-
+system("rm $tmp");
 
 
 ############################################################
