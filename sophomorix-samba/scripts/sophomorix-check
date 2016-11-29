@@ -269,9 +269,9 @@ foreach my  $user_file (@filelist){
     my $source=$user_file;
     my $targer_dir=
     my $target=
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER'};
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FILTERTARGET'};
     my $filter_script=
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER_SCRIPT'};
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FILTERSCRIPT'};
     
     system("mkdir -p $DevelConf::path_conf_tmp");
     if ($filter_script eq "---"){
@@ -280,9 +280,9 @@ foreach my  $user_file (@filelist){
             print "cp $source\n  ---> $target\n";
         }
         system("cp $source $target");
-    } elsif ($filter_script eq "ERROR_PATH_ABS_FILTER_SCRIPT"){
+    } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
         print "\nERROR: The configured Filter is not an executable script:\n";
-        print "   <$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{PATH_ABS_FILTER_SCRIPT_CONFIGURED}>\n";
+        print "   <$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}>\n";
         print "\n";
         exit;
     } else {

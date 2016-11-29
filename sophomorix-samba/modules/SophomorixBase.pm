@@ -408,21 +408,21 @@ sub config_sophomorix_read {
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$path_abs;
                 my $path_abs_filter=$DevelConf::path_conf_tmp."/".$token_file.".filter";
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER}=$path_abs_filter;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERTARGET}=$path_abs_filter;
                 my $path_abs_utf8=$DevelConf::path_conf_tmp."/".$token_file.".filter.utf8";
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_UTF8}=$path_abs_utf8;
 
                 # save unchecked filter script for error messages
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT_CONFIGURED}=$filter_script;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT_CONFIGURED}=$filter_script;
 
                 # save only abs_paths to executable scripts
                 if ($filter_script eq "---"){
-                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
+                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT}=$filter_script;
 	        } elsif (-f $filter_script and -x $filter_script and $filter_script=~m/^\//){
                    # configured value is a file and executable
-                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
+                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT}=$filter_script;
                 } else {
-                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}="ERROR_PATH_ABS_FILTER_SCRIPT";
+                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
                     print "   * WARNING: $filter_script \n";
                     print "        must be:\n";
                     print "          - an executable file\n";
