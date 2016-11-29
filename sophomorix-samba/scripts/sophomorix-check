@@ -282,8 +282,9 @@ foreach my  $user_file (@filelist){
         system("cp $source $target");
     } elsif ($filter_script eq "ERROR_PATH_ABS_FILTER_SCRIPT"){
         print "\nERROR: The configured Filter is not an executable script:\n";
-        print "<$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{PATH_ABS_FILTER_SCRIPT_CONFIGURED}>\n";
+        print "   <$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{PATH_ABS_FILTER_SCRIPT_CONFIGURED}>\n";
         print "\n";
+        exit;
     } else {
         # filter script is executable, when in config hash -> run it
         my $filter_script_filename = basename($filter_script);
