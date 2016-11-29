@@ -411,7 +411,19 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER}=$path_abs_filter;
                 my $path_abs_utf8=$DevelConf::path_conf_tmp."/".$token_file.".filter.utf8";
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_UTF8}=$path_abs_utf8;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
+
+                # save unchecked for error messages
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT_CONFIGURED}=$filter_script;
+
+                # save only abs_paths zo executable scripts
+                if ($filter_script eq "---"){
+                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
+	        } elsif (-f $filter_script and -x $filter_script and $filter_script=~m/^\//){
+                   # configured value is a file and executable
+                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}=$filter_script;
+                } else {
+                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_FILTER_SCRIPT}="ERROR_PATH_ABS_FILTER_SCRIPT";
+                }
 
                 if (exists $sophomorix_config{'ENCODINGS'}{$enc} or $enc eq "auto"){
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}=$enc;

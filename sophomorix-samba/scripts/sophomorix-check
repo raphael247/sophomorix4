@@ -263,7 +263,7 @@ if ($analyze_encoding ne ""){
 # ============================================================
 # copy or filter files
 # ============================================================
-&Sophomorix::SophomorixBase::print_title("Copying files to $DevelConf::path_conf_tmp");
+&Sophomorix::SophomorixBase::print_title("Copying/Filtering files to $DevelConf::path_conf_tmp");
 foreach my  $user_file (@filelist){
     my $filename = basename($user_file);
     my $source=$user_file;
@@ -272,22 +272,26 @@ foreach my  $user_file (@filelist){
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER'};
     my $filter_script=
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_FILTER_SCRIPT'};
-    if (-x $filter_script){
-        # script is executable
-        system("mkdir -p $DevelConf::path_conf_tmp");
-        print "calling filter script $filter_script\n";
-        system($filter_script);
-    } elsif ($filter_script =~ m/^\//){
-        # first char is a /
-        my $text="ERROR: Could not find executable filter script $filter_script";
-        &log_script_exit($text,0,1,0,@arguments);
-    } else {
-        system("mkdir -p $DevelConf::path_conf_tmp");
+    
+    system("mkdir -p $DevelConf::path_conf_tmp");
+    if ($filter_script eq "---"){
+        print "   * Copying $filename\n";
         if($Conf::log_level>=2){
             print "cp $source\n  ---> $target\n";
         }
         system("cp $source $target");
-    }
+    } elsif ($filter_script eq "ERROR_PATH_ABS_FILTER_SCRIPT"){
+        print "\nERROR: The configured Filter is not an executable script:\n";
+        print "<$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{PATH_ABS_FILTER_SCRIPT_CONFIGURED}>\n";
+        print "\n";
+    } else {
+        # filter script is executable, when in config hash -> run it
+        my $filter_script_filename = basename($filter_script);
+        my $filter_log_file=$DevelConf::path_conf_tmp."/".$filename."_".$filter_script_filename.".log";
+        print "   * Filtering $filename: $filter_script\n";
+        print "     * Logging to: $filter_log_file\n";
+        system("$filter_script > $filter_log_file  2>&1");
+    } 
 }
 
 
