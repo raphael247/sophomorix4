@@ -58,7 +58,7 @@ ENCODING=$(DESTDIR)/usr/share/sophomorix/encoding-data
 LANGUAGE=$(DESTDIR)/usr/share/sophomorix/lang
 
 # Filter
-#FILTER=$(DESTDIR)/usr/share/sophomorix/filter
+FILTER=$(DESTDIR)/usr/share/sophomorix/filter
 
 # SAMBADEBCONFDIR für Debian 
 #SAMBADEBCONFDIR=$(DESTDIR)/etc/samba
@@ -217,12 +217,8 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(ENCODING)
 	@install -oroot -groot --mode=0644 sophomorix-samba/encoding-data/*.txt $(ENCODING)
 # filter scripts
-#	@install -d -m755 -oroot -groot $(FILTER)
-#	@install -oroot -groot --mode=0755 sophomorix-base/filter/*-filter $(FILTER)
-#	@install -oroot -groot --mode=0755 sophomorix-base/filter/*-schueler $(FILTER)
-# Copy the module
-#	@install -d -m755 -oroot -groot $(PERLMOD)
-#	@install -oroot -groot --mode=0644 sophomorix-base/modules/Sophomorix*[A-Za-z1-9].pm $(PERLMOD)
+	@install -d -m755 -oroot -groot $(FILTER)
+	@install -oroot -groot --mode=0755 sophomorix-samba/filter/*.filter $(FILTER)
 # for samba
 #	@install -d -m700 -oroot -groot $(DESTDIR)/home/samba/netlogon
 #	@install -oroot -groot --mode=0600 sophomorix-base/samba/netlogon/*.bat.template $(CTEMPDIR)/samba/netlogon
