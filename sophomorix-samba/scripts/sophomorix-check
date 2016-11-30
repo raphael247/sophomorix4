@@ -87,6 +87,8 @@ my $help=0;
 my $info=0;
 my $dump_files=0;
 my $dump_AD=0;
+my %Match=();
+my $dump_matches=0;
 my $json=0;
 my $list_files=0;
 my $lock=0;
@@ -103,6 +105,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "dump-files" => \$dump_files,
            "dump-AD" => \$dump_AD,
+           "dump-matches" => \$dump_matches,
            "json|j+" => \$json,
            "list-files" => \$list_files,
            "lock" => \$lock,
@@ -168,6 +171,7 @@ Dumping data:
   -ij / --info --json              (dump configuration)
   --dump-files -j                  (dump contents of user files)
   --dump-AD -j                     (dump AD data)
+  --dump-matches -j                (dump matched users)
 
   -j / --json                      (dump as a nice json object)
   -jj / --json --json              (dump as a compact json object)
@@ -347,12 +351,12 @@ if ($dump_files==1){
 # --follow
 # show the line
 if ($follow ne ""){
-    my $identifier=$users_file{'file'}{$follow_file}{$follow_line}{'identifier'};
+    my $identifier=$users_file{'file'}{$follow_file}{$follow_line}{'identifier_ascii'};
     if (not defined $identifier){
         print "   * Line $follow_line in file $follow_file contains no usable data\n";
     } else {
-        print "   * LINE ORIG: $users_file{'identifier'}{$identifier}{LINE_OLD}\n";
-        print "   * LINE UTF8: $users_file{'identifier'}{$identifier}{LINE_NEW}\n";
+        print "   * LINE ORIG: $users_file{'identifier_ascii'}{$identifier}{LINE_OLD}\n";
+        print "   * LINE UTF8: $users_file{'identifier_ascii'}{$identifier}{LINE_NEW}\n";
     }
 }
 
@@ -386,13 +390,63 @@ if ($dump_AD==1){
 }
 
 
+# ============================================================
+# Walk thhrough all files and identifiers in %users_file
+# ============================================================
+
+&find_unid_matches();
+
+
+# --dump-matches
+if ($dump_matches==1){
+    &json_dump({json => $json,
+                jsoninfo => "MATCH",
+                jsoncomment => "File user -> AD matches",
+                hash_ref=>\%Match,
+              });
+}
+
+
 &AD_unbind_admin($ldap);
 
 &log_script_end(@arguments);
 
+
+
 ################################################################################
 # Subroutinen
 ################################################################################
+
+sub find_unid_matches {
+    foreach my $user_file (@filelist){
+        my $filename = basename($user_file);
+        foreach my $identifier_ascii ( @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} } ){
+            print "$filename:",
+                  "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                  "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                  "$identifier_ascii\n";
+            if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
+                # finding a unid match 
+                if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ){
+                    my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
+                    my $role=$AD{'lookup'}{'role_by_user'}{$sam};
+		    print "  --> unidMATCH: $sam --> ",
+                          "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
+                    # save match in %users_file
+                    $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+
+                } else {
+                    $Match{'unmatched_after_unid_match'}{$identifier_ascii}="no unid match";
+                    ### save unmatched for a shorter List ???
+                    print "No unid match\n";
+                }
+            } else {
+                $Match{'unmatched_after_unid_match'}{$identifier_ascii}="no unid, no match possible";
+            }
+        }
+    }
+}
+
 
 sub analyze_user_line {
     my ($line,$file_abs,$file_abs_tmp,$filename,$school,$count,$enc_used) = @_;
@@ -432,37 +486,37 @@ sub analyze_user_line {
         # corrected line
         my $line_new=join(";", ($class,$last_utf8,$first_utf8,$birthdate,$unid));
 
-        $users_file{'identifier'}{$identifier_ascii}{LINE_OLD}=$line;
-        $users_file{'identifier'}{$identifier_ascii}{LINE_NEW}=$line_new;
-        $users_file{'identifier'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
-        $users_file{'identifier'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
-        $users_file{'identifier'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
-        $users_file{'identifier'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
-        $users_file{'identifier'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
-        $users_file{'identifier'}{$identifier_ascii}{CLASS}=$class;
-        $users_file{'identifier'}{$identifier_ascii}{UNID}=$unid;
-        $users_file{'identifier'}{$identifier_ascii}{LOGIN}=$login;
-        $users_file{'identifier'}{$identifier_ascii}{FILE}=$filename;
-        $users_file{'identifier'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
-        $users_file{'identifier'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
-        $users_file{'identifier'}{$identifier_ascii}{LINE_COUNT}=$count;
-        $users_file{'identifier'}{$identifier_ascii}{FILE_ABS}=$file_abs;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{CLASS}=$class;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}=$unid;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{LOGIN}=$login;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{FILE}=$filename;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}=$count;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
 
         # add here more stuff to create sophomorix.add, ...
-        $users_file{'identifier'}{$identifier_ascii}{ROLE}=
+        $users_file{'identifier_ascii'}{$identifier_ascii}{ROLE}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
-        $users_file{'identifier'}{$identifier_ascii}{OU}=
+        $users_file{'identifier_ascii'}{$identifier_ascii}{OU}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{OU};
-        $users_file{'identifier'}{$identifier_ascii}{SCHOOL}=
+        $users_file{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
 
         # identifier list
-        
-
+        push @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
+        push @{ $users_file{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
 
         # file -> line
-        $users_file{'file'}{$filename}{$count}{'IDENTIFIER'}=$identifier_ascii;
-        $users_file{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+        #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+        #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
     }
 }
 

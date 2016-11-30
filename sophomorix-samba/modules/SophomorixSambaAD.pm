@@ -1315,13 +1315,13 @@ sub AD_get_AD {
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
             # calculate identifiers
-            my $identifier=
+            my $identifier_ascii=
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}
                .";".
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}
                .";".
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
-            $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER'}=$identifier;
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
             my $identifier_utf8=
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sn'}
                .";".
@@ -1329,6 +1329,15 @@ sub AD_get_AD {
                .";".
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
             $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+            # lookup
+            if ($entry->get_value('sophomorixUnid') ne "---"){
+                # no lookup for unid '---'
+                $AD{'lookup'}{'user_by_unid'}{$entry->get_value('sophomorixUnid')}=$sam;
+            }
+            $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii}=$sam;
+            $AD{'lookup'}{'user_by_identifier_utf8'}{$identifier_utf8}=$sam;
+            $AD{'lookup'}{'role_by_user'}{$sam}=$entry->get_value('sophomorixRole');
         }
     }
     ##################################################
