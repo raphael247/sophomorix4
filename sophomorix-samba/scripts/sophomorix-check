@@ -40,6 +40,7 @@ use Sophomorix::SophomorixBase qw(
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
+                                 recode_utf8_to_ascii
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_ou_add
@@ -409,15 +410,6 @@ sub analyze_user_line {
         my $class=&check_class($class_raw);
         my $first=&check_first($first_raw);
         my $last=&check_last($last_raw);
-
-        # converting names to utf8
-#        my $conv = Text::Iconv->new(
-#            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED},
-#            "utf8");
-        my $conv = Text::Iconv->new($enc_used,"utf8");
-        my $first_utf8 = $conv->convert($first);
-        my $last_utf8 = $conv->convert($last);
-
         my $birthdate=&check_birthdate($birthdate_raw);
         my $unid="";
         my $login="";
@@ -428,38 +420,49 @@ sub analyze_user_line {
             $unid=&check_unid($field5);
         }
 
-        # todo:
-        # password creation/passwodrv
-
-        my $identifier=join(";", ($last,$first,$birthdate));
+        # converting names to utf8 and then to ascii
+        my $conv = Text::Iconv->new($enc_used,"utf8");
+        my $first_utf8 = $conv->convert($first);
+        my $last_utf8 = $conv->convert($last);
+        my $first_ascii =&recode_utf8_to_ascii($first_utf8);
+        my $last_ascii =&recode_utf8_to_ascii($last_utf8);
+        # identifier
+        my $identifier_utf8=join(";", ($last_utf8,$first_utf8,$birthdate));
+        my $identifier_ascii=join(";", ($last_ascii,$first_ascii,$birthdate));
+        # corrected line
         my $line_new=join(";", ($class,$last_utf8,$first_utf8,$birthdate,$unid));
 
-        $users_file{'identifier'}{$identifier}{LINE_OLD}=$line;
-        $users_file{'identifier'}{$identifier}{LINE_NEW}=$line_new;
-        $users_file{'identifier'}{$identifier}{FIRSTNAME}=$first;
-        $users_file{'identifier'}{$identifier}{FIRSTNAME_UTF8}=$first_utf8;
-        $users_file{'identifier'}{$identifier}{LASTNAME}=$last;
-        $users_file{'identifier'}{$identifier}{LASTNAME_UTF8}=$last_utf8;
-        $users_file{'identifier'}{$identifier}{BIRTHDATE}=$birthdate;
-        $users_file{'identifier'}{$identifier}{CLASS}=$class;
-        $users_file{'identifier'}{$identifier}{UNID}=$unid;
-        $users_file{'identifier'}{$identifier}{LOGIN}=$login;
-        $users_file{'identifier'}{$identifier}{FILE}=$filename;
-        $users_file{'identifier'}{$identifier}{LINE_COUNT}=$count;
-        $users_file{'identifier'}{$identifier}{FILE_ABS}=$file_abs;
+        $users_file{'identifier'}{$identifier_ascii}{LINE_OLD}=$line;
+        $users_file{'identifier'}{$identifier_ascii}{LINE_NEW}=$line_new;
+        $users_file{'identifier'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
+        $users_file{'identifier'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
+        $users_file{'identifier'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
+        $users_file{'identifier'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
+        $users_file{'identifier'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
+        $users_file{'identifier'}{$identifier_ascii}{CLASS}=$class;
+        $users_file{'identifier'}{$identifier_ascii}{UNID}=$unid;
+        $users_file{'identifier'}{$identifier_ascii}{LOGIN}=$login;
+        $users_file{'identifier'}{$identifier_ascii}{FILE}=$filename;
+        $users_file{'identifier'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
+        $users_file{'identifier'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
+        $users_file{'identifier'}{$identifier_ascii}{LINE_COUNT}=$count;
+        $users_file{'identifier'}{$identifier_ascii}{FILE_ABS}=$file_abs;
 
         # add here more stuff to create sophomorix.add, ...
-        $users_file{'identifier'}{$identifier}{ROLE}=
+        $users_file{'identifier'}{$identifier_ascii}{ROLE}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
-        $users_file{'identifier'}{$identifier}{OU}=
+        $users_file{'identifier'}{$identifier_ascii}{OU}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{OU};
-        $users_file{'identifier'}{$identifier}{SCHOOL}=
+        $users_file{'identifier'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
 
-        # file -> line
-        $users_file{'file'}{$filename}{$count}{'identifier'}=$identifier;
-        $users_file{'file'}{$filename}{$count}{'identifier_worldwide'}=$identifier;
+        # identifier list
+        
 
+
+        # file -> line
+        $users_file{'file'}{$filename}{$count}{'IDENTIFIER'}=$identifier_ascii;
+        $users_file{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
     }
 }
 

@@ -1267,7 +1267,8 @@ sub AD_get_AD {
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-                       filter => '(&(objectClass=user)(sophomorixRole=student))',
+                       filter => '(&(objectClass=user)(|(sophomorixRole=student)(sophomorixRole=teacher)))',
+                       #filter => '(&(objectClass=user) (sophomorixRole=student))',
                        attrs => ['sAMAccountName',
                                  'sophomorixAdminClass',
                                  'givenName',
@@ -1288,36 +1289,46 @@ sub AD_get_AD {
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixAdminClass'}=
+            my $role=$entry->get_value('sophomorixRole');
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminClass'}=
                 $entry->get_value('sophomorixAdminClass');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixFirstnameASCII'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}=
                 $entry->get_value('sophomorixFirstnameASCII');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixSurnameASCII'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}=
                 $entry->get_value('sophomorixSurnameASCII');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'givenName'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'givenName'}=
                 $entry->get_value('givenName');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sn'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sn'}=
                 $entry->get_value('sn');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixBirthdate'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'}=
                 $entry->get_value('sophomorixBirthdate');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixStatus'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixStatus'}=
                 $entry->get_value('sophomorixStatus');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixSchoolname'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSchoolname'}=
                 $entry->get_value('sophomorixSchoolname');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixPrefix'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixPrefix'}=
                 $entry->get_value('sophomorixPrefix');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixAdminFile'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminFile'}=
                 $entry->get_value('sophomorixAdminFile');
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixUnid'}=
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixUnid'}=
                 $entry->get_value('sophomorixUnid');
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixRole'}=
+                $entry->get_value('sophomorixRole');
             # calculate identifiers
             my $identifier=
-               $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixSurnameASCII'}
+               $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}
                .";".
-               $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixFirstnameASCII'}
+               $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}
                .";".
-               $AD{'objectclass'}{'user'}{'student'}{$sam}{'sophomorixBirthdate'};
-            $AD{'objectclass'}{'user'}{'student'}{$sam}{'IDENTIFIER'}=$identifier;
+               $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER'}=$identifier;
+            my $identifier_utf8=
+               $AD{'objectclass'}{'user'}{$role}{$sam}{'sn'}
+               .";".
+               $AD{'objectclass'}{'user'}{$role}{$sam}{'givenName'}
+               .";".
+               $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
         }
     }
     ##################################################

@@ -42,6 +42,7 @@ $Data::Dumper::Terse = 1;
             dns_query_ip
             remove_whitespace
             json_dump
+            recode_utf8_to_ascii
             );
 
 
