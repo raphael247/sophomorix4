@@ -396,6 +396,21 @@ if ($dump_AD==1){
 
 &find_unid_matches();
 
+# --migration-ascii-to-utf8
+# matched tries to mach with ascii-identifier
+# approx-string start with zero, increase by one until all are matched
+# maximum 5 or so
+# track approx number with matches 
+# output matches and approx number
+# exit if not all could be matched
+#
+# the migration match ends with:
+#   A) All are matched, write sophomorix.update and exit 
+#   B) exit with ERROR
+#      show unmatched users
+# therefore the following match_functions are not applied:
+# marriage, birthdate, ... and such matches () becausethere arent any
+
 
 # --dump-matches
 if ($dump_matches==1){
