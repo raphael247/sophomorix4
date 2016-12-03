@@ -4,10 +4,17 @@ sophomorix-samba für linuxmuster.net 7 --- Weekly 8
 sophomorix4/Samba4 weekly Nr. 9  (xx.11.2016)
 ############################################################
 
+Priorität:
+- 1. utf8 migration
+- 2. sophomorix-check mit result output
+- 3. AD umsetzen -> testen
+- 4. sophomorix-session
+     --> Umsetzung mit nach Aufschrieb Rainer
+
 Entwicklertreffen 3.12.16:
 
-- Vorschlag OU=SCHOOLS für alle Schulen
-- Bugfixen: Doku
+- Vorschlag OU=SCHOOLS für alle Schulen -> OK
+- Bugfixen: Doku 
     Diskussion:
       regex -> syntax-filter
       S. 3: schulname raus
@@ -32,16 +39,11 @@ Stand --json output (siehe wiki)
 ACL's: Testverfahren
   über smbclient? smbmount usw.
   wo gibts ACL's
-  - Homeverzeichnis?
+  - Homoverzeichnis?
   - Projekttausch
   - Klassentausch
   -> wo noch?
 
-Homeverzeichnisse der user: 
-  - wo? (Linux-Pfad) 
-  - ACL?
-  - wie in ldap Einragen?
-  - wie Freigabe erstellen?
 
 LDAP-Baum: 
    - Änderungen
@@ -53,9 +55,69 @@ Quota: Beibehaltung
 
 LDAP-Baum:
 mac ins ad?
+-> schreibt das der Rechner
+
 hardwareclasse ins AD?
+Hardwareklasse gibt Gruppe im AD -> Name wie in devices.csv  Mitglieder Computers$
+Ort im AD:
+Gruppe <schule-Hardwareklasse> unterhalb OU=Computers
+
+Raum           gibt Gruppe im AD -> Name wie in devices.csv, Mitglieder Computers$
+Ort im AD:
+Gruppe Raum unterhalb OU=Raum
+
+ADMINS
+Gruppe admins, bzw. schule-admins  und global admins
+-> manuell user anlegen hinzufügen  
+
+
+sohomorix-init --school <school>
+legte leere ou's für die Schule an
+und den admin. mit passwort
+
+Über OU=SCHOOLS über alle schulen
+
+
+
+OU: Students->klassenname in schule <schule>: nicht mehr <schule-10a>, sondern <10a>
+- ist eindeutig über pfad, darunter gruppenobjekt <schule-10a>
+
+
+
+
+Homeverzeichnisse der user: 
+  - wo? (Linux-Pfad) 
+/home/schools/<school>/students/<class>/homes/<loginname>
+/home/schools/<school>/students/<class>/tausch
+/home/schools/<school>/teachers/homes/<loginname>
+/home/schools/<school>/teachers/tausch
+/home/schools/<school>/projects/<project>
+/home/global/projects/<project>
+...
+
+
+  - ACL?
+  - wie in ldap Eintragen?
+
+smbshare heisst <school> und entspricht Linux-pfad /home/schools/<school>
+
+homeDrive H:
+homeDirectory \\<linuxmuster.local>\<school>\students\<class>\homes\<loginname>
+...
+
+  - wie Freigabe erstellen: je school Freigabe erstellen
+net conf addshare <default-school> /home/schools/<default-school> writeable=y guest_ok=y „Share for school default-school“
+
+siehe https://linx-qh.de/samba-als-fileserver-auf-ubuntu-server-14-04-einrichten/
+ 
+
+
+default-school
+
 
 Passwortlängenproblem
+- nach migration auf samba defaults setzen 
+
 
 
 
