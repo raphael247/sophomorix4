@@ -396,6 +396,8 @@ if ($dump_AD==1){
 
 &find_unid_matches();
 
+
+&find_migration_ascii_to_utf8_matches();
 # --migration-ascii-to-utf8
 # matched tries to mach with ascii-identifier
 # approx-string start with zero, increase by one until all are matched
@@ -429,37 +431,69 @@ if ($dump_matches==1){
 
 
 ################################################################################
-# Subroutinen
+# Sub
 ################################################################################
 
+
+sub find_migration_ascii_to_utf8_matches {
+    &print_title("Migration match");
+    foreach my $identifier_ascii ( @{ $Match{'unmatched_after_unid_match'} } ){
+        print "$identifier_ascii\n";
+    }
+    &print_title("Migration match");
+}
+
+
+
 sub find_unid_matches {
+    &print_title("unidMatching lines to accounts:");
+    my $line_count=0;
+    my $matched_count=0;
+    my $no_unid_count=0;
+    my $not_matched_count=0;
     foreach my $user_file (@filelist){
         my $filename = basename($user_file);
         foreach my $identifier_ascii ( @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} } ){
-            print "$filename:",
-                  "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                  "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                  "$identifier_ascii\n";
+            $line_count++;
             if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
                 # finding a unid match 
                 if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ){
                     my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                     my $role=$AD{'lookup'}{'role_by_user'}{$sam};
-		    print "  --> unidMATCH: $sam --> ",
-                          "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
+                    if($Conf::log_level>=2){
+                        print "$filename:",
+                              "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                              "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                              "$identifier_ascii\n";
+		                print "  --> unidMATCH: $sam --> ",
+                                  "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
+                    }
+                    $matched_count++;
                     # save match in %users_file
                     $Match{'file'}{$filename}{$identifier_ascii}=$sam;
 
                 } else {
-                    $Match{'unmatched_after_unid_match'}{$identifier_ascii}="no unid match";
+                    $Match{'unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid match";
+                    push @{ $Match{'unmatched_after_unid_match'} }, $identifier_ascii;
                     ### save unmatched for a shorter List ???
-                    print "No unid match\n";
+                    $not_matched_count++;
+                    print "$filename:",
+                          "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                          "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                          "$identifier_ascii\n";
+                    print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
+                          " not found in AD\n";
+
                 }
             } else {
-                $Match{'unmatched_after_unid_match'}{$identifier_ascii}="no unid, no match possible";
+                $no_unid_count++;
+                push @{ $Match{'unmatched_after_unid_match'} }, $identifier_ascii;
+                $Match{'unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid, no match possible";
+
             }
         }
     }
+    &print_title("unidMatching $line_count lines: $matched_count matched, $not_matched_count unmatched, $no_unid_count without unid");
 }
 
 
