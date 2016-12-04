@@ -11,6 +11,8 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
+use String::Approx 'amatch';
+use String::Approx 'adist';
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -67,6 +69,47 @@ my $user_count=0;
 
 my $school="";
 my %users_file=();
+
+# allowed numbers for days
+my %convert_day = qw(
+     1     01          01    01
+     2     02          02    02
+     3     03          03    03
+     4     04          04    04
+     5     05          05    05
+     6     06          06    06
+     7     07          07    07
+     8     08          08    08
+     9     09          09    09
+     10    10          11    11
+     12    12          13    13
+     14    14          15    15
+     16    16          17    17
+     18    18          19    19
+     20    20          21    21
+     22    22          23    23
+     24    24          25    25
+     26    26          27    27
+     28    28          29    29
+     30    30          31    31
+);
+
+# allowed numbers for months
+my %convert_month = qw(
+     1     01          01    01
+     2     02          02    02
+     3     03          03    03
+     4     04          04    04
+     5     05          05    05
+     6     06          06    06
+     7     07          07    07
+     8     08          08    08
+     9     09          09    09
+     10    10          11    11
+     12    12
+);
+
+
 
 
 # encoding tests
@@ -394,10 +437,9 @@ if ($dump_AD==1){
 # Walk thhrough all files and identifiers in %users_file
 # ============================================================
 
-&find_unid_matches();
+&find_migration_unid_matches();
+&find_migration_ascii_matches();
 
-
-&find_migration_ascii_to_utf8_matches();
 # --migration-ascii-to-utf8
 # matched tries to mach with ascii-identifier
 # approx-string start with zero, increase by one until all are matched
@@ -435,27 +477,40 @@ if ($dump_matches==1){
 ################################################################################
 
 
-sub find_migration_ascii_to_utf8_matches {
-    &print_title("Migration match");
-    foreach my $identifier_ascii ( @{ $Match{'unmatched_after_unid_match'} } ){
+sub find_migration_ascii_matches {
+    print "\n";
+    &print_title("Migration matching ascii-to-utf8");
+    my $line_count=0;
+    my $matched_count=0;
+    my $not_matched_count=0;
+    foreach my $identifier_ascii ( @{ $Match{'file_unmatched_after_unid_match'} } ){
+        $line_count++;
+        my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
         if ( exists $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii} ){
             my $sam=$AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii};
-            print "    MATCH: $identifier_ascii to $sam\n";
-
-            my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+            if($Conf::log_level>=2){
+                print "    MATCH: $identifier_ascii to $sam\n";
+            }
             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-
-
+            $matched_count++;
         } else {
-            print "NO MATCH: $identifier_ascii\n";
+            print " $filename:",
+                  "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                  "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                  "$identifier_ascii\n";
+            print "   --> No exact match for $identifier_ascii\n";
+            push @{ $Match{'file_unmatched_after_ascii_to_utf8_match'} }, $identifier_ascii;
+            $Match{'file_unmatched_after_ascii_to_utf8_match_reason'}{$identifier_ascii}="no exact identifier match possible";
+            $not_matched_count++;
         }
     }
-    &print_title("Migration match");
+    &print_title("ascii--to-utf8-Matching $line_count lines: $matched_count matched, $not_matched_count unmatched");
 }
 
 
 
-sub find_unid_matches {
+sub find_migration_unid_matches {
+    print "\n";
     &print_title("unidMatching lines to accounts:");
     my $line_count=0;
     my $matched_count=0;
@@ -471,7 +526,7 @@ sub find_unid_matches {
                     my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                     my $role=$AD{'lookup'}{'role_by_user'}{$sam};
                     if($Conf::log_level>=2){
-                        print "$filename:",
+                        print " $filename:",
                               "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                               "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                               "$identifier_ascii\n";
@@ -483,11 +538,11 @@ sub find_unid_matches {
                     $Match{'file'}{$filename}{$identifier_ascii}=$sam;
 
                 } else {
-                    $Match{'unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid match";
-                    push @{ $Match{'unmatched_after_unid_match'} }, $identifier_ascii;
+                    $Match{'file_unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid match";
+                    push @{ $Match{'file_unmatched_after_unid_match'} }, $identifier_ascii;
                     ### save unmatched for a shorter List ???
                     $not_matched_count++;
-                    print "$filename:",
+                    print " $filename:",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                           "$identifier_ascii\n";
@@ -497,8 +552,8 @@ sub find_unid_matches {
                 }
             } else {
                 $no_unid_count++;
-                push @{ $Match{'unmatched_after_unid_match'} }, $identifier_ascii;
-                $Match{'unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid, no match possible";
+                push @{ $Match{'file_unmatched_after_unid_match'} }, $identifier_ascii;
+                $Match{'file_unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid, no match possible";
 
             }
         }
@@ -637,6 +692,9 @@ sub check_birthdate {
     }
 
     my ($day,$month,$year)=split(/\./,$birthdate);
+
+    $day=$convert_day{$day};
+    $month=$convert_month{$month};
 
     # Instead of undefined use empty string
     # this avoids errors
