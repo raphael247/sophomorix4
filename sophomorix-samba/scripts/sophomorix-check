@@ -438,7 +438,17 @@ if ($dump_matches==1){
 sub find_migration_ascii_to_utf8_matches {
     &print_title("Migration match");
     foreach my $identifier_ascii ( @{ $Match{'unmatched_after_unid_match'} } ){
-        print "$identifier_ascii\n";
+        if ( exists $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii} ){
+            my $sam=$AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii};
+            print "    MATCH: $identifier_ascii to $sam\n";
+
+            my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+            $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+
+
+        } else {
+            print "NO MATCH: $identifier_ascii\n";
+        }
     }
     &print_title("Migration match");
 }
@@ -469,7 +479,7 @@ sub find_unid_matches {
                                   "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
                     }
                     $matched_count++;
-                    # save match in %users_file
+                    # save match in %users_file ???
                     $Match{'file'}{$filename}{$identifier_ascii}=$sam;
 
                 } else {
