@@ -436,9 +436,34 @@ if ($dump_AD==1){
 # ============================================================
 # Walk thhrough all files and identifiers in %users_file
 # ============================================================
+# no migration
+#&populate_ad_to_be_matched_utf8();
+
+# migration
+&populate_ad_to_be_matched_ascii();
+&count_ad_to_be_matched_ascii();
 
 &find_migration_unid_matches();
+&count_ad_to_be_matched_ascii();
+
 &find_migration_ascii_matches();
+&count_ad_to_be_matched_ascii();
+
+&find_migration_ascii_approx_matches(1);
+&count_ad_to_be_matched_ascii();
+
+&find_migration_ascii_approx_matches(2);
+&count_ad_to_be_matched_ascii();
+
+&find_migration_ascii_approx_matches(3);
+&count_ad_to_be_matched_ascii();
+
+&find_migration_ascii_approx_matches(4);
+&count_ad_to_be_matched_ascii();
+
+
+
+
 
 # --migration-ascii-to-utf8
 # matched tries to mach with ascii-identifier
@@ -476,6 +501,79 @@ if ($dump_matches==1){
 # Sub
 ################################################################################
 
+sub count_ad_to_be_matched_ascii {
+    my $count=0;
+    foreach my $identifier_ascii (keys %{$Match{'ad_to_be_matched_identifiers_ascii'}} ) {
+        $count++;
+    } 
+    print "\nStill $count unmatched\n\n"
+}
+
+sub populate_ad_to_be_matched_ascii {
+    foreach my $identifier_ascii (keys %{$AD{'lookup'}{'user_by_identifier_ascii'}} ) { 
+        $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii}="not matched";
+    } 
+}
+
+sub populate_ad_to_be_matched_utf8 {
+    foreach my $identifier_utf8 (keys %{$AD{'lookup'}{'user_by_identifier_utf8'}} ) { 
+        $Match{'ad_to_be_matched_identifiers_utf8'}{$identifier_utf8}="not matched";
+    } 
+}
+
+
+sub edit_distance {
+    my ($string1,$string2)=@_;
+    my $string;
+    my $pattern;
+    # the shorter string is the pattern to avoid negative edit distances    
+    if (length($string1) < length($string2)){
+        $string=$string2;
+        $pattern=$string1;
+    } else {
+	$string=$string1;
+        $pattern=$string2;
+    }
+    my $edit_distance=adist($pattern,$string);
+    return $edit_distance;
+}
+
+
+
+sub find_migration_ascii_approx_matches {
+    my ($max_edit_distance) = @_;
+    print "\n";
+    &print_title("Migration approx matching (max. edit distance $max_edit_distance)");
+    my $line_count=0;
+    my $matched_count=0;
+    my $not_matched_count=0;
+    foreach my $identifier_ascii ( @{ $Match{'file_unmatched_after_ascii_match'} } ){
+        $line_count++;
+        my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+        print " $filename:",
+              "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+              "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+              "$identifier_ascii\n";
+        my $count=0;
+        foreach my $identifier_ascii_ad ( keys %{ $Match{'ad_to_be_matched_identifiers_ascii'} } ){
+            $count++;
+            my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
+            if($Conf::log_level>=2){
+                print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
+                print "      * $edit_distance (Edit distance)\n";
+            }
+            if ($edit_distance <= $max_edit_distance){
+                # APPROX MATCH
+                print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
+                delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii_ad};
+            }
+        }
+
+    }
+    &print_title("Migration approx matching ($line_count tested)");
+}
+
+
 
 sub find_migration_ascii_matches {
     print "\n";
@@ -487,20 +585,24 @@ sub find_migration_ascii_matches {
         $line_count++;
         my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
         if ( exists $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii} ){
+            # MATCH
             my $sam=$AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii};
             if($Conf::log_level>=2){
                 print "    MATCH: $identifier_ascii to $sam\n";
             }
             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+            # remove from ad_to_be_matched
+            delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii};
             $matched_count++;
         } else {
+            # NO MATCH
             print " $filename:",
                   "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                   "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                   "$identifier_ascii\n";
             print "   --> No exact match for $identifier_ascii\n";
-            push @{ $Match{'file_unmatched_after_ascii_to_utf8_match'} }, $identifier_ascii;
-            $Match{'file_unmatched_after_ascii_to_utf8_match_reason'}{$identifier_ascii}="no exact identifier match possible";
+            push @{ $Match{'file_unmatched_after_ascii_match'} }, $identifier_ascii;
+            $Match{'file_unmatched_after_ascii_match_reason'}{$identifier_ascii}="no exact identifier match possible";
             $not_matched_count++;
         }
     }
@@ -523,6 +625,7 @@ sub find_migration_unid_matches {
             if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
                 # finding a unid match 
                 if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ){
+                    # MATCH
                     my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                     my $role=$AD{'lookup'}{'role_by_user'}{$sam};
                     if($Conf::log_level>=2){
@@ -534,13 +637,13 @@ sub find_migration_unid_matches {
                                   "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
                     }
                     $matched_count++;
-                    # save match in %users_file ???
+                    # remove from ad_to_be_matched
+                    delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii};
                     $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-
                 } else {
+                    # NO MATCH
                     $Match{'file_unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid match";
                     push @{ $Match{'file_unmatched_after_unid_match'} }, $identifier_ascii;
-                    ### save unmatched for a shorter List ???
                     $not_matched_count++;
                     print " $filename:",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
@@ -554,7 +657,6 @@ sub find_migration_unid_matches {
                 $no_unid_count++;
                 push @{ $Match{'file_unmatched_after_unid_match'} }, $identifier_ascii;
                 $Match{'file_unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid, no match possible";
-
             }
         }
     }
