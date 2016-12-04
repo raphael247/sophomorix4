@@ -501,6 +501,20 @@ if ($dump_matches==1){
 # Sub
 ################################################################################
 
+
+# UTF8 match
+################################################################################
+sub populate_ad_to_be_matched_utf8 {
+    foreach my $identifier_utf8 (keys %{$AD{'lookup'}{'user_by_identifier_utf8'}} ) { 
+        $Match{'ad_to_be_matched_identifiers_utf8'}{$identifier_utf8}="not matched";
+    } 
+}
+
+
+
+# Migration match
+################################################################################
+# call this in the end of all matches ??????????????????????ßßß
 sub count_ad_to_be_matched_ascii {
     my $count=0;
     foreach my $identifier_ascii (keys %{$Match{'ad_to_be_matched_identifiers_ascii'}} ) {
@@ -509,33 +523,12 @@ sub count_ad_to_be_matched_ascii {
     print "\nStill $count unmatched\n\n"
 }
 
+
+
 sub populate_ad_to_be_matched_ascii {
     foreach my $identifier_ascii (keys %{$AD{'lookup'}{'user_by_identifier_ascii'}} ) { 
         $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii}="not matched";
     } 
-}
-
-sub populate_ad_to_be_matched_utf8 {
-    foreach my $identifier_utf8 (keys %{$AD{'lookup'}{'user_by_identifier_utf8'}} ) { 
-        $Match{'ad_to_be_matched_identifiers_utf8'}{$identifier_utf8}="not matched";
-    } 
-}
-
-
-sub edit_distance {
-    my ($string1,$string2)=@_;
-    my $string;
-    my $pattern;
-    # the shorter string is the pattern to avoid negative edit distances    
-    if (length($string1) < length($string2)){
-        $string=$string2;
-        $pattern=$string1;
-    } else {
-	$string=$string1;
-        $pattern=$string2;
-    }
-    my $edit_distance=adist($pattern,$string);
-    return $edit_distance;
 }
 
 
@@ -568,7 +561,6 @@ sub find_migration_ascii_approx_matches {
                 delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii_ad};
             }
         }
-
     }
     &print_title("Migration approx matching ($line_count tested)");
 }
@@ -608,6 +600,7 @@ sub find_migration_ascii_matches {
     }
     &print_title("ascii--to-utf8-Matching $line_count lines: $matched_count matched, $not_matched_count unmatched");
 }
+
 
 
 
@@ -664,6 +657,29 @@ sub find_migration_unid_matches {
 }
 
 
+
+# APPROX stuff
+################################################################################
+sub edit_distance {
+    my ($string1,$string2)=@_;
+    my $string;
+    my $pattern;
+    # the shorter string is the pattern to avoid negative edit distances    
+    if (length($string1) < length($string2)){
+        $string=$string2;
+        $pattern=$string1;
+    } else {
+	$string=$string1;
+        $pattern=$string2;
+    }
+    my $edit_distance=adist($pattern,$string);
+    return $edit_distance;
+}
+
+
+
+# checking stuff
+################################################################################
 sub analyze_user_line {
     my ($line,$file_abs,$file_abs_tmp,$filename,$school,$count,$enc_used) = @_;
     if (/^#/ or /^\s*$/){
@@ -737,6 +753,7 @@ sub analyze_user_line {
 }
 
 
+
 sub check_class {
     my ($class)=@_;
     $class=&remove_whitespace($class);
@@ -755,6 +772,7 @@ sub check_class {
 }
 
 
+
 sub check_first {
     my ($first)=@_;
     $first=&remove_whitespace($first);
@@ -762,11 +780,13 @@ sub check_first {
 }
 
 
+
 sub check_last {
     my ($last)=@_;
     $last=&remove_whitespace($last);
     return $last;
 }
+
 
 
 sub check_birthdate {
@@ -815,11 +835,13 @@ sub check_birthdate {
 }
 
 
+
 sub check_unid {
     my ($unid)=@_;
     $unid=&remove_whitespace($unid);
     return $unid;
 }
+
 
 
 sub check_login {
@@ -829,6 +851,9 @@ sub check_login {
 }
 
 
+
+# Encoding stuff
+################################################################################
 sub reading_firstnames {
     my @datafiles=("firstnames.utf8.txt", 
                    "firstnames.ISO_8859-1.txt", 
@@ -858,6 +883,7 @@ sub reading_firstnames {
         close(DATAFILE);
     }
 }
+
 
 
 sub reading_firstname_errors {
@@ -934,6 +960,7 @@ sub get_encoding {
     print "           ---> Using:  $enc_used\n";
     return $enc_used;
 }
+
 
 
 sub analyze_encoding {
