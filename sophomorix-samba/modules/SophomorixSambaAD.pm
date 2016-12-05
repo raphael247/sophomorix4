@@ -1341,6 +1341,8 @@ sub AD_get_AD {
             }
             $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii}=$sam;
             $AD{'lookup'}{'user_by_identifier_utf8'}{$identifier_utf8}=$sam;
+            $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+            $AD{'lookup'}{'status_by_identifier_utf8'}{$identifier_utf8}=$entry->get_value('sophomorixStatus');
             $AD{'lookup'}{'role_by_user'}{$sam}=$entry->get_value('sophomorixRole');
         }
     }

@@ -534,7 +534,9 @@ sub show_dynamic_identifiers_ascii {
 	    @ad_ids = sort @ad_ids;
             print "ad_dynamic_identifiers_ascii:\n";
             foreach my $id (@ad_ids){
-                print "   * $id ($AD{'lookup'}{'user_by_identifier_ascii'}{$id} in AD)\n";
+                my $status=
+                print "   * $id ($AD{'lookup'}{'user_by_identifier_ascii'}{$id} in AD,",
+                      " status $AD{'lookup'}{'status_by_identifier_ascii'}{$id})\n";
             }    
         }
         return 1;
