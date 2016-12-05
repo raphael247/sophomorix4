@@ -436,34 +436,26 @@ if ($dump_AD==1){
 # ============================================================
 # Walk thhrough all files and identifiers in %users_file
 # ============================================================
+
+# dynamic matching data ist contained in %Match
+# reading user files populate these subhashes (file identifiers):
+# $Match{'file_dynamic_identifiers_ascii'} or $users_file{'file_dynamic_identifiers_utf8'}
+# and populated from AD by subs (AD identifiers): 
+# $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
+
+
 # no migration
-#&populate_ad_to_be_matched_utf8();
+#&populate_ad_dynamic_identifiers_utf8();
 
 # migration
-&populate_ad_to_be_matched_ascii();
-&count_ad_to_be_matched_ascii();
+&populate_ad_dynamic_identifiers_ascii();
 
 &find_migration_unid_matches();
-&count_ad_to_be_matched_ascii();
-
 &find_migration_ascii_matches();
-&count_ad_to_be_matched_ascii();
-
 &find_migration_ascii_approx_matches(1);
-&count_ad_to_be_matched_ascii();
-
 &find_migration_ascii_approx_matches(2);
-&count_ad_to_be_matched_ascii();
-
 &find_migration_ascii_approx_matches(3);
-&count_ad_to_be_matched_ascii();
-
 &find_migration_ascii_approx_matches(4);
-&count_ad_to_be_matched_ascii();
-
-
-
-
 
 # --migration-ascii-to-utf8
 # matched tries to mach with ascii-identifier
@@ -504,9 +496,9 @@ if ($dump_matches==1){
 
 # UTF8 match
 ################################################################################
-sub populate_ad_to_be_matched_utf8 {
+sub populate_ad_dynamic_identifiers_utf8 {
     foreach my $identifier_utf8 (keys %{$AD{'lookup'}{'user_by_identifier_utf8'}} ) { 
-        $Match{'ad_to_be_matched_identifiers_utf8'}{$identifier_utf8}="not matched";
+        $Match{'ad_dynamic_identifiers_utf8'}{$identifier_utf8}="ad, not matched";
     } 
 }
 
@@ -515,19 +507,43 @@ sub populate_ad_to_be_matched_utf8 {
 # Migration match
 ################################################################################
 # call this in the end of all matches ??????????????????????ßßß
-sub count_ad_to_be_matched_ascii {
-    my $count=0;
-    foreach my $identifier_ascii (keys %{$Match{'ad_to_be_matched_identifiers_ascii'}} ) {
-        $count++;
+sub show_dynamic_identifiers_ascii {
+    my $file_count=0;
+    my $ad_count=0;
+    my @file_ids=();
+    my @ad_ids=();
+    foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
+        push @file_ids, $identifier_ascii;
+        $file_count++;
     } 
-    print "\nStill $count unmatched\n\n"
+    foreach my $identifier_ascii (keys %{$Match{'ad_dynamic_identifiers_ascii'}} ) {
+        push @ad_ids, $identifier_ascii;
+        $ad_count++;
+    }
+    my $diff=$ad_count-$file_count;
+    &print_title("$file_count users in files to be matched with $ad_count in AD (Diff: $diff)");
+    if ($file_count==0 or $ad_count==0){
+	return 0;
+    } else {
+        if($Conf::log_level>=2){
+            print "file_dynamic_identifiers_ascii:\n";
+            foreach my $id (@file_ids){
+                print "   * $id (in files)\n";
+            }    
+            print "ad_dynamic_identifiers_ascii:\n";
+            foreach my $id (@ad_ids){
+                print "   * $id (in AD)\n";
+            }    
+        }
+        return 1;
+    }
 }
 
 
 
-sub populate_ad_to_be_matched_ascii {
+sub populate_ad_dynamic_identifiers_ascii {
     foreach my $identifier_ascii (keys %{$AD{'lookup'}{'user_by_identifier_ascii'}} ) { 
-        $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii}="not matched";
+        $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii}="ad, not matched";
     } 
 }
 
@@ -535,12 +551,18 @@ sub populate_ad_to_be_matched_ascii {
 
 sub find_migration_ascii_approx_matches {
     my ($max_edit_distance) = @_;
+    my $run="approx_".$max_edit_distance."_run";
     print "\n";
     &print_title("Migration approx matching (max. edit distance $max_edit_distance)");
+    my $ret=&show_dynamic_identifiers_ascii();
+    if ($ret==0){
+        print "---> Nothing to do anymore\n";
+	    return 0;
+    }
     my $line_count=0;
     my $matched_count=0;
     my $not_matched_count=0;
-    foreach my $identifier_ascii ( @{ $Match{'file_unmatched_after_ascii_match'} } ){
+    foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
         $line_count++;
         my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
         print " $filename:",
@@ -548,17 +570,21 @@ sub find_migration_ascii_approx_matches {
               "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
               "$identifier_ascii\n";
         my $count=0;
-        foreach my $identifier_ascii_ad ( keys %{ $Match{'ad_to_be_matched_identifiers_ascii'} } ){
+        foreach my $identifier_ascii_ad ( keys %{ $Match{'ad_dynamic_identifiers_ascii'} } ){
             $count++;
             my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
-            if($Conf::log_level>=2){
+            if($Conf::log_level>=3){
                 print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
                 print "      * $edit_distance (Edit distance)\n";
             }
             if ($edit_distance <= $max_edit_distance){
                 # APPROX MATCH
                 print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
-                delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii_ad};
+                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
+                # save match to delete this match from list
+                $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
+                # remove the approx matches from the list
+                delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
             }
         }
     }
@@ -570,10 +596,11 @@ sub find_migration_ascii_approx_matches {
 sub find_migration_ascii_matches {
     print "\n";
     &print_title("Migration matching ascii-to-utf8");
+    &show_dynamic_identifiers_ascii();
     my $line_count=0;
     my $matched_count=0;
     my $not_matched_count=0;
-    foreach my $identifier_ascii ( @{ $Match{'file_unmatched_after_unid_match'} } ){
+    foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
         $line_count++;
         my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
         if ( exists $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii} ){
@@ -584,7 +611,8 @@ sub find_migration_ascii_matches {
             }
             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
             # remove from ad_to_be_matched
-            delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii};
+            delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
+            delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
             $matched_count++;
         } else {
             # NO MATCH
@@ -593,8 +621,7 @@ sub find_migration_ascii_matches {
                   "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                   "$identifier_ascii\n";
             print "   --> No exact match for $identifier_ascii\n";
-            push @{ $Match{'file_unmatched_after_ascii_match'} }, $identifier_ascii;
-            $Match{'file_unmatched_after_ascii_match_reason'}{$identifier_ascii}="no exact identifier match possible";
+            $Match{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
             $not_matched_count++;
         }
     }
@@ -603,54 +630,50 @@ sub find_migration_ascii_matches {
 
 
 
-
 sub find_migration_unid_matches {
     print "\n";
     &print_title("unidMatching lines to accounts:");
+    &show_dynamic_identifiers_ascii();
     my $line_count=0;
     my $matched_count=0;
     my $no_unid_count=0;
     my $not_matched_count=0;
-    foreach my $user_file (@filelist){
-        my $filename = basename($user_file);
-        foreach my $identifier_ascii ( @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} } ){
-            $line_count++;
-            if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
-                # finding a unid match 
-                if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ){
-                    # MATCH
-                    my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
-                    my $role=$AD{'lookup'}{'role_by_user'}{$sam};
-                    if($Conf::log_level>=2){
-                        print " $filename:",
-                              "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                              "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                              "$identifier_ascii\n";
-		                print "  --> unidMATCH: $sam --> ",
-                                  "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
-                    }
-                    $matched_count++;
-                    # remove from ad_to_be_matched
-                    delete $Match{'ad_to_be_matched_identifiers_ascii'}{$identifier_ascii};
-                    $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-                } else {
-                    # NO MATCH
-                    $Match{'file_unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid match";
-                    push @{ $Match{'file_unmatched_after_unid_match'} }, $identifier_ascii;
-                    $not_matched_count++;
+    foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
+        my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+        $line_count++;
+        if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
+            # finding a unid match 
+            if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ){
+                # MATCH
+                my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
+                my $role=$AD{'lookup'}{'role_by_user'}{$sam};
+                if($Conf::log_level>=2){
                     print " $filename:",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                           "$identifier_ascii\n";
-                    print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
-                          " not found in AD\n";
-
+	            print "  --> unidMATCH: $sam --> ",
+                          "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
                 }
+                $matched_count++;
+                # remove from dynamic hashes
+                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
+                delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+                $Match{'file'}{$filename}{$identifier_ascii}=$sam;
             } else {
-                $no_unid_count++;
-                push @{ $Match{'file_unmatched_after_unid_match'} }, $identifier_ascii;
-                $Match{'file_unmatched_after_unid_match_reason'}{$identifier_ascii}="no unid, no match possible";
+                # NO MATCH
+                $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
+                $not_matched_count++;
+                print " $filename:",
+                      "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                      "$identifier_ascii\n";
+                print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
+                      " not found in AD\n";
             }
+        } else {
+            $no_unid_count++;
+            $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid, no match possible";
         }
     }
     &print_title("unidMatching $line_count lines: $matched_count matched, $not_matched_count unmatched, $no_unid_count without unid");
@@ -745,6 +768,10 @@ sub analyze_user_line {
         # identifier list
         push @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
         push @{ $users_file{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
+
+        # identifier hash
+        $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii}="files, not matched";
+        $Match{'file_dynamic_identifiers_utf8'}{$identifier_utf8}="files, not matched";
 
         # file -> line
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
