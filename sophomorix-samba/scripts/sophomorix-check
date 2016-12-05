@@ -526,13 +526,15 @@ sub show_dynamic_identifiers_ascii {
 	return 0;
     } else {
         if($Conf::log_level>=2){
+	    @file_ids= sort @file_ids;
             print "file_dynamic_identifiers_ascii:\n";
             foreach my $id (@file_ids){
                 print "   * $id (in files)\n";
-            }    
+            }   
+	    @ad_ids = sort @ad_ids;
             print "ad_dynamic_identifiers_ascii:\n";
             foreach my $id (@ad_ids){
-                print "   * $id (in AD)\n";
+                print "   * $id ($AD{'lookup'}{'user_by_identifier_ascii'}{$id} in AD)\n";
             }    
         }
         return 1;
@@ -647,17 +649,20 @@ sub find_migration_unid_matches {
                 # MATCH
                 my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                 my $role=$AD{'lookup'}{'role_by_user'}{$sam};
+                # fetch the identifier from AD with same unid
+                my $identifier_ascii_from_AD=
+		    $AD{'lookup'}{'identifier_ascii_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                 if($Conf::log_level>=2){
                     print " $filename:",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                           "$identifier_ascii\n";
 	            print "  --> unidMATCH: $sam --> ",
-                          "$AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}\n";
+                          "$identifier_ascii_from_AD\n";
                 }
                 $matched_count++;
                 # remove from dynamic hashes
-                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
+                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_from_AD};
                 delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
                 $Match{'file'}{$filename}{$identifier_ascii}=$sam;
             } else {
@@ -729,6 +734,7 @@ sub analyze_user_line {
             $unid=&check_unid($field5);
         }
 
+
         # converting names to utf8 and then to ascii
         my $conv = Text::Iconv->new($enc_used,"utf8");
         my $first_utf8 = $conv->convert($first);
@@ -766,8 +772,8 @@ sub analyze_user_line {
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
 
         # identifier list
-        push @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
-        push @{ $users_file{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
+        #push @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
+        #push @{ $users_file{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
 
         # identifier hash
         $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii}="files, not matched";

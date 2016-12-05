@@ -1334,6 +1334,10 @@ sub AD_get_AD {
             if ($entry->get_value('sophomorixUnid') ne "---"){
                 # no lookup for unid '---'
                 $AD{'lookup'}{'user_by_unid'}{$entry->get_value('sophomorixUnid')}=$sam;
+                $AD{'lookup'}{'identifier_utf8_by_unid'}{$entry->get_value('sophomorixUnid')}=
+                    $identifier_utf8;
+                $AD{'lookup'}{'identifier_ascii_by_unid'}{$entry->get_value('sophomorixUnid')}=
+                    $identifier_ascii;
             }
             $AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii}=$sam;
             $AD{'lookup'}{'user_by_identifier_utf8'}{$identifier_utf8}=$sam;
