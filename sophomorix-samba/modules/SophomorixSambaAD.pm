@@ -1314,6 +1314,7 @@ sub AD_get_AD {
                 $entry->get_value('sophomorixUnid');
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
+
             # calculate identifiers
             my $identifier_ascii=
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}
@@ -1329,6 +1330,34 @@ sub AD_get_AD {
                .";".
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
             $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+            # new: by sam
+            $AD{'sam'}{$sam}{'sophomorixAdminClass'}=
+                $entry->get_value('sophomorixAdminClass');
+            $AD{'sam'}{$sam}{'sophomorixFirstnameASCII'}=
+                $entry->get_value('sophomorixFirstnameASCII');
+            $AD{'sam'}{$sam}{'sophomorixSurnameASCII'}=
+                $entry->get_value('sophomorixSurnameASCII');
+            $AD{'sam'}{$sam}{'givenName'}=
+                $entry->get_value('givenName');
+            $AD{'sam'}{$sam}{'sn'}=
+                $entry->get_value('sn');
+            $AD{'sam'}{$sam}{'sophomorixBirthdate'}=
+                $entry->get_value('sophomorixBirthdate');
+            $AD{'sam'}{$sam}{'sophomorixStatus'}=
+                $entry->get_value('sophomorixStatus');
+            $AD{'sam'}{$sam}{'sophomorixSchoolname'}=
+                $entry->get_value('sophomorixSchoolname');
+            $AD{'sam'}{$sam}{'sophomorixPrefix'}=
+                $entry->get_value('sophomorixPrefix');
+            $AD{'sam'}{$sam}{'sophomorixAdminFile'}=
+                $entry->get_value('sophomorixAdminFile');
+            $AD{'sam'}{$sam}{'sophomorixUnid'}=
+                $entry->get_value('sophomorixUnid');
+            $AD{'sam'}{$sam}{'sophomorixRole'}=
+                $entry->get_value('sophomorixRole');
+            $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+            $AD{'sam'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
             # lookup
             if ($entry->get_value('sophomorixUnid') ne "---"){

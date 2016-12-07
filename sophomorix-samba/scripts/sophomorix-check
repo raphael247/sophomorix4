@@ -452,26 +452,16 @@ if ($dump_AD==1){
 
 &find_migration_unid_matches();
 &find_migration_ascii_matches();
+
+# schleife erstellen, die abbricht wenn es nix mehr zu tun gibt
 &find_migration_ascii_approx_matches(1);
 &find_migration_ascii_approx_matches(2);
 &find_migration_ascii_approx_matches(3);
 &find_migration_ascii_approx_matches(4);
+# marriage, birthdate, ... and such matches
 
-# --migration-ascii-to-utf8
-# matched tries to mach with ascii-identifier
-# approx-string start with zero, increase by one until all are matched
-# maximum 5 or so
+# check if this is so:
 # track approx number with matches 
-# output matches and approx number
-# exit if not all could be matched
-#
-# the migration match ends with:
-#   A) All are matched, write sophomorix.update and exit 
-#   B) exit with ERROR
-#      show unmatched users
-# therefore the following match_functions are not applied:
-# marriage, birthdate, ... and such matches () becausethere arent any
-
 
 # --dump-matches
 if ($dump_matches==1){
@@ -483,6 +473,56 @@ if ($dump_matches==1){
 }
 
 
+
+
+# write into files
+#   - go through matches lines in line order
+#####################################
+#   - check for each matched line:
+#     - compare ldap entries, class and school
+#      - write to:
+#        - sophomorix.nochange -> do nothing, just for information
+#        - sophomorix.update   -> update ldap-data and status (+times, if not current)
+#        - sophomorix.move     -> move to another class or school
+#####################################
+#   - unmatched line:
+#     - new user: write sophomorix.add
+#####################################
+#   - unmatched user in ldap:
+#     - sophomorix.update mit status und time
+#     - sophomorix.kill (if status and times say so)
+
+
+my $update=$DevelConf::path_result."/sophomorix.update";
+open (UPDATE, ">$update");
+my $move=$DevelConf::path_result."/sophomorix.move";
+open (MOVE, ">$move");
+my $kill=$DevelConf::path_result."/sophomorix.kill";
+open (KILL, ">$kill");
+my $nochange=$DevelConf::path_result."/sophomorix.nochange";
+open (NOCHANGE, ">$nochange");
+
+foreach my $line_new ( @{ $Match{'lines'} } ){
+    if (defined $Match{'action'}{$line_new}{'sAMAccountName'}){
+        my $update=&write_update_file($line_new);
+        my $move=&write_move_file($line_new);
+        my $kill=&write_kill_file($line_new);
+        my $sum=$update+$move+$kill;
+        if ($sum==0){
+            print NOCHANGE "$line_new\n";
+        }
+    } else {
+        &write_add_file($line_new);
+    }
+}
+
+close(UPDATE);
+close(MOVE);
+close(KILL);
+close(NOCHANGE);
+
+
+
 &AD_unbind_admin($ldap);
 
 &log_script_end(@arguments);
@@ -492,6 +532,132 @@ if ($dump_matches==1){
 ################################################################################
 # Sub
 ################################################################################
+
+# writing lines into files
+################################################################################
+
+
+sub write_add_file {
+    my ($line_new)=@_;
+    my $add=0;
+    if($Conf::log_level>=2){
+        print "$line_new\n";
+        print "   * not matched to any sAMAccountName\n";
+    }
+
+
+    return $add;
+}
+
+sub write_update_file {
+    my ($line_new)=@_;
+    my $sam=$Match{'action'}{$line_new}{'sAMAccountName'};
+    my $unid;
+    my $surname_ascii;
+    my $firstname_ascii;
+    my $surname_utf8;
+    my $firstname_utf8;
+    my $birthdate;
+    my $update=0;
+    if($Conf::log_level>=2){
+        print "$line_new\n";
+        print "   * matched to: $sam --> $Match{'action'}{$line_new}{'MATCH_SUB'}\n";
+    }
+
+    # unid
+    if ( ($Match{'action'}{$line_new}{'unid'} eq $AD{'sam'}{$sam}{'sophomorixUnid'}) or
+         ($Match{'action'}{$line_new}{'unid'} eq "" and $AD{'sam'}{$sam}{'sophomorixUnid'} eq "---") ){
+        # no update
+        $unid="---";
+    } else {
+        # update
+        $update++;
+        $unid=$Match{'action'}{$line_new}{'unid'};
+    }
+
+    # surname_ascii
+    if ( ($Match{'action'}{$line_new}{'surname_ascii'} eq $AD{'sam'}{$sam}{'sophomorixSurnameASCII'})){
+        # no update
+        $surname_ascii="---";
+    } else {
+        # update
+        $update++;
+        $surname_ascii=$Match{'action'}{$line_new}{'surname_ascii'};
+    }
+
+    # firstname_ascii
+    if ( ($Match{'action'}{$line_new}{'firstname_ascii'} eq $AD{'sam'}{$sam}{'sophomorixFirstnameASCII'} )){
+        # no update
+        $firstname_ascii="---";
+    } else {
+        # update
+        $update++;
+        $firstname_ascii=$Match{'action'}{$line_new}{'firstname_ascii'};
+    }
+
+    # surname_utf8
+    if ( ($Match{'action'}{$line_new}{'surname_utf8'} eq $AD{'sam'}{$sam}{'sn'})){
+        # no update
+        $surname_utf8="---";
+    } else {
+        # update
+        $update++;
+        $surname_utf8=$Match{'action'}{$line_new}{'surname_utf8'};
+    }
+
+    # firstname_utf8
+    if ( ($Match{'action'}{$line_new}{'firstname_utf8'} eq $AD{'sam'}{$sam}{'givenName'} )){
+        # no update
+        $firstname_utf8="---";
+    } else {
+        # update
+        $update++;
+        $firstname_utf8=$Match{'action'}{$line_new}{'firstname_utf8'};
+    }
+
+    # birthdate
+    if ( ($Match{'action'}{$line_new}{'birthdate'} eq $AD{'sam'}{$sam}{'sophomorixBirthdate'} )){
+        # no update
+        $birthdate="---";
+    } else {
+        # update
+        $update++;
+        $birthdate=$Match{'action'}{$line_new}{'birthdate'};
+    }
+
+    # create line for sophomorix.update
+    my $update_line=$sam."::".$unid."::".$surname_ascii."::".$firstname_ascii.
+       "::".$birthdate."::".$surname_utf8."::".$firstname_utf8."::\n";
+    if ($update > 0){
+        print "sophomorix.add: $update_line";
+        print UPDATE $update_line;
+    }
+    return $update;
+}
+
+
+
+sub write_move_file {
+    my ($line_new)=@_;
+    my $sam=$Match{'action'}{$line_new}{'sAMAccountName'};
+    my $move=0;
+
+
+    return $move;
+}
+
+
+
+sub write_kill_file {
+    my ($line_new)=@_;
+    my $sam=$Match{'action'}{$line_new}{'sAMAccountName'};
+    my $kill=0;
+
+    return $kill;
+}
+
+
+
 
 
 # UTF8 match
@@ -583,12 +749,22 @@ sub find_migration_ascii_approx_matches {
             }
             if ($edit_distance <= $max_edit_distance){
                 # APPROX MATCH
+                my $sam=$AD{'lookup'}{'user_by_identifier_ascii'}{$identifier_ascii_ad};
                 print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
                 delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
                 # save match to delete this match from list
                 $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
                 # remove the approx matches from the list
                 delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+
+                # save to write later
+                my $sub=(caller(0))[3];
+                my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                $Match{'action'}{$line_new}{'sAMAccountName'}=$sam;
+                $Match{'action'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
+                $Match{'action'}{$line_new}{'status'}=
+                    $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii};
+
             }
         }
     }
@@ -613,7 +789,16 @@ sub find_migration_ascii_matches {
             if($Conf::log_level>=2){
                 print "    MATCH: $identifier_ascii to $sam\n";
             }
+
+            # save to write later
+            my $sub=(caller(0))[3];
             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+            my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+            $Match{'action'}{$line_new}{'sAMAccountName'}=$sam;
+            $Match{'action'}{$line_new}{'MATCH_SUB'}="$sub";
+            $Match{'action'}{$line_new}{'status'}=
+                $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii};
+
             # remove from ad_to_be_matched
             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
             delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
@@ -666,7 +851,16 @@ sub find_migration_unid_matches {
                 # remove from dynamic hashes
                 delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_from_AD};
                 delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+
+                # save to write later
+                my $sub=(caller(0))[3];
                 $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+                my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                $Match{'action'}{$line_new}{'sAMAccountName'}=$sam;
+                $Match{'action'}{$line_new}{'MATCH_SUB'}="$sub";
+                $Match{'action'}{$line_new}{'status'}=
+                    $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii};
+
             } else {
                 # NO MATCH
                 $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
@@ -768,8 +962,8 @@ sub analyze_user_line {
         # add here more stuff to create sophomorix.add, ...
         $users_file{'identifier_ascii'}{$identifier_ascii}{ROLE}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
-        $users_file{'identifier_ascii'}{$identifier_ascii}{OU}=
-            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{OU};
+        #$users_file{'identifier_ascii'}{$identifier_ascii}{OU}=
+        #    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{OU};
         $users_file{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
 
@@ -784,6 +978,25 @@ sub analyze_user_line {
         # file -> line
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+        # save for action 
+        $Match{'action'}{$line_new}{'identifier_ascii'}=$identifier_ascii;
+        $Match{'action'}{$line_new}{'school'}=
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
+	$Match{'action'}{$line_new}{'birthdate'}=$birthdate;
+	$Match{'action'}{$line_new}{'class'}=$class;
+	$Match{'action'}{$line_new}{'file'}=$filename;
+	$Match{'action'}{$line_new}{'firstname_ascii'}=$first_ascii;
+	$Match{'action'}{$line_new}{'surname_ascii'}=$last_ascii;
+	$Match{'action'}{$line_new}{'firstname_utf8'}=$first_utf8;
+	$Match{'action'}{$line_new}{'surname_utf8'}=$last_utf8;
+	$Match{'action'}{$line_new}{'line_count'}=$count;
+        $Match{'action'}{$line_new}{'role'}=
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
+	$Match{'action'}{$line_new}{'unid'}=$unid;
+
+         # list of lines
+         push @{ $Match{'lines'} }, $line_new;
     }
 }
 
