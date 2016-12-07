@@ -695,11 +695,11 @@ sub AD_user_update {
           "Updating User ${user_count}: $user");
     print "   DN: $dn\n";
 
-    if (defined $firstname_utf8){
+    if (defined $firstname_utf8 and $firstname_utf8 ne "---"){
         $replace{'givenName'}=$firstname_utf8;
         print "   givenName:                 $firstname_utf8\n";
     }
-    if (defined $surname_utf8){
+    if (defined $surname_utf8 and $surname_utf8 ne "---"){
         $replace{'sn'}=$surname_utf8;
         print "   sn:                        $surname_utf8\n";
     }
@@ -708,15 +708,15 @@ sub AD_user_update {
         $replace{'displayName'}=$display_name;
         print "   displayName:               $display_name\n";
     }
-    if (defined $firstname_ascii){
+    if (defined $firstname_ascii and $firstname_ascii ne "---" ){
         $replace{'sophomorixFirstnameASCII'}=$firstname_ascii;
         print "   sophomorixFirstnameASCII:  $firstname_ascii\n";
     }
-    if (defined $surname_ascii){
+    if (defined $surname_ascii and $surname_ascii ne "---"){
         $replace{'sophomorixSurnameASCII'}=$surname_ascii;
         print "   sophomorixSurnameASCII:    $surname_ascii\n";
     }
-    if (defined $birthdate){
+    if (defined $birthdate and $birthdate ne "---"){
         $replace{'sophomorixBirthdate'}=$birthdate;
         print "   sophomorixBirthdate:       $birthdate\n";
     }

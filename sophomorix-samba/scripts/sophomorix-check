@@ -595,25 +595,38 @@ sub write_update_file {
         $firstname_ascii=$Match{'action'}{$line_new}{'firstname_ascii'};
     }
 
-    # surname_utf8
-    if ( ($Match{'action'}{$line_new}{'surname_utf8'} eq $AD{'sam'}{$sam}{'sn'})){
-        # no update
-        $surname_utf8="---";
-    } else {
-        # update
-        $update++;
-        $surname_utf8=$Match{'action'}{$line_new}{'surname_utf8'};
-    }
 
-    # firstname_utf8
-    if ( ($Match{'action'}{$line_new}{'firstname_utf8'} eq $AD{'sam'}{$sam}{'givenName'} )){
-        # no update
-        $firstname_utf8="---";
-    } else {
-        # update
+    # firstname_utf8 and surname_utf8
+    if ( ($Match{'action'}{$line_new}{'firstname_utf8'} ne $AD{'sam'}{$sam}{'givenName'}) or
+         ($Match{'action'}{$line_new}{'surname_utf8'} ne $AD{'sam'}{$sam}{'sn'}) ){
         $update++;
         $firstname_utf8=$Match{'action'}{$line_new}{'firstname_utf8'};
+        $surname_utf8=$Match{'action'}{$line_new}{'surname_utf8'};
+    } else {
+        # no update
+        $firstname_utf8="---";
+        $surname_utf8="---";
     }
+
+    # # surname_utf8
+    # if ( ($Match{'action'}{$line_new}{'surname_utf8'} eq $AD{'sam'}{$sam}{'sn'})){
+    #     # no update
+    #     $surname_utf8="---";
+    # } else {
+    #     # update
+    #     $update++;
+    #     $surname_utf8=$Match{'action'}{$line_new}{'surname_utf8'};
+    # }
+
+    # # firstname_utf8
+    # if ( ($Match{'action'}{$line_new}{'firstname_utf8'} eq $AD{'sam'}{$sam}{'givenName'} )){
+    #     # no update
+    #     $firstname_utf8="---";
+    # } else {
+    #     # update
+    #     $update++;
+    #     $firstname_utf8=$Match{'action'}{$line_new}{'firstname_utf8'};
+    # }
 
     # birthdate
     if ( ($Match{'action'}{$line_new}{'birthdate'} eq $AD{'sam'}{$sam}{'sophomorixBirthdate'} )){
@@ -629,7 +642,7 @@ sub write_update_file {
     my $update_line=$sam."::".$unid."::".$surname_ascii."::".$firstname_ascii.
        "::".$birthdate."::".$surname_utf8."::".$firstname_utf8."::\n";
     if ($update > 0){
-        print "sophomorix.add: $update_line";
+        print "sophomorix.update: $update_line";
         print UPDATE $update_line;
     }
     return $update;
