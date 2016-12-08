@@ -660,6 +660,7 @@ sub AD_user_update {
     my $surname_ascii = $arg_ref->{surname_ascii};
     my $firstname_utf8 = $arg_ref->{firstname_utf8};
     my $surname_utf8 = $arg_ref->{surname_utf8};
+    my $filename = $arg_ref->{filename};
     my $birthdate = $arg_ref->{birthdate};
     my $unid = $arg_ref->{unid};
     my $user_count = $arg_ref->{user_count};
@@ -724,6 +725,10 @@ sub AD_user_update {
     if (defined $birthdate and $birthdate ne "---"){
         $replace{'sophomorixBirthdate'}=$birthdate;
         print "   sophomorixBirthdate:       $birthdate\n";
+    }
+    if (defined $filename and $filename ne "---"){
+        $replace{'sophomorixAdminFile'}=$filename;
+        print "   sophomorixAdminFile:       $filename\n";
     }
     if (defined $unid and $unid ne "---"){
         $replace{'sophomorixUnid'}=$unid;

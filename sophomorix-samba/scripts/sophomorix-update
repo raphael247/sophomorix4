@@ -221,6 +221,7 @@ while(<USERUPDATE>){
         $birthdate,
         $surname_utf8,
         $firstname_utf8,
+        $filename,
        )=split(/::/);
 
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
@@ -234,6 +235,7 @@ while(<USERUPDATE>){
                      surname_utf8=>$surname_utf8,
                      firstname_ascii=>$firstname_ascii,
                      firstname_utf8=>$firstname_utf8,
+                     filename=>$filename,
                      unid=>$unid,
                      user_count=>$user_count,
                    });
