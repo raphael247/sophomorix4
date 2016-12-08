@@ -813,6 +813,10 @@ sub find_migration_ascii_matches {
                   "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                   "$identifier_ascii\n";
             print "   --> No exact match for $identifier_ascii\n";
+#            if($Conf::log_level>=2){
+	    print "File: $identifier_ascii \n";
+	    print "AD:   $identifier_ascii \n";
+#            }
             $Match{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
             $not_matched_count++;
         }
@@ -835,7 +839,9 @@ sub find_migration_unid_matches {
         $line_count++;
         if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
             # finding a unid match 
-            if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ){
+            if ( exists $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} and
+                 $AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
+               ){
                 # MATCH
                 my $sam=$AD{'lookup'}{'user_by_unid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                 my $role=$AD{'lookup'}{'role_by_user'}{$sam};

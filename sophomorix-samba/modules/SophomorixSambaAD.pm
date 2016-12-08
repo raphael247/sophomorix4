@@ -674,7 +674,7 @@ sub AD_user_update {
   
     my $displayname;
     # hash of what to replace
-    my $replace=();
+    my %replace=();
     # list of what to delete
     my @delete=();
 
