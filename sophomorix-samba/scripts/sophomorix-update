@@ -139,8 +139,8 @@ if ($info==1) {
     open(USERUPDATE,"$update_file") 
             || die "ERROR: $!";
     print "\nThe following users can be updated:\n\n";
-    printf "%-14s %-28s %-16s\n",
-           "Login","NewName","NewBirthdate";
+    printf "%-10s %-21s %-21s %-14s %-10s\n",
+           "Login","NewNameUTF8","NewNameASCII","Newunid","NBirthdate";
     &print_line;
 
     my @lines=();
@@ -166,18 +166,21 @@ if ($info==1) {
        $count++;
        my ($login,
            $unid,
-           $surname,
-           $firstname,
+           $surname_ascii,
+           $firstname_ascii,
            $birthdate,
            $surname_utf8,
-           $firstname_utf,
+           $firstname_utf8,
           )=split(/::/,$line);
 
-    my $name=$surname.", ".$firstname;
+    my $name_ascii=$surname_ascii.", ".$firstname_ascii;
+    my $name_utf8=$surname_utf8.", ".$firstname_utf8;
     # Ausgabe
-    printf "%-14s %-28s %-16s\n",
+    printf "%-10s %-21s %-21s %-14s %-10s\n",
            $login,
-           $name, 
+           $name_utf8, 
+           $name_ascii, 
+           $unid, 
            $birthdate; 
     }
     &print_line;
@@ -231,6 +234,7 @@ while(<USERUPDATE>){
                      surname_utf8=>$surname_utf8,
                      firstname_ascii=>$firstname_ascii,
                      firstname_utf8=>$firstname_utf8,
+                     unid=>$unid,
                      user_count=>$user_count,
                    });
 }

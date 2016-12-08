@@ -661,6 +661,7 @@ sub AD_user_update {
     my $firstname_utf8 = $arg_ref->{firstname_utf8};
     my $surname_utf8 = $arg_ref->{surname_utf8};
     my $birthdate = $arg_ref->{birthdate};
+    my $unid = $arg_ref->{unid};
     my $user_count = $arg_ref->{user_count};
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword};
@@ -703,7 +704,11 @@ sub AD_user_update {
         $replace{'sn'}=$surname_utf8;
         print "   sn:                        $surname_utf8\n";
     }
-    if (defined $firstname_utf8 and $surname_utf8){
+    if (defined $firstname_utf8 and 
+        $surname_utf8 and 
+        $firstname_utf8 ne "---" and 
+        $surname_utf8 ne "---"
+       ){
         $display_name = $firstname_utf8." ".$surname_utf8;
         $replace{'displayName'}=$display_name;
         print "   displayName:               $display_name\n";
@@ -719,6 +724,10 @@ sub AD_user_update {
     if (defined $birthdate and $birthdate ne "---"){
         $replace{'sophomorixBirthdate'}=$birthdate;
         print "   sophomorixBirthdate:       $birthdate\n";
+    }
+    if (defined $unid and $unid ne "---"){
+        $replace{'sophomorixUnid'}=$unid;
+        print "   sophomorixUnid:            $unid\n";
     }
     if (defined $firstpassword){
         $replace{'sophomorixFirstpassword'}=$firstpassword;
