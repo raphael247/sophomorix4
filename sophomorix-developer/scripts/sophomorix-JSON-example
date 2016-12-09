@@ -1,0 +1,143 @@
+#!/usr/bin/perl -w
+use Getopt::Long;
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
+
+use Sophomorix::SophomorixBase qw(
+                                 check_options
+                                 json_dump
+                                 );
+$Conf::log_level=1;
+my $json=0;
+my $help=0;
+
+my %result=();
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "json|j+" => \$json,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+
+
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-JSON-example prints a JSON result Object
+
+Options:
+  -h  / --help
+
+  -j / --json                      (dump as a nice json object)
+  -jj / --json --json              (dump as a compact json object)
+  -jjj / --json --json --json      (dump as a perl hash)
+
+');
+   print "\n";
+   exit;
+}
+
+
+############################################################
+# saving an Error
+############################################################
+my $number=1;
+push @{ $result{'OUTPUT'} }, {TYPE => ERROR, 
+                              NUMBER => $number, 
+                              MESSAGE_DE => "Fehlermeldung $number",
+                              MESSAGE_EN => "ERROR $number"
+                             };
+push @{ $result{'OUTPUT'} }, {TYPE => WARNING, 
+                              NUMBER => $number, 
+                              MESSAGE_DE => "Warnung $number",
+                              MESSAGE_EN => "Warning $number"
+                             };
+
+$number++;
+
+push @{ $result{'OUTPUT'} }, {TYPE => ERROR, 
+                              NUMBER => $number, 
+                              MESSAGE_DE => "Fehlermeldung $number",
+                              MESSAGE_EN => "ERROR $number"
+                             };
+push @{ $result{'OUTPUT'} }, {TYPE => WARNING, 
+                              NUMBER => $number, 
+                              MESSAGE_DE => "Warnung $number",
+                              MESSAGE_EN => "Warning $number"
+                             };
+
+# summary at end of script
+############################################################
+push @{ $result{'SUMMARY'} }, {ERROR_COUNT=> 2, 
+                               WARNING_COUNT=> 2, 
+                               USER_ADDED=> 223, 
+                             };
+
+# create JSON object
+############################################################
+my $utf8_encoded_json_text = encode_json \%result;
+
+############################################################
+# Using the hash for terminal output
+############################################################
+print "\n";
+print "OUTPUT contains an ordered list of message-lines\n";
+print "Each message-lines has key-> value pairs to specify things for the messages\n";
+
+
+
+# OUTPUT
+############################################################
+print "\nThe OUTPUT LINES:\n\n";
+for my $ref ( @{ $result{'OUTPUT'} } ){
+    for my $role ( keys %$ref){
+        print "   * $role = $ref->{$role}\n";
+    }
+    print "\n";
+}
+
+
+
+# OUTPUT
+############################################################
+print "\nThe OUTPUT LINES 2:\n\n";
+for my $ref ( @{ $result{'OUTPUT'} } ){
+    print "   * Output number $ref->{'NUMBER'} is of type $ref->{'TYPE'}\n";
+    print "   * and the german Message is: $ref->{'MESSAGE_DE'} (EN: $ref->{'MESSAGE_EN'})\n";
+    print "\n";
+}
+
+
+
+#
+# direct access
+############################################################
+print "Accessing the data directly via index:\n";
+print "   * NUMBER:      $result{'OUTPUT'}[0]{NUMBER}\n";
+print "   * MESSAGE_DE:  $result{'OUTPUT'}[0]{MESSAGE_DE}\n";
+
+
+
+############################################################
+# output JSON
+############################################################
+print "\n";
+print "Here ist the JSON result object for schukonsole:\n";
+
+    &json_dump({json => $json,
+                jsoninfo => "RESULT",
+                jsoncomment => "The result hash of a script",
+                hash_ref=>\%result,
+               });
+print "\n";
