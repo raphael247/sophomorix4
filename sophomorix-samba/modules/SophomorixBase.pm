@@ -361,7 +361,7 @@ sub config_sophomorix_read {
 
         &print_title("Reading $conf_school");
         open(SCHOOL,"$conf_school") || 
-             die "ERROR: $conf_school not found!";
+             die "ERROR: $conf_school not found!\n";
         while (<SCHOOL>){
             $_=~s/\s+$//g;# remove trailing whitespace
             if(/^\#/){ # # am Anfang bedeutet Kommentarzeile

@@ -64,6 +64,9 @@ my @arguments = @ARGV;
 my $time_stamp_file=&time_stamp_file();
 my $time_stamp_AD=&time_stamp_AD();
 
+my $lock=0;
+my $unlock=0;
+
 my $school="";
 my $create=0;
 my $kill=0;
@@ -168,13 +171,21 @@ if ($info==1){
 # ============================================================
 # --create --school <name>
 if ($school ne "" and $create==1){
-         # create new ou
-         &AD_ou_add({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     school=>$school,
-                     creationdate=>$time_stamp_AD,
-                     sophomorix_config=>$ref_sophomorix_config,
-                   });
+    if (not exists $sophomorix_config{'SCHOOLS'}{$school}){
+        print "\n";
+        print "WARNING: You must add the school in\n";
+        print "         $DevelConf::file_conf_sophomorix\n";
+        print "         before you can create it!\n\n";
+     
+    } else {
+        # create new ou
+        &AD_ou_add({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    school=>$school,
+                    creationdate=>$time_stamp_AD,
+                    sophomorix_config=>\%sophomorix_config,
+                  });
+    }
 }
 
 
