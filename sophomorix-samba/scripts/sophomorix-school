@@ -1,0 +1,210 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-school) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
+use File::Basename qw( basename
+                       dirname
+                     ); 
+use Text::Iconv;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 filelist_fetch
+                                 remove_whitespace
+                                 json_dump
+                                 recode_utf8_to_ascii
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_ou_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_ou_tokened
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_get_AD
+                                 AD_dns_get
+                                 AD_object_search
+                                 get_forbidden_logins
+                                    );
+
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+
+my $school="";
+my $create=0;
+my $kill=0;
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "info|i" => \$info,
+           "create|c" => \$create,
+           "kill" => \$kill,
+           "school=s" => \$school,
+           "help|h" => \$help,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-school lists,adds and removes schools
+
+
+Options:
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+  --school <schoolname>
+  --create--school <schoolname>
+  --kill --school <schoolname>
+
+
+Dumping data:                     
+  -ij / --info --json              (dump configuration)
+  -j / --json                      (dump as a nice json object)
+  -jj / --json --json              (dump as a compact json object)
+  -jjj / --json --json --json      (dump as a perl hash)
+
+
+ 
+Please see the sophomorix-school(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+# --unlock
+if ($unlock==1) {
+    &unlock_sophomorix();
+    exit;
+}
+
+
+# --lock
+if ($lock==1) {
+    &lock_sophomorix("lock",0,@arguments);
+    exit;
+}
+
+
+&log_script_start(@arguments);
+
+
+################################################################################
+# Start
+################################################################################
+
+# ============================================================
+# listing schools
+# ============================================================
+# --info
+if ($info==1){
+    print "\nNot implemented\n\n";
+}
+
+
+# ============================================================
+# creating a school
+# ============================================================
+# --create --school <name>
+if ($school ne "" and $create==1){
+         # create new ou
+         &AD_ou_add({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     school=>$school,
+                     creationdate=>$time_stamp_AD,
+                     sophomorix_config=>$ref_sophomorix_config,
+                   });
+}
+
+
+# ============================================================
+# killing a school
+# ============================================================
+# --kill --school <name>
+if ($school ne "" and $kill==1){
+    print "\nNot implemented\n\n";
+}
+
+
+
+# ============================================================
+# listing schools
+# ============================================================
+
+
+
+
+&AD_unbind_admin($ldap);
+
+&log_script_end(@arguments);
+
+
+
+################################################################################
+# Sub
+################################################################################
+
+# 
+################################################################################
+
