@@ -935,7 +935,34 @@ Problem: eine Zeile kann MEHRERE Zeilen verursachen, z.B. Versetzung UND Namensk
 Egal in welcher Reihenfolge, es sollte 
 
 
+userAccountControl
+---------------------------
+enabled/disabled
+Passwort change ja, nein
+Passwort expires
 
+was braucht man davon
+
+enabled Account: 512, so wird jetzt hardcoded ein user angelegt
+
+samba-tool user disable <username>
+
+stellt auf 514 um, wie hier beschrieben:
+
+http://www.selfadsi.de/ads-attributes/user-userAccountControl.htm
+
+samba-tool user enable <username> stellt wieder auf 512 zurück
+
+Umsetzen:
+1) userAccountControl (dezimal) lesen
+2) Binär umwandeln
+3) schauen welche Bits gesetzt sind
+4) Daraus gewünschte Einstellungen erkennen (enabled, password expires, ...)
+5) prüfen ob was verändert werden muss:
+     - enablen/disabeln je nach sophomorixStatus und dazugehörige Zeiten
+     - passwort expires, ... falls in school.conf so konfiguriert
+6) in sophomorix.update schreiben
+7) mit sophomorix-update umsetzen
 
 
 Resultat für Encoding:
