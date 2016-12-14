@@ -671,6 +671,7 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
+    my $user_account_control = $arg_ref->{user_account_control};
   
     my $displayname;
     # hash of what to replace
@@ -743,9 +744,13 @@ sub AD_user_update {
         $replace{'unicodePwd'}=$uni_password;
         print "   unicodePwd:                **********\n";
     }
-    if (defined $status){
+    if (defined $status and $status ne "---"){
         $replace{'sophomorixStatus'}=$status;
         print "   sophomorixStatus:          $status\n";
+    }
+    if (defined $user_account_control and $user_account_control ne "---"){
+        $replace{'userAccountControl'}=$user_account_control;
+        print "   userAccountControl:        $user_account_control\n";
     }
     if (defined $comment){
         if ($comment eq ""){
