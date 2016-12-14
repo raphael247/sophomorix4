@@ -559,6 +559,8 @@ sub write_update_file {
     my $firstname_utf8;
     my $birthdate;
     my $filename;
+    my $status;
+    my $user_account_control;
     my $update=0;
     if($Conf::log_level>=2){
         print "$line_new\n";
@@ -628,9 +630,33 @@ sub write_update_file {
         $filename=$Match{'action'}{$line_new}{'filename'};
     }
 
+    # status
+    $status="---";
+
+    # userAccountControl
+    if ( ($Match{'action'}{$line_new}{'userAccountControl'} eq $AD{'sam'}{$sam}{'userAccountControl'} )){
+        # no update
+        $user_account_control="---";
+    } else {
+        # update
+        $update++;
+        $user_account_control=$Match{'action'}{$line_new}{'userAccountControl'};
+    }
+
+
+
     # create line for sophomorix.update
-    my $update_line=$sam."::".$unid."::".$surname_ascii."::".$firstname_ascii.
-       "::".$birthdate."::".$surname_utf8."::".$firstname_utf8."::".$filename."::\n";
+    my $update_line=$sam."::".
+                    $unid."::".
+                    $surname_ascii."::".
+                    $firstname_ascii."::".
+                    $birthdate."::".
+                    $surname_utf8."::".
+                    $firstname_utf8."::".
+                    $filename."::".
+                    $status."::".
+                    $user_account_control."::".
+                    "\n";
     if ($update > 0){
         print "sophomorix.update: $update_line";
         print UPDATE $update_line;
@@ -999,6 +1025,11 @@ sub analyze_user_line {
         $Match{'action'}{$line_new}{'role'}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
 	$Match{'action'}{$line_new}{'unid'}=$unid;
+
+        # status for the user 
+        # ????????? calulate from schools,conf
+        # at the moment: always 512 (enabled account)
+	$Match{'action'}{$line_new}{'userAccountControl'}="512";
 
          # list of lines
          push @{ $Match{'lines'} }, $line_new;

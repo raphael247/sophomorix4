@@ -1301,6 +1301,7 @@ sub AD_get_AD {
                                  'sophomorixAdminFile',
                                  'sophomorixUnid',
                                  'sophomorixRole',
+                                 'userAccountControl',
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
@@ -1333,6 +1334,8 @@ sub AD_get_AD {
                 $entry->get_value('sophomorixUnid');
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'userAccountControl'}=
+                $entry->get_value('userAccountControl');
 
             # calculate identifiers
             my $identifier_ascii=
@@ -1375,6 +1378,8 @@ sub AD_get_AD {
                 $entry->get_value('sophomorixUnid');
             $AD{'sam'}{$sam}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
+            $AD{'sam'}{$sam}{'userAccountControl'}=
+                $entry->get_value('userAccountControl');
             $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
             $AD{'sam'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
