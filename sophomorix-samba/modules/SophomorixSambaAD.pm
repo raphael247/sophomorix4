@@ -43,7 +43,7 @@ $Data::Dumper::Terse = 1;
             AD_get_ou_tokened
             AD_get_name_tokened
             get_forbidden_logins
-            AD_ou_add
+            AD_school_add
             AD_object_search
             AD_get_AD
             AD_class_fetch
@@ -864,12 +864,12 @@ sub AD_user_move {
     # make sure OU and tree exists
     if (not exists $school_created{$school_new}){
          # create new ou
-         &AD_ou_add({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     school=>$school_new,
-                     creationdate=>$creationdate,
-                     sophomorix_config=>$ref_sophomorix_config,
-                   });
+         &AD_school_add({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         school=>$school_new,
+                         creationdate=>$creationdate,
+                         sophomorix_config=>$ref_sophomorix_config,
+                       });
          # remember new ou to add it only once
          $school_created{$school_new}="already created";
     } else {
@@ -1047,7 +1047,7 @@ sub AD_get_container {
 
 
 
-sub AD_ou_add {
+sub AD_school_add {
     # if $result->code is not given, the add is silent
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};

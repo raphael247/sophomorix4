@@ -36,7 +36,7 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  );
 use Sophomorix::SophomorixSambaAD qw(
-                                 AD_ou_add
+                                 AD_school_add
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
@@ -78,11 +78,11 @@ print "Start\n";
 
 my $school_new="abc";
 
-         &AD_ou_add({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     school=>$school_new,
-                     creationdate=>$DevelConf::default_date,
-                     sophomorix_config=>\%sophomorix_config,
+         &AD_school_add({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         school=>$school_new,
+                         creationdate=>$DevelConf::default_date,
+                         sophomorix_config=>\%sophomorix_config,
    });
 
 

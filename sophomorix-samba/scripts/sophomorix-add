@@ -31,7 +31,7 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  );
 use Sophomorix::SophomorixSambaAD qw(
-                                 AD_ou_add
+                                 AD_school_add
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
@@ -452,12 +452,12 @@ while(<SOPHOMORIXADD>){
    # 1. Entry in AD
    if (not exists $school_created{$school}){
         # create ou
-        &AD_ou_add({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    school=>$school,
-                    creationdate=>$time_stamp_AD,
-                    sophomorix_config=>\%sophomorix_config,
-                  });
+        &AD_school_add({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        school=>$school,
+                        creationdate=>$time_stamp_AD,
+                        sophomorix_config=>\%sophomorix_config,
+                      });
         # remember ou
         $school_created{$school}="already created";
    } else {
