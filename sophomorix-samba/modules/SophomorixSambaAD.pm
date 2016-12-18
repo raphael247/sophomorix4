@@ -40,7 +40,7 @@ $Data::Dumper::Terse = 1;
             AD_group_kill
             AD_group_addmember
             AD_group_removemember
-            AD_get_ou_tokened
+            AD_get_schoolname
             AD_get_name_tokened
             get_forbidden_logins
             AD_school_add
@@ -558,7 +558,7 @@ sub AD_user_create {
     if ($deactivationdate eq "---"){
         $deactivationdate=$DevelConf::default_date;
     }
-    $school=&AD_get_ou_tokened($school);
+    $school=&AD_get_schoolname($school);
 
     # calculate
     my $shell="/bin/false";
@@ -824,8 +824,8 @@ sub AD_user_move {
     }
 
     my $target_branch;
-    $school_old=&AD_get_ou_tokened($school_old);
-    $school_new=&AD_get_ou_tokened($school_new);
+    $school_old=&AD_get_schoolname($school_old);
+    $school_new=&AD_get_schoolname($school_new);
 
     if ($role_new eq "student"){
          $target_branch="OU=".$group_new.",OU=Students,OU=".$school_new.",".$root_dse;
@@ -935,7 +935,7 @@ sub AD_user_move {
 
 
 
-sub AD_get_ou_tokened {
+sub AD_get_schoolname {
     my ($ou) = @_;
     if ($ou eq "---"){
         my $string=$DevelConf::name_default_school;
@@ -1057,13 +1057,7 @@ sub AD_school_add {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $gidnumber_wish;
 
-    $school=&AD_get_ou_tokened($school);
-    if ($school eq "---"){
-        $school=$DevelConf::name_default_school;
-        $school=$DevelConf::name_default_school;
-    } else {
-        $school=$school;
-    }
+    $school=&AD_get_schoolname($school);
 
     print "\n";
     &Sophomorix::SophomorixBase::print_title("Adding OU for school $school (begin) ...");
@@ -2523,7 +2517,7 @@ sub AD_group_create {
 
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (begin):");
 
-    $school=&AD_get_ou_tokened($school);
+    $school=&AD_get_schoolname($school);
 
     # calculate missing Attributes
     my $container=&AD_get_container($type,$group);
