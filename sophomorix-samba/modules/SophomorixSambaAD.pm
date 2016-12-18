@@ -448,8 +448,8 @@ sub AD_computer_create {
                                 "RestrictedKrbHost/".$dns_name,
                                );
     my $container=&AD_get_container($role,$room);
-    my $dn_room = $container."OU=".$school.",".$root_dse;
-    my $dn = "CN=".$name.",".$container."OU=".$school.",".$root_dse;
+    my $dn_room = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $dn = "CN=".$name.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
@@ -828,9 +828,9 @@ sub AD_user_move {
     $school_new=&AD_get_schoolname($school_new);
 
     if ($role_new eq "student"){
-         $target_branch="OU=".$group_new.",OU=Students,OU=".$school_new.",".$root_dse;
+         $target_branch="OU=".$group_new.",OU=Students,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     } elsif ($role_new eq "teacher"){
-         $target_branch="OU=".$group_new.",OU=Teachers,OU=".$school_new.",".$root_dse;
+         $target_branch="OU=".$group_new.",OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     }
 
     # fetch the dn (where the object really is)
