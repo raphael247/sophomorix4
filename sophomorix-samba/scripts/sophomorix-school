@@ -162,7 +162,11 @@ if ($lock==1) {
 # ============================================================
 # --info
 if ($info==1){
-    print "\nNot implemented\n\n";
+    print "The following schools exist:\n";
+foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+    print "   * $school\n";
+}
+
 }
 
 

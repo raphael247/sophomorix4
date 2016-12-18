@@ -566,8 +566,8 @@ sub AD_user_create {
     my $user_principal_name = $login."\@"."linuxmuster.local";
     my $container=&AD_get_container($role,$group);
 
-    my $dn_class = $container."OU=".$school.",".$root_dse;
-    my $dn = "cn=".$login.",".$container."OU=".$school.",".$root_dse;
+    my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
  
     # password generation
     my $uni_password=&_unipwd_from_plainpwd($plain_password);
@@ -1060,10 +1060,13 @@ sub AD_school_add {
     $school=&AD_get_schoolname($school);
 
     print "\n";
-    &Sophomorix::SophomorixBase::print_title("Adding OU for school $school (begin) ...");
+    &Sophomorix::SophomorixBase::print_title("Adding school $school (begin) ...");
 
     # providing OU_TOP of school
-    my $result = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
+    my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
+    my $result1 = $ldap->add($schools_ou,
+                        attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     ############################################################
@@ -1122,7 +1125,7 @@ sub AD_school_add {
 
     ############################################################
     # OU=GLOBAL
-    my $result2 = $ldap->add($ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP},
+    my $result3 = $ldap->add($ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
     ############################################################
@@ -1184,7 +1187,7 @@ sub AD_school_add {
                              addgroup => $group,
                             }); 
     }
-    &Sophomorix::SophomorixBase::print_title("Adding OU for school $school (end) ...");
+    &Sophomorix::SophomorixBase::print_title("Adding school $school (end) ...");
     print "\n";
 }
 
@@ -2521,9 +2524,9 @@ sub AD_group_create {
 
     # calculate missing Attributes
     my $container=&AD_get_container($type,$group);
-    my $target_branch=$container."OU=".$school.",".$root_dse;
+    my $target_branch=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
 
-    my $dn = "CN=".$group.",".$container."OU=".$school.",".$root_dse;
+    my $dn = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     if (defined $dn_wish){
         # override DN
         $dn=$dn_wish;
