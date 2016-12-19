@@ -518,6 +518,7 @@ sub AD_user_create {
     my $identifier = $arg_ref->{identifier};
     my $login = $arg_ref->{login};
     my $group = $arg_ref->{group};
+    my $group_basename = $arg_ref->{group_basename};
     my $firstname_ascii = $arg_ref->{firstname_ascii};
     my $surname_ascii = $arg_ref->{surname_ascii};
     my $firstname_utf8 = $arg_ref->{firstname_utf8};
@@ -564,7 +565,7 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
-    my $container=&AD_get_container($role,$group);
+    my $container=&AD_get_container($role,$group_basename);
 
     my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
@@ -592,8 +593,7 @@ sub AD_user_create {
         print "   Firstname(UTF8):    $firstname_utf8\n";
         print "   Birthday:           $birthdate\n";
         print "   Identifier:         $identifier\n";
-        print "   OU:                 $school\n"; # Organisatinal Unit
-        print "   School Token:       $school\n"; # Organisatinal Unit
+        print "   School:             $school\n"; # Organisatinal Unit
         print "   Role(User):         $role\n";
         print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
@@ -880,6 +880,7 @@ sub AD_user_move {
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       group=>$group_new,
+                      group_basename=>$group_new,
                       description=>$group_new,
                       school=>$school_new,
                       type=>$group_type_new,
@@ -1111,6 +1112,7 @@ sub AD_school_add {
                            dn_wish=>$dn,
                            school=>$school,
                            group=>$group,
+                           group_basename=>$group,
                            description=>$description,
                            type=>$type,
                            status=>"P",
@@ -1171,6 +1173,7 @@ sub AD_school_add {
                            dn_wish=>$dn,
                            school=>$school,
                            group=>$group,
+                           group_basename=>$group,
                            description=>$description,
                            type=>$type,
                            status=>"P",
@@ -2496,6 +2499,7 @@ sub AD_group_create {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $group = $arg_ref->{group};
+    my $group_basename = $arg_ref->{group_basename};
     my $description = $arg_ref->{description};
     my $school = $arg_ref->{school};
     my $type = $arg_ref->{type};
@@ -2523,7 +2527,7 @@ sub AD_group_create {
     $school=&AD_get_schoolname($school);
 
     # calculate missing Attributes
-    my $container=&AD_get_container($type,$group);
+    my $container=&AD_get_container($type,$group_basename);
     my $target_branch=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
 
     my $dn = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
