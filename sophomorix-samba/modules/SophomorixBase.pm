@@ -587,7 +587,6 @@ sub config_sophomorix_read {
 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
         # adding global
@@ -596,7 +595,6 @@ sub config_sophomorix_read {
 #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
 	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_printer_ou}="from DevelConf";
 	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
 

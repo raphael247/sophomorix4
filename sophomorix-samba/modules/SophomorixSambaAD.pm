@@ -1037,8 +1037,6 @@ sub AD_get_container {
     # other
     }  elsif ($role eq "management"){
         $container=$DevelConf::AD_management_ou;
-    }  elsif ($role eq "printer"){
-        $container=$DevelConf::AD_printer_ou;
     }
     # add the comma if necessary
     if ($container ne ""){
