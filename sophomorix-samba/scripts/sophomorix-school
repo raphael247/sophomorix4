@@ -163,10 +163,9 @@ if ($lock==1) {
 # --info
 if ($info==1){
     print "The following schools exist:\n";
-foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-    print "   * $school\n";
-}
-
+    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+        print "   * $school\n";
+    }
 }
 
 
@@ -180,7 +179,6 @@ if ($school ne "" and $create==1){
         print "WARNING: You must add the school in\n";
         print "         $DevelConf::file_conf_sophomorix\n";
         print "         before you can create it!\n\n";
-     
     } else {
         # create new ou
         &AD_school_add({ldap=>$ldap,
