@@ -582,7 +582,7 @@ sub config_sophomorix_read {
         } 
 
         # adding school
-	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
+	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
@@ -591,7 +591,7 @@ sub config_sophomorix_read {
 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
         # adding global
-#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_computer_ou}="from DevelConf";
+#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
 #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
