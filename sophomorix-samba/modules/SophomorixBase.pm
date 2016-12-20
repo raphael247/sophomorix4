@@ -678,8 +678,6 @@ sub config_sophomorix_read {
                 if ($group_secondary ne "" and not $group_secondary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{PREFIX}.$group_secondary;
-                    my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    my $cn_group="CN=".$group.",".$ou_group;
                     # print "GROUP: $group\n";
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group;
                     $sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP_LEVEL}{$group}="secondary";
@@ -688,10 +686,20 @@ sub config_sophomorix_read {
                     if ($group_tertiary ne ""){
                         $sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP_MEMBER}{$group}=$group_tertiary;
                     }
+                    #my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+                    #my $cn_group="CN=".$group.",".$ou_group;
+                    #$sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP}{$group}=
+                    #    $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+                    #$sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
+                    #$sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP_CN}{$cn_group}=$group;
+
+                    my $ou_group=$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+                    my $cn_group="CN=".$group.",".$ou_group;
                     $sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP}{$group}=
                         $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                     $sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP_OU}{$ou_group}=$group;
                     $sophomorix_config{'SCHOOLS'}{$ou_file}{GROUP_CN}{$cn_group}=$group;
+
                 } else {
                     # "" or "multi"
                     #print "GROUP: $group_secondary\n";
