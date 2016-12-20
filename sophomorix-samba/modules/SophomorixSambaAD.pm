@@ -611,7 +611,10 @@ sub AD_user_create {
         print "   File:               $file\n";
     }
 
+    # make sure $dn_class exists
     $ldap->add($dn_class,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+    # add the user
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $login,
@@ -1026,8 +1029,11 @@ sub AD_get_container {
     # group container
     }  elsif ($role eq "adminclass"){
         $container=$group_strg.$DevelConf::AD_student_ou;
+    }  elsif ($role eq "ouclass"){ # no additional ou with name of group
+        $container=$DevelConf::AD_student_ou;
     }  elsif ($role eq "teacherclass"){
-        $container=$group_strg.$DevelConf::AD_teacher_ou;
+        #$container=$group_strg.$DevelConf::AD_teacher_ou;
+        $container=$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "project"){
         $container=$DevelConf::AD_project_ou;
     }  elsif ($role eq "sophomorix-group"){
@@ -1042,6 +1048,9 @@ sub AD_get_container {
     if ($container ne ""){
         $container=$container.",";
     }
+print "KACK: >$role< <$group> <$container>\n";
+
+    return $container;
 }
 
 
@@ -2549,8 +2558,9 @@ sub AD_group_create {
         print "   Description:     $description\n";
         print "   File:            $file\n";
 
-        # Create target branch
+        # make sure target ou exists
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
         my $result = $ldap->add( $dn,
