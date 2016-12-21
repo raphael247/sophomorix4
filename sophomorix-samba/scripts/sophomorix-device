@@ -1115,7 +1115,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              name=>$ws_saved,
                              room=>$room_saved,
                              room_basename=>$room_basename,
-                             role=>"workstation",
+                             role=>"computer",
 		             type=>"roomws",
                              school=>$school,
                              creationdate=>$time_stamp_AD,
@@ -1449,7 +1449,7 @@ sub analyze_device_line {
         my $host_token=&AD_get_name_tokened($host,$school,"examaccount");
 
         my $room_token=&AD_get_name_tokened($room,$school,"roomws");
-        my $ws_token=&AD_get_name_tokened($host,$school,"workstation");
+        my $ws_token=&AD_get_name_tokened($host,$school,"computer");
         my $ws_token_account=$ws_token."\$";
         if($Conf::log_level>=3){
             print "\n$line\n";

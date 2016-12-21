@@ -963,7 +963,7 @@ sub AD_get_name_tokened {
         $role eq "room" or 
         $role eq "roomws" or
         $role eq "examaccount" or
-        $role eq "workstation" or
+        $role eq "computer" or
         $role eq "project" or
         $role eq "sophomorix-group"){
         if ($school eq "---" 
@@ -982,7 +982,7 @@ sub AD_get_name_tokened {
                 $name_tokened=$name."-".$school;
             }
         }
-        if ($role eq "workstation"){
+        if ($role eq "computer"){
             # make uppercase
             $name_tokened=~tr/a-z/A-Z/;
         }
@@ -1027,7 +1027,7 @@ sub AD_get_container {
     }  elsif ($role eq "teacher"){
 #        $container=$group_strg.$DevelConf::AD_teacher_ou;
         $container=$DevelConf::AD_teacher_ou;
-    }  elsif ($role eq "workstation"){
+    }  elsif ($role eq "computer"){
         $container=$group_strg.$DevelConf::AD_devices_ou;
 #    }  elsif ($role eq "examaccount"){
 #        $container=$group_strg.$DevelConf::AD_examaccount_ou;
