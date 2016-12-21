@@ -780,6 +780,15 @@ foreach my $device_file (@filelist){
 # }
 
 
+# computer rooms to kill
+foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
+    if (not exists $devices_file{'room'}{$room}){
+        # host is not in file anymore
+        &push_kill_computer_room($room);
+    }
+}
+
+
 # computers to kill
 foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
     if (not exists $devices_file{'computer'}{$computer}){
@@ -854,14 +863,14 @@ if($no_sync==1){
     #     print "KILL: $room\n";
     # }
 
+
+    # computer rooms
     print "\n";
     $count=$#killing_computer_rooms+1;
     &print_title("Computer rooms that must be killed ($count):");
     foreach my $room (@killing_computer_rooms){
         print "KILL: $room\n";
     }
-
-
 
     # Computers
     print "\n";
@@ -1020,8 +1029,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # }
 
     ############################################################
-    # # Kill the rooms of computers
-    &print_title("Rooms to be killed:");
+    # Kill the rooms of computers
+    &print_title("Computer rooms to be killed:");
     my $kill_computer_room_count=1;
     foreach my $room (@killing_computer_rooms){
         print "   * Killing Computer Room $room ...\n";
@@ -1689,6 +1698,12 @@ sub check_option {
 #     my ($kill) = @_;
 #     push @killing_examaccount_rooms, $kill;
 # }
+
+
+sub push_kill_computer_room {
+    my ($kill) = @_;
+    push @killing_computer_rooms, $kill;
+}
 
 
 
