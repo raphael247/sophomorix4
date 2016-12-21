@@ -87,6 +87,7 @@ $Data::Dumper::Indent = 6;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
+use JSON;
 use File::Basename qw( basename
                        dirname
                      ); 
@@ -106,6 +107,7 @@ use Sophomorix::SophomorixBase qw(
                                  check_options
                                  config_sophomorix_read
                                  dns_query_ip
+                                 json_dump
                                  filelist_fetch
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -157,7 +159,9 @@ my $school="";
 my $prefix="";
 my %school_created=();
 $school_created{$school}="created";
-
+my $json=0;
+my $dump_files=0;
+my $dump_AD=0;
 my $print=0;
 my $pass="12345678";
 my $password="";
@@ -176,8 +180,8 @@ my %devices_file=();
 #                       -> PATH_ABS
 #                       -> ROOM
 #                       -> SCHOOL
-#                       -> WORKSTATION    (capitalized name)
-#                       -> WORKSTATION_DOLLAR (capitalized with $)
+#                       -> COMPUTER    (capitalized name)
+#                       -> COMPUTER_DOLLAR (capitalized with $)
 #
 # room     -> $room     -> HOSTS
 #                       -> IPv4
@@ -187,8 +191,8 @@ my %devices_file=();
 # computer -> $computer -> ROOM
 #                       -> OU
 #                       -> SCHOOL
-#                       -> WORKSTATION    (capitalized name)
-#                       -> WORKSTATION_DOLLAR (capitalized with $)
+#                       -> COMPUTER    (capitalized name)
+#                       -> COMPUTER_DOLLAR (capitalized with $)
 #
 
 
@@ -275,6 +279,9 @@ my $testopt=GetOptions(
        "i|info" => \$info,
        "list-files" => \$list_files,
        "p|print" => \$print,
+       "json|j+" => \$json,
+       "dump-AD" => \$dump_AD,
+       "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
        "set-computer-passwords" => \$set_computer_passwords,
        "dns-test" => \$dns_test,
@@ -332,6 +339,11 @@ Managing DNS:
   --dns-kill (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
   --dns-show (show DNS-Nodes and DNS-Zones created by sophomorix)
 
+Dumping data:                     
+  --dump-files -j                  (dump contents of user files)
+  --dump-AD -j                     (dump AD data)
+  --dump-matches -j                (dump matched users)
+
 Obsolete: Managing italc:
           --italc-dir /path/to/dir  (create italc files in /path/to/dir:
                                    italcroom/globalconfig.xml)
@@ -378,8 +390,13 @@ if ($dns_test==1){
         }
         close(DEVICES);
     }
-    if($Conf::log_level>=2){
-        print Dumper(%devices_file);
+    # --dump-files
+    if ($dump_files==1){
+        &json_dump({json => $json,
+                    jsoninfo => "DEVICES_FILE",
+                    jsoncomment => "All devices read from all user files",
+                    hash_ref=>\%devices_file,
+                  });
     }
     foreach my $host (@domcomputers_file){
         my $file_ip=$devices_file{'device'}{$host}{"IPv4"};
@@ -520,6 +537,15 @@ my %AD= %$ref_AD;
 #&get_classrooms();
 
 
+# --dump-AD
+if ($dump_AD==1){
+    &json_dump({json => $json,
+                jsoninfo => "SEARCH",
+                jsoncomment => "AD Content",
+                hash_ref=>\%AD,
+               });
+}
+
 
 if ($print==1){
     print "--print not working\n";
@@ -652,7 +678,7 @@ if ($print==1){
 
 
 if ($info==1){
-    print "--info Not working\n";
+    print "--info Not implemented\n";
     exit;
 }
 # # ===========================================================================
@@ -839,6 +865,16 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 }
 
 
+# --dump-files
+if ($dump_files==1){
+    &json_dump({json => $json,
+                jsoninfo => "DEVICES_FILE",
+                jsoncomment => "All devices read from all user files",
+                hash_ref=>\%devices_file,
+              });
+}
+
+
 ############################################################################
 if($no_sync==1){
     # show info about what will be done
@@ -915,10 +951,6 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    #print Dumper(%devices_file{'computer'});
-    #print Dumper(%devices_file);
-
-    #print Dumper(%AD);
     exit;
 } 
 
@@ -1063,7 +1095,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $school=$devices_file{'computer'}{$computer}{'SCHOOL'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $room_basename=$devices_file{'computer'}{$computer}{'ROOM_BASENAME'};
-        my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
+        my $ws_saved=$devices_file{'computer'}{$computer}{'COMPUTER'};
         if (not exists $school_created{$school}){
             # create ou
             &AD_school_add({ldap=>$ldap,
@@ -1442,8 +1474,8 @@ sub analyze_device_line {
         } else {
             $devices_file{'device'}{$host_token}{'ACCOUNT'}="FALSE";
         }
-        $devices_file{'device'}{$host_token}{'WORKSTATION'}=$ws_token;
-        $devices_file{'device'}{$host_token}{'WORKSTATION_DOLLAR'}=$ws_token_account;
+        $devices_file{'device'}{$host_token}{'COMPUTER'}=$ws_token;
+        $devices_file{'device'}{$host_token}{'COMPUTER_DOLLAR'}=$ws_token_account;
         $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
         $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
         $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
@@ -1460,8 +1492,8 @@ sub analyze_device_line {
             $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'ROOM_BASENAME'}=$room;
-            $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
-            $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
+            $devices_file{'computer'}{$ws_token_account}{'COMPUTER'}=$ws_token;
+            $devices_file{'computer'}{$ws_token_account}{'COMPUTER_DOLLAR'}=$ws_token_account;
         }
     }
 }
