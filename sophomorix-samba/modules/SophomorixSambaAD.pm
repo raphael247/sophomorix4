@@ -1021,7 +1021,8 @@ sub AD_get_container {
     if ($role eq "student"){
         $container=$group_strg.$DevelConf::AD_student_ou;
     }  elsif ($role eq "teacher"){
-        $container=$group_strg.$DevelConf::AD_teacher_ou;
+#        $container=$group_strg.$DevelConf::AD_teacher_ou;
+        $container=$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "workstation"){
         $container=$group_strg.$DevelConf::AD_devices_ou;
     }  elsif ($role eq "examaccount"){
