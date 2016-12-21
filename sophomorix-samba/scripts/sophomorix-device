@@ -1029,6 +1029,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $computer (@adding_computers){
         my $school=$devices_file{'computer'}{$computer}{'SCHOOL'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
+        my $room_basename=$devices_file{'computer'}{$computer}{'ROOM_BASENAME'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'WORKSTATION'};
         if (not exists $school_created{$school}){
             # create ou
@@ -1048,6 +1049,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              ws_count=>$ws_count,
                              name=>$ws_saved,
                              room=>$room_saved,
+                             room_basename=>$room_basename,
                              role=>"workstation",
 		             type=>"roomws",
                              school=>$school,
@@ -1382,6 +1384,7 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'IPv4'}=$ip;
         $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;
         $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key;
+        $devices_file{'device'}{$host_token}{'ROOM_BASENAME'}=$room;
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
         if ($account_flag==1){
             $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
@@ -1405,6 +1408,7 @@ sub analyze_device_line {
         if ($account_flag==1){
             $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
+            $devices_file{'computer'}{$ws_token_account}{'ROOM_BASENAME'}=$room;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'WORKSTATION_DOLLAR'}=$ws_token_account;
         }

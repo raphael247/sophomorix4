@@ -429,6 +429,7 @@ sub AD_computer_create {
     my $root_dse = $arg_ref->{root_dse};
     my $name = $arg_ref->{name};
     my $room = $arg_ref->{room};
+    my $room_basename = $arg_ref->{room_basename};
     my $role = $arg_ref->{role};
     my $ws_count = $arg_ref->{ws_count};
     my $school = $arg_ref->{school};
@@ -447,7 +448,7 @@ sub AD_computer_create {
                                 "RestrictedKrbHost/".$name,
                                 "RestrictedKrbHost/".$dns_name,
                                );
-    my $container=&AD_get_container($role,$room);
+    my $container=&AD_get_container($role,$room_basename);
     my $dn_room = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "CN=".$name.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $prefix=$school;
