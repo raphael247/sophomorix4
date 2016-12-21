@@ -1053,8 +1053,6 @@ sub AD_get_container {
     if ($container ne ""){
         $container=$container.",";
     }
-print "KACK: >$role< <$group> <$container>\n";
-
     return $container;
 }
 
