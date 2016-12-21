@@ -244,9 +244,12 @@ my %ip_seen=();
 # my @killing_examaccounts=();
 # my @killing_examaccount_rooms=();
 
+
+
 # Computers
 my @adding_computers=();
 my @killing_computers=();
+my @killing_computer_rooms=();
 
 # dnsZones
 my @adding_dnszones=();
@@ -851,6 +854,13 @@ if($no_sync==1){
     #     print "KILL: $room\n";
     # }
 
+    print "\n";
+    $count=$#killing_computer_rooms+1;
+    &print_title("Computer rooms that must be killed ($count):");
+    foreach my $room (@killing_computer_rooms){
+        print "KILL: $room\n";
+    }
+
 
 
     # Computers
@@ -1010,6 +1020,20 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # }
 
     ############################################################
+    # # Kill the rooms of computers
+    &print_title("Rooms to be killed:");
+    my $kill_computer_room_count=1;
+    foreach my $room (@killing_computer_rooms){
+        print "   * Killing Computer Room $room ...\n";
+        &AD_group_kill({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        group=>$room,
+                        type=>"room",
+                        group_count=>$kill_computer_room_count,
+                  });
+    }
+
+    ############################################################
     # Kill computers
     &print_title("Computers to be killed:");
     my $count=1;
@@ -1056,6 +1080,23 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              creationdate=>$time_stamp_AD,
                            });
         $ws_count++;
+        # make sure that the room exists
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          group=>$room_saved,
+                          group_basename=>$room_basename,
+                          description=>$room_saved,
+                          school=>$school,
+                          status=>"P",
+                          type=>"room",
+                          creationdate=>$time_stamp_AD,
+                         });
+        # add computer to its room
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => $room_saved,
+                             addmember => $ws_saved,
+                            });   
     }
 
     ############################################################

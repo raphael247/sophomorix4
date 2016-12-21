@@ -1029,8 +1029,8 @@ sub AD_get_container {
         $container=$DevelConf::AD_teacher_ou;
     }  elsif ($role eq "workstation"){
         $container=$group_strg.$DevelConf::AD_devices_ou;
-    }  elsif ($role eq "examaccount"){
-        $container=$group_strg.$DevelConf::AD_examaccount_ou;
+#    }  elsif ($role eq "examaccount"){
+#        $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container
     }  elsif ($role eq "adminclass"){
         $container=$group_strg.$DevelConf::AD_student_ou;
@@ -1044,7 +1044,7 @@ sub AD_get_container {
     }  elsif ($role eq "sophomorix-group"){
         $container=$DevelConf::AD_project_ou;
     }  elsif ($role eq "room"){
-        $container=$group_strg.$DevelConf::AD_examaccount_ou;
+        $container=$group_strg.$DevelConf::AD_devices_ou;
     # other
     }  elsif ($role eq "management"){
         $container=$DevelConf::AD_management_ou;
@@ -2625,19 +2625,19 @@ sub AD_group_create {
 
         #} else {
     } elsif ($type eq "room"){
-        my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
-        # add the room to <token>-examaccounts
-        &AD_group_addmember({ldap => $ldap,
-                             root_dse => $root_dse, 
-                             group => $token_examaccounts,
-                             addgroup => $group,
-                           });
-        # add group <token>-examaccounts to global-examaccounts
-        &AD_group_addmember({ldap => $ldap,
-                             root_dse => $root_dse, 
-                             group => "global-".$DevelConf::examaccount,
-                             addgroup => $token_examaccounts,
-                           });
+        #my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
+        ## add the room to <token>-examaccounts
+        #&AD_group_addmember({ldap => $ldap,
+        #                     root_dse => $root_dse, 
+        #                     group => $token_examaccounts,
+        #                     addgroup => $group,
+        #                   });
+        ## add group <token>-examaccounts to global-examaccounts
+        #&AD_group_addmember({ldap => $ldap,
+        #                     root_dse => $root_dse, 
+        #                     group => "global-".$DevelConf::examaccount,
+        #                     addgroup => $token_examaccounts,
+        #                   });
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     return;
