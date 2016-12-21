@@ -806,6 +806,8 @@ sub AD_user_move {
     my $user_count = $arg_ref->{user_count};
     my $group_old = $arg_ref->{group_old};
     my $group_new = $arg_ref->{group_new};
+    my $group_old_basename = $arg_ref->{group_old_basename};
+    my $group_new_basename = $arg_ref->{group_new_basename};
     my $school_old = $arg_ref->{school_old};
     my $school_new = $arg_ref->{school_new};
     my $role_new = $arg_ref->{role};
@@ -831,9 +833,10 @@ sub AD_user_move {
     $school_new=&AD_get_schoolname($school_new);
 
     if ($role_new eq "student"){
-         $target_branch="OU=".$group_new.",OU=Students,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
+         $target_branch="OU=".$group_new_basename.",OU=Students,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     } elsif ($role_new eq "teacher"){
-         $target_branch="OU=".$group_new.",OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
+#         $target_branch="OU=".$group_new_basename.",OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
+         $target_branch="OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     }
 
     # fetch the dn (where the object really is)
@@ -854,8 +857,8 @@ sub AD_user_move {
         &Sophomorix::SophomorixBase::print_title("Moving User $user ($user_count),(start):");
         print "   DN:             $dn\n";
         print "   Target DN:      $target_branch\n";
-        print "   Group (Old):    $group_old\n";
-        print "   Group (New):    $group_new\n";
+        print "   Group (Old):    $group_old ($group_old_basename)\n";
+        print "   Group (New):    $group_new ($group_new_basename)\n";
         print "   Role (New):     $role_new\n";
         print "   Type (New):     $group_type_new\n";
         print "   School(Old):    $school_old\n";
@@ -883,7 +886,7 @@ sub AD_user_move {
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       group=>$group_new,
-                      group_basename=>$group_new,
+                      group_basename=>$group_new_basename,
                       description=>$group_new,
                       school=>$school_new,
                       type=>$group_type_new,
