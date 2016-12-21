@@ -64,7 +64,22 @@ perl module:  Filesys-SmbClient
 
 Weiter DNS: 
 
-muss hardwareklasse ins AD, wohin?
+------------------------------------------------------------
+Hardwareclasses (hwk, hardwareklasse)
+- wird von sophomorix-device als Gruppenmitgliedschaft des Computeraccounts
+  gespeichert
+Umsetzung:
+sophomorix-device
+   - liest alle erforderlicen hwk aus files (und deren members)
+   - liest vorhandene hwk aus AD (gruppen mit sophomorixTxpe hardwareclass)
+   - abgleich
+     nichtexistente hwk anlegen
+     welche Computer in welcher hwk dazu
+     welche computer aus welcher hwk raus
+     nicht mehr benötigte hwk entfernen
+---> nicht so dringend, beliebig nachlieferbar
+------------------------------------------------------------
+
 muss mac-adresse ins AD, wohin?
 Kommentar ins AD, wohin?
 --> weitere?
