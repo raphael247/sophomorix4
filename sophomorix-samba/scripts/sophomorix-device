@@ -1081,11 +1081,12 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                            });
         $ws_count++;
         # make sure that the room exists
+        my $room_description=$room_basename." in ".$school;
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
                           group=>$room_saved,
                           group_basename=>$room_basename,
-                          description=>$room_saved,
+                          description=>$room_description,
                           school=>$school,
                           status=>"P",
                           type=>"room",
