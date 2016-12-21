@@ -279,7 +279,7 @@ if ($test_ws_1==1){
     #               });
 
 
-    ##### Testing the computers  room
+    ##### Testing the computers room
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=j1008,OU=j1008,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"j1008",
@@ -289,6 +289,7 @@ if ($test_ws_1==1){
                    sophomorixType=>"room",
                    member => "J1008P01,J1008P02",
                   });
+
     # J1008P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=J1008P01,OU=j1008,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -423,7 +424,7 @@ if ($test_ws_1==1){
     #               });
 
 
-    ##### Testing the computers  room
+    ##### Testing the computers room
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=j1010,OU=j1010,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"j1010",
@@ -645,6 +646,17 @@ if ($test_ws_1==1){
     #                memberOf => "global-examaccounts",
     #               });
 
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1008,OU=j1008,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"j1008 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-J1008P01,BSZ-J1008P02",
+                  });
+
     # BSZ-J1008P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=BSZ-J1008P01,OU=j1008,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -707,6 +719,8 @@ if ($test_ws_1==1){
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
     #               });
+
+
 
     # BSZ-J1008P02$
     &AD_test_object({ldap=>$ldap,
@@ -777,6 +791,17 @@ if ($test_ws_1==1){
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
     #               });
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1010,OU=j1010,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"j1010 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-J1010P01,BSZ-J1010P02",
+                  });
 
     # BSZ-J1010P01$
     &AD_test_object({ldap=>$ldap,
@@ -874,6 +899,18 @@ if ($test_ws_1==1){
     ############################################################
     # bsz-d001p01
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-d001,OU=d001,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-d001",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"d001 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-D001P01",
+                  });
+
     # BSZ-D001P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=BSZ-D001P01,OU=d001,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -900,6 +937,18 @@ if ($test_ws_1==1){
     ############################################################
     # bsz-d002p01
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d002p01");
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-d002,OU=d002,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-d002",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"d002 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-D002P01",
+                  });
+
     # BSZ-D002P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=BSZ-D002P01,OU=d002,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -985,6 +1034,17 @@ if ($test_ws_2==1){
     #                memberOf => "global-examaccounts",
     #               });
 
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1008,OU=j1008,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"j1008 in default-school",
+                   sophomorixType=>"room",
+                   member => "J1008P02,J1008P03",
+                  });
+
     # J1008P03$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=J1008P03,OU=j1008,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1047,6 +1107,18 @@ if ($test_ws_2==1){
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
     #               });
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=j1010,OU=j1010,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"j1010 in default-school",
+                   sophomorixType=>"room",
+                   member => "J1010P01,J1010P02",
+                  });
+
 
     # J1008P02$
     &AD_test_object({ldap=>$ldap,
@@ -1214,6 +1286,18 @@ if ($test_ws_2==1){
     ############################################################
     # c001p01
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c001p01");
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=c001,OU=c001,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"c001",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"c001 in default-school",
+                   sophomorixType=>"room",
+                   member => "C001P01",
+                  });
+
     # C001P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=C001P01,OU=c001,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1240,6 +1324,18 @@ if ($test_ws_2==1){
     ############################################################
     # c002p01
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c002p01");
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=c002,OU=c002,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"c002",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"c002 in default-school",
+                   sophomorixType=>"room",
+                   member => "C002P01",
+                  });
+
     # C002P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=C002P01,OU=c002,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1304,6 +1400,17 @@ if ($test_ws_2==1){
     #                gidNumber=>"-1",
     #                memberOf => "global-examaccounts",
     #               });
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1008,OU=j1008,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-j1008",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"j1008 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-J1008P01,BSZ-J1008P02",
+                  });
 
     # BSZ-J1008P01$
     &AD_test_object({ldap=>$ldap,
@@ -1438,6 +1545,17 @@ if ($test_ws_2==1){
     #                memberOf => "global-examaccounts",
     #               });
 
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-j1010,OU=j1010,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-j1010",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"j1010 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-J1010P01,BSZ-J1010P02",
+                  });
+
     # BSZ-J1010P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=BSZ-J1010P01,OU=j1010,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1534,6 +1652,18 @@ if ($test_ws_2==1){
     ############################################################
     # bsz-d001p01
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-d001,OU=d001,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-d001",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"d001 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-D001P01",
+                  });
+
     # BSZ-D001P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=BSZ-D001P01,OU=d001,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1560,6 +1690,18 @@ if ($test_ws_2==1){
     ############################################################
     # bsz-d002p01
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d002p01");
+
+    ##### Testing the computers room
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-d002,OU=d002,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-d002",
+                   gidNumber=>"-1",
+                   sophomorixStatus=>"P",
+                   description=>"d002 in bsz",
+                   sophomorixType=>"room",
+                   member => "BSZ-D002P01",
+                  });
+
     # BSZ-D002P01$
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=BSZ-D002P01,OU=d002,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
