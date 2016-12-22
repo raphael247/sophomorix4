@@ -83,6 +83,7 @@ my $json=0;
 my $create=0;
 my $teacher="";
 my $session="";
+my $members; # undef: do not change members
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -93,6 +94,7 @@ my $testopt=GetOptions(
            "create|c" => \$create,
            "teacher|t=s" => \$teacher,
            "session|s=s" => \$session,
+           "members|m=s" => \$members,
           );
 
 
@@ -106,6 +108,9 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
+my %sessions=&AD_get_sessions($ldap,$root_dse);
+
+
 
 # --help
 if ($help==1) {
@@ -144,12 +149,20 @@ Please see the sophomorix-session(8) man pages for full documentation
 
 # --info
 if ($info==1) {
-    my %sessions=&AD_get_sessions($ldap,$root_dse);
     &json_dump({json => $json,
                 jsoninfo => "SESSIONS",
                 jsoncomment => "All sophomorix sessions",
                 hash_ref=>\%sessions,
                });
+
+    if ($session ne ""){
+        print "Session $session:\n";
+        print "   *     sAMAccountName:  $sessions{'id'}{$session}{'sAMAccountName'}  (teacher of the session)\n";
+        print "   *            members:  $sessions{'id'}{$session}{'members'}  (students of the session)\n";
+        print "   * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
+
+    }
+
     exit;
 }
 
@@ -168,6 +181,8 @@ if ($create==1 and $teacher ne ""){
                         root_dse=>$root_dse,
                         teacher=>$teacher,
                         creationdate=>$time_stamp_file,
+                        members=>$members,
+                        sessions_ref=>\%sessions,
                     });
 }
 
@@ -178,6 +193,8 @@ if ($session ne ""){
                         root_dse=>$root_dse,
                         teacher=>$teacher,
                         session=>$session,
+                        members=>$members,
+                        sessions_ref=>\%sessions,
                     });
 }
 

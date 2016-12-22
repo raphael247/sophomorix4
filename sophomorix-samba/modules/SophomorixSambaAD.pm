@@ -520,6 +520,8 @@ sub AD_session_manage {
     my $creationdate = $arg_ref->{creationdate};
     my $teacher = $arg_ref->{teacher};
     my $session = $arg_ref->{session};
+    my $new_members = $arg_ref->{members};
+    my $ref_sessions = $arg_ref->{sessions_ref};
 
     if (defined $creationdate){
         # create session with timestamp
@@ -528,88 +530,61 @@ sub AD_session_manage {
         $creationdate="---";
     }
 
-    if (not defined $teacher){
-        # search for the session
-        # ???????????
+    # creating the session string
+    $session_string="---";
+    $session_string_old="---";
+    if ($creationdate ne "---"){
+        # new session
+        $session_string=$creationdate.";";
+    } elsif (defined $session and defined $new_members){
+        # get data from session hash
+        $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};
+        $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
+        $session_string=$session.";".$new_members.";";  
+    } else {
+        print "\nI do not know what you want me to do\n\n";
+        return;
     }
 
     # locating the teachers DN
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$teacher);
 
-    # ceating the session string
-    $session_string="---";
-    if ($creationdate ne "---"){
-        # new session
-        $session_string=$creationdate.";";
-    } elsif (defined $session){
-        # search old session
+    ############################################################
+    # updating session
+    if($Conf::log_level>=1){
+        print "   Teacher:  $teacher\n";
+        print "   DN:       $dn\n";
+        print "   Session:  $session\n";
+        print "      Old:      $session_string_old\n";
+        print "      New:      $session_string\n";
+    }
+    if ($count==1){
+        my %new_sessions=();
+        my @new_sessions=();
+        my @old_sessions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixSessions");
 
+        # push old sessions into hash (drop doubles)
+        foreach my $old_session (@old_sessions){
+            my ($id,$old_members) = split(/;/,$old_session);
+            $new_sessions{$id}=$old_members;
+        }
+        # overwrite the changing session
+        $new_sessions{$session}=$new_members;
 
-        $session_string=$session.";update";  
+        # write the hash into a list
+        foreach my $session ( keys %new_sessions ) {
+            my $session_string_new=$session.";".$new_sessions{$session};
+                push @new_sessions, $session_string_new;
+        }
+
+        # updating session with the hash
+        my $mesg = $ldap->modify($dn,
+                          replace => {'sophomorixSessions' => \@new_sessions }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
     } else {
-        print "\ndont know what to do\n\n";
+        print "\nWARNING: User $teacher not found in ldap, skipping session creation\n\n";
         return;
     }
-
-
-    ############################################################
-    # creating session
-    ############################################################
- #   if ($creationdate ne "---" and defined $teacher ){
-        # create session
- #       my $session_string=$creationdate.";";
- #       &Sophomorix::SophomorixBase::print_title(
- #             "Creating session $creationdate for user $teacher");
-        if($Conf::log_level>=1){
-            print "   Teacher:  $teacher\n";
-            print "   DN:       $dn\n";
-            print "   Session:  $session\n";
-            print "   String:   $session_string\n";
-        }
-        if ($count==1){
-            my @old_sessions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixSessions");
-            my @sessions = uniq(@old_sessions,$session_string); 
-	    my $test="sess comm";
-            my $mesg = $ldap->modify($dn,
-                              replace => {'sophomorixSessions' => \@sessions }); 
-            &AD_debug_logdump($mesg,2,(caller(0))[3]);
-        } else {
-            print "\nWARNING: $teacher not found in ldap, skipping session creation\n\n";
-            return;
-        }
- #   }
-
-
-
-    # ############################################################
-    # # updating session
-    # ############################################################
-    # if ($session ne "" and defined $teacher ){
-    #     # update session
-    #     my $session_string=$creationdate.";update";
-    #     &Sophomorix::SophomorixBase::print_title(
-    #           "Updating session $session for user $teacher");
-    #     if($Conf::log_level>=1){
-    #         print "   Teacher:  $teacher\n";
-    #         print "   DN:       $dn\n";
-    #         print "   Session:  $session\n";
-    #     }
-    #     if ($count==1){
-    #         my @old_sessions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixSessions");
-    #         my @sessions = uniq(@old_sessions,$session_string); 
-    # 	    my $test="sess comm";
-    #         my $mesg = $ldap->modify($dn,
-    #                           replace => {'sophomorixSessions' => \@sessions }); 
-    #         &AD_debug_logdump($mesg,2,(caller(0))[3]);
-    #     } else {
-    #         print "\nWARNING: $teacher not found in ldap, skipping session creation\n\n";
-    #         return;
-    #     }
-    # }
-
-
-
-
 }
 
 
