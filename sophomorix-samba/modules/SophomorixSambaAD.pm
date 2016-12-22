@@ -519,6 +519,7 @@ sub AD_session_manage {
     my $root_dse = $arg_ref->{root_dse};
     my $creationdate = $arg_ref->{creationdate};
     my $teacher = $arg_ref->{teacher};
+    my $kill = $arg_ref->{kill};
     my $session = $arg_ref->{session};
     my $new_members = $arg_ref->{members};
     my $ref_sessions = $arg_ref->{sessions_ref};
@@ -532,6 +533,9 @@ sub AD_session_manage {
     if (not defined $new_members){
         $new_members="";
     }
+    if (not defined $kill){
+        $kill="FALSE";
+    }
 
     # creating the session string
     $session_string="---";
@@ -540,10 +544,15 @@ sub AD_session_manage {
         # new session
         $session_string=$creationdate.";".$new_members.";";
     } elsif (defined $session and defined $new_members){
-        # get data from session hash
-        $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};
-        $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
-        $session_string=$session.";".$new_members.";";  
+        if (defined $ref_sessions->{'id'}{$session}{'sAMAccountName'}){
+            # get data from session hash
+            $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};
+            $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
+            $session_string=$session.";".$new_members.";";
+        } else {
+            print "\n Session $session not found\n\n";
+            return;
+        }
     } else {
         print "\nI do not know what you want me to do\n\n";
         return;
@@ -571,8 +580,14 @@ sub AD_session_manage {
             my ($id,$old_members) = split(/;/,$old_session);
             $new_sessions{$id}=$old_members;
         }
-        # overwrite the changing session
-        $new_sessions{$session}=$new_members;
+
+        if ($kill eq "TRUE"){
+	    print "Killing session $session\n";
+            delete $new_sessions{$session};
+        } else {
+            # overwrite the changing session
+            $new_sessions{$session}=$new_members;
+        }
 
         # write the hash into a list
         foreach my $session ( keys %new_sessions ) {
