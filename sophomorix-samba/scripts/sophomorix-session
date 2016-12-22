@@ -128,6 +128,11 @@ Options:
   -vv / --verbose --verbose
   -i  / --info
 
+
+Create a session with the current time:
+
+sophomorix-session --create --teacher <user>
+
 - t <user> / --teacher <user>
 
 
@@ -163,6 +168,20 @@ if ($info==1) {
 
     }
 
+    if ($teacher ne ""){
+        my @ordered_list=();
+        foreach my $session ( keys %{ $sessions{'user'}->{$teacher}{'sophomorixSessions'} }){
+            push @ordered_list, $session;
+        }
+        @ordered_list = sort @ordered_list;
+        foreach my $session (@ordered_list ){
+            print "\n";
+            print "Teacher $teacher session $session:\n";
+            print "   *     sAMAccountName:  $sessions{'id'}{$session}{'sAMAccountName'}  (teacher of the session)\n";
+            print "   *            members:  $sessions{'id'}{$session}{'members'}  (students of the session)\n";
+            print "   * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
+        }
+    }
     exit;
 }
 

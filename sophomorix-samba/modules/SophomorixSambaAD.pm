@@ -529,6 +529,9 @@ sub AD_session_manage {
     } else {
         $creationdate="---";
     }
+    if (not defined $new_members){
+        $new_members="";
+    }
 
     # creating the session string
     $session_string="---";
