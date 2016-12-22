@@ -996,16 +996,6 @@ sub AD_get_name_tokened {
     } elsif ($role eq "teacher" or
              $role eq "student"){
         return $name;
-    # } elsif ($role eq "project"){
-    #     if ($school eq "---" or $school eq ""){
-    #         # OU=SCHOOL
-    #         $name_tokened=$school."-".$name;
-    #     } else 
-    #     unless ($name_tokened =~ m/^p\_/) { 
-    #         # add refix to projects: p_ 
-    #         $name_tokened="p_".$name_tokened;
-    #     }
-    #     return $name_tokened;
     } else {
         return $name;
     }
