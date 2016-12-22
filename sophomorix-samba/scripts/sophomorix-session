@@ -84,6 +84,7 @@ my $create=0;
 my $kill=0;
 my $teacher="";
 my $session="";
+my $developer_session="";
 my $members; # undef: do not change members
 
 # Parsen der Optionen
@@ -97,6 +98,7 @@ my $testopt=GetOptions(
            "teacher|t=s" => \$teacher,
            "session|s=s" => \$session,
            "members|m=s" => \$members,
+           "developer-session=s" => \$developer_session,
           );
 
 
@@ -228,6 +230,8 @@ if ($create==1 and $teacher ne ""){
                         teacher=>$teacher,
                         creationdate=>$time_stamp_file,
                         members=>$members,
+                        create=>"TRUE",
+                        developer_session=>$developer_session,
                         sessions_ref=>\%sessions,
                     });
     exit;

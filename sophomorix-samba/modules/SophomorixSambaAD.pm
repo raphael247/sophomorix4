@@ -519,19 +519,27 @@ sub AD_session_manage {
     my $root_dse = $arg_ref->{root_dse};
     my $creationdate = $arg_ref->{creationdate};
     my $teacher = $arg_ref->{teacher};
+    my $create = $arg_ref->{create};
     my $kill = $arg_ref->{kill};
     my $session = $arg_ref->{session};
+    my $developer_session = $arg_ref->{developer_session};
     my $new_members = $arg_ref->{members};
     my $ref_sessions = $arg_ref->{sessions_ref};
 
     if (defined $creationdate){
-        # create session with timestamp
+        # create session with current timestamp
         $session=$creationdate;
     } else {
         $creationdate="---";
     }
+
     if (not defined $new_members){
         $new_members="";
+    }
+
+    # default is update
+    if (not defined $create){
+        $creae="FALSE";
     }
     if (not defined $kill){
         $kill="FALSE";
@@ -540,9 +548,18 @@ sub AD_session_manage {
     # creating the session string
     $session_string="---";
     $session_string_old="---";
-    if ($creationdate ne "---"){
-        # new session
-        $session_string=$creationdate.";".$new_members.";";
+#    if ($creationdate ne "---"){
+    if ($create eq "TRUE"){
+        if ($developer_session ne ""){
+            # creating sessions with arbitrary names for testing
+            $session_string=$developer_session.";".$new_members.";";
+        } elsif ($creationdate ne "---"){
+            # new session
+            # this is the default
+            $session_string=$creationdate.";".$new_members.";";
+        } else {
+            
+        }
     } elsif (defined $session and defined $new_members){
         if (defined $ref_sessions->{'id'}{$session}{'sAMAccountName'}){
             # get data from session hash
