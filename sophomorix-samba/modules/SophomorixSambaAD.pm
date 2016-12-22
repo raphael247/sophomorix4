@@ -538,7 +538,7 @@ sub AD_session_manage {
     $session_string_old="---";
     if ($creationdate ne "---"){
         # new session
-        $session_string=$creationdate.";";
+        $session_string=$creationdate.";".$new_members.";";
     } elsif (defined $session and defined $new_members){
         # get data from session hash
         $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};

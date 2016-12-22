@@ -127,13 +127,21 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
-
+  - t <user> / --teacher <user>
+  --members <user1>,<user2>, ...
+  --create (user current time as session-id)
+  --kill
+  
 
 Create a session with the current time:
+  sophomorix-session --create --teacher <user>
+  sophomorix-session --create --teacher <user> --members <user1>,<user2>, ...
 
-sophomorix-session --create --teacher <user>
+Update the students of a running session:
+  sophomorix-session --session <sessen_id> --members <user1>,<user2>, ...
 
-- t <user> / --teacher <user>
+
+
 
 
 Dumping data:  
