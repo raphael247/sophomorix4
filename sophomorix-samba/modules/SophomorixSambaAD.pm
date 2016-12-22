@@ -30,6 +30,7 @@ $Data::Dumper::Terse = 1;
             AD_get_passwd
             AD_bind_admin
             AD_unbind_admin
+            AD_session_manage
             AD_user_create
             AD_user_update
             AD_computer_create
@@ -45,6 +46,7 @@ $Data::Dumper::Terse = 1;
             get_forbidden_logins
             AD_school_add
             AD_object_search
+            AD_get_sessions
             AD_get_AD
             AD_class_fetch
             AD_project_fetch
@@ -511,6 +513,106 @@ sub AD_computer_create {
 
 
 
+sub AD_session_manage {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $creationdate = $arg_ref->{creationdate};
+    my $teacher = $arg_ref->{teacher};
+    my $session = $arg_ref->{session};
+
+    if (defined $creationdate){
+        # create session with timestamp
+        $session=$creationdate;
+    } else {
+        $creationdate="---";
+    }
+
+    if (not defined $teacher){
+        # search for the session
+        # ???????????
+    }
+
+    # locating the teachers DN
+    my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$teacher);
+
+    # ceating the session string
+    $session_string="---";
+    if ($creationdate ne "---"){
+        # new session
+        $session_string=$creationdate.";";
+    } elsif (defined $session){
+        # search old session
+
+
+        $session_string=$session.";update";  
+    } else {
+        print "\ndont know what to do\n\n";
+        return;
+    }
+
+
+    ############################################################
+    # creating session
+    ############################################################
+ #   if ($creationdate ne "---" and defined $teacher ){
+        # create session
+ #       my $session_string=$creationdate.";";
+ #       &Sophomorix::SophomorixBase::print_title(
+ #             "Creating session $creationdate for user $teacher");
+        if($Conf::log_level>=1){
+            print "   Teacher:  $teacher\n";
+            print "   DN:       $dn\n";
+            print "   Session:  $session\n";
+            print "   String:   $session_string\n";
+        }
+        if ($count==1){
+            my @old_sessions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixSessions");
+            my @sessions = uniq(@old_sessions,$session_string); 
+	    my $test="sess comm";
+            my $mesg = $ldap->modify($dn,
+                              replace => {'sophomorixSessions' => \@sessions }); 
+            &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        } else {
+            print "\nWARNING: $teacher not found in ldap, skipping session creation\n\n";
+            return;
+        }
+ #   }
+
+
+
+    # ############################################################
+    # # updating session
+    # ############################################################
+    # if ($session ne "" and defined $teacher ){
+    #     # update session
+    #     my $session_string=$creationdate.";update";
+    #     &Sophomorix::SophomorixBase::print_title(
+    #           "Updating session $session for user $teacher");
+    #     if($Conf::log_level>=1){
+    #         print "   Teacher:  $teacher\n";
+    #         print "   DN:       $dn\n";
+    #         print "   Session:  $session\n";
+    #     }
+    #     if ($count==1){
+    #         my @old_sessions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixSessions");
+    #         my @sessions = uniq(@old_sessions,$session_string); 
+    # 	    my $test="sess comm";
+    #         my $mesg = $ldap->modify($dn,
+    #                           replace => {'sophomorixSessions' => \@sessions }); 
+    #         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    #     } else {
+    #         print "\nWARNING: $teacher not found in ldap, skipping session creation\n\n";
+    #         return;
+    #     }
+    # }
+
+
+
+
+}
+
+
 sub AD_user_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -635,6 +737,7 @@ sub AD_user_create {
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
                    sophomorixSchoolPrefix => $prefix,
+#                   sophomorixCustom => "Tst",
                    sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate, 
                    sophomorixTolerationDate => $tolerationdate, 
@@ -1248,7 +1351,43 @@ sub AD_object_search {
     }
 }
 
+sub AD_get_sessions {
+    my ($ldap,$root_dse)=@_;
+    my %sessions=();
 
+
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=user)(sophomorixRole=*))',
+                       #filter => '(&(objectClass=user) (sophomorixRole=student))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSessions',
+                                ]);
+        my $max_user = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+        $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+	    #$sessions{'user'}{$sam}="sophomorixSessions";;
+            my @session_list = sort $entry->get_value('sophomorixSessions');
+            foreach my $session (@session_list){
+                my ($id,$members,$strung)=split(/;/,$session);
+                # save by user
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}=$members;
+                # save by id
+                $sessions{'id'}{$id}{'sAMAccountName'}=$sam;
+                $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
+                $sessions{'id'}{$id}{'members'}=$members;
+	    }
+        
+
+        }
+
+    return %sessions; 
+}
 
 sub AD_get_AD {
     my %AD=();
