@@ -526,9 +526,12 @@ sub AD_session_manage {
     my $new_members = $arg_ref->{members};
     my $ref_sessions = $arg_ref->{sessions_ref};
 
+    # the updated session string
+    my $session_string_new="";
+    my $session_new="";        
     if (defined $creationdate){
         # create session with current timestamp
-        $session=$creationdate;
+        $session_new=$creationdate;
     } else {
         $creationdate="---";
     }
@@ -537,35 +540,30 @@ sub AD_session_manage {
         $new_members="";
     }
 
-    # default is update
-    if (not defined $create){
-        $creae="FALSE";
-    }
-    if (not defined $kill){
-        $kill="FALSE";
-    }
-
     # creating the session string
     $session_string="---";
     $session_string_old="---";
-#    if ($creationdate ne "---"){
     if ($create eq "TRUE"){
         if ($developer_session ne ""){
             # creating sessions with arbitrary names for testing
-            $session_string=$developer_session.";".$new_members.";";
+            $session_new=$developer_session;
+            $session_string_new=$developer_session.";".$new_members.";";
         } elsif ($creationdate ne "---"){
             # new session
             # this is the default
-            $session_string=$creationdate.";".$new_members.";";
+            $session_new=$creationdate;
+            $session_string_new=$creationdate.";".$new_members.";";
         } else {
             
         }
     } elsif (defined $session and defined $new_members){
+        # modifying the session
         if (defined $ref_sessions->{'id'}{$session}{'sAMAccountName'}){
             # get data from session hash
+            $session_new=$session;
             $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};
             $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
-            $session_string=$session.";".$new_members.";";
+            $session_string_new=$session.";".$new_members.";";
         } else {
             print "\n Session $session not found\n\n";
             return;
@@ -579,14 +577,6 @@ sub AD_session_manage {
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$teacher);
 
     ############################################################
-    # updating session
-    if($Conf::log_level>=1){
-        print "   Teacher:  $teacher\n";
-        print "   DN:       $dn\n";
-        print "   Session:  $session\n";
-        print "      Old:      $session_string_old\n";
-        print "      New:      $session_string\n";
-    }
     if ($count==1){
         my %new_sessions=();
         my @new_sessions=();
@@ -599,17 +589,26 @@ sub AD_session_manage {
         }
 
         if ($kill eq "TRUE"){
-	    print "Killing session $session\n";
-            delete $new_sessions{$session};
+	    print "Killing session $session_new\n";
+            delete $new_sessions{$session_new};
         } else {
             # overwrite the changing session
-            $new_sessions{$session}=$new_members;
+            $new_sessions{$session_new}=$new_members;
         }
 
         # write the hash into a list
         foreach my $session ( keys %new_sessions ) {
-            my $session_string_new=$session.";".$new_sessions{$session};
-                push @new_sessions, $session_string_new;
+            my $string=$session.";".$new_sessions{$session};
+            push @new_sessions, $string;
+	    print "String: $string\n";
+        }
+
+        if($Conf::log_level>=1){
+            print "   Teacher:  $teacher\n";
+            print "   DN:       $dn\n";
+            print "   Session:  $session_new\n";
+            print "      Old:      $session_string_old\n";
+            print "      New:      $session_string_new\n";
         }
 
         # updating session with the hash

@@ -609,24 +609,32 @@ sub AD_test_object {
 sub test_multivalue {
     my ($should,$attr,$entry,$sam_account) = @_;
     # get actual attrs
+    #print "ATTR: <$attr>\n";
     my %is=();
     my @data=$entry->get_value ($attr);
     my $count=0;
     foreach my $item (@data){
         my ($ent,@rest)=split(/,/,$item);
-#        my ($ent,@rest)=split(/\|/,$item);
-        $ent=~s/^CN=//;
-        #print "      * Datum: $ent\n";
-        $is{$ent}="seen";
+            $ent=~s/^CN=//;
+        #print "   * Item is: <$ent> <$item>\n";
+        if ($attr eq "memberOf" or $attr eq "member"){
+            $is{$ent}="seen";
+        } else {
+            $is{$item}="seen";
+        }
         $count++;
     }
+
+    #foreach my $item ( keys %is ) {
+    #    print " Hash: <$item> <$is{$item}>\n";
+    #}
+
     # compare with should attrs
     my $test_count=0;
- #   my @should_be=split(/,/,$should);
     my @should_be=split(/\|/,$should);
     foreach my $should_be (@should_be){
         is (exists $is{$should_be},1,
-	    "  * Entry $should_be IS in multivalue attribute $attr of $sam_account");
+	    "  * Entry <$should_be> IS in multivalue attribute $attr of $sam_account");
 	$test_count++;
     } 
     # were all actual memberships tested

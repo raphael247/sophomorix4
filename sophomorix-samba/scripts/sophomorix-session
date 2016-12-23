@@ -217,6 +217,7 @@ if ($session ne "" and $kill==1){
                         root_dse=>$root_dse,
                         session=>$session,
                         kill=>"TRUE",
+                        create=>"FALSE",
                         sessions_ref=>\%sessions,
                     });
     exit;
@@ -231,6 +232,7 @@ if ($create==1 and $teacher ne ""){
                         creationdate=>$time_stamp_file,
                         members=>$members,
                         create=>"TRUE",
+                        kill=>"FALSE",
                         developer_session=>$developer_session,
                         sessions_ref=>\%sessions,
                     });
@@ -243,6 +245,8 @@ if ($session ne ""){
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
                         teacher=>$teacher,
+                        create=>"FALSE",
+                        kill=>"FALSE",
                         session=>$session,
                         members=>$members,
                         sessions_ref=>\%sessions,
