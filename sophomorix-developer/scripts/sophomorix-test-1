@@ -28,6 +28,7 @@ use Sophomorix::SophomorixTest qw(
 $Conf::log_level=1;
 my $add=0;
 my $mod=0;
+my $ses=0;
 my $update=0;
 my $move=0;
 my $kill=0;
@@ -57,6 +58,7 @@ my $testopt=GetOptions(
            "test-kill" => \$test_kill,
            "add|a" => \$add,
            "mod" => \$mod,
+           "ses" => \$ses,
            "update|u" => \$update,
            "move|m" => \$move,
            "kill|k" => \$kill,
@@ -133,6 +135,9 @@ Step by step Test:
   Modify the users
       sophomorix-test-1 --mod
 
+  Test the use of sessions
+      sophomorix-test-1 --ses
+
   Copy sophomorix.update:
       sophomorix-test-1 --cp-update
   Update the users:
@@ -179,6 +184,7 @@ Step by step Test:
 if ($full==1){
     $add=1;
     $mod=1;
+    $ses=1;
     $update=1;
     $move=1;
     $kill=1;
@@ -289,11 +295,11 @@ if ($add==1 or $test_add==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>"maiersa42,muellegr42",
+                   sophomorixMembers=>"maiersa42|muellegr42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "bsz-students",
-                   member => "maiersa42,muellegr42",
+                   member => "maiersa42|muellegr42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -305,7 +311,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-students",
-                   member => "bsz-m7ab,bsz-m8cd",
+                   member => "bsz-m7ab|bsz-m8cd",
                   });
 
 
@@ -354,11 +360,11 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"maiersa42,muellegr42",
+                   sophomorixMembers=>"maiersa42|muellegr42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "bsz-students",
-                   member => "maiersa42,muellegr42",
+                   member => "maiersa42|muellegr42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -418,11 +424,11 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"jonsonad42,samardze42",
+                   sophomorixMembers=>"jonsonad42|samardze42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "bsz-students",
-                   member => "jonsonad42,samardze42",
+                   member => "jonsonad42|samardze42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -482,11 +488,11 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"jonsonad42,samardze42",
+                   sophomorixMembers=>"jonsonad42|samardze42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "bsz-students",
-                   member => "jonsonad42,samardze42",
+                   member => "jonsonad42|samardze42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -564,11 +570,11 @@ if ($add==1 or $test_add==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"oe42,wu42",
+                   sophomorixMembers=>"oe42|wu42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "oe42,wu42",
+                   member => "oe42|wu42",
                   });
 
 
@@ -597,7 +603,7 @@ if ($add==1 or $test_add==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixStatus => "U",
-                   memberOf => "uni-12abc,",
+                   memberOf => "uni-12abc",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -617,11 +623,11 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"lordjo42,blackmri42",
+                   sophomorixMembers=>"lordjo42|blackmri42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "uni-students",
-                   member => "lordjo42,blackmri42",
+                   member => "lordjo42|blackmri42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -661,7 +667,7 @@ if ($add==1 or $test_add==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixStatus => "U",
-                   memberOf => "uni-12abc,",
+                   memberOf => "uni-12abc",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -681,11 +687,11 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"lordjo42,blackmri42",
+                   sophomorixMembers=>"lordjo42|blackmri42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "uni-students",
-                   member => "lordjo42,blackmri42",
+                   member => "lordjo42|blackmri42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -725,7 +731,7 @@ if ($add==1 or $test_add==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixStatus => "U",
-                   memberOf => "uni-teachers,",
+                   memberOf => "uni-teachers",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -735,11 +741,11 @@ if ($add==1 or $test_add==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"kep42,gal42",
+                   sophomorixMembers=>"kep42|gal42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "kep42,gal42",
+                   member => "kep42|gal42",
               });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -749,11 +755,11 @@ if ($add==1 or $test_add==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"kep42,gal42",
+                   sophomorixMembers=>"kep42|gal42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "kep42,gal42",
+                   member => "kep42|gal42",
                   });
 
 
@@ -782,7 +788,7 @@ if ($add==1 or $test_add==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixStatus => "U",
-                   memberOf => "uni-teachers,",
+                   memberOf => "uni-teachers",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -792,11 +798,11 @@ if ($add==1 or $test_add==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"kep42,gal42",
+                   sophomorixMembers=>"kep42|gal42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "kep42,gal42",
+                   member => "kep42|gal42",
               });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -806,11 +812,11 @@ if ($add==1 or $test_add==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"kep42,gal42",
+                   sophomorixMembers=>"kep42|gal42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "kep42,gal42",
+                   member => "kep42|gal42",
                   });
 
 
@@ -923,7 +929,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"globalmanagementclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-wifi,uni-wifi,wifi,",
+                   member => "bsz-wifi|uni-wifi|wifi",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-internet,OU=Management,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -934,7 +940,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"globalmanagementclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-internet,uni-internet,internet,",
+                   member => "bsz-internet|uni-internet|internet",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-admins,OU=Management,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -945,7 +951,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"globalmanagementclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-admins,uni-admins,admins,",
+                   member => "bsz-admins|uni-admins|admins",
                   });
     # &AD_test_object({ldap=>$ldap,
     #                dn=>"CN=global-examaccounts,OU=ExamAccounts,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -967,7 +973,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"globalclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-students,uni-students,students",
+                   member => "bsz-students|uni-students|students",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-teachers,OU=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -978,16 +984,15 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"globalclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-teachers,uni-teachers,teachers",
+                   member => "bsz-teachers|uni-teachers|teachers",
                   });
 }
 
 
 
 ############################################################
-# Moving users --move
+# Modifying users --mod
 ############################################################
-# --mod
 if ($mod==1){
 
     &run_command("sophomorix-user $verbose_options -F --user maiersa42");
@@ -1332,6 +1337,49 @@ if ($mod==1){
                   });
 }
 
+
+############################################################
+# Modifying users --mod
+############################################################
+if ($ses==1){
+    print "Session tests\n";
+    &run_command("sophomorix-session $verbose_options --create --teacher maiersa42 --developer-session 666");
+    &run_command("sophomorix-session $verbose_options --create --teacher maiersa42 --developer-session 777");
+
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   uidNumber=>"-1",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixBirthdate  => "25.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixStatus => "U",
+                   memberOf => "bsz-m7ab",
+                   sophomorixSessions => "666;|777;",
+                  });
+
+
+
+}
+
+
 ############################################################
 # Moving users --move
 ############################################################
@@ -1627,11 +1675,11 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"jonsonad42,samardze42",
+                   sophomorixMembers=>"jonsonad42|samardze42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "bsz-students",
-                   member => "jonsonad42,samardze42",
+                   member => "jonsonad42|samardze42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -1691,11 +1739,11 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"jonsonad42,samardze42",
+                   sophomorixMembers=>"jonsonad42|samardze42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "bsz-students",
-                   member => "jonsonad42,samardze42",
+                   member => "jonsonad42|samardze42",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -1809,11 +1857,11 @@ if ($move==1 or $test_move==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"wu42,lordjo42",
+                   sophomorixMembers=>"wu42|lordjo42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "wu42,lordjo42",
+                   member => "wu42|lordjo42",
               });
 
 
@@ -1852,11 +1900,11 @@ if ($move==1 or $test_move==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"wu42,lordjo42",
+                   sophomorixMembers=>"wu42|lordjo42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    memberOf => "global-teachers",
-                   member => "wu42,lordjo42",
+                   member => "wu42|lordjo42",
                   });
 
 
@@ -2167,7 +2215,7 @@ if ($move==1 or $test_move==1){
                    sophomorixType=>"globalmanagementclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "ghs-wifi,lin-wifi,bsz-wifi,uni-wifi,wifi,",
+                   member => "ghs-wifi|lin-wifi|bsz-wifi|uni-wifi|wifi",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-internet,OU=Management,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -2178,7 +2226,7 @@ if ($move==1 or $test_move==1){
                    sophomorixType=>"globalmanagementclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "ghs-internet,lin-internet,bsz-internet,uni-internet,internet,",
+                   member => "ghs-internet|lin-internet|bsz-internet|uni-internet|internet",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-admins,OU=Management,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -2189,7 +2237,7 @@ if ($move==1 or $test_move==1){
                    sophomorixType=>"globalmanagementclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "ghs-admins,lin-admins,bsz-admins,uni-admins,admins,",
+                   member => "ghs-admins|lin-admins|bsz-admins|uni-admins|admins",
                   });
     # &AD_test_object({ldap=>$ldap,
     #                dn=>"CN=global-examaccounts,OU=ExamAccounts,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -2200,7 +2248,7 @@ if ($move==1 or $test_move==1){
     #                sophomorixType=>"globalmanagementclass",
     #                sophomorixHidden=>"FALSE",
     #                memberOf => "",
-    #                member => "ghs-examaccounts,lin-examaccounts,bsz-examaccounts,uni-examaccounts,examaccounts",
+    #                member => "ghs-examaccounts|lin-examaccounts|bsz-examaccounts|uni-examaccounts|examaccounts|,
     #               });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-students,OU=global-students,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -2211,7 +2259,7 @@ if ($move==1 or $test_move==1){
                    sophomorixType=>"globalclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-students,uni-students,lin-students,ghs-students,students",
+                   member => "bsz-students|uni-students|lin-students|ghs-students|students",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-teachers,OU=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
@@ -2222,7 +2270,7 @@ if ($move==1 or $test_move==1){
                    sophomorixType=>"globalclass",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
-                   member => "bsz-teachers,uni-teachers,lin-teachers,ghs-teachers,teachers",
+                   member => "bsz-teachers|uni-teachers|lin-teachers|ghs-teachers|teachers",
                   });
 }
 

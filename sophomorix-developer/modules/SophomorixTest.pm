@@ -239,6 +239,7 @@ sub AD_test_object {
     my $s_admingroups = $arg_ref->{sophomorixAdminGroups};
     my $s_membergroups = $arg_ref->{sophomorixMemberGroups};
     my $s_hidden = $arg_ref->{sophomorixHidden};
+    my $s_sessions = $arg_ref->{sophomorixSessions};
 
     my $member = $arg_ref->{member};
     my $member_of = $arg_ref->{memberOf};
@@ -508,8 +509,11 @@ sub AD_test_object {
         if (defined $s_membergroups){
             &test_multivalue($s_membergroups,"sophomorixMemberGroups",$entry,$sam_account);
         }
-
-
+        ##################################################
+        if (defined $s_sessions){
+            &test_multivalue($s_sessions,"sophomorixSessions",$entry,$sam_account);
+        }
+        ##################################################
 
 
         ##################################################
@@ -610,6 +614,7 @@ sub test_multivalue {
     my $count=0;
     foreach my $item (@data){
         my ($ent,@rest)=split(/,/,$item);
+#        my ($ent,@rest)=split(/\|/,$item);
         $ent=~s/^CN=//;
         #print "      * Datum: $ent\n";
         $is{$ent}="seen";
@@ -617,7 +622,8 @@ sub test_multivalue {
     }
     # compare with should attrs
     my $test_count=0;
-    my @should_be=split(/,/,$should);
+ #   my @should_be=split(/,/,$should);
+    my @should_be=split(/\|/,$should);
     foreach my $should_be (@should_be){
         is (exists $is{$should_be},1,
 	    "  * Entry $should_be IS in multivalue attribute $attr of $sam_account");
