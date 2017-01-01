@@ -82,6 +82,7 @@ my $json=0;
 
 my $create=0;
 my $kill=0;
+my $kill_all_sessions=0;
 my $teacher="";
 my $session="";
 my $developer_session="";
@@ -95,6 +96,7 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "create|c" => \$create,
            "kill" => \$kill,
+           "kill-all-sessions" => \$kill_all_sessions,
            "teacher|t=s" => \$teacher,
            "session|s=s" => \$session,
            "members|m=s" => \$members,
@@ -125,7 +127,6 @@ if ($help==1) {
    print('
 sophomorix-session manages sessions
 
-
 Options:
   -h  / --help
   -v  / --verbose
@@ -135,18 +136,14 @@ Options:
   --members <user1>,<user2>, ...
   --create (user current time as session-id)
   --kill -s <session-id>
-  
+  --kill-all-sessions
 
 Create a session with the current time:
   sophomorix-session --create --teacher <user>
   sophomorix-session --create --teacher <user> --members <user1>,<user2>, ...
 
 Update the students of a running session:
-  sophomorix-session --session <sessen_id> --members <user1>,<user2>, ...
-
-
-
-
+  sophomorix-session --session <session_id> --members <user1>,<user2>, ...
 
 Dumping data:  
   -ij                              (dump sessions)                
@@ -203,12 +200,27 @@ if ($info==1) {
 }
 
 
+
 &log_script_start(@arguments);
 
 
 ################################################################################
 # Start
 ################################################################################
+
+if ($kill_all_sessions==1){
+    &Sophomorix::SophomorixBase::print_title("Killing the following sessions:");
+    foreach my $session (keys %{ $sessions{'id'} }) {
+        &AD_session_manage({ldap=>$ldap,
+                            root_dse=>$root_dse,
+                            session=>$session,
+                            kill=>"TRUE",
+                            create=>"FALSE",
+                           sessions_ref=>\%sessions,
+                        });
+    }
+    exit;
+}
 
 
 if ($session ne "" and $kill==1){

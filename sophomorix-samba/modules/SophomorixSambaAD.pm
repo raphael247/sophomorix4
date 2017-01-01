@@ -590,6 +590,7 @@ sub AD_session_manage {
 
         if ($kill eq "TRUE"){
 	    print "Killing session $session_new\n";
+            $session_string_new="---";
             delete $new_sessions{$session_new};
         } else {
             # overwrite the changing session
@@ -600,7 +601,7 @@ sub AD_session_manage {
         foreach my $session ( keys %new_sessions ) {
             my $string=$session.";".$new_sessions{$session};
             push @new_sessions, $string;
-	    print "String: $string\n";
+	    #print "String: $string\n";
         }
 
         if($Conf::log_level>=1){
