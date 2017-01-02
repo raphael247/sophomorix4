@@ -2473,6 +2473,8 @@ sub AD_group_list {
     my $filter;
     if ($type eq "project"){
         $filter="(&(objectClass=group)(sophomorixType=project))";
+    } elsif ($type eq "sophomorix-group"){
+        $filter="(&(objectClass=group)(sophomorixType=sophomorix-group))";
     } elsif ($type eq "adminclass"){
         $filter="(&(objectClass=group)(sophomorixType=adminclass))";
     }
@@ -2487,7 +2489,6 @@ sub AD_group_list {
                    control => [ $sort ]
                          );
     my $max_pro = $mesg->count;
-
     if ($show==1){ 
         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
         print "-------------------+----------+-----+----+-+-",
@@ -2495,6 +2496,9 @@ sub AD_group_list {
 	if ($type eq "project"){
         printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
                "Project Name","AQ","AMQ","MM","H","A","L","S","J","Project Description";
+        } elsif ($type eq "sophomorix-group"){
+        printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
+               "Group Name","Quota","MQ","MM","H","A","L","S","J","Class Description";
         } elsif ($type eq "adminclass"){
         printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
                "Class Name","Quota","MQ","MM","H","A","L","S","J","Class Description";
@@ -2580,6 +2584,18 @@ sub AD_group_list {
                     $status,
                     $joinable,
 	            $description;
+            } elsif ($type eq "sophomorix-group"){
+                printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
+                    $entry->get_value('sAMAccountName'),
+                    $quota,
+                    $mailquota,
+                    $maxmembers,
+                    $hidden,
+                    $mailalias,
+                    $maillist,
+                    $status,
+                    $joinable,
+	            $description;
             } elsif ($type eq "adminclass"){
                 printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
@@ -2599,6 +2615,9 @@ sub AD_group_list {
 	if ($type eq "project"){
             print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
             print " A=mailalias    L=mailist,       S=status      H=hidden\n";
+        } elsif ($type eq "sophomorix-group"){
+            print "MQ=mailquota   J=joinable   MM=maxmembers      H=hidden\n";
+            print " A=mailalias      L=mailist,    S=status\n";
         } elsif ($type eq "adminclass"){
             print "MQ=mailquota   J=joinable   MM=maxmembers      H=hidden\n";
             print " A=mailalias      L=mailist,    S=status\n";
