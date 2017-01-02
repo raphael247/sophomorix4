@@ -119,7 +119,7 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-my %sessions=&AD_get_sessions($ldap,$root_dse);
+my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns);
 
 
 

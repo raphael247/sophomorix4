@@ -766,24 +766,27 @@ sub config_sophomorix_read {
     my @grouplist=("wifi","internet","admins");
     foreach my $group (@grouplist){
         my $sub_ou=$DevelConf::AD_management_ou;
- 
-        # old
-        #my $ou_group="OU=global-".$group.",".
-        #    $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
-        #my $cn_group="CN=global-".$group.",".$ou_group;
-        #$sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}="global-".$group;
-        #$sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
-
-        # new
-        my $cn_group="CN=global-".$group.",".
+         my $cn_group="CN=global-".$group.",".
             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
 
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{"global-".$group}=
             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{"global-".$group}="none";
-        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalmanagementclass";
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
+
+
+        if ($group eq "internet"){
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalinternetaccess";
+        } elsif ($group eq "wifi"){
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwifiaccess";
+        } elsif ($group eq "admins"){
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globaladmins";
+        } else {
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalmanagementgroup";
+        }
+
+
     }
 
     # SCHOOLS
@@ -791,37 +794,25 @@ sub config_sophomorix_read {
         # my @grouplist=("examaccounts","wifi","internet");
         my @grouplist=("wifi","internet","admins");
         foreach my $group (@grouplist){
-            my $sub_ou;
-#           if ($group eq "examaccounts"){
-#               $sub_ou=$DevelConf::AD_examaccount_ou;
-#           } else {
-                # wifi, internet
-                $sub_ou=$DevelConf::AD_management_ou;
-#           }
-
-            # old
-            #my $ou_group="OU=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
-            #       $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-            #my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
-            #my $cn_group="CN=".$group_prefix.",".$ou_group;
-            #$sophomorix_config{'SCHOOLS'}{$ou}{GROUP_OU}{$ou_group}="$group_prefix";
-            #$sophomorix_config{'SCHOOLS'}{$ou}{GROUP_CN}{$cn_group}="$group_prefix";
-
-            # new
+            my $sub_ou=$DevelConf::AD_management_ou;
             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
                    $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
             my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
-            #my $cn_group="CN=".$group_prefix.",".$ou_group;
-            #$sophomorix_config{'SCHOOLS'}{$ou}{GROUP_OU}{$ou_group}="$group_prefix";
             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_CN}{$cn_group}="$group_prefix";
-
-
             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP}{$group_prefix}=
                 $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
-            $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="managementclass";
             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_DESCRIPTION}{$group_prefix}="LML $ou $group";
             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_MEMBER}{$group_prefix}="global-".$group;
+            if ($group eq "internet"){
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="internetaccess";
+            } elsif ($group eq "wifi"){
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="wifiaccess";
+            } elsif ($group eq "admins"){
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="admins";
+            } else {
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="managementgroup";
+	    }
         }
     }
     close(ROLETYPE);

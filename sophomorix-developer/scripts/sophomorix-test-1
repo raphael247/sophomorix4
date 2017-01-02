@@ -927,7 +927,7 @@ if ($add==1 or $test_add==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalmanagementclass",
+                   sophomorixType=>"globalwifiaccess",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                    member => "bsz-wifi|uni-wifi|wifi",
@@ -938,7 +938,7 @@ if ($add==1 or $test_add==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalmanagementclass",
+                   sophomorixType=>"globalinternetaccess",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                    member => "bsz-internet|uni-internet|internet",
@@ -949,7 +949,7 @@ if ($add==1 or $test_add==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalmanagementclass",
+                   sophomorixType=>"globaladmins",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                    member => "bsz-admins|uni-admins|admins",
@@ -960,7 +960,7 @@ if ($add==1 or $test_add==1){
     #                gidNumber=>"-1",
     #                sophomorixCreationDate => "exists",
     #                sophomorixStatus=>"P",
-    #                sophomorixType=>"globalmanagementclass",
+    #                sophomorixType=>"globalmanagementgroup",
     #                sophomorixHidden=>"FALSE",
     #                memberOf => "",
     #                member => "bsz-examaccounts,uni-examaccounts,examaccounts,",
@@ -1346,8 +1346,9 @@ if ($ses==1){
     print "Session tests\n";
     &run_command("sophomorix-session $verbose_options --create --teacher maiersa42 --developer-session 666");
     &run_command("sophomorix-session $verbose_options --create --teacher maiersa42 --developer-session 777");
-    &AD_test_session_count($ldap,$root_dse,2);
-
+    print "HERE1\n";
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    print "HERE2\n";
     # maiersa42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1379,7 +1380,7 @@ if ($ses==1){
 
     &run_command("sophomorix-session $verbose_options --session 666 --members lordjo42");
     &run_command("sophomorix-session $verbose_options --session 777 --members lordjo42,blackmri42");
-    &AD_test_session_count($ldap,$root_dse,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1412,7 +1413,7 @@ if ($ses==1){
 
     # --removemembers
     &run_command("sophomorix-session $verbose_options --session 777 --removemembers blackmri42");
-    &AD_test_session_count($ldap,$root_dse,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1445,7 +1446,7 @@ if ($ses==1){
 
     # --removemembers (removing nonexisting member)
     &run_command("sophomorix-session $verbose_options --session 777 --removemembers blackmri42");
-    &AD_test_session_count($ldap,$root_dse,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1479,7 +1480,7 @@ if ($ses==1){
 
     # --addmembers (adding already existing member)
     &run_command("sophomorix-session $verbose_options --session 777 --addmembers lordjo42");
-    &AD_test_session_count($ldap,$root_dse,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1513,7 +1514,7 @@ if ($ses==1){
 
     # --addmembers
     &run_command("sophomorix-session $verbose_options --session 666 --addmembers blackmri42");
-    &AD_test_session_count($ldap,$root_dse,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1548,7 +1549,7 @@ if ($ses==1){
     &run_command("sophomorix-session $verbose_options --kill --session 666");
     &run_command("sophomorix-session $verbose_options --kill --session 777");
 
-    &AD_test_session_count($ldap,$root_dse,0);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,0);
 }
 
 
@@ -2384,7 +2385,7 @@ if ($move==1 or $test_move==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalmanagementclass",
+                   sophomorixType=>"globalwifiaccess",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                    member => "ghs-wifi|lin-wifi|bsz-wifi|uni-wifi|wifi",
@@ -2395,7 +2396,7 @@ if ($move==1 or $test_move==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalmanagementclass",
+                   sophomorixType=>"globalinternetaccess",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                    member => "ghs-internet|lin-internet|bsz-internet|uni-internet|internet",
@@ -2406,7 +2407,7 @@ if ($move==1 or $test_move==1){
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalmanagementclass",
+                   sophomorixType=>"globaladmins",
                    sophomorixHidden=>"FALSE",
                    memberOf => "",
                    member => "ghs-admins|lin-admins|bsz-admins|uni-admins|admins",
@@ -2417,7 +2418,7 @@ if ($move==1 or $test_move==1){
     #                gidNumber=>"-1",
     #                sophomorixCreationDate => "exists",
     #                sophomorixStatus=>"P",
-    #                sophomorixType=>"globalmanagementclass",
+    #                sophomorixType=>"globalmanagementgroup",
     #                sophomorixHidden=>"FALSE",
     #                memberOf => "",
     #                member => "ghs-examaccounts|lin-examaccounts|bsz-examaccounts|uni-examaccounts|examaccounts|,
