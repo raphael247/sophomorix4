@@ -28,6 +28,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             AD_object_nonexist
             AD_test_object
+            AD_test_session_count
             AD_test_dns
             AD_test_nondns
             AD_computers_any
@@ -37,6 +38,17 @@ $Data::Dumper::Terse = 1;
             run_command
 
             );
+
+
+
+sub AD_test_session_count {
+    my ($ldap,$root_dse,$should) = @_;
+    my %sessions=&Sophomorix::SophomorixSambaAD::AD_get_sessions($ldap,$root_dse);
+    my $count=$sessions{'sessioncount'};
+    is ($count,$should,"  * There exist $should sessions");
+    return $count;
+}
+
 
 
 sub AD_computers_any {
