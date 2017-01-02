@@ -1379,12 +1379,12 @@ sub AD_get_sessions {
                                dnsnodes=>"FALSE",
                   });
 
-#my %AD= %$ref_AD; 
-#  &Sophomorix::SophomorixBase::json_dump({json => "1",
-#                jsoninfo => "SEARCH",
-#                jsoncomment => "AD Content",
-#                hash_ref=>\%AD,
-#              });
+my %AD= %$ref_AD; 
+  &Sophomorix::SophomorixBase::json_dump({json => "1",
+                jsoninfo => "SEARCH",
+                jsoncomment => "AD Content",
+                hash_ref=>\%AD,
+              });
 
 
     $mesg = $ldap->search( # perform a search
@@ -1667,7 +1667,7 @@ sub AD_get_AD {
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
-            $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'internetaccess'}=$sam;
+            #$AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'internetaccess'}=$sam;
             $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'sophomorixStatus'}=$stat;
             $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'sophomorixType'}=$type;
             if($Conf::log_level>=2){
@@ -1703,7 +1703,7 @@ sub AD_get_AD {
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
-            $AD{'objectclass'}{'group'}{'wifiaccess'}{$sam}{'wifiaccess'}=$sam;
+            #$AD{'objectclass'}{'group'}{'wifiaccess'}{$sam}{'wifiaccess'}=$sam;
             $AD{'objectclass'}{'group'}{'wifiaccess'}{$sam}{'sophomorixStatus'}=$stat;
             $AD{'objectclass'}{'group'}{'wifiaccess'}{$sam}{'sophomorixType'}=$type;
             if($Conf::log_level>=2){
@@ -1739,7 +1739,7 @@ sub AD_get_AD {
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
-            $AD{'objectclass'}{'group'}{'admins'}{$sam}{'admins'}=$sam;
+            #$AD{'objectclass'}{'group'}{'admins'}{$sam}{'admins'}=$sam;
             $AD{'objectclass'}{'group'}{'admins'}{$sam}{'sophomorixStatus'}=$stat;
             $AD{'objectclass'}{'group'}{'admins'}{$sam}{'sophomorixType'}=$type;
             if($Conf::log_level>=2){
@@ -2969,9 +2969,9 @@ sub AD_group_addmember {
 
     if (defined $adduser){
         my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$adduser);
-        print "   * Adding user $adduser to group $group\n";
         if ($count > 0){
             print "   * User $adduser exists ($count results)\n";
+            print "   * Adding user $adduser to group $group\n";
             my $mesg = $ldap->modify( $dn_exist_group,
      	         	      add => {
                                   member => $dn_exist,
@@ -2982,7 +2982,11 @@ sub AD_group_addmember {
             #print "   # $command\n";
             #system($command);
             return;
-         }
+	} else {
+            # user does not exist -> exit with warning
+            print "   * WARNING: User $adduser nonexisting ($count results)\n";
+            return;
+        }
     } elsif (defined $addgroup){
         print "   * Adding group $addgroup to $group\n";
         my ($count_group,$dn_exist_addgroup,$cn_exist_addgroup)=&AD_object_search($ldap,$root_dse,"group",$addgroup);
@@ -3022,9 +3026,9 @@ sub AD_group_removemember {
 
     if (defined $removeuser){
         my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$removeuser);
-        print "   * Removing user $removeuser from group $group\n";
         if ($count > 0){
             print "   * User $removeuser exists ($count results)\n";
+            print "   * Removing user $removeuser from group $group\n";
             my $mesg = $ldap->modify( $dn_exist_group,
 	  	                  delete => {
                                   member => $dn_exist,
@@ -3033,6 +3037,10 @@ sub AD_group_removemember {
             #my $command="samba-tool group removemembers ". $group." ".$removeuser;
             #print "   # $command\n";
             #system($command);
+            return;
+        } else {
+            # user does not exist -> exit with warning
+            print "   * WARNING: User $removeuser nonexisting ($count results)\n";
             return;
         }
     } elsif (defined $removegroup){
