@@ -1407,6 +1407,137 @@ if ($ses==1){
                    sophomorixSessions => "666;lordjo42|777;lordjo42,blackmri42",
                   });
 
+   # --removemembers
+   &run_command("sophomorix-session $verbose_options --session 777 --removemembers blackmri42");
+
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   uidNumber=>"-1",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixBirthdate  => "25.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixStatus => "U",
+                   memberOf => "bsz-m7ab",            
+                   sophomorixSessions => "666;lordjo42|777;lordjo42",
+                  });
+
+   # --removemembers (removing nonexisting member)
+   &run_command("sophomorix-session $verbose_options --session 777 --removemembers blackmri42");
+
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   uidNumber=>"-1",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixBirthdate  => "25.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixStatus => "U",
+                   memberOf => "bsz-m7ab",            
+                   sophomorixSessions => "666;lordjo42|777;lordjo42",
+                  });
+
+
+   # --addmembers (adding already existing member)
+   &run_command("sophomorix-session $verbose_options --session 777 --addmembers lordjo42");
+
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   uidNumber=>"-1",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixBirthdate  => "25.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixStatus => "U",
+                   memberOf => "bsz-m7ab",            
+                   sophomorixSessions => "666;lordjo42|777;lordjo42",
+                  });
+
+
+   # --addmembers
+   &run_command("sophomorix-session $verbose_options --session 666 --addmembers blackmri42");
+
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   uidNumber=>"-1",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixBirthdate  => "25.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixStatus => "U",
+                   memberOf => "bsz-m7ab",            
+                   sophomorixSessions => "666;lordjo42,blackmri42|777;lordjo42",
+                  });
+
+
 
 
 
