@@ -1361,43 +1361,43 @@ sub AD_object_search {
     }
 }
 
+
 sub AD_get_sessions {
     my ($ldap,$root_dse)=@_;
     my %sessions=();
-
-
-        $mesg = $ldap->search( # perform a search
-                       base   => $root_dse,
-                       scope => 'sub',
-                       filter => '(&(objectClass=user)(sophomorixRole=*))',
-                       #filter => '(&(objectClass=user) (sophomorixRole=student))',
-                       attrs => ['sAMAccountName',
-                                 'sophomorixSessions',
-                                ]);
-        my $max_user = $mesg->count; 
-        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
-        $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
-        for( my $index = 0 ; $index < $max_user ; $index++) {
-            my $entry = $mesg->entry($index);
-            my $sam=$entry->get_value('sAMAccountName');
-	    #$sessions{'user'}{$sam}="sophomorixSessions";;
-            my @session_list = sort $entry->get_value('sophomorixSessions');
-            foreach my $session (@session_list){
-                my ($id,$members,$strung)=split(/;/,$session);
-                # save by user
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}=$members;
-                # save by id
-                $sessions{'id'}{$id}{'sAMAccountName'}=$sam;
-                $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
-                $sessions{'id'}{$id}{'members'}=$members;
-	    }
-        
-
+    my $session_count=0;
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => '(&(objectClass=user)(sophomorixRole=*))',
+                  #filter => '(&(objectClass=user) (sophomorixRole=student))',
+                   attrs => ['sAMAccountName',
+                             'sophomorixSessions',
+                            ]);
+    my $max_user = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+    $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        #$sessions{'user'}{$sam}="sophomorixSessions";;
+        my @session_list = sort $entry->get_value('sophomorixSessions');
+        foreach my $session (@session_list){
+            $session_count++;
+            my ($id,$members,$strung)=split(/;/,$session);
+            # save by user
+            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
+            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}=$members;
+            # save by id
+            $sessions{'id'}{$id}{'sAMAccountName'}=$sam;
+            $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
+            $sessions{'id'}{$id}{'members'}=$members;
         }
-
+    }
+    $sessions{'sessioncount'}=$session_count;
     return %sessions; 
 }
+
 
 sub AD_get_AD {
     my %AD=();
