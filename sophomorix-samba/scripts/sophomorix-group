@@ -99,7 +99,7 @@ if ($help==1) {
    print('
 sophomorix-group adds/modifies/deletes a group in samba 4 AD
 
-Options
+Options:
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
@@ -115,6 +115,10 @@ Options
 
   --addgroup group
   --removegroup group
+
+Examples:
+  Add a user to a management group:
+  sophomorix-group --addmember <user> --group <internet|wifi|*-internet|*-wifi>
 
 Please see the sophomorix-group(8) man pages for full documentation
 ');

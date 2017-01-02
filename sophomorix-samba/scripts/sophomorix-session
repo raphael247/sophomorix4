@@ -80,6 +80,7 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
+my $dump_AD=0;
 
 my $create=0;
 my $kill=0;
@@ -98,6 +99,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "help|h" => \$help,
            "create|c" => \$create,
+           "dump-AD" => \$dump_AD,
            "kill" => \$kill,
            "kill-all-sessions" => \$kill_all_sessions,
            "teacher|t=s" => \$teacher,
@@ -119,7 +121,7 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns);
+my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD);
 
 
 
@@ -153,7 +155,9 @@ Update the students of a running session:
   sophomorix-session --session <session_id> --members <user1>,<user2>, ...
 
 Dumping data:  
-  -ij                              (dump sessions)                
+  -ij                              (dump sessions)  
+  --dump-AD -j                     (dump AD data about management groups)     
+  
   -j / --json                      (dump as a nice json object)
   -jj / --json --json              (dump as a compact json object)
   -jjj / --json --json --json      (dump as a perl hash)
@@ -180,7 +184,7 @@ if ($info==1) {
     if ($session ne "" and exists $sessions{'id'}{$session}{'sAMAccountName'}){
         print "Session $session:\n";
         print "   *     sAMAccountName:  $sessions{'id'}{$session}{'sAMAccountName'}  (teacher of the session)\n";
-        print "   *            members:  $sessions{'id'}{$session}{'members'}  (students of the session)\n";
+        print "   *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
         print "   * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         
     }
@@ -198,7 +202,7 @@ if ($info==1) {
             print "\n";
             print "$count) Teacher $teacher session: $session\n";
             print "   *     sAMAccountName:  $sessions{'id'}{$session}{'sAMAccountName'}  (teacher of the session)\n";
-            print "   *            members:  $sessions{'id'}{$session}{'members'}  (students of the session)\n";
+            print "   *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
             print "   * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         }
     }
@@ -281,7 +285,7 @@ if ($session ne "" and $members ne ""){
 # --addmembers
 if ($session ne "" and $addmembers ne ""){
     my @addmembers=split(/,/,$addmembers);
-    my @old_members=split(/,/,$sessions{'id'}{$session}{'members'});
+    my @old_members=split(/,/,$sessions{'id'}{$session}{'memberstring'});
     my @members = uniq(@old_members,@addmembers);
     my $members_new=join(",",@members);
     # update the requested session
@@ -301,7 +305,7 @@ if ($session ne "" and $addmembers ne ""){
 
 # --removemembers
 if ($session ne "" and $removemembers ne ""){
-    my @old_members=split(/,/,$sessions{'id'}{$session}{'members'});
+    my @old_members=split(/,/,$sessions{'id'}{$session}{'memberstring'});
     my @members = &remove_from_list($removemembers,@old_members);
     my $members_new=join(",",@members);
     # update the requested session

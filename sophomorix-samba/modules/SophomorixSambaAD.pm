@@ -1364,7 +1364,7 @@ sub AD_object_search {
 
 
 sub AD_get_sessions {
-    my ($ldap,$root_dse,$root_dns)=@_;
+    my ($ldap,$root_dse,$root_dns,$json,$dump_AD)=@_;
     my %sessions=();
     my $session_count=0;
 
@@ -1378,14 +1378,13 @@ sub AD_get_sessions {
                                dnszones=>"FALSE",
                                dnsnodes=>"FALSE",
                   });
-
-my %AD= %$ref_AD; 
-  &Sophomorix::SophomorixBase::json_dump({json => "1",
-                jsoninfo => "SEARCH",
-                jsoncomment => "AD Content",
-                hash_ref=>\%AD,
-              });
-
+    if ($dump_AD==1){
+        &Sophomorix::SophomorixBase::json_dump({json => $json,
+                                                jsoninfo => "SEARCH",
+                                                jsoncomment => "AD Content",
+                                                hash_ref=>$ref_AD,
+                                               });
+    }
 
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -1412,15 +1411,30 @@ my %AD= %$ref_AD;
             my ($id,$members,$string)=split(/;/,$session);
             # save by user
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
-            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}=$members;
+            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'memberstring'}=$members;
             # save by id
             $sessions{'id'}{$id}{'sAMAccountName'}=$sam;
             $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
-            $sessions{'id'}{$id}{'members'}=$members;
-            # save memberlist
+            $sessions{'id'}{$id}{'memberstring'}=$members;
+
+            # save member information
             my @members=split(/,/,$members);
             foreach $member (@members){
-                print "Member of $id: $member\n";
+                # test membership in managementgroups
+                my @grouptypes=("wifiaccess","internetaccess");
+                foreach my $grouptype (@grouptypes){
+                    # befor testing set FALSE as default
+                    $sessions{'id'}{$id}{'members'}{$member}{$grouptype}="FALSE";
+                    $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{$grouptype}="FALSE";
+                    foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
+                        if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$member}){
+                            # if in the groups, set TRUE
+                            $sessions{'id'}{$id}{'members'}{$member}{$grouptype}="TRUE";
+                            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{$grouptype}="TRUE";
+                        }
+                    }
+                }
+                # do more with the session members
             }
         }
     }
