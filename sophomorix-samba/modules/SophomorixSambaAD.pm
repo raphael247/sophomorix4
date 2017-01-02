@@ -1375,15 +1375,19 @@ sub AD_get_sessions {
                              'sophomorixSessions',
                             ]);
     my $max_user = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+    if($Conf::log_level>=2){
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found to test for sessions");
+    }
     $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        #$sessions{'user'}{$sam}="sophomorixSessions";;
         my @session_list = sort $entry->get_value('sophomorixSessions');
         foreach my $session (@session_list){
             $session_count++;
+            if($Conf::log_level>=2){
+                &Sophomorix::SophomorixBase::print_title("$session_count: User $sam has session $session");
+            }
             my ($id,$members,$strung)=split(/;/,$session);
             # save by user
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
@@ -1395,6 +1399,7 @@ sub AD_get_sessions {
         }
     }
     $sessions{'sessioncount'}=$session_count;
+    &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 
 }
 
