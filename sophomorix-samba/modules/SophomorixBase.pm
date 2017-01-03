@@ -1136,13 +1136,27 @@ sub create_plain_password {
 
 
 
+# filesystem
+######################################################################
+sub get_homedirectory {
+    my ($root_dns,$school,$group_basename,$login,$role)=@_;
+    my $homedirectory;
+    if ($role eq "student"){
+        $homedirectory="\\\\".$root_dns."\\".$school."\\students\\".$group_basename."\\homes\\".$login;
+    } elsif ($role eq "teacher"){
+        $homedirectory="\\\\".$root_dns."\\".$school."\\teachers\\homes\\".$login;
+    } else {
+        $homedirectory="\\\\".$root_dns."\\".$school."\\unknown\\".$group_basename."\\homes\\".$login;
+    }
+    return $homedirectory;
+}
 
 
 
 # others
 ######################################################################
 # error, when options are not given correctly
-sub  check_options{
+sub check_options{
    my ($parse_ergebnis) = @_;
    if (not $parse_ergebnis==1){
       my @list = split(/\//,$0);

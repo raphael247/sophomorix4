@@ -681,19 +681,14 @@ sub AD_user_create {
     my $user_principal_name = $login."\@"."linuxmuster.local";
     my $container=&AD_get_container($role,$group_basename);
 
-    # filesystem directory
-    my $homedirectory;
-    if ($role eq "student"){
-        $homedirectory="\\\\".$root_dns."\\".$school."\\students\\".$group_basename."\\homes\\".$login;
-    } elsif ($role eq "teacher"){
-        $homedirectory="\\\\".$root_dns."\\".$school."\\teachers\\homes\\".$login;
-    } else {
-        $homedirectory="\\\\".$root_dns."\\".$school."\\unknown\\".$group_basename."\\homes\\".$login;
-    }
+    my $homedirectory=&Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                                     $school,
+                                                                     $group_basename,
+                                                                     $login,
+                                                                     $role);
 
     my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-
 
     # password generation
     my $uni_password=&_unipwd_from_plainpwd($plain_password);
@@ -750,7 +745,6 @@ sub AD_user_create {
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
-#                   homeDirectory => "\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa42",
                    homeDirectory => $homedirectory,
                    sophomorixExitAdminClass => "unknown", 
                    sophomorixUnid => $unid,
@@ -932,6 +926,7 @@ sub AD_user_move {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $user = $arg_ref->{user};
     my $user_count = $arg_ref->{user_count};
     my $group_old = $arg_ref->{group_old};
@@ -969,6 +964,12 @@ sub AD_user_move {
          $target_branch="OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     }
 
+    my $homedirectory_new=&Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                                         $school_new,
+                                                                         $group_new_basename,
+                                                                         $user,
+                                                                         $role_new);
+
     # fetch the dn (where the object really is)
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$user);
     if ($count==0){
@@ -994,6 +995,7 @@ sub AD_user_move {
         print "   School(Old):    $school_old\n";
         print "   School(New):    $school_new\n";
         print "   Prefix(New):    $prefix_new\n";
+        print "   homeDirectory:  $homedirectory_new\n";
         print "   Creationdate:   $creationdate (if new group must be added)\n";
     }
 
@@ -1033,6 +1035,7 @@ sub AD_user_move {
                           sophomorixSchoolPrefix => $prefix_new,
                           sophomorixSchoolname => $school_new,
                           sophomorixRole => $role_new,
+                          homeDirectory => $homedirectory_new,
                       }
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);

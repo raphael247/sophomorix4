@@ -28,6 +28,7 @@ use Sophomorix::SophomorixBase qw(
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_move
                                  AD_bind_admin
+                                 AD_dns_get
                                  AD_unbind_admin
                                  AD_get_name_tokened
                                     );
@@ -98,6 +99,7 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
@@ -322,6 +324,7 @@ while(<USERVERSETZEN>){
     my $group_token_new=&AD_get_name_tokened($neue_klasse,$school_new,"adminclass");
     &AD_user_move({ldap=>$ldap,
                    root_dse=>$root_dse,
+                   root_dns=>$root_dns,
                    user=>$login_versetzen,
                    user_count=>$user_nummer,
                    group_old_basename=>$alte_klasse,
