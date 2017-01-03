@@ -679,7 +679,7 @@ if ($test_add_class==1){
 
     ##### Testing the global groups
 #    &AD_test_object({ldap=>$ldap,
-#                   dn=>"CN=global-examaccounts,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+#                   dn=>"CN=global-examaccounts,OU=Groups,OU=GLOBAL,".$root_dse,
 #                   sAMAccountname=>"global-examaccounts",
 #                   gidNumber=>"-1",
 #                   sophomorixCreationDate => "exists",
@@ -688,7 +688,7 @@ if ($test_add_class==1){
 #                   sophomorixHidden=>"FALSE",
 #                  });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-students,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=global-students,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-students",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
@@ -697,7 +697,7 @@ if ($test_add_class==1){
                    sophomorixHidden=>"FALSE",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
                    sAMAccountname=>"global-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",

@@ -456,8 +456,10 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PWD_LENGHT}=$pwd_length;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU}=
                     $sophomorix_config{'SCHOOLS'}{$school}{OU};
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP_GLOBAL}=
+#                    "OU=GLOBAL,".$DevelConf::AD_schools_ou.",".$root_dse;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP_GLOBAL}=
-                    "OU=GLOBAL,".$DevelConf::AD_schools_ou.",".$root_dse;
+                    "OU=GLOBAL,".$root_dse;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILETYPE}="users";
             } elsif ($var eq "CLASS_FILE"){
                 my ($file,$rest)=split(/::/,$value);
@@ -515,8 +517,10 @@ sub config_sophomorix_read {
         close(SCHOOL);
     }
     # GLOBAL
+#    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
+#        "OU=".$DevelConf::AD_global_ou.",".$DevelConf::AD_schools_ou.",".$root_dse;
     $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
-        "OU=".$DevelConf::AD_global_ou.",".$DevelConf::AD_schools_ou.",".$root_dse;
+        "OU=".$DevelConf::AD_global_ou.",".$root_dse;
     $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="";
     $sophomorix_config{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
