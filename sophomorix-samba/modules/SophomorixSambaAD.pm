@@ -736,6 +736,7 @@ sub AD_user_create {
                    displayName   => [$display_name],
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
+                   homeDrive => "H:",
                    sophomorixExitAdminClass => "unknown", 
                    sophomorixUnid => $unid,
                    sophomorixStatus => $status,

@@ -212,6 +212,7 @@ sub AD_test_object {
     my $sn =$arg_ref->{sn};
     my $description =$arg_ref->{description};
     my $uidnumber =$arg_ref->{uidNumber};
+    my $homedrive =$arg_ref->{homeDrive};
 
     # group
     my $gidnumber =$arg_ref->{gidNumber};
@@ -322,6 +323,10 @@ sub AD_test_object {
         if (defined $description){
             is ($entry->get_value ('description'),$description,
 		"  * description is $description");
+        }
+        if (defined $homedrive){
+            is ($entry->get_value ('homeDrive'),$homedrive,
+		"  * homeDrive is $homedrive");
         }
         if (defined $uidnumber){
             my $uidnumber_sys=$entry->get_value ('uidNumber');
