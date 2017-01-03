@@ -966,7 +966,7 @@ if ($add==1 or $test_add==1){
     #                member => "bsz-examaccounts,uni-examaccounts,examaccounts,",
     #               });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-students,OU=global-students,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=global-students,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"global-students",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
@@ -977,7 +977,7 @@ if ($add==1 or $test_add==1){
                    member => "bsz-students|uni-students|students",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"global-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
@@ -2413,7 +2413,7 @@ if ($move==1 or $test_move==1){
                    member => "ghs-admins|lin-admins|bsz-admins|uni-admins|admins",
                   });
     # &AD_test_object({ldap=>$ldap,
-    #                dn=>"CN=global-examaccounts,OU=ExamAccounts,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+    #                dn=>"CN=global-examaccounts,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
     #                sAMAccountname=>"global-examaccounts",
     #                gidNumber=>"-1",
     #                sophomorixCreationDate => "exists",
@@ -2424,7 +2424,7 @@ if ($move==1 or $test_move==1){
     #                member => "ghs-examaccounts|lin-examaccounts|bsz-examaccounts|uni-examaccounts|examaccounts|,
     #               });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-students,OU=global-students,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=global-students,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"global-students",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
@@ -2435,7 +2435,7 @@ if ($move==1 or $test_move==1){
                    member => "bsz-students|uni-students|lin-students|ghs-students|students",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"global-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",

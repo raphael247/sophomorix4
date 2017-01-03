@@ -719,9 +719,9 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
                 if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
-		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.",".
-                                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
+#		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.",".
+#                                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
@@ -730,8 +730,13 @@ sub config_sophomorix_read {
                     }
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
                         $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+
+		    my $ou_group=$ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
                 }
 
                 # quaternary group
