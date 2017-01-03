@@ -1,0 +1,114 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SOPHOMORIX-SESSION 8 "January 03, 2017"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sophomorix-session \- Verwaltung von Unterrichten
+.SH SYNOPSIS
+.B sophomorix-session
+.RI [ options ]
+.br
+.SH DESCRIPTION
+.B sophomorix-session  
+erzeugt und ändert Unterrichte (sessions) im AD bei dem durchfühenden
+Lehrer im mehrfach-Attribut sophomorixSession. Deshalb kann ein lehrer
+mehrere Sessions verwalten.
+.br
+In sophomorixSessions steht folgender String: 
+.TP
+2017-01-03_02-44-35;lordjo42,blackmri42;
+.br
+* 2017-01-03_02-44-35 ist die Erstellzeit der session und wird als ID benutzt.
+.br
+* lordjo42,blackmri42 sind die Schüler in dieser Session.
+.br
+* Wer der Chef dieser Session ist geht daraus hervor, bei welchem user
+im AD die Session gespeichert ist.
+.PP
+.SH OPTIONS
+.B sophomorix-session
+benützt die GNU command line syntax, mit langen Optionen, die mit zwei
+Bindestrichen (`-') beginnen:
+.TP
+.B \-h, \-\-help
+Kurzübersicht über Optionen, sowie eine Liste der eingelesenen Dateien.
+.TP
+.B \-v, \-\-verbose
+Sagt, was das Programm gerade macht (verbose)
+.TP
+.B \-vv, \-\-verbose \-\-verbose
+Sagt ungeheuer genau, was das Programm gerade macht (very verbose)
+.TP
+.B -i, --info
+gibt informationen zu den sessions
+.TP
+.B --
+...
+.PP
+.SH EXAMPLES
+
+.br
+Als Schnittstelle zu Schulkonsole und andere Software, sind folgende
+Aufrufe von sophomorix-session typisch:
+.TP
+.B sophomorix-session --create --teacher <user>
+Erzeugt einen neuen Unterricht (session). Der <user> verwaltet diese
+session. Üblicherweise ist das eine Lehrerin, kann aber auch ein
+anderer User sein. Die Session wird bei dieser Lehrerin im Attribut
+sophomorixSessions (Multivalue) abgespeichert. 
+.br
+Als ID wird die sekundengenaue Erstellzeit  verwendet.
+.TP
+.B sophomorix-session --create --teacher <user> --members <user1>,<user2>, ...
+Hier wird die Session gleich mir usern (Schüler) anglegt.
+.TP
+.B sophomorix-session --session <session-id> --members <user1>,<user2>, ...
+Ersetzt die bisherigen user mit den usern <user1>,<user2>, ...
+.TP
+.B sophomorix-session --session <session-id> --addmembers <user1>,<user2>, ...
+Erweitert die bisherigen user um die user <user1>,<user2>, ...
+.TP
+.B sophomorix-session --session <session-id> --removemembers <user1>,<user2>, ...
+Entfernt aus den bisherigen usern die user <user1>,<user2>, ...
+.TP
+.B sophomorix-session -info --json (--json)
+Liefert Informationen zu ALLEN laufenden Sessions als JSON-Objekt
+zurück. Die zweite Option --json liefert ein kompaktes JSON-Obkekt
+zurück.
+.br
+Eine session wird im JSON-Objekt über ihre session-id(JSON: id)
+gefunden. Ist die session-id nicht bekannt, kann man sich die sessions
+eines Lehrer-user(JSON: user) im JSON objekt anzeigen lassen und die
+passende Session (z.B. nach Datum) aussuchen.
+.br
+In der Session finden sich informationen zu den Schülern (JSON: members) 
+.TP
+.B sophomorix-session --session <session-id> --kill
+Entfernt die gewählte Session Dauerhaft.
+.TP
+.B sophomorix-session --kill-all-sessions
+Entfernt alle Sessions. Dies kann z.B. nachts per cronjob erfolgen.
+.TP
+.SH SEE ALSO
+.BR sophomorix-group (8),
+
+.\".BR baz (1).
+.\".br
+.\"You can see the full options of the Programs by calling for example 
+.\".IR "sophomrix-session -h" ,
+.
+.SH AUTHOR
+Written by <jeffbeck@web.de>.
