@@ -627,6 +627,7 @@ sub AD_user_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $user_count = $arg_ref->{user_count};
     my $identifier = $arg_ref->{identifier};
     my $login = $arg_ref->{login};
@@ -680,9 +681,20 @@ sub AD_user_create {
     my $user_principal_name = $login."\@"."linuxmuster.local";
     my $container=&AD_get_container($role,$group_basename);
 
+    # filesystem directory
+    my $homedirectory;
+    if ($role eq "student"){
+        $homedirectory="\\\\".$root_dns."\\".$school."\\students\\".$group_basename."\\homes\\".$login;
+    } elsif ($role eq "teacher"){
+        $homedirectory="\\\\".$root_dns."\\".$school."\\teachers\\homes\\".$login;
+    } else {
+        $homedirectory="\\\\".$root_dns."\\".$school."\\unknown\\".$group_basename."\\homes\\".$login;
+    }
+
     my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
- 
+
+
     # password generation
     my $uni_password=&_unipwd_from_plainpwd($plain_password);
 
@@ -722,6 +734,7 @@ sub AD_user_create {
         print "   Unid:               $unid\n";
         print "   Unix-uidNumber:     $uidnumber_wish\n";
         print "   File:               $file\n";
+        print "   HomeDirectory:      $homedirectory\n";
     }
 
     # make sure $dn_class exists
@@ -737,6 +750,8 @@ sub AD_user_create {
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
+#                   homeDirectory => "\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa42",
+                   homeDirectory => $homedirectory,
                    sophomorixExitAdminClass => "unknown", 
                    sophomorixUnid => $unid,
                    sophomorixStatus => $status,

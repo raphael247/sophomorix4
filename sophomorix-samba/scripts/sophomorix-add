@@ -33,6 +33,7 @@ use Sophomorix::SophomorixBase qw(
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_add
                                  AD_bind_admin
+                                 AD_dns_get
                                  AD_unbind_admin
                                  AD_user_create
                                  AD_group_create
@@ -123,6 +124,7 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
@@ -468,6 +470,7 @@ while(<SOPHOMORIXADD>){
 
    &AD_user_create({ldap=>$ldap,
                     root_dse=>$root_dse, 
+                    root_dns=>$root_dns, 
                     user_count=>$user_count,
                     identifier=>$identifier,
                     login=>$login_token,
