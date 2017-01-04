@@ -30,6 +30,7 @@ $Data::Dumper::Terse = 1;
             AD_get_passwd
             AD_bind_admin
             AD_unbind_admin
+            AD_get_sessions
             AD_session_manage
             AD_user_create
             AD_user_update
@@ -46,7 +47,6 @@ $Data::Dumper::Terse = 1;
             get_forbidden_logins
             AD_school_add
             AD_object_search
-            AD_get_sessions
             AD_get_AD
             AD_class_fetch
             AD_project_fetch
@@ -1389,10 +1389,9 @@ sub AD_object_search {
 
 
 sub AD_get_sessions {
-    my ($ldap,$root_dse,$root_dns,$json,$dump_AD)=@_;
+    my ($ldap,$root_dse,$root_dns,$json,$dump_AD,$show_session)=@_;
     my %sessions=();
     my $session_count=0;
-
     my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                                root_dse=>$root_dse,
                                root_dns=>$root_dns,
@@ -1434,6 +1433,13 @@ sub AD_get_sessions {
                 &Sophomorix::SophomorixBase::print_title("$session_count: User $sam has session $session");
             }
             my ($id,$members,$string)=split(/;/,$session);
+            if ($show_session eq "all"){
+                # just go on
+            } elsif ($id ne $show_session){
+                # skip this session
+                next;
+            }
+
             # save by user
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'memberstring'}=$members;

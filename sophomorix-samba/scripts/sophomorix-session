@@ -121,8 +121,8 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD);
-
+#my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD);
+my %sessions=();
 
 
 # --help
@@ -170,13 +170,26 @@ Please see the sophomorix-session(8) man pages for full documentation
    exit;
 }
 
+if ($session ne ""){
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,$session);
+} else {
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,"all");
+}
 
 
 # --info
 if ($info==1) {
+    my $jsoncomment;
+    if ($session ne ""){
+        # show only one session
+        $jsoncomment="The sophomorix session $session";
+    } else {
+        # show all sessions
+        $jsoncomment="All sophomorix sessions";
+    }
     &json_dump({json => $json,
                 jsoninfo => "SESSIONS",
-                jsoncomment => "All sophomorix sessions",
+                jsoncomment => $jsoncomment,
                 hash_ref=>\%sessions,
                });
 
