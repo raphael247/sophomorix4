@@ -95,6 +95,17 @@ my $file_update_test=$testdata."/sophomorix.update-1";
 my $file_move_test=$testdata."/sophomorix.move-1";
 my $file_kill_test=$testdata."/sophomorix.kill-1";
 
+my $file_students=$testdata."/students.csv-1";
+my $file_teachers=$testdata."/teachers.csv-1";
+my $file_students_bsz=$testdata."/bsz.students.csv-1";
+my $file_teachers_bsz=$testdata."/bsz.teachers.csv-1";
+my $file_students_uni=$testdata."/uni.students.csv-1";
+my $file_teachers_uni=$testdata."/uni.teachers.csv-1";
+
+my $file_school=$testdata."/school.conf-1";
+my $file_school_bsz=$testdata."/bsz.school.conf-1";
+my $file_school_uni=$testdata."/uni.school.conf-1";
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -240,6 +251,15 @@ if ($add==1){
 if ($cp_add==1){
     # copy sophomorix.add
     &run_command("cp -v $file_add_test $file_add");
+    &run_command("cp -v $file_students /etc/linuxmuster/sophomorix/default-school/students.csv");
+    &run_command("cp -v $file_teachers /etc/linuxmuster/sophomorix/default-school/teachers.csv");
+    &run_command("cp -v $file_students_bsz /etc/linuxmuster/sophomorix/bsz/bsz.students.csv");
+    &run_command("cp -v $file_teachers_bsz /etc/linuxmuster/sophomorix/bsz/bsz.teachers.csv");
+    &run_command("cp -v $file_students_uni /etc/linuxmuster/sophomorix/uni/uni.students.csv");
+    &run_command("cp -v $file_teachers_uni /etc/linuxmuster/sophomorix/uni/uni.teachers.csv");
+    &run_command("cp -v $file_school /etc/linuxmuster/sophomorix/default-school/school.conf");
+    &run_command("cp -v $file_school_bsz /etc/linuxmuster/sophomorix/bsz/bsz.school.conf");
+    &run_command("cp -v $file_school_uni /etc/linuxmuster/sophomorix/uni/uni.school.conf");
 }
 
 if ($add==1 or $test_add==1){
