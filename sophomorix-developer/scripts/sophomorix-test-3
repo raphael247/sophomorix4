@@ -195,6 +195,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid1234",
                    memberOf => "bsz-m7ab|p_bsz-Chemie-AG23",
                   });
     ##### Testing the users class
@@ -245,6 +246,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid2345",
                    memberOf => "bsz-m7ab|p_bsz-Chemie-AG23",
                   });
     ##### Testing the users class
@@ -295,6 +297,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid3456",
                    memberOf => "bsz-m8cd",
                   });
     ##### Testing the users class
@@ -345,6 +348,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid4567",
                    memberOf => "bsz-m8cd",
                   });
     ##### Testing the users class
@@ -395,6 +399,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid5678",
                    memberOf => "bsz-teachers|p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-teachers group
@@ -434,6 +439,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid6789",
                    memberOf => "bsz-teachers|p_bsz-Chemie-AG23",
                   });
     ##### Testing the users ou-teachers group
@@ -473,6 +479,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unidb1234",
                    memberOf => "uni-12abc",
                   });
     ##### Testing the users class
@@ -523,6 +530,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unidb2345",
                    memberOf => "uni-12abc",
                   });
     ##### Testing the users class
@@ -573,6 +581,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unidb5678",
                    memberOf => "uni-teachers",
                   });
     ##### Testing the users ou-teachers group
@@ -612,6 +621,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unidb6789",
                    memberOf => "uni-teachers",
                   });
     ##### Testing the users ou-teachers group
@@ -649,6 +659,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid12345",
                    memberOf => "s6ade",
                   });
     ##### Testing the users class
@@ -697,6 +708,7 @@ if ($test_add_pro==1){
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
+                   sophomorixUnid => "unid123456",
                    memberOf => "teachers",
                   });
     ##### Testing the users ou-teachers group
@@ -1402,7 +1414,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --members (3, nonexisting user)
+    # --members (3, nonexisting user)
     &run_command("sophomorix-project $verbose_options -p mathe23 --members muellegr23,nonexuser2");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1450,7 +1462,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --membergroups (3, nonexisting user)
+    # --membergroups (3, nonexisting user)
     &run_command("sophomorix-project $verbose_options -p mathe23 --membergroups bsz-super7,nonexgroup2");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1476,7 +1488,7 @@ if ($mod_pro==1){
                   });
 
 
-   # --admins (4, group instead of user)
+    # --admins (4, group instead of user)
     &run_command("sophomorix-project $verbose_options -p mathe23 --admins maiersa23,bsz-super6");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1500,7 +1512,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --members (4, group instead of user)
+    # --members (4, group instead of user)
     &run_command("sophomorix-project $verbose_options -p mathe23 --members muellegr23,super13");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1524,7 +1536,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --admingroups (4, user instead of group)
+    # --admingroups (4, user instead of group)
     &run_command("sophomorix-project $verbose_options -p mathe23 --admingroups kep23,super12");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1548,7 +1560,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --membergroups (4, user instead of group)
+    # --membergroups (4, user instead of group)
     &run_command("sophomorix-project $verbose_options -p mathe23 --membergroups wu23,bsz-super7");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1574,7 +1586,7 @@ if ($mod_pro==1){
                   });
 
 
-   # --addadmins (1 adding to existing value)
+    # --addadmins (1 adding to existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --addadmins wu23,oe23");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1598,7 +1610,7 @@ if ($mod_pro==1){
                    member => "wu23|oe23|maiersa23|muellegr23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --addmembers (1 adding to existing value)
+    # --addmembers (1 adding to existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --addmembers samardze23,schneima23");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1622,7 +1634,7 @@ if ($mod_pro==1){
                    member => "wu23|oe23|maiersa23|muellegr23|samardze23|schneima23|super12|bsz-super7",
                    memberOf => "",
                   });
-   # --addadmingroups (1 adding to existing value)
+    # --addadmingroups (1 adding to existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --addadmingroups super13");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1646,7 +1658,7 @@ if ($mod_pro==1){
                    member => "wu23|oe23|maiersa23|muellegr23|samardze23|schneima23|super12|super13|bsz-super7",
                    memberOf => "",
                   });
-   # --addmembergroups (1 adding to existing value)
+    # --addmembergroups (1 adding to existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --addmembergroups bsz-super6");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1672,7 +1684,7 @@ if ($mod_pro==1){
                   });
 
 
-   # --removeadmins (1 removing from existing value)
+    # --removeadmins (1 removing from existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --removeadmins wu23,oe23");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1696,7 +1708,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|samardze23|schneima23|super12|super13|bsz-super6|bsz-super7",
                    memberOf => "",
                   });
-   # --removemembers (1 removing from existing value)
+    # --removemembers (1 removing from existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --removemembers samardze23,schneima23");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1720,7 +1732,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|super13|bsz-super6|bsz-super7",
                    memberOf => "",
                   });
-   # --removeadmingroups (1 removing from existing value)
+    # --removeadmingroups (1 removing from existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --removeadmingroups super13");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1744,7 +1756,7 @@ if ($mod_pro==1){
                    member => "maiersa23|muellegr23|super12|bsz-super6|bsz-super7",
                    memberOf => "",
                   });
-   # --removemembergroups (1 removing from existing value)
+    # --removemembergroups (1 removing from existing value)
     &run_command("sophomorix-project $verbose_options -p mathe23 --removemembergroups bsz-super6");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
