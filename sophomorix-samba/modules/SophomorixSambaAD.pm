@@ -681,11 +681,12 @@ sub AD_user_create {
     my $user_principal_name = $login."\@"."linuxmuster.local";
     my $container=&AD_get_container($role,$group_basename);
 
-    my $homedirectory=&Sophomorix::SophomorixBase::get_homedirectory($root_dns,
-                                                                     $school,
-                                                                     $group_basename,
-                                                                     $login,
-                                                                     $role);
+    my ($homedirectory,$linux_home)=
+        &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                       $school,
+                                                       $group_basename,
+                                                       $login,
+                                                       $role);
 
     my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
@@ -730,6 +731,7 @@ sub AD_user_create {
         print "   Unix-uidNumber:     $uidnumber_wish\n";
         print "   File:               $file\n";
         print "   HomeDirectory:      $homedirectory\n";
+        print "   LinuxHome:          $linux_home\n";
     }
 
     # make sure $dn_class exists
@@ -964,11 +966,12 @@ sub AD_user_move {
          $target_branch="OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     }
 
-    my $homedirectory_new=&Sophomorix::SophomorixBase::get_homedirectory($root_dns,
-                                                                         $school_new,
-                                                                         $group_new_basename,
-                                                                         $user,
-                                                                         $role_new);
+    my ($homedirectory_new,$linux_home)=
+        &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                       $school_new,
+                                                       $group_new_basename,
+                                                       $user,
+                                                       $role_new);
 
     # fetch the dn (where the object really is)
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$user);
