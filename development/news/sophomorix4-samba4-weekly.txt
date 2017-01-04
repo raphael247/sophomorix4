@@ -4,6 +4,68 @@ sophomorix-samba für linuxmuster.net 7 --- Weekly 8
 sophomorix4/Samba4 weekly Nr. 9  (xx.11.2016)
 ############################################################
 
+Entwicklertreffen 13.1.17
+
+managment gruppen:
+ - weitere? webfilter,intranet, drucker
+
+sophomorix-session:
+
+ - Session beenden/User aus session
+   muss user wieder in die Gruppen internet,wifi, ...
+ - was, wenn einem user einer Klasse wifi dauerhaft gesperrt werden soll
+   Oder wifi an einer Schule nur für Tablet-Klassen?
+   Vorschlag: vom admin der Schule verwaltete wifi-allowed Gruppe
+   nur wer in wifi-allowed ist kann per Schuko in wifi gesetzt werden
+   (wie ist das mit ganzen Klassen?)
+   school.conf:
+   [wifiaccess]
+     group=12a,12b,teachers # students
+     users=maierle,muellerle
+     usersblock=lucifer   # lucifer ist in 12a
+     groupblock=5a  # falls group=students
+
+--> allgemeine Frage:
+    wie konfiguriert man in einer Textdatei beliebige userlisten einfach
+    geht das bei AD auch:
+    Gruppe hinzufügen zu wifi, aber einen user NICHT
+    
+- gibt es einen samba mechanismus mit dem man die user der gruppe
+  students (mit den gruppen 7a, ... die wiederum ) abfragen kann?
+
+- Auflisten der aufzuteilenden Dateien:
+  wie soll das im JSON-Objekt zurückgegeben werden
+  files -> path/to/file -> permissions -> 0755
+                        -> size        -> 2MB
+                        -> ...
+  dirs -> path/to/dir   -> permissions -> 0755
+		        -> ...
+  
+       -> path/to/dir2  -> 
+
+  Perl Module?:
+  http://stackoverflow.com/questions/32374350/file-path-into-json-data-structure
+  http://stackoverflow.com/questions/31326188/how-to-build-hierarhical-hash-in-perl-from-directory-tree
+  http://www.perlmonks.org/?node_id=1077470
+
+
+
+- sollte es noch einen Comment geben für eine session?
+  - lehrer hat für seine Unterrichte sessions, die er nie beendet:
+     z.B. Comment= "Montag 7a"
+
+- sollten session lange aufgehoben werden können?
+
+
+
+sophomorix-device:
+
+- hwk -> Einzelcomputer als Member -> SPÄTER
+
+
+
+
+
 
 Priorität:
 - 1. utf8 migration -> done 8.12.16
@@ -23,7 +85,10 @@ Priorität:
      sophomorixExamMode Attribut, singlevalue -> OK 21.12.16
      --> todo: Umsetzung nach Aufschrieb Rainer
 
-- 6. Schema Erweiterungen um custom attribute -> 
+  6. Vorname, Nachname, KA-Modus anzeige beim user,
+      ob er im modus ist. Inhalt des attributs, zeigt von wem
+
+- 7. Schema Erweiterungen um custom attribute -> 
 
 
 Entwicklertreffen 3.12.16:
