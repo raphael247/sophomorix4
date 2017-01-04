@@ -861,6 +861,9 @@ sub AD_user_update {
         print "   sophomorixAdminFile:       $filename\n";
     }
     if (defined $unid and $unid ne "---"){
+        if ($unid eq ""){
+            $unid="---"; # upload --- for empty unid
+        }
         $replace{'sophomorixUnid'}=$unid;
         print "   sophomorixUnid:            $unid\n";
     }

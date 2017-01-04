@@ -502,8 +502,15 @@ open (KILL, ">$kill");
 my $nochange=$DevelConf::path_result."/sophomorix.nochange";
 open (NOCHANGE, ">$nochange");
 
+&print_title("Writing the files:");
+
 foreach my $line_new ( @{ $Match{'lines'} } ){
     if (defined $Match{'action'}{$line_new}{'sAMAccountName'}){
+        if($Conf::log_level>=2){
+            print "\n";
+            print "Testing: $line_new\n";
+            print "   * matched to: $Match{'action'}{$line_new}{'sAMAccountName'} --> $Match{'action'}{$line_new}{'MATCH_SUB'}\n";
+        }
         my $update=&write_update_file($line_new);
         my $move=&write_move_file($line_new);
         my $kill=&write_kill_file($line_new);
@@ -562,10 +569,6 @@ sub write_update_file {
     my $status;
     my $user_account_control;
     my $update=0;
-    if($Conf::log_level>=2){
-        print "$line_new\n";
-        print "   * matched to: $sam --> $Match{'action'}{$line_new}{'MATCH_SUB'}\n";
-    }
 
     # unid
     if ( ($Match{'action'}{$line_new}{'unid'} eq $AD{'sam'}{$sam}{'sophomorixUnid'}) or
@@ -658,7 +661,7 @@ sub write_update_file {
                     $user_account_control."::".
                     "\n";
     if ($update > 0){
-        print "sophomorix.update: $update_line";
+        print "--> sophomorix.update: $update_line";
         print UPDATE $update_line;
     }
     return $update;
@@ -1272,6 +1275,9 @@ sub analyze_encoding {
         chomp();
         s/^ //g; # Leerzeichen am Zeilenangfang entfernen
         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            next;
+        }
+        if ($_ eq ""){ # ignore empty line
             next;
         }
 
