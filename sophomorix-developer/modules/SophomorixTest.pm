@@ -235,6 +235,7 @@ sub AD_test_object {
     my $s_webui = $arg_ref->{sophomorixWebuiDashboard};
     my $s_user_permissions = $arg_ref->{sophomorixUserPermissions};
     my $s_admin_file = $arg_ref->{sophomorixAdminFile};
+    my $s_unid = $arg_ref->{sophomorixUnid};
 
 
     # sophomorix group
@@ -408,6 +409,10 @@ sub AD_test_object {
         if (defined $s_admin_file){
             is ($entry->get_value ('sophomorixAdminFile'),$s_admin_file,
 		"  * sophomorixAdminFile is $s_admin_file");
+        }
+        if (defined $s_unid){
+            is ($entry->get_value ('sophomorixUnid'),$s_unid,
+		"  * sophomorixUnid is $s_unid");
         }
         if (defined $s_type){
             is ($entry->get_value ('sophomorixType'),$s_type,
