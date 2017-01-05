@@ -626,6 +626,7 @@ sub AD_session_manage {
 }
 
 
+
 sub AD_session_set_exam {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -633,9 +634,22 @@ sub AD_session_set_exam {
     my $root_dns = $arg_ref->{root_dns};
     my $student = $arg_ref->{student};
     my $teacher = $arg_ref->{teacher};
+    my $user_count = $arg_ref->{user_count};
     print "   * Setting exam mode for session member $student (Teacher: $teacher)\n";
-
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$student);
+    if (not $count==1){
+        print "ERROR: Could not set exam mode for nonexisting user $student\n";
+        return;
+    }
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$student,
+                     user_count=>$user_count,
+                     exammode=>$teacher,
+                   });
 }
+
 
 
 sub AD_session_unset_exam {
@@ -645,8 +659,22 @@ sub AD_session_unset_exam {
     my $root_dns = $arg_ref->{root_dns};
     my $student = $arg_ref->{student};
     my $teacher = $arg_ref->{teacher};
+    my $user_count = $arg_ref->{user_count};
     print "   * Unsetting exam mode for session member $student (Teacher: $teacher)\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$student);
+    if (not $count==1){
+        print "ERROR: Could not unset exam mode for nonexisting user $student\n";
+        return;
+    }
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$student,
+                     user_count=>$user_count,
+                     exammode=>"---",
+                   });
 }
+
 
 
 sub AD_user_create {
@@ -791,6 +819,7 @@ sub AD_user_create {
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
+                   sophomorixExamMode => "---", 
                    userAccountControl => '512',
                    uidNumber => $uidnumber_wish,
                    objectclass => ['top', 'person',
@@ -827,7 +856,9 @@ sub AD_user_update {
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
     my $user_account_control = $arg_ref->{user_account_control};
-  
+    my $examteacher = $arg_ref->{exammode};
+      
+
     my $displayname;
     # hash of what to replace
     my %replace=();
@@ -910,6 +941,10 @@ sub AD_user_update {
         $replace{'userAccountControl'}=$user_account_control;
         print "   userAccountControl:        $user_account_control\n";
     }
+    if (defined $examteacher and $examteacher ne ""){
+        $replace{'sophomorixExamMode'}=$examteacher;
+        print "   sophomorixExamMode:        $examteacher\n";
+    }
     if (defined $comment){
         if ($comment eq ""){
             # delete attr if empty
@@ -952,6 +987,7 @@ sub AD_user_update {
 }
 
 
+
 sub AD_get_user {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -967,6 +1003,7 @@ sub AD_get_user {
                     filter => $filter,
                     attrs => ['sAMAccountName',
                               'sophomorixAdminClass',
+                              'sophomorixExamMode',
                               'givenName',
                               'sn',
                              ]);
@@ -981,10 +1018,12 @@ sub AD_get_user {
         my $firstname = $entry->get_value('givenName');
         my $lastname = $entry->get_value('sn');
         my $class = $entry->get_value('sophomorixAdminClass');
+        my $exammode = $entry->get_value('sophomorixExamMode');
         my $existing="TRUE";
-        return ($firstname,$lastname,$class,$existing);
+        return ($firstname,$lastname,$class,$existing,$exammode);
     }
 }
+
 
 
 sub AD_user_move {
@@ -1518,7 +1557,7 @@ sub AD_get_sessions {
             }
             foreach $member (@members){
                 # get userinfo
-                my ($firstname,$lastname,$adminclass,$existing)=
+                my ($firstname,$lastname,$adminclass,$existing,$exammode)=
                     &AD_get_user({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
@@ -1529,11 +1568,13 @@ sub AD_get_sessions {
                 $sessions{'id'}{$id}{'members'}{$member}{'lastname'}=$lastname;
                 $sessions{'id'}{$id}{'members'}{$member}{'adminclass'}=$adminclass;
                 $sessions{'id'}{$id}{'members'}{$member}{'existing'}=$existing;
+                $sessions{'id'}{$id}{'members'}{$member}{'exammode'}=$exammode;
 
                 $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'firstname'}=$firstname;
                 $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'lastname'}=$lastname;
                 $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'adminclass'}=$adminclass;
                 $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'existing'}=$existing;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'exammode'}=$exammode;
 
                 # test membership in managementgroups
                 my @grouptypes=("wifiaccess","internetaccess");
@@ -1557,6 +1598,7 @@ sub AD_get_sessions {
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 
 }
+
 
 
 sub AD_get_AD {
@@ -3467,6 +3509,8 @@ sub _project_info_prefix {
     }
     return @list_prefixed;
 }
+
+
 
 sub _unipwd_from_plainpwd{
     # create string for unicodePwd in AD from $plain_password 

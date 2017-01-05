@@ -344,22 +344,29 @@ if ($session ne "" and $removemembers ne ""){
 
 # --set-exam-mode
 if ($session ne "" and $set_exam_mode ne ""){
-    # get chief of session
-    my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
-    my @students=split(/,/,$set_exam_mode);
-    print "$teacher is teacher of $session\n";
-    foreach my $student (@students){
-        if (exists $sessions{'id'}{$session}{'members'}{$student}){
-            &AD_session_set_exam({ldap=>$ldap,
-                                  root_dse=>$root_dse,
-                                  root_dns=>$root_dns,
-                                  teacher=>$teacher,
-                                  session=>$session,
-                                  student=>$student,
-                                  sessions_ref=>\%sessions,
-                                });
-        } else {
-            print "   * Doing nothing: $student is not in the session\n";
+    if (not exists $sessions{'id'}{$session}{'sAMAccountName'} ){
+        print "   * Doing nothing: session $session not found\n"; 
+    } else {
+        # get chief of session
+        my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
+        my @students=split(/,/,$set_exam_mode);
+        print "$teacher is teacher of $session\n";
+        my $user_count=0;
+        foreach my $student (@students){
+	    $user_count++;
+            if (exists $sessions{'id'}{$session}{'members'}{$student}){
+                &AD_session_set_exam({ldap=>$ldap,
+                                      root_dse=>$root_dse,
+                                      root_dns=>$root_dns,
+                                      teacher=>$teacher,
+                                      session=>$session,
+                                      student=>$student,
+                                      user_count=>$user_count,
+                                      sessions_ref=>\%sessions,
+                                   });
+            } else {
+                print "   * Doing nothing: $student is not in the session\n";
+            }
         }
     }
 }
@@ -371,7 +378,9 @@ if ($session ne "" and $unset_exam_mode ne ""){
     my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
     my @students=split(/,/,$unset_exam_mode);
     print "$teacher is teacher of $session\n";
+    my $user_count=0;
     foreach my $student (@students){
+	$user_count++;
         if (exists $sessions{'id'}{$session}{'members'}{$student}){
             &AD_session_unset_exam({ldap=>$ldap,
                                     root_dse=>$root_dse,
@@ -379,6 +388,7 @@ if ($session ne "" and $unset_exam_mode ne ""){
                                     teacher=>$teacher,
                                     session=>$session,
                                     student=>$student,
+                                    user_count=>$user_count,
                                     sessions_ref=>\%sessions,
                                   });
         } else {
