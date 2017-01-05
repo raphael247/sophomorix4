@@ -236,6 +236,7 @@ sub AD_test_object {
     my $s_user_permissions = $arg_ref->{sophomorixUserPermissions};
     my $s_admin_file = $arg_ref->{sophomorixAdminFile};
     my $s_unid = $arg_ref->{sophomorixUnid};
+    my $s_exammode = $arg_ref->{sophomorixExamMode};
 
 
     # sophomorix group
@@ -413,6 +414,10 @@ sub AD_test_object {
         if (defined $s_unid){
             is ($entry->get_value ('sophomorixUnid'),$s_unid,
 		"  * sophomorixUnid is $s_unid");
+        }
+        if (defined $s_exammode){
+            is ($entry->get_value ('sophomorixExamMode'),$s_exammode,
+		"  * sophomorixExamMode is $s_exammode");
         }
         if (defined $s_type){
             is ($entry->get_value ('sophomorixType'),$s_type,
