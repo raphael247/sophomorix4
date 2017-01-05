@@ -34,6 +34,7 @@ $Data::Dumper::Terse = 1;
             AD_session_manage
             AD_user_create
             AD_user_update
+            AD_get_user
             AD_computer_create
             AD_user_move
             AD_user_kill
@@ -926,6 +927,40 @@ sub AD_user_update {
 }
 
 
+sub AD_get_user {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $user = $arg_ref->{user};
+
+    my $filter="(&(objectClass=user) (sAMAccountName=".$user."))";
+    #my $filter="(sAMAccountName=".$user.")";
+     $mesg = $ldap->search( # perform a search
+                    base   => $root_dse,
+                    scope => 'sub',
+                    filter => $filter,
+                    attrs => ['sAMAccountName',
+                              'sophomorixAdminClass',
+                              'givenName',
+                              'sn',
+                             ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+    my $max_user = $mesg->count; 
+    my $entry = $mesg->entry(0);
+    if (not defined $entry){
+        my $existing="FALSE";
+        return ("","","",$existing);
+    } else {
+        my $firstname = $entry->get_value('givenName');
+        my $lastname = $entry->get_value('sn');
+        my $class = $entry->get_value('sophomorixAdminClass');
+        my $existing="TRUE";
+        return ($firstname,$lastname,$class,$existing);
+    }
+}
+
 
 sub AD_user_move {
     my ($arg_ref) = @_;
@@ -1410,7 +1445,7 @@ sub AD_get_sessions {
                                                });
     }
 
-    $mesg = $ldap->search( # perform a search
+    my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
                    filter => '(&(objectClass=user)(sophomorixRole=*))',
@@ -1418,11 +1453,13 @@ sub AD_get_sessions {
                    attrs => ['sAMAccountName',
                              'sophomorixSessions',
                             ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max_user = $mesg->count; 
     if($Conf::log_level>=2){
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found to test for sessions");
     }
     $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
+
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
@@ -1450,7 +1487,29 @@ sub AD_get_sessions {
 
             # save member information
             my @members=split(/,/,$members);
+            if ($#members==-1){
+                # skip user detection when memberlist is empty
+                next;
+            }
             foreach $member (@members){
+                # get userinfo
+                my ($firstname,$lastname,$adminclass,$existing)=
+                    &AD_get_user({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  user=>$member,
+                       });
+
+                $sessions{'id'}{$id}{'members'}{$member}{'firstname'}=$firstname;
+                $sessions{'id'}{$id}{'members'}{$member}{'lastname'}=$lastname;
+                $sessions{'id'}{$id}{'members'}{$member}{'adminclass'}=$adminclass;
+                $sessions{'id'}{$id}{'members'}{$member}{'existing'}=$existing;
+
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'firstname'}=$firstname;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'lastname'}=$lastname;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'adminclass'}=$adminclass;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'existing'}=$existing;
+
                 # test membership in managementgroups
                 my @grouptypes=("wifiaccess","internetaccess");
                 foreach my $grouptype (@grouptypes){
