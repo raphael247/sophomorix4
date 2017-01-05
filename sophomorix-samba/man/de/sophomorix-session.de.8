@@ -84,14 +84,14 @@ Erweitert die bisherigen user um die user <user1>,<user2>, ...
 .B sophomorix-session --session <session-id> --removemembers <user1>,<user2>, ...
 Entfernt aus den bisherigen usern die user <user1>,<user2>, ...
 .TP
-.B sophomorix-session -info --json (--json)
-Liefert Informationen zu ALLEN laufenden Sessions als JSON-Objekt
+.B sophomorix-session -info --json (--json) [--session <session-id>]
+Liefert Informationen zu ALLEN[einer] laufenden Session[s] als JSON-Objekt
 zurück. Die zweite Option --json liefert ein kompaktes JSON-Obkekt
 zurück.
 .br
-Eine session wird im JSON-Objekt über ihre session-id(JSON: id)
+Eine session wird im JSON-Objekt über ihre session-id(JSON-Objekt->id)
 gefunden. Ist die session-id nicht bekannt, kann man sich die sessions
-eines Lehrer-user(JSON: user) im JSON objekt anzeigen lassen und die
+eines Lehrer-user(JSON-Objekt->user) im JSON objekt anzeigen lassen und die
 passende Session (z.B. nach Datum) aussuchen.
 .br
 In der Session finden sich informationen zu den Schülern (JSON: members) 
