@@ -1667,6 +1667,142 @@ if ($ses==1){
                    sophomorixSessions => "666;lordjo42,blackmri42|777;lordjo42",
                   });
 
+    # --set-exam-mode
+    &run_command("sophomorix-session $verbose_options --session 666 --set-exam-mode lordjo42,blackmri42");
+
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jon Lord",
+                   givenName=>"Jon",
+                   name=>"lordjo42",
+                   sAMAccountname=>"lordjo42",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\uni\\students\\12abc\\homes\\lordjo42",
+                   sn=>"Lord",
+                   userPrincipalName => "lordjo42@".$root_dns,
+                   sophomorixAdminClass => "uni-12abc",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster23!",
+                   sophomorixFirstnameASCII => "Jon",
+                   sophomorixSurnameASCII  => "Lord",
+                   sophomorixBirthdate  => "22.01.1994",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "uni",
+                   sophomorixSchoolname => "uni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "maiersa42",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "unidb2345",
+                   memberOf => "uni-12abc",
+                  });
+
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Richard Blackmore",
+                   givenName=>"Richard",
+                   name=>"blackmri42",
+                   sAMAccountname=>"blackmri42",
+                   uidNumber=>"90000",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\uni\\students\\12abc\\homes\\blackmri42",
+                   sn=>"Blackmore",
+                   userPrincipalName => "blackmri42@".$root_dns,
+                   sophomorixAdminClass => "uni-12abc",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Richard",
+                   sophomorixSurnameASCII  => "Blackmore",
+                   sophomorixBirthdate  => "16.01.1995",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "uni",
+                   sophomorixSchoolname => "uni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "maiersa42",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "unidb1234",
+                   memberOf => "uni-12abc",
+                  });
+
+
+    # --unset-exam-mode
+    &run_command("sophomorix-session $verbose_options --session 666 --unset-exam-mode lordjo42,blackmri42");
+
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jon Lord",
+                   givenName=>"Jon",
+                   name=>"lordjo42",
+                   sAMAccountname=>"lordjo42",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\uni\\students\\12abc\\homes\\lordjo42",
+                   sn=>"Lord",
+                   userPrincipalName => "lordjo42@".$root_dns,
+                   sophomorixAdminClass => "uni-12abc",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster23!",
+                   sophomorixFirstnameASCII => "Jon",
+                   sophomorixSurnameASCII  => "Lord",
+                   sophomorixBirthdate  => "22.01.1994",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "uni",
+                   sophomorixSchoolname => "uni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "unidb2345",
+                   memberOf => "uni-12abc",
+                  });
+
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Richard Blackmore",
+                   givenName=>"Richard",
+                   name=>"blackmri42",
+                   sAMAccountname=>"blackmri42",
+                   uidNumber=>"90000",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\uni\\students\\12abc\\homes\\blackmri42",
+                   sn=>"Blackmore",
+                   userPrincipalName => "blackmri42@".$root_dns,
+                   sophomorixAdminClass => "uni-12abc",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Richard",
+                   sophomorixSurnameASCII  => "Blackmore",
+                   sophomorixBirthdate  => "16.01.1995",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "uni",
+                   sophomorixSchoolname => "uni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "unidb1234",
+                   memberOf => "uni-12abc",
+                  });
+
+
 
     &run_command("sophomorix-session $verbose_options --kill --session 666");
     &run_command("sophomorix-session $verbose_options --kill --session 777");
