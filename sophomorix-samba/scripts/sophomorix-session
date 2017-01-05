@@ -50,6 +50,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_session_manage
+                                 AD_session_set_exam
+                                 AD_session_unset_exam
                                  AD_user_create
                                  AD_group_create
                                  AD_group_addmember
@@ -91,6 +93,8 @@ my $developer_session="";
 my $members=""; # undef: do not change members
 my $addmembers="";
 my $removemembers="";
+my $set_exam_mode="";
+my $unset_exam_mode="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -107,6 +111,8 @@ my $testopt=GetOptions(
            "members|m=s" => \$members,
            "addmembers=s" => \$addmembers,
            "removemembers=s" => \$removemembers,
+           "set-exam-mode=s" => \$set_exam_mode,
+           "unset-exam-mode=s" => \$unset_exam_mode,
            "developer-session=s" => \$developer_session,
           );
 
@@ -143,6 +149,8 @@ Options:
   --members <user1>,<user2>, ...
   --addmembers <user1>,<user2>, ...
   --removemembers <user1>,<user2>, ...
+  --set-exam-mode <user1>,<user2>, ...
+  --unset-exam-mode <user1>,<user2>, ...
   --create (user current time as session-id)
   --kill -s <session-id>
   --kill-all-sessions
@@ -334,6 +342,51 @@ if ($session ne "" and $removemembers ne ""){
     exit;
 }
 
+# --set-exam-mode
+if ($session ne "" and $set_exam_mode ne ""){
+    # get chief of session
+    my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
+    my @students=split(/,/,$set_exam_mode);
+    print "$teacher is teacher of $session\n";
+    foreach my $student (@students){
+        if (exists $sessions{'id'}{$session}{'members'}{$student}){
+            &AD_session_set_exam({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  teacher=>$teacher,
+                                  session=>$session,
+                                  student=>$student,
+                                  sessions_ref=>\%sessions,
+                                });
+        } else {
+            print "   * Doing nothing: $student is not in the session\n";
+        }
+    }
+}
+
+
+# --unset-exam-mode
+if ($session ne "" and $unset_exam_mode ne ""){
+    # get chief of session
+    my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
+    my @students=split(/,/,$unset_exam_mode);
+    print "$teacher is teacher of $session\n";
+    foreach my $student (@students){
+        if (exists $sessions{'id'}{$session}{'members'}{$student}){
+            &AD_session_unset_exam({ldap=>$ldap,
+                                    root_dse=>$root_dse,
+                                    root_dns=>$root_dns,
+                                    teacher=>$teacher,
+                                    session=>$session,
+                                    student=>$student,
+                                    sessions_ref=>\%sessions,
+                                  });
+        } else {
+            print "   * Doing nothing: $student is not in the session\n";
+        }
+    }
+
+}
 
 
 &AD_unbind_admin($ldap);

@@ -32,6 +32,8 @@ $Data::Dumper::Terse = 1;
             AD_unbind_admin
             AD_get_sessions
             AD_session_manage
+            AD_session_set_exam
+            AD_session_unset_exam
             AD_user_create
             AD_user_update
             AD_get_user
@@ -621,6 +623,29 @@ sub AD_session_manage {
         print "\nWARNING: User $teacher not found in ldap, skipping session creation\n\n";
         return;
     }
+}
+
+
+sub AD_session_set_exam {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $student = $arg_ref->{student};
+    my $teacher = $arg_ref->{teacher};
+    print "   * Setting exam mode for session member $student (Teacher: $teacher)\n";
+
+}
+
+
+sub AD_session_unset_exam {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $student = $arg_ref->{student};
+    my $teacher = $arg_ref->{teacher};
+    print "   * Unsetting exam mode for session member $student (Teacher: $teacher)\n";
 }
 
 
