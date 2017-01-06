@@ -6,10 +6,23 @@ sophomorix4/Samba4 weekly Nr. 9  (xx.11.2016)
 
 Entwicklertreffen 13.1.17
 
-managment gruppen:
- - weitere? webfilter,intranet, drucker
+
 
 sophomorix-session:
+
+ - managment gruppen:
+   weitere? webfilter,intranet, drucker
+
+ - um ein vollständiges JSON-Objekt zurückzugeben
+   was wird zurückgegeben, wenn nicht ermittelt werden kann 
+   bzw. noch nicht umgesetzt ist?
+   Vorschlag
+   webfilter-> unknown
+   webfilter-> not implemented ODER todo 
+
+ - wie findet man heraus ob ein user angemeldet ist?
+    -> ändern sich ldap-attribute?
+    -> an welchem PC?
 
  - Session beenden/User aus session
    muss user wieder in die Gruppen internet,wifi, ...
@@ -24,6 +37,11 @@ sophomorix-session:
      users=maierle,muellerle
      usersblock=lucifer   # lucifer ist in 12a
      groupblock=5a  # falls group=students
+
+   -> wifiaccess hat eigentlich 3 Stati:
+      - vom admin erlaubt oder verboten
+      - vom lehrer freischaltbar
+      - default on/off (anlegen, nach KAs, ...)
 
 --> allgemeine Frage:
     wie konfiguriert man in einer Textdatei beliebige userlisten einfach
@@ -48,6 +66,10 @@ sophomorix-session:
   http://stackoverflow.com/questions/31326188/how-to-build-hierarhical-hash-in-perl-from-directory-tree
   http://www.perlmonks.org/?node_id=1077470
 
+ODER soll nur ein Überblick Angezeigt werden:
+   - nicht rekursiv (oberste Ebene only)
+   - JSON: Liste der Inhalte mit typ (file,directory) zur Darstellung mit Ordnersymbol
+   
 
 
 - sollte es noch einen Comment geben für eine session?
@@ -57,10 +79,27 @@ sophomorix-session:
 - sollten session lange aufgehoben werden können?
 
 
+teacher.cvs students.csv und so:
+5. und 6. Feld Problem:
+    BISHER: teacher.csv:  5. Feld ist wunsch-loginname
+            students.csv: 5. Feld ist Eindeutige ID des Schulverwaltungsprogramms
+
+    NEU: so lassen oder vereinheitlichen? wie herum?
+    Für so lassen spricht:
+       - SVP-Exports (meist Schüler) sind schon Konfguriert (wer nutzt diese ID überhaupt?)
+       - Lehrer werden oft mit Lehrerkürzel exportiert
+       - Beim schülerexport kann kein Wunschlogin exporiert werden
+         -> 5. Feld müsste dann leer bleiben, 6. Feld Unid
+            -> ist schwer Konfigurierbar
+            -> Lösung nonsens ins 5. Feld und auf ignoriert stellen ist auch quatsch
+       - beim lehrer
+   Gegen so lassen spricht:
+       Vereinheitlichung (aber wozu)
+
 
 sophomorix-device:
 
-- hwk -> Einzelcomputer als Member -> SPÄTER
+- hwk -> Einzelcomputer als Member -> SPÄTER OK?
 
 
 
