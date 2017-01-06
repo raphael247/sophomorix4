@@ -171,6 +171,11 @@ if ($info==1) {
            $birthdate,
            $surname_utf8,
            $firstname_utf8,
+           $filename,
+           $status,
+           $user_account_control,
+           $school,
+           $role,
           )=split(/::/,$line);
 
     my $name_ascii=$surname_ascii.", ".$firstname_ascii;
@@ -224,6 +229,8 @@ while(<USERUPDATE>){
         $filename,
         $status,
         $user_account_control,
+        $school,
+        $role,
        )=split(/::/);
 
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
@@ -240,6 +247,8 @@ while(<USERUPDATE>){
                      filename=>$filename,
                      status=>$status,
                      user_account_control=>$user_account_control,
+                     school=>$school,
+                     role=>$role,
                      unid=>$unid,
                      user_count=>$user_count,
                    });

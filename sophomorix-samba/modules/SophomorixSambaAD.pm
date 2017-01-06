@@ -856,8 +856,9 @@ sub AD_user_update {
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
     my $user_account_control = $arg_ref->{user_account_control};
+    my $school = $arg_ref->{school};
+    my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
-      
 
     my $displayname;
     # hash of what to replace
@@ -940,6 +941,23 @@ sub AD_user_update {
     if (defined $user_account_control and $user_account_control ne "---"){
         $replace{'userAccountControl'}=$user_account_control;
         print "   userAccountControl:        $user_account_control\n";
+    }
+    if (defined $school and $school ne "---"){
+        # update sophomorixSchoolname AND sophomorixSchoolPrefix
+        $replace{'sophomorixSchoolname'}=$school;
+        print "   sophomorixSchoolname:      $school\n";
+        my $prefix;
+        if ($school eq $DevelConf::name_default_school){
+            $prefix="---";
+        } else {
+            $prefix=$school;
+        }
+        $replace{'sophomorixSchoolPrefix'}=$prefix;
+        print "   sophomorixSchoolPrefix:    $prefix\n";
+    }
+    if (defined $role and $role ne "---"){
+        $replace{'sophomorixRole'}=$role;
+        print "   sophomorixRole:            $role\n";
     }
     if (defined $examteacher and $examteacher ne ""){
         $replace{'sophomorixExamMode'}=$examteacher;

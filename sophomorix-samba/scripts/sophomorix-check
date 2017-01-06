@@ -566,6 +566,8 @@ sub write_update_file {
     my $firstname_utf8;
     my $birthdate;
     my $filename;
+    my $school;
+    my $role;
     my $status;
     my $user_account_control;
     my $update=0;
@@ -633,6 +635,26 @@ sub write_update_file {
         $filename=$Match{'action'}{$line_new}{'filename'};
     }
 
+    # school
+    if ( ($Match{'action'}{$line_new}{'school'} eq $AD{'sam'}{$sam}{'sophomorixSchoolname'} )){
+        # no update
+        $school="---";
+    } else {
+        # update
+        $update++;
+        $school=$Match{'action'}{$line_new}{'school'};
+    }
+
+    # role
+    if ( ($Match{'action'}{$line_new}{'role'} eq $AD{'sam'}{$sam}{'sophomorixRole'} )){
+        # no update
+        $role="---";
+    } else {
+        # update
+        $update++;
+        $role=$Match{'action'}{$line_new}{'role'};
+    }
+
     # status
     $status="---";
 
@@ -659,6 +681,8 @@ sub write_update_file {
                     $filename."::".
                     $status."::".
                     $user_account_control."::".
+                    $school."::".
+                    $role."::".
                     "\n";
     if ($update > 0){
         print "--> sophomorix.update: $update_line";
