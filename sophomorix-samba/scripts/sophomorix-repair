@@ -27,6 +27,13 @@ use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
+use Net::DNS;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
 
 use Sophomorix::SophomorixBase qw(
                                  print_line
@@ -72,7 +79,8 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $permissions=0;
-
+my $json=0;
+my $dump_AD=0;
 
 
 ###############################################################################
@@ -86,6 +94,8 @@ my $repair_directory_tree="$DevelConf::path_conf_devel/repair.directories";
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "dump-AD" => \$dump_AD,
            "verbose|v+" => \$Conf::log_level,
            "permissions" => \$permissions,
           );
@@ -150,10 +160,34 @@ Please see the sophomorix-repair(8) man pages for full documentation
 # Gruppenlisten/Userlisten erstellen
 ###############################################################################
 
+# ============================================================
+# asking AD for users
+# ============================================================
+&print_title("Asking the system for users ...");
 
+# fetch system data
+my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           computers=>"TRUE",
+                           rooms=>"TRUE",
+                           management=>"TRUE",
+                           adminclasses=>"TRUE",
+#                           examaccounts=>"TRUE",
+                           users=>"TRUE",
+                           dnszones=>"TRUE",
+                           dnsnodes=>"TRUE",
+             });
+my %AD= %$ref_AD; 
 
-
-# do something
+# --dump-AD
+if ($dump_AD==1){
+    &json_dump({json => $json,
+                jsoninfo => "SEARCH",
+                jsoncomment => "AD Content",
+                hash_ref=>\%AD,
+              });
+}
 
 
 # --permissions
@@ -219,6 +253,7 @@ sub repair_directory_tree {
        $path=join("/",@new_dirs);
          
 #       if($Conf::log_level>=3){
+          print "\n";
           print "   $num) Calling &repair_directory for $_:\n";
           print "     Path:          $path\n";
           print "     Owner:         $owner\n";
@@ -237,22 +272,18 @@ sub repair_directory_tree {
 
 
 
-###############################################################################
-# Reparieren eines bind mounts 
-###############################################################################
-
-
-
 sub repair_directory {
     my ($path_with_var, $owner, $groupowner, $permission, $acl, $schools, $groups, $users) = @_;
     foreach my $school (@$schools){
         my $path=$path_with_var;
         $path=~s/\@\@SCHOOL\@\@/$school/;
-        print " * school is $school  -> $path\n";
+        print "   Determining path:\n";
+        print "      * school is >$school<  -> Path: $path\n";
         foreach my $group (@$groups){
-            print " * group is $group\n";
+            print "      * group is >$group< -> Path: $path\n";
             foreach my $user (@$users){
-                print " * user is $user\n";
+                print "      * user is >$user< -> Path: $path\n";
+                print "      Path: $path\n";
                 mkdir $path;
                 chmod oct($permission), $path;
             }

@@ -525,7 +525,7 @@ sub config_sophomorix_read {
 #        "OU=".$DevelConf::AD_global_ou.",".$DevelConf::AD_schools_ou.",".$root_dse;
     $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
         "OU=".$DevelConf::AD_global_ou.",".$root_dse;
-    $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="";
+    $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="global";
     $sophomorix_config{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP}=
