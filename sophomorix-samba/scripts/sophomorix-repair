@@ -164,13 +164,14 @@ if ($permissions==1) {
 
 
 sub repair_directory_tree {
+   my $num=0;
+   open(DIRS, "<${repair_directory_tree}")|| die "Fehler: $!";
+   while (<DIRS>) {
     # Liste mit einem Element, dass die Schleifen EINMAL durchlaufen werden
     my @schools=("");
     my @groups=("");
     my @users=("");
-   my $num=0;
-   open(DIRS, "<${repair_directory_tree}")|| die "Fehler: $!";
-   while (<DIRS>) {
+
        my $school_count=0;
        my $group_count=0;
        my $user_count=0;
@@ -182,7 +183,6 @@ sub repair_directory_tree {
        $num++;
        
        if (/\@\@SCHOOL\@\@/) {
-#           @schools=("eins","zwo");
            @schools = @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
            $group_count++;
            if($Conf::log_level>=3){
@@ -191,21 +191,33 @@ sub repair_directory_tree {
            }
        }
 
-       # split line
        my ($path, $owner, $groupowner, $permission,$acl) = split(/::/);
-       my ($var,@rest)=split(/\//,$path);
-       $var=">".$var."<"; # add the ><, so that no substrings will be replaced
+       my @dirs=split(/\//,$path);
+       my @new_dirs=();
+       foreach my $dir (@dirs){
+           $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
 
+           # /var
+           $dir=~s/>\$path_log</${DevelConf::path_log}/;
+           $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
+           # /home
+           $dir=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
+           $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
 
-       # /var
-       $var=~s/>\$path_log</${DevelConf::path_log}/;
-       $var=~s/>\$path_log_user</${DevelConf::path_log_user}/;
-       # /home
-       $var=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
-       $path=join("/",$var,@rest);
+           # other
+           $dir=~s/>\$directory_students</${DevelConf::directory_students}/;
+           $dir=~s/>\$directory_teachers</${DevelConf::directory_teachers}/;
+           $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
+           $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
 
+           # remove <,>
+           $dir=~s/^>//g;
+           $dir=~s/<$//g;
+	   push @new_dirs,$dir;
+       }
+
+       $path=join("/",@new_dirs);
          
-       # Verzeichnis reparieren
 #       if($Conf::log_level>=3){
           print "   $num) Calling &repair_directory for $_:\n";
           print "     Path:          $path\n";
