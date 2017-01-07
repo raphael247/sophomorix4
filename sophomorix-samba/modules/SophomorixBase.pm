@@ -304,6 +304,9 @@ sub config_sophomorix_read {
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
         "OU=".$DevelConf::name_default_school.",".$DevelConf::AD_schools_ou.",".$root_dse; 
 
+    # school list
+    push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $DevelConf::name_default_school; 
+
     ##################################################
     # sophomorix.conf 
     my $conf_file=$DevelConf::file_conf_sophomorix;
@@ -324,6 +327,7 @@ sub config_sophomorix_read {
         $value=&remove_whitespace($value);
         if ($var eq "SCHOOL"){
             $sophomorix_config{'SCHOOLS'}{$value}{'OU'}="unknown";
+            push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $value; 
             $sophomorix_config{'SCHOOLS'}{$value}{'CONF_FILE'}=
                 $DevelConf::path_conf_sophomorix."/".$value."/".$value.".school.conf";
         } elsif ($var eq "LANG"){
@@ -825,6 +829,10 @@ sub config_sophomorix_read {
         }
     }
     close(ROLETYPE);
+
+    # sorting some lists
+    @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+
     return %sophomorix_config; 
 }
  

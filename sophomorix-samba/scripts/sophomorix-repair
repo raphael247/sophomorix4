@@ -1,0 +1,420 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-repair) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+
+# next
+# option --log-funny-files /path/to/file : list all files that should not be there in the log file
+# time for bind repair: 3s for a user that is in 30 groups
+#                       1s for a user that is in 3 groups
+
+# update man page:
+# add 4 options delete/repair-bind/links
+# remove option --repairlinks (never existed)
+
+# check printout in loglevel2
+
+# If binds are to be used: replace obsolte funktions
+   # obsolete functions in SophomorixBase.pm:
+   # &Sophomorix::SophomorixBase::create_school_link($login); --> update_pointer_school
+   # &create_share_link($login,$group,$group,$group_type);    --> update_pointer
+
+
+# Bibliotheken
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 filelist_fetch
+                                 remove_whitespace
+                                 json_dump
+                                 recode_utf8_to_ascii
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_get_AD
+                                 AD_dns_get
+                                 AD_object_search
+                                 get_forbidden_logins
+                                    );
+my @arguments = @ARGV;
+
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $permissions=0;
+
+
+
+###############################################################################
+# Beginn
+###############################################################################
+# Datei, die die zu reparierenden Verzeichnisse beinhaltet
+my $repair_directory_tree="$DevelConf::path_conf_devel/repair.directories";
+
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "verbose|v+" => \$Conf::log_level,
+           "permissions" => \$permissions,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt);
+
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlbeschreibung
+   print "\n$scriptname repairs the permissions ",
+         "of a sophomorix installation,\n",
+         "reading the permissions from $repair_directory_tree.\n\n";
+   print('
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i
+  -f filename / --file filename
+
+What to repair (one option must be given):
+
+  --permissions
+      (repairs permission outside of $HOME)
+
+Please see the sophomorix-repair(8) man pages for full documentation
+');
+   exit;
+}
+
+
+
+# if ($quick==1){
+#     # no permissions needed
+#     &titel("Reading permission data ...");
+#     &get_alle_verzeichnis_rechte();
+# } else {
+#     # repair.directories einlesen
+#     &titel("Reading permission data ...");
+#     &get_alle_verzeichnis_rechte();
+#     # fetch permission for all homes
+#     &fetch_repairhome();
+# }
+
+#&check_verzeichnis_mkdir("${DevelConf::log_pfad_repair}");
+
+
+
+###############################################################################
+# Gruppenlisten/Userlisten erstellen
+###############################################################################
+
+
+
+
+# do something
+
+
+# --permissions
+if ($permissions==1) {
+   &repair_directory_tree();
+}
+
+
+
+sub repair_directory_tree {
+    # Liste mit einem Element, dass die Schleifen EINMAL durchlaufen werden
+    my @schools=("");
+    my @groups=("");
+    my @users=("");
+   my $num=0;
+   open(DIRS, "<${repair_directory_tree}")|| die "Fehler: $!";
+   while (<DIRS>) {
+       my $school_count=0;
+       my $group_count=0;
+       my $user_count=0;
+       chomp();   
+       if ($_ eq ""){next;} # Wenn Zeile Leer, dann aussteigen
+       if(/^\#/){next;} # Bei Kommentarzeichen aussteigen
+
+       #print "$_";
+       $num++;
+       
+       if (/\@\@SCHOOL\@\@/) {
+#           @schools=("eins","zwo");
+           @schools = @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+           $group_count++;
+           if($Conf::log_level>=3){
+              print " \@\@SCHOOL\@\@ gefunden ",
+                    "(Gruppenplatzhalter: $school_count)\n";
+           }
+       }
+
+       # split line
+       my ($path, $owner, $groupowner, $permission,$acl) = split(/::/);
+       my ($var,@rest)=split(/\//,$path);
+       $var=">".$var."<"; # add the ><, so that no substrings will be replaced
+
+
+       # /var
+       $var=~s/>\$path_log</${DevelConf::path_log}/;
+       $var=~s/>\$path_log_user</${DevelConf::path_log_user}/;
+       # /home
+       $var=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
+       $path=join("/",$var,@rest);
+
+         
+       # Verzeichnis reparieren
+#       if($Conf::log_level>=3){
+          print "   $num) Calling &repair_directory for $_:\n";
+          print "     Path:          $path\n";
+          print "     Owner:         $owner\n";
+          print "     Group:         $groupowner\n";
+          print "     Permissions:   $permission\n";
+          print "     ACL:           $acl\n";
+          print "     Schoollist:    @schools\n";
+          print "     Grouplist:     @groups\n";
+          print "     Userlist:      @users\n";
+#       }
+       &repair_directory($path, $owner, $groupowner, $permission, $acl, \@schools, \@groups, \@users);
+   }
+
+   close(DIRS);
+}
+
+
+
+###############################################################################
+# Reparieren eines bind mounts 
+###############################################################################
+
+
+
+sub repair_directory {
+    my ($path_with_var, $owner, $groupowner, $permission, $acl, $schools, $groups, $users) = @_;
+    foreach my $school (@$schools){
+        my $path=$path_with_var;
+        $path=~s/\@\@SCHOOL\@\@/$school/;
+        print " * school is $school  -> $path\n";
+        foreach my $group (@$groups){
+            print " * group is $group\n";
+            foreach my $user (@$users){
+                print " * user is $user\n";
+                mkdir $path;
+                chmod oct($permission), $path;
+            }
+        }
+    }
+
+
+
+
+
+
+   #my $korrigieren=1;
+   #my $permission_to_set="";
+
+   # $samba
+   #my @userliste=();
+
+
+
+
+
+   # foreach my $gruppe (@$gruppen){
+   #       if($Conf::log_level>=3){
+   #          print "***** Gruppe ist $gruppe *****\n";
+   #       }
+   #       # Pfad sichern
+   #       my $save_path=$path;
+   #       # Owner sichern
+   #       my $save_owner=$owner; 
+
+   #       # Group-owner sichern
+   #       my $save_groupowner=$groupowner; 
+
+   #       # Userliste evtl. einschränken
+   # 	 if ($path=~/\$klassen/ && $path=~/\$schueler/) {
+   #          @userliste=&fetchstudents_from_adminclass($gruppe);
+   #          #print "Userliste: Nur Klasse\n";
+   # 	 } elsif ($path=~/\$projects/ && $path=~/\$members/) {
+   #          @userliste=&fetchusers_from_project($gruppe);
+   #          #print "Userliste: Nur Workstations\n";
+   # 	 } elsif ($path=~/\$raeume/ && $path=~/\$workstation/) {
+   #          @userliste=&fetchworkstations_from_room($gruppe);
+   #          #print "Userliste: Nur Workstations\n";
+   # 	 } else {
+   #          my $zahl=@$user;
+   #          if (not $zahl==0) {
+   #             @userliste=@$user;
+   #             #print "Userliste: Alle ($zahl)\n";
+   # 	    } else {
+   #             @userliste=("");
+   #             print "Userliste: User ohne Namen ($zahl User)\n";
+   # 	    }
+   # 	 }
+
+   #       # Ersetzungen vornehmen von Gruppen
+   #       # Bsp.: String $klassen mit dem Wert von $gruppe ersetzen
+   #       $path=~s/\$klassen/$gruppe/g; 
+   #       $path=~s/\$raeume/$gruppe/g; 
+   #       $path=~s/\$projects/$gruppe/g; 
+   #       $path=~s/\$subclasses/$gruppe/g; 
+
+   #       $groupowner=~s/\$klassen/$gruppe/g; 
+   #       $groupowner=~s/\$raeume/$gruppe/g;
+   #       $groupowner=~s/\$projects/$gruppe/g;
+   #       $groupowner=~s/\$subclasses/$gruppe/g;
+
+   #    foreach $user (@$user){
+   #       if($Conf::log_level>=3){
+   #          print "User ist $user\n";
+   #       }
+   #       # Pfad sichern
+   #       my $save_path=$path;         
+   #       # Owner sichern
+   #       my $save_owner=$owner;
+         
+   #       # Grou-owner sichern
+   #       my $save_groupowner=$groupowner;
+         
+   #       my $ownerid=0;
+   #       my $gid=0;
+
+   #       # Ersetzungen vornehmen von Usern
+   #       $path=~s/\$schueler/$user/g; 
+   #       $path=~s/\$lehrer/$user/g; 
+   #       $path=~s/\$workstation/$user/g; 
+   #       $path=~s/\$members/$user/g; 
+
+   #       $owner=~s/\$schueler/$user/g; 
+   #       $owner=~s/\$lehrer/$user/g;
+   #       $owner=~s/\$workstation/$user/g; 
+   #       $owner=~s/\$members/$user/g; 
+
+   #       # use database
+   #       ($a,$a,$a,$a,$ownerid) = 
+   #          &Sophomorix::SophomorixPgLdap::fetchdata_from_account($owner);
+   #       if ($ownerid==-1) {
+   #           # use ldap
+   # 	     if (not defined($ownerid=getpwnam $owner)){
+   #               print "WARNING: Benutzer $owner gibt es nicht!\n";
+   #               next;
+   # 	     }
+   #       }
+
+   #       if (not   defined ($gid = getgrnam $groupowner)) {
+   #          print "WARNING: Gruppe $groupowner gibt es nicht!\n";
+   #          next;
+   #       }
+
+   #       # Anlegen, falls nicht vorhanden
+   #       # folgendes nicht mehr verwenden, da rechte unötigerweise verändert werden
+   #       #system("install -d $path");
+ 
+   #       if (not -e $path) {
+   #          # anlegen
+   #          mkdir $path;
+             #mkdir $path, oct($permission);
+   #       }
+   #       # # Mehrere mit / getrente Permissions angegeben -> Liste
+   #       if ($permission =~m/\//) {
+   #           my @permission_list = split(/\//,$permission);
+   #           # Dateirechte des Verzeichnises ermitteln
+   #           my ($a,$b,$mode) = stat(${path});
+   #           #print "Mode ist $mode\n";
+   #           # Umwandeln in übliche Schreibweise
+   #           $mode &=07777;
+   #           $mode=sprintf "%04o",$mode;
+
+   #           if($Conf::log_level>=2){
+   #              print "Permissions are $mode  (Permitted: $permission)\n";
+   # 	     }
+   #           # Falls Verzeichnisrechte gesetzt werden müssen, 
+   #           # auf den ersten Wert setzten 
+   #           $permission_to_set=$permission_list[0];
+   #           # Sind die Verzeichnisrechte OK
+   # 	     foreach my $perm (@permission_list){
+   #             if ($mode==$perm) {
+   #             #print "VerzeichnisrechteOK\n";
+   #             # Verzeichnisrechte wurden in der Liste der zulässigen gefunden
+   #             # -> nicht mehr korrigieren
+   #             $korrigieren=0;
+   #             }
+   #           }
+   #       } else {
+   #         $permission_to_set=$permission;
+   #       }
+
+   #       # Bei Bedarf Verzeichnisrechte korrigieren
+   #       if ($korrigieren==1) {
+   #          chmod oct($permission_to_set), $path;
+   #          chown $ownerid, $gid, $path;
+   #          print "  * $path $owner($ownerid) ",
+   #                "$groupowner($gid) $permission_to_set\n";
+   #       } else {
+   #          # Verzeichnisrechte nicht korrigieren
+   #          chown $ownerid, $gid, $path;
+   #          print "  * $path $owner($ownerid) ",
+   #                "$groupowner($gid) Rechte: OK\n";
+   #          # Korrigier-Variable zurücksetzten
+   #          $korrigieren=1;
+   # 	 }
+
+   #       # Pfad wiederherstellen
+   #       $path=$save_path;
+   #       $owner=$save_owner;
+   #       $groupowner=$save_groupowner;
+   #    }
+
+   #  # Pfad wiederherstellen
+   #  $path=$save_path;
+   #  $owner=$save_owner;
+   #  $groupowner=$save_groupowner;
+   #  }
+
+}
+
+
+
