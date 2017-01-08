@@ -1,34 +1,30 @@
-# Diese Liste wird von sophomorix-repair ausgelesen
+# This list is read by sophomorix-repair
 #
-# Platzhalter:
+# Variables from left to right:
 #
-# Gruppen:
-# $klassen         alle Klassen in denen Schüler sind (OHNE lehrer)
-# $raeume          alle Räume, in denen sich Workstations befinden
-# $projects        alle Projekte der Schule
-# $subclasses      alle Subclassen der Schule
+# @@SCHOOL@@
 #
-# User:
-# $schueler                         alle Schüler der Schule
-# $schueler rechts von $klassen     alle Schüler dieser Klasse
-# $lehrer                           alle Lehrer der Schule
-# $workstation                      alle Workstation der Schule
-# $workstation rechts von $raeume   alle Workstation dieses Raumes
+# sophomorixType for groups:
+# @@ADMINCLASS@@
+# @@TEACHERCLASS@@
+# @@ROOM@@
+# @@PROJECT@@
 #
-# $members rechts von $projects     alle Mitglieder dieses Projektes
+# for users and computers
 #
-#  ! Es darf nur max. 1 Gruppenplatzhalter der obigen vorkommen (auch mehrmals)
-#  ! Es darf nur max. 1 Userplatzhalter der obigen vorkommen (auch mehrmals)
+# @@MEMBER@@ 
+#   means the members 
+#     -> of the sophomorixType-variable left of it
+#       -> of the school left of it
+# 
+# sophomorixRole ?
 #
+#
+# This is probably not needed anymore
 # Mehrere zulässige Verzeichnisrechte angeben:
 # Beispiel: 2750/2751   
 #    - korrigirt NICHT wenn Dateirechte 2750 ODER 2751 sind   
 #    - wenn Verzeichnis ANGELEGT wird, wird 2750 verwendet (der erste Wert)
-#
-#Pfad::owner::groupowner::hex-permission
-#/home/testen/$klassen/$schueler::$schueler::domadmins::0707
-#
-
 
 # # /var/*
 ### $var_lib_pfad::root::root::0700
@@ -42,13 +38,29 @@ $path_log_user/::root::root::0700::noacl
 $homedir_all_schools/::root::root::0755::noacl
 $homedir_all_schools/@@SCHOOL@@/::root::root::0755::noacl
 $homedir_all_schools/@@SCHOOL@@/$directory_students/::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/$directory_teachers/::root::root::0755::noacl
+$homedir_all_schools/@@SCHOOL@@//@@TEACHERCLASS@@::root::root::0755::noacl
 $homedir_all_schools/@@SCHOOL@@/$directory_projects/::root::root::0755::noacl
+$homedir_all_schools/@@SCHOOL@@/$directory_students/@@ADMINCLASS@@/::root::root::0755::noacl
+$homedir_all_schools/@@SCHOOL@@/@@TEACHERCLASS@@::root::root::0755::noacl
+$homedir_all_schools/@@SCHOOL@@/$directory_projects/@@PROJECT@@::root::root::0755::noacl
+# global
 $homedir_global/::root::root::0755::noacl
 $homedir_global/$directory_students/::root::root::0755::noacl
-$homedir_global/$directory_teachers/::root::root::0755::noacl
+$homedir_global/@@TEACHERCLASS@@/::root::root::0755::noacl
 $homedir_global/$directory_projects/::root::root::0755::noacl
 $homedir_global/$directory_management/::root::root::0755::noacl
+
+
+
+
+
+
+
+
+
+
+
+# old stuff follows
 
 # $homedir_all_admins::root::root::0771
 # $homedir_teacher::administrator::teachers::0751

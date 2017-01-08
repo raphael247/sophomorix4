@@ -197,76 +197,79 @@ if ($permissions==1) {
    &repair_directory_tree();
 }
 
-
+############################################################
+# subs
+############################################################
 
 sub repair_directory_tree {
-   my $num=0;
-   open(DIRS, "<${repair_directory_tree}")|| die "Fehler: $!";
-   while (<DIRS>) {
-    # Liste mit einem Element, dass die Schleifen EINMAL durchlaufen werden
-    my @schools=("");
-    my @groups=("");
-    my @users=("");
-
-       my $school_count=0;
-       my $group_count=0;
-       my $user_count=0;
-       chomp();   
-       if ($_ eq ""){next;} # Wenn Zeile Leer, dann aussteigen
-       if(/^\#/){next;} # Bei Kommentarzeichen aussteigen
-
-       #print "$_";
-       $num++;
+    my $num=0;
+    open(DIRS, "<${repair_directory_tree}")|| die "Fehler: $!";
+    while (<DIRS>) {
+        $num++;
+        # List with ONE school, so ONE loop is certain
+        my @schools=("");
+        my $group_type="";
+        my $school_count=0;
+        my $groupvar_count=0;
+        chomp();   
+        if ($_ eq ""){next;} # Wenn Zeile Leer, dann aussteigen
+        if(/^\#/){next;} # Bei Kommentarzeichen aussteigen
        
-       if (/\@\@SCHOOL\@\@/) {
-           @schools = @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
-           $group_count++;
-           if($Conf::log_level>=3){
-              print " \@\@SCHOOL\@\@ gefunden ",
-                    "(Gruppenplatzhalter: $school_count)\n";
-           }
-       }
+        if (/\@\@SCHOOL\@\@/) {
+            @schools = @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+            $school_count++;
+        }
 
-       my ($path, $owner, $groupowner, $permission,$acl) = split(/::/);
-       my @dirs=split(/\//,$path);
-       my @new_dirs=();
-       foreach my $dir (@dirs){
-           $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
+        if (/\@\@ADMINCLASS\@\@/) {
+            $group_type="adminclass";
+            $groupvar_count++;
+        }
+        if (/\@\@TEACHERCLASS\@\@/) {
+            $group_type="teacherclass";
+            $groupvar_count++;
+        }
+        if (/\@\@PROJECT\@\@/) {
+            $group_type="project";
+            $groupvar_count++;
+        }
 
-           # /var
-           $dir=~s/>\$path_log</${DevelConf::path_log}/;
-           $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
-           # /home
-           $dir=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
-           $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
+        my ($path, $owner, $groupowner, $permission,$acl) = split(/::/);
+        my @dirs=split(/\//,$path);
+        my @new_dirs=();
+        foreach my $dir (@dirs){
+            $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
 
-           # other
-           $dir=~s/>\$directory_students</${DevelConf::directory_students}/;
-           $dir=~s/>\$directory_teachers</${DevelConf::directory_teachers}/;
-           $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
-           $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
+            # /var
+            $dir=~s/>\$path_log</${DevelConf::path_log}/;
+            $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
+            # /home
+            $dir=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
+            $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
 
-           # remove <,>
-           $dir=~s/^>//g;
-           $dir=~s/<$//g;
-	   push @new_dirs,$dir;
-       }
+            # other
+            $dir=~s/>\$directory_students</${DevelConf::directory_students}/;
+            $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
+            $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
 
-       $path=join("/",@new_dirs);
+            # remove <,>
+            $dir=~s/^>//g;
+            $dir=~s/<$//g;
+	    push @new_dirs,$dir;
+        }
+
+        $path=join("/",@new_dirs);
          
-#       if($Conf::log_level>=3){
-          print "\n";
-          print "   $num) Calling &repair_directory for $_:\n";
-          print "     Path:          $path\n";
-          print "     Owner:         $owner\n";
-          print "     Group:         $groupowner\n";
-          print "     Permissions:   $permission\n";
-          print "     ACL:           $acl\n";
-          print "     Schoollist:    @schools\n";
-          print "     Grouplist:     @groups\n";
-          print "     Userlist:      @users\n";
-#       }
-       &repair_directory($path, $owner, $groupowner, $permission, $acl, \@schools, \@groups, \@users);
+#        if($Conf::log_level>=3){
+            print "\n";
+            print "   $num) Calling &repair_directory for $_:\n";
+            print "     Path:          $path\n";
+            print "     Owner:         $owner\n";
+            print "     Group:         $groupowner\n";
+            print "     Permissions:   $permission\n";
+            print "     ACL:           $acl\n";
+            print "     Schoollist:    @schools\n";
+#        }
+        &repair_directory($path, $owner, $groupowner, $permission, $acl, \@schools, $group_type, $groupvar_count);
    }
 
    close(DIRS);
@@ -275,25 +278,44 @@ sub repair_directory_tree {
 
 
 sub repair_directory {
-    my ($path_with_var, $owner, $groupowner, $permission, $acl, $schools, $groups, $users) = @_;
+    my ($path_with_var, $owner, $groupowner, $permission, $acl, $schools, $group_type, $groupvar_count) = @_;
     foreach my $school (@$schools){
         my $path=$path_with_var;
         $path=~s/\@\@SCHOOL\@\@/$school/;
-        print "   Determining path:\n";
-        print "      * school is >$school<  -> Path: $path\n";
-        foreach my $group (@$groups){
-            print "      * group is >$group< -> Path: $path\n";
-            foreach my $user (@$users){
-                print "      * user is >$user< -> Path: $path\n";
+        print "   Determining path for school $school:\n";
+        print "      * Path after school: $path\n";
+
+        # determining groups to walk through
+        my @groups;
+        if ($groupvar_count==0){
+            # no vars found -> one single loop
+            @groups=("");
+        } else {
+            # vars found
+            if(defined $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
+                # there is a group list -> use it
+                @groups=@{ $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
+            } else {
+                # there is no group list -> avoid the eve a single loop 
+                @groups=();
+	    }
+        }
+
+        # group loop
+        foreach my $group (@groups){
+            $path=~s/\@\@ADMINCLASS\@\@/$group/;
+            $path=~s/\@\@TEACHERCLASS\@\@/$group/;
+            $path=~s/\@\@PROJECT\@\@/$group/;
+            print "      * Path after group:  $path\n";
+            my @users=("");
+            foreach my $user (@users){
+                print "      * Path after user:   $path\n";
                 print "      Path: $path\n";
                 mkdir $path;
                 chmod oct($permission), $path;
             }
         }
     }
-
-
-
 
 
 
