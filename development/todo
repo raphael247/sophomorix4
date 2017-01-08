@@ -4,7 +4,12 @@ Later:
 * man pages
 * RoleType.conf in smb .conf format
 * sophomorixAdminClass 
-  - used by rooms, classes, ... better name: sophomorixGroup
+  - used by rooms, classes, ... better name: 
+      sophomorixGroup            the group name
+      sophomorixExitGroup        the group name before moved to attic
+      sophomorixGroupBasename    the name in students.csv, ... no schooltoken
+* AD_get_AD erzeugt listen. 
+  Diese sollten noch per Schleife asciibetisch sortiert werden 
 ############################################################
 
 sophomorixAdminClass: 
@@ -89,6 +94,57 @@ Weiter acl:
 UND  ls dir1/dir2/      und weitere möglichkeiten 
 
 perl module:  Filesys-SmbClient 
+
+/home OHNE ACLs: mit getfacl /home
+-------------------------------------
+getfacl: Entferne führende '/' von absoluten Pfadnamen
+# file: home
+# owner: root
+# group: root
+user::rwx
+group::r-x
+other::r-x
+
+
+/home  ACLs: mit setfacl 
+  # setfacl -m u:maiersa42:rwx /home
+  # setfacl -m g:bsz-m8cd:rwx /home
+-------------------------------------
+getfacl: Entferne führende '/' von absoluten Pfadnamen
+# file: home
+# owner: root
+# group: root
+user::rwx
+user:LINUXMUSTER\134maiersa42:rwx
+group::r-x
+group:LINUXMUSTER\134bsz-m8cd:rwx
+mask::rwx
+other::r-x
+
+
+Testen der ACL (und permission und owner) mit folgender Funktion:
+
+&acl_test ("/path/abs/to/dir_or_file",
+           "# owner: root",         # erste nicht ignorierte Zeile
+           "# group: root",         # zweite nicht ignorierte Zeile
+           "# user: rwx",           # dritte nicht ignorierte Zeile
+           ...
+          );
+
+-> jede Zeile wird einzeln mit Test verglichen, um zu sehen WAS nicht passt
+-> vorhandene Zeile und getestete Zeilen werden gezählt 
+   test für gleiche Anzahl
+-> getesteter Pfad wir in hash %acl_test_paths gespeichert, falls er mit /home beginnt
+
+Zusatzbefehl:
+&acl_are_all_tested();
+  - macht ein find über /home/schools und /home/global (nur dirs?) und schaut:
+    -> gibts nicht getestete dirs unter /home ? -> angangs evtl. ignorieren
+       ---> schauen, ob Müll entstanden ist
+  - für jedes gefundene dir in /home einen test:
+    ->wurde es getestet
+       -> ja, ok. Nein not ok       
+
 
 
 
