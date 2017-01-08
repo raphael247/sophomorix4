@@ -38,6 +38,8 @@ use Sophomorix::SophomorixBase qw(
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_add
                                  AD_bind_admin
+                                 AD_get_user
+                                 AD_dns_get
                                  AD_unbind_admin
                                  AD_user_create
                                  AD_object_search
@@ -68,22 +70,40 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 ############################################################
 # BEGIN: Test code goes here
 ############################################################
 
-print "Start\n";
+my $member="wu42";
 
-my $school_new="abc";
+my ($firstname,$surname,$class,$existing,$exammode)=
+                    &AD_get_user({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  user=>$member,
+                       });
 
-         &AD_school_add({ldap=>$ldap,
-                         root_dse=>$root_dse,
-                         school=>$school_new,
-                         creationdate=>$DevelConf::default_date,
-                         sophomorix_config=>\%sophomorix_config,
-   });
+print "$firstname  $surname  $class  $existing $exammode\n";
+
+
+# print "Start\n";
+# my $school="myschool";
+# my $group_basename="7a";
+# my $login="bz2";
+# my $role="teach";
+
+#     my ($homedirectory,$linux_home)=
+#         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+#                                                        $school,
+#                                                        $group_basename,
+#                                                        $login,
+#                                                        $role);
+
+# print "Homedir: $homedirectory\n";
+# print "Linux:   $linux_home\n";
 
 
 ############################################################

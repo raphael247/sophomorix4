@@ -494,7 +494,7 @@ sub AD_computer_create {
 #                   sophomorixExitAdminClass => "unknown", 
 #                   sophomorixUnid => $unid,
                    sophomorixStatus => "P",
-#                   sophomorixAdminClass => $group_token,    
+                   sophomorixAdminClass => $room,    
 #                   sophomorixFirstPassword => $plain_password, 
 #                   sophomorixFirstnameASCII => $firstname_ascii,
 #                   sophomorixSurnameASCII  => $surname_ascii,
@@ -1631,6 +1631,9 @@ sub AD_get_AD {
     my $teacherclasses = $arg_ref->{teacherclasses};
     if (not defined $teacherclasses){$teacherclasses="FALSE"};
 
+    my $projects = $arg_ref->{projects};
+    if (not defined $projects){$projects="FALSE"};
+
     my $computers = $arg_ref->{computers};
     if (not defined $computers){$computers="FALSE"};
 
@@ -1658,6 +1661,7 @@ sub AD_get_AD {
     if($users eq "TRUE"){
         $adminclasses="TRUE";
         $teacherclasses="TRUE";
+        $projects="TRUE";
     }
     # make sure room lists exist, when computers are added
     if($computers eq "TRUE"){
@@ -1692,12 +1696,13 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
-#            push @{ $AD{'lists'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'lists'}{'by_school'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
+            $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
 #        my $unneeded=$#{ $AD{'lists'}{'adminclass'} }; # make list computer empty to allow sort  
@@ -1732,12 +1737,54 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
 #            push @{ $AD{'lists'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
+            $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
+        }
+        # sorting some lists
+#        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
+    }
+
+
+    ##################################################
+    if ($projects eq "TRUE"){
+        # sophomorixType projects from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=project))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_project = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_project sophomorix projects found in AD");
+        $AD{'result'}{'group'}{'project'}{'COUNT'}=$max_project;
+        for( my $index = 0 ; $index < $max_project ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            $AD{'objectclass'}{'group'}{'project'}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{'project'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'project'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'project'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # lists
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'lists'}{$type} }, $sam; 
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+            $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
 #        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
@@ -1864,8 +1911,15 @@ sub AD_get_AD {
             $AD{'lookup'}{'role_by_user'}{$sam}=$entry->get_value('sophomorixRole');
 
             # lists
-            push @{ $AD{'lists'}{'global'}{$entry->get_value('sophomorixRole')} }, $sam; 
-            push @{ $AD{'lists'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam;
+
+            my $type=$AD{'lookup'}{'type_by_adminclass'}{$entry->get_value('sophomorixAdminClass')};
+            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}
+                       {'users_by_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
+            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}
+                       {'users_by_type'}{$type} }, $sam;  
+
         }
         # sorting some lists
 #        my $unneeded1=$#{ $AD{'lists'}{'student'} }; # make list computer nonempty        
@@ -1902,11 +1956,12 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
+            $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
 #        my $unneeded=$#{ $AD{'lists'}{'room'} }; # make list computer empty to allow sort  
@@ -1925,6 +1980,7 @@ sub AD_get_AD {
                                     'sophomorixSchoolPrefix',
                                     'sophomorixSchoolname',
                                     'sophomorixAdminFile',
+                                    'sophomorixAdminClass',
                                     'sophomorixRole',
                                   ]);
         my $max_user = $mesg->count; 
@@ -1942,11 +1998,17 @@ sub AD_get_AD {
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
             # lists
-            push @{ $AD{'lists'}{'global'}{$entry->get_value('sophomorixRole')} }, $sam; 
-            push @{ $AD{'lists'}{$sn}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$sn}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
+
+            my $type=$AD{'lookup'}{'type_by_adminclass'}{$entry->get_value('sophomorixAdminClass')};
+            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}
+                       {'users_by_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
+            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}{'users_by_type'}{$type} }, $sam;  
+
         }
         # sorting some lists
 #        my $unneeded=$#{ $AD{'lists'}{'computer'} }; # make list computer empty to allow sort  
@@ -1995,8 +2057,8 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'global'}{'internetaccess'} }, $member;
-                push @{ $AD{'lists'}{$schoolname}{'internetaccess'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'internetaccess'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'internetaccess'} }, $member;
             }
         }
         # sorting some lists
@@ -2039,8 +2101,8 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'wifiaccess'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'global'}{'wifiaccess'} }, $member;
-                push @{ $AD{'lists'}{$schoolname}{'wifiaccess'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'wifiaccess'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'wifiaccess'} }, $member;
             }
         }
         # sorting some lists
@@ -2084,8 +2146,8 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'admins'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'global'}{'admins'} }, $member;
-                push @{ $AD{'lists'}{$scholname}{'admins'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'admins'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$scholname}{'admins'} }, $member;
             }
         }
         # sorting some lists
@@ -2160,14 +2222,14 @@ sub AD_get_AD {
                 # shophomorix dnsZone or default dnsZone
                 $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
                 $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
-                push @{ $AD{'lists'}{'global'}{'sophomorixdnsZone'} }, $zone;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'sophomorixdnsZone'} }, $zone;
             } else {
                 # other dnsZone
 		$sopho_max_zone=$sopho_max_zone-1;
                 $other_max_zone=$other_max_zone+1;
                 $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
                 $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
-                push @{ $AD{'lists'}{'global'}{'otherdnsZone'} }, $zone;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'otherdnsZone'} }, $zone;
             }
         }
         $AD{'result'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
@@ -2214,7 +2276,7 @@ sub AD_get_AD {
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=$desc;
-                push @{ $AD{'lists'}{'global'}{'dnsNode'} }, $dc;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'dnsNode'} }, $dc;
                 if($Conf::log_level>=2){
                     print "   * $dc\n";
                 }
