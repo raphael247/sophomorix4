@@ -1377,9 +1377,6 @@ sub AD_school_add {
                          });
     }
 
-
-
-
     ############################################################
     # OU=GLOBAL
     my $result3 = $ldap->add($ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP},
@@ -1407,7 +1404,6 @@ sub AD_school_add {
         print "      * DN: $dn (GROUP_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     }
-
 
     ############################################################
     # OU=GLOBAL    
@@ -1632,6 +1628,9 @@ sub AD_get_AD {
     my $adminclasses = $arg_ref->{adminclasses};
     if (not defined $adminclasses){$adminclasses="FALSE"};
 
+    my $teacherclasses = $arg_ref->{teacherclasses};
+    if (not defined $teacherclasses){$teacherclasses="FALSE"};
+
     my $computers = $arg_ref->{computers};
     if (not defined $computers){$computers="FALSE"};
 
@@ -1654,6 +1653,97 @@ sub AD_get_AD {
         # dnsZones are needed to get dnsNodes
         $dnszones="TRUE";
     }
+
+    # make sure adminclass lists exist, when users are added
+    if($users eq "TRUE"){
+        $adminclasses="TRUE";
+        $teacherclasses="TRUE";
+    }
+    # make sure room lists exist, when computers are added
+    if($computers eq "TRUE"){
+        $rooms="TRUE";
+    }
+
+
+    ##################################################
+    if ($adminclasses eq "TRUE"){
+        # sophomorixType adminclass from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=adminclass))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_adminclass = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_adminclass sophomorix adminclasses found in AD");
+        $AD{'result'}{'group'}{'adminclass'}{'COUNT'}=$max_adminclass;
+        for( my $index = 0 ; $index < $max_adminclass ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # lists
+            push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
+#            push @{ $AD{'lists'}{$type} }, $sam; 
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+        }
+        # sorting some lists
+#        my $unneeded=$#{ $AD{'lists'}{'adminclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'lists'}{'adminclass'} } = sort @{ $AD{'lists'}{'adminclass'} }; 
+    }
+
+
+    ##################################################
+    if ($teacherclasses eq "TRUE"){
+        # sophomorixType teacherclass from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=teacherclass))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_teacherclass = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_teacherclass sophomorix teacherclasses found in AD");
+        $AD{'result'}{'group'}{'teacherclass'}{'COUNT'}=$max_teacherclass;
+        for( my $index = 0 ; $index < $max_teacherclass ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # lists
+            push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
+#            push @{ $AD{'lists'}{$type} }, $sam; 
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+        }
+        # sorting some lists
+#        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
+    }
+
 
     ##################################################
     if ($users eq "TRUE"){
@@ -1784,44 +1874,45 @@ sub AD_get_AD {
 #        @{ $AD{'lists'}{'teacher'} } = sort @{ $AD{'lists'}{'teacher'} }; 
     }
 
+
     ##################################################
-    if ($adminclasses eq "TRUE"){
-        # sophomorixType adminclass from ldap
+    if ($rooms eq "TRUE"){
+        # sophomorixType room from ldap
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-                       filter => '(&(objectClass=group)(sophomorixType=adminclass))',
+                       filter => '(&(objectClass=group)(sophomorixType=room))',
                        attrs => ['sAMAccountName',
-                                 'sophomorixSchoolname',
                                  'sophomorixStatus',
+                                 'sophomorixSchoolname',
                                  'sophomorixType',
                                 ]);
-        my $max_adminclass = $mesg->count; 
+        my $max_room = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
-            "$max_adminclass sophomorix adminclasses found in AD");
-        $AD{'result'}{'group'}{'adminclass'}{'COUNT'}=$max_adminclass;
-        for( my $index = 0 ; $index < $max_adminclass ; $index++) {
+            "$max_room sophomorix Rooms found in AD");
+        $AD{'result'}{'group'}{'room'}{'COUNT'}=$max_room;
+        for( my $index = 0 ; $index < $max_room ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
             my $schoolname=$entry->get_value('sophomorixSchoolname');
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'room'}=$sam;
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixStatus'}=$stat;
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixType'}=$type;
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
             push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
             push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
-#            push @{ $AD{'lists'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'adminclass'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'adminclass'} } = sort @{ $AD{'lists'}{'adminclass'} }; 
+#        my $unneeded=$#{ $AD{'lists'}{'room'} }; # make list computer empty to allow sort  
+#        @{ $AD{'lists'}{'room'} } = sort @{ $AD{'lists'}{'room'} }; 
     }
+
 
     ##################################################
     if ($computers eq "TRUE"){
@@ -1864,43 +1955,6 @@ sub AD_get_AD {
         # print "COUNT: $#{ $AD{'lists'}{'computer'} }\n";  # -1   
     }
 
-    ##################################################
-    if ($rooms eq "TRUE"){
-        # sophomorixType room from ldap
-        $mesg = $ldap->search( # perform a search
-                       base   => $root_dse,
-                       scope => 'sub',
-                       filter => '(&(objectClass=group)(sophomorixType=room))',
-                       attrs => ['sAMAccountName',
-                                 'sophomorixStatus',
-                                 'sophomorixSchoolname',
-                                 'sophomorixType',
-                                ]);
-        my $max_room = $mesg->count; 
-        &Sophomorix::SophomorixBase::print_title(
-            "$max_room sophomorix Rooms found in AD");
-        $AD{'result'}{'group'}{'room'}{'COUNT'}=$max_room;
-        for( my $index = 0 ; $index < $max_room ; $index++) {
-            my $entry = $mesg->entry($index);
-            my $sam=$entry->get_value('sAMAccountName');
-            my $type=$entry->get_value('sophomorixType');
-            my $stat=$entry->get_value('sophomorixStatus');
-            my $schoolname=$entry->get_value('sophomorixSchoolname');
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
-            $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
-            # lists
-            push @{ $AD{'lists'}{'global'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{$schoolname}{$type} }, $sam; 
-            if($Conf::log_level>=2){
-                print "   * $sam\n";
-            }
-        }
-        # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'room'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'room'} } = sort @{ $AD{'lists'}{'room'} }; 
-    }
 
     ##################################################
     if ($management eq "TRUE"){
@@ -2039,6 +2093,7 @@ sub AD_get_AD {
 #        @{ $AD{'lists'}{'admins'} } = sort @{ $AD{'lists'}{'admins'} }; 
     }
 
+
     # ##################################################
     # if ($examaccounts eq "TRUE"){
     #     # sophomorix ExamAccounts from ldap
@@ -2066,6 +2121,7 @@ sub AD_get_AD {
     #         $AD{'objectclass'}{'user'}{'examaccount'}{$sam}{'sophomorixAdminFile'}=$filename;
     #     }
     # }
+
 
     ##################################################
     if ($dnszones eq "TRUE"){
