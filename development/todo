@@ -9,7 +9,9 @@ Later:
       sophomorixExitGroup        the group name before moved to attic
       sophomorixGroupBasename    the name in students.csv, ... no schooltoken
 * AD_get_AD erzeugt listen. 
-  Diese sollten noch per Schleife asciibetisch sortiert werden 
+  Diese sollten noch per Schleife asciibetisch sortiert werden
+* AD_get_AD liefert listen für ALLE sophomorixType (ouclass, usw ...) 
+* Festplattenquota
 ############################################################
 
 sophomorixAdminClass: 
@@ -84,6 +86,14 @@ school (ehemals school_token,ou) usw
 
 In the AD the school token of the default school is ---
 
+
+
+sophomorix-repair
+
+User auflisten lassen,
+dann  mit $root_dns,$school,$group_basename,$user,$role 
+bzw. in unixHomeDirectory schauen
+-> dann role-basiert die entsprechende ACL aufrufen
 
 
 Weiter acl:
