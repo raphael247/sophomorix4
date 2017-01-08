@@ -735,7 +735,7 @@ sub AD_user_create {
     my $user_principal_name = $login."\@"."linuxmuster.local";
     my $container=&AD_get_container($role,$group_basename);
 
-    my ($homedirectory,$linux_home)=
+    my ($homedirectory,$unix_home)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                        $school,
                                                        $group_basename,
@@ -784,8 +784,8 @@ sub AD_user_create {
         print "   Unid:               $unid\n";
         print "   Unix-uidNumber:     $uidnumber_wish\n";
         print "   File:               $file\n";
-        print "   HomeDirectory:      $homedirectory\n";
-        print "   LinuxHome:          $linux_home\n";
+        print "   homeDirectory:      $homedirectory\n";
+        print "   unixHomeDirectory:  $unix_home\n";
     }
 
     # make sure $dn_class exists
@@ -802,6 +802,7 @@ sub AD_user_create {
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
                    homeDirectory => $homedirectory,
+                   unixHomeDirectory => $unix_home,
                    sophomorixExitAdminClass => "unknown", 
                    sophomorixUnid => $unid,
                    sophomorixStatus => $status,
@@ -1086,7 +1087,7 @@ sub AD_user_move {
          $target_branch="OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     }
 
-    my ($homedirectory_new,$linux_home)=
+    my ($homedirectory_new,$unix_home_new)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                        $school_new,
                                                        $group_new_basename,
@@ -1110,16 +1111,17 @@ sub AD_user_move {
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Moving User $user ($user_count),(start):");
         print "   DN:             $dn\n";
-        print "   Target DN:      $target_branch\n";
-        print "   Group (Old):    $group_old ($group_old_basename)\n";
-        print "   Group (New):    $group_new ($group_new_basename)\n";
-        print "   Role (New):     $role_new\n";
-        print "   Type (New):     $group_type_new\n";
-        print "   School(Old):    $school_old\n";
-        print "   School(New):    $school_new\n";
-        print "   Prefix(New):    $prefix_new\n";
-        print "   homeDirectory:  $homedirectory_new\n";
-        print "   Creationdate:   $creationdate (if new group must be added)\n";
+        print "   Target DN:         $target_branch\n";
+        print "   Group (Old):       $group_old ($group_old_basename)\n";
+        print "   Group (New):       $group_new ($group_new_basename)\n";
+        print "   Role (New):        $role_new\n";
+        print "   Type (New):        $group_type_new\n";
+        print "   School(Old):       $school_old\n";
+        print "   School(New):       $school_new\n";
+        print "   Prefix(New):       $prefix_new\n";
+        print "   homeDirectory:     $homedirectory_new\n";
+        print "   unixHomeDirectory: $unix_home_new\n";
+        print "   Creationdate:      $creationdate (if new group must be added)\n";
     }
 
     # make sure OU and tree exists
@@ -1159,6 +1161,7 @@ sub AD_user_move {
                           sophomorixSchoolname => $school_new,
                           sophomorixRole => $role_new,
                           homeDirectory => $homedirectory_new,
+                          unixHomeDirectory => $unix_home_new,
                       }
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);

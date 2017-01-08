@@ -214,6 +214,7 @@ sub AD_test_object {
     my $uidnumber =$arg_ref->{uidNumber};
     my $homedrive =$arg_ref->{homeDrive};
     my $homedirectory =$arg_ref->{homeDirectory};
+    my $unixhomedirectory =$arg_ref->{unixHomeDirectory};
     my $useraccountcontrol =$arg_ref->{userAccountControl};
 
     # group
@@ -335,6 +336,10 @@ sub AD_test_object {
         if (defined $homedirectory){
             is ($entry->get_value ('homeDirectory'),$homedirectory,
 		"  * homeDirectory is $homedirectory");
+        }
+        if (defined $unixhomedirectory){
+            is ($entry->get_value ('unixHomeDirectory'),$unixhomedirectory,
+		"  * unixHomeDirectory is $unixhomedirectory");
         }
         if (defined $useraccountcontrol){
             is ($entry->get_value ('userAccountControl'),$useraccountcontrol,

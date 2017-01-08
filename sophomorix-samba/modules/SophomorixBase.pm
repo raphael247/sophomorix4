@@ -1149,18 +1149,18 @@ sub create_plain_password {
 sub get_homedirectory {
     my ($root_dns,$school,$group_basename,$user,$role)=@_;
     my $homedirectory;
-    my $linux_home;
+    my $unix_home;
     if ($role eq "student"){
         $homedirectory="\\\\".$root_dns."\\".$school."\\students\\".$group_basename."\\homes\\".$user;
-        $linux_home="/home/schools/".$school."/students/".$group_basename."/homes/".$user;
+        $unix_home="/home/schools/".$school."/students/".$group_basename."/homes/".$user;
     } elsif ($role eq "teacher"){
         $homedirectory="\\\\".$root_dns."\\".$school."\\teachers\\homes\\".$user;
-        $linux_home="/home/schools/".$school."/teachers/homes/".$user;
+        $unix_home="/home/schools/".$school."/teachers/homes/".$user;
     } else {
         $homedirectory="\\\\".$root_dns."\\".$school."\\unknown\\".$group_basename."\\homes\\".$user;
-        $linux_home="/home/schools/".$school."/unknown/".$group_basename."/homes/".$user;
+        $unix_home="/home/schools/".$school."/unknown/".$group_basename."/homes/".$user;
     }
-    return ($homedirectory,$linux_home);
+    return ($homedirectory,$unix_home);
 }
 
 
