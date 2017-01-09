@@ -24,6 +24,7 @@ use Sophomorix::SophomorixTest qw(
                                  AD_test_object
                                  run_command
                                  AD_test_session_count
+                                 ACL_test
                                  );
 
 $Conf::log_level=1;
@@ -1096,6 +1097,23 @@ if ($add==1 or $test_add==1){
                    memberOf => "",
                    member => "bsz-teachers|uni-teachers|teachers",
                   });
+
+
+    ############################################################
+    # Testing the filesystem
+    &ACL_test ("/home/schools","d",
+               "# owner: root", 
+               "# group: root", 
+               "user::rwx",     
+               "group::r-x",    
+               "other::r-x",    
+              );
+
+
+
+
+
+
 }
 
 

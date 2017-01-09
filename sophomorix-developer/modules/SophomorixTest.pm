@@ -35,6 +35,7 @@ $Data::Dumper::Terse = 1;
             AD_examaccounts_any
             AD_dnsnodes_any
             AD_rooms_any
+            ACL_test
             run_command
 
             );
@@ -683,6 +684,45 @@ sub test_multivalue {
     is ($count,$test_count,
         "  * $sam_account has $count entries in multivalue attribute $attr: $test_count tested");
 }
+
+
+############################################################
+# ACL
+############################################################
+sub ACL_test {
+    my ($abs_path,$filetype,@test)=@_;
+    my $string=`getfacl $abs_path 2> /dev/null`;
+    my @lines_raw=split(/\n/,$string);
+    my @fs=();
+    foreach my $line (@lines_raw){
+        if ($line=~m/^# file/){
+            next;
+        }
+        push @fs, $line;
+    }
+    # starting tests
+    my $exists=0;
+    # existence and type
+    if ($filetype eq "f"){
+        if (-f $abs_path){
+            $exists=1;
+        }
+        is ($exists,1,"  * File exists: $abs_path");
+    } elsif ($filetype eq "d"){
+        if (-d $abs_path){
+            $exists=1;
+        }
+        is ($exists,1,"  * Directory exists: $abs_path"); 
+    }
+    # ACL lines
+    is ($#test,$#fs,"     * ACL contains correct number of entries(lines)");    
+    for (my $i=0;$i<=$#test;$i++){
+        my $line_num=$i+1;
+        is ($test[$i],$fs[$i],"     * ACL entry $line_num is $test[$i]");
+    }
+} 
+
+
 
 
 sub run_command {
