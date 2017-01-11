@@ -13,6 +13,7 @@ use Sophomorix::SophomorixConfig;
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use Test::More "no_plan";
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -22,6 +23,7 @@ $Data::Dumper::Terse = 1;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
+                                 ACL_set_file
                                  time_stamp_AD
                                  time_stamp_file
                                  unlock_sophomorix
@@ -77,17 +79,14 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 # BEGIN: Test code goes here
 ############################################################
 
-my $member="wu42";
 
-my ($firstname,$surname,$class,$existing,$exammode)=
-                    &AD_get_user({ldap=>$ldap,
-                                  root_dse=>$root_dse,
-                                  root_dns=>$root_dns,
-                                  user=>$member,
-                       });
-
-print "$firstname  $surname  $class  $existing $exammode\n";
-
+&ACL_set_file({path=>"/home/file2",
+#               role=>"student",
+               aclname=>"student_home",
+               group=>"m8cd",
+               school=>"bsz",
+               adminclass=>"12cs",
+});
 
 # print "Start\n";
 # my $school="myschool";
@@ -95,7 +94,7 @@ print "$firstname  $surname  $class  $existing $exammode\n";
 # my $login="bz2";
 # my $role="teach";
 
-#     my ($homedirectory,$linux_home)=
+#     my ($homedirectory,$unix_home)=
 #         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
 #                                                        $school,
 #                                                        $group_basename,
@@ -103,7 +102,7 @@ print "$firstname  $surname  $class  $existing $exammode\n";
 #                                                        $role);
 
 # print "Homedir: $homedirectory\n";
-# print "Linux:   $linux_home\n";
+# print "Linux:   $unix_home\n";
 
 
 ############################################################

@@ -25,6 +25,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             print_line
             print_title
+            ACL_set_file
             remove_from_list
             time_stamp_AD
             time_stamp_file
@@ -1074,6 +1075,82 @@ sub backup_amku_file {
         system("chmod 600 ${output}");
     }
 }
+
+
+
+# acl stuff
+######################################################################
+sub ACL_set_file {
+    # $path and $aclname are mandatory
+    # $workgroup will be later mandatory 
+    my ($arg_ref) = @_;
+    my $workgroup = $arg_ref->{workgroup};
+    my $path = $arg_ref->{path};
+    my $aclname = $arg_ref->{aclname};
+    #my $role = $arg_ref->{role};
+    #my $type = $arg_ref->{type};
+
+    # replacements
+    my $school = $arg_ref->{school};
+    my $user = $arg_ref->{user};
+    my $group = $arg_ref->{group};
+ 
+    my $source="";
+    my $tmp="";
+    if (not defined $workgroup){
+        $workgroup=LINUXMUSTER;
+    }
+
+    if (defined $aclname){
+        $source=$DevelConf::path_conf_devel_acl."/".$aclname.".acl.template";
+        $tmp=$DevelConf::path_conf_tmp."/".$aclname.".acl";
+#    } elsif (defined $role){
+#        $source=$DevelConf::path_conf_devel_acl."/".$role.".acl.template";
+#        $tmp=$DevelConf::path_conf_tmp."/".$role.".acl";
+#    } elsif (defined $type){
+#        $source=$DevelConf::path_conf_devel_acl."/".$type.".acl.template";
+#        $tmp=$DevelConf::path_conf_tmp."/".$type.".acl";
+    } else {
+        print "";
+        &Sophomorix::SophomorixBase::log_script_exit(
+            "acl_name, role or type is mandatory when setting ACL's!",1,1,0,@arguments);
+    }
+
+    if (not -e $source){
+        &Sophomorix::SophomorixBase::log_script_exit(
+            "acl template $source not found!",1,1,0,@arguments);
+    }
+
+    # replacements
+    my $replace="";
+    $replace=$replace." -e 's/\@\@WORKGROUP\@\@/${workgroup}/g'"; 
+    if (defined $user){
+        $replace=$replace." -e 's/\@\@USER\@\@/${user}/g'"; 
+    }
+    if (defined $group){
+        $replace=$replace." -e 's/\@\@GROUP\@\@/${group}/g'"; 
+    }
+    if (defined $school){
+        $replace=$replace." -e 's/\@\@SCHOOL\@\@/${school}-/g'"; 
+    }
+
+    # patch the acl into tmp
+    $sed_command="sed $replace $source > $tmp";
+    print "$sed_command\n";
+    system($sed_command);
+
+#    if($Conf::log_level>=2){
+        print "\nPatched ACL:\n\n";
+        system("cat $tmp");
+        print "\n";
+#    }
+
+    # apply acl from tmp to path
+    $setfacl="setfacl --set-file=".$tmp." ".$path;
+    print "$setfacl\n";
+    system($setfacl);
+}
+
 
 
 # password stuff
