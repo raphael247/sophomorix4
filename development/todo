@@ -16,13 +16,24 @@ Later:
   get LINUXMUSTER workgroup and others from smb.conf 
 ############################################################
 
+
+
+
+Überlegen:
+############################################################
 sophomorixAdminClass: 
   - bisher Klassenname MIT Prefix. 
   - Besser ohne prefix? Was äbdert sich dann?
   - oder neues Attribut sophomorixAdminClassBasename? Exit.... auch?
 
-todo:
 
+############################################################
+
+
+
+
+todo:
+############################################################
 tests für status
 
 Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sbin/sophomorix-add line 368.
@@ -30,17 +41,13 @@ Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sb
 type of a room/roomws: wenn room wegfällt, wegen examaccounts, 
                        kann room für die workstations genommen werden (statt sophomorixType=roomws)
 
+------------------------------------------------------------
 SophomorixSamba_AD:  suche nach: future groups in students.csv
 dort sollten die zukünftigen Gruppen ermittelt werden, um vergave von loginnamen zu 
 beschränken
 
-ou wegfallen lassen: immer das Token benutzen
-Pfade zu Konfigurationsdateien ändern
-ka siehe unten
-
-
+------------------------------------------------------------
 ouclass umbenennen in studentsclass oder students
-
 -> muss in SophomorixSamba ersetzt werden
 -> muss in RoleType ersetzt werden
 -> und in Tests
@@ -58,7 +65,7 @@ gibt 3x in SophomorixSamba:
 
 
 xls input:
-
+------------------------------------------------------------
 viele Schulen bekommen xls Dateien aus der Schulverwaltung
 für diese filter bereitstellen
 
@@ -67,7 +74,7 @@ Filter evtl. automatisch ermitteln lassen:
 alle integrierten Filter durchgehen:
 danach entstandene datei checken:
 
-Erfolgreicher Filter führt zu einer Folgenden Datei
+Erfolgreicher Filter führt zu einer folgenden Datei:
 
 Klassenfeld: klassen, die sich wiederholen
 Vorname: Namen aus Liste
@@ -79,7 +86,7 @@ unid: muss eindeutig sein
 -> ermittelter Filter sich merken
    -> nächstesmal als erstes checken 
 
-
+------------------------------------------------------------
 school (ehemals school_token,ou) usw
 - Config hash,directories:
   school is used für this name
@@ -91,13 +98,14 @@ In the AD the school token of the default school is ---
 
 
 sophomorix-repair
-
+------------------------------------------------------------
 Alle setzen:
   # sicherstellen dass existent
   # chown für owner.group
   # ACL setzen aus Datei (setzt auch permissions für owner,group and others)
   # chattr,lsattr für files (nicht dirs?)
   # getfattr, setfattr???
+  # more
 
 
 User auflisten lassen,
@@ -107,7 +115,7 @@ bzw. in unixHomeDirectory schauen
 
 
 Weiter acl:
-
+------------------------------------------------------------
 - acls testen auf server
   -> smbclient, login, 
      cd ...; cd ...; ls
@@ -207,9 +215,9 @@ CLASS_FILE: alle Namen zulässig
 DEVICE_FILE: alle Namen zulässig
 
 Klassenarbeit (exam)
-- neues Feld im ldap
+- (neues Feld im ldap: DONE)
   -sophomorixExamMode: Inhalt loginame der lehrers, der ihn in KA versetzt hat
-  oder ---
+  oder --- Done
 - zu tun wenn KA gestartet wird:
   sophomorix-teacher --examuser user1,user2,... --teacher bz
    macht: 
@@ -235,8 +243,6 @@ Bugs sophomorix-device
 
 - variablen umbenennen
   workstation: begriff vermeiden
-- Tests schreiben dazu
-  sophomorix-test für dns erweitern
 
 - unused rooms löschen
 - unused zones löschen
@@ -252,11 +258,6 @@ Rechner, Drucker, Access Points:
 - lehrernetz/schuelernetz 
 - ist eine Role erforderlich?
 - wo im ldap? dns-admin-description
-
-Zusammenfassung zu Räumen
-
-
-
 
 
 
@@ -287,7 +288,7 @@ AD_get_name_tokened wird ersetzt durch sophomorix_config hash abfrage
 remove_whitespace überall einsetzten
 
 Passwoort falsch in sophomorix-samba.secret
---> Abbruch mit aussagekräftiger Fehkermeldung.
+--> Abbruch mit aussagekräftiger Fehlermeldung.
 
 
 Passwortänderung erzwingen, wie geht das?
@@ -338,6 +339,7 @@ what about /etc/linuxmuster/sophomorix/device/classrooms
 --> classrooms.csv (more configuration stuff)
 wegfallen lassen -> Daten in ldap?
    statt room ist group type classroom?
+
 
 
 
