@@ -78,16 +78,31 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
-my $permissions=0;
 my $json=0;
 my $dump_AD=0;
-
+my $permissions=0;
+my $student_home=0;
+my $teacher_home=0;
+my $adminclass_dirs=0;
+my $teacherclass_dirs=0;
+my $project_dirs=0;
 
 ###############################################################################
 # Beginn
 ###############################################################################
-# Datei, die die zu reparierenden Verzeichnisse beinhaltet
+# Configuration Files to be used
+# The tree
 my $repair_directory_tree="$DevelConf::path_conf_devel/repair.directories";
+# Student homes
+my $repair_student_home="$DevelConf::path_conf_devel/student_home.repair.directories";
+# Teacher homes
+my $repair_teacher_home="$DevelConf::path_conf_devel/teacher_home.repair.directories";
+# Adminclass dirs
+my $repair_adminclass_dirs="$DevelConf::path_conf_devel/adminclass_dirs.repair.directories";
+# Teacherclass dirs
+my $repair_teacherclass_dirs="$DevelConf::path_conf_devel/teacherclass_dirs.repair.directories";
+# Project dirs
+my $repair_project_dirs="$DevelConf::path_conf_devel/project_dirs.repair.directories";
 
 
 # Parsen der Optionen
@@ -98,6 +113,11 @@ my $testopt=GetOptions(
            "dump-AD" => \$dump_AD,
            "verbose|v+" => \$Conf::log_level,
            "permissions" => \$permissions,
+           "student-homes" => \$student_home,
+           "teacher-homes" => \$teacher_home,
+           "adminclass-dirs" => \$adminclass_dirs,
+           "teacherclass-dirs" => \$teacherclass_dirs,
+           "project-dirs" => \$project_dirs,
           );
 
 
@@ -117,9 +137,9 @@ if ($help==1) {
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
    # Befehlbeschreibung
-   print "\n$scriptname repairs the permissions ",
+   print "\n$scriptname repairs the permissions,owner,groupowner,acls ",
          "of a sophomorix installation,\n",
-         "reading the permissions from $repair_directory_tree.\n\n";
+         "reading the permissions from *.repair.directories files\n\n";
    print('
 Options
   -h  / --help
@@ -128,10 +148,17 @@ Options
   -i
   -f filename / --file filename
 
+  --dump_AD -j
+
 What to repair (one option must be given):
 
   --permissions
-      (repairs permission outside of $HOME)
+      (repairs all permissions outside of $HOME)
+  --student-homes
+  --teacher-homes
+  --adminclass-dirs
+  --teacherclass-dirs
+  --project-dirs
 
 Please see the sophomorix-repair(8) man pages for full documentation
 ');
@@ -194,18 +221,47 @@ if ($dump_AD==1){
 
 # --permissions
 if ($permissions==1) {
-   &repair_directory_tree();
+   &repair_dirs_from_file($repair_directory_tree);
+}
+
+# --student-homes
+if ($student_home==1) {
+   &repair_dirs_from_file($repair_student_home);
+}
+
+# --teacher-homes
+if ($teacher_home==1) {
+   &repair_dirs_from_file($repair_teacher_home);
+}
+
+# --adminclass-dirs
+if ($adminclass_dirs==1) {
+   &repair_dirs_from_file($repair_adminclass_dirs);
+}
+
+
+# --teacherclass-dirs
+if ($teacherclass_dirs==1) {
+   &repair_dirs_from_file($repair_teacherclass_dirs);
+}
+
+# --project-dirs
+if ($project_dirs==1) {
+   &repair_dirs_from_file($repair_project_dirs);
 }
 
 ############################################################
 # subs
 ############################################################
 
-sub repair_directory_tree {
+sub repair_dirs_from_file {
+    my ($directory_file)=@_;
     my $num=0;
-    open(DIRS, "<${repair_directory_tree}")|| die "Fehler: $!";
+    my $line_num=0;
+    &print_title("Repairing dirs from file $directory_file");
+    open(DIRS, "<$directory_file")|| die "ERROR: $directory_file $!";
     while (<DIRS>) {
-        $num++;
+        $line_num++;
         # List with ONE school, so ONE loop is certain
         my @schools=("");
         my $group_type="";
@@ -214,7 +270,8 @@ sub repair_directory_tree {
         chomp();   
         if ($_ eq ""){next;} # Wenn Zeile Leer, dann aussteigen
         if(/^\#/){next;} # Bei Kommentarzeichen aussteigen
-       
+
+        $num++;
         if (/\@\@SCHOOL\@\@/) {
             @schools = @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
             $school_count++;
@@ -258,18 +315,19 @@ sub repair_directory_tree {
         }
 
         $path=join("/",@new_dirs);
-         
-#        if($Conf::log_level>=3){
+
+        print "   $num) Line $line_num: $_:\n";
+        if($Conf::log_level>=3){
             print "\n";
-            print "   $num) Calling &repair_directory for $_:\n";
-            print "     Path:          $path\n";
+            print "     Line:          $_\n";
             print "     Owner:         $owner\n";
             print "     Group:         $groupowner\n";
             print "     Permissions:   $permission\n";
             print "     ACL:           $acl\n";
             print "     Schoollist:    @schools\n";
-#        }
-        &repair_directory($path, $owner, $groupowner, $permission, $acl, \@schools, $group_type, $groupvar_count);
+        }
+        &repair_single_directory($path, $owner, $groupowner, $permission, 
+                                 $acl, \@schools, $group_type, $groupvar_count);
    }
 
    close(DIRS);
@@ -277,14 +335,16 @@ sub repair_directory_tree {
 
 
 
-sub repair_directory {
-    my ($path_with_var, $owner, $groupowner, $permission, $acl, $schools, $group_type, $groupvar_count) = @_;
+sub repair_single_directory {
+    my ($path_with_var, $owner, $groupowner, $permission, 
+        $acl, $schools, $group_type, $groupvar_count) = @_;
     foreach my $school (@$schools){
         my $path=$path_with_var;
         $path=~s/\@\@SCHOOL\@\@/$school/;
-        print "   Determining path for school $school:\n";
-        print "      * Path after school: $path\n";
-
+        if($Conf::log_level>=3){
+            print "   Determining path for school $school:\n";
+            print "      * Path after school: $path\n";
+        }
         # determining groups to walk through
         my @groups;
         if ($groupvar_count==0){
@@ -303,16 +363,31 @@ sub repair_directory {
 
         # group loop
         foreach my $group (@groups){
-            $path=~s/\@\@ADMINCLASS\@\@/$group/;
-            $path=~s/\@\@TEACHERCLASS\@\@/$group/;
-            $path=~s/\@\@PROJECT\@\@/$group/;
-            print "      * Path after group:  $path\n";
+            my $path_after_group=$path;
+            $path_after_group=~s/\@\@ADMINCLASS\@\@/$group/;
+            $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group/;
+            $path_after_group=~s/\@\@PROJECT\@\@/$group/;
+            if($Conf::log_level>=3){      
+                print "      * Path after group:  $path_after_group\n";
+            }
+
+            # user loop
             my @users=("");
+            if ($path_after_group=~/\@\@USER\@\@/) {
+                @users = @{ $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
+            }
             foreach my $user (@users){
-                print "      * Path after user:   $path\n";
-                print "      Path: $path\n";
-                mkdir $path;
-                chmod oct($permission), $path;
+                my $path_after_user=$path_after_group;
+                $path_after_user=~s/\@\@USER\@\@/$user/;
+                if($Conf::log_level>=3){      
+                    print "      * Path after user:   $path_after_user\n";
+	        }
+                print "       $path_after_user\n";
+                mkdir $path_after_user;
+                my $chown_command="chown ".$owner.".".$groupowner." ".$path_after_user;
+                print "          $chown_command\n";
+                #system($chown_command);
+                chmod oct($permission), $path_after_user;
             }
         }
     }
