@@ -176,12 +176,45 @@ hochladen mit schuko -> human filter
 -> /etc/ (syntax OK) -> Editierbar mit Schulkonsole
 
 
+Ablauf (Grafik anpassen):
+
+1) "Hochladen" geht auf 2 Wege:
+  A) Webui: Datei lokal öffnen und dann Syntaxkorrigiert speichern 
+     Korrekturen im RAM:
+      - Die Felder wählen, die sophomorix braucht
+        Klasse, Nachname, Vorname, Geburtsdatum und Unid(optional), Wunschlogin(optional)
+      - Felder Wählen, die sophomorix (in Zukunft( kennt (Schuhgröße, ...)
+      - Reihenfolge der Felder tauschen so dass es passt.
+      - Zeilen löschen (bzw. auskommentieren)
+      - KEIN Editieren der Namen (Problem: in welchem Encoding wird gespeichert)
+      --> danach speichern nach tmp und Aufruf von sophomorix-newfile
+          (Archiv+Filter), löschen in tmp
+
+  B) webui: 
+        - hochladen ohne Änderung
+        - Aufruf von sophomorix-newfile
+
+  C) sophomorix-newfile students.csv oder (sophomorix-check -newfile students.csv)
+     - Archiviert die neue Datei (falls anders als die letzte Archivierung)
+     - nutzt den Filter zu Behebung der Reihenfolge usw.
+
+Ergebnis von 1): syntakisch korrekte Datei (Reihenfolge, Strichpunkte, ....)
+                 aber ohne Plausibilitätschecks, umcodierung
+                 - in /etc/linuxmuster/sophomorix
+
+2) sophomorix-check
+    - macht plausibilitätstests und umcodierung auf utf8
+    - erzeugt sophomorix.add, .move, .update, .kill  
+
+
+
+
+
+ 
 
 sophomorix-device:
 
 - hwk -> Einzelcomputer als Member -> SPÄTER OK?
-
-
 
 
 
