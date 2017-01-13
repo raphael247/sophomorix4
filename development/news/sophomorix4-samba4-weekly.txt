@@ -7,6 +7,9 @@ sophomorix4/Samba4 weekly Nr. 9  (xx.11.2016)
 Entwicklertreffen 13.1.17
 
 didacta
+Dienstag bis Samstag
+Di,Mi vorm., Do nachm
+
 
 Testserver
 
@@ -15,29 +18,28 @@ Testschulen
 sernet Stundenkontigent
 -> AD-Performanz
 -> Filesystem-Fragen
+   DFS
 -> uid-mapping
 -> unvorhergesehenes
 -> Zugang zum Testserver
+Bald fragen:
+Dateisystem anlegen und testen:
+ cd,cd,cd,ls-Problem
+ remote anlegbar
+
 
 Fragen:
 Welcher user ist an welchem Computer angemeldet: steht das im ldap
 
+
 userAccountControl:
 - beliebiges zulassen durch den admin?
 - oder korrigieren auf wenige mögliche Werte
+-> simple:
+   - komplett alles zulassen
+   (später befehle dazu)
 
-
-filsystem:
- - nochmals überlegen, ob man wirklich das prinzip 'wie ldap' durchziehen möchte
-   und unter KLASSE/tausch KLASSE/homes zu haben
-   ---> Nachteile:
-     --> shares enthalten unwichtige Daten/ homes wichtige
-         -->für backup ist es sinnvoll wichtiges von unwichtiges zu trennen
-     --> scripte
-         will man per script die shares löschen, etc. (der admin) ist es einfachen
-         wen die zusammen sind rm /home/.../*/...
-   Evtl. unixHomeDirectory anpassen
-
+filesystem:
  - was muss gesetzt werden für Datei/Verzeichnis?
   # sicherstellen dass existent
   # chown für owner.group
@@ -46,17 +48,35 @@ filsystem:
   # getfattr, setfattr???
   # mehr?
 
+
+
 sophomorix-session:
 
  - managment gruppen:
-   weitere? webfilter,intranet, drucker
+   weitere? webfilter,intranet
+
+ - printing
+   AD: je Drucker eine Gruppe
+   sophomorix-device:
+    Wenn Drucker, dann Gruppe erstellen
+    (Jeder nur-IP-Gerät(0 in Feld 11) bekommt eine Gruppe, später konfigurierbar in devices.csv)
+   User in Druckergruppe:  kann drucken
+   Nicht in Druckergruppe: kann nicht drucken
+   pyquota: Frank testet early on AD attribute gebraucht werden
+   sophomorix-session
+   wie internet, wifi gibts ne gruppe 'printing'
+
+   webfilter: Gruppe: wenn drin, da ja
+   (rumdrehen?, noch offen)
+
 
  - um ein vollständiges JSON-Objekt zurückzugeben
    was wird zurückgegeben, wenn nicht ermittelt werden kann 
    bzw. noch nicht umgesetzt ist?
    Vorschlag
    webfilter-> unknown
-   webfilter-> not implemented ODER todo 
+   webfilter-> not_implemented 
+   OK
 
  - wie findet man heraus ob ein user angemeldet ist?
     -> ändern sich ldap-attribute?
@@ -64,57 +84,71 @@ sophomorix-session:
 
  - Session beenden/User aus session
    muss user wieder in die Gruppen internet,wifi, ...
+   
  - was, wenn einem user einer Klasse wifi dauerhaft gesperrt werden soll
    Oder wifi an einer Schule nur für Tablet-Klassen?
    Vorschlag: vom admin der Schule verwaltete wifi-allowed Gruppe
    nur wer in wifi-allowed ist kann per Schuko in wifi gesetzt werden
    (wie ist das mit ganzen Klassen?)
    school.conf:
-   [wifiaccess]
-     group=12a,12b,teachers # students
-     users=maierle,muellerle
-     usersblock=lucifer   # lucifer ist in 12a
-     groupblock=5a  # falls group=students
+   
+   [group:wifi] # jede Managementgruppe (evtl. später projekte)
+     allow_group=12a,12b,teachers # students
+     allow_users=maierle,muellerle
+     except_users=lucifer   # lucifer ist in 12a
+     except_group=5a  # falls group=students
+     revert_allow_users=maierle,muellerle
+     revert_allow_group=12a,12b,teachers # students
+     revert_except_users=lucifer   # lucifer ist in 12a
+     revert_except_group=5a  # falls group=students
+     revert_cron=...  # Zeile für cronjob
+
+     # allow:  nur diese user können vom Lehrer hinzugenommen werden
+     # revert: rückstellen auf diesen default
 
    -> wifiaccess hat eigentlich 3 Stati:
       - vom admin erlaubt oder verboten
       - vom lehrer freischaltbar
       - default on/off (anlegen, nach KAs, ...)
 
---> allgemeine Frage:
-    wie konfiguriert man in einer Textdatei beliebige userlisten einfach
-    geht das bei AD auch:
-    Gruppe hinzufügen zu wifi, aber einen user NICHT
-    
 - gibt es einen samba mechanismus mit dem man die user der gruppe
   students (mit den gruppen 7a, ... die wiederum ) abfragen kann?
+  ?
 
 - Auflisten der aufzuteilenden Dateien:
-  wie soll das im JSON-Objekt zurückgegeben werden
-  files -> path/to/file -> permissions -> 0755
-                        -> size        -> 2MB
-                        -> ...
-  dirs -> path/to/dir   -> permissions -> 0755
-		        -> ...
-  
-       -> path/to/dir2  -> 
-
-  Perl Module?:
-  http://stackoverflow.com/questions/32374350/file-path-into-json-data-structure
-  http://stackoverflow.com/questions/31326188/how-to-build-hierarhical-hash-in-perl-from-directory-tree
-  http://www.perlmonks.org/?node_id=1077470
-
-ODER soll nur ein Überblick Angezeigt werden:
+  Soll nur ein Überblick Angezeigt werden:
    - nicht rekursiv (oberste Ebene only)
    - JSON: Liste der Inhalte mit typ (file,directory) zur Darstellung mit Ordnersymbol
-   
+   - Pfad zurückgeben:
+     smbpath:  \\server\a\...
+     (unixpath: /home/schools, ...) weg
 
+#  wie soll das im JSON-Objekt zurückgegeben werden
+#  files -> path/to/file -> permissions -> 0755
+#                        -> size        -> 2MB
+#                        -> ...
+#  dirs -> path/to/dir   -> permissions -> 0755
+#		        -> ...
+#  
+#       -> path/to/dir2  -> 
+#
+#  Perl Module?:
+#  http://stackoverflow.com/questions/32374350/file-path-into-json-data-structure
+#  http://stackoverflow.com/questions/31326188/how-to-build-hierarhical-hash-in-perl-from-directory-tree
+#  http://www.perlmonks.org/?node_id=1077470
+#
 
 - sollte es noch einen Comment geben für eine session?
   - lehrer hat für seine Unterrichte sessions, die er nie beendet:
      z.B. Comment= "Montag 7a"
+--> OK, soll rein
 
 - sollten session lange aufgehoben werden können?
+Ja
+
+Allgemein:
+Zeitparametersperre mit gruppenrücksetzen, low prio
+mit atq umsetzen
 
 
 teacher.cvs students.csv und so:
@@ -133,6 +167,14 @@ teacher.cvs students.csv und so:
        - beim lehrer
    Gegen so lassen spricht:
        Vereinheitlichung (aber wozu)
+
+Ablauf sophomorix:
+
+hochladen mit schuko -> human filter
+ - korrigiert die Reihenfolge
+
+-> /etc/ (syntax OK) -> Editierbar mit Schulkonsole
+
 
 
 sophomorix-device:
