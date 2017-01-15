@@ -29,8 +29,10 @@ Dateisystem anlegen und testen:
 
 
 Fragen:
-Welcher user ist an welchem Computer angemeldet: steht das im ldap
-
+Welcher user ist an welchem Computer angemeldet: steht das im ldap?
+ - wie findet man heraus ob ein user angemeldet ist?
+    -> ändern sich ldap-attribute?
+    -> an welchem PC?
 
 userAccountControl:
 - beliebiges zulassen durch den admin?
@@ -78,10 +80,6 @@ sophomorix-session:
    webfilter-> not_implemented 
    OK
 
- - wie findet man heraus ob ein user angemeldet ist?
-    -> ändern sich ldap-attribute?
-    -> an welchem PC?
-
  - Session beenden/User aus session
    muss user wieder in die Gruppen internet,wifi, ...
    
@@ -123,21 +121,6 @@ sophomorix-session:
      smbpath:  \\server\a\...
      (unixpath: /home/schools, ...) weg
 
-#  wie soll das im JSON-Objekt zurückgegeben werden
-#  files -> path/to/file -> permissions -> 0755
-#                        -> size        -> 2MB
-#                        -> ...
-#  dirs -> path/to/dir   -> permissions -> 0755
-#		        -> ...
-#  
-#       -> path/to/dir2  -> 
-#
-#  Perl Module?:
-#  http://stackoverflow.com/questions/32374350/file-path-into-json-data-structure
-#  http://stackoverflow.com/questions/31326188/how-to-build-hierarhical-hash-in-perl-from-directory-tree
-#  http://www.perlmonks.org/?node_id=1077470
-#
-
 - sollte es noch einen Comment geben für eine session?
   - lehrer hat für seine Unterrichte sessions, die er nie beendet:
      z.B. Comment= "Montag 7a"
@@ -145,6 +128,7 @@ sophomorix-session:
 
 - sollten session lange aufgehoben werden können?
 Ja
+
 
 Allgemein:
 Zeitparametersperre mit gruppenrücksetzen, low prio
@@ -171,13 +155,6 @@ teacher.cvs students.csv und so:
 
 
  
-
-sophomorix-device:
-
-- hwk -> Einzelcomputer als Member -> SPÄTER OK?
-
-
-
 
 Priorität:
 - 1. utf8 migration -> done 8.12.16
@@ -292,10 +269,55 @@ homeDrive H:
 homeDirectory \\<linuxmuster.local>\<school>\students\<class>\homes\<loginname>
 ...
 
-  - wie Freigabe erstellen: je school Freigabe erstellen
-net conf addshare <default-school> /home/schools/<default-school> writeable=y guest_ok=y „Share for school default-school“
+
+
+Shares:
+
+Vorher: 
+---------------------
+smb.conf:
+[global]
+registry shares = yes
+
+
+
+OK:
+# net conf addshare <default-school> /home/schools/<default-school> writeable=y guest_ok=y "Share for school default-school"
+# net conf addshare <default-school> /home/schools/bsz writeable=y guest_ok=y "Share for school bsz"
+
+Auflisten aller shares ohne weitere infos:
+# net conf listshares
+
+Auflisten aller shares mit Optionen
+# net conf list
+
+Auflisten eines shares mit Optionen
+net conf showshare bsz
+
+Anpassen
+net conf setparm bsz writeable no
+--> setzt read only = yes
+
+
+
+Testen: 
+smbclient -L localhost --user=wu42%LinuxMuster!
+
+Mounten auf dem Server:
+apt-get install cifs-utils
+
+# net conf addshare <default-school> /home/schools/bsz writeable=y guest_ok=y "Share for school bsz"
+# mkdir -p /home/smbschools/bsz
+# /bin/mount -t cifs -o user=administrator,domain=LINUXUSTER //localhost/bsz /home/smbschools/bsz
+# /bin/mount -t cifs -o user=administrator //localhost/bsz /home/smbschools/bsz
+
+# smbclient -U administrator \\\\localhost\\bsz
+
+
+
 
 siehe https://linx-qh.de/samba-als-fileserver-auf-ubuntu-server-14-04-einrichten/
+
  
 
 
