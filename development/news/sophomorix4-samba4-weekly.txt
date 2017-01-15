@@ -168,52 +168,6 @@ teacher.cvs students.csv und so:
    Gegen so lassen spricht:
        Vereinheitlichung (aber wozu)
 
-Ablauf sophomorix:
-
-hochladen mit schuko -> human filter
- - korrigiert die Reihenfolge
-
--> /etc/ (syntax OK) -> Editierbar mit Schulkonsole
-
-
-Ablauf (Grafik anpassen):
-
-1) "Hochladen" geht auf 3 Wege:
-  A) Webui + Human-Filter+ Machine-Filter
-     (Machine-Filter ist meist nur cp)
-     Datei lokal öffnen und dann Syntaxkorrigiert speichern 
-     Korrekturen im RAM:
-      - Die Felder wählen, die sophomorix braucht
-        Klasse, Nachname, Vorname, Geburtsdatum und Unid(optional), Wunschlogin(optional)
-      - Felder Wählen, die sophomorix (in Zukunft( kennt (Schuhgröße, ...)
-      - Reihenfolge der Felder tauschen so dass es passt.
-      - Zeilen löschen (bzw. auskommentieren)
-      - KEIN Editieren der Namen (Problem: in welchem Encoding wird gespeichert)
-      --> danach speichern nach tmp und Aufruf von sophomorix-newfile
-          (Archiv+Filter), löschen in tmp
-
-  B) Webui OHNE Human-Filter MIT Machine-Filter (nur hochladen):         
-        - hochladen ohne jegliche Änderung
-        - Aufruf von sophomorix-newfile
-
-  C) Konsole OHNE Human-Filter MIT Machine-Filter:
-     sophomorix-newfile students.csv oder (sophomorix-check -newfile students.csv)
-     - ermittelt den richtigen Speicherort für die Datei, (bzw. mit parameter)
-     - Archiviert die neue Datei (falls anders als die letzte Archivierung)
-     - speichert Datei nach tmp
-     - nutzt den Filter zu Behebung der Reihenfolge usw.
-     - Ergebnis in /etc an richtiger Stelle
-
-Ergebnis von 1): syntakisch korrekte Datei (Reihenfolge, Strichpunkte, ....)
-                 aber ohne Plausibilitätschecks, umcodierung
-                 - in /etc/linuxmuster/sophomorix
-
-2) sophomorix-check
-    - macht plausibilitätstests und umcodierung auf utf8
-    - erzeugt sophomorix.add, .move, .update, .kill  
-
-
-
 
 
  
