@@ -270,7 +270,7 @@ sub read_lockfile {
 
 
 
-# reding configuration files
+# reading configuration files
 ######################################################################
 sub config_sophomorix_read {
     my ($ldap,$root_dse)=@_;
@@ -777,7 +777,7 @@ sub config_sophomorix_read {
     ###############################################
     # GLOBAL
     # my @grouplist=("examaccounts","wifi","internet");
-    my @grouplist=("wifi","internet","admins");
+    my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
     foreach my $group (@grouplist){
         my $sub_ou=$DevelConf::AD_management_ou;
          my $cn_group="CN=global-".$group.",".
@@ -789,24 +789,27 @@ sub config_sophomorix_read {
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{"global-".$group}="none";
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
 
-
         if ($group eq "internet"){
             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalinternetaccess";
         } elsif ($group eq "wifi"){
             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwifiaccess";
         } elsif ($group eq "admins"){
             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globaladmins";
+        } elsif ($group eq "webfilter"){
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwebfilter";
+        } elsif ($group eq "intranet"){
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalintranet";
+        } elsif ($group eq "printing"){
+            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalprinting";
         } else {
             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalmanagementgroup";
         }
-
-
     }
 
     # SCHOOLS
     foreach my $ou (keys %{$sophomorix_config{'SCHOOLS'}}) {
         # my @grouplist=("examaccounts","wifi","internet");
-        my @grouplist=("wifi","internet","admins");
+        my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
         foreach my $group (@grouplist){
             my $sub_ou=$DevelConf::AD_management_ou;
             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
@@ -824,6 +827,12 @@ sub config_sophomorix_read {
                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="wifiaccess";
             } elsif ($group eq "admins"){
                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="admins";
+            } elsif ($group eq "webfilter"){
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="webfilter";
+            } elsif ($group eq "intranet"){
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="intranetaccess";
+            } elsif ($group eq "printing"){
+                $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="printing";
             } else {
                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="managementgroup";
 	    }
