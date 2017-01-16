@@ -90,6 +90,7 @@ my $kill_all_sessions=0;
 my $teacher="";
 my $session="";
 my $developer_session="";
+my $comment="";
 my $members=""; # undef: do not change members
 my $addmembers="";
 my $removemembers="";
@@ -108,6 +109,7 @@ my $testopt=GetOptions(
            "kill-all-sessions" => \$kill_all_sessions,
            "teacher|t=s" => \$teacher,
            "session|s=s" => \$session,
+           "comment=s" => \$comment,
            "members|m=s" => \$members,
            "addmembers=s" => \$addmembers,
            "removemembers=s" => \$removemembers,
@@ -146,6 +148,7 @@ Options:
   -vv / --verbose --verbose
   -i  / --info
   - t <user> / --teacher <user>
+  --comment <string>              # ; are dropped in comment
   --members <user1>,<user2>, ...
   --addmembers <user1>,<user2>, ...
   --removemembers <user1>,<user2>, ...
@@ -276,6 +279,7 @@ if ($create==1 and $teacher ne ""){
                         teacher=>$teacher,
                         creationdate=>$time_stamp_file,
                         members=>$members,
+                        comment=>$comment,
                         create=>"TRUE",
                         kill=>"FALSE",
                         developer_session=>$developer_session,
@@ -296,6 +300,23 @@ if ($session ne "" and $members ne ""){
                         kill=>"FALSE",
                         session=>$session,
                         members=>$members,
+                        sessions_ref=>\%sessions,
+                    });
+    exit;
+}
+
+
+
+# --comment
+if ($session ne "" and $comment ne ""){
+    # update the requested session
+    &AD_session_manage({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        teacher=>$teacher,
+                        create=>"FALSE",
+                        kill=>"FALSE",
+                        session=>$session,
+                        comment=>$comment,
                         sessions_ref=>\%sessions,
                     });
     exit;

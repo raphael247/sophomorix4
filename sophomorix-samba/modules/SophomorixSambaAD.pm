@@ -525,9 +525,12 @@ sub AD_session_manage {
     my $create = $arg_ref->{create};
     my $kill = $arg_ref->{kill};
     my $session = $arg_ref->{session};
+    my $comment = $arg_ref->{comment};
     my $developer_session = $arg_ref->{developer_session};
     my $new_members = $arg_ref->{members};
+
     my $ref_sessions = $arg_ref->{sessions_ref};
+    
 
     # the updated session string
     my $session_string_new="";
@@ -539,6 +542,12 @@ sub AD_session_manage {
         $creationdate="---";
     }
 
+    if (not defined $comment or $comment eq ""){
+        $comment="---";
+    } else {
+        # remove ; from comment
+        $comment=~s/;//g;
+    }
     if (not defined $new_members){
         $new_members="";
     }
@@ -550,12 +559,12 @@ sub AD_session_manage {
         if ($developer_session ne ""){
             # creating sessions with arbitrary names for testing
             $session_new=$developer_session;
-            $session_string_new=$developer_session.";".$new_members.";";
+            $session_string_new=$developer_session.";".$comment.";".$new_members.";";
         } elsif ($creationdate ne "---"){
             # new session
             # this is the default
             $session_new=$creationdate;
-            $session_string_new=$creationdate.";".$new_members.";";
+            $session_string_new=$creationdate.";".$comment.";".$new_members.";";
         } else {
             
         }
@@ -566,7 +575,7 @@ sub AD_session_manage {
             $session_new=$session;
             $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};
             $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
-            $session_string_new=$session.";".$new_members.";";
+            $session_string_new=$session.";".$comment.";".$new_members.";";
         } else {
             print "\n Session $session not found\n\n";
             return;
@@ -587,8 +596,8 @@ sub AD_session_manage {
 
         # push old sessions into hash (drop doubles)
         foreach my $old_session (@old_sessions){
-            my ($id,$old_members) = split(/;/,$old_session);
-            $new_sessions{$id}=$old_members;
+            my ($id,$comment,$old_members) = split(/;/,$old_session);
+            $new_sessions{$id}=$comment.";".$old_members.";";
         }
 
         if ($kill eq "TRUE"){
@@ -597,7 +606,7 @@ sub AD_session_manage {
             delete $new_sessions{$session_new};
         } else {
             # overwrite the changing session
-            $new_sessions{$session_new}=$new_members;
+            $new_sessions{$session_new}=$comment.";".$new_members.";";
         }
 
         # write the hash into a list
@@ -1550,7 +1559,7 @@ sub AD_get_sessions {
             if($Conf::log_level>=2){
                 &Sophomorix::SophomorixBase::print_title("$session_count: User $sam has session $session");
             }
-            my ($id,$members,$string)=split(/;/,$session);
+            my ($id,$comment,$members,$string)=split(/;/,$session);
             if ($show_session eq "all"){
                 # just go on
             } elsif ($id ne $show_session){
@@ -1560,10 +1569,12 @@ sub AD_get_sessions {
 
             # save by user
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
+            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'memberstring'}=$members;
             # save by id
             $sessions{'id'}{$id}{'sAMAccountName'}=$sam;
             $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
+            $sessions{'id'}{$id}{'comment'}=$comment;
             $sessions{'id'}{$id}{'memberstring'}=$members;
 
             # save member information
