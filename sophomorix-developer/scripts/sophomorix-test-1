@@ -304,7 +304,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -375,7 +375,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid2345",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -446,7 +446,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid3456",
                    userAccountControl => "512",
-                   memberOf => "bsz-m8cd",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -517,7 +517,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid4567",
                    userAccountControl => "512",
-                   memberOf => "bsz-m8cd",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -588,7 +588,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid5678",
                    userAccountControl => "512",
-                   memberOf => "bsz-teachers",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     # wu42
@@ -620,7 +620,7 @@ if ($add==1 or $test_add==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
-                   memberOf => "bsz-teachers",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -670,7 +670,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb1234",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -741,7 +741,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb2345",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -812,7 +812,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "uni-teachers",
+                   memberOf => "uni-teachers|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -877,7 +877,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb6789",
                    userAccountControl => "512",
-                   memberOf => "uni-teachers",
+                   memberOf => "uni-teachers|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -942,7 +942,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid12345",
                    userAccountControl => "512",
-                   memberOf => "s6ade",
+                   memberOf => "s6ade|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -1011,7 +1011,7 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid123456",
                    userAccountControl => "512",
-                   memberOf => "teachers",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -1035,7 +1035,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-wifi",
-                   member => "",
+                   member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=internet,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1047,7 +1047,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-internet",
-                   member => "",
+                   member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=admins,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1071,7 +1071,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-webfilter",
-                   member => "",
+                   member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=intranet,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1083,7 +1083,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-intranet",
-                   member => "",
+                   member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=printing,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1095,7 +1095,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-printing",
-                   member => "",
+                   member => "schneima42|sch42",
                   });
 
     ##### Testing the school groups of bsz
@@ -1109,7 +1109,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-wifi",
-                   member => "",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-internet,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1121,7 +1121,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-internet",
-                   member => "",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-admins,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1145,7 +1145,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-webfilter",
-                   member => "",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-intranet,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1157,7 +1157,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-intranet",
-                   member => "",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-printing,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1169,7 +1169,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-printing",
-                   member => "",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
 
     ##### Testing the school groups of uni
@@ -1183,7 +1183,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "global-wifi",
-                   member => "",
+                   member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-internet,OU=Management,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -1195,7 +1195,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "global-internet",
-                   member => "",
+                   member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-admins,OU=Management,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -1219,7 +1219,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "global-webfilter",
-                   member => "",
+                   member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-intranet,OU=Management,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -1231,7 +1231,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "global-intranet",
-                   member => "",
+                   member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni-printing,OU=Management,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -1243,7 +1243,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "global-printing",
-                   member => "",
+                   member => "lordjo42|blackmri42|kep42|gal42",
                   });
 
 
@@ -1415,7 +1415,7 @@ if ($mod==1){
                    sophomorixStatus => "F",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options -P --user maiersa42");
@@ -1450,7 +1450,7 @@ if ($mod==1){
                    sophomorixStatus => "P",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options -R --user maiersa42");
@@ -1486,7 +1486,7 @@ if ($mod==1){
                    sophomorixStatus => "R",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options -K --user maiersa42");
@@ -1522,7 +1522,7 @@ if ($mod==1){
                    sophomorixStatus => "K",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options -A --user maiersa42");
@@ -1558,7 +1558,7 @@ if ($mod==1){
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options --comment \"Test Comment!\" --user maiersa42");
@@ -1593,7 +1593,7 @@ if ($mod==1){
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options --webui-dashboard \"Test webui!\" --user maiersa42");
@@ -1629,7 +1629,7 @@ if ($mod==1){
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options --user-permissions one,two,three --user maiersa42");
@@ -1666,7 +1666,7 @@ if ($mod==1){
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     &run_command("sophomorix-user $verbose_options --add-user-permissions four,five --user maiersa42");
     # Testing change
@@ -1702,7 +1702,7 @@ if ($mod==1){
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     &run_command("sophomorix-user $verbose_options --remove-user-permissions one,two --user maiersa42");
@@ -1739,7 +1739,7 @@ if ($mod==1){
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
 
@@ -1780,7 +1780,7 @@ if ($mod==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 }
 
@@ -1824,7 +1824,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                    sophomorixSessions => "666;---;;|777;---;;",
                   });
 
@@ -1863,7 +1863,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",            
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
                    sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42,blackmri42;",
                   });
 
@@ -1902,7 +1902,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",            
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
                    sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42;",
                   });
 
@@ -1941,7 +1941,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",            
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
                    sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42;",
                   });
 
@@ -1981,7 +1981,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",            
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
                    sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42;",
                   });
 
@@ -2021,7 +2021,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",            
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
                    sophomorixSessions => "666;---;lordjo42,blackmri42;|777;---;lordjo42;",
                   });
 
@@ -2061,7 +2061,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",            
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
                    sophomorixSessions => "666;Mondays Session;lordjo42,blackmri42;|777;No such  allowed;lordjo42;",
                   });
 
@@ -2099,7 +2099,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb2345",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
     # blackmri42
@@ -2133,7 +2133,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb1234",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
 
@@ -2171,7 +2171,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb2345",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
     # blackmri42
@@ -2205,7 +2205,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb1234",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
 
@@ -2250,7 +2250,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid12345",
                    userAccountControl => "512",
-                   memberOf => "s6ade",
+                   memberOf => "s6ade|wifi|internet|webfilter|intranet|printing",
                    sophomorixSessions => "888;Session 888 of schneima42;blackmri42;|999;Session 999 of schneima42;lordjo42,blackmri42;",
                   });
 
@@ -2285,7 +2285,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb1234",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
     # lordjo42
@@ -2319,7 +2319,7 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb2345",
                    userAccountControl => "512",
-                   memberOf => "uni-12abc",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
 
@@ -2377,7 +2377,7 @@ if ($update==1 or $test_update==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     # muellegr42 -> birthday
@@ -2411,7 +2411,7 @@ if ($update==1 or $test_update==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid2345",
                    userAccountControl => "512",
-                   memberOf => "bsz-m7ab",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     # samardze42
@@ -2445,7 +2445,7 @@ if ($update==1 or $test_update==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid4567",
                    userAccountControl => "512",
-                   memberOf => "bsz-m8cd",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
 }
@@ -2500,7 +2500,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
-                   memberOf => "bsz-attic",
+                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2571,7 +2571,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid2345",
                    userAccountControl => "512",
-                   memberOf => "lin-attic",
+                   memberOf => "lin-attic|lin-wifi|lin-internet|lin-webfilter|lin-intranet|lin-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2642,7 +2642,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid3456",
                    userAccountControl => "512",
-                   memberOf => "bsz-m9cd",
+                   memberOf => "bsz-m9cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2713,7 +2713,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid4567",
                    userAccountControl => "512",
-                   memberOf => "bsz-m9cd",
+                   memberOf => "bsz-m9cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2784,7 +2784,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid5678",
                    userAccountControl => "512",
-                   memberOf => "bsz-alumni",
+                   memberOf => "bsz-alumni|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2855,7 +2855,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid6789",
                    userAccountControl => "512",
-                   memberOf => "uni-teachers",
+                   memberOf => "uni-teachers|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2905,7 +2905,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb2345",
                    userAccountControl => "512",
-                   memberOf => "uni-teachers",
+                   memberOf => "uni-teachers|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2955,7 +2955,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb1234",
                    userAccountControl => "512",
-                   memberOf => "lin-teachers",
+                   memberOf => "lin-teachers|lin-wifi|lin-internet|lin-webfilter|lin-intranet|lin-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -3005,7 +3005,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "uni-alumni",
+                   memberOf => "uni-alumni|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -3075,7 +3075,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unidb6789",
                    userAccountControl => "512",
-                   memberOf => "ghs-alumni",
+                   memberOf => "ghs-alumni|ghs-wifi|ghs-internet|ghs-webfilter|ghs-intranet|ghs-printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -3145,7 +3145,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid12345",
                    userAccountControl => "512",
-                   memberOf => "s7ade",
+                   memberOf => "s7ade|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -3215,7 +3215,7 @@ if ($move==1 or $test_move==1){
                    sophomorixStatus => "U",
                    sophomorixUnid => "unid123456",
                    userAccountControl => "512",
-                   memberOf => "alumni",
+                   memberOf => "alumni|wifi|internet|webfilter|intranet|printing",
                    userAccountControl => "512",
                   });
     ##### Testing the users class

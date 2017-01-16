@@ -847,6 +847,16 @@ sub AD_user_create {
                            );
     $result->code && warn "Failed to add entry: ", $result->error ;
     &AD_debug_logdump($result,2,(caller(0))[3]);
+    # add user to management groups (not tonadmin)
+    my @grouplist=("wifi","internet","webfilter","intranet","printing");
+    foreach my $group (@grouplist){
+        my $management_group=&AD_get_name_tokened($group,$school,"management");
+        &AD_group_addmember_management({ldap => $ldap,
+                                        root_dse => $root_dse, 
+                                        group => $management_group,
+                                        addmember => $login,
+                                       }); 
+    }
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
 }
 
@@ -1239,6 +1249,7 @@ sub AD_get_name_tokened {
         $role eq "examaccount" or
         $role eq "computer" or
         $role eq "project" or
+        $role eq "management" or
         $role eq "sophomorix-group"){
         if ($school eq "---" 
             or $school eq ""
@@ -3437,6 +3448,24 @@ sub AD_group_addmember {
     } else {
         return;
     }
+}
+
+sub AD_group_addmember_management {
+    # requires token-group as groupname
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $group = $arg_ref->{group};
+    my $addmember = $arg_ref->{addmember};
+
+    # testing if user can be added
+    # ?????? missing
+
+    &AD_group_addmember({ldap => $ldap,
+                         root_dse => $root_dse, 
+                         group => $group,
+                         addmember => $addmember,
+                            }); 
 }
 
 
