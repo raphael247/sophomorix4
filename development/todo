@@ -40,6 +40,7 @@ add the groups
   webfilter
   intranet
   printing                     OK 16.1.2017
+Update tests for new memberships  OK 17.1.2017
 
 display membership status with sophomorix-session -ij
 
@@ -47,10 +48,42 @@ sophomorix-check workflow umsetzen
 
 mail sernet dateisystem  OK 16.1.2017
 
+DN: OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local entsteht bei tests irtümlicherweise
+-->nonexisting test
+
+
+AD_group_addmember_management
+
+-> allow only adding in:
+   -> a management group (no other type of group)
+   -> of the same school as the user (as found out by sophomorixSchool)
+      (choose the correct group) groupname in option: internet leads to group bsz-internet (if user is )
+      options:
+        --internet  <user1,user2>  --nointernet  <user1,user2>
+        --intranet  <user1,user2>  --nointranet  <user1,user2> 
+        --webfilter <user1,user2>  --nowebfilter <user1,user2> 
+        --printng   <user1,user2>  --noprinting  <user1,user2>
+
+        --admin     <user1,user2>  --noadmin <user1,user2>
+
+ 
+   -> and beeing allowed to be added
+
+
+sophomorix-session -i:
+
+liegfert dann noch folgende Infos:
+     group_internetaccess_allowed  TRUE/FALSE
+     group_internetaccess_default  TRUE/FALSE
+     .... um in der Schulkonsole
+       -- auf default zurückgehen zu können
+       -- um einschalten ausgrauen zu können
+
+
 
 tests für status
 
-Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sbin/sophomorix-add line 368.
+Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sbin/sophomorix-add line 367.
 
 type of a room/roomws: wenn room wegfällt, wegen examaccounts, 
                        kann room für die workstations genommen werden (statt sophomorixType=roomws)
