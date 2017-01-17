@@ -683,6 +683,16 @@ sub test_multivalue {
     # were all actual memberships tested
     is ($count,$test_count,
         "  * $sam_account has $count entries in multivalue attribute $attr: $test_count tested");
+    if (not $count==$test_count){
+        print "   Found the following $count entries in AD:\n";
+	foreach my $entry (@data){
+            print "      $entry\n";
+        }
+        print "   Expected the following $test_count entries in the test:\n";
+	foreach my $entry (@should_be){
+            print "      $entry\n";
+        }
+    }
 }
 
 

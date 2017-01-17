@@ -1135,7 +1135,7 @@ sub AD_user_move {
     }
     if($Conf::log_level>=1){
         print "\n";
-        &Sophomorix::SophomorixBase::print_title("Moving User $user ($user_count),(start):");
+        &Sophomorix::SophomorixBase::print_title("Moving user $user ($user_count),(start):");
         print "   DN:             $dn\n";
         print "   Target DN:         $target_branch\n";
         print "   Group (Old):       $group_old ($group_old_basename)\n";
@@ -1222,7 +1222,34 @@ sub AD_user_move {
                      rdn=>$rdn,
                      target_branch=>$target_branch,
                     });
-    &Sophomorix::SophomorixBase::print_title("Moving User $user, (end)");
+
+
+    # change management groups if school changes
+    if ($school_old ne $school_new){
+        &Sophomorix::SophomorixBase::print_title("School $school_old --> $school_new, managment groups change (start)");
+        my @grouplist=("wifi","internet","webfilter","intranet","printing");
+        # removing
+        foreach my $group (@grouplist){
+            my $management_group=&AD_get_name_tokened($group,$school_old,"management");
+            &AD_group_removemember({ldap => $ldap,
+                                    root_dse => $root_dse, 
+                                    group => $management_group,
+                                    removemember => $user,
+                                   });   
+        }
+        # adding
+        foreach my $group (@grouplist){
+            my $management_group=&AD_get_name_tokened($group,$school_new,"management");
+            &AD_group_addmember_management({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $management_group,
+                                            addmember => $user,
+                                           }); 
+        }
+        &Sophomorix::SophomorixBase::print_title("School $school_old --> $school_new, managment groups change (start)");
+    }
+
+    &Sophomorix::SophomorixBase::print_title("Moving user $user, (end)");
 }
 
 
