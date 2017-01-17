@@ -1637,29 +1637,29 @@ sub AD_get_sessions {
                                   user=>$member,
                        });
 
-                $sessions{'id'}{$id}{'members'}{$member}{'firstname'}=$firstname;
-                $sessions{'id'}{$id}{'members'}{$member}{'lastname'}=$lastname;
-                $sessions{'id'}{$id}{'members'}{$member}{'adminclass'}=$adminclass;
-                $sessions{'id'}{$id}{'members'}{$member}{'existing'}=$existing;
-                $sessions{'id'}{$id}{'members'}{$member}{'exammode'}=$exammode;
+                $sessions{'id'}{$id}{'members'}{$member}{'user_firstname'}=$firstname;
+                $sessions{'id'}{$id}{'members'}{$member}{'user_lastname'}=$lastname;
+                $sessions{'id'}{$id}{'members'}{$member}{'user_adminclass'}=$adminclass;
+                $sessions{'id'}{$id}{'members'}{$member}{'user_existing'}=$existing;
+                $sessions{'id'}{$id}{'members'}{$member}{'user_exammode'}=$exammode;
 
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'firstname'}=$firstname;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'lastname'}=$lastname;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'adminclass'}=$adminclass;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'existing'}=$existing;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'exammode'}=$exammode;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_firstname'}=$firstname;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_lastname'}=$lastname;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_adminclass'}=$adminclass;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_existing'}=$existing;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_exammode'}=$exammode;
 
                 # test membership in managementgroups
-                my @grouptypes=("wifiaccess","internetaccess");
+                my @grouptypes=("wifiaccess","internetaccess","webfilter","intranetaccess","printing");
                 foreach my $grouptype (@grouptypes){
                     # befor testing set FALSE as default
-                    $sessions{'id'}{$id}{'members'}{$member}{$grouptype}="FALSE";
-                    $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{$grouptype}="FALSE";
+                    $sessions{'id'}{$id}{'members'}{$member}{"group_".$grouptype}="FALSE";
+                    $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{"group_".$grouptype}="FALSE";
                     foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                         if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$member}){
                             # if in the groups, set TRUE
-                            $sessions{'id'}{$id}{'members'}{$member}{$grouptype}="TRUE";
-                            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{$grouptype}="TRUE";
+                            $sessions{'id'}{$id}{'members'}{$member}{"group_".$grouptype}="TRUE";
+                            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{"group_".$grouptype}="TRUE";
                         }
                     }
                 }
@@ -2212,6 +2212,147 @@ sub AD_get_AD {
         # sorting some lists
 #        my $unneeded3=$#{ $AD{'lists'}{'admins'} }; 
 #        @{ $AD{'lists'}{'admins'} } = sort @{ $AD{'lists'}{'admins'} }; 
+
+
+
+
+        # ----------------------------------------
+        # sophomorixType webfilter from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=webfilter))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_webfilter = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_webfilter sophomorix webfilter groups found in AD");
+        $AD{'result'}{'group'}{'webfilter'}{'COUNT'}=$max_webfilter;
+        for( my $index = 0 ; $index < $max_webfilter ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            #$AD{'objectclass'}{'group'}{'webfilter'}{$sam}{'webfilter'}=$sam;
+            $AD{'objectclass'}{'group'}{'webfilter'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'webfilter'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'webfilter'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+            # fetching members
+            my @members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"member");
+            foreach my $member (@members){
+                my ($cn,@rest)=split(/,/,$member);
+                my $user=$cn;
+                $user=~s/^CN=//;
+                #print "$sam: <$user> $cn  --- $member\n";
+                $AD{'objectclass'}{'group'}{'webfilter'}{$sam}{'members'}{$user}=$member;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'webfilter'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'webfilter'} }, $member;
+            }
+        }
+
+
+
+
+        # ----------------------------------------
+        # sophomorixType intranetaccess from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=intranetaccess))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_intranetaccess = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_intranetaccess sophomorix intranetaccess groups found in AD");
+        $AD{'result'}{'group'}{'intranetaccess'}{'COUNT'}=$max_intranetaccess;
+        for( my $index = 0 ; $index < $max_intranetaccess ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            #$AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'intranetaccess'}=$sam;
+            $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+            # fetching members
+            my @members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"member");
+            foreach my $member (@members){
+                my ($cn,@rest)=split(/,/,$member);
+                my $user=$cn;
+                $user=~s/^CN=//;
+                #print "$sam: <$user> $cn  --- $member\n";
+                $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'members'}{$user}=$member;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'intranetaccess'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'intranetaccess'} }, $member;
+            }
+        }
+
+
+
+
+
+        # ----------------------------------------
+        # sophomorixType printing from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=printing))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_printing = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_printing sophomorix printing groups found in AD");
+        $AD{'result'}{'group'}{'printing'}{'COUNT'}=$max_printing;
+        for( my $index = 0 ; $index < $max_printing ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            #$AD{'objectclass'}{'group'}{'printing'}{$sam}{'printing'}=$sam;
+            $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+            # fetching members
+            my @members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"member");
+            foreach my $member (@members){
+                my ($cn,@rest)=split(/,/,$member);
+                my $user=$cn;
+                $user=~s/^CN=//;
+                #print "$sam: <$user> $cn  --- $member\n";
+                $AD{'objectclass'}{'group'}{'printing'}{$sam}{'members'}{$user}=$member;
+                push @{ $AD{'lists'}{'by_school'}{'global'}{'printing'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'printing'} }, $member;
+            }
+        }
+
+
+
+
+
     }
 
 
