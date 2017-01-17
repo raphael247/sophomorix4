@@ -239,7 +239,11 @@ sub manage_groupmemberships {
                           filter => $filter,
                           attr => ['cn','sophomorixSchoolname']
                             );
+
         my $count = $mesg->count;
+        if ($count==0){
+            &log_script_exit("ERROR: Could not find user $user",1,1,0,@arguments);
+        }
         my $entry = $mesg->entry(0);
         my $school = $entry->get_value('sophomorixSchoolname');
         print "USER: $user is in school $school\n";
