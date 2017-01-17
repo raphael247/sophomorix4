@@ -1,0 +1,268 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-managementgroup) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or jeffbeck@linuxmuster.net
+
+
+# Bibliotheken
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use Net::LDAP;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 check_options
+                                 config_sophomorix_read
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_get_name_tokened
+                                 AD_group_addmember
+                                 AD_group_addmember_management
+                                 AD_group_removemember
+                                 AD_group_list
+                                 get_forbidden_logins
+                                    );
+
+my @arguments = @ARGV;
+my $time_stamp_AD=&time_stamp_AD();
+
+
+# ===========================================================================
+# Variablen
+# ==========================================================================
+
+my $help=0;
+my $info=0;
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+$Conf::log_level=1;
+
+my $internet="";
+my $intranet="";
+my $wifi="";
+my $webfilter="";
+my $printing="";
+my $admin="";
+
+my $nointernet="";
+my $nointranet="";
+my $nowifi="";
+my $nowebfilter="";
+my $noprinting="";
+my $noadmin="";
+
+my $skiplock=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "verbose|v+" => \$Conf::log_level,
+           "internet=s" => \$internet,
+           "intranet=s" => \$intranet,
+           "wifi=s" => \$wifi,
+           "webfilter=s" => \$webfilter,
+           "printing=s" => \$printing,
+           "admin=s" => \$admin,
+           "nointernet=s" => \$nointernet,
+           "nointranet=s" => \$nointranet,
+           "nowifi=s" => \$nowifi,
+           "nowebfilter=s" => \$nowebfilter,
+           "noprinting=s" => \$noprinting,
+           "noadmin=s" => \$noadmin,
+           "skiplock" => \$skiplock,
+          );
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-managementgroup adds/removes a user from a managementgroup
+
+Options:
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+Examples 
+  sophomorix-managementgroup  --internet  <user1,user2,...>   --nointernet  <user1,user2,...>
+                              --wifi      <user1,user2,...>   --nowifi  <user1,user2,...>
+                              --intranet  <user1,user2,...>   --nointranet  <user1,user2,...> 
+                              --webfilter <user1,user2,...>   --nowebfilter <user1,user2,...> 
+                              --printing  <user1,user2,...>   --noprinting  <user1,user2,...>
+                              --admin     <user1,user2,...>   --noadmin <user1,user2,...>
+
+Please see the sophomorix-managementgroup(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+
+#if ($info==1){
+#    &AD_group_list($ldap,$root_dse,"management",1);
+#    exit;
+#} 
+
+
+&log_script_start(@arguments);
+
+
+############################################################
+# add
+############################################################
+
+# --internet
+if ($internet ne ""){
+    &manage_groupmemberships("internet","add",$internet);
+}
+
+
+# --intranet
+if ($intranet ne ""){
+    &manage_groupmemberships("internet","add",$intranet);
+}
+
+
+# --wifi
+if ($wifi ne ""){
+    &manage_groupmemberships("wifi","add",$wifi);
+}
+
+
+# --webfilter
+if ($webfilter ne ""){
+    &manage_groupmemberships("webfilter","add",$webfilter);
+}
+
+
+# --printing
+if ($printing ne ""){
+    &manage_groupmemberships("printing","add",$printing);
+}
+
+
+# --admin
+if ($admin ne ""){
+    &manage_groupmemberships("admin","add",$admin);
+}
+
+
+
+
+
+
+############################################################
+# remove
+############################################################
+
+# --nointernet
+if ($nointernet ne ""){
+    &manage_groupmemberships("internet","remove",$nointernet);
+}
+
+
+# --nointranet
+if ($nointranet ne ""){
+    &manage_groupmemberships("intranet","remove",$nointranet);
+}
+
+
+# --nowifi
+if ($nowifi ne ""){
+    &manage_groupmemberships("wifi","remove",$nowifi);
+}
+
+
+# --nowebfilter
+if ($nowebfilter ne ""){
+    &manage_groupmemberships("webfilter","remove",$nowebfilter);
+}
+
+
+# --noprinting
+if ($noprinting ne ""){
+    &manage_groupmemberships("printing","remove",$noprinting);
+}
+
+
+# --noadmin
+if ($noadmin ne ""){
+    &manage_groupmemberships("admin","remove",$noadmin);
+}
+
+&AD_unbind_admin($ldap);
+
+&log_script_end(@arguments);
+
+
+
+
+############################################################
+# sub
+############################################################
+
+sub manage_groupmemberships {
+    my ($basegroup,$action,$groupstring)=@_;
+    my @users=split(/,/,$groupstring);
+    foreach my $user (@users){
+        my $filter="(&(objectclass=user) (name=".$user."))";
+        my $mesg = $ldap->search(
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attr => ['cn','sophomorixSchoolname']
+                            );
+        my $count = $mesg->count;
+        my $entry = $mesg->entry(0);
+        my $school = $entry->get_value('sophomorixSchoolname');
+        print "USER: $user is in school $school\n";
+        
+        my $group=&AD_get_name_tokened($basegroup,$school,"management");
+        print "      group is $group\n";
+	if ($action eq "remove"){
+            print "      $user --> $group ($action)\n";
+
+            &AD_group_removemember({ldap => $ldap, 
+                                    root_dse => $root_dse, 
+                                    group => $group,
+                                    removemember => $user,
+                                  });   
+
+        } elsif ($action eq "add"){
+            print "      $user --> $group ($action)\n";
+ 
+            &AD_group_addmember_management({ldap => $ldap, 
+                                            root_dse => $root_dse, 
+                                            group => $group,
+                                            addmember => $user,
+                                           });  
+        }
+   }
+}

@@ -44,6 +44,7 @@ $Data::Dumper::Terse = 1;
             AD_group_create
             AD_group_kill
             AD_group_addmember
+            AD_group_addmember_management
             AD_group_removemember
             AD_get_schoolname
             AD_get_name_tokened
