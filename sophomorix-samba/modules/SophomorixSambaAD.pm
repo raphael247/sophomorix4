@@ -1651,7 +1651,7 @@ sub AD_get_sessions {
                 $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_exammode'}=$exammode;
 
                 # test membership in managementgroups
-                my @grouptypes=("wifiaccess","internetaccess","webfilter","intranetaccess","printing");
+                my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
                 foreach my $grouptype (@grouptypes){
                     # befor testing set FALSE as default
                     $sessions{'id'}{$id}{'members'}{$member}{"group_".$grouptype}="FALSE";
