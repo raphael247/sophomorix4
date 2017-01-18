@@ -2537,7 +2537,6 @@ if ($ses==1){
                   });
 
 
-
     #################### webfilter
     # --nowebfilter, 1 user
      &run_command("sophomorix-managementgroup $verbose_options --nowebfilter lordjo42");
@@ -2592,6 +2591,76 @@ if ($ses==1){
 
     # --webfilter, 2 user
     &run_command("sophomorix-managementgroup $verbose_options --webfilter lordjo42,blackmri42");
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"lordjo42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"blackmri42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+
+
+    #################### printing
+    # --noprinting, 1 user
+     &run_command("sophomorix-managementgroup $verbose_options --noprinting lordjo42");
+    # # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"lordjo42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet",
+                  });
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"blackmri42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+
+    # # --printing, 1 user
+     &run_command("sophomorix-managementgroup $verbose_options --printing lordjo42");
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"lordjo42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"blackmri42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+
+    # # --noprinting, 2 user
+    &run_command("sophomorix-managementgroup $verbose_options --noprinting lordjo42,blackmri42");
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"lordjo42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet",
+                  });
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"blackmri42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet",
+                  });
+
+    # --printing, 2 user
+    &run_command("sophomorix-managementgroup $verbose_options --printing lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
