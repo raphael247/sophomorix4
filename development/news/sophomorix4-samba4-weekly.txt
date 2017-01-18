@@ -52,63 +52,11 @@ filesystem:
 
 
 
-sophomorix-session:
-
- - printing
-   AD: je Drucker eine Gruppe
-   sophomorix-device:
-    Wenn Drucker, dann Gruppe erstellen
-    (Jeder nur-IP-Gerät(0 in Feld 11) bekommt eine Gruppe, später konfigurierbar in devices.csv)
-   User in Druckergruppe:  kann drucken
-   Nicht in Druckergruppe: kann nicht drucken
-   pyquota: Frank testet early on AD attribute gebraucht werden
-   sophomorix-session
-   wie internet, wifi gibts ne gruppe 'printing'
-
-   webfilter: Gruppe: wenn drin, da ja
-   (rumdrehen?, noch offen)
-
-
- - um ein vollständiges JSON-Objekt zurückzugeben
-   was wird zurückgegeben, wenn nicht ermittelt werden kann 
-   bzw. noch nicht umgesetzt ist?
-   Vorschlag
-   webfilter-> unknown
-   webfilter-> not_implemented 
-   OK
-
- - Session beenden/User aus session
-   muss user wieder in die Gruppen internet,wifi, ...
-   
- - was, wenn einem user einer Klasse wifi dauerhaft gesperrt werden soll
-   Oder wifi an einer Schule nur für Tablet-Klassen?
-   Vorschlag: vom admin der Schule verwaltete wifi-allowed Gruppe
-   nur wer in wifi-allowed ist kann per Schuko in wifi gesetzt werden
-   (wie ist das mit ganzen Klassen?)
-   school.conf:
-   
-   [group:wifi] # jede Managementgruppe (evtl. später projekte)
-     allow_group=12a,12b,teachers # students
-     allow_users=maierle,muellerle
-     except_users=lucifer   # lucifer ist in 12a
-     except_group=5a  # falls group=students
-     revert_allow_users=maierle,muellerle
-     revert_allow_group=12a,12b,teachers # students
-     revert_except_users=lucifer   # lucifer ist in 12a
-     revert_except_group=5a  # falls group=students
-     revert_cron=...  # Zeile für cronjob
-
-     # allow:  nur diese user können vom Lehrer hinzugenommen werden
-     # revert: rückstellen auf diesen default
-
-   -> wifiaccess hat eigentlich 3 Stati:
-      - vom admin erlaubt oder verboten
-      - vom lehrer freischaltbar
-      - default on/off (anlegen, nach KAs, ...)
-
 - gibt es einen samba mechanismus mit dem man die user der gruppe
   students (mit den gruppen 7a, ... die wiederum ) abfragen kann?
   ?
+
+
 
 - Auflisten der aufzuteilenden Dateien:
   Soll nur ein Überblick Angezeigt werden:

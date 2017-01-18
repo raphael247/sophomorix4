@@ -59,7 +59,9 @@ DN: OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local
  entsteht bei tests irtümlicherweise
 -->nonexisting test, Bugfixed                          OK 18.1.2017
 
-Weiter:
+###??????????????????????????????????????????????????###
+TODO: Weiter sophomorix-session:
+Return JSON vollständig: unknown, not_implemented  bei quota, ...
 
 Dummy Dateilisten: 2 Ordner, 2 Dateien
 1) files -> share_dir -> files -> liste alphabetisch,
@@ -81,14 +83,54 @@ quota -> Comment
    hardlimit=unknown
    gracetime=not_implemented
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+session beenden: 
+was passiert dann mit den session einstellungen
+(option reset?)
+
+school.conf: Konfiguriere den Default der memberships
+   [group:wifi] # jede Managementgruppe (evtl. später projekte)
+     allow_group=12a,12b,teachers # students
+     allow_users=maierle,muellerle
+     except_users=lucifer   # lucifer ist in 12a
+     except_group=5a  # falls group=students
+     revert_allow_users=maierle,muellerle
+     revert_allow_group=12a,12b,teachers # students
+     revert_except_users=lucifer   # lucifer ist in 12a
+     revert_except_group=5a  # falls group=students
+     revert_cron=...  # Zeile für cronjob
+
+     # allow:  nur diese user können vom Lehrer hinzugenommen werden
+     # revert: rückstellen auf diesen default
+
+   -> wifiaccess hat eigentlich 3 Stati:
+      - vom admin erlaubt oder verboten
+      - vom lehrer freischaltbar
+      - default on/off (anlegen, nach KAs, ...)
+
+
+
+
+
 Fertig
 
 
-
+??????????????????????????????????????????????????
 sophomorix-check workflow umsetzen
 
+??????????????????????????????????????????????????
 mail sernet dateisystem  OK 16.1.2017
 
+??????????????????????????????????????????????????
+sophomorix-device:
+
+AD: je Drucker eine Gruppe
+Wenn Drucker, dann Gruppe erstellen
+    (Jeder nur-IP-Gerät(0 in Feld 11) bekommt eine Gruppe, 
+     später konfigurierbar in devices.csv)
+   User in Druckergruppe:  kann drucken
+   Nicht in Druckergruppe: kann nicht drucken
+   pyquota: Frank testet early on AD attribute gebraucht werden
 
 
 AD_group_addmember_management
@@ -110,9 +152,11 @@ AD_group_addmember_management
    -> and beeing allowed to be added
 
 
+
+
 sophomorix-session -i:
 
-liegfert dann noch folgende Infos:
+liefert dann noch folgende Infos:
      group_internetaccess_allowed  TRUE/FALSE
      group_internetaccess_default  TRUE/FALSE
      .... um in der Schulkonsole
