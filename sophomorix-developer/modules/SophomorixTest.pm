@@ -27,6 +27,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT_OK = qw( );
 @EXPORT = qw(
             AD_object_nonexist
+            AD_dn_nonexist
             AD_test_object
             AD_test_session_count
             AD_test_dns
@@ -188,7 +189,21 @@ sub AD_object_nonexist {
 }
 
 
+sub AD_dn_nonexist {
+    my ($ldap,$root_dse,$dn) = @_;
+    my $mesg = $ldap->search(
+                      base   => $dn,
+                      scope => 'sub',
+                      filter => 'name=*',
+                      attr => ['cn']
+                            );
+    #print Dumper(\$mesg);
+    #&Sophomorix::SophomorixSambaAD::AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $count = $mesg->count;
+    is ($count,0,"  * $dn does not exist");
 
+
+}
 
 
 

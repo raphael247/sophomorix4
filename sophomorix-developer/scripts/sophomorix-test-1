@@ -21,6 +21,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                     );
 use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
+                                 AD_dn_nonexist
                                  AD_test_object
                                  run_command
                                  AD_test_session_count
@@ -245,6 +246,8 @@ if ($add==1){
 ############################################################
 # Run the tests
 ############################################################
+&AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
+
 
 ############################################################
 # Adding users --add
@@ -270,6 +273,9 @@ if ($add==1 or $test_add==1){
         &run_command("sophomorix-add -i");
         &run_command("sophomorix-add $verbose_options");
     }
+
+
+    &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
 
     ##### Testing the users
 
@@ -4196,6 +4202,8 @@ if ($kill==1 or $test_kill==1){
         &run_command("sophomorix-class --kill --class ghs-alumni $verbose_options");
         &run_command("sophomorix-class --kill --class uni-teachers $verbose_options");
     }
+
+    &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
 
     ##### Testing the users
     &AD_object_nonexist($ldap,$root_dse,"user","maiersa42");

@@ -1420,18 +1420,18 @@ sub AD_school_add {
         my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
         my $school=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL'};
         # create
-         &AD_group_create({ldap=>$ldap,
-                           root_dse=>$root_dse,
-                           dn_wish=>$dn,
-                           school=>$school,
-                           group=>$group,
-                           group_basename=>$group,
-                           description=>$description,
-                           type=>$type,
-                           status=>"P",
-                           creationdate=>$creationdate,
-                           joinable=>"TRUE",
-                           hidden=>"FALSE",
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn_wish=>$dn,
+                          school=>$school,
+                          group=>$group,
+                          group_basename=>$group,
+                          description=>$description,
+                          type=>$type,
+                          status=>"P",
+                          creationdate=>$creationdate,
+                          joinable=>"TRUE",
+                          hidden=>"FALSE",
                          });
     }
 
@@ -3454,12 +3454,16 @@ sub AD_group_create {
 
     # calculate missing Attributes
     my $container=&AD_get_container($type,$group_basename);
+
     my $target_branch=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
 
     my $dn = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     if (defined $dn_wish){
         # override DN
         $dn=$dn_wish;
+        # override target so it fits to dn
+        my ($unused,@used)=split(/,/,$dn);
+        $target_branch=join(",",@used);
     }
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
