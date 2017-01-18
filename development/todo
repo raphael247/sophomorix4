@@ -59,6 +59,30 @@ DN: OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local
  entsteht bei tests irtümlicherweise
 -->nonexisting test, Bugfixed                          OK 18.1.2017
 
+Weiter:
+
+Dummy Dateilisten: 2 Ordner, 2 Dateien
+1) files -> share_dir -> files -> liste alphabetisch,
+                        -> type=d/type=f
+                        -> comment_en=Share
+                        -> comment_de=Austeilen
+2) files -> collect_dir -> liste alphabetisch, jeweils type=d type=f
+                        -> comment_en=Collect
+                        -> comment_de=Einsammeln
+
+Dummy Quotaangaben - Mehrere Filesysteme
+key   -> Liste     -> key/Value
+quota -> /dev/sda1 -> hard_limit -> xMB
+                   -> soft_limit
+                   -> used -> xMB
+                   -> Comment=Home
+quota -> Comment
+   filesystem-path, Comment, Werte (welche?)
+   hardlimit=unknown
+   gracetime=not_implemented
+
+Fertig
+
 
 
 sophomorix-check workflow umsetzen
