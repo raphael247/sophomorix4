@@ -2745,6 +2745,42 @@ if ($ses==1){
                    sAMAccountname=>"blackmri42",
                    memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
+
+
+    #################### manangement options combined
+    # all options
+     &run_command("sophomorix-managementgroup $verbose_options --admins lordjo42,blackmri42 --noprinting lordjo42,blackmri42 --nointranet lordjo42,blackmri42 --nowebfilter lordjo42,blackmri42 --nointernet lordjo42,blackmri42 --nowifi lordjo42,blackmri42");
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"lordjo42",
+                   memberOf => "uni-12abc|uni-admins",
+                  });
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"blackmri42",
+                   memberOf => "uni-12abc|uni-admins",
+                  });
+
+    &run_command("sophomorix-managementgroup $verbose_options --noadmins lordjo42,blackmri42 --printing lordjo42,blackmri42 --intranet lordjo42,blackmri42 --webfilter lordjo42,blackmri42 --internet lordjo42,blackmri42 --wifi lordjo42,blackmri42");
+    # lordjo42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"lordjo42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+    # blackmri42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=blackmri42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   #####
+                   sAMAccountname=>"blackmri42",
+                   memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
+                  });
+
 }
 
 
