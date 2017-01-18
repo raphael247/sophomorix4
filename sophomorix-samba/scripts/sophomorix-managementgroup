@@ -56,14 +56,14 @@ my $intranet="";
 my $wifi="";
 my $webfilter="";
 my $printing="";
-my $admin="";
+my $admins="";
 
 my $nointernet="";
 my $nointranet="";
 my $nowifi="";
 my $nowebfilter="";
 my $noprinting="";
-my $noadmin="";
+my $noadmins="";
 
 my $skiplock=0;
 
@@ -77,13 +77,13 @@ my $testopt=GetOptions(
            "wifi=s" => \$wifi,
            "webfilter=s" => \$webfilter,
            "printing=s" => \$printing,
-           "admin=s" => \$admin,
+           "admins=s" => \$admins,
            "nointernet=s" => \$nointernet,
            "nointranet=s" => \$nointranet,
            "nowifi=s" => \$nowifi,
            "nowebfilter=s" => \$nowebfilter,
            "noprinting=s" => \$noprinting,
-           "noadmin=s" => \$noadmin,
+           "noadmins=s" => \$noadmins,
            "skiplock" => \$skiplock,
           );
 
@@ -115,7 +115,7 @@ Examples
                               --intranet  <user1,user2,...>   --nointranet  <user1,user2,...> 
                               --webfilter <user1,user2,...>   --nowebfilter <user1,user2,...> 
                               --printing  <user1,user2,...>   --noprinting  <user1,user2,...>
-                              --admin     <user1,user2,...>   --noadmin <user1,user2,...>
+                              --admins     <user1,user2,...>   --noadmins <user1,user2,...>
 
 Please see the sophomorix-managementgroup(8) man pages for full documentation
 ');
@@ -168,9 +168,9 @@ if ($printing ne ""){
 }
 
 
-# --admin
-if ($admin ne ""){
-    &manage_groupmemberships("admin","add",$admin);
+# --admins
+if ($admins ne ""){
+    &manage_groupmemberships("admins","add",$admins);
 }
 
 
@@ -212,9 +212,9 @@ if ($noprinting ne ""){
 }
 
 
-# --noadmin
-if ($noadmin ne ""){
-    &manage_groupmemberships("admin","remove",$noadmin);
+# --noadmins
+if ($noadmins ne ""){
+    &manage_groupmemberships("admins","remove",$noadmins);
 }
 
 &AD_unbind_admin($ldap);
