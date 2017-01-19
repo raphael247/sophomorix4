@@ -1669,6 +1669,11 @@ sub AD_get_sessions {
         }
     }
     $sessions{'sessioncount'}=$session_count;
+
+    # List contents of share and collect directory
+    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir",\%sessions);
+    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir",\%sessions);
+
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 
 }

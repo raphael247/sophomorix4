@@ -40,6 +40,7 @@ $Data::Dumper::Terse = 1;
             check_options
             config_sophomorix_read
             filelist_fetch
+            dir_listing
             dns_query_ip
             remove_whitespace
             json_dump
@@ -894,6 +895,26 @@ sub filelist_fetch {
     return @filelist;
 }
 
+
+sub dir_listing {
+    my ($dir,$name,$ref_sessions)=@_;
+    opendir DIR, $dir or return;
+    foreach my $file (readdir DIR){
+        my $abs_path=$dir."/".$file;
+        my $Type;
+        if ($file eq "."){next};
+        if ($file eq ".."){next};
+        if (-d $abs_path){
+            $type="d";
+        } elsif (-f $abs_path){
+            $type="f";
+        } else {
+            $type="strange";
+        }
+        $ref_sessions->{'files'}{$name}{$file}=$type;
+    }
+    closedir DIR;
+}
 
 
 # sophomorix logging to command.log

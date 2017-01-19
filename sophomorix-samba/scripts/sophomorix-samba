@@ -178,15 +178,14 @@ sub get_dn_from_smb_conf {
 
 sub get_ldb_files {
     my @files=();
-      opendir SAMBADB, $samba_private or return;
-       foreach my $file (readdir SAMBADB){
-          if ($file eq "."){next};
-          if ($file eq ".."){next};
-          if ($file=~m/.ldb$/){
-	      push @files,$file;
-          }
-      }
-       closedir SAMBADB;
+    opendir SAMBADB, $samba_private or return;
+    foreach my $file (readdir SAMBADB){
+        if ($file eq "."){next};
+        if ($file eq ".."){next};
+        if ($file=~m/.ldb$/){
+        push @files,$file;
+    }
+    closedir SAMBADB;
     @files = sort @files;
     return @files;
 }
