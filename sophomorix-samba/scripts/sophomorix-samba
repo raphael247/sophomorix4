@@ -183,7 +183,8 @@ sub get_ldb_files {
         if ($file eq "."){next};
         if ($file eq ".."){next};
         if ($file=~m/.ldb$/){
-        push @files,$file;
+            push @files,$file;
+        }
     }
     closedir SAMBADB;
     @files = sort @files;
@@ -193,15 +194,15 @@ sub get_ldb_files {
 
 sub get_ldb_d_files {
     my @files=();
-      opendir SAMBADB, $samba_private_d or return;
-       foreach my $file (readdir SAMBADB){
-          if ($file eq "."){next};
-          if ($file eq ".."){next};
-          if ($file=~m/.ldb$/){
-	      push @files,$file;
-          }
-      }
-       closedir SAMBADB;
+    opendir SAMBADB, $samba_private_d or return;
+    foreach my $file (readdir SAMBADB){
+        if ($file eq "."){next};
+        if ($file eq ".."){next};
+        if ($file=~m/.ldb$/){
+	    push @files,$file;
+        }
+    }
+    closedir SAMBADB;
     @files = sort @files;
     return @files;
 }
