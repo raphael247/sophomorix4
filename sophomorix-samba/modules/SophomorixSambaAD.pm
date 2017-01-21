@@ -522,7 +522,7 @@ sub AD_session_manage {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $creationdate = $arg_ref->{creationdate};
-    my $teacher = $arg_ref->{teacher};
+    my $supervisor = $arg_ref->{supervisor};
     my $create = $arg_ref->{create};
     my $kill = $arg_ref->{kill};
     my $session = $arg_ref->{session};
@@ -571,10 +571,10 @@ sub AD_session_manage {
         }
     } elsif (defined $session and defined $new_members and defined $new_comment){
         # modifying the session
-        if (defined $ref_sessions->{'id'}{$session}{'sAMAccountName'}){
+        if (defined $ref_sessions->{'id'}{$session}{'supervisor'}){
             # get data from session hash
             $session_new=$session;
-            $teacher=$ref_sessions->{'id'}{$session}{'sAMAccountName'};
+            $supervisor=$ref_sessions->{'id'}{$session}{'supervisor'};
             $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
             my ($unused,$old_comment,$old_members)=split(/;/,$session_string_old);
 	    if ($new_comment eq "---"){
@@ -593,8 +593,8 @@ sub AD_session_manage {
         return;
     }
 
-    # locating the teachers DN
-    my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$teacher);
+    # locating the supervisors DN
+    my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$supervisor);
 
     ############################################################
     if ($count==1){
@@ -625,9 +625,9 @@ sub AD_session_manage {
         }
 
         if($Conf::log_level>=1){
-            print "   Teacher:  $teacher\n";
-            print "   DN:       $dn\n";
-            print "   Session:  $session_new\n";
+            print "   Supervisor:  $supervisor\n";
+            print "   DN:          $dn\n";
+            print "   Session:     $session_new\n";
             print "      Old:      $session_string_old\n";
             print "      New:      $session_string_new\n";
         }
@@ -637,7 +637,7 @@ sub AD_session_manage {
                           replace => {'sophomorixSessions' => \@new_sessions }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     } else {
-        print "\nWARNING: User $teacher not found in ldap, skipping session creation\n\n";
+        print "\nWARNING: User $supervisor not found in ldap, skipping session creation\n\n";
         return;
     }
 }
@@ -650,9 +650,9 @@ sub AD_session_set_exam {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $student = $arg_ref->{student};
-    my $teacher = $arg_ref->{teacher};
+    my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
-    print "   * Setting exam mode for session member $student (Teacher: $teacher)\n";
+    print "   * Setting exam mode for session member $student (Supervisor: $supervisor)\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$student);
     if (not $count==1){
         print "ERROR: Could not set exam mode for nonexisting user $student\n";
@@ -663,7 +663,7 @@ sub AD_session_set_exam {
                      dn=>$dn,
                      user=>$student,
                      user_count=>$user_count,
-                     exammode=>$teacher,
+                     exammode=>$supervisor,
                    });
 }
 
@@ -675,9 +675,9 @@ sub AD_session_unset_exam {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $student = $arg_ref->{student};
-    my $teacher = $arg_ref->{teacher};
+    my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
-    print "   * Unsetting exam mode for session member $student (Teacher: $teacher)\n";
+    print "   * Unsetting exam mode for session member $student (Supervisor: $supervisor)\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$student);
     if (not $count==1){
         print "ERROR: Could not unset exam mode for nonexisting user $student\n";
@@ -1618,7 +1618,7 @@ sub AD_get_sessions {
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'memberstring'}=$members;
             # save by id
-            $sessions{'id'}{$id}{'sAMAccountName'}=$sam;
+            $sessions{'id'}{$id}{'supervisor'}=$sam;
             $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
             $sessions{'id'}{$id}{'comment'}=$comment;
             $sessions{'id'}{$id}{'memberstring'}=$members;
@@ -1671,8 +1671,8 @@ sub AD_get_sessions {
     $sessions{'sessioncount'}=$session_count;
 
     # List contents of share and collect directory
-    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir",\%sessions);
-    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir",\%sessions);
+    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir","supervisor",\%sessions);
+    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir","supervisor",\%sessions);
 
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 

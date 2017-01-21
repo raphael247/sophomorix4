@@ -897,7 +897,7 @@ sub filelist_fetch {
 
 
 sub dir_listing {
-    my ($dir,$name,$ref_sessions)=@_;
+    my ($dir,$name,$boss,$ref_sessions)=@_;
     opendir DIR, $dir or return;
     foreach my $file (readdir DIR){
         my $abs_path=$dir."/".$file;
@@ -911,7 +911,8 @@ sub dir_listing {
         } else {
             $type="strange";
         }
-        $ref_sessions->{'files'}{$name}{$file}=$type;
+        $ref_sessions->{'files'}{$boss}{$name}{$file}{'type'}=$type;
+        $ref_sessions->{'files'}{$name}{$file}{'size'}='do we need this';
     }
     closedir DIR;
 }

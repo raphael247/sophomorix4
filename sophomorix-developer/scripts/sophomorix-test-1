@@ -1796,8 +1796,8 @@ if ($mod==1){
 ############################################################
 if ($ses==1){
     print "Session tests\n";
-    &run_command("sophomorix-session $verbose_options --create --teacher maiersa42 --developer-session 666");
-    &run_command("sophomorix-session $verbose_options --create --teacher maiersa42 --developer-session 777");
+    &run_command("sophomorix-session $verbose_options --create --supervisor maiersa42 --developer-session 666");
+    &run_command("sophomorix-session $verbose_options --create --supervisor maiersa42 --developer-session 777");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2222,8 +2222,8 @@ if ($ses==1){
 
 
     # create a full session in one blow
-    &run_command("sophomorix-session $verbose_options --create --teacher schneima42 --developer-session 888 --comment \"Session 888 of schneima42\" --members blackmri42");
-    &run_command("sophomorix-session $verbose_options --create --teacher schneima42 --developer-session 999 --comment \"Session 999 of schneima42\" --members lordjo42,blackmri42");
+    &run_command("sophomorix-session $verbose_options --create --supervisor schneima42 --developer-session 888 --comment \"Session 888 of schneima42\" --members blackmri42");
+    &run_command("sophomorix-session $verbose_options --create --supervisor schneima42 --developer-session 999 --comment \"Session 999 of schneima42\" --members lordjo42,blackmri42");
 
     # schneima42
     &AD_test_object({ldap=>$ldap,

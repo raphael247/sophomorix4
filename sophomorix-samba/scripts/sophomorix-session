@@ -87,7 +87,7 @@ my $dump_AD=0;
 my $create=0;
 my $kill=0;
 my $kill_all_sessions=0;
-my $teacher="";
+my $supervisor="";
 my $session="";
 my $developer_session="";
 my $comment="";
@@ -107,7 +107,7 @@ my $testopt=GetOptions(
            "dump-AD" => \$dump_AD,
            "kill" => \$kill,
            "kill-all-sessions" => \$kill_all_sessions,
-           "teacher|t=s" => \$teacher,
+           "supervisor|t=s" => \$supervisor,
            "session|s=s" => \$session,
            "comment=s" => \$comment,
            "members|m=s" => \$members,
@@ -147,7 +147,7 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
-  - t <user> / --teacher <user>
+  - t <user> / --supervisor <user>
   --comment <string>              # ; are dropped in comment
   --members <user1>,<user2>, ...
   --addmembers <user1>,<user2>, ...
@@ -159,8 +159,8 @@ Options:
   --kill-all-sessions
 
 Create a session with the current time:
-  sophomorix-session --create --teacher <user>
-  sophomorix-session --create --teacher <user> --members <user1>,<user2>, ...
+  sophomorix-session --create --supervisor <user>
+  sophomorix-session --create --supervisor <user> --members <user1>,<user2>, ...
 
 Update the students of a running session:
   sophomorix-session --session <session_id> --members <user1>,<user2>, ...
@@ -205,29 +205,31 @@ if ($info==1) {
                });
 
     # session listing
-    if ($session ne "" and exists $sessions{'id'}{$session}{'sAMAccountName'}){
-        print "Session $session:\n";
-        print "   *     sAMAccountName:  $sessions{'id'}{$session}{'sAMAccountName'}  (teacher of the session)\n";
-        print "   *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
-        print "   * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
+    if ($session ne "" and exists $sessions{'id'}{$session}{'supervisor'}){
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title("Session $session:");
+        print "     *     supervisor:      $sessions{'id'}{$session}{'supervisor'}  (supervisor of the session)\n";
+        print "     *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
+        print "     * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         
     }
 
-    # teacher listing
-    if ($teacher ne ""){
+    # supervisor listing
+    if ($supervisor ne ""){
         my @ordered_list=();
-        foreach my $session ( keys %{ $sessions{'user'}->{$teacher}{'sophomorixSessions'} }){
+        foreach my $session ( keys %{ $sessions{'user'}->{$supervisor}{'sophomorixSessions'} }){
             push @ordered_list, $session;
         }
         @ordered_list = sort @ordered_list;
         my $count=0;
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title("Sessions of supervisor $supervisor:");
         foreach my $session (@ordered_list ){
             $count++;
-            print "\n";
-            print "$count) Teacher $teacher session: $session\n";
-            print "   *     sAMAccountName:  $sessions{'id'}{$session}{'sAMAccountName'}  (teacher of the session)\n";
-            print "   *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
-            print "   * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
+            print "  $count) Supervisor $supervisor session: $session\n";
+            print "     *         supervisor:  $sessions{'id'}{$session}{'supervisor'}  (supervisor of the session)\n";
+            print "     *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
+            print "     * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         }
     }
     exit $sessions{'sessioncount'};
@@ -272,11 +274,11 @@ if ($session ne "" and $kill==1){
 
 
 
-if ($create==1 and $teacher ne ""){
-    # create a session in teacher
+if ($create==1 and $supervisor ne ""){
+    # create a session in supervisor
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
-                        teacher=>$teacher,
+                        supervisor=>$supervisor,
                         creationdate=>$time_stamp_file,
                         members=>$members,
                         comment=>$comment,
@@ -295,7 +297,7 @@ if ($session ne "" and $members ne ""){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
-                        teacher=>$teacher,
+                        supervisor=>$supervisor,
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
@@ -312,7 +314,7 @@ if ($session ne "" and $comment ne ""){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
-                        teacher=>$teacher,
+                        supervisor=>$supervisor,
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
@@ -333,7 +335,7 @@ if ($session ne "" and $addmembers ne ""){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
-                        teacher=>$teacher,
+                        supervisor=>$supervisor,
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
@@ -353,7 +355,7 @@ if ($session ne "" and $removemembers ne ""){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
-                        teacher=>$teacher,
+                        supervisor=>$supervisor,
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
@@ -365,13 +367,13 @@ if ($session ne "" and $removemembers ne ""){
 
 # --set-exam-mode
 if ($session ne "" and $set_exam_mode ne ""){
-    if (not exists $sessions{'id'}{$session}{'sAMAccountName'} ){
+    if (not exists $sessions{'id'}{$session}{'supervisor'} ){
         print "   * Doing nothing: session $session not found\n"; 
     } else {
         # get chief of session
-        my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
+        my $supervisor=$sessions{'id'}{$session}{'supervisor'};
         my @students=split(/,/,$set_exam_mode);
-        print "$teacher is teacher of $session\n";
+        print "$supervisor is supervisor of $session\n";
         my $user_count=0;
         foreach my $student (@students){
 	    $user_count++;
@@ -379,7 +381,7 @@ if ($session ne "" and $set_exam_mode ne ""){
                 &AD_session_set_exam({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
-                                      teacher=>$teacher,
+                                      supervisor=>$supervisor,
                                       session=>$session,
                                       student=>$student,
                                       user_count=>$user_count,
@@ -396,9 +398,9 @@ if ($session ne "" and $set_exam_mode ne ""){
 # --unset-exam-mode
 if ($session ne "" and $unset_exam_mode ne ""){
     # get chief of session
-    my $teacher=$sessions{'id'}{$session}{'sAMAccountName'};
+    my $supervisor=$sessions{'id'}{$session}{'supervisor'};
     my @students=split(/,/,$unset_exam_mode);
-    print "$teacher is teacher of $session\n";
+    print "$supervisor is supervisor of $session\n";
     my $user_count=0;
     foreach my $student (@students){
 	$user_count++;
@@ -406,7 +408,7 @@ if ($session ne "" and $unset_exam_mode ne ""){
             &AD_session_unset_exam({ldap=>$ldap,
                                     root_dse=>$root_dse,
                                     root_dns=>$root_dns,
-                                    teacher=>$teacher,
+                                    supervisor=>$supervisor,
                                     session=>$session,
                                     student=>$student,
                                     user_count=>$user_count,
