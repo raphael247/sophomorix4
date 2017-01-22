@@ -1618,7 +1618,7 @@ sub AD_get_sessions {
             $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
             $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participantstring'}=$participants;
             # save by id
-            $sessions{'id'}{$id}{'supervisor'}=$sam;
+            $sessions{'id'}{$id}{'supervisor'}{'name'}=$sam;
             $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
             $sessions{'id'}{$id}{'comment'}=$comment;
             $sessions{'id'}{$id}{'participantstring'}=$participants;
@@ -1655,12 +1655,14 @@ sub AD_get_sessions {
                 foreach my $grouptype (@grouptypes){
                     # befor testing set FALSE as default
                     $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
+                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}
+                             {'participants'}{$participant}{"group_".$grouptype}="FALSE";
                     foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                         if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
                             # if in the groups, set TRUE
                             $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
-                            $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
+                            $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}
+                                     {'participants'}{$participant}{"group_".$grouptype}="TRUE";
                         }
                     }
                 }
@@ -1678,9 +1680,19 @@ sub AD_get_sessions {
         # one session
         # List contents of share and collect directory 
         # of the supervisor
-        my $sup=$sessions{'id'}{$show_session}{'supervisor'};
-        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir","supervisor",$sup,\%sessions);
-        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir","supervisor",$sup,\%sessions);
+        my $sup=$sessions{'id'}{$show_session}{'supervisor'}{'name'};
+	print "HERE: $sup\n";
+        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix",
+                                                 "collect_dir","supervisor",
+                                                 $sup,
+                                                 $show_session,
+                                                 \%sessions);
+        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz",
+                                                 "share_dir",
+                                                 "supervisor",
+                                                 $sup,
+                                                 $show_session,
+                                                 \%sessions);
         # List quota 
         # of all participants
         
