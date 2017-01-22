@@ -59,23 +59,15 @@ DN: OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local
  entsteht bei tests irtümlicherweise
 -->nonexisting test, Bugfixed                          OK 18.1.2017
 
+Bei Listen 1er Session mit:
+sophomorix-session -ij --session 2017-01-22_18-03-16
+- wird beim supervisor dessen collect angezeigt        OK 22.1.17
+- wird beim supervisor dessen share angezeigt          OK 22.1.17
+(dummy listen)
+
 ###??????????????????????????????????????????????????###
 TODO: Weiter sophomorix-session:
 Return JSON vollständig: unknown, not_implemented  bei quota, ...
-
-Dummy Dateilisten: 2 Ordner, 2 Dateien
-1) files -> share_dir -> files -> liste alphabetisch,
-                        -> type=d/type=f
-                        -> comment_en=Share
-                        -> comment_de=Austeilen
-(--> für jede session ein anderes dir?)
-
-2) files -> collect_dir -> liste alphabetisch, jeweils type=d type=f
-                        -> comment_en=Collect
-                        -> comment_de=Einsammeln
-OK 19.1.17
-
-
 
 Dummy Quotaangaben - Mehrere Filesysteme
 key   -> Liste     -> key/Value

@@ -1670,9 +1670,17 @@ sub AD_get_sessions {
     }
     $sessions{'sessioncount'}=$session_count;
 
-    # List contents of share and collect directory
-    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir","supervisor",\%sessions);
-    &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir","supervisor",\%sessions);
+    # show files
+    if ($show_session eq "all"){
+        # don show files of supervisor|participant
+    } else {
+        my $sup=$sessions{'id'}{$show_session}{'supervisor'};
+        # List contents of share and collect directory of the supervisor
+        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir","supervisor",$sup,\%sessions);
+        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir","supervisor",$sup,\%sessions);
+        
+
+    }
 
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 
