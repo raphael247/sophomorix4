@@ -107,7 +107,7 @@ my $testopt=GetOptions(
            "dump-AD" => \$dump_AD,
            "kill" => \$kill,
            "kill-all-sessions" => \$kill_all_sessions,
-           "supervisor|t=s" => \$supervisor,
+           "supervisor=s" => \$supervisor,
            "session|s=s" => \$session,
            "comment=s" => \$comment,
            "participants|m=s" => \$participants,
@@ -147,7 +147,7 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
-  - t <user> / --supervisor <user>
+  --supervisor <user>
   --comment <string>              # ; are dropped in comment
   --participants <user1>,<user2>, ...
   --addparticipants <user1>,<user2>, ...
@@ -182,8 +182,10 @@ Please see the sophomorix-session(8) man pages for full documentation
 }
 
 if ($session ne ""){
+    # get the session $session
     %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,$session);
 } else {
+    # get all sessions
     %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,"all");
 }
 
