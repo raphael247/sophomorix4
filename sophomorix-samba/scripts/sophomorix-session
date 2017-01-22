@@ -91,9 +91,9 @@ my $supervisor="";
 my $session="";
 my $developer_session="";
 my $comment="";
-my $members=""; # undef: do not change members
-my $addmembers="";
-my $removemembers="";
+my $participants=""; # undef: do not change participants
+my $addparticipants="";
+my $removeparticipants="";
 my $set_exam_mode="";
 my $unset_exam_mode="";
 
@@ -110,9 +110,9 @@ my $testopt=GetOptions(
            "supervisor|t=s" => \$supervisor,
            "session|s=s" => \$session,
            "comment=s" => \$comment,
-           "members|m=s" => \$members,
-           "addmembers=s" => \$addmembers,
-           "removemembers=s" => \$removemembers,
+           "participants|m=s" => \$participants,
+           "addparticipants=s" => \$addparticipants,
+           "removeparticipants=s" => \$removeparticipants,
            "set-exam-mode=s" => \$set_exam_mode,
            "unset-exam-mode=s" => \$unset_exam_mode,
            "developer-session=s" => \$developer_session,
@@ -149,9 +149,9 @@ Options:
   -i  / --info
   - t <user> / --supervisor <user>
   --comment <string>              # ; are dropped in comment
-  --members <user1>,<user2>, ...
-  --addmembers <user1>,<user2>, ...
-  --removemembers <user1>,<user2>, ...
+  --participants <user1>,<user2>, ...
+  --addparticipants <user1>,<user2>, ...
+  --removeparticipants <user1>,<user2>, ...
   --set-exam-mode <user1>,<user2>, ...
   --unset-exam-mode <user1>,<user2>, ...
   --create (user current time as session-id)
@@ -160,10 +160,10 @@ Options:
 
 Create a session with the current time:
   sophomorix-session --create --supervisor <user>
-  sophomorix-session --create --supervisor <user> --members <user1>,<user2>, ...
+  sophomorix-session --create --supervisor <user> --participants <user1>,<user2>, ...
 
-Update the students of a running session:
-  sophomorix-session --session <session_id> --members <user1>,<user2>, ...
+Update the participants of a running session:
+  sophomorix-session --session <session_id> --participants <user1>,<user2>, ...
 
 Dumping data:  
   -ij                              (dump sessions)  
@@ -209,7 +209,7 @@ if ($info==1) {
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Session $session:");
         print "     *     supervisor:      $sessions{'id'}{$session}{'supervisor'}  (supervisor of the session)\n";
-        print "     *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
+        print "     *   participants:      $sessions{'id'}{$session}{'participantstring'}  (participants of the session)\n";
         print "     * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         
     }
@@ -228,7 +228,7 @@ if ($info==1) {
             $count++;
             print "  $count) Supervisor $supervisor session: $session\n";
             print "     *         supervisor:  $sessions{'id'}{$session}{'supervisor'}  (supervisor of the session)\n";
-            print "     *            members:  $sessions{'id'}{$session}{'memberstring'}  (students of the session)\n";
+            print "     *       participants:  $sessions{'id'}{$session}{'participantstring'}  (participants of the session)\n";
             print "     * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         }
     }
@@ -280,7 +280,7 @@ if ($create==1 and $supervisor ne ""){
                         root_dse=>$root_dse,
                         supervisor=>$supervisor,
                         creationdate=>$time_stamp_file,
-                        members=>$members,
+                        participants=>$participants,
                         comment=>$comment,
                         create=>"TRUE",
                         kill=>"FALSE",
@@ -292,8 +292,8 @@ if ($create==1 and $supervisor ne ""){
 
 
 
-# --members
-if ($session ne "" and $members ne ""){
+# --participants
+if ($session ne "" and $participants ne ""){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
@@ -301,7 +301,7 @@ if ($session ne "" and $members ne ""){
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
-                        members=>$members,
+                        participants=>$participants,
                         sessions_ref=>\%sessions,
                     });
     exit;
@@ -326,12 +326,12 @@ if ($session ne "" and $comment ne ""){
 
 
 
-# --addmembers
-if ($session ne "" and $addmembers ne ""){
-    my @addmembers=split(/,/,$addmembers);
-    my @old_members=split(/,/,$sessions{'id'}{$session}{'memberstring'});
-    my @members = uniq(@old_members,@addmembers);
-    my $members_new=join(",",@members);
+# --addparticipants
+if ($session ne "" and $addparticipants ne ""){
+    my @addparticipants=split(/,/,$addparticipants);
+    my @old_participants=split(/,/,$sessions{'id'}{$session}{'participantstring'});
+    my @participants = uniq(@old_participants,@addparticipants);
+    my $participants_new=join(",",@participants);
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
@@ -339,7 +339,7 @@ if ($session ne "" and $addmembers ne ""){
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
-                        members=>$members_new,
+                        participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
     exit;
@@ -347,11 +347,11 @@ if ($session ne "" and $addmembers ne ""){
 
 
 
-# --removemembers
-if ($session ne "" and $removemembers ne ""){
-    my @old_members=split(/,/,$sessions{'id'}{$session}{'memberstring'});
-    my @members = &remove_from_list($removemembers,@old_members);
-    my $members_new=join(",",@members);
+# --removeparticipants
+if ($session ne "" and $removeparticipants ne ""){
+    my @old_participants=split(/,/,$sessions{'id'}{$session}{'participantstring'});
+    my @participants = &remove_from_list($removeparticipants,@old_participants);
+    my $participants_new=join(",",@participants);
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
@@ -359,7 +359,7 @@ if ($session ne "" and $removemembers ne ""){
                         create=>"FALSE",
                         kill=>"FALSE",
                         session=>$session,
-                        members=>$members_new,
+                        participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
     exit;
@@ -372,23 +372,23 @@ if ($session ne "" and $set_exam_mode ne ""){
     } else {
         # get chief of session
         my $supervisor=$sessions{'id'}{$session}{'supervisor'};
-        my @students=split(/,/,$set_exam_mode);
+        my @participants=split(/,/,$set_exam_mode);
         print "$supervisor is supervisor of $session\n";
         my $user_count=0;
-        foreach my $student (@students){
+        foreach my $participant (@participants){
 	    $user_count++;
-            if (exists $sessions{'id'}{$session}{'members'}{$student}){
+            if (exists $sessions{'id'}{$session}{'participants'}{$participant}){
                 &AD_session_set_exam({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       supervisor=>$supervisor,
                                       session=>$session,
-                                      student=>$student,
+                                      participant=>$participant,
                                       user_count=>$user_count,
                                       sessions_ref=>\%sessions,
                                    });
             } else {
-                print "   * Doing nothing: $student is not in the session\n";
+                print "   * Doing nothing: $participant is not in the session\n";
             }
         }
     }
@@ -399,23 +399,23 @@ if ($session ne "" and $set_exam_mode ne ""){
 if ($session ne "" and $unset_exam_mode ne ""){
     # get chief of session
     my $supervisor=$sessions{'id'}{$session}{'supervisor'};
-    my @students=split(/,/,$unset_exam_mode);
+    my @participants=split(/,/,$unset_exam_mode);
     print "$supervisor is supervisor of $session\n";
     my $user_count=0;
-    foreach my $student (@students){
+    foreach my $participant (@participants){
 	$user_count++;
-        if (exists $sessions{'id'}{$session}{'members'}{$student}){
+        if (exists $sessions{'id'}{$session}{'participants'}{$participant}){
             &AD_session_unset_exam({ldap=>$ldap,
                                     root_dse=>$root_dse,
                                     root_dns=>$root_dns,
                                     supervisor=>$supervisor,
                                     session=>$session,
-                                    student=>$student,
+                                    participant=>$participant,
                                     user_count=>$user_count,
                                     sessions_ref=>\%sessions,
                                   });
         } else {
-            print "   * Doing nothing: $student is not in the session\n";
+            print "   * Doing nothing: $participant is not in the session\n";
         }
     }
 

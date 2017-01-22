@@ -528,7 +528,7 @@ sub AD_session_manage {
     my $session = $arg_ref->{session};
     my $new_comment = $arg_ref->{comment};
     my $developer_session = $arg_ref->{developer_session};
-    my $new_members = $arg_ref->{members};
+    my $new_participants = $arg_ref->{participants};
 
     my $ref_sessions = $arg_ref->{sessions_ref};
     
@@ -549,8 +549,8 @@ sub AD_session_manage {
         # remove ; from comment
         $new_comment=~s/;//g;
     }
-    if (not defined $new_members){
-        $new_members="";
+    if (not defined $new_participants){
+        $new_participants="";
     }
 
     # creating the session string
@@ -560,30 +560,30 @@ sub AD_session_manage {
         if ($developer_session ne ""){
             # creating sessions with arbitrary names for testing
             $session_new=$developer_session;
-            $session_string_new=$developer_session.";".$new_comment.";".$new_members.";";
+            $session_string_new=$developer_session.";".$new_comment.";".$new_participants.";";
         } elsif ($creationdate ne "---"){
             # new session
             # this is the default
             $session_new=$creationdate;
-            $session_string_new=$creationdate.";".$new_comment.";".$new_members.";";
+            $session_string_new=$creationdate.";".$new_comment.";".$new_participants.";";
         } else {
             
         }
-    } elsif (defined $session and defined $new_members and defined $new_comment){
+    } elsif (defined $session and defined $new_participants and defined $new_comment){
         # modifying the session
         if (defined $ref_sessions->{'id'}{$session}{'supervisor'}){
             # get data from session hash
             $session_new=$session;
             $supervisor=$ref_sessions->{'id'}{$session}{'supervisor'};
             $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
-            my ($unused,$old_comment,$old_members)=split(/;/,$session_string_old);
+            my ($unused,$old_comment,$old_participants)=split(/;/,$session_string_old);
 	    if ($new_comment eq "---"){
                 $new_comment=$old_comment;
 	    }
-            if($new_members eq ""){
-                $new_members=$old_members;
+            if($new_participants eq ""){
+                $new_participants=$old_participants;
             }
-            $session_string_new=$session.";".$new_comment.";".$new_members.";";
+            $session_string_new=$session.";".$new_comment.";".$new_participants.";";
         } else {
             print "\n Session $session not found\n\n";
             return;
@@ -604,8 +604,8 @@ sub AD_session_manage {
 
         # push old sessions into hash (drop doubles)
         foreach my $old_session (@old_sessions){
-            my ($id,$old_comment,$old_members) = split(/;/,$old_session);
-            $new_sessions{$id}=$old_comment.";".$old_members.";";
+            my ($id,$old_comment,$old_participants) = split(/;/,$old_session);
+            $new_sessions{$id}=$old_comment.";".$old_participants.";";
         }
 
         if ($kill eq "TRUE"){
@@ -614,7 +614,7 @@ sub AD_session_manage {
             delete $new_sessions{$session_new};
         } else {
             # overwrite the changing session
-            $new_sessions{$session_new}=$new_comment.";".$new_members.";";
+            $new_sessions{$session_new}=$new_comment.";".$new_participants.";";
         }
 
         # write the hash into a list
@@ -649,19 +649,19 @@ sub AD_session_set_exam {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
-    my $student = $arg_ref->{student};
+    my $participant = $arg_ref->{participant};
     my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
-    print "   * Setting exam mode for session member $student (Supervisor: $supervisor)\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$student);
+    print "   * Setting exam mode for session participant $participant (Supervisor: $supervisor)\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
-        print "ERROR: Could not set exam mode for nonexisting user $student\n";
+        print "ERROR: Could not set exam mode for nonexisting user $participant\n";
         return;
     }
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$student,
+                     user=>$participant,
                      user_count=>$user_count,
                      exammode=>$supervisor,
                    });
@@ -674,19 +674,19 @@ sub AD_session_unset_exam {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
-    my $student = $arg_ref->{student};
+    my $participant = $arg_ref->{participant};
     my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
-    print "   * Unsetting exam mode for session member $student (Supervisor: $supervisor)\n";
-    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$student);
+    print "   * Unsetting exam mode for session participant $participant (Supervisor: $supervisor)\n";
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
-        print "ERROR: Could not unset exam mode for nonexisting user $student\n";
+        print "ERROR: Could not unset exam mode for nonexisting user $participant\n";
         return;
     }
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$student,
+                     user=>$participant,
                      user_count=>$user_count,
                      exammode=>"---",
                    });
@@ -1605,7 +1605,7 @@ sub AD_get_sessions {
             if($Conf::log_level>=2){
                 &Sophomorix::SophomorixBase::print_title("$session_count: User $sam has session $session");
             }
-            my ($id,$comment,$members,$string)=split(/;/,$session);
+            my ($id,$comment,$participants,$string)=split(/;/,$session);
             if ($show_session eq "all"){
                 # just go on
             } elsif ($id ne $show_session){
@@ -1616,55 +1616,55 @@ sub AD_get_sessions {
             # save by user
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
             $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
-            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'memberstring'}=$members;
+            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participantstring'}=$participants;
             # save by id
             $sessions{'id'}{$id}{'supervisor'}=$sam;
             $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
             $sessions{'id'}{$id}{'comment'}=$comment;
-            $sessions{'id'}{$id}{'memberstring'}=$members;
+            $sessions{'id'}{$id}{'participantstring'}=$participants;
 
-            # save member information
-            my @members=split(/,/,$members);
-            if ($#members==-1){
-                # skip user detection when memberlist is empty
+            # save participant information
+            my @participants=split(/,/,$participants);
+            if ($#participants==-1){
+                # skip user detection when participantlist is empty
                 next;
             }
-            foreach $member (@members){
+            foreach $participant (@participants){
                 # get userinfo
                 my ($firstname,$lastname,$adminclass,$existing,$exammode)=
                     &AD_get_user({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
-                                  user=>$member,
+                                  user=>$participant,
                        });
 
-                $sessions{'id'}{$id}{'members'}{$member}{'user_firstname'}=$firstname;
-                $sessions{'id'}{$id}{'members'}{$member}{'user_lastname'}=$lastname;
-                $sessions{'id'}{$id}{'members'}{$member}{'user_adminclass'}=$adminclass;
-                $sessions{'id'}{$id}{'members'}{$member}{'user_existing'}=$existing;
-                $sessions{'id'}{$id}{'members'}{$member}{'user_exammode'}=$exammode;
+                $sessions{'id'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname;
+                $sessions{'id'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname;
+                $sessions{'id'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass;
+                $sessions{'id'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
+                $sessions{'id'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
 
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_firstname'}=$firstname;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_lastname'}=$lastname;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_adminclass'}=$adminclass;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_existing'}=$existing;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{'user_exammode'}=$exammode;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
+                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
 
-                # test membership in managementgroups
+                # test participantship in managementgroups
                 my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
                 foreach my $grouptype (@grouptypes){
                     # befor testing set FALSE as default
-                    $sessions{'id'}{$id}{'members'}{$member}{"group_".$grouptype}="FALSE";
-                    $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{"group_".$grouptype}="FALSE";
+                    $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
+                    $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
                     foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
-                        if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$member}){
+                        if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
                             # if in the groups, set TRUE
-                            $sessions{'id'}{$id}{'members'}{$member}{"group_".$grouptype}="TRUE";
-                            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'members'}{$member}{"group_".$grouptype}="TRUE";
+                            $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
+                            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
                         }
                     }
                 }
-                # do more with the session members
+                # do more with the session participants
             }
         }
     }
