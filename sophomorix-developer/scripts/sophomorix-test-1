@@ -1873,8 +1873,8 @@ if ($ses==1){
                    sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42,blackmri42;",
                   });
 
-    # --removeparticipants
-    &run_command("sophomorix-session $verbose_options --session 777 --removeparticipants blackmri42");
+    # --remove-participants
+    &run_command("sophomorix-session $verbose_options --session 777 --remove-participants blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -1912,48 +1912,8 @@ if ($ses==1){
                    sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42;",
                   });
 
-    # --removeparticipants (removing nonexisting participant)
-    &run_command("sophomorix-session $verbose_options --session 777 --removeparticipants blackmri42");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
-
-    # maiersa42
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Sarina Maier",
-                   givenName=>"Sarina",
-                   name=>"maiersa42",
-                   sAMAccountname=>"maiersa42",
-                   uidNumber=>"-1",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa42",
-                   unixHomeDirectory=>"/home/schools/bsz/students/m7ab/homes/maiersa42",
-                   sn=>"Maier",
-                   userPrincipalName => "maiersa42@".$root_dns,
-                   sophomorixAdminClass => "bsz-m7ab",
-                   sophomorixExitAdminClass => "unknown",
-                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Sarina",
-                   sophomorixSurnameASCII  => "Maier",
-                   sophomorixBirthdate  => "25.01.1991",
-                   sophomorixRole => "student",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "U",
-                   sophomorixUnid => "unid1234",
-                   userAccountControl => "512",
-                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
-                   sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42;",
-                  });
-
-
-    # --addparticipants (adding already existing participant)
-    &run_command("sophomorix-session $verbose_options --session 777 --addparticipants lordjo42");
+    # --remove-participants (removing nonexisting participant)
+    &run_command("sophomorix-session $verbose_options --session 777 --remove-participants blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -1992,8 +1952,48 @@ if ($ses==1){
                   });
 
 
-    # --addparticipants
-    &run_command("sophomorix-session $verbose_options --session 666 --addparticipants blackmri42");
+    # --add-participants (adding already existing participant)
+    &run_command("sophomorix-session $verbose_options --session 777 --add-participants lordjo42");
+    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+
+    # maiersa42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa42",
+                   sAMAccountname=>"maiersa42",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa42",
+                   unixHomeDirectory=>"/home/schools/bsz/students/m7ab/homes/maiersa42",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa42@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixBirthdate  => "25.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "unid1234",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",            
+                   sophomorixSessions => "666;---;lordjo42;|777;---;lordjo42;",
+                  });
+
+
+    # --add-participants
+    &run_command("sophomorix-session $verbose_options --session 666 --add-participants blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42

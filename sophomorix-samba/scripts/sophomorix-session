@@ -92,8 +92,8 @@ my $session="";
 my $developer_session="";
 my $comment="";
 my $participants=""; # undef: do not change participants
-my $addparticipants="";
-my $removeparticipants="";
+my $add_participants="";
+my $remove_participants="";
 my $set_exam_mode="";
 my $unset_exam_mode="";
 
@@ -111,8 +111,8 @@ my $testopt=GetOptions(
            "session|s=s" => \$session,
            "comment=s" => \$comment,
            "participants|m=s" => \$participants,
-           "addparticipants=s" => \$addparticipants,
-           "removeparticipants=s" => \$removeparticipants,
+           "add-participants=s" => \$add_participants,
+           "remove-participants=s" => \$remove_participants,
            "set-exam-mode=s" => \$set_exam_mode,
            "unset-exam-mode=s" => \$unset_exam_mode,
            "developer-session=s" => \$developer_session,
@@ -150,8 +150,8 @@ Options:
   --supervisor <user>
   --comment <string>              # ; are dropped in comment
   --participants <user1>,<user2>, ...
-  --addparticipants <user1>,<user2>, ...
-  --removeparticipants <user1>,<user2>, ...
+  --add-participants <user1>,<user2>, ...
+  --remove-participants <user1>,<user2>, ...
   --set-exam-mode <user1>,<user2>, ...
   --unset-exam-mode <user1>,<user2>, ...
   --create (user current time as session-id)
@@ -328,11 +328,11 @@ if ($session ne "" and $comment ne ""){
 
 
 
-# --addparticipants
-if ($session ne "" and $addparticipants ne ""){
-    my @addparticipants=split(/,/,$addparticipants);
+# --add-participants
+if ($session ne "" and $add_participants ne ""){
+    my @add_participants=split(/,/,$add_participants);
     my @old_participants=split(/,/,$sessions{'id'}{$session}{'participantstring'});
-    my @participants = uniq(@old_participants,@addparticipants);
+    my @participants = uniq(@old_participants,@add_participants);
     my $participants_new=join(",",@participants);
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
@@ -349,10 +349,10 @@ if ($session ne "" and $addparticipants ne ""){
 
 
 
-# --removeparticipants
-if ($session ne "" and $removeparticipants ne ""){
+# --remove-participants
+if ($session ne "" and $remove_participants ne ""){
     my @old_participants=split(/,/,$sessions{'id'}{$session}{'participantstring'});
-    my @participants = &remove_from_list($removeparticipants,@old_participants);
+    my @participants = &remove_from_list($remove_participants,@old_participants);
     my $participants_new=join(",",@participants);
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
