@@ -219,7 +219,7 @@ if ($info==1) {
     # supervisor listing
     if ($supervisor ne ""){
         my @ordered_list=();
-        foreach my $session ( keys %{ $sessions{'user'}->{$supervisor}{'sophomorixSessions'} }){
+        foreach my $session ( keys %{ $sessions{'supervisor'}->{$supervisor}{'sophomorixSessions'} }){
             push @ordered_list, $session;
         }
         @ordered_list = sort @ordered_list;

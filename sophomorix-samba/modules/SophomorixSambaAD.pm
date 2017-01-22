@@ -1594,7 +1594,7 @@ sub AD_get_sessions {
     if($Conf::log_level>=2){
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found to test for sessions");
     }
-    $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
+    $AD{'result'}{'supervisor'}{'student'}{'COUNT'}=$max_user;
 
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
@@ -1614,9 +1614,9 @@ sub AD_get_sessions {
             }
 
             # save by user
-            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
-            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
-            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participantstring'}=$participants;
+            $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
+            $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
+            $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participantstring'}=$participants;
             # save by id
             $sessions{'id'}{$id}{'supervisor'}=$sam;
             $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
@@ -1644,23 +1644,23 @@ sub AD_get_sessions {
                 $sessions{'id'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
                 $sessions{'id'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
 
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
-                $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
+                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname;
+                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname;
+                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass;
+                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
+                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
 
                 # test participantship in managementgroups
                 my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
                 foreach my $grouptype (@grouptypes){
                     # befor testing set FALSE as default
                     $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
-                    $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
+                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
                     foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                         if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
                             # if in the groups, set TRUE
                             $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
-                            $sessions{'user'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
+                            $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
                         }
                     }
                 }
@@ -1672,12 +1672,17 @@ sub AD_get_sessions {
 
     # show files
     if ($show_session eq "all"){
+        # all sessions
         # don show files of supervisor|participant
     } else {
+        # one session
+        # List contents of share and collect directory 
+        # of the supervisor
         my $sup=$sessions{'id'}{$show_session}{'supervisor'};
-        # List contents of share and collect directory of the supervisor
         &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix","collect_dir","supervisor",$sup,\%sessions);
         &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz","share_dir","supervisor",$sup,\%sessions);
+        # List quota 
+        # of all participants
         
 
     }

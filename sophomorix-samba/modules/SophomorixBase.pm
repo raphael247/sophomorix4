@@ -897,6 +897,7 @@ sub filelist_fetch {
 
 
 sub dir_listing {
+    # dirlistng for supervisor only
     my ($dir,$name,$role,$user,$ref_sessions)=@_;
     opendir DIR, $dir or return;
     foreach my $file (readdir DIR){
@@ -911,8 +912,8 @@ sub dir_listing {
         } else {
             $type="strange";
         }
-        $ref_sessions->{'user'}{$user}{$name}{$file}{'type'}=$type;
-#        $ref_sessions->{'user'}{$user}{$name}{$file}{'size'}='do we need this';
+        $ref_sessions->{'supervisor'}{$user}{$name}{$file}{'type'}=$type;
+#        $ref_sessions->{'supervisor'}{$user}{$name}{$file}{'size'}='do we need this';
     }
     closedir DIR;
 }
