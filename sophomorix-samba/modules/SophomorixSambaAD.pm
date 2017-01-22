@@ -529,9 +529,7 @@ sub AD_session_manage {
     my $new_comment = $arg_ref->{comment};
     my $developer_session = $arg_ref->{developer_session};
     my $new_participants = $arg_ref->{participants};
-
     my $ref_sessions = $arg_ref->{sessions_ref};
-    
 
     # the updated session string
     my $session_string_new="";
@@ -571,10 +569,10 @@ sub AD_session_manage {
         }
     } elsif (defined $session and defined $new_participants and defined $new_comment){
         # modifying the session
-        if (defined $ref_sessions->{'id'}{$session}{'supervisor'}){
+        if (defined $ref_sessions->{'id'}{$session}{'supervisor'}{'name'}){
             # get data from session hash
             $session_new=$session;
-            $supervisor=$ref_sessions->{'id'}{$session}{'supervisor'};
+            $supervisor=$ref_sessions->{'id'}{$session}{'supervisor'}{'name'};
             $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
             my ($unused,$old_comment,$old_participants)=split(/;/,$session_string_old);
 	    if ($new_comment eq "---"){
@@ -1681,7 +1679,6 @@ sub AD_get_sessions {
         # List contents of share and collect directory 
         # of the supervisor
         my $sup=$sessions{'id'}{$show_session}{'supervisor'}{'name'};
-	print "HERE: $sup\n";
         &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix",
                                                  "collect_dir","supervisor",
                                                  $sup,

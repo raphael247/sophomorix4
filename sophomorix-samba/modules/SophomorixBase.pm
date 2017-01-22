@@ -912,14 +912,8 @@ sub dir_listing {
         } else {
             $type="strange";
         }
-
         $ref_sessions->{'supervisor'}{$user}{'files'}{$name}{$file}{'type'}=$type;
-
         $ref_sessions->{'id'}{$session}{'supervisor'}{'files'}{$name}{$file}{'type'}=$type;
-
-
-#        $ref_sessions->{'supervisor'}{$user}{$name}{$file}{'type'}=$type;
-#        $ref_sessions->{'supervisor'}{$user}{$name}{$file}{'size'}='do we need this';
     }
     closedir DIR;
 }

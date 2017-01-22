@@ -207,10 +207,10 @@ if ($info==1) {
                });
 
     # session listing
-    if ($session ne "" and exists $sessions{'id'}{$session}{'supervisor'}){
+    if ($session ne "" and exists $sessions{'id'}{$session}{'supervisor'}{'name'}){
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Session $session:");
-        print "     *     supervisor:      $sessions{'id'}{$session}{'supervisor'}  (supervisor of the session)\n";
+        print "     *     supervisor:      $sessions{'id'}{$session}{'supervisor'}{'name'}  (supervisor of the session)\n";
         print "     *   participants:      $sessions{'id'}{$session}{'participantstring'}  (participants of the session)\n";
         print "     * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         
@@ -229,7 +229,7 @@ if ($info==1) {
         foreach my $session (@ordered_list ){
             $count++;
             print "  $count) Supervisor $supervisor session: $session\n";
-            print "     *         supervisor:  $sessions{'id'}{$session}{'supervisor'}  (supervisor of the session)\n";
+            print "     *         supervisor:  $sessions{'id'}{$session}{'supervisor'}{'name'}  (supervisor of the session)\n";
             print "     *       participants:  $sessions{'id'}{$session}{'participantstring'}  (participants of the session)\n";
             print "     * sophomorixSessions:  $sessions{'id'}{$session}{'sophomorixSessions'}\n";
         }
@@ -369,11 +369,11 @@ if ($session ne "" and $removeparticipants ne ""){
 
 # --set-exam-mode
 if ($session ne "" and $set_exam_mode ne ""){
-    if (not exists $sessions{'id'}{$session}{'supervisor'} ){
+    if (not exists $sessions{'id'}{$session}{'supervisor'}{'name'} ){
         print "   * Doing nothing: session $session not found\n"; 
     } else {
         # get chief of session
-        my $supervisor=$sessions{'id'}{$session}{'supervisor'};
+        my $supervisor=$sessions{'id'}{$session}{'supervisor'}{'name'};
         my @participants=split(/,/,$set_exam_mode);
         print "$supervisor is supervisor of $session\n";
         my $user_count=0;
@@ -400,7 +400,7 @@ if ($session ne "" and $set_exam_mode ne ""){
 # --unset-exam-mode
 if ($session ne "" and $unset_exam_mode ne ""){
     # get chief of session
-    my $supervisor=$sessions{'id'}{$session}{'supervisor'};
+    my $supervisor=$sessions{'id'}{$session}{'supervisor'}{'name'};
     my @participants=split(/,/,$unset_exam_mode);
     print "$supervisor is supervisor of $session\n";
     my $user_count=0;
