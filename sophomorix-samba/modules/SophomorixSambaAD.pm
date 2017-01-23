@@ -1678,22 +1678,26 @@ sub AD_get_sessions {
         # one session
         # List contents of share and collect directory 
         # of the supervisor
-        my $sup=$sessions{'id'}{$show_session}{'supervisor'}{'name'};
-        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix",
-                                                 "collect_dir","supervisor",
-                                                 $sup,
-                                                 $show_session,
-                                                 \%sessions);
-        &Sophomorix::SophomorixBase::dir_listing("/etc/linuxmuster/sophomorix/bsz",
-                                                 "share_dir",
-                                                 "supervisor",
-                                                 $sup,
-                                                 $show_session,
-                                                 \%sessions);
+        my $supervisor=$sessions{'id'}{$show_session}{'supervisor'}{'name'};
+        &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix",
+                                                                    "collect_dir","supervisor",
+                                                                    $supervisor,
+                                                                    $show_session,
+                                                                    \%sessions);
+        &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix/bsz",
+                                                                    "share_dir",
+                                                                    "supervisor",
+                                                                    $supervisor,
+                                                                    $show_session,
+                                                                    \%sessions);
         # List quota 
         # of all participants
-        
-
+        foreach my $participant (keys %{$sessions{'id'}{$show_session}{'participants'}}) {
+            &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,
+                                                                           $show_session,
+                                                                           $supervisor,
+                                                                           \%sessions);
+        }
     }
 
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");

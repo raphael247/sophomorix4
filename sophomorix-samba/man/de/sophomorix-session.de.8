@@ -24,19 +24,20 @@ sophomorix-session \- Verwaltung von Unterrichten
 .SH DESCRIPTION
 .B sophomorix-session  
 erzeugt und ändert Unterrichte (sessions) im AD bei dem durchfühenden
-Lehrer im mehrfach-Attribut sophomorixSession. Deshalb kann ein lehrer
+Supervisor im mehrfach-Attribut sophomorixSession. Ein Supervisor kann
 mehrere Sessions verwalten.
 .br
 In sophomorixSessions steht folgender String: 
 .TP
-2017-01-03_02-44-35;lordjo42,blackmri42;
+2017-01-03_02-44-35;This is the Monday Session;lordjo42,blackmri42;
 .br
 * 2017-01-03_02-44-35 ist die Erstellzeit der session und wird als ID benutzt.
 .br
-* lordjo42,blackmri42 sind die Schüler in dieser Session.
+* This is the Monday Session: Kommentar zu dieser Session.
 .br
-* Wer der Chef dieser Session ist geht daraus hervor, bei welchem user
-im AD die Session gespeichert ist.
+* lordjo42,blackmri42 sind die Participants (Teilnehmer) in dieser Session.
+.br
+* Beim Supervisor der Session ist die Session im AD gespeichert ist.
 .PP
 .SH OPTIONS
 .B sophomorix-session
@@ -63,15 +64,15 @@ Als Schnittstelle zu Schulkonsole und andere Software, sind folgende
 Aufrufe von sophomorix-session typisch:
 .TP
 .B sophomorix-session --create --supervisor <user>
-Erzeugt einen neuen Unterricht (session). Der <user> verwaltet diese
-session. Üblicherweise ist das eine Lehrerin, kann aber auch ein
-anderer User sein. Die Session wird bei dieser Lehrerin im Attribut
-sophomorixSessions (Multivalue) abgespeichert. 
+Erzeugt einen neuen Unterricht (session). Der Supervisor <user>
+verwaltet diese session. Üblicherweise ist das eine Lehrerin, kann
+aber auch ein anderer User sein. Die Session wird bei dieser Lehrerin
+im Attribut sophomorixSessions (Multivalue) abgespeichert.
 .br
 Als ID wird die sekundengenaue Erstellzeit  verwendet.
 .TP
 .B sophomorix-session --create --supervisor <user> --participants <user1>,<user2>, ... --comment ''My Comment''
-Hier wird die Session gleich mir usern (Schüler) anglegt.
+Hier wird die Session gleich mir Participants (Teilnehmer) anglegt.
 .TP
 .B sophomorix-session --session <session-id> --participants <user1>,<user2>, ...
 Ersetzt die bisherigen user mit den usern <user1>,<user2>, ...
@@ -93,12 +94,16 @@ Liefert Informationen zu ALLEN[einer] laufenden Session[s] als JSON-Objekt
 zurück. Die zweite Option --json liefert ein kompaktes JSON-Obkekt
 zurück.
 .br
+Wird nur eine Session angegeben sind mehr Informationen im JSON-Object
+vorhanden.
+.br
 Eine session wird im JSON-Objekt über ihre session-id(JSON-Objekt->id)
 gefunden. Ist die session-id nicht bekannt, kann man sich die sessions
-eines Lehrer-user(JSON-Objekt->user) im JSON objekt anzeigen lassen und die
-passende Session (z.B. nach Datum) aussuchen.
+eines Supervisors (JSON-Objekt->user) im JSON objekt anzeigen lassen
+und die passende Session (z.B. nach Datum) aussuchen.
 .br
-In der Session finden sich informationen zu den Schülern (JSON: participants) 
+In der Session finden sich informationen zu den Participants
+(Teilnehmer) im JSON Object bei 'participants'.
 .TP
 .B sophomorix-session --session <session-id> --kill
 Entfernt die gewählte Session dauerhaft.

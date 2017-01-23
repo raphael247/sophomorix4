@@ -896,9 +896,12 @@ sub filelist_fetch {
 }
 
 
-sub dir_listing {
-    # dirlistng for supervisor only
-    my ($dir,$name,$role,$user,$session,$ref_sessions)=@_;
+sub dir_listing_session_supervisor {
+    # directory listing for supervisor of session only
+
+    # fix the path to homedir of supervisors ???????????????????ß
+
+    my ($dir,$name,$role,$supervisor,$session,$ref_sessions)=@_;
     opendir DIR, $dir or return;
     foreach my $file (readdir DIR){
         my $abs_path=$dir."/".$file;
@@ -912,11 +915,31 @@ sub dir_listing {
         } else {
             $type="strange";
         }
-        $ref_sessions->{'supervisor'}{$user}{'files'}{$name}{$file}{'type'}=$type;
+        $ref_sessions->{'supervisor'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
         $ref_sessions->{'id'}{$session}{'supervisor'}{'files'}{$name}{$file}{'type'}=$type;
     }
     closedir DIR;
 }
+
+
+sub quota_listing_session_participant {
+    # quota listng for participant only
+    my ($participant,$session,$supervisor,$ref_sessions)=@_;
+    print "fetching quota of participant $participant  --> todo\n";
+
+    # session ids
+    $ref_sessions->{'id'}{$session}{'participants'}{$participant}{'quota'}{'/dev/sda1'}{'comment'}="Home";
+    $ref_sessions->{'id'}{$session}{'participants'}{$participant}{'quota'}{'/dev/sda1'}{'hardlimit'}="xxx MB";
+
+
+    # supervisors
+    $ref_sessions->{'supervisor'}{$supervisor}{'sophomorixSessions'}{$session}{'participants'}
+                   {$participant}{'quota'}{'/dev/sda1'}{'hardlimit'}="xxx MB";
+    $ref_sessions->{'supervisor'}{$supervisor}{'sophomorixSessions'}{$session}{'participants'}
+                   {$participant}{'quota'}{'/dev/sda1'}{'comment'}="Home";
+}
+
+
 
 
 # sophomorix logging to command.log
