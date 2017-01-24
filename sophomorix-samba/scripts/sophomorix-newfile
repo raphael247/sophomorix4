@@ -1,0 +1,150 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-newfile) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+use String::Approx 'amatch';
+use String::Approx 'adist';
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
+use File::Basename qw( basename
+                       dirname
+                     ); 
+use Text::Iconv;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 filelist_fetch
+                                 remove_whitespace
+                                 json_dump
+                                 recode_utf8_to_ascii
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_get_AD
+                                 AD_dns_get
+                                 AD_object_search
+                                 get_forbidden_logins
+                                    );
+
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "info|i" => \$info,
+           "help|h" => \$help,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-newfile registers new user export files to the correct location in /etc/linuxmuster/sophomorix.
+
+- New files are deleted after registration
+  (option --filteronly keeps the files)
+- New files and overwritten files are logged
+- a filter is applied if configured
+  (check with --filteronly)
+- (later: encoding is analyzed and written to extemded attributes)
+
+Options:
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+
+
+ 
+Please see the sophomorix-newfile(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my @filelist=&filelist_fetch({filetype=>"users",
+                              sophomorix_config=>\%sophomorix_config,
+                            });
+
+
+
+# --info
+if ($info==1) {
+    print "to be done where to log\n";
+    exit;
+}
+
+&log_script_start(@arguments);
+
+
+################################################################################
+# Start
+################################################################################
+
+
+
+
+
+
+&AD_unbind_admin($ldap);
+
+&log_script_end(@arguments);
+
+
+
+################################################################################
+# Sub
+################################################################################
