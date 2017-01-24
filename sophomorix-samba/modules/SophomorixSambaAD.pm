@@ -1048,6 +1048,7 @@ sub AD_get_user {
                     attrs => ['sAMAccountName',
                               'sophomorixAdminClass',
                               'sophomorixExamMode',
+                              'sophomorixRole',
                               'givenName',
                               'sn',
                              ]);
@@ -1062,9 +1063,10 @@ sub AD_get_user {
         my $firstname = $entry->get_value('givenName');
         my $lastname = $entry->get_value('sn');
         my $class = $entry->get_value('sophomorixAdminClass');
+        my $role = $entry->get_value('sophomorixRole');
         my $exammode = $entry->get_value('sophomorixExamMode');
         my $existing="TRUE";
-        return ($firstname,$lastname,$class,$existing,$exammode);
+        return ($firstname,$lastname,$class,$existing,$exammode,$role);
     }
 }
 
@@ -1586,6 +1588,9 @@ sub AD_get_sessions {
                   #filter => '(&(objectClass=user) (sophomorixRole=student))',
                    attrs => ['sAMAccountName',
                              'sophomorixSessions',
+                             'sophomorixRole',
+                             'givenName',
+                             'sn',
                             ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max_user = $mesg->count; 
@@ -1598,6 +1603,9 @@ sub AD_get_sessions {
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
+        my $supervisor_role=$entry->get_value('sophomorixRole');
+        my $firstname = $entry->get_value('givenName');
+        my $lastname = $entry->get_value('sn');
         my @session_list = sort $entry->get_value('sophomorixSessions');
         if($Conf::log_level>=2){
             my $user_session_count=$#session_list+1;
@@ -1624,8 +1632,14 @@ sub AD_get_sessions {
                 $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
                 $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
                 $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participantstring'}=$participants;
+                $sessions{'supervisor'}{$sam}{'sophomorixRole'}=$supervisor_role;
+                $sessions{'supervisor'}{$sam}{'firstname'}=$firstname;
+                $sessions{'supervisor'}{$sam}{'lastname'}=$lastname;
                 # save by id
                 $sessions{'id'}{$id}{'supervisor'}{'name'}=$sam;
+                $sessions{'id'}{$id}{'supervisor'}{'sophomorixRole'}=$supervisor_role;
+                $sessions{'id'}{$id}{'supervisor'}{'firstname'}=$firstname;
+                $sessions{'id'}{$id}{'supervisor'}{'lastname'}=$lastname;
                 $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
                 $sessions{'id'}{$id}{'comment'}=$comment;
                 $sessions{'id'}{$id}{'participantstring'}=$participants;
@@ -1640,7 +1654,7 @@ sub AD_get_sessions {
                 }
                 foreach $participant (@participants){
                     # get userinfo
-                    my ($firstname,$lastname,$adminclass,$existing,$exammode)=
+                    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role)=
                         &AD_get_user({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
@@ -1651,6 +1665,7 @@ sub AD_get_sessions {
                     $sessions{'id'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname;
                     $sessions{'id'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass;
                     $sessions{'id'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'sophomorixRole'}=$role;
                     $sessions{'id'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
 
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
@@ -1663,6 +1678,8 @@ sub AD_get_sessions {
                              {$participant}{'user_existing'}=$existing;
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
                              {$participant}{'user_exammode'}=$exammode;
+                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
+                             {$participant}{'sophomorixRole'}=$role;
 
                     # test participantship in managementgroups
                     my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
