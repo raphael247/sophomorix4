@@ -6,13 +6,10 @@
 
 # Bibliotheken
 use strict;
-#use Quota;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
-use String::Approx 'amatch';
-use String::Approx 'adist';
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -23,7 +20,6 @@ use JSON;
 use File::Basename qw( basename
                        dirname
                      ); 
-use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -80,6 +76,10 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
+my $newfile=$ARGV[0];
+
+
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -134,6 +134,53 @@ if ($info==1) {
 # Start
 ################################################################################
 
+if (not defined $newfile){
+    print "\n ERROR: You need to specify a file\n\n";
+    exit;
+}
+
+if (not -f  $newfile){
+    print "\n ERROR: $newfile must be a file\n\n";
+    exit;
+}
+
+
+&print_title("Registering $newfile:");
+
+my $pwd=`pwd`;
+chomp($pwd);
+my $basename = basename($newfile);
+my $parent_dir = dirname($newfile);
+$parent_dir=~s/^\./$pwd/;
+my $newfile_abs=$parent_dir."/".$basename;
+
+my $target="";
+
+if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
+    $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'PATH_ABS'};
+} else {
+    print "\nERROR: Your filename $basename is not a valid filename on this server\n\n";
+    print "   * Please rename the file accordingly so I can find out where to copy it.\n\n";
+    exit;
+}
+
+
+
+print "   * Option:         $newfile\n";
+print "   * Newfile:        $basename\n";
+print "   * Pwd:            $pwd\n";
+print "   * Dir of newfile: $parent_dir\n";
+print "   * Newfile_abs:    $newfile_abs\n";
+print "   * Target in /etc: $target\n";
+
+
+
+
+# to do:
+
+# list valid filenames on error
+# show and calc log paths/filenames, mkdir parent of log
+# show filter
 
 
 
