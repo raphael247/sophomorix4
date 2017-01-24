@@ -1598,6 +1598,11 @@ sub AD_get_sessions {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my @session_list = sort $entry->get_value('sophomorixSessions');
+        if($Conf::log_level>=2){
+            my $user_session_count=$#session_list+1;
+            print "   * User $sam has $user_session_count sessions\n";
+	}
+        
         foreach my $session (@session_list){
             $session_count++;
             if($Conf::log_level>=2){
@@ -1606,8 +1611,18 @@ sub AD_get_sessions {
             my ($id,$comment,$participants,$string)=split(/;/,$session);
             if ($show_session eq "all"){
                 # just go on
+                if($Conf::log_level>=2){
+                    print "Loading partial data of session $id.\n";
+                }            
+            } elsif ($id eq $show_session){
+                if($Conf::log_level>=2){
+                    print "Loading full data of selected session $id.\n";
+                }            
             } elsif ($id ne $show_session){
                 # skip this session
+                if($Conf::log_level>=2){
+                    print "Session $id was not requested.\n";
+                }            
                 next;
             }
 
@@ -1673,8 +1688,8 @@ sub AD_get_sessions {
     # show files
     if ($show_session eq "all"){
         # all sessions
-        # don show files of supervisor|participant
-    } else {
+        # don't show files of supervisor|participant
+    } elsif ($id eq $show_session){
         # one session
         # List contents of share and collect directory 
         # of the supervisor
