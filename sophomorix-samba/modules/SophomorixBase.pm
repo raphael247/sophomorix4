@@ -925,7 +925,7 @@ sub dir_listing_session_supervisor {
 sub quota_listing_session_participant {
     # quota listng for participant only
     my ($participant,$session,$supervisor,$ref_sessions)=@_;
-    print "fetching quota of participant $participant  --> todo\n";
+    print "      * fetching quota of participant $participant  --> todo\n";
 
     # session ids
     $ref_sessions->{'id'}{$session}{'participants'}{$participant}{'quota'}{'/dev/sda1'}{'comment'}="Home";
