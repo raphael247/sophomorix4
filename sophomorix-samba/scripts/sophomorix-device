@@ -1607,7 +1607,7 @@ sub check_ip {
         if($Conf::log_level>=3){
             print "      Octet:    $octet\n";
         }
-        if ( int($octet) < 1 or int($octet) > 255) {
+        if ( int($octet) < 0 or int($octet) > 255) {
             print "\nERROR: ->$ip<- is invalid Option in ip octet\n\n";
             exit 1;
         } else {
