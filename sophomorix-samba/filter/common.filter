@@ -1,0 +1,100 @@
+#!/usr/bin/perl -w
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+############################################################
+# Start configure 
+############################################################
+my $source="---";
+my $target="---";
+my $filter_only=0;
+my $short=0;
+my @lines=();
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "filter-only" => \$filter_only,
+           "short" => \$short,
+          );
+if (defined $ARGV[0]){
+    $source=$ARGV[0];
+}
+if (defined $ARGV[1]){
+    $target=$ARGV[1];
+}
+
+if ($source eq "---"){
+    print "\nERROR: No source file given\n\n";
+    exit;
+}
+
+if ($target eq "---" and $filter_only==0){
+    print "\nERROR: You must give a target or the option --filter-only\n";
+    print "         --filter-only filters to stdout\n\n";
+    exit;
+
+}
+
+if ($filter_only==0){
+    print "Reading from $source\n";
+    print "Saving to $target\n";
+}
+
+
+&read_lines($source);
+
+
+&save_lines($target);
+
+
+############################################################
+# subs
+############################################################
+
+sub read_lines {
+    my ($source)=@_;
+    open(SOURCE, "<$source") || die "Fehler: $! $source not found!";
+    while (<SOURCE>){
+        chomp();
+        push @lines, $_;
+	#print "$_\n";
+    }
+}
+
+sub save_lines {
+    my ($target)=@_;
+    if ($target ne "---"){
+        open(TARGET, ">$target") || die "Fehler: $! Could not open $target!";
+    }
+    my $count=0;
+    foreach my $line (@lines){
+        $count++;
+        my $max=$#lines+1;
+           if ($filter_only==1){
+            if ($short==1){
+                if ($count < 10 or $count > $max-10){
+                    print "$line\n";
+                }
+            } else {
+                print "$line\n";
+            }
+        } else {
+            print TARGET "$line\n";
+        }
+        
+    }
+    if ($target ne "---"){
+        close (TARGET);
+    }
+}
+
+
+sub remove_quote {
+    my ($string)=@_;
+    $string=~s/^"//g;
+    $string=~s/"$//g;
+    $string=~s/^ //g;
+    $string=~s/ $//g;
+    return $string;
+}
