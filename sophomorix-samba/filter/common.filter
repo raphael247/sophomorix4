@@ -42,8 +42,11 @@ if ($filter_only==0){
 }
 
 
+# configuration of filter
+
 &read_lines($source);
 
+&remove_quote();
 
 &save_lines($target);
 
@@ -91,10 +94,15 @@ sub save_lines {
 
 
 sub remove_quote {
-    my ($string)=@_;
-    $string=~s/^"//g;
-    $string=~s/"$//g;
-    $string=~s/^ //g;
-    $string=~s/ $//g;
-    return $string;
+    for(@lines){
+        my (@items)=split(/;/);
+        foreach my $item (@items){
+	    $item=~s/^"//g;
+            $item=~s/"$//g;
+            $item=~s/^ //g;
+            $item=~s/ $//g;
+        }
+        $_=join(";",@items);
+
+    }
 }
