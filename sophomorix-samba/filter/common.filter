@@ -48,6 +48,8 @@ if ($filter_only==0){
 
 &remove_quote();
 
+&pick_line(7,"2015/16"); # use only lines where column 7 is 2015/16
+
 &save_lines($target);
 
 
@@ -76,7 +78,9 @@ sub save_lines {
         my $max=$#lines+1;
            if ($filter_only==1){
             if ($short==1){
-                if ($count < 10 or $count > $max-10){
+                if ($count==15){
+                    print "------------ lines removed ------------\n";
+                } elsif ($count < 15 or $count > $max-15){
                     print "$line\n";
                 }
             } else {
@@ -105,4 +109,21 @@ sub remove_quote {
         $_=join(";",@items);
 
     }
+}
+
+
+
+sub pick_line {
+    my @selected=();
+    my ($column,$string)=@_;
+    my $index=$column-1;
+    foreach my $line (@lines){
+        my (@items)=split(/;/,$line);
+        if ($items[$index] eq $string){
+            push @selected, $line;
+        }
+        $_=join(";",@items);
+    }
+    # the selected lines are the new list
+    @lines=@selected;
 }
