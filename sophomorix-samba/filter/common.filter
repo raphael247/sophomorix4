@@ -50,6 +50,8 @@ if ($filter_only==0){
 
 &pick_line(7,"2015/16"); # use only lines where column 7 is 2015/16
 
+&pick_columns("2,3,4,5,6"), # pick the colums used an reorder them if necessary
+
 &save_lines($target);
 
 
@@ -97,6 +99,7 @@ sub save_lines {
 }
 
 
+
 sub remove_quote {
     for(@lines){
         my (@items)=split(/;/);
@@ -126,4 +129,33 @@ sub pick_line {
     }
     # the selected lines are the new list
     @lines=@selected;
+}
+
+
+
+sub pick_columns {
+    my @ordered=();
+    my ($option)=@_;
+    my (@order)=split(/,/,$option);
+    my %save_by_column=();
+    my $new_line="";
+    # save line in hash, key is column number
+    foreach my $line (@lines){
+        %save_by_column=(); # empty
+        my $new_line=""; # empty
+        my (@items)=split(/;/,$line);
+        my $column_count=1;
+        foreach my $item (@items){
+            $save_by_column{$column_count}=$item;
+            $column_count++;
+        }
+        # reassemble the line
+            foreach my $column (@order){
+            #print "$column $save_by_column{$column}\n";
+            $new_line=$new_line.$save_by_column{$column}.";";
+        }
+        push @ordered, $new_line;
+    }
+    # the selected lines are the new list
+    @lines=@ordered;
 }
