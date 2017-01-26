@@ -65,20 +65,24 @@ sophomorix-session -ij --session 2017-01-22_18-03-16
 - wird beim supervisor dessen share angezeigt          OK 22.1.17
 (dummy listen)
 
+Quota listen                                           OK 24.1.17
+- wir nur bei participants angezeigt
+
 ###??????????????????????????????????????????????????###
 TODO: Weiter sophomorix-session:
 Return JSON vollständig: unknown, not_implemented  bei quota, ...
 
-Dummy Quotaangaben - Mehrere Filesysteme
-key   -> Liste     -> key/Value
-quota -> /dev/sda1 -> hard_limit -> xMB
-                   -> soft_limit
-                   -> used -> xMB
-                   -> Comment=Home
-quota -> Comment
-   filesystem-path, Comment, Werte (welche?)
-   hardlimit=unknown
-   gracetime=not_implemented
+
+common filter:
+weiter:
+comment_line(column_nr,string)  kommentiert aus
+drop_line(column_nr,string)  entfernt
+bei string auch regex?
+
+Diesen Filter in school.conf konfigurierbar machen:
+DROP_LINE=6,String
+(nach ini-Umstellung)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 session beenden: 
