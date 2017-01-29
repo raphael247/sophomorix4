@@ -33,18 +33,6 @@ AD_get_AD:
 management=TRUE -> schleife statt 6 einzelne suchen
 
 
-sophomorix-exam: setzt user in KA-modus/oder nicht
-   entsprechend wie managementgroups
-      on user1,user2,...
-Klassenarbeitsmodus setzen raus aus session, rein in sophomorix-exam
-
-beliebige managemengruppen nachher definierbar und mit usern belegbar
-
-sernet kontaktieren wer das macht mit filesystem
-
-ini format, subsections mit '.' getrennt
-
-
 
 Zusätzlicher administrator für sophomorix:
 username: sophomorix-admin
@@ -99,8 +87,74 @@ Quota listen                                           OK 24.1.17
 - wir nur bei participants angezeigt
 
 ###??????????????????????????????????????????????????###
-TODO: Weiter sophomorix-session:
-Return JSON vollständig: unknown, not_implemented  bei quota, ...
+TODO: Weiter workflow
+
+
+sophomorix-exam: setzt user in KA-modus/oder nicht
+   entsprechend wie managementgroups
+      on user1,user2,...
+Klassenarbeitsmodus setzen raus aus session, rein in sophomorix-exam???
+
+
+
+sernet kontaktieren wer das macht mit filesystem OK 29.1.17.
+
+
+
+sophomorix-admin
+--create <adminname> --school global
+Und beim setup:
+sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
+(kommt in Gruppe global-admins)
+
+Andere Schule
+sophomorix-admin --create <admin-name> --school bsz --password <fdrTfdtti>
+(kommt in Gruppe bsz-admins)
+
+
+
+Nach provisioning durch linusmuster-base:
+sophomorix-devel.conf:
+  - user mit dem sophomorix arbeiten soll definieren
+    -> sophomorix-admin
+  - file angeben in dem das Passwort des users steht
+    /etc/linuxmuster/.secret/sophomorix-admin
+
+
+
+
+
+Beliebige managemengruppen erlauben/nachliefern können, z.B. nextcloud 
+1) In Schule managementgruppe bereitstellen
+  - bei AD_school_add hinzu
+    sophomorix-school --create school <school>  (oder --update)
+    sophomorix-school --create-all-schools     (todo, bei Paketinstallation)
+2) Managementgruppen auf default zurücksetzen:
+   Konfiguration in school.conf (ini format, subsections mit '.' getrennt, konfigurierbar)
+   school.conf: Konfiguriere den Default der memberships
+   [group.wifi] # jede Managementgruppe (evtl. später projekte)
+     allow_group=12a,12b,teachers # students
+     allow_users=maierle,muellerle
+     except_users=lucifer   # lucifer ist in 12a
+     except_group=5a  # falls group=students
+     revert_allow_users=maierle,muellerle
+     revert_allow_group=12a,12b,teachers # students
+     revert_except_users=lucifer   # lucifer ist in 12a
+     revert_except_group=5a  # falls group=students
+     revert_cron=...  # Zeile für cronjob
+     # allow:  nur diese user können vom Lehrer hinzugenommen werden
+     # revert: rückstellen auf diesen default
+   -> wifiaccess hat eigentlich 3 Stati:
+      - vom admin erlaubt oder verboten
+      - vom lehrer freischaltbar
+      - default on/off (anlegen, nach KAs, ...)
+
+  sophomorix-managementgroup --revert         -> zurück auf default
+  sophomorix-managementgroup --revert-allow   -> alle möglichen
+
+
+
+
 
 
 common filter:
@@ -119,26 +173,6 @@ session beenden:
 was passiert dann mit den session einstellungen
 (option reset?)
 
-school.conf: Konfiguriere den Default der memberships
-   [group:wifi] # jede Managementgruppe (evtl. später projekte)
-     allow_group=12a,12b,teachers # students
-     allow_users=maierle,muellerle
-     except_users=lucifer   # lucifer ist in 12a
-     except_group=5a  # falls group=students
-     revert_allow_users=maierle,muellerle
-     revert_allow_group=12a,12b,teachers # students
-     revert_except_users=lucifer   # lucifer ist in 12a
-     revert_except_group=5a  # falls group=students
-     revert_cron=...  # Zeile für cronjob
-
-     # allow:  nur diese user können vom Lehrer hinzugenommen werden
-     # revert: rückstellen auf diesen default
-
-   -> wifiaccess hat eigentlich 3 Stati:
-      - vom admin erlaubt oder verboten
-      - vom lehrer freischaltbar
-      - default on/off (anlegen, nach KAs, ...)
-
 
 
 
@@ -146,11 +180,6 @@ school.conf: Konfiguriere den Default der memberships
 Fertig
 
 
-??????????????????????????????????????????????????
-sophomorix-check workflow umsetzen
-
-??????????????????????????????????????????????????
-mail sernet dateisystem  OK 16.1.2017
 
 ??????????????????????????????????????????????????
 sophomorix-device:
