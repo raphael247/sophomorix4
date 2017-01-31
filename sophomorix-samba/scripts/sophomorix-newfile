@@ -20,6 +20,7 @@ use JSON;
 use File::Basename qw( basename
                        dirname
                      ); 
+use Cwd 'abs_path';
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -162,18 +163,12 @@ if (not -f  $newfile){
 
 &print_title("Registering $newfile:");
 
-my $pwd=`pwd`;
-chomp($pwd);
 my $basename = basename($newfile);
-my $parent_dir = dirname($newfile);
-$parent_dir=~s/^\./$pwd/;
-my $newfile_abs=$parent_dir."/".$basename;
+my $newfile_abs = abs_path($newfile);
 my $target="";
-
 my $newfile_log;
 my $etcfile_log;
 my $filter_script;
-
 
 if ($name ne ""){
     if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
@@ -201,10 +196,8 @@ if ($name ne ""){
 
 print "   * Option:          $newfile\n";
 print "   * Newfile:         $basename\n";
-print "   * Name:            $name\n";
-print "   * Pwd:             $pwd\n";
-print "   * Dir of newfile:  $parent_dir\n";
-print "   * Newfile_abs:     $newfile_abs\n";
+print "     * Renamed to:    $name\n";
+print "     * Newfile_abs:     $newfile_abs\n";
 print "   * Target in /etc:  $target\n";
 print "   * Log new file to: $newfile_log\n";
 print "   * Log etc file to: $etcfile_log\n";
