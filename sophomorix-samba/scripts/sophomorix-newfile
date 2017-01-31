@@ -65,12 +65,14 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $filter_only=0;
+my $name="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
            "help|h" => \$help,
+           "name=s" => \$name,
            "filter-only" => \$filter_only,
           );
 
@@ -107,7 +109,7 @@ Options:
 Examples:
     sophomorix-newfile students.csv                         (target according to given file)
     sophomorix-newfile /path/to/students.csv                (target according to given file)
-    sophomorix-newfile somefile.csv --target students.csv   (target as specified)
+    sophomorix-newfile somefile.csv --name students.csv     (target according to given name)
 
     sophomorix-newfile /path/to/students.csv --filter-only   (filtering to stdout)
   
@@ -166,24 +168,40 @@ my $basename = basename($newfile);
 my $parent_dir = dirname($newfile);
 $parent_dir=~s/^\./$pwd/;
 my $newfile_abs=$parent_dir."/".$basename;
-
 my $target="";
 
-if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
+my $newfile_log;
+my $etcfile_log;
+my $filter_script;
+
+
+if ($name ne ""){
+    if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
+        $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'PATH_ABS'};
+        $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$name;
+        $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$name;
+        $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'FILTERSCRIPT'};
+    } else {
+        print "\nERROR: Your --name $name is not a valid filename on this server\n\n";
+        print "   * Please use a valid filename so I can find out where to copy it.\n\n";
+        exit;
+    }
+} elsif (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
     $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'PATH_ABS'};
+    $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$basename;
+    $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$basename;
+    $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
 } else {
     print "\nERROR: Your filename $basename is not a valid filename on this server\n\n";
     print "   * Please rename the file accordingly so I can find out where to copy it.\n\n";
     exit;
 }
 
-my $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$basename;
-my $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$basename;
-my $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
 
 
 print "   * Option:          $newfile\n";
 print "   * Newfile:         $basename\n";
+print "   * Name:            $name\n";
 print "   * Pwd:             $pwd\n";
 print "   * Dir of newfile:  $parent_dir\n";
 print "   * Newfile_abs:     $newfile_abs\n";
