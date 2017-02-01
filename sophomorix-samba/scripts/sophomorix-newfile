@@ -167,26 +167,33 @@ my $basename = basename($newfile);
 my $newfile_abs = abs_path($newfile);
 my $target="";
 my $newfile_log;
+my $newfile_log_filter;
 my $etcfile_log;
 my $filter_script;
 
 if ($name ne ""){
+    # option --name ....
     if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
         $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'PATH_ABS'};
         $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$name;
+        $newfile_log_filter=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$name.".filter";
         $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$name;
         $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'FILTERSCRIPT'};
     } else {
+        # --name with wrong filename
         print "\nERROR: Your --name $name is not a valid filename on this server\n\n";
         print "   * Please use a valid filename so I can find out where to copy it.\n\n";
         exit;
     }
 } elsif (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
+    # valid filename
     $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'PATH_ABS'};
     $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$basename;
+    $newfile_log_filter=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$basename.".filter";
     $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$basename;
     $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
 } else {
+    # not valid filename
     print "\nERROR: Your filename $basename is not a valid filename on this server\n\n";
     print "   * Please rename the file accordingly so I can find out where to copy it.\n\n";
     exit;
@@ -194,14 +201,15 @@ if ($name ne ""){
 
 
 
-print "   * Option:          $newfile\n";
-print "   * Newfile:         $basename\n";
-print "     * Renamed to:    $name\n";
-print "     * Newfile_abs:     $newfile_abs\n";
-print "   * Target in /etc:  $target\n";
-print "   * Log new file to: $newfile_log\n";
-print "   * Log etc file to: $etcfile_log\n";
-print "   * Filter:          $filter_script\n";
+print "   * Option:           $newfile\n";
+print "   * Newfile:          $basename\n";
+print "     * Renamed to:       $name\n";
+print "     * Newfile_abs:      $newfile_abs\n";
+print "   * Target in /etc:   $target\n";
+print "   * Log new file to:  $newfile_log\n";
+print "     * filtered:       $newfile_log_filter\n";
+print "   * Log etc file to:  $etcfile_log\n";
+print "   * Filter:           $filter_script\n";
 
 
 # to do:
@@ -230,38 +238,56 @@ my $mkdir_command_2="mkdir -p $DevelConf::path_log_etcfiles";
 print "   $mkdir_command_2\n";
 system($mkdir_command_2);
 
-    if ($filter_script eq "---"){
-	my $command_1="cp $target $etcfile_log";
+if ($filter_script eq "---"){
+    # no filter script
+    # backup
+    if (-e $target){
+        my $command_1="cp $target $etcfile_log";
         print "   $command_1\n";
         system($command_1);
+    }
 
-	my $command_2="cp $newfile_abs $target";
-        print "   $command_2\n";
-        system($command_2);
+    # newfile to /etc
+    my $command_2="cp $newfile_abs $target";
+    print "   $command_2\n";
+    system($command_2);
 
-	my $command_3="mv $newfile_abs $newfile_log";
+    # newfile to log
+    my $command_3="mv $newfile_abs $newfile_log";
+    print "   $command_3\n";
+    system($command_3);
+} elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
+    print "\nERROR: The configured Filter is not an executable script:\n";
+    print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
+    print "\n";
+    exit;
+} else {
+    # filter script is executable, when in config hash -> run it
+    # backup
+    if (-e $target){
+        my $command_1="cp $target $etcfile_log";
+        print "   $command_1\n";
+        system($command_1);
+    }
+
+    # newfile to /etc, using filter
+    my $command_2="$filter_script $newfile_abs $target";
+    print "   $command_2\n";
+    system($command_2);
+
+    # filtered newfile to log
+    if (-e $target){
+        my $command_3="cp $target $newfile_log_filter";
         print "   $command_3\n";
         system($command_3);
+    }
 
- 
-#            print "   cp $target\n     ---> $etcfile_log\n";
-#            print "   cp $newfile_abs\n     ---> $target\n";
-#            print "   mv $newfile_abs\n     ---> $newfile_log\n";
-    } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
-        print "\nERROR: The configured Filter is not an executable script:\n";
-        print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
-        print "\n";
-        exit;
-    } else {
+    # unfiltered newfile to log
+    my $command_4="mv $newfile_abs $newfile_log";
+    print "   $command_4\n";
+    system($command_4);
 
-        # filter script is executable, when in config hash -> run it
-        #my $filter_script_filename = basename($filter_script);
-        #my $filter_log_file=$DevelConf::path_conf_tmp."/".$filename."_".$filter_script_filename.".log";
-        #print "   * Filtering $filename: $filter_script\n";
-        #print "     * Logging to: $filter_log_file\n";
-        #print "     * Logging to: $filter_log_file\n";
-        #system("$filter_script > $filter_log_file  2>&1");
-    } 
+} 
 
 
 
