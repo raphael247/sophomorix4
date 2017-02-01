@@ -183,6 +183,7 @@ if ($name ne ""){
         # --name with wrong filename
         print "\nERROR: Your --name $name is not a valid filename on this server\n\n";
         print "   * Please use a valid filename so I can find out where to copy it.\n\n";
+        &print_valid_filenames;
         exit;
     }
 } elsif (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
@@ -196,6 +197,7 @@ if ($name ne ""){
     # not valid filename
     print "\nERROR: Your filename $basename is not a valid filename on this server\n\n";
     print "   * Please rename the file accordingly so I can find out where to copy it.\n\n";
+    &print_valid_filenames;
     exit;
 }
 
@@ -211,18 +213,14 @@ print "     * filtered:       $newfile_log_filter\n";
 print "   * Log etc file to:  $etcfile_log\n";
 print "   * Filter:           $filter_script\n";
 
-
-# to do:
-
-# list valid filenames on error
-
-
-
 ## --filter-only
-if ($filter_only==1){
-
-
-
+if ($filter_only==1 and $filter_script ne "---"){
+    my $command="$filter_script --filter --short $newfile_abs $target";
+    print "   $command\n";
+    system($command);
+    exit;
+} elsif ($filter_only==1) {
+    print "\nERROR: No filter script defined\n\n";
     exit;
 }
 
@@ -303,3 +301,16 @@ if ($filter_script eq "---"){
 ################################################################################
 # Sub
 ################################################################################
+
+sub print_valid_filenames{
+    my @list=();
+    foreach my $key (keys %{$sophomorix_config{'FILES'}{'USER_FILE'}}) {
+	push @list, $key;
+    }
+    @list=sort @list;
+    print "   * Valid files/names are:\n";
+    foreach my $file (@list){
+        print "      * $file\n";
+    }
+}
+
