@@ -116,7 +116,7 @@ my %convert_month = qw(
 my %firstnames_data=();
 my %firstnames_errors=();
 my %encoding_check_results=();
-my @encodings_to_check=("utf8","ISO_8859-1");
+my @encodings_to_check=("UTF8","ISO_8859-1");
 
 my @loglines=();
 
@@ -311,37 +311,41 @@ if ($analyze_encoding ne ""){
 # ============================================================
 # copy or filter files
 # ============================================================
-&Sophomorix::SophomorixBase::print_title("Copying/Filtering files to $DevelConf::path_conf_tmp");
-foreach my  $user_file (@filelist){
-    my $filename = basename($user_file);
-    my $source=$user_file;
-    my $targer_dir=
-    my $target=
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FILTERTARGET'};
-    my $filter_script=
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FILTERSCRIPT'};
+
+# not copying or filtering:
+
+
+# &Sophomorix::SophomorixBase::print_title("Copying/Filtering files to $DevelConf::path_conf_tmp");
+# foreach my  $user_file (@filelist){
+#     my $filename = basename($user_file);
+#     my $source=$user_file;
+#     my $targer_dir=
+#     my $target=
+#         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FILTERTARGET'};
+#     my $filter_script=
+#         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FILTERSCRIPT'};
     
-    system("mkdir -p $DevelConf::path_conf_tmp");
-    if ($filter_script eq "---"){
-        print "   * Copying $filename\n";
-        if($Conf::log_level>=2){
-            print "cp $source\n  ---> $target\n";
-        }
-        system("cp $source $target");
-    } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
-        print "\nERROR: The configured Filter is not an executable script:\n";
-        print "   <$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}>\n";
-        print "\n";
-        exit;
-    } else {
-        # filter script is executable, when in config hash -> run it
-        my $filter_script_filename = basename($filter_script);
-        my $filter_log_file=$DevelConf::path_conf_tmp."/".$filename."_".$filter_script_filename.".log";
-        print "   * Filtering $filename: $filter_script\n";
-        print "     * Logging to: $filter_log_file\n";
-        system("$filter_script > $filter_log_file  2>&1");
-    } 
-}
+#     system("mkdir -p $DevelConf::path_conf_tmp");
+#     if ($filter_script eq "---"){
+#         print "   * Copying $filename\n";
+#         if($Conf::log_level>=2){
+#             print "cp $source\n  ---> $target\n";
+#         }
+#         system("cp $source $target");
+#     } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
+#         print "\nERROR: The configured Filter is not an executable script:\n";
+#         print "   <$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}>\n";
+#         print "\n";
+#         exit;
+#     } else {
+#         # filter script is executable, when in config hash -> run it
+#         my $filter_script_filename = basename($filter_script);
+#         my $filter_log_file=$DevelConf::path_conf_tmp."/".$filename."_".$filter_script_filename.".log";
+#         print "   * Filtering $filename: $filter_script\n";
+#         print "     * Logging to: $filter_log_file\n";
+#         system("$filter_script > $filter_log_file  2>&1");
+#     } 
+# }
 
 
 # ============================================================
@@ -350,34 +354,42 @@ foreach my  $user_file (@filelist){
 &reading_firstnames();
 &reading_firstname_errors();
 foreach my  $user_file (@filelist){
-    my $filename = basename($user_file);
-    my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
+#    my $filename = basename($user_file);
+#    my $user_file_atmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
     # file in tmp    
-    &analyze_encoding($user_file,$user_file_tmp);
+#    &analyze_encoding($user_file,$user_file_tmp);
+    &analyze_encoding($user_file,$user_file);
 }
 
 
 # ============================================================
 # reading and checking all filtered user files
 # ============================================================
+system("mkdir -p $DevelConf::path_conf_tmp");
 foreach my $user_file (@filelist){
     my $count=0;
     my $filename = basename($user_file);
-    my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
+#    my $user_file_tmp=$DevelConf::path_conf_tmp."/".$filename.".filter";
+    my $user_file_utf8=$DevelConf::path_conf_tmp."/".$filename.".utf8";
     # fetching some config data
     $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
 
     # file in tmp    
-    &print_title("Reading $user_file_tmp");
+#    &print_title("Reading $user_file_tmp");
     my $enc_used=&get_encoding($filename);
-    open(USERS,"$user_file_tmp") || 
-         die "ERROR: $user_file_tmp not found!";  
+#    open(USERS,"$user_file_tmp") || 
+#         die "ERROR: $user_file_tmp not found!";  
+    &print_title("Reading $user_file");
+    open(USERS,"$user_file") || 
+         die "ERROR: $user_file not found!";  
+    open(USERSUTF8,">$user_file_utf8") || 
+         die "ERROR: $user_file_utf8 not found!";  
     while(<USERS>){
         $count++;
-        &analyze_user_line($_,$user_file,$user_file_tmp,
-                           $filename,$school,$count,$enc_used);
+        &analyze_user_line($_,$user_file,$filename,$school,$count,$enc_used);
     }
     close(USERS);
+    close(USERSUTF8);
 }
 
 
@@ -963,7 +975,7 @@ sub edit_distance {
 # checking stuff
 ################################################################################
 sub analyze_user_line {
-    my ($line,$file_abs,$file_abs_tmp,$filename,$school,$count,$enc_used) = @_;
+    my ($line,$file_abs,$filename,$school,$count,$enc_used) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -1000,6 +1012,7 @@ sub analyze_user_line {
         my $identifier_ascii=join(";", ($last_ascii,$first_ascii,$birthdate));
         # corrected line
         my $line_new=join(";", ($class,$last_utf8,$first_utf8,$birthdate,$unid));
+        print USERSUTF8 $line_new."\n";
 
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
@@ -1052,6 +1065,7 @@ sub analyze_user_line {
         $Match{'action'}{$line_new}{'role'}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
 	$Match{'action'}{$line_new}{'unid'}=$unid;
+
 
         # status for the user 
         # ????????? calulate from schools,conf
@@ -1396,7 +1410,7 @@ sub print_analyzed_encoding {
     # print valid firstnames
     if($Conf::log_level>=2){
     print "\nValid firstnames: ",
-          "($encoding_check_results{$file}{'firstnames'}{'result'} ---> utf8)\n";
+          "($encoding_check_results{$file}{'firstnames'}{'result'} ---> ut8)f\n";
     print "==========================================================================\n";
     foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} } ){
         printf  "%-20s %-12s %-20s\n",
