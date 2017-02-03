@@ -718,6 +718,8 @@ sub AD_user_create {
     my $deactivationdate = $arg_ref->{deactivationdate};
     my $status = $arg_ref->{status};
     my $file = $arg_ref->{file};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
 
     if($Conf::log_level>=1){
         print "\n";
@@ -759,6 +761,16 @@ sub AD_user_create {
 
     my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    # ou for administrators
+    if ($role eq "administrator"){
+        if ($school eq $DevelConf::AD_global_ou){
+            $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
+	    $dn="cn=".$login.",".$dn_class;
+        } else {
+            $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
+	    $dn="cn=".$login.",".$dn_class;
+        }
+    }
 
     # password generation
     my $uni_password=&_unipwd_from_plainpwd($plain_password);
@@ -1278,6 +1290,7 @@ sub AD_get_name_tokened {
         $role eq "computer" or
         $role eq "project" or
         $role eq "management" or
+        $role eq "administrator" or
         $role eq "sophomorix-group"){
         if ($school eq "---" 
             or $school eq ""

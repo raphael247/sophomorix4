@@ -1,0 +1,197 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-admin) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# ===========================================================================
+# Bibliotheken
+# ===========================================================================
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+
+#use Sophomorix::SophomorixConfig;
+#use Sophomorix::SophomorixBase;
+#use Sophomorix::SophomorixAPI;
+#use Sophomorix::SophomorixPgLdap;
+#use DBI;
+#use Net::LDAP;
+use Net::LDAP;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 remove_from_list
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_add
+                                 AD_bind_admin
+                                 AD_dns_get
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_kill
+                                 AD_group_addmember
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_class_fetch
+                                 AD_project_fetch
+                                 AD_group_update
+                                 AD_project_sync_members
+                                 AD_dn_fetch_multivalue
+                                 AD_group_list
+                                 get_forbidden_logins
+                                    );
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $create="";
+my $school="";
+my $password="";
+
+my $reset_class="";
+$Conf::log_level=1;
+
+
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "create|c=s" => \$create,
+           "school|s=s" => \$school,
+           "password=s" => \$password,
+           "verbose|v+" => \$Conf::log_level,
+          );
+
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlbeschreibung
+   print('
+sophomorix-admin adds admins to the admin managementgroups
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+# create a the global-admin (for linuxmuster-base):
+sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
+
+# create another global-admin
+sophomorix-admin --create <name-of-admin> --school global --password <fdrTfdtti>
+
+Please see the sophomorix--admin(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+############################################################
+# config values
+############################################################
+
+# --info
+if ($info==1){
+    print "todo: List all admins on this server\n"; 
+}
+&log_script_start(@arguments);
+
+
+# ===========================================================================
+# Programmbeginn
+# ===========================================================================
+
+# --create <user>
+if ($create ne "" and $school ne "" and $password ne ""){
+    my $group_basename="admins";
+    my $group_token=&AD_get_name_tokened($group_basename,$school,"administrators");
+    if ($school eq "global"){ # uppercase
+        $school=$DevelConf::AD_global_ou;
+    }
+
+   &AD_user_create({ldap=>$ldap,
+                    root_dse=>$root_dse, 
+                    root_dns=>$root_dns, 
+                    user_count=>"1",
+                    login=>$create,
+                    group=>$group_token,
+                    group_basename=>$group_basename,
+                    firstname_ascii=>"---",
+                    surname_ascii=>"---",
+                    firstname_utf8=>"---",
+                    surname_utf8=>"---",
+                    birthdate=>"---",
+                    plain_password=>$password,
+#                    uidnumber_wish=>$uidnumber_wish,
+#                    gidnumber_wish=>$gidnumber_wish,
+                    role=>"administrator",
+                    type=>"sophomorixadmin",
+                    school=>$school,
+                    creationdate=>$time_stamp_AD,
+                    tolerationdate=>"---",
+                    deactivationdate=>"---",
+                    status=>"p",
+                    file=>"no file",
+                    sophomorix_config=>\%sophomorix_config,
+                  });
+
+
+
+
+
+} elsif ($create ne "" and ($school eq "" or $password eq "")){
+    print "\nERROR: A school and passord is needed to create the admin $create\n\n";
+} 
+
+
+
+
+# ===========================================================================
+# Ende des Scripts
+# ===========================================================================
+&AD_unbind_admin($ldap);
+&log_script_end(@arguments);
+
+
+
+
+
+
+

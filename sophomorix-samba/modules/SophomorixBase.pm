@@ -777,6 +777,10 @@ sub config_sophomorix_read {
     # Management groups: wifi,internet,admins
     ###############################################
     # GLOBAL
+    # OU for Administrators
+    $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
+        $DevelConf::AD_management_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
+
     # my @grouplist=("examaccounts","wifi","internet");
     my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
     foreach my $group (@grouplist){
@@ -809,6 +813,10 @@ sub config_sophomorix_read {
 
     # SCHOOLS
     foreach my $ou (keys %{$sophomorix_config{'SCHOOLS'}}) {
+        # OU for Administrators
+        $sophomorix_config{'SCHOOLS'}{$ou}{ADMINS}{OU}=
+            $DevelConf::AD_management_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
+
         # my @grouplist=("examaccounts","wifi","internet");
         my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
         foreach my $group (@grouplist){
