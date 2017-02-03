@@ -86,7 +86,20 @@ sophomorix-session -ij --session 2017-01-22_18-03-16
 Quota listen                                           OK 24.1.17
 - wir nur bei participants angezeigt
 
-TODO: Weiter workflow                                  OK 2.2.17
+Workflow                                               OK 2.2.17
+
+sophomorix-admin
+--create <adminname> --school global
+Und beim setup:
+sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
+(kommt in Gruppe global-admins)
+
+Andere Schule
+sophomorix-admin --create <admin-name> --school bsz --password <fdrTfdtti>
+(kommt in Gruppe bsz-admins)
+                                                      OK 3.2.17
+
+
 
 ###??????????????????????????????????????????????????###
 
@@ -101,19 +114,6 @@ Klassenarbeitsmodus setzen raus aus session, rein in sophomorix-exam???
 sernet kontaktieren wer das macht mit filesystem OK 29.1.17.
 
 
-
-sophomorix-admin
---create <adminname> --school global
-Und beim setup:
-sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
-(kommt in Gruppe global-admins)
-
-Andere Schule
-sophomorix-admin --create <admin-name> --school bsz --password <fdrTfdtti>
-(kommt in Gruppe bsz-admins)
-
-
-
 Nach provisioning durch linusmuster-base:
 sophomorix-devel.conf:
   - user mit dem sophomorix arbeiten soll definieren
@@ -121,6 +121,11 @@ sophomorix-devel.conf:
   - file angeben in dem das Passwort des users steht
     /etc/linuxmuster/.secret/sophomorix-admin
 
+
+sophomorix-admin
+
+- tests schreiben test-1
+- admins löschen, auflisten
 
 
 
