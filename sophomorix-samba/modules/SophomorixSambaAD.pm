@@ -763,7 +763,8 @@ sub AD_user_create {
     my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     # ou for administrators
     if ($role eq "administrator"){
-        if ($school eq $DevelConf::AD_global_ou){
+        # bei global muss im hash in GLOBAL gesucht werden 
+        if ($school eq $DevelConf::AD_global_ou or $school eq "global"){
             $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
 	    $dn="cn=".$login.",".$dn_class;
         } else {
@@ -862,6 +863,15 @@ sub AD_user_create {
     my @grouplist=("wifi","internet","webfilter","intranet","printing");
     foreach my $group (@grouplist){
         my $management_group=&AD_get_name_tokened($group,$school,"management");
+        &AD_group_addmember_management({ldap => $ldap,
+                                        root_dse => $root_dse, 
+                                        group => $management_group,
+                                        addmember => $login,
+                                       }); 
+    }
+    # add administrators to admin group
+    if ($role eq "administrator"){
+        my $management_group=&AD_get_name_tokened("admins",$school,"management");
         &AD_group_addmember_management({ldap => $ldap,
                                         root_dse => $root_dse, 
                                         group => $management_group,

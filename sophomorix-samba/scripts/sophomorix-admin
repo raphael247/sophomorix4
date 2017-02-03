@@ -142,11 +142,8 @@ if ($info==1){
 if ($create ne "" and $school ne "" and $password ne ""){
     my $group_basename="admins";
     my $group_token=&AD_get_name_tokened($group_basename,$school,"administrators");
-    if ($school eq "global"){ # uppercase
-        $school=$DevelConf::AD_global_ou;
-    }
 
-   &AD_user_create({ldap=>$ldap,
+    &AD_user_create({ldap=>$ldap,
                     root_dse=>$root_dse, 
                     root_dns=>$root_dns, 
                     user_count=>"1",
@@ -171,10 +168,6 @@ if ($create ne "" and $school ne "" and $password ne ""){
                     file=>"no file",
                     sophomorix_config=>\%sophomorix_config,
                   });
-
-
-
-
 
 } elsif ($create ne "" and ($school eq "" or $password eq "")){
     print "\nERROR: A school and passord is needed to create the admin $create\n\n";

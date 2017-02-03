@@ -1296,6 +1296,9 @@ sub get_homedirectory {
     } elsif ($role eq "teacher"){
         $homedirectory="\\\\".$root_dns."\\".$school."\\teachers\\homes\\".$user;
         $unix_home="/home/schools/".$school."/teachers/homes/".$user;
+    } elsif ($role eq "administrator"){
+        $homedirectory="\\\\".$root_dns."\\".$school."\\management\\homes\\".$user;
+        $unix_home="/home/schools/".$school."/management/homes/".$user;
     } else {
         $homedirectory="\\\\".$root_dns."\\".$school."\\unknown\\".$group_basename."\\homes\\".$user;
         $unix_home="/home/schools/".$school."/unknown/".$group_basename."/homes/".$user;
