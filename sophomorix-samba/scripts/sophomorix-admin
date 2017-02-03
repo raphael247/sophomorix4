@@ -140,6 +140,16 @@ if ($info==1){
 
 # --create <user>
 if ($create ne "" and $school ne "" and $password ne ""){
+    # test if school exists
+    if ($school eq "global"){
+        # is ok
+    } elsif (exists $sophomorix_config{'SCHOOLS'}{$school}){
+        # is ok
+    } else {
+        print "\nERROR: School $school is not a valid school on this server\n\n";
+        exit;
+    }
+
     my $group_basename="admins";
     my $group_token=&AD_get_name_tokened($group_basename,$school,"administrators");
 
@@ -171,6 +181,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
 
 } elsif ($create ne "" and ($school eq "" or $password eq "")){
     print "\nERROR: A school and passord is needed to create the admin $create\n\n";
+    exit;
 } 
 
 
