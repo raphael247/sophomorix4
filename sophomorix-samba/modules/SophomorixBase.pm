@@ -290,8 +290,6 @@ sub config_sophomorix_read {
     }
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
-
-
     # Adding some defaults:
     $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
         "adminclass";
