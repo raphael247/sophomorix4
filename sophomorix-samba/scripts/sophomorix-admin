@@ -54,6 +54,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_project_sync_members
                                  AD_dn_fetch_multivalue
                                  AD_group_list
+                                 AD_admin_list
                                  get_forbidden_logins
                                     );
 my @arguments = @ARGV;
@@ -129,8 +130,9 @@ Please see the sophomorix--admin(8) man pages for full documentation
 
 # --info
 if ($info==1){
-    print "todo: List all admins on this server\n"; 
+    &AD_admin_list($ldap,$root_dse);
 }
+
 &log_script_start(@arguments);
 
 
@@ -147,11 +149,20 @@ if ($create ne "" and $school ne "" and $password ne ""){
         # is ok
     } else {
         print "\nERROR: School $school is not a valid school on this server\n\n";
+        &print_valid_schools;
         exit;
     }
 
     my $group_basename="admins";
     my $group_token=&AD_get_name_tokened($group_basename,$school,"administrators");
+
+    # make sure school exists
+    &AD_school_add({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    school=>$school,
+                    creationdate=>$time_stamp_AD,
+                    sophomorix_config=>\%sophomorix_config,
+                  });
 
     &AD_user_create({ldap=>$ldap,
                     root_dse=>$root_dse, 
@@ -166,8 +177,6 @@ if ($create ne "" and $school ne "" and $password ne ""){
                     surname_utf8=>"---",
                     birthdate=>"---",
                     plain_password=>$password,
-#                    uidnumber_wish=>$uidnumber_wish,
-#                    gidnumber_wish=>$gidnumber_wish,
                     role=>"administrator",
                     type=>"sophomorixadmin",
                     school=>$school,
@@ -185,17 +194,22 @@ if ($create ne "" and $school ne "" and $password ne ""){
 } 
 
 
-
-
 # ===========================================================================
 # Ende des Scripts
 # ===========================================================================
 &AD_unbind_admin($ldap);
 &log_script_end(@arguments);
 
-
-
-
-
-
-
+# subs
+sub print_valid_schools{
+    my @list=();
+    foreach my $key (keys %{$sophomorix_config{'SCHOOLS'}}) {
+	push @list, $key;
+    }
+    @list=sort @list;
+    push @list, "global";
+    print "   * Valid schools on are:\n";
+    foreach my $file (@list){
+        print "      * $file\n";
+    }
+}

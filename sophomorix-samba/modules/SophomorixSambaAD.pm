@@ -58,6 +58,7 @@ $Data::Dumper::Terse = 1;
             AD_dn_fetch_multivalue
             AD_project_sync_members
             AD_group_list
+            AD_admin_list
             AD_object_move
             AD_debug_logdump
             AD_login_test
@@ -3314,6 +3315,39 @@ sub AD_project_sync_members {
     } else {
         print "ERROR: Sync failed: $max_pro projects found\n";
     }
+}
+
+
+
+sub AD_admin_list {
+    my ($ldap,$root_dse)=@_;
+    # sophomorix students,teachers from ldap
+    my $mesg = $ldap->search( # perform a search
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => '(&(objectClass=user) (sophomorixRole=administrator))',
+                      attrs => ['sAMAccountName',
+                                'sophomorixAdminClass',
+                                'givenName',
+                                'sn',
+                                'sophomorixStatus',
+                                'sophomorixSchoolname',
+                                'sophomorixSchoolPrefix',
+                                'sophomorixRole',
+                                'userAccountControl',
+                               ]);
+    my $max_user = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_user sophomorix administrators found in AD");
+    print "+------------------------+----------------+\n";
+    printf "| %-22s | %-14s |\n","administrator","School";
+    print "+------------------------+----------------+\n";
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $school=$entry->get_value('sophomorixSchoolname');
+        printf "| %-22s | %-14s |\n",$sam,$school;
+    }
+    print "+------------------------+----------------+\n";
 }
 
 
