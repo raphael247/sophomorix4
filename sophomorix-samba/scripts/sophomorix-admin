@@ -157,12 +157,18 @@ if ($create ne "" and $school ne "" and $password ne ""){
     my $group_token=&AD_get_name_tokened($group_basename,$school,"administrators");
 
     # make sure school exists
+    my $school_provide;
+    if ($school eq "global"){
+        $school_provide=$DevelConf::name_default_school;
+    } else {
+        $school_provide=$school;
+    }
     &AD_school_add({ldap=>$ldap,
                     root_dse=>$root_dse,
-                    school=>$school,
+                    school=>$school_provide,
                     creationdate=>$time_stamp_AD,
                     sophomorix_config=>\%sophomorix_config,
-                  });
+                 });
 
     &AD_user_create({ldap=>$ldap,
                     root_dse=>$root_dse, 
