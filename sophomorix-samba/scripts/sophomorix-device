@@ -296,7 +296,7 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 # Reading Configuration
-my $smb_pwd=&AD_get_passwd(); # needed for using samba-tool
+my $smb_pwd=&AD_get_passwd($DevelConf::sophomorix_admin,$DevelConf::secret_file_sophomorix_admin); # needed for using samba-tool
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);

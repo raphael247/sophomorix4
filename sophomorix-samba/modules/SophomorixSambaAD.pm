@@ -74,26 +74,39 @@ $Data::Dumper::Terse = 1;
             );
 
 sub AD_get_passwd {
-    my $smb_pwd="";
-    if (-e $DevelConf::file_samba_pwd) {
-        open (SECRET, $DevelConf::file_samba_pwd);
+    my ($user,$pwd_file)=@_;
+    my $password="";
+    if (-e $pwd_file) {
+        open (SECRET, $pwd_file);
         while(<SECRET>){
-            $smb_pwd=$_;
-            chomp($smb_pwd);
+            $password=$_;
+            chomp($password);
         }
         close(SECRET);
     } else {
-        print "Password of samba Administrator must ",
-               "be in $DevelConf::file_samba_pwd\n";
+        print "Password of samba user $user must ",
+               "be in $pwd_file\n";
         exit;
     }
-    return($smb_pwd);
+    return($password);
 }
 
 
 
 sub AD_bind_admin {
-    my ($smb_pwd)=&AD_get_passwd();
+    if (not -e $DevelConf::secret_file_sophomorix_admin){
+        print "\nERROR: Connection to AD failed: No password found!\n\n";
+        print "sophomorix connects to AD with the user $DevelConf::sophomorix_admin:\n";
+        print "  A) Make sure $DevelConf::sophomorix_admin exists:\n";
+        print "     samba-tool user create $DevelConf::sophomorix_admin %Muster!% \n";
+        print "     (Replace Muster! according to: samba-tool domain passwordsettings show)\n";
+        print "  B) Store the Password of $DevelConf::sophomorix_admin (without newline character) in:\n";
+        print "     $DevelConf::secret_file_sophomorix_admin\n";
+        print "\n";
+        exit;
+    }
+
+    my ($smb_pwd)=&AD_get_passwd($DevelConf::sophomorix_admin,$DevelConf::secret_file_sophomorix_admin);
     my $host="ldaps://localhost";
     # check connection to Samba4 AD
     if($Conf::log_level>=3){
@@ -127,10 +140,13 @@ sub AD_bind_admin {
     }
 
     # admin bind
-    my $admin_dn="CN=Administrator,CN=Users,".$root_dse;
-    my $mesg = $ldap->bind($admin_dn, password => $smb_pwd);
+    my $sophomorix_admin_dn="CN=".$DevelConf::sophomorix_admin.",CN=Users,".$root_dse;
+    if($Conf::log_level>=2){
+        print "Binding with $sophomorix_admin_dn\n";
+    }
+    my $mesg = $ldap->bind($sophomorix_admin_dn, password => $smb_pwd);
     # show errors from bind
-    $mesg->code && die $mesg->error;
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
     # Testing if sophomorix schema is present
     # ldbsearch -H ldap://localhost -UAdministrator%Muster! -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User
@@ -237,7 +253,7 @@ sub AD_dns_create {
     
     # adding dnsNode with samba-tool
     my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
-                " --password='$smb_pwd' -U Administrator";
+                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "$command\n";
     system($command);
 
@@ -290,7 +306,7 @@ sub AD_dns_zonecreate {
     }
 
     # adding dnsNode with samba-tool
-    my $command="  samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U Administrator";
+    my $command="  samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "$command\n";
     system($command);
 
@@ -329,7 +345,7 @@ sub AD_dns_kill {
         $dns_type="A";
     }
 
-    my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U Administrator";
+    my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "     * $command\n";
     system($command);
 }
@@ -348,7 +364,7 @@ sub AD_dns_zonekill {
         $dns_server="localhost";
     }
 
-    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U Administrator";
+    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "   * $command\n";
     system($command);
 }
@@ -512,7 +528,6 @@ sub AD_computer_create {
 #                   'objectclass' => \@objectclass,
                            ]
                            );
-    $result->code && warn "Failed to add entry: ", $result->error ;
     &AD_debug_logdump($result,2,(caller(0))[3]);
 }
 
@@ -858,7 +873,6 @@ sub AD_user_create {
 #                   'objectclass' => \@objectclass,
                            ]
                            );
-    $result->code && warn "Failed to add entry: ", $result->error ;
     &AD_debug_logdump($result,2,(caller(0))[3]);
     # add user to management groups (not tonadmin)
     my @grouplist=("wifi","internet","webfilter","intranet","printing");
@@ -1386,7 +1400,6 @@ sub AD_get_container {
 
 
 sub AD_school_add {
-    # if $result->code is not given, the add is silent
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -1404,9 +1417,11 @@ sub AD_school_add {
     my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
     my $result1 = $ldap->add($schools_ou,
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    &AD_debug_logdump($result1,2,(caller(0))[3]);
+
     my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
+    &AD_debug_logdump($result1,2,(caller(0))[3]);
     ############################################################
     # sub ou's for OU=*    
     if($Conf::log_level>=2){
@@ -1417,17 +1432,20 @@ sub AD_school_add {
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
     foreach my $sub_ou (keys %{$ref_sophomorix_config->{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}}) {
         my $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (DEVELCONF_SCHOOL_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
     foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_OU'}}) {
         print "      * DN: $dn (GROUP_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
     ############################################################
@@ -1439,6 +1457,7 @@ sub AD_school_add {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
         my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
@@ -1463,7 +1482,7 @@ sub AD_school_add {
     # OU=GLOBAL
     my $result3 = $ldap->add($ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
+    &AD_debug_logdump($result3,2,(caller(0))[3]);
     ############################################################
     # sub ou's for OU=GLOBAL    
     if($Conf::log_level>=2){
@@ -1474,17 +1493,20 @@ sub AD_school_add {
         $dn=$sub_ou.",".$ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP};
         print "      * DN: $dn (RT_GLOBAL_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
     foreach my $sub_ou (keys %{$ref_sophomorix_config->{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}}) {
         my $dn=$sub_ou.",".$ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP};
         print "      * DN: $dn (DEVELCONF_GLOBAL_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
     foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_OU'}}) {
         print "      * DN: $dn (GROUP_OU)\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
     ############################################################
@@ -1496,6 +1518,7 @@ sub AD_school_add {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
         $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result,2,(caller(0))[3]);
         my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
@@ -3612,7 +3635,6 @@ sub AD_group_create {
 
         # make sure target ou exists
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
         my $result = $ldap->add( $dn,
@@ -3638,7 +3660,6 @@ sub AD_group_create {
                                                       'group' ],
                                 ]
                             );
-        $result->code && warn "failed to add entry: ", $result->error ;
         &AD_debug_logdump($result,2,(caller(0))[3]);
     } else {
         print "   * Group $group exists already ($count results)\n";
@@ -3915,10 +3936,24 @@ sub  get_forbidden_logins{
 sub AD_debug_logdump {
     # dumping ldap message object in loglevels
     my ($message,$level,$text) = @_;
-    if($Conf::log_level>=$level){
-        if ( $message->code) { # 0: no error
-            print "   Debug info from server($text):\n";
-            print Dumper(\$message);
+    my $string=$message->error;
+    if ($string=~/.*: Success/ or $string eq "Success"){
+        # ok
+    } elsif ($string=~/Entry .* already exists/){
+        # not so bad, just display it
+        #print "         * OK: $string\n";
+    } elsif ($string=~/Attribute member already exists for target/){
+        # not so bad, just display it
+        #print "         * OK: $string\n";
+    } else {
+        # bad error
+        print "\nERROR in $text:\n";
+        print "   $string\n\n";
+        if($Conf::log_level>=$level){
+            if ( $message->code) { # 0: no error
+                print "   Debug info from server($text):\n";
+                print Dumper(\$message);
+            }
         }
     }
 }
