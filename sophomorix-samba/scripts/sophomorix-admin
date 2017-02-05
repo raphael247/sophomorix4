@@ -181,27 +181,32 @@ if ($create ne "" and $school ne "" and $password ne ""){
                     sophomorix_config=>\%sophomorix_config,
                  });
 
+    my $sn="Admin";
+    my $given_name=$school;
+    if ($school eq "global"){
+        $given_name="Global";
+    }
     &AD_user_create({ldap=>$ldap,
-                    root_dse=>$root_dse, 
-                    root_dns=>$root_dns, 
-                    user_count=>"1",
-                    login=>$create,
-                    group=>$group_token,
-                    group_basename=>$group_basename,
-                    firstname_ascii=>"---",
-                    surname_ascii=>"---",
-                    firstname_utf8=>"---",
-                    surname_utf8=>"---",
-                    birthdate=>"---",
-                    plain_password=>$password,
-                    role=>"administrator",
-                    type=>"sophomorixadmin",
-                    school=>$school,
-                    creationdate=>$time_stamp_AD,
-                    tolerationdate=>"---",
-                    deactivationdate=>"---",
-                    status=>"p",
-                    file=>"no file",
+                    root_dse => $root_dse, 
+                    root_dns => $root_dns, 
+                    user_count => "1",
+                    login => $create,
+                    group => $group_token,
+                    group_basename => $group_basename,
+                    firstname_ascii => $given_name,
+                    surname_ascii => $sn,
+                    firstname_utf8 => $given_name,
+                    surname_utf8 => $sn,
+                    birthdate => "---",
+                    plain_password => $password,
+                    role => "administrator",
+                    type => "sophomorixadmin",
+                    school => $school,
+                    creationdate => $time_stamp_AD,
+                    tolerationdate => "---",
+                    deactivationdate => "---",
+                    status => "p",
+                    file => "no file",
                     sophomorix_config=>\%sophomorix_config,
                   });
 

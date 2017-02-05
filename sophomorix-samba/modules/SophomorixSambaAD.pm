@@ -839,9 +839,9 @@ sub AD_user_create {
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $login,
-                   givenName   => $firstname_utf8,
-                   sn   => $surname_utf8,
-                   displayName   => [$display_name],
+                   givenName => $firstname_utf8,
+                   sn => $surname_utf8,
+                   displayName => [$display_name],
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
