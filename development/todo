@@ -19,6 +19,8 @@ Later:
 * when creating an object (project, user, admin) always check beforehand if it already exists
   if it exist: exit without doing anything
   (see example code in sophomorix-admin --create <name is checked>)
+* AD_get_AD:
+  management=TRUE -> schleife statt 6 einzelne suchen
 ############################################################
 
 
@@ -30,29 +32,6 @@ sophomorixAdminClass:
   - bisher Klassenname MIT Prefix. 
   - Besser ohne prefix? Was äbdert sich dann?
   - oder neues Attribut sophomorixAdminClassBasename? Exit.... auch?
-
-AD_get_AD:
-
-management=TRUE -> schleife statt 6 einzelne suchen
-
-
-
-Zusätzlicher administrator für sophomorix:
-username: sophomorix-admin
-
-/etc/linuxmuster/.secret/administrator     
-                         sophomorix-admin
-
-Dann legt sophomorix alle weiteren admins an
-
-1) global-admin in OU GLOBAL
-Befehl zum anlegen dieses admins in der Gruppe global-admins
-(in 1 Woche)
-
-
-
-
-
 ############################################################
 
 
@@ -176,10 +155,8 @@ sophomorix-devel.conf:
 sophomorix-admin
 
 - tests schreiben test-1
-- admins löschen, auflisten
-
-global admins mitglied der Gruppe Domain Admins
-
+- admins löschen
+- admins vornamen und Nachnamen geben (Für login screen)
 
 
 
