@@ -42,6 +42,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_dns_get
                                  AD_unbind_admin
+                                 AD_object_search
                                  AD_user_create
                                  AD_group_create
                                  AD_group_kill
@@ -139,6 +140,16 @@ if ($info==1){
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
+
+# exit if the user exists already
+my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create);
+if ($count==0){
+    # ok
+} else {
+    print "\nERROR: Object $create exists already in AD\n\n";
+    exit;
+}
+
 
 # --create <user>
 if ($create ne "" and $school ne "" and $password ne ""){

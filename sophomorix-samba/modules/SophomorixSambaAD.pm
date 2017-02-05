@@ -895,12 +895,24 @@ sub AD_user_create {
                                         group => $management_group,
                                         addmember => $login,
                                        }); 
-        # add/make sure group global-admins to 'Domain admins'
-        &AD_group_addmember({ldap => $ldap,
-                             root_dse => $root_dse, 
-                             group => "Domain Admins",
-                             addgroup => "global-admins",
-                           });
+        if ($school eq "global"){ # not GLOBAL (its the sophomorix-admin option --school)
+            # global admin users are 'Domain Admins'
+            &AD_group_addmember({ldap => $ldap,
+                                 root_dse => $root_dse, 
+                                 group => "Domain Admins",
+                                 addmember => $login,
+                               });
+        } else {
+            # school admin users are NOT 'Domain Admins'
+            # do nothing
+        }
+        # deprecated becaus school-admin users would result as 'Domain Admins'
+        ## add/make sure group global-admins to 'Domain admins'
+        #&AD_group_addmember({ldap => $ldap,
+        #                     root_dse => $root_dse, 
+        #                     group => "Domain Admins",
+        #                     addgroup => "global-admins",
+        #                   });
     }
 
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
@@ -1575,6 +1587,10 @@ sub AD_object_search {
         # searching dnsNode
         $base="DC=DomainDnsZones,".$root_dse;
         $filter="(&(objectclass=".$objectclass.") (name=".$name."))"; 
+    } elsif  ($objectclass eq "all"){
+        # find all 
+        $base=$root_dse;
+        $filter="(cn=".$name.")"; 
     } else {
         $base=$root_dse;
         $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
