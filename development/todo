@@ -91,29 +91,31 @@ Workflow                                               OK 2.2.17
 sophomorix-admin
 --create <adminname> --school global
 Und beim setup:
-sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
+sophomorix-admin --create global-admin --school global --password 'fdrTfdtt!i'
 (kommt in Gruppe global-admins)
+(Gruppe global-admins kommt in  "Domain Admins")
 
 Andere Schule
-sophomorix-admin --create <admin-name> --school bsz --password <fdrTfdtti>
+sophomorix-admin --create <admin-name> --school bsz --password 'fdrTfdtt!i'
 (kommt in Gruppe bsz-admins)
+(Gruppe global-admins kommt in  "Domain Admins")
                                                       OK 3.2.17
 
 ----------------------------------------------------------------
 Probleme sophomorix-admin/Administrator:
 ----------------------------------------------------------------
-##### sophomorix-admin nutzen:
+##### sophomorix-admin erzeugen:
 
 Der Befehl:
 
-samba-tool user create sophomorix-admin %12345678% --given-name=Sophomorix --surname="Sevice-Admin" --description "Sophomorix Service Admin"
+samba-tool user create sophomorix-admin %12345678% --given-name=Sophomorix \
+           --surname="Sevice-Admin" --description "Sophomorix Service Admin"
 
 ist murks. Da
 
 Problem 1:  
-
-Passwort funzt nicht, sobald man ein ! nutzt
-Bei Ausrufezeichen tut 
+Passwort tut nicht, sobald man ein ! nutzt
+Bei Ausrufezeichen tut z.B. 
    samba-tool user create sophomorix-admin 'Muster!'
 
 Falls man sichergehen will, dass das passwort wirklich gesetzt wird, nimmt man
@@ -137,26 +139,13 @@ Hat mans geschafft den sophomorix-admin anzulegen, hat er irgendwie nicht genüg
 Also:
  samba-tool group addmembers Administrators  sophomorix-admin
 
+-> sind Weitere Gruppen notwendig?
 
 
-Also wie folgt scheints zu tun:
+Als script scheints wie folgt zu tun:
 
-samba-tool user create sophomorix-admin 'Muster!ZUFallsstring'
-Dann: 'Muster!ZUFallsstring' nach 
-   /etc/linuxmuster/.secret/sophomorix-admin
-samba-tool user setexpiry sophomorix-admin --noexpiry
-samba-tool group addmembers Administrators  sophomorix-admin
-
-
-##### Oder Administrator nutzen:
-  sophomorix:       AD_bind_admin: Meldung zu beginn anpassen
-  linuxmuster-base: nach provisioning sollte noch ausgeführt werden, damit Passwort nich abläuft:
-     samba-tool user setexpiry Administrator --noexpiry
+siehe: sophomorix4/tools/add-sophomorix-admin
 ----------------------------------------------------------------
-
-
-
-
 
 
 
@@ -185,6 +174,8 @@ sophomorix-admin
 
 - tests schreiben test-1
 - admins löschen, auflisten
+
+global admins mitglied der Gruppe Domain Admins
 
 
 

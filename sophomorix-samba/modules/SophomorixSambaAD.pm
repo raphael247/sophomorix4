@@ -874,7 +874,8 @@ sub AD_user_create {
                            ]
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
-    # add user to management groups (not tonadmin)
+
+    # add user to management groups (not to admin)
     my @grouplist=("wifi","internet","webfilter","intranet","printing");
     foreach my $group (@grouplist){
         my $management_group=&AD_get_name_tokened($group,$school,"management");
@@ -884,15 +885,24 @@ sub AD_user_create {
                                         addmember => $login,
                                        }); 
     }
+
     # add administrators to admin group
     if ($role eq "administrator"){
+        # add to *-admins of the school, or global-admins
         my $management_group=&AD_get_name_tokened("admins",$school,"management");
         &AD_group_addmember_management({ldap => $ldap,
                                         root_dse => $root_dse, 
                                         group => $management_group,
                                         addmember => $login,
                                        }); 
+        # add/make sure group global-admins to 'Domain admins'
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => "Domain Admins",
+                             addgroup => "global-admins",
+                           });
     }
+
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
 }
 
@@ -3690,7 +3700,6 @@ sub AD_group_create {
                                  group => "global-".$DevelConf::teacher,
                                  addgroup => $group,
                                });
-
 
         #} else {
     } elsif ($type eq "room"){
