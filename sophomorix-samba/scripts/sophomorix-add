@@ -555,18 +555,18 @@ while(<SOPHOMORIXADD>){
   # NEW
   # add student/teacher to its adminclass-group
   # find dn of adminclass.group
-  my ($count,$dn_class,$cn_exist,$info)=&AD_object_search($ldap,$root_dse,"group",$group_token);
+  my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$group_token);
   # fetch old members from sophomorixmembers
   my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
   # create a unique list of new members
   my @members = uniq(@old_members,$login_token); 
   my $members=join(",",@members);
-  # update project
+  # update group
   &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-                      type=>"adminclass",
-                      members=>$members,
+                    root_dse=>$root_dse,
+                    dn=>$dn_class,
+                    type=>"adminclass",
+                    members=>$members,
                   });
 
 

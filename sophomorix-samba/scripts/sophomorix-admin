@@ -143,6 +143,9 @@ if ($info==1){
 
 # exit if the user exists already
 my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create);
+
+#my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group","m7ab");
+#print "DN=$dn_class\n";
 if ($count==0){
     # ok
 } else {

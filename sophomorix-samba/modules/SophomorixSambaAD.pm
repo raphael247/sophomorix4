@@ -46,18 +46,19 @@ $Data::Dumper::Terse = 1;
             AD_group_addmember
             AD_group_addmember_management
             AD_group_removemember
+            AD_group_update
+            AD_group_list
             AD_get_schoolname
             AD_get_name_tokened
             get_forbidden_logins
+            AD_ou_create
             AD_school_add
             AD_object_search
             AD_get_AD
             AD_class_fetch
             AD_project_fetch
-            AD_group_update
             AD_dn_fetch_multivalue
             AD_project_sync_members
-            AD_group_list
             AD_admin_list
             AD_object_move
             AD_debug_logdump
@@ -1074,14 +1075,12 @@ sub AD_user_update {
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
 
-
     # modify
     my $mesg = $ldap->modify( $dn,
 		      replace => { %replace }
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
-     
     # delete
     my $mesg2 = $ldap->modify( $dn, 
                        delete => [@delete]
@@ -1421,6 +1420,34 @@ sub AD_get_container {
 
 
 
+sub AD_ou_create {
+#     my ($ldap,$root_dse,$dn,$ou)=@_;
+#    my $mesg = $ldap->search(
+#                       base   => $dn,
+#                       scope => 'sub',
+#                       filter => 'name=*',
+#                       attr => ['cn']
+#                             );
+#    my $count = $mesg->count;
+
+# print "AD_ou_create $count of $dn\n"; 
+#     if ($count==0){
+#     &Sophomorix::SophomorixBase::print_title("Creating ou $ou (begin):");
+#     print "      * DN:  $dn\n";
+#     print "      * OU:  $ou\n";
+#     my $result = $ldap->add($dn,attr => [
+# # 	                    ou => $ou,
+#                             objectclass => ['top', 
+#                                             'organizationalUnit']
+#                                      ]
+#         );
+#     &AD_debug_logdump($result,2,(caller(0))[3]);
+#     &Sophomorix::SophomorixBase::print_title("Creating ou $ou (end):");
+#     }
+}
+
+
+
 sub AD_school_add {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -1478,8 +1505,7 @@ sub AD_school_add {
     foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
-        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-        &AD_debug_logdump($result,2,(caller(0))[3]);
+#        &AD_ou_create($ldap,$root_dse,$dn,$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn});
         my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
@@ -1539,8 +1565,10 @@ sub AD_school_add {
     foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
-        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-        &AD_debug_logdump($result,2,(caller(0))[3]);
+#        &AD_ou_create($ldap,$root_dse,$dn,$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn});
+
+#        $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+#        &AD_debug_logdump($result,2,(caller(0))[3]);
         my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
@@ -1595,6 +1623,8 @@ sub AD_object_search {
         $base=$root_dse;
         $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
     }
+
+
     my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
