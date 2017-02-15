@@ -129,6 +129,56 @@ Als script scheints wie folgt zu tun:
 siehe: sophomorix4/tools/add-sophomorix-admin
 ----------------------------------------------------------------
 
+Fileserver:
+
+* Angeraten: Domain Controller und Fileserver auf verschiedenen Maschinen
+  * Fileserver des DC_ für group policies, netlogon, sysvol
+  * DC braucht signing/Fileserver nicht-> Performance unterschied
+  * update notwendigkeit verschieden
+  * sophomorix würde auf dem Domain Controller laufen
+* ALLES über smb erledigen (kein NFS, ... auf dieselben Daten)
+  * Linux: aktuelle cifs-clients sehr gut
+* Backup MIT acl's: z.B. rsync MIT extended Atributes
+* Dateisystem
+  * ext4 (konservativ)
+  * xfs (neuste funktionen nur in aktuelleren Kerneln, nicht in LTS 16.04)
+  * btrfs (lvm nicht mehr notwndig, Samba VSS Modul vorhanden, CopyOnWrite uvw., in LTS 16.04 enthalten)
+* ACL's
+  * win ACL's und posix ACL's sind was verschiedenes
+  * defaultmäßig setzt smbcacls BEIDES
+  * setzen von posix ACL's ist abschaltbar pro share
+    * vfs objects = acl_xattr
+        stored in the Extended Attribute security.NTACL
+    * zeigen: 
+       getfattr -d filename (reicht nicht)
+       getfattr -n security.NTACL filename
+* DFS: spricht nichts dagegen
+  * 3 Typen:
+    * Filesystem/Links pro Ordner (besser getestet)
+    * Filesystem/Links in AD (nicht so getestet)
+    * DFS Proxy (pro share) 
+
+* user "Administrator" 
+  * ist nur in AD
+    * wbinfo -u   zeigt: 
+         LINUXMUSTER\sophomorix-admin
+         LINUXMUSTER\administrator
+    * wbinfo -i administrator / wbinfo -i Administrator
+    LINUXMUSTER\administrator:*:0:100::/home/LINUXMUSTER/administrator:/bin/false
+    LINUXMUSTER\sophomorix-admin:*:3000017:100::/home/LINUXMUSTER/sophomorix-admin:/bin/false
+* Tools:
+  * smbcacls
+  * smbcquotas
+  * smbclient
+  * kann man mkdir, chmod, .... auf dem samba share abschalten???
+* Setup:
+  1) DC einrichten
+  2) Fileserver einrichten
+  3) net ads join (Benutzer und Kennwort des DC)
+  4) Freigaben auf dem Fileserver + DFS Eintrag auf dem DC
+
+* Fragen:
+  
 
 
 

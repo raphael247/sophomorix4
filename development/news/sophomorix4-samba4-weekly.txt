@@ -276,6 +276,42 @@ apt-get install cifs-utils
 
 # smbclient -U administrator \\\\localhost\\bsz
 
+Datei hochladen:
+# smbclient -U Administrator%'Muster!' //linuxmuster.local/bsz  -c 'put changelog-sophomorix-src'
+Verzeichnis anlegen:
+# smbclient -U Administrator%'Muster!' //linuxmuster.local/bsz  -c 'mkdir test'
+Owner:  BUILTIN\administrators   (uid 3000003)
+GOwner: users                    (gid 100)
+
+
+NT ACLs setzen:
+ADD:
+# smbcacls -U sophomorix-admin%'Muster!' //linuxmuster.local/bsz  test2 --add ACL:sophomorix-admin:ALLOWED/3/FULL
+
+
+
+NT ACLs anzeigen:
+# smbcacls -U sophomorix-admin%'Muster!' //linuxmuster.local/bsz  test2
+# smbcacls --numeric -U sophomorix-admin%'Muster!' //linuxmuster.local/bsz  test2
+Beispiel:
+REVISION:1
+CONTROL:SR|DP
+OWNER:BUILTIN\Administrators
+GROUP:LINUXMUSTER\Domain Users
+ACL:BUILTIN\Administrators:ALLOWED/0x0/FULL
+ACL:CREATOR OWNER:ALLOWED/OI|CI|IO/FULL
+ACL:LINUXMUSTER\Domain Users:ALLOWED/0x0/READ
+ACL:CREATOR GROUP:ALLOWED/OI|CI|IO/READ
+ACL:EVERYONE:ALLOWED/OI|CI/READ
+
+
+
+
+Aufbau einer ACL:
+ACL:<user>:ALLOWED:/3/<FULL|READ|CHANGE>
+ACL:user:[ALLOWED|DENIED]/flags/[FULL|READ|CHANGE]
+
+
 
 
 
