@@ -1,0 +1,13 @@
+#!/bin/sh
+net conf addshare abc /home/schools/abc writeable=y guest_ok=y "Share for school abc"
+net conf addshare bsz /home/schools/bsz writeable=y guest_ok=y "Share for school bsz"
+net conf addshare default-school /home/schools/default-school writeable=y guest_ok=y "Share for school default-school"
+net conf addshare ghs /home/schools/ghs writeable=y guest_ok=y "Share for school ghs"
+net conf addshare lin /home/schools/lin writeable=y guest_ok=y "Share for school lin"
+net conf addshare ltg /home/schools/ltg writeable=y guest_ok=y "Share for school ltg"
+net conf addshare test /home/schools/test writeable=y guest_ok=y "Share for school test"
+net conf addshare uni /home/schools/uni writeable=y guest_ok=y "Share for school uni"
+
+#
+echo "The shares:"
+net conf listshares
