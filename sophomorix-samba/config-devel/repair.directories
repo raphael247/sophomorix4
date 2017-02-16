@@ -30,25 +30,40 @@
 ### $var_lib_pfad::root::root::0700
 ### $log_files::root::root::0700
 
-$path_log/::root::root::0755::noacl
-$path_log_user/::root::root::0700::noacl
+LINUX::$path_log/::root::root::0755::noacl
+LINUX::$path_log_user/::root::root::0700::noacl
 
 
 # ###   /home/*
-$homedir_all_schools/::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/$directory_students/::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@//@@TEACHERCLASS@@::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/$directory_projects/::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/$directory_students/@@ADMINCLASS@@/::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/@@TEACHERCLASS@@::root::root::0755::noacl
-$homedir_all_schools/@@SCHOOL@@/$directory_projects/@@PROJECT@@::root::root::0755::noacl
+LINUX::$homedir_all_schools/::root::root::0755::noacl
+LINUX::$homedir_all_schools/@@SCHOOL@@/::root::root::0755::noacl
+
+# admins
+SMB::@@SCHOOL@@//management/::root::root::0755::noacl
+
+
+# teachers
+SMB::@@SCHOOL@@//@@TEACHERCLASS@@/::root::root::0755::noacl
+SMB::@@SCHOOL@@//@@TEACHERCLASS@@/homes/::root::root::0755::noacl
+SMB::@@SCHOOL@@//@@TEACHERCLASS@@/tausch/::root::root::0755::noacl
+
+# students
+SMB::@@SCHOOL@@/$directory_students/::root::root::0755::noacl
+SMB::@@SCHOOL@@/$directory_students/@@ADMINCLASS@@/::root::root::0755::noacl
+SMB::@@SCHOOL@@/$directory_students/@@ADMINCLASS@@/homes/::root::root::0755::noacl
+SMB::@@SCHOOL@@/$directory_students/@@ADMINCLASS@@/tausch/::root::root::0755::noacl
+
+#projects
+SMB::@@SCHOOL@@/$directory_projects/::root::root::0755::noacl
+SMB::@@SCHOOL@@/$directory_projects/@@PROJECT@@::root::root::0755::noacl
+
+
 # global
-$homedir_global/::root::root::0755::noacl
-$homedir_global/$directory_students/::root::root::0755::noacl
-$homedir_global/@@TEACHERCLASS@@/::root::root::0755::noacl
-$homedir_global/$directory_projects/::root::root::0755::noacl
-$homedir_global/$directory_management/::root::root::0755::noacl
+#SMB::$homedir_global/::root::root::0755::noacl
+#SMB::$homedir_global/$directory_students/::root::root::0755::noacl
+#SMB::$homedir_global/@@TEACHERCLASS@@/::root::root::0755::noacl
+#SMB::$homedir_global/$directory_projects/::root::root::0755::noacl
+#SMB::$homedir_global/$directory_management/::root::root::0755::noacl
 
 
 

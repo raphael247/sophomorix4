@@ -1,4 +1,23 @@
 #!/bin/sh
+
+# clean up with: 
+#     rm -rf /home/schools
+#     rm -rf /home/global
+
+mkdir -p /home/global
+
+mkdir -p /home/schools/abc
+mkdir -p /home/schools/bsz
+mkdir -p /home/schools/default-school
+mkdir -p /home/schools/ghs
+mkdir -p /home/schools/lin
+mkdir -p /home/schools/ltg
+mkdir -p /home/schools/test
+mkdir -p /home/schools/uni
+
+
+net conf addshare default-global /home/global writeable=y guest_ok=y "Share for school global"
+
 net conf addshare abc /home/schools/abc writeable=y guest_ok=y "Share for school abc"
 net conf addshare bsz /home/schools/bsz writeable=y guest_ok=y "Share for school bsz"
 net conf addshare default-school /home/schools/default-school writeable=y guest_ok=y "Share for school default-school"

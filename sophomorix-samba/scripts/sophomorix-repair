@@ -290,7 +290,7 @@ sub repair_dirs_from_file {
             $groupvar_count++;
         }
 
-        my ($path, $owner, $groupowner, $permission,$acl) = split(/::/);
+        my ($os,$path, $owner, $groupowner, $permission,$acl) = split(/::/);
         my @dirs=split(/\//,$path);
         my @new_dirs=();
         foreach my $dir (@dirs){
@@ -316,17 +316,16 @@ sub repair_dirs_from_file {
 
         $path=join("/",@new_dirs);
 
-        print "   $num) Line $line_num: $_:\n";
+        print "   $num) Line $line_num:  $_:\n";
         if($Conf::log_level>=3){
-            print "\n";
-            print "     Line:          $_\n";
-            print "     Owner:         $owner\n";
-            print "     Group:         $groupowner\n";
-            print "     Permissions:   $permission\n";
-            print "     ACL:           $acl\n";
-            print "     Schoollist:    @schools\n";
+            print "      Type:     $os\n";
+            print "      Owner:    $owner\n";
+            print "      Group:    $groupowner\n";
+            print "      Perm:     $permission\n";
+            print "      ACL:      $acl\n";
+            print "      Schools:  @schools\n";
         }
-        &repair_single_directory($path, $owner, $groupowner, $permission, 
+        &repair_single_directory($os,$path, $owner, $groupowner, $permission, 
                                  $acl, \@schools, $group_type, $groupvar_count);
    }
 
@@ -336,14 +335,16 @@ sub repair_dirs_from_file {
 
 
 sub repair_single_directory {
-    my ($path_with_var, $owner, $groupowner, $permission, 
+    my ($os,$path_with_var, $owner, $groupowner, $permission, 
         $acl, $schools, $group_type, $groupvar_count) = @_;
     foreach my $school (@$schools){
         my $path=$path_with_var;
+        my $path_smb=$path_with_var;
         $path=~s/\@\@SCHOOL\@\@/$school/;
+        $path_smb=~s/\@\@SCHOOL\@\@\///;
         if($Conf::log_level>=3){
             print "   Determining path for school $school:\n";
-            print "      * Path after school: $path\n";
+            print "      * Path after school: $path (smb: $path_smb)\n";
         }
         # determining groups to walk through
         my @groups;
@@ -356,7 +357,7 @@ sub repair_single_directory {
                 # there is a group list -> use it
                 @groups=@{ $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
             } else {
-                # there is no group list -> avoid the eve a single loop 
+                # there is no group list -> avoid the even a single loop 
                 @groups=();
 	    }
         }
@@ -367,8 +368,12 @@ sub repair_single_directory {
             $path_after_group=~s/\@\@ADMINCLASS\@\@/$group/;
             $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group/;
             $path_after_group=~s/\@\@PROJECT\@\@/$group/;
+            my $path_after_group_smb=$path_smb;
+            $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group/;
+            $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group/;
+            $path_after_group_smb=~s/\@\@PROJECT\@\@/$group/;
             if($Conf::log_level>=3){      
-                print "      * Path after group:  $path_after_group\n";
+                print "      * Path after group:  $path_after_group (smb: $path_after_group_smb)\n";
             }
 
             # user loop
@@ -379,15 +384,26 @@ sub repair_single_directory {
             foreach my $user (@users){
                 my $path_after_user=$path_after_group;
                 $path_after_user=~s/\@\@USER\@\@/$user/;
+                my $path_after_user_smb=$path_after_group_smb;
+                $path_after_user_smb=~s/\@\@USER\@\@/$user/;
                 if($Conf::log_level>=3){      
-                    print "      * Path after user:   $path_after_user\n";
+                    print "      * Path after user:   $path_after_user (smb: $path_after_user_smb)\n";
 	        }
-                print "       $path_after_user\n";
-                mkdir $path_after_user;
-                my $chown_command="chown ".$owner.".".$groupowner." ".$path_after_user;
-                print "          $chown_command\n";
-                #system($chown_command);
-                chmod oct($permission), $path_after_user;
+                if ($os eq "SMB"){
+                    my $smbclient_command="smbclient -U Administrator%'Muster!'".
+                                         " //$root_dns/$school -c 'mkdir $path_after_user_smb'\n";
+                    print "$smbclient_command\n";
+                    system($smbclient_command);
+                } elsif ($os eq "LINUX"){
+                    mkdir $path_after_user;
+                    my $chown_command="chown ".$owner.".".$groupowner." ".$path_after_user;
+                    print "          $chown_command\n";
+                    #system($chown_command);
+                    chmod oct($permission), $path_after_user;
+                } else {
+                    print "\nERROR: $os unknown\n\n";
+                    exit;
+                }
             }
         }
     }
