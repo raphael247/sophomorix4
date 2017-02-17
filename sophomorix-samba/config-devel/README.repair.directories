@@ -1,0 +1,55 @@
+Syntax in *.repair.directories:
+--------------------------------------------------
+Line syntax:
+TYPE::PATH::USER::GROUP::PERMISSIONS::NTACL
+
+
+TYPE field:
+--------------------
+LINUX   --> * Treat the path as a unix-path. 
+            * Use mkdir, chown, chmod to create dirs
+            * USER used in chown
+            * GROUP used in chown
+            * PERMISSIONS used in chmod
+            * posix acl not supportet at the moment: noacl
+            This is used for directories that are NOT on a smb share
+            i.e. Linux logdirs, ....
+
+SMB     --> * Treat the path as a relative path in a samba share
+                 The path must beginn with @@SCHOOL@@/
+                 -> this is expanded to UNC-Path: //linuxmuster.local/@@SCHOOL@@
+                 -> The path following left of @@SCHOOL@@/ is the
+                    relative path in the  share //linuxmuster.local/@@SCHOOL@@
+            * Use smbclient, smbcacls to create dirs/ntacls
+            * USER not used
+            * GROUP not used
+            * PERMISSIONS not used
+            * ntacls are supported
+            This is used for directories in           
+
+
+Variables in PATH field:
+--------------------
+  School:
+  ----------
+  @@SCHOOL@@         -> the schools (including default-school, but not global)
+
+  Group:
+  ----------
+  @@TEACHERCLASS@@   -> the teacherclass of @@SCHOOL@@
+                        (@@SCHOOL@@ must be written left of @@TEACHERCLASS@@)
+
+  @@ADMINCLASS@@     -> the adminclass (classes of administration software) of @@SCHOOL@@
+                        (@@SCHOOL@@ must be written left of @@ADMINCLASS@@)
+
+  @@PROJECT@@        -> the projects of @@SCHOOL@@
+                         (@@SCHOOL@@ must be written left of @@PROJECT@@)
+  User:
+  ----------
+  @@USER@@           -> the user in the group left of @@USER@@
+
+
+Tools:
+show ntacls:
+
+sophomorix-cacls /abs/unix/path

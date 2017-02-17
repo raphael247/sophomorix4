@@ -1,0 +1,160 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-check) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use Net::LDAP;
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 filelist_fetch
+                                 remove_whitespace
+                                 json_dump
+                                 recode_utf8_to_ascii
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_get_passwd
+                                 AD_school_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_get_AD
+                                 AD_dns_get
+                                 AD_object_search
+                                 get_forbidden_logins
+                                    );
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+
+
+my $user=$DevelConf::sophomorix_admin;
+my ($pass)=&AD_get_passwd($DevelConf::sophomorix_admin,$DevelConf::secret_file_sophomorix_admin);
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "help|h" => \$help,
+          );
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-cacls accepts one ore more unix paths as the option and connects via smb to this path to show ntacls with smbcacls
+
+Options:
+  -h  / --help
+');
+   print "\n";
+   exit;
+}
+
+# use multiple options
+my @linux_paths=@ARGV;
+
+# path -> share
+my %share_by_path = &shares();
+
+foreach my $linux_path (@linux_paths){
+    my $smb_unc="";
+    my $smb_rel="";
+    my $command="";
+    my $is_smb=0;
+    foreach my $path (keys %share_by_path) {
+        # if unix path starts with a known share path
+        my $share=$share_by_path{$path};
+        if ($linux_path=~m/^$path/){
+            # calculate smbcacls command
+            $is_smb=1;
+            $smb_unc="//".$root_dns."/".$share;
+            $smb_rel=$linux_path;
+            $smb_rel=~s/^$path//;
+            $smb_rel=~s/^\///g;
+            $smb_rel=~s/\/$//g;
+            $command="smbcacls -U ".$user."%".$pass." ".$smb_unc." ".$smb_rel;
+        }
+    }
+
+    # printout
+    if ($is_smb==0){
+        print "=============================================================\n";
+        print "LINUX: $linux_path is not on a SMB share\n";
+    } else {
+        print "=============================================================\n";
+        print "LINUX: $linux_path\n";
+        print "   SMB-UNC: $smb_unc\n";
+        print "   SMB-RELPATH: $smb_rel\n";
+        print "   $command\n";
+        print "---------------------------------------------------------------\n";
+        if ($smb_rel eq ""){
+            print "directory/file name is not allowed to be empty\n";
+        } else {
+            system($command);
+        }
+        print "\n\n";
+    }
+}
+
+
+
+
+############################################################
+sub shares {
+    my %result=();
+    my $string1=`net conf list | grep -F '['`;
+    $string1=~s/\[//g;
+    $string1=~s/\]//g;
+    my @shares = split(/\n/,$string1);
+    my @paths=();
+    my $string2=`net conf list | grep -F 'path = '`;
+    my @lines = split(/\n/,$string2);
+    foreach my $line (@lines){
+        chomp($line);
+        $line=~s/path =//g;
+        $line=&remove_whitespace($line);
+        push @paths, $line;
+    } 
+    my $count=0;
+    foreach my $path (@paths){
+        $result{$path}=$shares[$count];
+        $count++;
+    } 
+    return %result;
+}
