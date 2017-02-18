@@ -184,8 +184,7 @@ Bisher: Admministrator (sonst tuts nicht) da id=0
 AD_bind sollte derselbe user sein also 
 entweder sophomorix-admin oder Administrator
 Hier noch anpassen:
-   --> sophomorix-repair
-
+   -->  SophomorixBase.pm: my $smbcacls_base_command="
 
 sophomorix-repair:
 
@@ -193,16 +192,32 @@ sophomorix-repair:
   (this should be done by school)
 Administrator kann nur die verzeichnise anlegen?
 
-sophomorix-cacls /home/school/... abs Pfad (tab nutzen ermöglichen)
 
--> aus abs pfad UNC pfad ermitteln,
-dann smbcacls aurufen
-
-Problen:
-wenn AD als sophomorix-admin befüllt wir
+Problem:
+wenn AD als sophomorix-admin befüllt wird
 und Dateisystem mit Adminitrator angelegt wird:
 
 muss man IMMER testen ob beide funktionieren, bevor was halbfertig gemacht wird
+
+weiter:
+
+sophomorix-repair nach hierarchie ordnen
+
+--linux|unix
+--schools <school>
+--projects <project>    (DEP: schools)
+--teacherclasses <teacherclass> (DEP: schools)
+--teacher-homes <user> (DEP: teacherclasses)
+--adminclasses <adminclass> (DEP: schools)
+--student-homes <user> (DEP: adminclass)
+
+--all (all the above)
+
+
+
+
+
+
 
 
 ###??????????????????????????????????????????????????###
