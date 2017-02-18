@@ -23,7 +23,7 @@ $Data::Dumper::Terse = 1;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 ACL_set_file
+                                 NTACL_set_file
                                  time_stamp_AD
                                  time_stamp_file
                                  unlock_sophomorix
@@ -80,9 +80,9 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 ############################################################
 
 
-&ACL_set_file({path=>"/home/file2",
+&NTACL_set_file({path=>"/home/file2",
 #               role=>"student",
-               aclname=>"student_home",
+               ntaclname=>"student_home",
                group=>"m8cd",
                school=>"bsz",
                adminclass=>"12cs",

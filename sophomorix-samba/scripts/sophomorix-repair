@@ -53,6 +53,7 @@ use Sophomorix::SophomorixBase qw(
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
+                                 NTACL_set_file
                                  recode_utf8_to_ascii
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -316,17 +317,19 @@ sub repair_dirs_from_file {
 
         $path=join("/",@new_dirs);
 
-        print "   $num) Line $line_num:  $_:\n";
+        print "------------------------------------------------------------\n";
+        print "$num) Line $line_num:  $_:\n";
         if($Conf::log_level>=3){
-            print "      Type:     $os\n";
-            print "      Owner:    $owner\n";
-            print "      Group:    $groupowner\n";
-            print "      Perm:     $permission\n";
-            print "      NT-ACL:   $ntacl\n";
-            print "      Schools:  @schools\n";
+            print "   Type:     $os\n";
+            print "   Owner:    $owner\n";
+            print "   Group:    $groupowner\n";
+            print "   Perm:     $permission\n";
+            print "   NT-ACL:   $ntacl\n";
+            print "   Schools:  @schools\n";
         }
         &repair_single_directory($os,$path, $owner, $groupowner, $permission, 
                                  $ntacl, \@schools, $group_type, $groupvar_count);
+        print "--- DONE with $num) Line $line_num:  $_---\n";
    }
 
    close(DIRS);
@@ -397,11 +400,11 @@ sub repair_single_directory {
                     system($smbclient_command);
 
                     # smbcacls
-                    my $smbcacls_option=&smbcacls_set_option($ntacl);
-                    my $smbcacls_command="smbcacls -U Administrator%'Muster!' //$root_dns/$school $path_after_user_smb ".
-                                          $smbcacls_option;
-                    print "$smbcacls_command\n";
-                    #system("$smbcacls_command");
+                    &NTACL_set_file({root_dns=>$root_dns,
+                                     school=>$school,
+                                     ntacl=>$ntacl,
+                                     smbpath=>$path_after_user_smb,
+                                   });
                } elsif ($os eq "LINUX"){
                     mkdir $path_after_user;
                     my $chown_command="chown ".$owner.".".$groupowner." ".$path_after_user;
@@ -582,12 +585,3 @@ sub repair_single_directory {
 
 }
 
-
-
-sub smbcacls_set_option {
-    my ($ntacl)=@_;
-    print "Creating option\n";
-    my $option="--set ";
-
-    return $option;
-}

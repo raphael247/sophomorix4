@@ -25,7 +25,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             print_line
             print_title
-            ACL_set_file
+            NTACL_set_file
             remove_from_list
             time_stamp_AD
             time_stamp_file
@@ -223,7 +223,7 @@ sub lock_sophomorix {
         # lock , only when nonexisting
         if (not -e $DevelConf::lock_file){
            &print_title("Creating lock in $DevelConf::lock_file");
-           open(LOCK,">$DevelConf::lock_file") || die "Cannot create lock file \n";;
+           open(LOCK,">$DevelConf::lock_file") || die "Cannot create lock file \n";
            print LOCK "$lock";
            close(LOCK);
         } else {
@@ -236,7 +236,7 @@ sub lock_sophomorix {
 	if (-e $DevelConf::lock_file
            and $l_pid==$pid){
            &print_title("Stealing lock in $DevelConf::lock_file");
-           open(LOCK,">$DevelConf::lock_file") || die "Cannot create lock file \n";;
+           open(LOCK,">$DevelConf::lock_file") || die "Cannot create lock file \n";
            print LOCK "$lock";
            close(LOCK);
            return 1;
@@ -1141,7 +1141,63 @@ sub backup_amku_file {
 
 # acl stuff
 ######################################################################
-sub ACL_set_file {
+sub NTACL_set_file {
+    my ($arg_ref) = @_;
+    my $root_dns = $arg_ref->{root_dns};
+    my $school = $arg_ref->{school};
+    my $ntacl = $arg_ref->{ntacl};
+    my $smbpath = $arg_ref->{smbpath};
+#    my $user = $arg_ref->{user};
+#    my $group = $arg_ref->{group};
+   
+    my $ntacl_abs=$DevelConf::path_conf_devel_ntacl."/".$ntacl.".template";
+    if ($ntacl eq "noacl" or $ntacl eq "nontacl"){
+        print "Skipping ACL/NTACL creation for $smbpath\n";
+        return;
+    } elsif (not -r $ntacl_abs){ # -r: readable
+        print "ERROR: $ntacl_abs not found/readable\n\n";
+        exit;
+    }
+    print "Setting the NTACL:\n";
+    my $smbcacls_option="";
+    open(NTACL,"<$ntacl_abs");
+    my $line_count=0;
+    while (<NTACL>) {
+        $_=~s/\s+$//g;# remove trailing whitespace
+        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            next;
+        }
+        
+        my $line=$_;
+        $line_count++;
+        chomp($line);
+        # replacements in line go here
+
+        # create multiple lines? from one line
+        if ($line_count==1){
+            $smbcacls_option=$line;
+        } else {
+            $smbcacls_option=$smbcacls_option.",".$line;
+        }
+
+
+    }
+    $smbcacls_option="\"".$smbcacls_option."\"";
+    my $smbcacls_base_command="smbcacls -U Administrator%'Muster!' //$root_dns/$school $smbpath --set ";
+    my $smbcacls_command=$smbcacls_base_command.$smbcacls_option;
+    print "* $smbcacls_base_command\n";
+    print "  $smbcacls_option\n";
+    my $smbcacls_return=system("$smbcacls_command");
+    if($smbcacls_return==0){
+	print "NTACLS set successfully ($smbcacls_return)\n";
+    } else {
+	print "ERROR setting NTACLS ($smbcacls_return)\n";
+    }
+    close(NTACL);
+}
+
+
+sub ACL_set_file_obsolete {
     # $path and $aclname are mandatory
     # $workgroup will be later mandatory 
     my ($arg_ref) = @_;
