@@ -195,12 +195,12 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-devel.conf $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-RoleType.conf $(DEVELCONF)/devel
-#	@install -oroot -groot --mode=0644 sophomorix-base/config-devel/sophomorix-support.conf $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/README.repair.directories $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/student_home.repair.directories $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/teacher_home.repair.directories $(DEVELCONF)/devel
-	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/acl
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/acl/*acl.template $(DEVELCONF)/devel/acl
+#	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/acl
+#	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/acl/*acl.template $(DEVELCONF)/devel/acl
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/ntacl
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/ntacl/*ntacl.template $(DEVELCONF)/devel/ntacl
 #	@install -oroot -groot --mode=0600 sophomorix-base/config-devel/repair-directories-alt/repair.directories-6.0-stable $(DEVELCONF)/devel/repair-directories-alt
