@@ -1987,35 +1987,8 @@ sub AD_get_AD {
 #        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     ##################################################
     if ($administratorclasses eq "TRUE"){
-
-
-	print "\n admins \n\n";
         # sophomorixType teacherclass from ldap
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
@@ -2053,43 +2026,6 @@ sub AD_get_AD {
 #        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
 #        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     ##################################################
     if ($projects eq "TRUE"){

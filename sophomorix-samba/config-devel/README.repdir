@@ -1,5 +1,5 @@
-Syntax in *.repair.directories:
---------------------------------------------------
+Syntax in the files ./repdir/repdir.*
+############################################################
 Line syntax:
 TYPE::PATH::USER::GROUP::PERMISSIONS::NTACL
 
@@ -7,25 +7,25 @@ TYPE::PATH::USER::GROUP::PERMISSIONS::NTACL
 TYPE field:
 --------------------
 LINUX   --> * Treat the path as a unix-path. 
-            * Use mkdir, chown, chmod to create dirs
+            * Use mkdir, chown, chmod to create dirs and change owner|permissions
             * USER used in chown
             * GROUP used in chown
             * PERMISSIONS used in chmod
-            * posix acl not supportet at the moment: noacl
+            * posix acl not supported at the moment(probably never): noacl 
             This is used for directories that are NOT on a smb share
             i.e. Linux logdirs, ....
 
 SMB     --> * Treat the path as a relative path in a samba share
-                 The path must beginn with @@SCHOOL@@/
+                 The path must beginn with @@SCHOOL@@/ to specify the share.
                  -> this is expanded to UNC-Path: //linuxmuster.local/@@SCHOOL@@
                  -> The path following left of @@SCHOOL@@/ is the
                     relative path in the  share //linuxmuster.local/@@SCHOOL@@
-            * Use smbclient, smbcacls to create dirs/ntacls
-            * USER not used
-            * GROUP not used
-            * PERMISSIONS not used
+            * Use smbclient, smbcacls to create dirs/set ntacls
+            * USER not used at the moment
+            * GROUP not used at the moment
+            * PERMISSIONS not used at the moment
             * ntacls are supported
-            This is used for directories in           
+            This is used for directories on a smb share          
 
 
 Variables in PATH field:
@@ -36,12 +36,11 @@ Variables in PATH field:
 
   Group:
   ----------
-  @@MANAGEMENT@@     -> the dir for admins of @@SCHOOL@@ (i.e. management)
-                        (@@SCHOOL@@ must be written left of @@TEACHERCLASS@@)
+  @@MANAGEMENT@@     -> the dir for admins of @@SCHOOL@@ (i.e. always: management)
+                        (@@SCHOOL@@ must be written left of @@MANAGEMENT@@)
 
   @@TEACHERCLASS@@   -> the teacherclass(es) of @@SCHOOL@@
                         (@@SCHOOL@@ must be written left of @@TEACHERCLASS@@)
-
 
   @@ADMINCLASS@@     -> the adminclass (classes of administration software) of @@SCHOOL@@
                         (@@SCHOOL@@ must be written left of @@ADMINCLASS@@)
@@ -53,7 +52,26 @@ Variables in PATH field:
   @@USER@@           -> the user in the group left of @@USER@@
 
 
-Tools:
-show ntacls:
 
-sophomorix-cacls /abs/unix/path
+Variables in NTACLS:
+############################################################
+
+see: Variables in PATH field above
+
+Perhaps more to come, ...
+
+
+
+Tools for debugging and testing:
+############################################################
+A) Show ntacls:
+     # sophomorix-cacls /abs/unix/path
+
+B) Adding/Removing/Changing a path:
+     1) edit ./repdir/repdir.<what_you_need>
+     2) # sophohomorix-repair
+
+C) Changing NTACLs:
+     1) edit ./ntacl/<what_you_need>.ntacl.template
+     2) # sophohomorix-repair
+
