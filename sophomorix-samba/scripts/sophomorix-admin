@@ -168,8 +168,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
     }
 
     my $group_basename="admins";
-    my $group_token=&AD_get_name_tokened($group_basename,$school,"administrators");
-
+    my $group_token=&AD_get_name_tokened($group_basename,$school,"administrator");
     # make sure school exists
     my $school_provide;
     if ($school eq "global"){
