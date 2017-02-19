@@ -196,9 +196,14 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-devel.conf $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-RoleType.conf $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/README.repair.directories $(DEVELCONF)/devel
-	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories $(DEVELCONF)/devel
-	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/student_home.repair.directories $(DEVELCONF)/devel
-	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/teacher_home.repair.directories $(DEVELCONF)/devel
+# the repair directories
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.linux $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.school $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.project $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.teacherclass $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.teacher_home $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.adminclass $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0600 sophomorix-samba/config-devel/repair.directories.student_home $(DEVELCONF)/devel
 #	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/acl
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/acl/*acl.template $(DEVELCONF)/devel/acl
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/ntacl

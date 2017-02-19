@@ -28,6 +28,7 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Net::DNS;
+use File::Basename;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -81,30 +82,33 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $dump_AD=0;
-my $permissions=0;
-my $student_home=0;
+my $linux=0;
+my $school=0;
+my $project=0;
+my $teacherclass=0;
 my $teacher_home=0;
-my $adminclass_dirs=0;
-my $teacherclass_dirs=0;
-my $project_dirs=0;
+my $adminclass=0;
+my $student_home=0;
+
 
 ###############################################################################
 # Beginn
 ###############################################################################
 # Configuration Files to be used
-# The tree
-my $repair_directory_tree="$DevelConf::path_conf_devel/repair.directories";
-# Student homes
-my $repair_student_home="$DevelConf::path_conf_devel/student_home.repair.directories";
+# linux
+my $repair_linux="$DevelConf::path_conf_devel/repair.directories.linux";
+# school
+my $repair_school="$DevelConf::path_conf_devel/repair.directories.school";
+# project
+my $repair_project="$DevelConf::path_conf_devel/repair.directories.project";
+# teacherclass
+my $repair_teacherclass="$DevelConf::path_conf_devel/repair.directories.teacherclass";
 # Teacher homes
-my $repair_teacher_home="$DevelConf::path_conf_devel/teacher_home.repair.directories";
-# Adminclass dirs
-my $repair_adminclass_dirs="$DevelConf::path_conf_devel/adminclass_dirs.repair.directories";
-# Teacherclass dirs
-my $repair_teacherclass_dirs="$DevelConf::path_conf_devel/teacherclass_dirs.repair.directories";
-# Project dirs
-my $repair_project_dirs="$DevelConf::path_conf_devel/project_dirs.repair.directories";
-
+my $repair_teacher_home="$DevelConf::path_conf_devel/repair.directories.teacher_home";
+# adminclass
+my $repair_adminclass="$DevelConf::path_conf_devel/repair.directories.adminclass";
+# Student homes
+my $repair_student_home="$DevelConf::path_conf_devel/repair.directories.student_home";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -113,12 +117,13 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "dump-AD" => \$dump_AD,
            "verbose|v+" => \$Conf::log_level,
-           "permissions" => \$permissions,
-           "student-homes" => \$student_home,
+           "linux|unix" => \$linux,
+           "school" => \$school,
+           "project" => \$project,
+           "teacherclass" => \$teacherclass,
            "teacher-homes" => \$teacher_home,
-           "adminclass-dirs" => \$adminclass_dirs,
-           "teacherclass-dirs" => \$teacherclass_dirs,
-           "project-dirs" => \$project_dirs,
+           "adminclass" => \$adminclass,
+           "student-homes" => \$student_home,
           );
 
 
@@ -153,34 +158,19 @@ Options
 
 What to repair (one option must be given):
 
-  --permissions
+  --linux|unix
       (repairs all permissions outside of $HOME)
-  --student-homes
+  --school
+  --project
+  --teacherclass
   --teacher-homes
-  --adminclass-dirs
-  --teacherclass-dirs
-  --project-dirs
+  --adminclass
+  --student-homes
 
 Please see the sophomorix-repair(8) man pages for full documentation
 ');
    exit;
 }
-
-
-
-# if ($quick==1){
-#     # no permissions needed
-#     &titel("Reading permission data ...");
-#     &get_alle_verzeichnis_rechte();
-# } else {
-#     # repair.directories einlesen
-#     &titel("Reading permission data ...");
-#     &get_alle_verzeichnis_rechte();
-#     # fetch permission for all homes
-#     &fetch_repairhome();
-# }
-
-#&check_verzeichnis_mkdir("${DevelConf::log_pfad_repair}");
 
 
 
@@ -220,36 +210,57 @@ if ($dump_AD==1){
 }
 
 
-# --permissions
-if ($permissions==1) {
-   &repair_dirs_from_file($repair_directory_tree);
+# --linux
+if ($linux==1) {
+   &repair_dirs_from_file($repair_linux);
 }
 
-# --student-homes
-if ($student_home==1) {
-   &repair_dirs_from_file($repair_student_home);
+
+
+# --school
+if ($school==1) {
+   &repair_dirs_from_file($repair_school);
 }
+
+
+# --project
+if ($project==1) {
+   &repair_dirs_from_file($repair_project);
+}
+
+
+# --teacherclass
+if ($teacherclass==1) {
+   &repair_dirs_from_file($repair_teacherclass);
+}
+
 
 # --teacher-homes
 if ($teacher_home==1) {
    &repair_dirs_from_file($repair_teacher_home);
 }
 
-# --adminclass-dirs
-if ($adminclass_dirs==1) {
-   &repair_dirs_from_file($repair_adminclass_dirs);
+
+# --adminclass
+if ($adminclass==1) {
+   &repair_dirs_from_file($repair_adminclass);
 }
 
 
-# --teacherclass-dirs
-if ($teacherclass_dirs==1) {
-   &repair_dirs_from_file($repair_teacherclass_dirs);
+# --student-homes
+if ($student_home==1) {
+   &repair_dirs_from_file($repair_student_home);
 }
 
-# --project-dirs
-if ($project_dirs==1) {
-   &repair_dirs_from_file($repair_project_dirs);
-}
+
+
+
+
+
+
+
+
+
 
 ############################################################
 # subs
@@ -257,9 +268,10 @@ if ($project_dirs==1) {
 
 sub repair_dirs_from_file {
     my ($directory_file)=@_;
+    my $directory_file_base = basename($directory_file);
     my $num=0;
     my $line_num=0;
-    &print_title("Repairing dirs from file $directory_file");
+    &print_title("Repairing from file: $directory_file_base");
     open(DIRS, "<$directory_file")|| die "ERROR: $directory_file $!";
     while (<DIRS>) {
         $line_num++;
