@@ -414,15 +414,21 @@ sub repair_single_directory {
 
         # group loop
         foreach my $group (@groups){
+            my $group_basename=$group;
+
+            # calculating group basename without prefix
+            $group_basename=~s/^${school}-//;
+            print "working with group $group >$group_basename< ...\n";
+
             my $path_after_group=$path;
-            $path_after_group=~s/\@\@ADMINCLASS\@\@/$group/;
-            $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group/;
-            $path_after_group=~s/\@\@PROJECT\@\@/$group/;
+            $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
+            $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
+            $path_after_group=~s/\@\@PROJECT\@\@/$group_basename/;
             $path_after_group=~s/\@\@MANAGEMENT\@\@/management/;
             my $path_after_group_smb=$path_smb;
-            $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group/;
-            $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group/;
-            $path_after_group_smb=~s/\@\@PROJECT\@\@/$group/;
+            $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group_basename/;
+            $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
+            $path_after_group_smb=~s/\@\@PROJECT\@\@/$group_basename/;
             $path_after_group_smb=~s/\@\@MANAGEMENT\@\@/management/;
             if($Conf::log_level>=3){      
                 print "      * Path after group:  $path_after_group (smb: $path_after_group_smb)\n";
