@@ -203,19 +203,18 @@ weiter:
 
 sophomorix-repair nach Hierarchie ordnen
 
---linux|unix                                       repair.directories.linux
---schools <school>                                 repair.directories.school    
---projects <project>    (DEP: schools)             repair.directories.project
---teacherclasses <teacherclass> (DEP: schools)     repair.directories.teacherclass
---teacher-homes <user> (DEP: teacherclasses)       repair.directories.teacher-home
---adminclasses <adminclass> (DEP: schools)         repair.directories.adminclass
---student-homes <user> (DEP: adminclass)           repair.directories.student-home
+--linux|unix                                       repdir.linux
+--schools <school>                                 repdir.school    
+--projects <project>    (DEP: schools)             repdir.project
+--teacherclasses <teacherclass> (DEP: schools)     repdir.teacherclass
+--teacher-homes <user> (DEP: teacherclasses)       repdir.teacher-home
+--adminclasses <adminclass> (DEP: schools)         repdir.adminclass
+--student-homes <user> (DEP: adminclass)           repdir.student-home
 
 --all (all the above)
 
 (include global? yes, I guess)
 
-repair directories splitten, wie angegeben
 neue optionen 
 -dependencies einführen
 
@@ -223,8 +222,8 @@ Um EIN homedir anzulegen wird aufgerufen
 sophomorix-repair --student-homes <user>
 
 funktion: in sophomorix-repair:
-statt: repair_dirs_from_file|repair_single_directory -> repair_using_file (repair.directories.student-home)
-     optionen: alle variablen in repair.directories UND ntacls
+statt: repair_dirs_from_file|repair_single_directory -> repair_using_file (repdir.student-home)
+     optionen: alle variablen in repdir UND ntacls
 
 
 

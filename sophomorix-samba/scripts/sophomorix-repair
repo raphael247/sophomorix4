@@ -85,6 +85,7 @@ my $dump_AD=0;
 my $linux=0;
 my $school=0;
 my $project=0;
+my $admin_home=0;
 my $teacherclass=0;
 my $teacher_home=0;
 my $adminclass=0;
@@ -96,19 +97,21 @@ my $student_home=0;
 ###############################################################################
 # Configuration Files to be used
 # linux
-my $repair_linux="$DevelConf::path_conf_devel/repair.directories.linux";
+my $repair_linux="$DevelConf::path_conf_devel/repdir/repdir.linux";
 # school
-my $repair_school="$DevelConf::path_conf_devel/repair.directories.school";
+my $repair_school="$DevelConf::path_conf_devel/repdir/repdir.school";
 # project
-my $repair_project="$DevelConf::path_conf_devel/repair.directories.project";
+my $repair_project="$DevelConf::path_conf_devel/repdir/repdir.project";
+# Admin homes
+my $repair_admin_home="$DevelConf::path_conf_devel/repdir/repdir.admin_home";
 # teacherclass
-my $repair_teacherclass="$DevelConf::path_conf_devel/repair.directories.teacherclass";
+my $repair_teacherclass="$DevelConf::path_conf_devel/repdir/repdir.teacherclass";
 # Teacher homes
-my $repair_teacher_home="$DevelConf::path_conf_devel/repair.directories.teacher_home";
+my $repair_teacher_home="$DevelConf::path_conf_devel/repdir/repdir.teacher_home";
 # adminclass
-my $repair_adminclass="$DevelConf::path_conf_devel/repair.directories.adminclass";
+my $repair_adminclass="$DevelConf::path_conf_devel/repdir/repdir.adminclass";
 # Student homes
-my $repair_student_home="$DevelConf::path_conf_devel/repair.directories.student_home";
+my $repair_student_home="$DevelConf::path_conf_devel/repdir/repdir.student_home";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -120,6 +123,7 @@ my $testopt=GetOptions(
            "linux|unix" => \$linux,
            "school" => \$school,
            "project" => \$project,
+           "admin-homes" => \$admin_home,
            "teacherclass" => \$teacherclass,
            "teacher-homes" => \$teacher_home,
            "adminclass" => \$adminclass,
@@ -145,7 +149,7 @@ if ($help==1) {
    # Befehlbeschreibung
    print "\n$scriptname repairs the permissions,owner,groupowner,acls/ntacls ",
          "of a sophomorix installation,\n",
-         "reading the permissions from *.repair.directories files\n\n";
+         "reading the permissions from *.repdir files\n\n";
    print('
 Options
   -h  / --help
@@ -162,6 +166,7 @@ What to repair (one option must be given):
       (repairs all permissions outside of $HOME)
   --school
   --project
+  --admin-homes
   --teacherclass
   --teacher-homes
   --adminclass
@@ -191,6 +196,7 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            rooms=>"FALSE",
                            management=>"TRUE",
                            adminclasses=>"FALSE",
+                           administratorclasses=>"TRUE",
                            teacherclasses=>"FALSE",
                            projects=>"TRUE",
 #                           examaccounts=>"TRUE",
@@ -216,7 +222,6 @@ if ($linux==1) {
 }
 
 
-
 # --school
 if ($school==1) {
    &repair_dirs_from_file($repair_school);
@@ -226,6 +231,12 @@ if ($school==1) {
 # --project
 if ($project==1) {
    &repair_dirs_from_file($repair_project);
+}
+
+
+# --admin-homes
+if ($admin_home==1) {
+   &repair_dirs_from_file($repair_admin_home);
 }
 
 
@@ -300,6 +311,12 @@ sub repair_dirs_from_file {
         }
         if (/\@\@PROJECT\@\@/) {
             $group_type="project";
+            $groupvar_count++;
+        }
+
+        # good Idea??????????????????????????????ß
+        if (/management/) {
+            $group_type="admins";
             $groupvar_count++;
         }
 
@@ -394,6 +411,7 @@ sub repair_single_directory {
             # user loop
             my @users=("");
             if ($path_after_group=~/\@\@USER\@\@/) {
+		print "GR: $group\n";
                 @users = @{ $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
             }
             foreach my $user (@users){
