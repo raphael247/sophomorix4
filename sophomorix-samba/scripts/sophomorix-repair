@@ -411,8 +411,14 @@ sub repair_single_directory {
             # user loop
             my @users=("");
             if ($path_after_group=~/\@\@USER\@\@/) {
-		print "GR: $group\n";
-                @users = @{ $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
+                if (defined $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
+                    @users = @{ $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
+                } else {
+                    print "\n";
+                    print "##### No users in $group #####\n";
+                    # empty list means do nothing in next loop
+                    @users=();
+                }
             }
             foreach my $user (@users){
                 my $path_after_user=$path_after_group;
@@ -425,7 +431,9 @@ sub repair_single_directory {
                 if ($os eq "SMB"){
                     # smbclient
                     my $smbclient_command="smbclient -U Administrator%'Muster!'".
-                                         " //$root_dns/$school -c 'mkdir $path_after_user_smb'\n";
+                                         " //$root_dns/$school -c 'mkdir $path_after_user_smb'";
+                    print "\n";
+                    print "##### User: $user #####\n";
                     print "$smbclient_command\n";
                     system($smbclient_command);
 

@@ -201,7 +201,7 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.linux $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.school $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.project $(DEVELCONF)/devel/repdir
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.admin_home $(DEVELCONF)/devel/repdir
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.administrator_home $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.teacherclass $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.teacher_home $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.adminclass $(DEVELCONF)/devel/repdir
