@@ -103,7 +103,7 @@ my $repair_school="$DevelConf::path_conf_devel/repdir/repdir.school";
 # project
 my $repair_project="$DevelConf::path_conf_devel/repdir/repdir.project";
 # Admin homes
-my $repair_admin_home="$DevelConf::path_conf_devel/repdir/repdir.admin_home";
+my $repair_admin_home="$DevelConf::path_conf_devel/repdir/repdir.administrator_home";
 # teacherclass
 my $repair_teacherclass="$DevelConf::path_conf_devel/repdir/repdir.teacherclass";
 # Teacher homes
@@ -313,9 +313,7 @@ sub repair_dirs_from_file {
             $group_type="project";
             $groupvar_count++;
         }
-
-        # good Idea??????????????????????????????ß
-        if (/management/) {
+        if (/\@\@MANAGEMENT\@\@/) {
             $group_type="admins";
             $groupvar_count++;
         }
@@ -400,10 +398,12 @@ sub repair_single_directory {
             $path_after_group=~s/\@\@ADMINCLASS\@\@/$group/;
             $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group/;
             $path_after_group=~s/\@\@PROJECT\@\@/$group/;
+            $path_after_group=~s/\@\@MANAGEMENT\@\@/management/;
             my $path_after_group_smb=$path_smb;
             $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group/;
             $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group/;
             $path_after_group_smb=~s/\@\@PROJECT\@\@/$group/;
+            $path_after_group_smb=~s/\@\@MANAGEMENT\@\@/management/;
             if($Conf::log_level>=3){      
                 print "      * Path after group:  $path_after_group (smb: $path_after_group_smb)\n";
             }

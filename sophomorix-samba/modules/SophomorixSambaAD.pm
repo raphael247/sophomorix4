@@ -1865,6 +1865,9 @@ sub AD_get_AD {
     my $teacherclasses = $arg_ref->{teacherclasses};
     if (not defined $teacherclasses){$teacherclasses="FALSE"};
 
+    my $administratorclasses = $arg_ref->{administratorclasses};
+    if (not defined $administratorclasses){$administratorclasses="FALSE"};
+
     my $projects = $arg_ref->{projects};
     if (not defined $projects){$projects="FALSE"};
 
@@ -1985,6 +1988,109 @@ sub AD_get_AD {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ##################################################
+    if ($administratorclasses eq "TRUE"){
+
+
+	print "\n admins \n\n";
+        # sophomorixType teacherclass from ldap
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => '(&(objectClass=group)(sophomorixType=admins))',
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_teacherclass = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_teacherclass sophomorix admins found in AD");
+        $AD{'result'}{'group'}{'teacherclass'}{'COUNT'}=$max_teacherclass;
+        for( my $index = 0 ; $index < $max_teacherclass ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # lists
+            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'lists'}{$type} }, $sam; 
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+            $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
+        }
+        # sorting some lists
+#        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     ##################################################
     if ($projects eq "TRUE"){
         # sophomorixType projects from ldap
@@ -2032,7 +2138,7 @@ sub AD_get_AD {
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-                       filter => '(&(objectClass=user)(|(sophomorixRole=student)(sophomorixRole=teacher)))',
+                       filter => '(&(objectClass=user)(|(sophomorixRole=student)(sophomorixRole=teacher)(sophomorixRole=administrator)))',
                        #filter => '(&(objectClass=user) (sophomorixRole=student))',
                        attrs => ['sAMAccountName',
                                  'sophomorixAdminClass',
@@ -2368,7 +2474,7 @@ sub AD_get_AD {
             #$AD{'objectclass'}{'group'}{'admins'}{$sam}{'admins'}=$sam;
             $AD{'objectclass'}{'group'}{'admins'}{$sam}{'sophomorixStatus'}=$stat;
             $AD{'objectclass'}{'group'}{'admins'}{$sam}{'sophomorixType'}=$type;
-            $AD{'objectclass'}{'group'}{'admins'}{$sam}{'sophomorixSchoolname'}=$scholname;
+            $AD{'objectclass'}{'group'}{'admins'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
@@ -2381,7 +2487,7 @@ sub AD_get_AD {
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'admins'}{$sam}{'members'}{$user}=$member;
                 push @{ $AD{'lists'}{'by_school'}{'global'}{'admins'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$scholname}{'admins'} }, $member;
+                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'admins'} }, $member;
             }
         }
         # sorting some lists
