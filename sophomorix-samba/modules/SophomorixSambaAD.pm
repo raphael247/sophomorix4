@@ -383,6 +383,7 @@ sub AD_repdir_using_file {
     my $repdir_file = $arg_ref->{repdir_file};
     my $ref_AD = $arg_ref->{AD};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
     # optional options
     my $school = $arg_ref->{school};
 
@@ -400,11 +401,12 @@ sub AD_repdir_using_file {
     # reading repdir file
     open(REPDIRFILE, "<$repdir_file")|| die "ERROR: $repdir_file $!";
     while (<REPDIRFILE>) {
+        my $line=$_;
         $line_num++;
         my $group_type="";
-        my $groupvar_count=0;
-        chomp();   
-        if ($_ eq ""){next;} # next on empty line
+        my $groupvar_seen=0;
+        chomp($line);   
+        if ($line eq ""){next;} # next on empty line
         if(/^\#/){next;} # next on comments
 
         $entry_num++;
@@ -414,22 +416,22 @@ sub AD_repdir_using_file {
 
         if (/\@\@ADMINCLASS\@\@/) {
             $group_type="adminclass";
-            $groupvar_count++;
+            $groupvar_seen++;
         }
         if (/\@\@TEACHERCLASS\@\@/) {
             $group_type="teacherclass";
-            $groupvar_count++;
+            $groupvar_seen++;
         }
         if (/\@\@PROJECT\@\@/) {
             $group_type="project";
-            $groupvar_count++;
+            $groupvar_seen++;
         }
         if (/\@\@MANAGEMENT\@\@/) {
             $group_type="admins";
-            $groupvar_count++;
+            $groupvar_seen++;
         }
 
-        my ($os,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/);
+        my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/,$line);
 
         # replacing $vars in path
         my @old_dirs=split(/\//,$path_with_var);
@@ -454,9 +456,9 @@ sub AD_repdir_using_file {
         $path_with_var=join("/",@new_dirs);
 
         print "------------------------------------------------------------\n";
-        print "$entry_num) Line $line_num:  $_:\n";
+        print "$entry_num) Line $line_num:  $line:\n";
         if($Conf::log_level>=3){
-            print "   Type:     $os\n";
+            print "   Type:     $entry_type\n";
             print "   Path:     $path_with_var\n";
             print "   Owner:    $owner\n";
             print "   Group:    $groupowner\n";
@@ -478,7 +480,7 @@ sub AD_repdir_using_file {
             }
             # determining groups to walk through
             my @groups;
-            if ($groupvar_count==0){
+            if ($groupvar_seen==0){
                 # no vars found -> one single loop
                 @groups=("");
             } else {
@@ -490,13 +492,6 @@ sub AD_repdir_using_file {
                     # there is no group list -> avoid the even a single loop 
                     @groups=();
 	        }
-#                if(defined $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
-#                    # there is a group list -> use it
-#                    @groups=@{ $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
-#                } else {
-#                    # there is no group list -> avoid the even a single loop 
-#                    @groups=();
-#	        }
             }
             ########################################
             # group loop start
@@ -525,8 +520,6 @@ sub AD_repdir_using_file {
                 # user loop start
                 my @users=("");
                 if ($path_after_group=~/\@\@USER\@\@/) {
-#                    if (defined $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
-#                        @users = @{ $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
                     if (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
                         @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
                     } else {
@@ -544,7 +537,7 @@ sub AD_repdir_using_file {
                     if($Conf::log_level>=3){      
                         print "      * Path after user:   $path_after_user (smb: $path_after_user_smb)\n";
 	            }
-                    if ($os eq "SMB"){
+                    if ($entry_type eq "SMB"){
                         # smbclient
                         my $smbclient_command="smbclient -U Administrator%'Muster!'".
                                               " //$root_dns/$school -c 'mkdir $path_after_user_smb'";
@@ -559,24 +552,23 @@ sub AD_repdir_using_file {
                                                                      ntacl=>$ntacl,
                                                                      smbpath=>$path_after_user_smb,
                                                                    });
-                   } elsif ($os eq "LINUX"){
+                   } elsif ($entry_type eq "LINUX"){
                         mkdir $path_after_user;
                         my $chown_command="chown ".$owner.".".$groupowner." ".$path_after_user;
                         print "          $chown_command\n";
                         system($chown_command);
                         chmod oct($permission), $path_after_user;
                     } else {
-                        print "\nERROR: $os unknown\n\n";
+                        print "\nERROR: $entry_type unknown\n\n";
                         exit;
                     }
                 } # user loop end 
             } # group loop end 
         } # school loop end
-        print "--- DONE with $entry_num) Line $line_num:  $_---\n";
+        print "--- DONE with $entry_num) Line $line_num:  $line ---\n";
     }
     close(REPDIRFILE);
 }
-
 
 
 
