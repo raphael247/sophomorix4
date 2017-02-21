@@ -71,6 +71,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_AD
                                  AD_dns_get
                                  AD_object_search
+                                 AD_repdir_using_file
                                  get_forbidden_logins
                                     );
 my @arguments = @ARGV;
@@ -242,49 +243,49 @@ if ($all==1) {
 
 # --linux
 if ($linux==1) {
-   &repair_dirs_from_file($repair_linux);
+   &AD_repdir_using_file($repair_linux);
 }
 
 
 # --school
 if ($school==1) {
-   &repair_dirs_from_file($repair_school);
+   &AD_repdir_using_file($repair_school);
 }
 
 
 # --project
 if ($project==1) {
-   &repair_dirs_from_file($repair_project);
+   &AD_repdir_using_file($repair_project);
 }
 
 
 # --admin-homes
 if ($administrator_home==1) {
-   &repair_dirs_from_file($repair_administrator_home);
+   &AD_repdir_using_file($repair_administrator_home);
 }
 
 
 # --teacherclass
 if ($teacherclass==1) {
-   &repair_dirs_from_file($repair_teacherclass);
+   &AD_repdir_using_file($repair_teacherclass);
 }
 
 
 # --teacher-homes
 if ($teacher_home==1) {
-   &repair_dirs_from_file($repair_teacher_home);
+   &AD_repdir_using_file($repair_teacher_home);
 }
 
 
 # --adminclass
 if ($adminclass==1) {
-   &repair_dirs_from_file($repair_adminclass);
+   &AD_repdir_using_file($repair_adminclass);
 }
 
 
 # --student-homes
 if ($student_home==1) {
-   &repair_dirs_from_file($repair_student_home);
+   &AD_repdir_using_file($repair_student_home);
 }
 
 
@@ -368,7 +369,7 @@ sub repair_dirs_from_file {
         print "$num) Line $line_num:  $_:\n";
         if($Conf::log_level>=3){
             print "   Type:     $os\n";
-            print "   Owner:    $owner\n";
+             print "   Owner:    $owner\n";
             print "   Group:    $groupowner\n";
             print "   Perm:     $permission\n";
             print "   NT-ACL:   $ntacl\n";

@@ -68,6 +68,7 @@ $Data::Dumper::Terse = 1;
             AD_dns_zonecreate
             AD_dns_kill
             AD_dns_zonekill
+            AD_repdir_using_file
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -368,6 +369,13 @@ sub AD_dns_zonekill {
     my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "   * $command\n";
     system($command);
+}
+
+
+
+sub AD_repdir_using_file {
+    print "Calling AD_repdir_using_file\n";
+
 }
 
 
