@@ -374,8 +374,11 @@ sub AD_dns_zonekill {
 
 
 sub AD_repdir_using_file {
-    print "Calling AD_repdir_using_file\n";
-
+    my ($arg_ref) = @_;
+    #my $ldap = $arg_ref->{ldap};
+    #my $root_dse = $arg_ref->{root_dse};
+    my $repdir_file = $arg_ref->{repdir_file};
+    print "Calling AD_repdir_using_file: $repdir_file\n";
 }
 
 

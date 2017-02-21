@@ -99,21 +99,21 @@ my $all=0;
 ###############################################################################
 # Configuration Files to be used
 # linux
-my $repair_linux="$DevelConf::path_conf_devel/repdir/repdir.linux";
+my $repdir_linux="$DevelConf::path_conf_devel/repdir/repdir.linux";
 # school
-my $repair_school="$DevelConf::path_conf_devel/repdir/repdir.school";
+my $repdir_school="$DevelConf::path_conf_devel/repdir/repdir.school";
 # project
-my $repair_project="$DevelConf::path_conf_devel/repdir/repdir.project";
+my $repdir_project="$DevelConf::path_conf_devel/repdir/repdir.project";
 # Admin homes
-my $repair_administrator_home="$DevelConf::path_conf_devel/repdir/repdir.administrator_home";
+my $repdir_administrator_home="$DevelConf::path_conf_devel/repdir/repdir.administrator_home";
 # teacherclass
-my $repair_teacherclass="$DevelConf::path_conf_devel/repdir/repdir.teacherclass";
+my $repdir_teacherclass="$DevelConf::path_conf_devel/repdir/repdir.teacherclass";
 # Teacher homes
-my $repair_teacher_home="$DevelConf::path_conf_devel/repdir/repdir.teacher_home";
+my $repdir_teacher_home="$DevelConf::path_conf_devel/repdir/repdir.teacher_home";
 # adminclass
-my $repair_adminclass="$DevelConf::path_conf_devel/repdir/repdir.adminclass";
+my $repdir_adminclass="$DevelConf::path_conf_devel/repdir/repdir.adminclass";
 # Student homes
-my $repair_student_home="$DevelConf::path_conf_devel/repdir/repdir.student_home";
+my $repdir_student_home="$DevelConf::path_conf_devel/repdir/repdir.student_home";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -167,7 +167,7 @@ What to repair:
   --linux|unix (repairs all permissions outside of $HOME)
   --school                   (use repdir.school)
   --project                  (use repdir.project)
-  --admin-homes              (use repdir.administrator_home)
+  --administrator-homes      (use repdir.administrator_home)
   --teacherclass             ( use repdir.teacherclass)
   --teacher-homes            (use repdir.teacher_home)
   --adminclass               (use repdir.adminclass)
@@ -243,49 +243,73 @@ if ($all==1) {
 
 # --linux
 if ($linux==1) {
-   &AD_repdir_using_file($repair_linux);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_linux,
+                        });
 }
 
 
 # --school
 if ($school==1) {
-   &AD_repdir_using_file($repair_school);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_school,
+                        });
 }
 
 
 # --project
 if ($project==1) {
-   &AD_repdir_using_file($repair_project);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_project,
+                        });
 }
 
 
-# --admin-homes
+# --administrator-homes
 if ($administrator_home==1) {
-   &AD_repdir_using_file($repair_administrator_home);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_administrator_home,
+                        });
 }
 
 
 # --teacherclass
 if ($teacherclass==1) {
-   &AD_repdir_using_file($repair_teacherclass);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_teacherclass,
+                        });
 }
 
 
 # --teacher-homes
 if ($teacher_home==1) {
-   &AD_repdir_using_file($repair_teacher_home);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_teacher_home,
+                        });
 }
 
 
 # --adminclass
 if ($adminclass==1) {
-   &AD_repdir_using_file($repair_adminclass);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_adminclass,
+                        });
 }
 
 
 # --student-homes
 if ($student_home==1) {
-   &AD_repdir_using_file($repair_student_home);
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         repdir_file=>$repdir_student_home,
+                        });
 }
 
 
