@@ -245,7 +245,9 @@ if ($all==1) {
 if ($linux==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_linux,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -255,7 +257,9 @@ if ($linux==1) {
 if ($school==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_school,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -265,7 +269,9 @@ if ($school==1) {
 if ($project==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_project,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -275,7 +281,9 @@ if ($project==1) {
 if ($administrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_administrator_home,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -285,7 +293,9 @@ if ($administrator_home==1) {
 if ($teacherclass==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_teacherclass,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -295,7 +305,9 @@ if ($teacherclass==1) {
 if ($teacher_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_teacher_home,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -305,7 +317,9 @@ if ($teacher_home==1) {
 if ($adminclass==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_adminclass,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -315,7 +329,9 @@ if ($adminclass==1) {
 if ($student_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
+                         root_dns=>$root_dns,
                          repdir_file=>$repdir_student_home,
+                         AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
 }
@@ -336,10 +352,6 @@ sub repair_dirs_from_file {
     my $num=0;
     my $line_num=0;
     &print_title("Repairing from file: $directory_file_base");
-
-
-
-
 
     open(DIRS, "<$directory_file")|| die "ERROR: $directory_file $!";
     while (<DIRS>) {
@@ -425,6 +437,7 @@ sub repair_dirs_from_file {
 sub repair_single_directory {
     my ($os,$path_with_var, $owner, $groupowner, $permission, 
         $ntacl, $schools, $group_type, $groupvar_count) = @_;
+
     foreach my $school (@$schools){
         my $path=$path_with_var;
         my $path_smb=$path_with_var;

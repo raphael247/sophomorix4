@@ -377,9 +377,11 @@ sub AD_dns_zonekill {
 sub AD_repdir_using_file {
     my ($arg_ref) = @_;
     # mandatory options
-    #my $ldap = $arg_ref->{ldap};
-    #my $root_dse = $arg_ref->{root_dse};
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $repdir_file = $arg_ref->{repdir_file};
+    my $ref_AD = $arg_ref->{AD};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     # optional options
     my $school = $arg_ref->{school};
@@ -389,7 +391,7 @@ sub AD_repdir_using_file {
     my $line_num=0;
     &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file_base");
 
-    # option scchool
+    # option school
     my @schools=("");
     if (defined $school){
         @schools=($school);
@@ -427,10 +429,10 @@ sub AD_repdir_using_file {
             $groupvar_count++;
         }
 
-        my ($os,$path, $owner, $groupowner, $permission,$ntacl) = split(/::/);
+        my ($os,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/);
 
         # replacing $vars in path
-        my @old_dirs=split(/\//,$path);
+        my @old_dirs=split(/\//,$path_with_var);
         my @new_dirs=();
         foreach my $dir (@old_dirs){
             $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
@@ -449,12 +451,13 @@ sub AD_repdir_using_file {
             $dir=~s/<$//g;
 	    push @new_dirs,$dir;
         }
-        $path=join("/",@new_dirs);
+        $path_with_var=join("/",@new_dirs);
 
         print "------------------------------------------------------------\n";
         print "$entry_num) Line $line_num:  $_:\n";
         if($Conf::log_level>=3){
             print "   Type:     $os\n";
+            print "   Path:     $path_with_var\n";
             print "   Owner:    $owner\n";
             print "   Group:    $groupowner\n";
             print "   Perm:     $permission\n";
@@ -462,12 +465,118 @@ sub AD_repdir_using_file {
             print "   Schools:  @schools\n";
         }
 
-        # more here ?????????
+        ########################################
+        # school loop start             
+        foreach my $school (@schools){
+            my $path=$path_with_var;
+            my $path_smb=$path_with_var;
+            $path=~s/\@\@SCHOOL\@\@/$school/;
+            $path_smb=~s/\@\@SCHOOL\@\@\///;
+            if($Conf::log_level>=3){
+                print "   Determining path for school $school:\n";
+                print "      * Path after school: $path (smb: $path_smb)\n";
+            }
+            # determining groups to walk through
+            my @groups;
+            if ($groupvar_count==0){
+                # no vars found -> one single loop
+                @groups=("");
+            } else {
+                # vars found
+                if(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
+                    # there is a group list -> use it
+                    @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
+                } else {
+                    # there is no group list -> avoid the even a single loop 
+                    @groups=();
+	        }
+#                if(defined $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
+#                    # there is a group list -> use it
+#                    @groups=@{ $AD{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
+#                } else {
+#                    # there is no group list -> avoid the even a single loop 
+#                    @groups=();
+#	        }
+            }
+            ########################################
+            # group loop start
+            foreach my $group (@groups){
+                my $group_basename=$group;
 
+                # calculating group basename without prefix
+                $group_basename=~s/^${school}-//;
+                print "working with group $group >$group_basename< ...\n";
+
+                my $path_after_group=$path;
+                $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
+                $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
+                $path_after_group=~s/\@\@PROJECT\@\@/$group_basename/;
+                $path_after_group=~s/\@\@MANAGEMENT\@\@/management/;
+                my $path_after_group_smb=$path_smb;
+                $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group_basename/;
+                $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
+                $path_after_group_smb=~s/\@\@PROJECT\@\@/$group_basename/;
+                $path_after_group_smb=~s/\@\@MANAGEMENT\@\@/management/;
+                if($Conf::log_level>=3){      
+                    print "      * Path after group:  $path_after_group (smb: $path_after_group_smb)\n";
+                }
+
+                ########################################
+                # user loop start
+                my @users=("");
+                if ($path_after_group=~/\@\@USER\@\@/) {
+#                    if (defined $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
+#                        @users = @{ $AD{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
+                    if (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
+                        @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
+                    } else {
+                        print "\n";
+                        print "##### No users in $group #####\n";
+                        # empty list means do nothing in next loop
+                        @users=();
+                    }
+                }
+                foreach my $user (@users){
+                    my $path_after_user=$path_after_group;
+                    $path_after_user=~s/\@\@USER\@\@/$user/;
+                    my $path_after_user_smb=$path_after_group_smb;
+                    $path_after_user_smb=~s/\@\@USER\@\@/$user/;
+                    if($Conf::log_level>=3){      
+                        print "      * Path after user:   $path_after_user (smb: $path_after_user_smb)\n";
+	            }
+                    if ($os eq "SMB"){
+                        # smbclient
+                        my $smbclient_command="smbclient -U Administrator%'Muster!'".
+                                              " //$root_dns/$school -c 'mkdir $path_after_user_smb'";
+                        print "\n";
+                        print "##### User: $user #####\n";
+                        print "$smbclient_command\n";
+                        system($smbclient_command);
+
+                        # smbcacls
+                        &Sophomorix::SophomorixBase::NTACL_set_file({root_dns=>$root_dns,
+                                                                     school=>$school,
+                                                                     ntacl=>$ntacl,
+                                                                     smbpath=>$path_after_user_smb,
+                                                                   });
+                   } elsif ($os eq "LINUX"){
+                        mkdir $path_after_user;
+                        my $chown_command="chown ".$owner.".".$groupowner." ".$path_after_user;
+                        print "          $chown_command\n";
+                        system($chown_command);
+                        chmod oct($permission), $path_after_user;
+                    } else {
+                        print "\nERROR: $os unknown\n\n";
+                        exit;
+                    }
+                } # user loop end 
+            } # group loop end 
+        } # school loop end
         print "--- DONE with $entry_num) Line $line_num:  $_---\n";
     }
     close(REPDIRFILE);
 }
+
 
 
 
