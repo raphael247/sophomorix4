@@ -433,10 +433,11 @@ sub AD_repdir_using_file {
             $group_type="project";
             $groupvar_seen++;
         }
-#        if (/\@\@MANAGEMENT\@\@/) {
-#            $group_type="admins";
-#            # is NOT a groupvar
-#        }
+        if (/\$directory_management/) {
+            $group_type="admins";
+            # go through one group loop for admins
+            $groupvar_seen++;
+        }
 
         my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/,$line);
 
@@ -465,13 +466,14 @@ sub AD_repdir_using_file {
         print "------------------------------------------------------------\n";
         print "$entry_num) Line $line_num:  $line:\n";
         if($Conf::log_level>=3){
-            print "   Type:     $entry_type\n";
-            print "   Path:     $path_with_var\n";
-            print "   Owner:    $owner\n";
-            print "   Group:    $groupowner\n";
-            print "   Perm:     $permission\n";
-            print "   NT-ACL:   $ntacl\n";
-            print "   Schools:  @schools\n";
+            print "   Type:       $entry_type\n";
+            print "   Path:       $path_with_var\n";
+            print "   Owner:      $owner\n";
+            print "   Group:      $groupowner\n";
+            print "   Group-Type: $group_type\n";
+            print "   Perm:       $permission\n";
+            print "   NT-ACL:     $ntacl\n";
+            print "   Schools:    @schools\n";
         }
 
         ########################################
@@ -502,7 +504,7 @@ sub AD_repdir_using_file {
                     # there is a group list -> use it
                     @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
                 } else {
-                    # there is no group list -> avoid the even a single loop 
+                    # there is no group list -> avoid even a single loop 
                     @groups=();
 	        }
             }
@@ -510,21 +512,17 @@ sub AD_repdir_using_file {
             # group loop start
             foreach my $group (@groups){
                 my $group_basename=$group;
-
                 # calculating group basename without prefix
                 $group_basename=~s/^${school}-//;
-                print "working with group $group >$group_basename< ...\n";
 
                 my $path_after_group=$path;
                 $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@PROJECT\@\@/$group_basename/;
-#                $path_after_group=~s/\@\@MANAGEMENT\@\@/management/;
                 my $path_after_group_smb=$path_smb;
                 $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group_basename/;
                 $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
                 $path_after_group_smb=~s/\@\@PROJECT\@\@/$group_basename/;
-#                $path_after_group_smb=~s/\@\@MANAGEMENT\@\@/management/;
                 if($Conf::log_level>=3){      
                     print "      * Path after group:  $path_after_group (smb: $path_after_group_smb)\n";
                 }
@@ -561,8 +559,13 @@ sub AD_repdir_using_file {
                         # smbclient
                         my $smbclient_command="smbclient -U Administrator%'Muster!'".
                                               " //$root_dns/$school -c 'mkdir $path_after_user_smb'";
-                        print "\n";
-                        print "##### User: $user #####\n";
+                        my $user_typeout;
+                        if ($user eq ""){
+                            $user_typeout="<none>";
+                        } else {
+                            $user_typeout=$user;
+                        }
+                        print "   User: $user_typeout\n";
                         print "$smbclient_command\n";
                         system($smbclient_command);
 

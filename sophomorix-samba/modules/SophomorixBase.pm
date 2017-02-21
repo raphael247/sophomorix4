@@ -1163,10 +1163,10 @@ sub NTACL_set_file {
    
     my $ntacl_abs=$DevelConf::path_conf_devel_ntacl."/".$ntacl.".template";
     if ($ntacl eq "noacl" or $ntacl eq "nontacl"){
-        print "Skipping ACL/NTACL creation for $smbpath\n";
+        print "   Skipping ACL/NTACL creation for $smbpath\n";
         return;
     } elsif (not -r $ntacl_abs){ # -r: readable
-        print "ERROR: $ntacl_abs not found/readable\n\n";
+        print "\nERROR: $ntacl_abs not found/readable\n\n";
         exit;
     }
     print "Setting the NTACL:\n";
