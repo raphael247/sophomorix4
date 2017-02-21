@@ -386,7 +386,9 @@ sub AD_repdir_using_file {
 
     # optional options
     my $school = $arg_ref->{school};
-    
+    my $project = $arg_ref->{project};
+    my $administrator = $arg_ref->{administrator};
+
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
     my $entry_num=0; # was $num
@@ -429,7 +431,7 @@ sub AD_repdir_using_file {
         }
         if (/\@\@MANAGEMENT\@\@/) {
             $group_type="admins";
-            $groupvar_seen++;
+            # is NOT a groupvar
         }
 
         my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/,$line);
@@ -486,7 +488,9 @@ sub AD_repdir_using_file {
                 @groups=("");
             } else {
                 # vars found
-                if(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
+                if (defined $project){
+                    @groups=($project);
+                } elsif(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
                     # there is a group list -> use it
                     @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
                 } else {
@@ -521,7 +525,10 @@ sub AD_repdir_using_file {
                 # user loop start
                 my @users=("");
                 if ($path_after_group=~/\@\@USER\@\@/) {
-                    if (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
+                    # determining list of users
+                    if (defined $administrator){
+                        @users=($administrator);
+                    } elsif (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
                         @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
                     } else {
                         print "\n";

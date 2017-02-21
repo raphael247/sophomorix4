@@ -84,6 +84,32 @@ AD_repdir_using_file repairs multiple users, groups, schools, ...
 when called like in sophomorix-repair
 
 When creating/repairing ONE user-home, group-share, school then:
+ - load %sophomorix_config
+ - 
  - all @@VAR@@ in the file (and the ntacl file) must be given as option
  - The option of AD_repdir_using_file is the lowercase name of @@VAR@@: 
-   
+
+# Examples   
+# creating ONE School:
+   &AD_repdir_using_file({root_dns=>$root_dns,
+                         repdir_file=>"repdir.school",
+                         school=>"bsz",
+                         sophomorix_config=>\%sophomorix_config,
+                        });
+
+
+#creating ONE project in ONE school:
+   &AD_repdir_using_file({root_dns=>$root_dns,
+                         repdir_file=>"repdir.project",
+                         school=>"default-school",
+                         project=>"p_astro",
+                         sophomorix_config=>\%sophomorix_config,
+                        });
+
+#creating ONE administrator home in ONE school:
+  &AD_repdir_using_file({root_dns=>$root_dns,
+                         repdir_file=>"repdir.administrator_home",
+                         school=>"abc",
+                         administrator=>"admin10",
+                         sophomorix_config=>\%sophomorix_config,
+                        });
