@@ -433,10 +433,10 @@ sub AD_repdir_using_file {
             $group_type="project";
             $groupvar_seen++;
         }
-        if (/\@\@MANAGEMENT\@\@/) {
-            $group_type="admins";
-            # is NOT a groupvar
-        }
+#        if (/\@\@MANAGEMENT\@\@/) {
+#            $group_type="admins";
+#            # is NOT a groupvar
+#        }
 
         my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/,$line);
 
@@ -519,12 +519,12 @@ sub AD_repdir_using_file {
                 $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@PROJECT\@\@/$group_basename/;
-                $path_after_group=~s/\@\@MANAGEMENT\@\@/management/;
+#                $path_after_group=~s/\@\@MANAGEMENT\@\@/management/;
                 my $path_after_group_smb=$path_smb;
                 $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group_basename/;
                 $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
                 $path_after_group_smb=~s/\@\@PROJECT\@\@/$group_basename/;
-                $path_after_group_smb=~s/\@\@MANAGEMENT\@\@/management/;
+#                $path_after_group_smb=~s/\@\@MANAGEMENT\@\@/management/;
                 if($Conf::log_level>=3){      
                     print "      * Path after group:  $path_after_group (smb: $path_after_group_smb)\n";
                 }
