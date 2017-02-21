@@ -16,6 +16,7 @@ use Unicode::String qw(utf16);
 use Net::LDAP;
 use Net::LDAP::Control::Sort;
 use List::MoreUtils qw(uniq);
+use File::Basename;
 #use Sophomorix::SophomorixBase;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -375,10 +376,97 @@ sub AD_dns_zonekill {
 
 sub AD_repdir_using_file {
     my ($arg_ref) = @_;
+    # mandatory options
     #my $ldap = $arg_ref->{ldap};
     #my $root_dse = $arg_ref->{root_dse};
     my $repdir_file = $arg_ref->{repdir_file};
-    print "Calling AD_repdir_using_file: $repdir_file\n";
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    # optional options
+    my $school = $arg_ref->{school};
+
+    my $repdir_file_base = basename($repdir_file);
+    my $entry_num=0; # was $num
+    my $line_num=0;
+    &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file_base");
+
+    # option scchool
+    my @schools=("");
+    if (defined $school){
+        @schools=($school);
+    }
+
+    # reading repdir file
+    open(REPDIRFILE, "<$repdir_file")|| die "ERROR: $repdir_file $!";
+    while (<REPDIRFILE>) {
+        $line_num++;
+        my $group_type="";
+        my $groupvar_count=0;
+        chomp();   
+        if ($_ eq ""){next;} # next on empty line
+        if(/^\#/){next;} # next on comments
+
+        $entry_num++;
+        if (/\@\@SCHOOL\@\@/ and not defined $school) {
+            @schools = @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+        }
+
+        if (/\@\@ADMINCLASS\@\@/) {
+            $group_type="adminclass";
+            $groupvar_count++;
+        }
+        if (/\@\@TEACHERCLASS\@\@/) {
+            $group_type="teacherclass";
+            $groupvar_count++;
+        }
+        if (/\@\@PROJECT\@\@/) {
+            $group_type="project";
+            $groupvar_count++;
+        }
+        if (/\@\@MANAGEMENT\@\@/) {
+            $group_type="admins";
+            $groupvar_count++;
+        }
+
+        my ($os,$path, $owner, $groupowner, $permission,$ntacl) = split(/::/);
+
+        # replacing $vars in path
+        my @old_dirs=split(/\//,$path);
+        my @new_dirs=();
+        foreach my $dir (@old_dirs){
+            $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
+            # /var
+            $dir=~s/>\$path_log</${DevelConf::path_log}/;
+            $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
+            # /home
+            $dir=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
+            $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
+            # other
+            $dir=~s/>\$directory_students</${DevelConf::directory_students}/;
+            $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
+            $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
+            # remove <,>
+            $dir=~s/^>//g;
+            $dir=~s/<$//g;
+	    push @new_dirs,$dir;
+        }
+        $path=join("/",@new_dirs);
+
+        print "------------------------------------------------------------\n";
+        print "$entry_num) Line $line_num:  $_:\n";
+        if($Conf::log_level>=3){
+            print "   Type:     $os\n";
+            print "   Owner:    $owner\n";
+            print "   Group:    $groupowner\n";
+            print "   Perm:     $permission\n";
+            print "   NT-ACL:   $ntacl\n";
+            print "   Schools:  @schools\n";
+        }
+
+        # more here ?????????
+
+        print "--- DONE with $entry_num) Line $line_num:  $_---\n";
+    }
+    close(REPDIRFILE);
 }
 
 

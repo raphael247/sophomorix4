@@ -246,6 +246,7 @@ if ($linux==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_linux,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -255,6 +256,7 @@ if ($school==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_school,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -264,6 +266,7 @@ if ($project==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_project,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -273,6 +276,7 @@ if ($administrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_administrator_home,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -282,6 +286,7 @@ if ($teacherclass==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_teacherclass,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -291,6 +296,7 @@ if ($teacher_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_teacher_home,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -300,6 +306,7 @@ if ($adminclass==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_adminclass,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -309,6 +316,7 @@ if ($student_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          repdir_file=>$repdir_student_home,
+                         sophomorix_config=>\%sophomorix_config,
                         });
 }
 
@@ -328,6 +336,11 @@ sub repair_dirs_from_file {
     my $num=0;
     my $line_num=0;
     &print_title("Repairing from file: $directory_file_base");
+
+
+
+
+
     open(DIRS, "<$directory_file")|| die "ERROR: $directory_file $!";
     while (<DIRS>) {
         $line_num++;
