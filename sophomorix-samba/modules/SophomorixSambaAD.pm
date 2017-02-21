@@ -391,6 +391,7 @@ sub AD_repdir_using_file {
     my $teacherclass = $arg_ref->{teacherclass};
     my $teacher_home = $arg_ref->{teacher_home};
     my $adminclass = $arg_ref->{adminclass};
+    my $student_home = $arg_ref->{student_home};
 
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
@@ -537,6 +538,8 @@ sub AD_repdir_using_file {
                         @users=($administrator_home);
                     } elsif (defined $teacher_home){
                         @users=($teacher_home);
+                    } elsif (defined $student_home){
+                        @users=($student_home);
                     } elsif (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
                         @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
                     } else {
