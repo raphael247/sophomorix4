@@ -79,23 +79,6 @@ my $all=0;
 ###############################################################################
 # Beginn
 ###############################################################################
-# Configuration Files to be used
-# linux
-my $repdir_linux="$DevelConf::path_conf_devel/repdir/repdir.linux";
-# school
-my $repdir_school="$DevelConf::path_conf_devel/repdir/repdir.school";
-# project
-my $repdir_project="$DevelConf::path_conf_devel/repdir/repdir.project";
-# Admin homes
-my $repdir_administrator_home="$DevelConf::path_conf_devel/repdir/repdir.administrator_home";
-# teacherclass
-my $repdir_teacherclass="$DevelConf::path_conf_devel/repdir/repdir.teacherclass";
-# Teacher homes
-my $repdir_teacher_home="$DevelConf::path_conf_devel/repdir/repdir.teacher_home";
-# adminclass
-my $repdir_adminclass="$DevelConf::path_conf_devel/repdir/repdir.adminclass";
-# Student homes
-my $repdir_student_home="$DevelConf::path_conf_devel/repdir/repdir.student_home";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -225,7 +208,7 @@ if ($linux==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_linux,
+                         repdir_file=>"repdir.linux",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -237,7 +220,7 @@ if ($school==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_school,
+                         repdir_file=>"repdir.school",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -249,7 +232,7 @@ if ($project==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_project,
+                         repdir_file=>"repdir.project",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -261,7 +244,7 @@ if ($administrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_administrator_home,
+                         repdir_file=>"repdir.administrator_home",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -273,7 +256,7 @@ if ($teacherclass==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_teacherclass,
+                         repdir_file=>"repdir.teacherclass",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -285,7 +268,7 @@ if ($teacher_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_teacher_home,
+                         repdir_file=>"repdir.teacher_home",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -297,7 +280,7 @@ if ($adminclass==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_adminclass,
+                         repdir_file=>"repdir.adminclass",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
@@ -309,7 +292,7 @@ if ($student_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         repdir_file=>$repdir_student_home,
+                         repdir_file=>"repdir.student_home",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });

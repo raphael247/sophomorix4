@@ -386,11 +386,12 @@ sub AD_repdir_using_file {
 
     # optional options
     my $school = $arg_ref->{school};
-
-    my $repdir_file_base = basename($repdir_file);
+    
+    # abs path
+    my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
     my $entry_num=0; # was $num
     my $line_num=0;
-    &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file_base");
+    &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file");
 
     # option school
     my @schools=("");
@@ -399,7 +400,7 @@ sub AD_repdir_using_file {
     }
 
     # reading repdir file
-    open(REPDIRFILE, "<$repdir_file")|| die "ERROR: $repdir_file $!";
+    open(REPDIRFILE, "<$repdir_file_abs")|| die "ERROR: $repdir_file_abs $!";
     while (<REPDIRFILE>) {
         my $line=$_;
         $line_num++;

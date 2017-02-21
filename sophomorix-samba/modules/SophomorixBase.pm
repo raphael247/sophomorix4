@@ -304,6 +304,17 @@ sub config_sophomorix_read {
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
         "OU=".$DevelConf::name_default_school.",".$DevelConf::AD_schools_ou.",".$root_dse; 
 
+    # Adding repdir absolute paths
+    opendir REPDIR, $DevelConf::path_conf_devel_repdir or return;
+    foreach my $file (readdir REPDIR){
+        my $abs_path=$DevelConf::path_conf_devel_repdir."/".$file;
+        my $Type;
+        if ($file eq "."){next};
+        if ($file eq ".."){next};
+        $sophomorix_config{'REPDIR_FILES'}{$file}=$abs_path;
+    }
+    closedir REPDIR;
+
     # school list
     push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $DevelConf::name_default_school; 
 
