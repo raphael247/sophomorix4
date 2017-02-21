@@ -390,6 +390,7 @@ sub AD_repdir_using_file {
     my $administrator_home = $arg_ref->{administrator_home};
     my $teacherclass = $arg_ref->{teacherclass};
     my $teacher_home = $arg_ref->{teacher_home};
+    my $adminclass = $arg_ref->{adminclass};
 
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
@@ -494,6 +495,8 @@ sub AD_repdir_using_file {
                     @groups=($project);
                 } elsif (defined $teacherclass){
                     @groups=($teacherclass);
+                } elsif (defined $adminclass){
+                    @groups=($adminclass);
                 } elsif(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
                     # there is a group list -> use it
                     @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
