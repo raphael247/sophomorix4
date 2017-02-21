@@ -387,8 +387,9 @@ sub AD_repdir_using_file {
     # optional options
     my $school = $arg_ref->{school};
     my $project = $arg_ref->{project};
-    my $administrator = $arg_ref->{administrator};
+    my $administrator_home = $arg_ref->{administrator_home};
     my $teacherclass = $arg_ref->{teacherclass};
+    my $teacher_home = $arg_ref->{teacher_home};
 
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
@@ -529,8 +530,10 @@ sub AD_repdir_using_file {
                 my @users=("");
                 if ($path_after_group=~/\@\@USER\@\@/) {
                     # determining list of users
-                    if (defined $administrator){
-                        @users=($administrator);
+                    if (defined $administrator_home){
+                        @users=($administrator_home);
+                    } elsif (defined $teacher_home){
+                        @users=($teacher_home);
                     } elsif (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
                         @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
                     } else {

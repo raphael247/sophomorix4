@@ -110,7 +110,7 @@ When creating/repairing ONE user-home, group-share, school then:
   &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.administrator_home",
                          school=>"abc",
-                         administrator=>"admin10",
+                         administrator_home=>"admin10",
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -123,3 +123,11 @@ When creating/repairing ONE user-home, group-share, school then:
                          sophomorix_config=>\%sophomorix_config,
                         });
 
+#creating ONE teacher_home in ONE teacherclass in ONE school:
+   &AD_repdir_using_file({root_dns=>$root_dns,
+                         repdir_file=>"repdir.teacher_home",
+                         school=>"bsz",
+                         teacherclass=>"teachers",
+                         teacher_home=>"oe42",
+                         sophomorix_config=>\%sophomorix_config,
+                        });
