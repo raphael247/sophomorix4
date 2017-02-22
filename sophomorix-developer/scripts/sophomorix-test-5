@@ -161,7 +161,7 @@ if ($add_admin==1){
 # --test-add-admin  
 if ($test_add_admin==1){
     ##### Testing the users
-    # maiersa38
+    # admin-bsz-66
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=admin-bsz-66,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
@@ -175,8 +175,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/home/schools/bsz/management/admin-bsz-66",
                    sn=>"Admin",
                    userPrincipalName => "admin-bsz-66@".$root_dns,
-                   sophomorixAdminAdmin => "bsz-m7ab",
-                   sophomorixExitAdminAdmin => "unknown",
+                   sophomorixAdminClass => "bsz-admins",
+                   sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "bsz",
                    sophomorixSurnameASCII  => "Admin",
@@ -198,6 +198,47 @@ if ($test_add_admin==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
+                   memberOf => "global-admins",
+                  });
+
+
+    # admin-abc-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=admin-abc-666,OU=Management,OU=abc,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"abc Admin",
+                   givenName=>"abc",
+                   name=>"admin-abc-666",
+                   sAMAccountname=>"admin-abc-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\abc\\management\\admin-abc-666",
+                   unixHomeDirectory=>"/home/schools/abc/management/admin-abc-666",
+                   sn=>"Admin",
+                   userPrincipalName => "admin-abc-666@".$root_dns,
+                   sophomorixAdminClass => "abc-admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "abc",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "administrator",
+                   sophomorixSchoolPrefix => "abc",
+                   sophomorixSchoolname => "abc",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "abc-admins|abc-wifi|abc-internet|abc-webfilter|abc-intranet|abc-printing",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=abc-admins,OU=Management,OU=abc,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"abc-admins",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"admins",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "abc",
                    memberOf => "global-admins",
                   });
 }
