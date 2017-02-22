@@ -37,6 +37,7 @@ $Data::Dumper::Terse = 1;
             AD_dnsnodes_any
             AD_rooms_any
             ACL_test
+            directory_tree_test
             run_command
 
             );
@@ -708,6 +709,41 @@ sub test_multivalue {
             print "      $entry\n";
         }
     }
+}
+
+
+############################################################
+# directory_tree
+############################################################
+sub directory_tree_test {
+    # fist option: wher to search for the dirs
+    # 2nd, ... the dirs to test
+    my ($finddir,@dirlist) = @_;
+    my %dir_hash=();
+    my $string=`find $finddir`;
+    my @dirs=split(/\n/,$string);
+    foreach my $dir (@dirs){
+        $dir_hash{$dir}="seen";
+	#print "<$dir>\n";
+    }
+    print "****** Testing directory tree $finddir\n";
+    foreach my $dir (@dirlist){
+        is (exists $dir_hash{$dir} ,1, "* Existing: $dir");
+        if (exists $dir_hash{$dir}){
+            delete $dir_hash{$dir};
+        }
+    }
+   
+    # print the untested that exist
+    my @untested=();
+    foreach my $dir ( keys %dir_hash ) {
+        push @untested, $dir;
+    }
+    @untested = sort @untested;
+    foreach my $dir (@untested){
+        is (0,1, "* Existing, but not tested: $dir");
+        #print "$dir\n";
+    } 
 }
 
 
