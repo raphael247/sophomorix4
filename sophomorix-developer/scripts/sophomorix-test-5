@@ -241,6 +241,86 @@ if ($test_add_admin==1){
                    sophomorixSchoolname => "abc",
                    memberOf => "global-admins",
                   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # admin-66
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=admin-66,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"default-school Admin",
+                   givenName=>"default-school",
+                   name=>"admin-66",
+                   sAMAccountname=>"admin-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\management\\admin-66",
+                   unixHomeDirectory=>"/home/schools/default-school/management/admin-66",
+                   sn=>"Admin",
+                   userPrincipalName => "admin-66@".$root_dns,
+                   sophomorixAdminClass => "admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "default-school",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "administrator",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "admins|wifi|internet|webfilter|intranet|printing",
+                  });
+    # admin-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=admin-666,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"default-school Admin",
+                   givenName=>"default-school",
+                   name=>"admin-666",
+                   sAMAccountname=>"admin-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\management\\admin-666",
+                   unixHomeDirectory=>"/home/schools/default-school/management/admin-666",
+                   sn=>"Admin",
+                   userPrincipalName => "admin-666@".$root_dns,
+                   sophomorixAdminClass => "admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "default-school",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "administrator",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "admins|wifi|internet|webfilter|intranet|printing",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=admins,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"admins",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"admins",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "global-admins",
+                  });
+
 }
 
 
