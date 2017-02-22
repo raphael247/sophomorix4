@@ -1,0 +1,13 @@
+#!/bin/sh
+sophomorix-samba --restore-samba ohne-user --schema-load
+
+rm -rf /home/schools
+rm -rf /home/global
+
+sleep 4
+
+./tools/add-sophomorix-admin
+
+samba-tool user setpassword Administrator
+
+sophomorix-test-$1 --full
