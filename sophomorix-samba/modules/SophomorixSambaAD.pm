@@ -1437,6 +1437,7 @@ sub AD_user_move {
          # create new ou
          &AD_school_create({ldap=>$ldap,
                             root_dse=>$root_dse,
+                            root_dns=>$root_dns,
                             school=>$school_new,
                             creationdate=>$creationdate,
                             sophomorix_config=>$ref_sophomorix_config,
@@ -1675,6 +1676,7 @@ sub AD_school_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $school = $arg_ref->{school};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -1684,13 +1686,15 @@ sub AD_school_create {
 
     print "\n";
     &Sophomorix::SophomorixBase::print_title("Adding school $school (begin) ...");
-
-    # providing OU_TOP of school
+    ############################################################
+    # providing OU=SCHOOLS
+    ############################################################
     my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
     my $result1 = $ldap->add($schools_ou,
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
 
+    # providing the OU=* for schools
     my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
@@ -1749,8 +1753,18 @@ sub AD_school_create {
                          });
     }
 
+    # creating filesystem for school
+    &AD_repdir_using_file({root_dns=>$root_dns,
+                           repdir_file=>"repdir.school",
+                           school=>$school,
+                           sophomorix_config=>$ref_sophomorix_config,
+                        });
+
+
+
     ############################################################
-    # OU=GLOBAL
+    # providing OU=GLOBAL
+    ############################################################
     my $result3 = $ldap->add($ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result3,2,(caller(0))[3]);

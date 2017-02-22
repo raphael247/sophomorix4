@@ -183,6 +183,7 @@ if ($school ne "" and $create==1){
         # create new ou
         &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
+                           root_dns=>$root_dns,
                            school=>$school,
                            creationdate=>$time_stamp_AD,
                            sophomorix_config=>\%sophomorix_config,

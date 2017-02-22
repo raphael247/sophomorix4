@@ -132,6 +132,7 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
@@ -216,6 +217,7 @@ if ($class ne "" and $info==1){
 if ($create==1 and $class ne ""){
    &AD_school_create({ldap=>$ldap,
                       root_dse=>$root_dse,
+                      root_dns=>$root_dns,
                       school=>$school,
                       creationdate=>$time_stamp_AD,
                       sophomorix_config=>\%sophomorix_config,
