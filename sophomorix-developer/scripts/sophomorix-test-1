@@ -23,6 +23,7 @@ use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
                                  AD_dn_nonexist
                                  AD_test_object
+                                 directory_tree_test
                                  run_command
                                  AD_test_session_count
                                  ACL_test
@@ -1374,10 +1375,28 @@ if ($add==1 or $test_add==1){
                "other::r-x",    
               );
 
-
-
-
-
+    &directory_tree_test("/home/schools",
+                         "/home/schools",
+                         "/home/schools/bsz",
+                         "/home/schools/bsz/management",
+                         "/home/schools/bsz/projects",
+                         "/home/schools/bsz/students",
+                         "/home/schools/uni",
+                         "/home/schools/uni/management",
+                         "/home/schools/uni/projects",
+                         "/home/schools/uni/students",
+                         "/home/schools/default-school",
+                         "/home/schools/default-school/management",
+                         "/home/schools/default-school/projects",
+                         "/home/schools/default-school/students",
+                        ); 
+    &directory_tree_test("/home/global",
+                         "/home/global",
+                         "/home/global/management",
+                         "/home/global/projects",
+                         "/home/global/students",
+                         "/home/global/teachers",
+                        ); 
 
 }
 
@@ -2908,6 +2927,7 @@ if ($update==1 or $test_update==1){
                    userAccountControl => "512",
                    memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
 
 }
 
