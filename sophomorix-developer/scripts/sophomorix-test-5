@@ -242,18 +242,6 @@ if ($test_add_admin==1){
                    memberOf => "global-admins",
                   });
 
-
-
-
-
-
-
-
-
-
-
-
-
     # admin-66
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=admin-66,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -321,6 +309,82 @@ if ($test_add_admin==1){
                    memberOf => "global-admins",
                   });
 
+
+
+
+
+
+
+
+
+
+
+    # global-admin-66
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-admin-66,OU=Management,OU=GLOBAL,".$root_dse,
+                   #####
+                   displayName=>"Global Admin",
+                   givenName=>"Global",
+                   name=>"global-admin-66",
+                   sAMAccountname=>"global-admin-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\global\\management\\global-admin-66",
+                   unixHomeDirectory=>"/home/schools/global/management/global-admin-66",
+                   sn=>"Admin",
+                   userPrincipalName => "global-admin-66@".$root_dns,
+                   sophomorixAdminClass => "global-admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Global",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "administrator",
+                   sophomorixSchoolPrefix => "global",
+                   sophomorixSchoolname => "global",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "global-admins|global-wifi|global-internet|global-webfilter|global-intranet|global-printing|Domain Admins",
+                  });
+    # global-admin-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-admin-666,OU=Management,OU=GLOBAL,".$root_dse,
+                   #####
+                   displayName=>"Global Admin",
+                   givenName=>"Global",
+                   name=>"global-admin-666",
+                   sAMAccountname=>"global-admin-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\global\\management\\global-admin-666",
+                   unixHomeDirectory=>"/home/schools/global/management/global-admin-666",
+                   sn=>"Admin",
+                   userPrincipalName => "global-admin-666@".$root_dns,
+                   sophomorixAdminClass => "global-admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Global",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "administrator",
+                   sophomorixSchoolPrefix => "global",
+                   sophomorixSchoolname => "global",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "global-admins|global-wifi|global-internet|global-webfilter|global-intranet|global-printing|Domain Admins",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-admins,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-admins",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"globaladmins",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "global",
+                   memberOf => "",
+                  });
 }
 
 
