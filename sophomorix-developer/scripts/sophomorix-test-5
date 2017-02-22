@@ -1,0 +1,265 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-test-5) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 check_options
+                                 time_stamp_AD 
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_add
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_user_kill
+                                 AD_dns_get
+                                 AD_object_search
+                                 AD_debug_logdump
+                                 AD_get_name_tokened
+                                    );
+use Sophomorix::SophomorixTest qw(
+                                 AD_object_nonexist
+                                 AD_test_object
+                                 run_command
+                                 );
+
+$Conf::log_level=1;
+my $help=0;
+my $full=0;
+
+
+
+my $add_admin=0;
+my $test_add_admin=0;
+
+my $mod_admin=0;
+my $test_mod_admin=0;
+
+my $kill_admin=0;
+my $test_kill_admin=0;
+
+my $verbose_options="";
+
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "full|f" => \$full,
+           "verbose|v+" => \$Conf::log_level,
+           "add-admin" => \$add_admin,
+           "test-add-admin" => \$test_add_admin,
+           "mod-admin" => \$mod_admin,
+           "test-mod-admin" => \$test_mod_admin,
+           "kill-admin" => \$kill_admin,
+           "test-kill-admin" => \$test_kill_admin,
+  );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+
+
+if ($Conf::log_level==1){
+    $verbose_options="";
+} elsif ($Conf::log_level==2){
+    $verbose_options="-v";
+} elsif ($Conf::log_level==3){
+    $verbose_options="-vv";
+}
+
+
+
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+
+my $testdata="/usr/share/sophomorix-developer/testdata";
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-test-5 tests the addition of admins.
+
+Options
+  -h  / --help
+
+  Admins:
+  sophomorix-test-5 --add-admin  
+    add some admins
+  sophomorix-test-5 --test-add-admin
+    test the added admins
+
+  sophomorix-test-5 --mod-admin
+    modify added admins
+  sophomorix-test-5 --test-mod-admin
+    test modified admins
+
+  sophomorix-test-5 --kill-admin
+    kill all added admins
+  sophomorix-test-5 --test-kill-admin
+    test killed admins
+
+');
+   print "\n";
+   exit;
+}
+
+
+
+
+
+############################################################
+# Check preliminaries
+############################################################
+
+# --full
+if ($full==1){
+    $add_admin=1;
+    $mod_admin=1;
+    $kill_admin=1;
+    $test_add_admin=1;
+    $test_mod_admin=1;
+    $test_kill_admin=1;
+}
+
+############################################################
+# Add admins
+############################################################
+# --add-admin  
+if ($add_admin==1){
+    # admin in OU=bsz
+    &run_command("sophomorix-admin $verbose_options --create admin-bsz-66 --school bsz --password 'Muster!'");
+    &run_command("sophomorix-admin $verbose_options --create admin-abc-666 --school abc --password 'Muster!'");
+    # admin in OU=default-school
+    &run_command("sophomorix-admin $verbose_options --create admin-66 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin $verbose_options --create admin-666 --school default-school --password 'Muster!'");
+    # admin in OU=default-school
+    &run_command("sophomorix-admin $verbose_options --create global-admin-66 --school global --password 'Muster!'");
+    &run_command("sophomorix-admin $verbose_options --create global-admin-666 --school global --password 'Muster!'");
+
+}
+
+############################################################
+# Test added admins
+############################################################
+# --test-add-admin  
+if ($test_add_admin==1){
+    ##### Testing the users
+    # maiersa38
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=admin-bsz-66,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"bsz Admin",
+                   givenName=>"bsz",
+                   name=>"admin-bsz-66",
+                   sAMAccountname=>"admin-bsz-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\management\\admin-bsz-66",
+                   unixHomeDirectory=>"/home/schools/bsz/management/admin-bsz-66",
+                   sn=>"Admin",
+                   userPrincipalName => "admin-bsz-66@".$root_dns,
+                   sophomorixAdminAdmin => "bsz-m7ab",
+                   sophomorixExitAdminAdmin => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "bsz",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "administrator",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   memberOf => "bsz-admins|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-admins,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-admins",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"admins",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "global-admins",
+                  });
+}
+
+
+
+
+############################################################
+# Modify added projects
+############################################################
+# --mod-admin  
+if ($mod_admin==1){
+}
+
+############################################################
+#  Test modified  projects
+############################################################
+# --test-mod-admin  
+if ($test_mod_admin==1){
+    print "\nNothing to do so far (--test-mod-admin), ...\n\n";
+}
+
+
+
+
+############################################################
+# Kill projects
+############################################################
+# --kill-admin  
+if ($kill_admin==1){
+    &run_command("sophomorix-admin $verbose_options --kill admin-bsz-66");
+    &run_command("sophomorix-admin $verbose_options --kill admin-abc-666");
+    # admin in OU=default-school
+    &run_command("sophomorix-admin $verbose_options --kill admin-66");
+    &run_command("sophomorix-admin $verbose_options --kill admin-666");
+    # admin in OU=default-school
+    &run_command("sophomorix-admin $verbose_options --kill global-admin-66");
+    &run_command("sophomorix-admin $verbose_options --kill global-admin-666");
+
+
+}
+
+############################################################
+#  Test killed  users, groups, projects
+############################################################
+# --test-kill-admin  
+if ($test_kill_admin==1){
+    # users
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-bsz-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-abc-666");
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-666");
+    &AD_object_nonexist($ldap,$root_dse,"user","global-admin-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","global-admin-666");
+}
+
+
+
+
+
+
+&AD_unbind_admin($ldap);
+
+
+
