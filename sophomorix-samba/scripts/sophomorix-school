@@ -43,7 +43,7 @@ use Sophomorix::SophomorixBase qw(
                                  recode_utf8_to_ascii
                                  );
 use Sophomorix::SophomorixSambaAD qw(
-                                 AD_school_add
+                                 AD_school_create
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
@@ -181,12 +181,12 @@ if ($school ne "" and $create==1){
         print "         before you can create it!\n\n";
     } else {
         # create new ou
-        &AD_school_add({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        school=>$school,
-                        creationdate=>$time_stamp_AD,
-                        sophomorix_config=>\%sophomorix_config,
-                      });
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           school=>$school,
+                           creationdate=>$time_stamp_AD,
+                           sophomorix_config=>\%sophomorix_config,
+                         });
     }
 }
 

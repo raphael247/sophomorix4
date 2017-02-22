@@ -111,7 +111,7 @@ use Sophomorix::SophomorixBase qw(
                                  filelist_fetch
                                  );
 use Sophomorix::SophomorixSambaAD qw(
-                                 AD_school_add
+                                 AD_school_create
                                  AD_get_passwd
                                  AD_bind_admin
                                  AD_unbind_admin
@@ -993,7 +993,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #     $plain_password=&get_plain_password($role,@passwort_zeichen);
     #     if (not exists $school_created{$school}){
     #         # create ou
-    #         &AD_school_add({ldap=>$ldap,
+    #         &AD_school_create({ldap=>$ldap,
     #                     root_dse=>$root_dse,
     #                     school=>$school,
     #                     creationdate=>$time_stamp_AD,
@@ -1098,12 +1098,12 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $ws_saved=$devices_file{'computer'}{$computer}{'COMPUTER'};
         if (not exists $school_created{$school}){
             # create ou
-            &AD_school_add({ldap=>$ldap,
-                            root_dse=>$root_dse,
-                            school=>$school,
-                            creationdate=>$time_stamp_AD,
-                            sophomorix_config=>\%sophomorix_config,
-                          });
+            &AD_school_create({ldap=>$ldap,
+                               root_dse=>$root_dse,
+                               school=>$school,
+                               creationdate=>$time_stamp_AD,
+                               sophomorix_config=>\%sophomorix_config,
+                             });
             # remember ou
             $school_created{$school}="already created";
         } else {

@@ -38,7 +38,7 @@ use Sophomorix::SophomorixBase qw(
                                  remove_from_list
                                  );
 use Sophomorix::SophomorixSambaAD qw(
-                                 AD_school_add
+                                 AD_school_create
                                  AD_bind_admin
                                  AD_dns_get
                                  AD_get_user
@@ -184,13 +184,12 @@ if ($create ne "" and $school ne "" and $password ne ""){
         $school_provide=$school;
     }
     &print_title("Creating admin $create in school $school");
-    &AD_school_add({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    school=>$school_provide,
-                    creationdate=>$time_stamp_AD,
-                    sophomorix_config=>\%sophomorix_config,
-                 });
-
+    &AD_school_create({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       school=>$school_provide,
+                       creationdate=>$time_stamp_AD,
+                       sophomorix_config=>\%sophomorix_config,
+                     });
     my $sn="Admin";
     my $given_name=$school;
     if ($school eq "global"){
