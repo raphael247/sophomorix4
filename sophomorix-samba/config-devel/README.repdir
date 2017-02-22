@@ -92,6 +92,10 @@ To test the creation of diretories:
 Programming interna:
 ############################################################
 
+To see, which dirs AD_repdir_using_file creates, see:  
+
+  ./repdir-hierarchy.png
+
 AD_repdir_using_file repairs multiple users, groups, schools, ...
 when called like in sophomorix-repair
 
@@ -102,7 +106,7 @@ When creating/repairing ONE user-home, group-share, school then:
  - The option of AD_repdir_using_file is the lowercase name of @@VAR@@: 
 
 # Examples   
-# creating ONE School:
+# creating ONE School: ( --school (red) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.school",
                          school=>"bsz",
@@ -110,7 +114,7 @@ When creating/repairing ONE user-home, group-share, school then:
                         });
 
 
-#creating ONE project in ONE school:
+#creating ONE project in ONE school: ( --project (dark-yellow) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.project",
                          school=>"default-school",
@@ -119,7 +123,7 @@ When creating/repairing ONE user-home, group-share, school then:
                         });
 
 
-#creating ONE administrator home in ONE school:
+#creating ONE administrator home in ONE school: ( --administrator-home (dark-cyan) in repdir-hierarchy.png)
   &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.administrator_home",
                          school=>"abc",
@@ -128,7 +132,7 @@ When creating/repairing ONE user-home, group-share, school then:
                         });
 
 
-#creating ONE teacherclass in ONE school:
+#creating ONE teacherclass in ONE school: ( --teacherclass (dark-green) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.teacherclass",
                          school=>"abc",
@@ -137,7 +141,7 @@ When creating/repairing ONE user-home, group-share, school then:
                         });
 
 
-#creating ONE teacher_home in ONE teacherclass in ONE school:
+#creating ONE teacher_home in ONE teacherclass in ONE school: ( --teacher-home (dark-magenta) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.teacher_home",
                          school=>"bsz",
@@ -147,7 +151,7 @@ When creating/repairing ONE user-home, group-share, school then:
                         });
 
 
-#creating ONE adminclass in ONE school:
+#creating ONE adminclass in ONE school: ( --adminclass (dark-red) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.adminclass",
                          school=>"bsz",
@@ -155,7 +159,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          sophomorix_config=>\%sophomorix_config,
                         });
 
-#creating ONE student_home in ONE adminclass in ONE school:
+#creating ONE student_home in ONE adminclass in ONE school: ( --student-home (magenta) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.student_home",
                          school=>"bsz",
