@@ -41,6 +41,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_add
                                  AD_bind_admin
                                  AD_dns_get
+                                 AD_get_user
+                                 AD_user_kill
                                  AD_unbind_admin
                                  AD_object_search
                                  AD_user_create
@@ -73,6 +75,7 @@ my $info=0;
 my $create="";
 my $school="";
 my $password="";
+my $kill="";
 
 my $reset_class="";
 $Conf::log_level=1;
@@ -86,6 +89,7 @@ my $testopt=GetOptions(
            "create|c=s" => \$create,
            "school|s=s" => \$school,
            "password=s" => \$password,
+           "kill=s" => \$kill,
            "verbose|v+" => \$Conf::log_level,
           );
 
@@ -117,6 +121,9 @@ sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
 
 # create another global-admin
 sophomorix-admin --create <name-of-admin> --school global --password <fdrTfdtti>
+
+# kill an administrator created by sophomorix
+sophomorix-admin --kill <name-of-admin>
 
 Please see the sophomorix--admin(8) man pages for full documentation
 ');
@@ -176,6 +183,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
     } else {
         $school_provide=$school;
     }
+    &print_title("Creating admin $create in school $school");
     &AD_school_add({ldap=>$ldap,
                     root_dse=>$root_dse,
                     school=>$school_provide,
@@ -216,6 +224,33 @@ if ($create ne "" and $school ne "" and $password ne ""){
     print "\nERROR: A school and password is needed to create the admin $create\n\n";
     exit;
 } 
+
+
+
+# --kill <user>
+if ($kill ne ""){
+    # make sure it exists and is an administrator created by sophomorix
+    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role)=
+    &AD_get_user({ldap=>$ldap,
+                  root_dse=>$root_dse,
+                  root_dns=>$root_dns,
+                  user=>$kill,
+                });
+    if ($existing eq "FALSE"){
+        print "\nERROR: User $kill does not exist\n\n";
+        exit;
+    }
+    if ($role eq "administrator"){
+        &AD_user_kill({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       login=>$kill,
+                       user_count=>"0",
+                     });
+    } else {
+        print "\nERROR: User $kill is not an administrator created by sophomorix\n\n";
+        exit;
+    }
+}
 
 
 # ===========================================================================
