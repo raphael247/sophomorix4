@@ -454,6 +454,7 @@ sub AD_repdir_using_file {
             $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
             # other
             $dir=~s/>\$directory_students</${DevelConf::directory_students}/;
+            $dir=~s/>\$directory_teachers</${DevelConf::directory_teachers}/;
             $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
             $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
             # remove <,>
@@ -481,8 +482,12 @@ sub AD_repdir_using_file {
         foreach my $school (@schools){
             my $path=$path_with_var;
             my $path_smb=$path_with_var;
-            $path=~s/\@\@SCHOOL\@\@/$school/;
-            $path_smb=~s/\@\@SCHOOL\@\@\///;
+            if ($school eq $DevelConf::homedir_global_smb_share){
+                $path_smb=~s/\/home\/global\///;
+            } else {
+                $path=~s/\@\@SCHOOL\@\@/$school/;
+                $path_smb=~s/\@\@SCHOOL\@\@\///;
+            }
             if($Conf::log_level>=3){
                 print "   Determining path for school $school:\n";
                 print "      * Path after school: $path (smb: $path_smb)\n";

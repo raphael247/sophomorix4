@@ -66,6 +66,7 @@ my $info=0;
 my $json=0;
 my $dump_AD=0;
 my $linux=0;
+my $global=0;
 my $school=0;
 my $project=0;
 my $administrator_home=0;
@@ -88,6 +89,7 @@ my $testopt=GetOptions(
            "dump-AD" => \$dump_AD,
            "verbose|v+" => \$Conf::log_level,
            "linux|unix" => \$linux,
+           "global" => \$global,
            "school" => \$school,
            "project" => \$project,
            "administrator-home" => \$administrator_home,
@@ -130,6 +132,7 @@ Options
 What to repair in the Filesystem:
 
   --linux|unix               (use repdir.linux, repairs all permissions outside of $HOME)
+  --global                   (use repdir.global, repairs the global part)
   --school                   (use repdir.school, repairs a school and subdirs)
   --project                  (use repdir.project, repairs projects)
   --administrator-home       (use repdir.administrator_home, repairs homes of administrators)
@@ -193,6 +196,7 @@ print "dumcp $dump_AD \n";
 # --all
 if ($all==1) {
     $linux=1;
+    $global=1;
     $school=1;
     $project=1;
     $administrator_home=1;
@@ -209,6 +213,19 @@ if ($linux==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.linux",
+                         AD=>\%AD,
+                         sophomorix_config=>\%sophomorix_config,
+                        });
+}
+
+
+# --global
+if ($global==1) {
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         root_dns=>$root_dns,
+                         school=>$DevelConf::homedir_global_smb_share,
+                         repdir_file=>"repdir.global",
                          AD=>\%AD,
                          sophomorix_config=>\%sophomorix_config,
                         });
