@@ -504,8 +504,7 @@ sub AD_repdir_using_file {
                     # there is a group list -> use it
                     @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
                 } else {
-                    # there is no group list -> avoid even a single loop 
-                    @groups=();
+                    @groups=("");
 	        }
             }
             ########################################
@@ -1137,6 +1136,15 @@ sub AD_user_create {
         #                     group => "Domain Admins",
         #                     addgroup => "global-admins",
         #                   });
+    }
+
+    if ($role eq "administrator"){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.administrator_home",
+                               school=>$school,
+                               administrator_home=>$login,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
     }
 
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
