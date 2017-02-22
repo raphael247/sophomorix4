@@ -105,7 +105,17 @@ When creating/repairing ONE user-home, group-share, school then:
  - all @@VAR@@ in the file (and the ntacl file) must be given as option
  - The option of AD_repdir_using_file is the lowercase name of @@VAR@@: 
 
-# Examples   
+# Examples  
+# creating the Global school 
+   &AD_repdir_using_file({root_dns=>$root_dns,
+                         school=>$DevelConf::homedir_global_smb_share,
+                         repdir_file=>"repdir.global",
+                         AD=>\%AD,
+                         sophomorix_config=>\%sophomorix_config,
+                        });
+
+
+
 # creating ONE School: ( --school (red) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.school",

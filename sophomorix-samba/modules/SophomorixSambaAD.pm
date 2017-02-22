@@ -483,7 +483,8 @@ sub AD_repdir_using_file {
             my $path=$path_with_var;
             my $path_smb=$path_with_var;
             if ($school eq $DevelConf::homedir_global_smb_share){
-                $path_smb=~s/\/home\/global\///;
+                $path_smb=~s/\/home\/global\///; # for school
+                $path_smb=~s/\@\@SCHOOL\@\@\///; # for homdirs
             } else {
                 $path=~s/\@\@SCHOOL\@\@/$school/;
                 $path_smb=~s/\@\@SCHOOL\@\@\///;
@@ -1144,12 +1145,21 @@ sub AD_user_create {
     }
 
     if ($role eq "administrator"){
-        &AD_repdir_using_file({root_dns=>$root_dns,
-                               repdir_file=>"repdir.administrator_home",
-                               school=>$school,
-                               administrator_home=>$login,
-                               sophomorix_config=>$ref_sophomorix_config,
-                             });
+        if ($school eq "global"){
+            &AD_repdir_using_file({root_dns=>$root_dns,
+                                   repdir_file=>"repdir.administrator_home",
+                                   school=>$DevelConf::homedir_global_smb_share,,
+                                   administrator_home=>$login,
+                                   sophomorix_config=>$ref_sophomorix_config,
+                                 });
+        } else {
+            &AD_repdir_using_file({root_dns=>$root_dns,
+                                   repdir_file=>"repdir.administrator_home",
+                                   school=>$school,
+                                   administrator_home=>$login,
+                                   sophomorix_config=>$ref_sophomorix_config,
+                                 });
+        }
     }
 
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
@@ -1773,8 +1783,6 @@ sub AD_school_create {
                            sophomorix_config=>$ref_sophomorix_config,
                         });
 
-
-
     ############################################################
     # providing OU=GLOBAL
     ############################################################
@@ -1846,6 +1854,15 @@ sub AD_school_create {
                              addgroup => $group,
                             }); 
     }
+
+    # creating filesystem for global
+    &AD_repdir_using_file({ldap=>$ldap,
+                           root_dns=>$root_dns,
+                           repdir_file=>"repdir.global",
+                           school=>$DevelConf::homedir_global_smb_share,
+                           sophomorix_config=>$ref_sophomorix_config,
+                         });
+
     &Sophomorix::SophomorixBase::print_title("Adding school $school (end) ...");
     print "\n";
 }
