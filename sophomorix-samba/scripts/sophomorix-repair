@@ -90,11 +90,11 @@ my $testopt=GetOptions(
            "linux|unix" => \$linux,
            "school" => \$school,
            "project" => \$project,
-           "administrator-homes" => \$administrator_home,
+           "administrator-home" => \$administrator_home,
            "teacherclass" => \$teacherclass,
-           "teacher-homes" => \$teacher_home,
+           "teacher-home" => \$teacher_home,
            "adminclass" => \$adminclass,
-           "student-homes" => \$student_home,
+           "student-home" => \$student_home,
            "all" => \$all,
           );
 
@@ -132,11 +132,11 @@ What to repair in the Filesystem:
   --linux|unix               (use repdir.linux, repairs all permissions outside of $HOME)
   --school                   (use repdir.school, repairs a school and subdirs)
   --project                  (use repdir.project, repairs projects)
-  --administrator-homes      (use repdir.administrator_home, repairs homes of administrators)
+  --administrator-home       (use repdir.administrator_home, repairs homes of administrators)
   --teacherclass             (use repdir.teacherclass, repairs teacherclasses)
-  --teacher-homes            (use repdir.teacher_home, repairs homes of teachers)
+  --teacher-home             (use repdir.teacher_home, repairs homes of teachers)
   --adminclass               (use repdir.adminclass, repairs adminclasses)
-  --student-homes            (use repdir.student_home, repairs homes of students)
+  --student-home             (use repdir.student_home, repairs homes of students)
 
   -- all                     (use all the above, top to bottom order)
 
@@ -239,7 +239,7 @@ if ($project==1) {
 }
 
 
-# --administrator-homes
+# --administrator-home
 if ($administrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
@@ -263,7 +263,7 @@ if ($teacherclass==1) {
 }
 
 
-# --teacher-homes
+# --teacher-home
 if ($teacher_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
@@ -287,7 +287,7 @@ if ($adminclass==1) {
 }
 
 
-# --student-homes
+# --student-home
 if ($student_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
