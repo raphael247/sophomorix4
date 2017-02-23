@@ -1763,6 +1763,7 @@ sub AD_school_create {
         # create
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
+                          root_dns=>$root_dns,
                           dn_wish=>$dn,
                           school=>$school,
                           group=>$group,
@@ -1773,6 +1774,7 @@ sub AD_school_create {
                           creationdate=>$creationdate,
                           joinable=>"TRUE",
                           hidden=>"FALSE",
+                          sophomorix_config=>$ref_sophomorix_config,
                          });
     }
 
@@ -1834,6 +1836,7 @@ sub AD_school_create {
         # create
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
+                          root_dns=>$root_dns,
                           dn_wish=>$dn,
                           school=>$school,
                           group=>$group,
@@ -1844,6 +1847,7 @@ sub AD_school_create {
                           creationdate=>$creationdate,
                           joinable=>"TRUE",
                           hidden=>"FALSE",
+                          sophomorix_config=>$ref_sophomorix_config,
                         });
     }
     # all groups created, add some memberships
@@ -3940,6 +3944,7 @@ sub AD_group_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $group = $arg_ref->{group};
     my $group_basename = $arg_ref->{group_basename};
     my $description = $arg_ref->{description};
@@ -3952,6 +3957,7 @@ sub AD_group_create {
     my $dn_wish = $arg_ref->{dn_wish};
     my $cn = $arg_ref->{cn};
     my $file = $arg_ref->{file};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $joinable){
         $joinable="FALSE";    
@@ -4029,6 +4035,7 @@ sub AD_group_create {
     } else {
         print "   * Group $group exists already ($count results)\n";
     }
+
     if ($type eq "adminclass"){
         # a group like 7a, 7b
         #print "Student class of the school: $group\n";
@@ -4048,15 +4055,26 @@ sub AD_group_create {
                              group => "global-".$DevelConf::student,
                              addgroup => $token_students,
                            });
+        # &AD_repdir_using_file({root_dns=>$root_dns,
+        #                        repdir_file=>"repdir.student_home",
+        #                        school=>$school,
+        #                        adminclass=>$group,
+        #                        student_home=>"maiersa42",
+        #                        sophomorix_config=>$ref_sophomorix_config,
+        #                      });
     } elsif ($type eq "teacherclass"){
-            # add <token>-teachers to global-teachers
-            &AD_group_addmember({ldap => $ldap,
-                                 root_dse => $root_dse, 
-                                 group => "global-".$DevelConf::teacher,
-                                 addgroup => $group,
-                               });
-
-        #} else {
+        # add <token>-teachers to global-teachers
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => "global-".$DevelConf::teacher,
+                             addgroup => $group,
+                           });
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.teacherclass",
+                               school=>$school,
+                               teacherclass=>$group,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
     } elsif ($type eq "room"){
         #my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
         ## add the room to <token>-examaccounts
@@ -4071,6 +4089,13 @@ sub AD_group_create {
         #                     group => "global-".$DevelConf::examaccount,
         #                     addgroup => $token_examaccounts,
         #                   });
+    } elsif ($type eq "project"){
+        # &AD_repdir_using_file({root_dns=>$root_dns,
+        #                        repdir_file=>"repdir.project",
+        #                        school=>$school,
+        #                        project=>$group,
+        #                        sophomorix_config=>$ref_sophomorix_config,
+        #                      });
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     return;

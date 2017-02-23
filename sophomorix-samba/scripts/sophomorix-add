@@ -469,6 +469,26 @@ while(<SOPHOMORIXADD>){
    my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
    my $login_token=&AD_get_name_tokened($login_check_ok,$school,$role);
 
+
+  &AD_group_create({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    root_dns=>$root_dns,
+                    group=>$group_token,
+                    group_basename=>$class_group,
+                    school=>$school,
+                    status=>"P",
+                    type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
+                    joinable=>"TRUE",
+                    description=>$group_token,
+                    creationdate=>$time_stamp_AD,
+                    gidnumber_wish=>$gidnumber_wish,
+                    file=>$file,
+                    sophomorix_config=>\%sophomorix_config,
+                  });
+
+
+
+
    &AD_user_create({ldap=>$ldap,
                     root_dse=>$root_dse, 
                     root_dns=>$root_dns, 
@@ -494,6 +514,7 @@ while(<SOPHOMORIXADD>){
                     deactivationdate=>$deactivationdate,
                     status=>$status,
                     file=>$file,
+                    sophomorix_config=>\%sophomorix_config,
                   });
 
    # 1. Entry in sophomorix database and auth system
@@ -528,20 +549,6 @@ while(<SOPHOMORIXADD>){
 
   # 5. Add user to all groups she is in (files must exist to create links)
   #&add_newuser_to_her_projects($login_check_ok,$class_group);
-
-  &AD_group_create({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    group=>$group_token,
-                    group_basename=>$class_group,
-                    school=>$school,
-                    status=>"P",
-                    type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
-                    joinable=>"TRUE",
-                    description=>$group_token,
-                    creationdate=>$time_stamp_AD,
-                    gidnumber_wish=>$gidnumber_wish,
-                    file=>$file,
-                  });
 
 
 # OLD
