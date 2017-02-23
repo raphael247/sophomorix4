@@ -4127,12 +4127,12 @@ sub AD_group_create {
         #                     addgroup => $token_examaccounts,
         #                   });
     } elsif ($type eq "project"){
-        # &AD_repdir_using_file({root_dns=>$root_dns,
-        #                        repdir_file=>"repdir.project",
-        #                        school=>$school,
-        #                        project=>$group,
-        #                        sophomorix_config=>$ref_sophomorix_config,
-        #                      });
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.project",
+                               school=>$school,
+                               project=>$group,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     return;
