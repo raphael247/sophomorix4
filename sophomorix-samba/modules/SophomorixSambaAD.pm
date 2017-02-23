@@ -1425,7 +1425,8 @@ sub AD_user_move {
     my $group_new_basename = $arg_ref->{group_new_basename};
     my $school_old = $arg_ref->{school_old};
     my $school_new = $arg_ref->{school_new};
-    my $role_new = $arg_ref->{role};
+    my $role_old = $arg_ref->{role_old};
+    my $role_new = $arg_ref->{role_new};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
@@ -1454,7 +1455,13 @@ sub AD_user_move {
          $target_branch="OU=Teachers,OU=".$school_new.",".$DevelConf::AD_schools_ou.",".$root_dse;
     }
 
-    my ($homedirectory_new,$unix_home_new)=
+    my ($homedirectory_old,$unix_home_old,$unc_old,$smb_rel_path_old)=
+        &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                       $school_old,
+                                                       $group_old_basename,
+                                                       $user,
+                                                       $role_old);
+    my ($homedirectory_new,$unix_home_new,$unc_new,$smb_rel_path_new)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                        $school_new,
                                                        $group_new_basename,
@@ -1486,6 +1493,7 @@ sub AD_user_move {
         print "   School(Old):       $school_old\n";
         print "   School(New):       $school_new\n";
         print "   Prefix(New):       $prefix_new\n";
+        print "   Rename:            $smb_rel_path_old -> $smb_rel_path_new\n";
         print "   homeDirectory:     $homedirectory_new\n";
         print "   unixHomeDirectory: $unix_home_new\n";
         print "   Creationdate:      $creationdate (if new group must be added)\n";
@@ -1567,7 +1575,6 @@ sub AD_user_move {
                      target_branch=>$target_branch,
                     });
 
-
     # change management groups if school changes
     if ($school_old ne $school_new){
         &Sophomorix::SophomorixBase::print_title("School $school_old --> $school_new, managment groups change (start)");
@@ -1591,6 +1598,19 @@ sub AD_user_move {
                                            }); 
         }
         &Sophomorix::SophomorixBase::print_title("School $school_old --> $school_new, managment groups change (start)");
+    }
+
+
+    # move the home directory of the user
+    if ($school_old eq $school_new){
+        # this is on the same share
+        # smbclient ... rename (=move)
+        my $smbclient_command="smbclient -U Administrator%'Muster!'".
+                              " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
+        print "$smbclient_command\n";
+        system($smbclient_command);
+    } else {
+
     }
 
     &Sophomorix::SophomorixBase::print_title("Moving user $user, (end)");

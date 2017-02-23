@@ -44,7 +44,8 @@ my $login_versetzen;
 my $old_status;
 my $school_old;
 my $school_new;
-my $role;
+my $role_old;
+my $role_new;
 
 my $identifier;
 my $alte_zeile="";
@@ -210,7 +211,8 @@ if ($info==1) {
         $old_status,
         $school_old,
         $school_new,
-        $role,
+        $role_old,
+        $role_new,
        )=split(/::/,$line);
 
     my $group_token_old=&AD_get_name_tokened($alte_klasse,$school_old,"adminclass");
@@ -271,7 +273,8 @@ while(<USERVERSETZEN>){
      $old_status,
      $school_old,
      $school_new,
-     $role,
+     $role_old,
+     $role_new,
     )=split(/::/);
     if (not defined $old_status){$old_status=""};
    # Home ermitteln
@@ -333,7 +336,8 @@ while(<USERVERSETZEN>){
                    group_new=>$group_token_new,
                    school_old=>$school_old,
                    school_new=>$school_new,
-                   role=>$role,
+                   role_old=>$role_old,
+                   role_new=>$role_new,
                    creationdate=>$time_stamp_AD,
                    sophomorix_config=>\%sophomorix_config,
                   });
