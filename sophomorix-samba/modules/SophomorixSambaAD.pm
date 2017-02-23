@@ -1160,7 +1160,28 @@ sub AD_user_create {
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         }
-    }
+    } elsif ($role eq "teacher"){
+        if ($school eq "global"){
+            &AD_repdir_using_file({root_dns=>$root_dns,
+                                   repdir_file=>"repdir.teacher_home",
+                                   school=>$DevelConf::homedir_global_smb_share,,
+                                   teacherclass=>$group,
+                                   teacher_home=>$login,
+                                   sophomorix_config=>$ref_sophomorix_config,
+                                 });
+        } else {
+            &AD_repdir_using_file({root_dns=>$root_dns,
+                                   repdir_file=>"repdir.teacher_home",
+                                   school=>$school,
+                                   teacherclass=>$group,
+                                   teacher_home=>$login,
+                                   sophomorix_config=>$ref_sophomorix_config,
+                                 });
+        }
+
+    } elsif ($role eq "student"){
+
+    }  
 
     &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
 }
