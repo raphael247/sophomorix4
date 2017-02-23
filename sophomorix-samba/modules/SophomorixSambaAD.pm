@@ -398,7 +398,7 @@ sub AD_repdir_using_file {
     my $entry_num=0; # was $num
     my $line_num=0;
     &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file");
-
+    print "";
     # option school
     my @schools=("");
     if (defined $school){
@@ -1474,6 +1474,7 @@ sub AD_user_move {
     # make sure new group exists
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
+                      root_dns=>$root_dns,
                       group=>$group_new,
                       group_basename=>$group_new_basename,
                       description=>$group_new,
@@ -1482,6 +1483,7 @@ sub AD_user_move {
                       joinable=>"TRUE",
                       status=>"P",
                       creationdate=>$creationdate,
+                      sophomorix_config=>$ref_sophomorix_config,
                     });
 
     # update user entry
@@ -4055,13 +4057,12 @@ sub AD_group_create {
                              group => "global-".$DevelConf::student,
                              addgroup => $token_students,
                            });
-        # &AD_repdir_using_file({root_dns=>$root_dns,
-        #                        repdir_file=>"repdir.student_home",
-        #                        school=>$school,
-        #                        adminclass=>$group,
-        #                        student_home=>"maiersa42",
-        #                        sophomorix_config=>$ref_sophomorix_config,
-        #                      });
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.adminclass",
+                               school=>$school,
+                               adminclass=>$group,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
     } elsif ($type eq "teacherclass"){
         # add <token>-teachers to global-teachers
         &AD_group_addmember({ldap => $ldap,

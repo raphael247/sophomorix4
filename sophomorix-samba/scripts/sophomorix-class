@@ -226,6 +226,7 @@ if ($create==1 and $class ne ""){
    my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
+                     root_dns=>$root_dns,
                      school=>$school,
                      group=>$group_token,
                      group_basename=>$class,
@@ -236,6 +237,7 @@ if ($create==1 and $class ne ""){
                      joinable=>"TRUE",
                      hidden=>"FALSE",
                      gidnumber_wish=>$gidnumber_wish,
+                     sophomorix_config=>\%sophomorix_config,
                   });
 }
 

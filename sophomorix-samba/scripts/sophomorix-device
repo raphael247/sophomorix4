@@ -1127,6 +1127,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $room_description=$room_basename." in ".$school;
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
+                          root_dns=>$root_dns,
                           group=>$room_saved,
                           group_basename=>$room_basename,
                           description=>$room_description,
@@ -1134,6 +1135,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           status=>"P",
                           type=>"room",
                           creationdate=>$time_stamp_AD,
+                          sophomorix_config=>\%sophomorix_config,
                          });
         # add computer to its room
         &AD_group_addmember({ldap => $ldap,

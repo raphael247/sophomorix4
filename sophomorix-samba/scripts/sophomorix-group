@@ -165,6 +165,7 @@ if ($create==1 and $group ne ""){
     my $group_token=&AD_get_name_tokened($group,$school,"sophomorix-group");
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse, 
+                      root_dns=>$root_dns,
                       school=>$school,
                       group=>$group_token,
                       group_basename=>$group,
@@ -172,6 +173,7 @@ if ($create==1 and $group ne ""){
                       type=>"sophomorix-group",
                       status=>"P",
                       creationdate=>$time_stamp_AD,
+                      sophomorix_config=>\%sophomorix_config,
                     });
 }
 

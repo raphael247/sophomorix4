@@ -587,6 +587,7 @@ if ($create==1 and $project ne ""){
    my $group_token=&AD_get_name_tokened($project,$school,"project");
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
+                     root_dns=>$root_dns,
                      school=>$school,
                      group=>$group_token,
                      group_basename=>$project,
@@ -595,6 +596,7 @@ if ($create==1 and $project ne ""){
                      status=>"P",
                      creationdate=>$time_stamp_AD,
                      gidnumber_wish=>$gidnumber_wish,
+                     sophomorix_config=>\%sophomorix_config,
                   });
 }
 
