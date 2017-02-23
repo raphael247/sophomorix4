@@ -33,6 +33,7 @@ use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
                                  AD_test_object
                                  run_command
+                                 directory_tree_test
                                  );
 
 $Conf::log_level=1;
@@ -1022,6 +1023,91 @@ if ($test_add_pro==1){
                    sophomorixSchoolname => "default-school",
                    memberOf => "",
                   });
+
+
+    &directory_tree_test("/home/schools",
+                         "/home/schools",
+                         "/home/schools/bsz",
+                         "/home/schools/bsz/management",
+                         "/home/schools/bsz/projects",
+                         "/home/schools/bsz/students",
+                         "/home/schools/bsz/teachers",
+                         "/home/schools/bsz/teachers/homes",
+                         "/home/schools/bsz/teachers/homes/oe23",
+                         "/home/schools/bsz/teachers/homes/oe23/teacher1",
+                         "/home/schools/bsz/teachers/homes/oe23/teacher2",
+                         "/home/schools/bsz/teachers/homes/wu23",
+                         "/home/schools/bsz/teachers/homes/wu23/teacher1",
+                         "/home/schools/bsz/teachers/homes/wu23/teacher2",
+                         "/home/schools/bsz/teachers/share",
+                         "/home/schools/bsz/students/m7ab",
+                         "/home/schools/bsz/students/m7ab/homes",
+                         "/home/schools/bsz/students/m7ab/share",
+                         "/home/schools/bsz/students/m7ab/homes/maiersa23",
+                         "/home/schools/bsz/students/m7ab/homes/maiersa23/dir1",
+                         "/home/schools/bsz/students/m7ab/homes/maiersa23/dir2",
+                         "/home/schools/bsz/students/m7ab/homes/muellegr23",
+                         "/home/schools/bsz/students/m7ab/homes/muellegr23/dir1",
+                         "/home/schools/bsz/students/m7ab/homes/muellegr23/dir2",
+                         "/home/schools/bsz/students/m8cd",
+                         "/home/schools/bsz/students/m8cd/share",
+                         "/home/schools/bsz/students/m8cd/homes",
+                         "/home/schools/bsz/students/m8cd/homes/jonsonad23",
+                         "/home/schools/bsz/students/m8cd/homes/jonsonad23/dir1",
+                         "/home/schools/bsz/students/m8cd/homes/jonsonad23/dir2",
+                         "/home/schools/bsz/students/m8cd/homes/samardze23",
+                         "/home/schools/bsz/students/m8cd/homes/samardze23/dir1",
+                         "/home/schools/bsz/students/m8cd/homes/samardze23/dir2",
+                         "/home/schools/uni",
+                         "/home/schools/uni/management",
+                         "/home/schools/uni/projects",
+                         "/home/schools/uni/students",
+                         "/home/schools/uni/students/12abc",
+                         "/home/schools/uni/students/12abc/share",
+                         "/home/schools/uni/students/12abc/homes",
+                         "/home/schools/uni/students/12abc/homes/lordjo23",
+                         "/home/schools/uni/students/12abc/homes/lordjo23/dir1",
+                         "/home/schools/uni/students/12abc/homes/lordjo23/dir2",
+                         "/home/schools/uni/students/12abc/homes/blackmri23",
+                         "/home/schools/uni/students/12abc/homes/blackmri23/dir1",
+                         "/home/schools/uni/students/12abc/homes/blackmri23/dir2",
+                         "/home/schools/uni/teachers",
+                         "/home/schools/uni/teachers/homes",
+                         "/home/schools/uni/teachers/homes/kep23",
+                         "/home/schools/uni/teachers/homes/kep23/teacher1",
+                         "/home/schools/uni/teachers/homes/kep23/teacher2",
+                         "/home/schools/uni/teachers/homes/gal23",
+                         "/home/schools/uni/teachers/homes/gal23/teacher1",
+                         "/home/schools/uni/teachers/homes/gal23/teacher2",
+                         "/home/schools/uni/teachers/share",
+                         "/home/schools/default-school",
+                         "/home/schools/default-school/management",
+                         "/home/schools/default-school/projects",
+                         "/home/schools/default-school/students",
+                         "/home/schools/default-school/students/s6ade",
+                         "/home/schools/default-school/students/s6ade/share",
+                         "/home/schools/default-school/students/s6ade/homes",
+                         "/home/schools/default-school/students/s6ade/homes/schneima23",
+                         "/home/schools/default-school/students/s6ade/homes/schneima23/dir1",
+                         "/home/schools/default-school/students/s6ade/homes/schneima23/dir2",
+                         "/home/schools/default-school/teachers",
+                         "/home/schools/default-school/teachers/homes",
+                         "/home/schools/default-school/teachers/homes/sch23",
+                         "/home/schools/default-school/teachers/homes/sch23/teacher1",
+                         "/home/schools/default-school/teachers/homes/sch23/teacher2",
+                         "/home/schools/default-school/teachers/share",
+                        ); 
+    &directory_tree_test("/home/global",
+                         "/home/global",
+                         "/home/global/management",
+                         "/home/global/projects",
+                         "/home/global/students",
+                         "/home/global/teachers",
+                        ); 
+
+
+
+
 }
 
 
