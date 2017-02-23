@@ -230,7 +230,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
 # --kill <user>
 if ($kill ne ""){
     # make sure it exists and is an administrator created by sophomorix
-    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role)=
+    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
     &AD_get_user({ldap=>$ldap,
                   root_dse=>$root_dse,
                   root_dns=>$root_dns,
@@ -243,6 +243,7 @@ if ($kill ne ""){
     if ($role eq "administrator"){
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,
+                       root_dns=>$root_dns,
                        login=>$kill,
                        user_count=>"0",
                      });

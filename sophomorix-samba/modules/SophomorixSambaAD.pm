@@ -19,6 +19,11 @@ use List::MoreUtils qw(uniq);
 use File::Basename;
 #use Sophomorix::SophomorixBase;
 use Data::Dumper;
+
+# for smb://
+use POSIX;
+use Filesys::SmbClient;
+
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
@@ -604,9 +609,20 @@ sub AD_user_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $user = $arg_ref->{login};
     my $identifier = $arg_ref->{identifier};
     my $user_count = $arg_ref->{user_count};
+
+    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
+        &AD_get_user({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$user,
+                    });
+    $home_directory=~s/\\/\//g;
+    my $smb_home="smb:".$home_directory;
+
 
     &Sophomorix::SophomorixBase::print_title("Killing User $user ($user_count):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
@@ -614,6 +630,14 @@ sub AD_user_kill {
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
         system($command);
+        my $smb = new Filesys::SmbClient(username  => "administrator",
+                                   password  => "Muster!",
+                                   debug     => 1);
+        # deleting home
+        if ($role eq "student" or $role eq "teacher"){
+            print "Deleting: $smb_home\n";
+            $smb->rmdir_recurse($smb_home) or print "Error rmdir_recurse: ", $!, "\n";
+        }
         return;
     } else {
         print "   * User $user nonexisting ($count results)\n";
@@ -1391,6 +1415,7 @@ sub AD_get_user {
                               'sophomorixRole',
                               'givenName',
                               'sn',
+                              'homeDirectory',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -1405,8 +1430,9 @@ sub AD_get_user {
         my $class = $entry->get_value('sophomorixAdminClass');
         my $role = $entry->get_value('sophomorixRole');
         my $exammode = $entry->get_value('sophomorixExamMode');
+        my $home_directory = $entry->get_value('homeDirectory');
         my $existing="TRUE";
-        return ($firstname,$lastname,$class,$existing,$exammode,$role);
+        return ($firstname,$lastname,$class,$existing,$exammode,$role,$home_directory);
     }
 }
 
@@ -1610,9 +1636,32 @@ sub AD_user_move {
         print "$smbclient_command\n";
         system($smbclient_command);
     } else {
+        # this is dirty and works only if the shares are on the same server
+        # ????????????????????????????
 
+        my $mv="mv $unix_home_old $unix_home_new";
+        print "Moving Home: $mv\n";
+        system($mv);
     }
 
+    # fixing the acls on the new home
+    if ($role_new eq "student"){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.student_home",
+                               school=>$school_new,
+                               adminclass=>$group_new,
+                               student_home=>$user,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
+    } elsif ($role_new eq "teacher"){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.teacher_home",
+                               school=>$school_new,
+                               teacherclass=>$group_new,
+                               teacher_home=>$user,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
+    }
     &Sophomorix::SophomorixBase::print_title("Moving user $user, (end)");
 }
 
@@ -2086,7 +2135,7 @@ sub AD_get_sessions {
                 }
                 foreach $participant (@participants){
                     # get userinfo
-                    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role)=
+                    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
                         &AD_get_user({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,

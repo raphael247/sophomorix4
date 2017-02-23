@@ -30,6 +30,7 @@ use Sophomorix::SophomorixBase qw(
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
+                                 AD_dns_get
                                  AD_user_kill
                                  AD_get_name_tokened
                                     );
@@ -86,6 +87,7 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
@@ -247,6 +249,7 @@ if ($killuser ne ""){
         $user_count++;
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,
+                       root_dns=>$root_dns,
                        login=>$user_to_kill,
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
@@ -265,6 +268,7 @@ if ($killuser ne ""){
 
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,
+                       root_dns=>$root_dns,
                        login=>$login_name_to_kill,
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
