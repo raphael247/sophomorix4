@@ -639,8 +639,13 @@ sub AD_user_kill {
               my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
                                                password  => $smb_admin_pass,
                                                debug     => 1);
-              print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-              $smb->rmdir_recurse($smb_home) or print "Error rmdir_recurse: ", $!, "\n";
+              #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+              my $return=$smb->rmdir_recurse($smb_home);
+              if($return==1){
+                  print "OK: Deleted with succes $smb_home\n";
+              } else {
+                  print "ERROR: rmdir_recurse $smb_home $!\n";
+              }
         }
         return;
     } else {
@@ -730,11 +735,11 @@ sub AD_group_kill {
             my $smb_share_homes=$smb_share."/homes";
             my $return1=$smb->rmdir($smb_share_homes);
             if($return1==1){
-                print "OK: Deleted empty dir with succes: $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                print "OK: Deleted empty dir with succes $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                 # go on an recursively delete group/share and
-                my $return2=$smb->rmdir_recurse($smb_share) or print "Error rmdir_recurse: ", $!, "\n";
+                my $return2=$smb->rmdir_recurse($smb_share);
                 if($return2==1){
-                    print "OK: Deleted with succes: $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     # deleting the AD account
                     my $command="samba-tool group delete ". $group;
                     print "   # $command\n";
