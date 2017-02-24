@@ -1333,6 +1333,7 @@ sub get_plain_password {
 }
 
 
+
 sub create_plain_password {
     my ($num)=shift;
     my @password_chars=@_;
@@ -1390,17 +1391,24 @@ sub get_homedirectory {
     return ($homedirectory,$unix_home,$unc,$smb_rel_path);
 }
 
+
+
 sub get_sharedirectory {
     my ($root_dns,$school,$group,$type)=@_;
     my $smb_share; # as needed for perl module 'homeDirectory (using //)
     my $unix_dir; # unix-path (works only if share is on the same server)
     my $smb_rel_path; # option for smbclient
-    my $school_smbshare;
-    if ($school eq "global"){
+
+    my $school_smbshare=$school;
+    if ($school eq "---"){
+        $school=$DevelConf::name_default_school;
+        $school_smbshare=$DevelConf::name_default_school;
+    } elsif ($school eq "global"){
         $school_smbshare=$DevelConf::homedir_global_smb_share;
     } else {
         $school_smbshare=$school;
     }
+
     my $unc="//".$root_dns."/".$school_smbshare;
 
     if ($type eq "project"){
@@ -1409,9 +1417,9 @@ sub get_sharedirectory {
         $unix_dir="/home/schools/".$school."/projects/".$group;
     } elsif  ($type eq "adminclass"){
         my $group_basename=&get_group_basename($group,$school);
-        $smb_rel_path="students/".$group_basename."/share";
+        $smb_rel_path="students/".$group_basename;
         $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path;
-        $unix_dir="/home/schools/".$school."/students/".$group_basename."/share";
+        $unix_dir="/home/schools/".$school."/students/".$group_basename;
     } else {
         $smb_rel_path="unknown";
         $smb_share="unknown";
@@ -1421,11 +1429,14 @@ sub get_sharedirectory {
     return ($smb_share,$unix_dir,$unc,$smb_rel_path);
 }
 
+
+
 sub get_group_basename {
     my ($group,$school)=@_;
     $group=~s/^${school}-//;
     return $group;
 }
+
 
 
 # others

@@ -43,6 +43,7 @@ $Data::Dumper::Terse = 1;
             AD_user_create
             AD_user_update
             AD_get_user
+            AD_get_group
             AD_computer_create
             AD_user_move
             AD_user_kill
@@ -524,9 +525,6 @@ sub AD_repdir_using_file {
             foreach my $group (@groups){
                 my $group_basename=$group;
                 $group_basename=&Sophomorix::SophomorixBase::get_group_basename($group,$school);
-                ## calculating group basename without prefix
-                #$group_basename=~s/^${school}-//;
-
                 my $path_after_group=$path;
                 $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
@@ -633,13 +631,14 @@ sub AD_user_kill {
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
         system($command);
-        my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
-                                         password  => $smb_admin_pass,
-                                         debug     => 1);
+
         # deleting home
         if ($role eq "student" or 
             $role eq "teacher" or 
             $role eq "administrator"){
+              my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+                                               password  => $smb_admin_pass,
+                                               debug     => 1);
               print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
               $smb->rmdir_recurse($smb_home) or print "Error rmdir_recurse: ", $!, "\n";
         }
@@ -685,20 +684,72 @@ sub AD_group_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $school_opt = $arg_ref->{school};
     my $group = $arg_ref->{group};
-    my $type = $arg_ref->{type};
+    my $type_opt = $arg_ref->{type};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $group_count = $arg_ref->{group_count};
 
-    &Sophomorix::SophomorixBase::print_title("Killing Group($type) $group:");
+    my ($existing,
+        $type,
+        $school,
+        $status,
+        $description)=
+        &AD_get_group({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      group=>$group,
+                    });
+
+    if (defined $school_opt){
+        $school=$school_opt; # override school
+    }
+    if (defined $type_opt){
+        $type=$type_opt; # override type
+    }
+    if ($school eq "global"){
+        $school_smbshare=$DevelConf::homedir_global_smb_share;
+    } elsif ($school eq "---"){
+        $school=$DevelConf::name_default_school;
+    }
+
+    my ($smb_share,$unix_dir,$unc,$smb_rel_path)=
+        &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,$school,$group,$type);
+
+    &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count > 0){
-        my $command="samba-tool group delete ". $group;
-        print "   # $command\n";
-        system($command);
-        return;
+
+        # deleting share
+        if ($smb_share ne  "unknown"){
+            my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+                                             password  => $smb_admin_pass,
+                                             debug     => 1);
+            # trying to delete homes (success only if it is empty)
+            my $smb_share_homes=$smb_share."/homes";
+            my $return1=$smb->rmdir($smb_share_homes);
+            if($return1==1){
+                print "OK: Deleted empty dir with succes: $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                # go on an recursively delete group/share and
+                my $return2=$smb->rmdir_recurse($smb_share) or print "Error rmdir_recurse: ", $!, "\n";
+                if($return2==1){
+                    print "OK: Deleted with succes: $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    # deleting the AD account
+                    my $command="samba-tool group delete ". $group;
+                    print "   # $command\n";
+                    system($command);
+                } else {
+                    print "ERROR: rmdir_recurse $smb_share $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                }
+            } else {
+                print "ERROR: rmdir $smb_share_homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+            }
+       }
+       return;
     } else {
-        print "   * Group $group nonexisting ($count results)\n";
-        return;
+       print "   * Group $group nonexisting ($count results)\n";
+       return;
     }
 }
 
@@ -1445,6 +1496,46 @@ sub AD_get_user {
         my $home_directory = $entry->get_value('homeDirectory');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,$home_directory);
+    }
+}
+
+
+
+sub AD_get_group {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $group = $arg_ref->{group};
+
+    my $filter="(&(objectClass=group) (sAMAccountName=".$group."))";
+     $mesg = $ldap->search( # perform a search
+                    base   => $root_dse,
+                    scope => 'sub',
+                    filter => $filter,
+                    attrs => ['sAMAccountName',
+                              'sophomorixSchoolname',
+                              'sophomorixType',
+                              'sophomorixStatus',
+                              'description',
+                             ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+    my $max_group = $mesg->count; 
+    my $entry = $mesg->entry(0);
+    if (not defined $entry){
+        my $existing="FALSE";
+        return ($existing,"","","","");
+    } else {
+        my $existing="TRUE";
+        my $type = $entry->get_value('sophomorixType');
+        my $school = $entry->get_value('sophomorixSchoolname');
+        if ($school eq "---"){
+            $school=$DevelConf::name_default_school;
+        }
+        my $status = $entry->get_value('sophomorixStatus');
+        my $description = $entry->get_value('description');
+        return ($existing,$type,$school,$status,$description);
     }
 }
 

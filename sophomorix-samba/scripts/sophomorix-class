@@ -249,12 +249,17 @@ if ($create==1 and $class ne ""){
 # --kill --class <name>
 ############################################################
 if ($kill==1 and $class ne ""){
-  my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
-  &AD_group_kill({ldap=>$ldap,
-                  root_dse=>$root_dse,
-                  group=>$group_token,
-                  type=>"adminclass",
+    my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
+    &AD_group_kill({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    root_dns=>$root_dns,
+                    group=>$group_token,
+                    group=>$class,
+                    school=>$school,
+                    smb_admin_pass=>$smb_admin_pass,
+                    type=>"adminclass",
                   });
+    exit;
 }
 
 

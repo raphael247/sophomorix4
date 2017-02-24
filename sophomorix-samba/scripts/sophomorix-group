@@ -189,6 +189,7 @@ if ($kill==1 and $group ne ""){
   my $group_token=&AD_get_name_tokened($group,$school,"sophomorix-group");
   &AD_group_kill({ldap=>$ldap,
                   root_dse=>$root_dse,
+                  root_dns=>$root_dns,
                   group=>$group_token,
                   type=>"sophomorix-group",
                   });
