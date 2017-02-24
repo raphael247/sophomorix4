@@ -316,6 +316,30 @@ was passiert dann mit den session einstellungen
 Fertig
 
 
+Sollen user in global vorgesehen werden?
+(außer global admins?)
+
+perl smbmodul nimmt als workgroup WORKGROUP an.
+workgroup ist aber LINUXMUSTER, bzw. das beim provisionieren angegebene
+-> Probleme?
+
+
+<bug>
+
+sophomorix-test-5:
+
+sophomorix-admin --create admin-66 --school default-school --password 'Muster!'
+
+legt an:
+
+/home/schools/default-school/teachers
+/home/schools/default-school/teachers/share
+/home/schools/default-school/teachers/homes
+
+sollte aber nicht
+
+</bug>
+
 
 ??????????????????????????????????????????????????
 sophomorix-device:
