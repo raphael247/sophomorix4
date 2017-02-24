@@ -1542,7 +1542,6 @@ if ($kill_class==1){
     &run_command("sophomorix-class $verbose_options --kill --class uni-12abc");
     &run_command("sophomorix-class $verbose_options --kill --class bsz-m8cd");
     &run_command("sophomorix-class $verbose_options --kill --class bsz-m7ab");
-
     &run_command("sophomorix-class $verbose_options --kill --class bsz-class7-38");
     &run_command("sophomorix-class $verbose_options --kill --class bsz-class6-38");
 
@@ -1568,10 +1567,14 @@ if ($test_kill_class==1){
     &AD_object_nonexist($ldap,$root_dse,"user","sch38");
 
     # groups
-    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class6-38");
-    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class7-38");
     &AD_object_nonexist($ldap,$root_dse,"group","class12-38");
     &AD_object_nonexist($ldap,$root_dse,"group","class13-38");
+    &AD_object_nonexist($ldap,$root_dse,"group","s6ade");
+    &AD_object_nonexist($ldap,$root_dse,"group","uni-12abc");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m8cd");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m7ab");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class7-38");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-class6-38");
 
     &directory_tree_test("/home/schools",
                          "/home/schools",
@@ -1581,80 +1584,20 @@ if ($test_kill_class==1){
                          "/home/schools/bsz/students",
                          "/home/schools/bsz/teachers",
                          "/home/schools/bsz/teachers/homes",
-#                         "/home/schools/bsz/teachers/homes/oe38",
-#                         "/home/schools/bsz/teachers/homes/oe38/teacher1",
-#                         "/home/schools/bsz/teachers/homes/oe38/teacher2",
-#                         "/home/schools/bsz/teachers/homes/wu38",
-#                         "/home/schools/bsz/teachers/homes/wu38/teacher1",
-#                         "/home/schools/bsz/teachers/homes/wu38/teacher2",
                          "/home/schools/bsz/teachers/share",
-#                         "/home/schools/bsz/students/m7ab",
-#                         "/home/schools/bsz/students/m7ab/homes",
-#                         "/home/schools/bsz/students/m7ab/share",
-#                         "/home/schools/bsz/students/m7ab/homes/maiersa38",
-#                         "/home/schools/bsz/students/m7ab/homes/maiersa38/dir1",
-#                         "/home/schools/bsz/students/m7ab/homes/maiersa38/dir2",
-#                         "/home/schools/bsz/students/m7ab/homes/muellegr38",
-#                         "/home/schools/bsz/students/m7ab/homes/muellegr38/dir1",
-#                         "/home/schools/bsz/students/m7ab/homes/muellegr38/dir2",
-#                         "/home/schools/bsz/students/m8cd",
-#                         "/home/schools/bsz/students/m8cd/share",
-#                         "/home/schools/bsz/students/m8cd/homes",
-#                         "/home/schools/bsz/students/m8cd/homes/jonsonad38",
-#                         "/home/schools/bsz/students/m8cd/homes/jonsonad38/dir1",
-#                         "/home/schools/bsz/students/m8cd/homes/jonsonad38/dir2",
-#                         "/home/schools/bsz/students/m8cd/homes/samardze38",
-#                         "/home/schools/bsz/students/m8cd/homes/samardze38/dir1",
-#                         "/home/schools/bsz/students/m8cd/homes/samardze38/dir2",
-#                         "/home/schools/bsz/students/class6-38",
-#                         "/home/schools/bsz/students/class6-38/homes",
-#                         "/home/schools/bsz/students/class6-38/share",
-#                         "/home/schools/bsz/students/class7-38",
-#                         "/home/schools/bsz/students/class7-38/homes",
-#                         "/home/schools/bsz/students/class7-38/share",
                          "/home/schools/uni",
                          "/home/schools/uni/management",
                          "/home/schools/uni/projects",
                          "/home/schools/uni/students",
-#                         "/home/schools/uni/students/12abc",
-#                         "/home/schools/uni/students/12abc/share",
-#                         "/home/schools/uni/students/12abc/homes",
-#                         "/home/schools/uni/students/12abc/homes/lordjo38",
-#                         "/home/schools/uni/students/12abc/homes/lordjo38/dir1",
-#                         "/home/schools/uni/students/12abc/homes/lordjo38/dir2",
-#                         "/home/schools/uni/students/12abc/homes/blackmri38",
-#                         "/home/schools/uni/students/12abc/homes/blackmri38/dir1",
-#                         "/home/schools/uni/students/12abc/homes/blackmri38/dir2",
                          "/home/schools/uni/teachers",
                          "/home/schools/uni/teachers/homes",
-#                         "/home/schools/uni/teachers/homes/kep38",
-#                         "/home/schools/uni/teachers/homes/kep38/teacher1",
-#                         "/home/schools/uni/teachers/homes/kep38/teacher2",
-#                         "/home/schools/uni/teachers/homes/gal38",
-#                         "/home/schools/uni/teachers/homes/gal38/teacher1",
-#                         "/home/schools/uni/teachers/homes/gal38/teacher2",
                          "/home/schools/uni/teachers/share",
                          "/home/schools/default-school",
                          "/home/schools/default-school/management",
                          "/home/schools/default-school/projects",
                          "/home/schools/default-school/students",
-#                         "/home/schools/default-school/students/s6ade",
-#                         "/home/schools/default-school/students/s6ade/share",
-#                         "/home/schools/default-school/students/s6ade/homes",
-#                         "/home/schools/default-school/students/s6ade/homes/schneima38",
-#                         "/home/schools/default-school/students/s6ade/homes/schneima38/dir1",
-#                         "/home/schools/default-school/students/s6ade/homes/schneima38/dir2",
-#                         "/home/schools/default-school/students/class12-38",
-#                         "/home/schools/default-school/students/class12-38/share",
-#                         "/home/schools/default-school/students/class12-38/homes",
-#                         "/home/schools/default-school/students/class13-38",
-#                         "/home/schools/default-school/students/class13-38/share",
-#                         "/home/schools/default-school/students/class13-38/homes",
                          "/home/schools/default-school/teachers",
                          "/home/schools/default-school/teachers/homes",
-#                         "/home/schools/default-school/teachers/homes/sch38",
-#                         "/home/schools/default-school/teachers/homes/sch38/teacher1",
-#                         "/home/schools/default-school/teachers/homes/sch38/teacher2",
                          "/home/schools/default-school/teachers/share",
                         ); 
     &directory_tree_test("/home/global",
@@ -1666,12 +1609,4 @@ if ($test_kill_class==1){
                         ); 
 }
 
-
-
-
-
-
 &AD_unbind_admin($ldap);
-
-
-
