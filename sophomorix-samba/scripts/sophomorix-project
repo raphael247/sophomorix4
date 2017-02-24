@@ -610,12 +610,15 @@ if ($create==1 and $project ne ""){
 # --kill --project <name>
 ############################################################
 if ($kill==1 and $project ne ""){
-  my $group_token=&AD_get_name_tokened($project,$school,"project");
-  &AD_group_kill({ldap=>$ldap,
-                  root_dse=>$root_dse,
-                  group=>$group_token,
-                  type=>"project",
+    my $group_token=&AD_get_name_tokened($project,$school,"project");
+    &AD_group_kill({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    root_dns=>$root_dns,
+                    group=>$group_token,
+                    smb_admin_pass=>$smb_admin_pass,
+                    type=>"project",
                   });
+  exit;
 }
 
 

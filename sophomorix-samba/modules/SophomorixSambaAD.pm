@@ -725,11 +725,11 @@ sub AD_group_kill {
     &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
 
-    print "Here $type\n";
     if ($count > 0){
         if ($type eq "adminclass"){
             ### adminclass #####################################
             # deleting share if possible, when succesful  the account
+            # do not delete ./homes if not empty !
             if ($smb_share ne  "unknown"){
                 my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
                                                  password  => $smb_admin_pass,
@@ -755,16 +755,30 @@ sub AD_group_kill {
                 }
 
             }
-
 	} elsif ($type eq "project"){
-
-
+            # delete the share, when succesful the group
+            if ($smb_share ne  "unknown"){
+                my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+                                                 password  => $smb_admin_pass,
+                                                 debug     => 1);
+                # trying to delete homes (success only if it is empty)
+                my $return1=$smb->rmdir_recurse($smb_share);
+                if($return1==1){
+                    print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    # deleting the AD account
+                    my $command="samba-tool group delete ". $group;
+                    print "   # $command\n";
+                    system($command);
+                } else {
+                    print "ERROR: rmdir_recurse $smb_share $!\n";
+                }
+            }
 	} elsif ($type eq "sophomorix-group"){
-                ### sophomorix-group #####################################
-                # there is no share, just delete the group
-                my $command="samba-tool group delete ". $group;
-                print "   # $command\n";
-                system($command);
+            ### sophomorix-group #####################################
+            # there is no share, just delete the group
+            my $command="samba-tool group delete ". $group;
+            print "   # $command\n";
+            system($command);
         }
         return;
     } else {
