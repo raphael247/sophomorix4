@@ -523,8 +523,9 @@ sub AD_repdir_using_file {
             # group loop start
             foreach my $group (@groups){
                 my $group_basename=$group;
-                # calculating group basename without prefix
-                $group_basename=~s/^${school}-//;
+                $group_basename=&Sophomorix::SophomorixBase::get_group_basename($group,$school);
+                ## calculating group basename without prefix
+                #$group_basename=~s/^${school}-//;
 
                 my $path_after_group=$path;
                 $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
@@ -639,7 +640,7 @@ sub AD_user_kill {
         if ($role eq "student" or 
             $role eq "teacher" or 
             $role eq "administrator"){
-              print "Deleting: $smb_home\n";
+              print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
               $smb->rmdir_recurse($smb_home) or print "Error rmdir_recurse: ", $!, "\n";
         }
         return;
@@ -4294,6 +4295,8 @@ sub AD_group_addmember {
         return;
     }
 }
+
+
 
 sub AD_group_addmember_management {
     # requires token-group as groupname
