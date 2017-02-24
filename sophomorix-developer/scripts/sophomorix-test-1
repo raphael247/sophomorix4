@@ -4681,6 +4681,7 @@ if ($kill==1 or $test_kill==1){
         &run_command("sophomorix-class --kill --class ghs-alumni $verbose_options");
         &run_command("sophomorix-class --kill --class bsz-alumni $verbose_options");
         &run_command("sophomorix-class --kill --class bsz-attic $verbose_options");
+
         &run_command("sophomorix-class --kill --class bsz-m7ab $verbose_options");
         &run_command("sophomorix-class --kill --class bsz-m8cd $verbose_options");
         &run_command("sophomorix-class --kill --class bsz-m9cd $verbose_options");
@@ -4707,15 +4708,47 @@ if ($kill==1 or $test_kill==1){
     &AD_object_nonexist($ldap,$root_dse,"group","m7ab");
     &AD_object_nonexist($ldap,$root_dse,"group","m8cd");
     &AD_object_nonexist($ldap,$root_dse,"group","12abc");
-    &AD_object_nonexist($ldap,$root_dse,"group","uni-12abc");
     &AD_object_nonexist($ldap,$root_dse,"group","s6ade");
     &AD_object_nonexist($ldap,$root_dse,"group","attic");
     &AD_object_nonexist($ldap,$root_dse,"group","lin-attic");
     &AD_object_nonexist($ldap,$root_dse,"group","m9cd");
-    &AD_object_nonexist($ldap,$root_dse,"group","m9cd");
     &AD_object_nonexist($ldap,$root_dse,"group","s7ade");
     &AD_object_nonexist($ldap,$root_dse,"group","alumni");
     &AD_object_nonexist($ldap,$root_dse,"group","ghs-alumni");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-alumni");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-attic");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m7ab");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m8cd");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m9cd");
+
+    # uni-alumni should be still there, because of fakeuser file
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=uni-alumni,OU=alumni,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"uni-alumni",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"uni-alumni",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixMembers=>"kep42",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "uni",
+                   memberOf => "uni-students",
+                   member => "",
+                  });
+
+
+    &AD_object_nonexist($ldap,$root_dse,"group","uni-12abc");
+
 
     &directory_tree_test("/home/schools",
                          "/home/schools",
@@ -4770,6 +4803,9 @@ if ($kill==1 or $test_kill==1){
     &run_command("rm -f /home/schools/uni/students/alumni/homes/fakeuser");
     # kill the class that coldnz be killed
     &run_command("sophomorix-class --kill --class uni-alumni $verbose_options");
+
+    &AD_object_nonexist($ldap,$root_dse,"group","uni-alumni");
+
     # check again the dirtree
     &directory_tree_test("/home/schools",
                          "/home/schools",
