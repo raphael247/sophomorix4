@@ -213,23 +213,44 @@ neue optionen
 
 sophomorix-repair und directoty tree:
 
-sophomorix-school OK
-sophomoix-admin   OK
 
+Löschen von Verzeichnissen/Daten (rekursiv)
 
-
-Löschen von Verzeichnissen
-
-- user löschen: home löschen not OK
-- Klassen NICHT löschen, wenn letzter User gelöscht wird
+- User: Home löschen beim entfernen des Accounts:            OK 
+- Klassen NICHT löschen, wenn letzter User gelöscht wird     OK
+  - Klassen können vorübergehend leer sein
+    Gibts die möglichkeit Klassen, die schon 1 Jahr nicht benutzt wurden zu löschen?
+    -> getested mit global internet
+       sobald ein user in eine Gruppe kommt wird im 
+       attribut 'whenChanged' die Zeit aktualisiert
+       -> Anzeigbar machen (Projekt zuletzt aktualisiert, ....)
+       -> bei nichtbenutzten adminclasses sollte also  'whenChanged' gleich bleiben
+       -> automatisches löschen incl. Tauschverzeichnis (cronjob), wenn
+          1) Klasse lange nicht benutzt (>450 Tage, default)
+          2) Klasse ohne member
+       -> leereKlassen löschen
 - sophomorix-class -kill: tausch löschen
 - projekt löschen: tauschverzeichnis löschen 
 
+Feature or not?
+sophomorix-user
+Händisches vorabanlegen der user (Schulkonsole), mit spezial-Kommentar in sophomorixAdminFile
+(Vorname,Nachname,Gebdat,schule)
+Falls derselbe user dann in einer Schuldatei auftaucht wird integriert/zusammengefpührt
+(sophomorixAdminFile, ...)
 
 
-
-
-
+<bug>
+tests für adminclasses: mittesten von 
+sophomorixMembers
+sophomorixAdmins
+projects:
+zusätzlich bei Projekten:
+sophomorixMembergroups
+sophomorixAdmingroups
+Bug: werden nicht geleert beim löschen der user
+--> löschen nicht mit samba-tool
+</bug>
 
 
 ###??????????????????????????????????????????????????###
