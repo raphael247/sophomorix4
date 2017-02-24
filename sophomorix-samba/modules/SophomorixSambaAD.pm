@@ -1022,7 +1022,7 @@ sub AD_user_create {
     my $user_principal_name = $login."\@"."linuxmuster.local";
     my $container=&AD_get_container($role,$group_basename);
 
-    my ($homedirectory,$unix_home)=
+    my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                        $school,
                                                        $group_basename,
