@@ -33,6 +33,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_group_removemember
                                  AD_group_list
+                                 AD_get_passwd
                                  get_forbidden_logins
                                     );
 
@@ -89,6 +90,8 @@ my $testopt=GetOptions(
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_administrator,
+                                     $DevelConf::secret_file_sophomorix_administrator);
 
 # --help
 if ($help==1) {
@@ -160,6 +163,7 @@ if ($create==1 and $group ne ""){
                        root_dns=>$root_dns,
                        school=>$school,
                        creationdate=>$time_stamp_AD,
+                       smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
                      }); 
     my $group_token=&AD_get_name_tokened($group,$school,"sophomorix-group");
@@ -173,6 +177,7 @@ if ($create==1 and $group ne ""){
                       type=>"sophomorix-group",
                       status=>"P",
                       creationdate=>$time_stamp_AD,
+                      smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
                     });
 }

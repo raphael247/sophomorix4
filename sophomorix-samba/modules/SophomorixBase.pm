@@ -1158,6 +1158,7 @@ sub NTACL_set_file {
     my $school = $arg_ref->{school};
     my $ntacl = $arg_ref->{ntacl};
     my $smbpath = $arg_ref->{smbpath};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
 #    my $user = $arg_ref->{user};
 #    my $group = $arg_ref->{group};
    
@@ -1194,7 +1195,8 @@ sub NTACL_set_file {
 
     }
     $smbcacls_option="\"".$smbcacls_option."\"";
-    my $smbcacls_base_command="smbcacls -U Administrator%'Muster!' //$root_dns/$school $smbpath --set ";
+    my $smbcacls_base_command="smbcacls -U ".$DevelConf::sophomorix_administrator."%'".
+                              $smb_admin_pass."' //$root_dns/$school $smbpath --set ";
     my $smbcacls_command=$smbcacls_base_command.$smbcacls_option;
     print "* $smbcacls_base_command\n";
     print "  $smbcacls_option\n";

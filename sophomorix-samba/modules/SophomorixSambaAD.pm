@@ -387,6 +387,7 @@ sub AD_repdir_using_file {
     my $root_dns = $arg_ref->{root_dns};
     my $repdir_file = $arg_ref->{repdir_file};
     my $ref_AD = $arg_ref->{AD};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # optional options
@@ -567,8 +568,8 @@ sub AD_repdir_using_file {
 	            }
                     if ($entry_type eq "SMB"){
                         # smbclient
-                        my $smbclient_command="smbclient -U Administrator%'Muster!'".
-                                              " //$root_dns/$school -c 'mkdir $path_after_user_smb'";
+                        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_administrator."%'".
+                                              $smb_admin_pass."'"." //$root_dns/$school -c 'mkdir $path_after_user_smb'";
                         my $user_typeout;
                         if ($user eq ""){
                             $user_typeout="<none>";
@@ -584,6 +585,7 @@ sub AD_repdir_using_file {
                                                                      school=>$school,
                                                                      ntacl=>$ntacl,
                                                                      smbpath=>$path_after_user_smb,
+                                                                     smb_admin_pass=>$smb_admin_pass,
                                                                    });
                    } elsif ($entry_type eq "LINUX"){
                         mkdir $path_after_user;
@@ -613,6 +615,7 @@ sub AD_user_kill {
     my $user = $arg_ref->{login};
     my $identifier = $arg_ref->{identifier};
     my $user_count = $arg_ref->{user_count};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
 
     my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
         &AD_get_user({ldap=>$ldap,
@@ -629,9 +632,9 @@ sub AD_user_kill {
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
         system($command);
-        my $smb = new Filesys::SmbClient(username  => "administrator",
-                                   password  => "Muster!",
-                                   debug     => 1);
+        my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+                                         password  => $smb_admin_pass,
+                                         debug     => 1);
         # deleting home
         if ($role eq "student" or 
             $role eq "teacher" or 
@@ -988,6 +991,7 @@ sub AD_user_create {
     my $deactivationdate = $arg_ref->{deactivationdate};
     my $status = $arg_ref->{status};
     my $file = $arg_ref->{file};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
 
@@ -1175,6 +1179,7 @@ sub AD_user_create {
                                    repdir_file=>"repdir.administrator_home",
                                    school=>$DevelConf::homedir_global_smb_share,,
                                    administrator_home=>$login,
+                                   smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         } else {
@@ -1182,6 +1187,7 @@ sub AD_user_create {
                                    repdir_file=>"repdir.administrator_home",
                                    school=>$school,
                                    administrator_home=>$login,
+                                   smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         }
@@ -1192,6 +1198,7 @@ sub AD_user_create {
                                    school=>$DevelConf::homedir_global_smb_share,,
                                    teacherclass=>$group,
                                    teacher_home=>$login,
+                                   smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         } else {
@@ -1200,6 +1207,7 @@ sub AD_user_create {
                                    school=>$school,
                                    teacherclass=>$group,
                                    teacher_home=>$login,
+                                   smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         }
@@ -1210,6 +1218,7 @@ sub AD_user_create {
                                    school=>$DevelConf::homedir_global_smb_share,,
                                    adminclass=>$group,
                                    student_home=>$login,
+                                   smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         } else {
@@ -1218,6 +1227,7 @@ sub AD_user_create {
                                    school=>$school,
                                    adminclass=>$group,
                                    student_home=>$login,
+                                   smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
                                  });
         }
@@ -1455,6 +1465,7 @@ sub AD_user_move {
     my $role_old = $arg_ref->{role_old};
     my $role_new = $arg_ref->{role_new};
     my $creationdate = $arg_ref->{creationdate};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # read from config
@@ -1534,6 +1545,7 @@ sub AD_user_move {
                             root_dns=>$root_dns,
                             school=>$school_new,
                             creationdate=>$creationdate,
+                            smb_admin_pass=>$smb_admin_pass,
                             sophomorix_config=>$ref_sophomorix_config,
                           });
          # remember new ou to add it only once
@@ -1554,6 +1566,7 @@ sub AD_user_move {
                       joinable=>"TRUE",
                       status=>"P",
                       creationdate=>$creationdate,
+                      smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
                     });
 
@@ -1632,7 +1645,9 @@ sub AD_user_move {
     if ($school_old eq $school_new){
         # this is on the same share
         # smbclient ... rename (=move)
-        my $smbclient_command="smbclient -U Administrator%'Muster!'".
+#        my $smbclient_command="smbclient -U Administrator%'Muster!'".
+#                              " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
+        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_administrator."%'".$smb_admin_pass."'".
                               " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
         print "$smbclient_command\n";
         system($smbclient_command);
@@ -1652,6 +1667,7 @@ sub AD_user_move {
                                school=>$school_new,
                                adminclass=>$group_new,
                                student_home=>$user,
+                               smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     } elsif ($role_new eq "teacher"){
@@ -1660,6 +1676,7 @@ sub AD_user_move {
                                school=>$school_new,
                                teacherclass=>$group_new,
                                teacher_home=>$user,
+                               smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     }
@@ -1810,6 +1827,7 @@ sub AD_school_create {
     my $root_dns = $arg_ref->{root_dns};
     my $school = $arg_ref->{school};
     my $creationdate = $arg_ref->{creationdate};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $gidnumber_wish;
 
@@ -1882,6 +1900,7 @@ sub AD_school_create {
                           creationdate=>$creationdate,
                           joinable=>"TRUE",
                           hidden=>"FALSE",
+                          smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>$ref_sophomorix_config,
                          });
     }
@@ -1890,6 +1909,7 @@ sub AD_school_create {
     &AD_repdir_using_file({root_dns=>$root_dns,
                            repdir_file=>"repdir.school",
                            school=>$school,
+                           smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
                         });
 
@@ -1955,6 +1975,7 @@ sub AD_school_create {
                           creationdate=>$creationdate,
                           joinable=>"TRUE",
                           hidden=>"FALSE",
+                          smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>$ref_sophomorix_config,
                         });
     }
@@ -1972,6 +1993,7 @@ sub AD_school_create {
                            root_dns=>$root_dns,
                            repdir_file=>"repdir.global",
                            school=>$DevelConf::homedir_global_smb_share,
+                           smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
                          });
 
@@ -4064,7 +4086,9 @@ sub AD_group_create {
     my $gidnumber_wish = $arg_ref->{gidnumber_wish};
     my $dn_wish = $arg_ref->{dn_wish};
     my $cn = $arg_ref->{cn};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $file = $arg_ref->{file};
+
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $joinable){
@@ -4167,6 +4191,7 @@ sub AD_group_create {
                                repdir_file=>"repdir.adminclass",
                                school=>$school,
                                adminclass=>$group,
+                               smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     } elsif ($type eq "teacherclass"){
@@ -4180,6 +4205,7 @@ sub AD_group_create {
                                repdir_file=>"repdir.teacherclass",
                                school=>$school,
                                teacherclass=>$group,
+                               smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     } elsif ($type eq "room"){
@@ -4201,6 +4227,7 @@ sub AD_group_create {
                                repdir_file=>"repdir.project",
                                school=>$school,
                                project=>$group,
+                               smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     }

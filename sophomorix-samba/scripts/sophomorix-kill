@@ -32,6 +32,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_unbind_admin
                                  AD_dns_get
                                  AD_user_kill
+                                 AD_get_passwd
                                  AD_get_name_tokened
                                     );
 
@@ -89,6 +90,8 @@ my $testopt=GetOptions(
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_administrator,
+                                     $DevelConf::secret_file_sophomorix_administrator);
 
 # --help
 if ($help==1) {
@@ -253,6 +256,7 @@ if ($killuser ne ""){
                        login=>$user_to_kill,
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
+                       smb_admin_pass=>$smb_admin_pass,
                      });
     }
 } else {
@@ -272,6 +276,7 @@ if ($killuser ne ""){
                        login=>$login_name_to_kill,
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
+                       smb_admin_pass=>$smb_admin_pass,
                      });
     }
     close(KILL);

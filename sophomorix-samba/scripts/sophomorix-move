@@ -29,7 +29,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_move
                                  AD_bind_admin
                                  AD_dns_get
-                                 AD_unbind_admin
+                                 AD_unbind_admin 
+                                 AD_get_passwd
                                  AD_get_name_tokened
                                     );
 my @arguments = @ARGV;
@@ -102,6 +103,8 @@ my $testopt=GetOptions(
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_administrator,
+                                     $DevelConf::secret_file_sophomorix_administrator);
 
 # --help
 if ($help==1) {
@@ -338,7 +341,8 @@ while(<USERVERSETZEN>){
                    school_new=>$school_new,
                    role_old=>$role_old,
                    role_new=>$role_new,
-                   creationdate=>$time_stamp_AD,
+                   creationdate=>$time_stamp_AD, 
+                   smb_admin_pass=>$smb_admin_pass,
                    sophomorix_config=>\%sophomorix_config,
                   });
 

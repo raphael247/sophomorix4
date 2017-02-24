@@ -58,6 +58,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_group_list
                                  AD_admin_list
+                                 AD_get_passwd
                                  get_forbidden_logins
                                     );
 my @arguments = @ARGV;
@@ -100,6 +101,8 @@ my $testopt=GetOptions(
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_administrator,
+                                     $DevelConf::secret_file_sophomorix_administrator);
 
 # --help
 if ($help==1) {
@@ -189,6 +192,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
                        root_dns=>$root_dns,
                        school=>$school_provide,
                        creationdate=>$time_stamp_AD,
+                       smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
                      });
     my $sn="Admin";
@@ -217,6 +221,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
                     deactivationdate => "---",
                     status => "p",
                     file => "no file",
+                    smb_admin_pass=>$smb_admin_pass,
                     sophomorix_config=>\%sophomorix_config,
                   });
 
@@ -246,6 +251,7 @@ if ($kill ne ""){
                        root_dns=>$root_dns,
                        login=>$kill,
                        user_count=>"0",
+                       smb_admin_pass=>$smb_admin_pass,
                      });
     } else {
         print "\nERROR: User $kill is not an administrator created by sophomorix\n\n";

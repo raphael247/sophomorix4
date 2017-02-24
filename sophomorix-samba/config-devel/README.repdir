@@ -111,6 +111,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          school=>$DevelConf::homedir_global_smb_share,
                          repdir_file=>"repdir.global",
                          AD=>\%AD,
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -120,6 +121,7 @@ When creating/repairing ONE user-home, group-share, school then:
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.school",
                          school=>"bsz",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -129,6 +131,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          repdir_file=>"repdir.project",
                          school=>"default-school",
                          project=>"p_astro",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -138,6 +141,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          repdir_file=>"repdir.administrator_home",
                          school=>"abc",
                          administrator_home=>"admin10",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -147,6 +151,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          repdir_file=>"repdir.teacherclass",
                          school=>"abc",
                          teacherclass=>"teachers",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -157,6 +162,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          school=>"bsz",
                          teacherclass=>"teachers",
                          teacher_home=>"oe42",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -166,6 +172,7 @@ When creating/repairing ONE user-home, group-share, school then:
                          repdir_file=>"repdir.adminclass",
                          school=>"bsz",
                          adminclass=>"bsz-m7ab",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
 
@@ -175,5 +182,6 @@ When creating/repairing ONE user-home, group-share, school then:
                          school=>"bsz",
                          adminclass=>"bsz-m7ab",
                          student_home=>"maiersa42",
+                         smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
