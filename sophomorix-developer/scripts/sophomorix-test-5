@@ -426,9 +426,7 @@ if ($test_add_admin==1){
                          "/home/global/projects",
                          "/home/global/students",
                          "/home/global/teachers",
-                        ); 
-
-
+                        );
 }
 
 
@@ -439,6 +437,7 @@ if ($test_add_admin==1){
 ############################################################
 # --mod-admin  
 if ($mod_admin==1){
+    print "\nNothing to mod so far (--mod-admin), ...\n\n";
 }
 
 ############################################################
@@ -481,6 +480,47 @@ if ($test_kill_admin==1){
     &AD_object_nonexist($ldap,$root_dse,"user","admin-666");
     &AD_object_nonexist($ldap,$root_dse,"user","global-admin-66");
     &AD_object_nonexist($ldap,$root_dse,"user","global-admin-666");
+
+    &directory_tree_test("/home/schools",
+                         "/home/schools",
+                         "/home/schools/abc",
+                         "/home/schools/abc/management",
+#                         "/home/schools/abc/management/admin-abc-666",
+#                         "/home/schools/abc/management/admin-abc-666/admindir1",
+#                         "/home/schools/abc/management/admin-abc-666/admindir2",
+                         "/home/schools/abc/projects",
+                         "/home/schools/abc/students",
+                         "/home/schools/bsz",
+                         "/home/schools/bsz/management",
+#                         "/home/schools/bsz/management/admin-bsz-66",
+#                         "/home/schools/bsz/management/admin-bsz-66/admindir1",
+#                         "/home/schools/bsz/management/admin-bsz-66/admindir2",
+                         "/home/schools/bsz/projects",
+                         "/home/schools/bsz/students",
+                         "/home/schools/default-school",
+                         "/home/schools/default-school/management",
+#                         "/home/schools/default-school/management/admin-66",
+#                         "/home/schools/default-school/management/admin-66/admindir1",
+#                         "/home/schools/default-school/management/admin-66/admindir2",
+#                         "/home/schools/default-school/management/admin-666",
+#                         "/home/schools/default-school/management/admin-666/admindir1",
+#                         "/home/schools/default-school/management/admin-666/admindir2",
+                         "/home/schools/default-school/projects",
+                         "/home/schools/default-school/students",
+                        ); 
+    &directory_tree_test("/home/global",
+                         "/home/global",
+                         "/home/global/management",
+#                         "/home/global/management/global-admin-66",
+#                         "/home/global/management/global-admin-66/admindir1",
+#                         "/home/global/management/global-admin-66/admindir2",
+#                         "/home/global/management/global-admin-666",
+#                         "/home/global/management/global-admin-666/admindir1",
+#                         "/home/global/management/global-admin-666/admindir2",
+                         "/home/global/projects",
+                         "/home/global/students",
+                         "/home/global/teachers",
+                        ); 
 }
 
 

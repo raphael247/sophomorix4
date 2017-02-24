@@ -623,7 +623,6 @@ sub AD_user_kill {
     $home_directory=~s/\\/\//g;
     my $smb_home="smb:".$home_directory;
 
-
     &Sophomorix::SophomorixBase::print_title("Killing User $user ($user_count):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
     if ($count > 0){
@@ -634,9 +633,11 @@ sub AD_user_kill {
                                    password  => "Muster!",
                                    debug     => 1);
         # deleting home
-        if ($role eq "student" or $role eq "teacher"){
-            print "Deleting: $smb_home\n";
-            $smb->rmdir_recurse($smb_home) or print "Error rmdir_recurse: ", $!, "\n";
+        if ($role eq "student" or 
+            $role eq "teacher" or 
+            $role eq "administrator"){
+              print "Deleting: $smb_home\n";
+              $smb->rmdir_recurse($smb_home) or print "Error rmdir_recurse: ", $!, "\n";
         }
         return;
     } else {
