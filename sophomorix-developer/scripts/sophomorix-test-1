@@ -4664,7 +4664,11 @@ if ($kill==1 or $test_kill==1){
         &run_command("cp -v $file_kill_test $file_kill");
         &run_command("sophomorix-kill -i");
         &run_command("sophomorix-kill $verbose_options");
-        # removing adminclasses,teacherclasses
+
+        # creating files to avoid deletion
+        &run_command("touch /home/schools/uni/students/alumni/homes/fakeuser");
+
+        # removing adminclasses
         &run_command("sophomorix-class --kill --class m7ab $verbose_options");
         &run_command("sophomorix-class --kill --class m8cd $verbose_options");
         &run_command("sophomorix-class --kill --class uni-12abc $verbose_options");
@@ -4721,81 +4725,7 @@ if ($kill==1 or $test_kill==1){
                          "/home/schools/bsz/students",
                          "/home/schools/bsz/teachers",
                          "/home/schools/bsz/teachers/homes",
-##                         "/home/schools/bsz/teachers/homes/oe42",                # moved away
-##                         "/home/schools/bsz/teachers/homes/oe42/teacher1",       # moved away
-##                         "/home/schools/bsz/teachers/homes/oe42/teacher2",       # moved away
-#                         "/home/schools/bsz/students/alumni",
-#                         "/home/schools/bsz/students/alumni/share",
-#                         "/home/schools/bsz/students/alumni/homes",
-#                         "/home/schools/bsz/students/alumni/homes/oe42",                  # moved to here
-#                         "/home/schools/bsz/students/alumni/homes/oe42/teacher1",         # moved to here
-#                         "/home/schools/bsz/students/alumni/homes/oe42/teacher2",         # moved to here
-#                         "/home/schools/bsz/students/alumni/homes/oe42/dir1",             # moved to here
-#                         "/home/schools/bsz/students/alumni/homes/oe42/dir2",             # moved to here
-##                         "/home/schools/bsz/teachers/homes/wu42",                # moved away
-##                         "/home/schools/bsz/teachers/homes/wu42/teacher1",       # moved away
-##                         "/home/schools/bsz/teachers/homes/wu42/teacher2",       # moved away
-#                         "/home/schools/uni/teachers/homes/wu42",                         # moved to here
-#                         "/home/schools/uni/teachers/homes/wu42/teacher1",                # moved to here
-#                         "/home/schools/uni/teachers/homes/wu42/teacher2",                # moved to here
                          "/home/schools/bsz/teachers/share",
-#                         "/home/schools/bsz/students/m7ab",
-#                         "/home/schools/bsz/students/m7ab/homes",
-#                         "/home/schools/bsz/students/m7ab/share",
-##                         "/home/schools/bsz/students/m7ab/homes/maiersa42",      # moved away
-##                         "/home/schools/bsz/students/m7ab/homes/maiersa42/dir1", # moved away
-##                         "/home/schools/bsz/students/m7ab/homes/maiersa42/dir2", # moved away
-#                         "/home/schools/bsz/students/attic",
-#                         "/home/schools/bsz/students/attic/share",
-#                         "/home/schools/bsz/students/attic/homes",
-#                         "/home/schools/bsz/students/attic/homes/maiersa42",                # moved to here
-#                         "/home/schools/bsz/students/attic/homes/maiersa42/dir1",           # moved to here
-#                         "/home/schools/bsz/students/attic/homes/maiersa42/dir2",           # moved to here
-##                         "/home/schools/bsz/students/m7ab/homes/muellegr42",      # moved away
-##                         "/home/schools/bsz/students/m7ab/homes/muellegr42/dir1", # moved away
-##                         "/home/schools/bsz/students/m7ab/homes/muellegr42/dir2", # moved away
-#                         "/home/schools/lin/students/attic",
-#                         "/home/schools/lin/students/attic/share",
-#                         "/home/schools/lin/students/attic/homes",
-#                         "/home/schools/lin/students/attic/homes/muellegr42",             # moved to here
-#                         "/home/schools/lin/students/attic/homes/muellegr42/dir1",        # moved to here
-#                         "/home/schools/lin/students/attic/homes/muellegr42/dir2",        # moved to here
-#                         "/home/schools/bsz/students/m8cd",
-#                         "/home/schools/bsz/students/m8cd/share",
-#                         "/home/schools/bsz/students/m8cd/homes",
-##                         "/home/schools/bsz/students/m8cd/homes/jonsonad42",       # moved away
-##                         "/home/schools/bsz/students/m8cd/homes/jonsonad42/dir1",  # moved away
-##                         "/home/schools/bsz/students/m8cd/homes/jonsonad42/dir2",  # moved away
-##                         "/home/schools/bsz/students/m8cd/homes/samardze42",       # moved away
-##                         "/home/schools/bsz/students/m8cd/homes/samardze42/dir1",  # moved away
-##                         "/home/schools/bsz/students/m8cd/homes/samardze42/dir2",  # moved away
-#                         "/home/schools/bsz/students/m9cd",
-#                         "/home/schools/bsz/students/m9cd/share",
-#                         "/home/schools/bsz/students/m9cd/homes",
-#                         "/home/schools/bsz/students/m9cd/homes/jonsonad42",               # moved to here
-#                         "/home/schools/bsz/students/m9cd/homes/jonsonad42/dir1",          # moved to here
-#                         "/home/schools/bsz/students/m9cd/homes/jonsonad42/dir2",          # moved to here
-#                         "/home/schools/bsz/students/m9cd/homes/samardze42",               # moved to here
-#                         "/home/schools/bsz/students/m9cd/homes/samardze42/dir1",          # moved to here
-#                         "/home/schools/bsz/students/m9cd/homes/samardze42/dir2",          # moved to here
-                         "/home/schools/uni",
-                         "/home/schools/uni/management",
-                         "/home/schools/uni/projects",
-                         "/home/schools/uni/students",
-#                         "/home/schools/uni/students/12abc",
-#                         "/home/schools/uni/students/12abc/share",
-#                         "/home/schools/uni/students/12abc/homes",
-#                         "/home/schools/uni/teachers/homes/lordjo42",                      # moved to here
-#                         "/home/schools/uni/teachers/homes/lordjo42/dir1",                 # moved to here
-#                         "/home/schools/uni/teachers/homes/lordjo42/dir2",                 # moved to here
-#                         "/home/schools/uni/teachers/homes/lordjo42/teacher1",             # moved to here
-#                         "/home/schools/uni/teachers/homes/lordjo42/teacher2",             # moved to here
-##                        "/home/schools/uni/students/12abc/homes/lordjo42",        # moved away
-##                        "/home/schools/uni/students/12abc/homes/lordjo42/dir1",   # moved away
-##                        "/home/schools/uni/students/12abc/homes/lordjo42/dir2",   # moved away
-##                        "/home/schools/uni/students/12abc/homes/blackmri42",      # moved away
-##                        "/home/schools/uni/students/12abc/homes/blackmri42/dir1", # moved away
-##                        "/home/schools/uni/students/12abc/homes/blackmri42/dir2", # moved away
                          "/home/schools/lin",
                          "/home/schools/lin/management",
                          "/home/schools/lin/projects",
@@ -4803,69 +4733,27 @@ if ($kill==1 or $test_kill==1){
                          "/home/schools/lin/teachers",
                          "/home/schools/lin/teachers/share",
                          "/home/schools/lin/teachers/homes",
-#                         "/home/schools/lin/teachers/homes/blackmri42",                          # moved to here
-#                         "/home/schools/lin/teachers/homes/blackmri42/teacher1",                 # moved to here
-#                         "/home/schools/lin/teachers/homes/blackmri42/teacher2",                 # moved to here
-#                         "/home/schools/lin/teachers/homes/blackmri42/dir1",                     # moved to here
-#                         "/home/schools/lin/teachers/homes/blackmri42/dir2",                     # moved to here
+                         "/home/schools/uni",
+                         "/home/schools/uni/management",
+                         "/home/schools/uni/projects",
+                         "/home/schools/uni/students",
+                         "/home/schools/uni/students/alumni",
+                         "/home/schools/uni/students/alumni/share",
+                         "/home/schools/uni/students/alumni/homes",
+                         "/home/schools/uni/students/alumni/homes/fakeuser",
                          "/home/schools/uni/teachers",
                          "/home/schools/uni/teachers/homes",
-##                        "/home/schools/uni/teachers/homes/kep42",             # moved away
-##                        "/home/schools/uni/teachers/homes/kep42/teacher1",    # moved away
-##                        "/home/schools/uni/teachers/homes/kep42/teacher2",    # moved away
-#                         "/home/schools/uni/students/alumni",
-#                         "/home/schools/uni/students/alumni/share",
-#                         "/home/schools/uni/students/alumni/homes",
-#                         "/home/schools/uni/students/alumni/homes/kep42",                  # moved to here
-#                         "/home/schools/uni/students/alumni/homes/kep42/teacher1",         # moved to here
-#                         "/home/schools/uni/students/alumni/homes/kep42/teacher2",         # moved to here
-#                         "/home/schools/uni/students/alumni/homes/kep42/dir1",             # moved to here
-#                         "/home/schools/uni/students/alumni/homes/kep42/dir2",             # moved to here
- ##                        "/home/schools/uni/teachers/homes/gal42",             # moved away
- ##                        "/home/schools/uni/teachers/homes/gal42/teacher1",    # moved away
- ##                        "/home/schools/uni/teachers/homes/gal42/teacher2",    # moved away
+                         "/home/schools/uni/teachers/share",
                          "/home/schools/ghs",
                          "/home/schools/ghs/management",
                          "/home/schools/ghs/projects",
                          "/home/schools/ghs/students",
-#                         "/home/schools/ghs/students/alumni",
-#                         "/home/schools/ghs/students/alumni/share",
-#                         "/home/schools/ghs/students/alumni/homes",
-#                         "/home/schools/ghs/students/alumni/homes/gal42",                  # moved to here
-#                         "/home/schools/ghs/students/alumni/homes/gal42/teacher1",         # moved to here
-#                         "/home/schools/ghs/students/alumni/homes/gal42/teacher2",         # moved to here
-#                         "/home/schools/ghs/students/alumni/homes/gal42/dir1",             # moved to here
-#                         "/home/schools/ghs/students/alumni/homes/gal42/dir2",             # moved to here
-                         "/home/schools/uni/teachers/share",
                          "/home/schools/default-school",
                          "/home/schools/default-school/management",
                          "/home/schools/default-school/projects",
                          "/home/schools/default-school/students",
-#                         "/home/schools/default-school/students/s6ade",
-#                         "/home/schools/default-school/students/s6ade/share",
-#                         "/home/schools/default-school/students/s6ade/homes",
-##                         "/home/schools/default-school/students/s6ade/homes/schneima42",       # moved away
-##                         "/home/schools/default-school/students/s6ade/homes/schneima42/dir1",  # moved away
-##                         "/home/schools/default-school/students/s6ade/homes/schneima42/dir2",  # moved away
-#                         "/home/schools/default-school/students/s7ade",
-#                         "/home/schools/default-school/students/s7ade/share",
-#                         "/home/schools/default-school/students/s7ade/homes",
-#                         "/home/schools/default-school/students/s7ade/homes/schneima42",                  # moved to here
-#                         "/home/schools/default-school/students/s7ade/homes/schneima42/dir1",             # moved to here
-#                         "/home/schools/default-school/students/s7ade/homes/schneima42/dir2",             # moved to here
                          "/home/schools/default-school/teachers",
                          "/home/schools/default-school/teachers/homes",
-##                         "/home/schools/default-school/teachers/homes/sch42",                   # moved away
-##                         "/home/schools/default-school/teachers/homes/sch42/teacher1",          # moved away
-##                         "/home/schools/default-school/teachers/homes/sch42/teacher2",          # moved away
-#                         "/home/schools/default-school/students/alumni",
-#                         "/home/schools/default-school/students/alumni/share",
-#                         "/home/schools/default-school/students/alumni/homes",
-#                         "/home/schools/default-school/students/alumni/homes/sch42",                      # moved to here
-#                         "/home/schools/default-school/students/alumni/homes/sch42/teacher1",             # moved to here
-#                         "/home/schools/default-school/students/alumni/homes/sch42/teacher2",             # moved to here
-#                         "/home/schools/default-school/students/alumni/homes/sch42/dir1",                 # moved to here
-#                         "/home/schools/default-school/students/alumni/homes/sch42/dir2",                 # moved to here
                          "/home/schools/default-school/teachers/share",
                         ); 
     &directory_tree_test("/home/global",
@@ -4875,6 +4763,59 @@ if ($kill==1 or $test_kill==1){
                          "/home/global/students",
                          "/home/global/teachers",
                         ); 
+
+
+
+    # remove files to avoid deletion
+    &run_command("rm -f /home/schools/uni/students/alumni/homes/fakeuser");
+    # kill the class that coldnz be killed
+    &run_command("sophomorix-class --kill --class uni-alumni $verbose_options");
+    # check again the dirtree
+    &directory_tree_test("/home/schools",
+                         "/home/schools",
+                         "/home/schools/bsz",
+                         "/home/schools/bsz/management",
+                         "/home/schools/bsz/projects",
+                         "/home/schools/bsz/students",
+                         "/home/schools/bsz/teachers",
+                         "/home/schools/bsz/teachers/homes",
+                         "/home/schools/bsz/teachers/share",
+                         "/home/schools/uni",
+                         "/home/schools/uni/management",
+                         "/home/schools/uni/projects",
+                         "/home/schools/uni/students",
+                         "/home/schools/lin",
+                         "/home/schools/lin/management",
+                         "/home/schools/lin/projects",
+                         "/home/schools/lin/students",
+                         "/home/schools/lin/teachers",
+                         "/home/schools/lin/teachers/share",
+                         "/home/schools/lin/teachers/homes",
+                         "/home/schools/uni/teachers",
+                         "/home/schools/uni/teachers/homes",
+                         "/home/schools/ghs",
+                         "/home/schools/ghs/management",
+                         "/home/schools/ghs/projects",
+                         "/home/schools/ghs/students",
+                         "/home/schools/uni/teachers/share",
+                         "/home/schools/default-school",
+                         "/home/schools/default-school/management",
+                         "/home/schools/default-school/projects",
+                         "/home/schools/default-school/students",
+                         "/home/schools/default-school/teachers",
+                         "/home/schools/default-school/teachers/homes",
+                         "/home/schools/default-school/teachers/share",
+                        ); 
+    &directory_tree_test("/home/global",
+                         "/home/global",
+                         "/home/global/management",
+                         "/home/global/projects",
+                         "/home/global/students",
+                         "/home/global/teachers",
+                        ); 
+
+
+
 }
 
 
