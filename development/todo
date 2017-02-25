@@ -34,9 +34,6 @@ sophomorixAdminClass:
   - oder neues Attribut sophomorixAdminClassBasename? Exit.... auch?
 ############################################################
 
-sophomorix-group legt gruppen an, wo sollen sie ins AD?
-(bisher bei Projects)
-
 
 
 
@@ -195,6 +192,9 @@ sophomorix-repair:
   (this should be done by school)
 Administrator kann nur die verzeichnise anlegen?
 
+smbcacls mit --kerberos nutzen
+(Performance Vorteile mit kernberos ticket?)
+
 
 Problem:
 wenn AD als sophomorix-admin befüllt wird
@@ -222,18 +222,22 @@ Löschen von Verzeichnissen/Daten (rekursiv)
 - User: Home löschen beim entfernen des Accounts:            OK 
 - Klassen NICHT löschen, wenn letzter User gelöscht wird     OK
   - Klassen können vorübergehend leer sein
-    Gibts die möglichkeit Klassen, die schon 1 Jahr nicht benutzt wurden zu löschen?
+    Gibts die möglichkeit Klassen, die schon 1 Jahr nicht 
+    benutzt wurden zu löschen?
     -> getested mit global internet
        sobald ein user in eine Gruppe kommt wird im 
        attribut 'whenChanged' die Zeit aktualisiert
-       -> Anzeigbar machen (Projekt zuletzt aktualisiert, ....)
-       -> bei nichtbenutzten adminclasses sollte also  'whenChanged' gleich bleiben
-       -> automatisches löschen incl. Tauschverzeichnis (cronjob), wenn
+       -> Anzeigbar machen (Projekt zuletzt aktualisiert,
+           ....)
+       -> bei nichtbenutzten adminclasses sollte also 
+          'whenChanged' gleich bleiben
+       -> automatisches löschen incl. Tauschverzeichnis 
+          (cronjob), wenn
           1) Klasse lange nicht benutzt (>450 Tage, default)
           2) Klasse ohne member
        -> leereKlassen löschen
-- sophomorix-class -kill: tausch löschen
-- projekt löschen: tauschverzeichnis löschen 
+- sophomorix-class -kill: tausch löschen                    OK
+- projekt löschen: tauschverzeichnis löschen                OK 
 
 Feature or not?
 sophomorix-user
@@ -258,6 +262,16 @@ Bug: werden nicht geleert beim löschen der user
 ??? warum kann sophomorix-minitest get_homedirectory aufrugen wenn es in SophomorixBase nicht exportiert wird?
 mit get_sharedirectory geht das nicht
 
+
+<bug>
+inconsistent:
+sophomorix-class --create --class 7a
+sophomorix-class --kill --class 7a
+sophomorix-class --kill --class 7a
+
+Einheitlich
+
+</bug>
 
 ###??????????????????????????????????????????????????###
 
