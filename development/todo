@@ -21,6 +21,22 @@ Later:
   (see example code in sophomorix-admin --create <name is checked>)
 * AD_get_AD:
   management=TRUE -> schleife statt 6 einzelne suchen
+* Klassen per cronjob ntfernen, in denen
+  A) kein user drin ist
+  B) 450 Tage keine Änderung war
+  Umsetzung: getested mit global-internet
+    sobald ein user in eine Gruppe kommt wird im 
+    attribut 'whenChanged' die Zeit aktualisiert
+       -> Anzeigbar machen (Projekt zuletzt aktualisiert,
+           ....)
+       -> bei nichtbenutzten adminclasses sollte also 
+          'whenChanged' gleich bleiben
+* possible Feature:
+  - Händisches vorabanlegen/selbstanlegen der user (Schulkonsole), mit spezial-Kommentar in 
+    sophomorixAdminFile (Vorname,Nachname,Gebdat,schule)
+  - Falls derselbe user dann in einer Schuldatei auftaucht wird integriert/zusammengefpührt
+    (sophomorixAdminFile, ...)
+
 ############################################################
 
 
@@ -84,50 +100,6 @@ sophomorix-admin --create <admin-name> --school bsz --password 'fdrTfdtt!i'
                                                       OK 3.2.17
 
 ----------------------------------------------------------------
-Probleme sophomorix-admin/Administrator:
-----------------------------------------------------------------
-##### sophomorix-admin erzeugen:
-
-Der Befehl:
-
-samba-tool user create sophomorix-admin %12345678% --given-name=Sophomorix \
-           --surname="Sevice-Admin" --description "Sophomorix Service Admin"
-
-ist murks. Da
-
-Problem 1:  
-Passwort tut nicht, sobald man ein ! nutzt
-Bei Ausrufezeichen tut z.B. 
-   samba-tool user create sophomorix-admin 'Muster!'
-
-Falls man sichergehen will, dass das passwort wirklich gesetzt wird, nimmt man
-user setpassword sophomorix-admin
-und macht das interaktiv
-
-Also vielleicht folgendes Passwort verwenden: Muster! und daran einen langen Zufallstring ohne Sonderzeichen verwenden?
-
-Problem2: 
-Als CN bastelt sich samba etwas zusammen aus given-name,surname,description:
-* das Enthält dann auch Leerzeichen
-* man spricht dann den user an mit 
-  A) samba-tool user setpassword sophomorix-admin
-  B) beim connecten per ldap-browser muss man aber den zusammengebastelten CN nehmen und rausfinden was mit dem Leerzeichen ist
----> zu verwirrend, also keep it simple:
-   samba-tool user create sophomorix-admin %12345678%
-Dann sind samaccout und cn gleich, nämlich: sophomorix-admin
-
-Problem 3:
-Hat mans geschafft den sophomorix-admin anzulegen, hat er irgendwie nicht genügend rechte
-Also:
- samba-tool group addmembers Administrators  sophomorix-admin
-
--> sind Weitere Gruppen notwendig?
-
-
-Als script scheints wie folgt zu tun:
-
-siehe: sophomorix4/tools/add-sophomorix-admin
-----------------------------------------------------------------
 
 Fileserver:
 
@@ -186,7 +158,15 @@ entweder sophomorix-admin oder Administrator
 Hier noch anpassen:
    -->  SophomorixBase.pm: my $smbcacls_base_command="
 
-sophomorix-repair:
+
+
+sophomorix-repair 
+------------------------------------------------------------
+(include global? yes, I guess)
+wie heisst das share: linuxmuster-global
+
+sophomorix-repair und directoty tree:
+dependencies
 
 - make sure every school can be reached by a UNC path with  share
   (this should be done by school)
@@ -196,48 +176,15 @@ smbcacls mit --kerberos nutzen
 (Performance Vorteile mit kernberos ticket?)
 
 
-Problem:
-wenn AD als sophomorix-admin befüllt wird
-und Dateisystem mit Adminitrator angelegt wird:
-
-muss man IMMER testen ob beide funktionieren, bevor was halbfertig gemacht wird
-
-weiter:
-
-sophomorix-repair 
-
-(include global? yes, I guess)
-wie heisst das share?????????????? todo
-
-
-neue optionen 
--dependencies einführen
-
-
-sophomorix-repair und directoty tree:
 
 
 Löschen von Verzeichnissen/Daten (rekursiv)
-
+--------------------------------------------------------------------------------
 - User: Home löschen beim entfernen des Accounts:            OK 
 - Klassen NICHT löschen, wenn letzter User gelöscht wird     OK
-  - Klassen können vorübergehend leer sein
-    Gibts die möglichkeit Klassen, die schon 1 Jahr nicht 
-    benutzt wurden zu löschen?
-    -> getested mit global internet
-       sobald ein user in eine Gruppe kommt wird im 
-       attribut 'whenChanged' die Zeit aktualisiert
-       -> Anzeigbar machen (Projekt zuletzt aktualisiert,
-           ....)
-       -> bei nichtbenutzten adminclasses sollte also 
-          'whenChanged' gleich bleiben
-       -> automatisches löschen incl. Tauschverzeichnis 
-          (cronjob), wenn
-          1) Klasse lange nicht benutzt (>450 Tage, default)
-          2) Klasse ohne member
-       -> leereKlassen löschen
-- sophomorix-class -kill: tausch löschen                    OK
-- projekt löschen: tauschverzeichnis löschen                OK 
+  - Klassen können vorübergehend leer sein: nicht löschen    OK
+- sophomorix-class -kill: tausch löschen                     OK
+- projekt löschen: tauschverzeichnis löschen                 OK 
 
 Feature or not?
 sophomorix-user
@@ -259,7 +206,7 @@ Bug: werden nicht geleert beim löschen der user
 --> löschen nicht mit samba-tool
 </bug>
 
-??? warum kann sophomorix-minitest get_homedirectory aufrugen wenn es in SophomorixBase nicht exportiert wird?
+??? warum kann sophomorix-minitest get_homedirectory aufgerufen erdenwenn es in SophomorixBase nicht exportiert wird?
 mit get_sharedirectory geht das nicht
 
 
@@ -275,16 +222,13 @@ Einheitlich
 
 ###??????????????????????????????????????????????????###
 
+------------------------------------------------------------
 sophomorix-exam: setzt user in KA-modus/oder nicht
    entsprechend wie managementgroups
       on user1,user2,...
 Klassenarbeitsmodus setzen raus aus session, rein in sophomorix-exam???
 
-
-
-sernet kontaktieren wer das macht mit filesystem OK 29.1.17.
-
-
+------------------------------------------------------------
 Nach provisioning durch linusmuster-base:
 sophomorix-devel.conf:
   - user mit dem sophomorix arbeiten soll definieren
@@ -293,14 +237,9 @@ sophomorix-devel.conf:
     /etc/linuxmuster/.secret/sophomorix-admin
 
 
-sophomorix-admin
 
-- tests schreiben test-1
-- admins löschen
-- admins vornamen und Nachnamen geben (Für login screen)
-
-
-
+Managementgroups
+------------------------------------------------------------
 Beliebige managemengruppen erlauben/nachliefern können, z.B. nextcloud 
 1) In Schule managementgruppe bereitstellen
   - bei AD_school_create hinzu
@@ -335,6 +274,7 @@ Beliebige managemengruppen erlauben/nachliefern können, z.B. nextcloud
 
 
 common filter:
+------------------------------------------------------------
 weiter:
 comment_line(column_nr,string)  kommentiert aus
 drop_line(column_nr,string)  entfernt
@@ -352,19 +292,22 @@ was passiert dann mit den session einstellungen
 
 
 
-
-
 Fertig
 
 
 Sollen user in global vorgesehen werden?
 (außer global admins?)
 
+
+Filesys-SmbClient
+------------------------------------------------------------
 perl smbmodul nimmt als workgroup WORKGROUP an.
 workgroup ist aber LINUXMUSTER, bzw. das beim provisionieren angegebene
 -> Probleme?
 
 
+BUGS:
+----------------------------------------------------------------------
 <bug>
 
 sophomorix-test-5:
@@ -381,8 +324,11 @@ sollte aber nicht
 
 </bug>
 
+Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sbin/sophomorix-add line 367.
 
-??????????????????????????????????????????????????
+
+
+------------------------------------------------------------
 sophomorix-device:
 
 AD: je Drucker eine Gruppe
@@ -391,9 +337,16 @@ Wenn Drucker, dann Gruppe erstellen
      später konfigurierbar in devices.csv)
    User in Druckergruppe:  kann drucken
    Nicht in Druckergruppe: kann nicht drucken
-   pyquota: Frank testet early on AD attribute gebraucht werden
+   pyquota: Frank testet early ob AD attribute gebraucht werden
+
+type of a room/roomws: wenn room wegfällt, wegen examaccounts, 
+                       kann room für die workstations genommen werden (statt sophomorixType=roomws)
 
 
+
+
+
+------------------------------------------------------------
 AD_group_addmember_management
 
 -> allow only adding in:
@@ -425,13 +378,9 @@ liefert dann noch folgende Infos:
        -- um einschalten ausgrauen zu können
 
 
-
+------------------------------------------------------------
 tests für status
 
-Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sbin/sophomorix-add line 367.
-
-type of a room/roomws: wenn room wegfällt, wegen examaccounts, 
-                       kann room für die workstations genommen werden (statt sophomorixType=roomws)
 
 ------------------------------------------------------------
 SophomorixSamba_AD:  suche nach: future groups in students.csv
@@ -491,65 +440,14 @@ In the AD the school token of the default school is ---
 
 sophomorix-repair
 ------------------------------------------------------------
-Alle setzen:
-  # sicherstellen dass existent
-  # chown für owner.group
-  # ACL setzen aus Datei (setzt auch permissions für owner,group and others)
-  # chattr,lsattr für files (nicht dirs?)
-  # getfattr, setfattr???
-  # more
 
+acl_test in sophomorix-developer
+   -> dasselbe für ntacl_test
 
-User auflisten lassen,
-dann  mit $root_dns,$school,$group_basename,$user,$role 
-bzw. in unixHomeDirectory schauen
--> dann role-basiert die entsprechende ACL aufrufen
-
-
-Weiter acl:
-------------------------------------------------------------
-- acls testen auf server
-  -> smbclient, login, 
-     cd ...; cd ...; ls
-UND  ls dir1/dir2/      und weitere möglichkeiten 
-
-perl module:  Filesys-SmbClient 
-
-/home OHNE ACLs: mit getfacl /home
--------------------------------------
-getfacl: Entferne führende '/' von absoluten Pfadnamen
-# file: home
-# owner: root
-# group: root
-user::rwx
-group::r-x
-other::r-x
-
-
-/home  ACLs: mit setfacl 
-  # setfacl -m u:maiersa42:rwx /home
-  # setfacl -m g:bsz-m8cd:rwx /home
--------------------------------------
-getfacl: Entferne führende '/' von absoluten Pfadnamen
-# file: home
-# owner: root
-# group: root
-user::rwx
-user:LINUXMUSTER\134maiersa42:rwx
-group::r-x
-group:LINUXMUSTER\134bsz-m8cd:rwx
-mask::rwx
-other::r-x
-
-
-Testen der ACL (und permission und owner) mit folgender Funktion:
-
-&acl_test ("/path/abs/to/dir_or_file",
-           "# owner: root",         # erste nicht ignorierte Zeile
-           "# group: root",         # zweite nicht ignorierte Zeile
-           "# user: rwx",           # dritte nicht ignorierte Zeile
-           ...
-          );
+find test: 
+1) testen obs ntacls gibt, abs-pfade sich meken
+2) ntacl_test
+3) testen ob alle ntacls getestet wurden
 
 -> jede Zeile wird einzeln mit Test verglichen, um zu sehen WAS nicht passt
 -> vorhandene Zeile und getestete Zeilen werden gezählt 
@@ -567,8 +465,22 @@ Zusatzbefehl:
 
 
 
+User auflisten lassen,
+dann  mit $root_dns,$school,$group_basename,$user,$role 
+bzw. in unixHomeDirectory schauen
+-> dann role-basiert die entsprechende ACL aufrufen
+
+
+
+
 
 Weiter DNS: 
+
+Datei mit anzulegenden zonen
+  -> diese datei wird von linuxmuster-base erzeugt??
+  -> Nur 1 Zone?
+nicht mehrgenutzte Zonen löschen (geht das, wenn noch einträge da sind??)
+Dann die DNS Nodes für reverse lookup zur passenden Zone hinzunehmen
 
 ------------------------------------------------------------
 Hardwareclasses (hwk, hardwareklasse)

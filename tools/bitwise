@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use strict;
+#use integer;
+
+my @list=(512,514,66048,66050);
+
+
+#my $user_account_control_read=512;
+
+#print "Read from AD: $user_account_control_read\n";
+
+# set bit 2 to 1, keep others (OR)
+#my $set_disable_bit = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+
+# set bit 2 to 0, keep others (AND)
+#my $set_enable_bit =  0b1111_1111_1111_1111_1111_1111_1111_1101;
+
+foreach my $uac (@list){
+    print "\n";
+    printf "Read from AD:         %32b (%s)\n", $uac, $uac;
+    my $res1=&uac_disable_user($uac);
+    printf "  New disabled value: %32b (%s)\n", $res1, $res1;
+    my $res2=&uac_enable_user($uac);
+    printf "  New enabled value:  %32b (%s)\n", $res2, $res2;
+}
+
+
+
+sub uac_disable_user {
+    my ($uac)=@_;
+    # bit 2 to set must be 1, OR
+    my $set_disable_bit = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+    my $res = $uac | $set_disable_bit;
+    return $res;
+}
+
+
+
+
+
+sub uac_enable_user {
+    my ($uac)=@_;
+    # bit 2 to set must be 0, AND
+    my $set_enable_bit =  0b1111_1111_1111_1111_1111_1111_1111_1101;
+    my $res = $uac & $set_enable_bit;
+    return $res;
+}

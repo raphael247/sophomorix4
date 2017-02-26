@@ -1,0 +1,98 @@
+
+
+Obsolete 26.2.17
+######################################################################
+Weiter acl:
+------------------------------------------------------------
+- acls testen auf server
+  -> smbclient, login, 
+     cd ...; cd ...; ls
+UND  ls dir1/dir2/      und weitere möglichkeiten 
+
+
+/home OHNE ACLs: mit getfacl /home
+-------------------------------------
+getfacl: Entferne führende '/' von absoluten Pfadnamen
+# file: home
+# owner: root
+# group: root
+user::rwx
+group::r-x
+other::r-x
+
+
+/home  ACLs: mit setfacl 
+  # setfacl -m u:maiersa42:rwx /home
+  # setfacl -m g:bsz-m8cd:rwx /home
+-------------------------------------
+getfacl: Entferne führende '/' von absoluten Pfadnamen
+# file: home
+# owner: root
+# group: root
+user::rwx
+user:LINUXMUSTER\134maiersa42:rwx
+group::r-x
+group:LINUXMUSTER\134bsz-m8cd:rwx
+mask::rwx
+other::r-x
+
+
+Testen der ACL (und permission und owner) mit folgender Funktion:
+
+&acl_test ("/path/abs/to/dir_or_file",
+           "# owner: root",         # erste nicht ignorierte Zeile
+           "# group: root",         # zweite nicht ignorierte Zeile
+           "# user: rwx",           # dritte nicht ignorierte Zeile
+           ...
+          );
+
+
+
+
+
+Obsolete 20.2.17
+######################################################################
+----------------------------------------------------------------
+Probleme sophomorix-admin/Administrator:
+----------------------------------------------------------------
+##### sophomorix-admin erzeugen:
+
+Der Befehl:
+
+samba-tool user create sophomorix-admin %12345678% --given-name=Sophomorix \
+           --surname="Sevice-Admin" --description "Sophomorix Service Admin"
+
+ist murks. Da
+
+Problem 1:  
+Passwort tut nicht, sobald man ein ! nutzt
+Bei Ausrufezeichen tut z.B. 
+   samba-tool user create sophomorix-admin 'Muster!'
+
+Falls man sichergehen will, dass das passwort wirklich gesetzt wird, nimmt man
+user setpassword sophomorix-admin
+und macht das interaktiv
+
+Also vielleicht folgendes Passwort verwenden: Muster! und daran einen langen Zufallstring ohne Sonderzeichen verwenden?
+
+Problem2: 
+Als CN bastelt sich samba etwas zusammen aus given-name,surname,description:
+* das Enthält dann auch Leerzeichen
+* man spricht dann den user an mit 
+  A) samba-tool user setpassword sophomorix-admin
+  B) beim connecten per ldap-browser muss man aber den zusammengebastelten CN nehmen und rausfinden was mit dem Leerzeichen ist
+---> zu verwirrend, also keep it simple:
+   samba-tool user create sophomorix-admin %12345678%
+Dann sind samaccout und cn gleich, nämlich: sophomorix-admin
+
+Problem 3:
+Hat mans geschafft den sophomorix-admin anzulegen, hat er irgendwie nicht genügend rechte
+Also:
+ samba-tool group addmembers Administrators  sophomorix-admin
+
+-> sind Weitere Gruppen notwendig?
+
+
+Als script scheints wie folgt zu tun:
+
+siehe: sophomorix4/tools/add-sophomorix-admin
