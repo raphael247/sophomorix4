@@ -1512,13 +1512,13 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
         $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
 
-        # dnsNode
-        my @octets=split(/\./,$ip);
-        my $dnsnode=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
-        $devices_file{'dnsNode'}{$dnsnode}="seen";
-
         # dnsZone
-        $devices_file{'dnsZone'}{$host_token}=$ip;
+        my @octets=split(/\./,$ip);
+        my $dnszone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+        $devices_file{'dnsZone'}{$dnszone}="seen";
+
+        # dnsNode
+        $devices_file{'dnsNode'}{$host_token}=$ip;
 
         $devices_file{'room'}{$room_token}{'HOSTS'}{$host_token}="seen";
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
