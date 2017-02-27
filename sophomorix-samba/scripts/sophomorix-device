@@ -1072,6 +1072,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         print "   * Killing Computer Room $room ...\n";
         &AD_group_kill({ldap=>$ldap,
                         root_dse=>$root_dse,
+                        root_dns=>$root_dns,
                         group=>$room,
                         type=>"room",
                         group_count=>$kill_computer_room_count,

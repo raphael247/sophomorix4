@@ -773,6 +773,12 @@ sub AD_group_kill {
                     print "ERROR: rmdir_recurse $smb_share $!\n";
                 }
             }
+	} elsif ($type eq "room"){
+            ### rooms from sophomorix-device #####################################
+            # there is no share, just delete the group
+            my $command="samba-tool group delete ". $group;
+            print "   # $command\n";
+            system($command);
 	} elsif ($type eq "sophomorix-group"){
             ### sophomorix-group #####################################
             # there is no share, just delete the group
