@@ -845,6 +845,7 @@ foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_p
 }
 
 
+
 # dnsNodes to add
 foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
     if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
@@ -866,6 +867,27 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
         }
     }
 }
+
+
+# dnsZones to kill
+foreach my $dnszone (keys %{$AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
+    if (not exists $devices_file{'dnsZone'}{$dnszone}){
+        # dns node is not needed anymore, no host
+        &push_kill_dnszone($dnszone);
+    }
+}
+
+
+
+# dnsZones to add
+foreach my $dnszone (keys %{$devices_file{'dnsZone'}}) {
+    if (not exists $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dnszone} ){
+        # nonexisting --> add dnszone
+        &push_add_dnszone($dnszone);
+    }
+}
+
+
 
 
 # --dump-files
@@ -1489,7 +1511,14 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
         $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
         $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
-        $devices_file{'dnsNode'}{$host_token}=$ip;
+
+        # dnsNode
+        my @octets=split(/\./,$ip);
+        my $dnsnode=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+        $devices_file{'dnsNode'}{$dnsnode}="seen";
+
+        # dnsZone
+        $devices_file{'dnsZone'}{$host_token}=$ip;
 
         $devices_file{'room'}{$room_token}{'HOSTS'}{$host_token}="seen";
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
