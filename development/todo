@@ -3,8 +3,22 @@ Next:
 user status change in userAccountControl + tests
 sophomorix-check, .add , .kill workflow
 DNS reverse lookups
-ntacl_test
 
+Zone anlegen: samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa 
+samba-tool dns zonedelete <Your-AD-DNS-Server-IP-or-hostname> 0.99.10.in-addr.arpa
+
+
+Host anlegen: samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR r100-pc01.linuxmuster.local
+dns delete <Your-AD-DNS-Server-IP-or-hostname> samdom.example.com demo A 10.99.0.55
+
+
+samba-tool dns zonedelete linuxmuster.local 210.171.10.in-addr.arpa --password='Muster!' -U sophomorix-admin
+
+samba-tool dns zonedelete localhost 2.170.10.in-addr.arpa --password='Muster!' -U administrator
+
+
+
+ntacl_test
 
 Later:
 ############################################################

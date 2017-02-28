@@ -3161,6 +3161,10 @@ sub AD_get_AD {
         for( my $index = 0 ; $index < $max_zone ; $index++) {
             my $entry = $mesg->entry($index);
             my $zone=$entry->get_value('dc');
+            if ($zone eq $root_dns){ 
+                print "Skipping zone: $zone\n"; #skip provisioning DNS Zone
+                next;
+            }
             my $name=$entry->get_value('name');
             my $desc=$entry->get_value('adminDescription');
             if($Conf::log_level>=2){

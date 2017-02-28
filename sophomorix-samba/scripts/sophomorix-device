@@ -128,6 +128,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_computer_kill
                                  AD_dns_get
                                  AD_dns_create
+                                 AD_dns_zonecreate
                                  AD_dns_kill
                                  AD_dns_zonekill
                                  get_forbidden_logins
@@ -1187,6 +1188,39 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                     });
         $dns_node_count++;
     }
+
+
+    ############################################################
+    # Kill dnsZones
+    &print_title("dnsZones to be killed:");
+    my $dns_zone_count=1;
+    foreach my $dns_zone (@killing_dnszones){
+	print "        $dns_zone\n";
+        &AD_dns_zonekill({ldap=>$ldap, 
+                          root_dse=>$root_dse,
+                          dns_server=>"localhost",
+                          dns_zone=>$dns_zone,
+                          smb_pwd=>$smb_admin_pass,
+                        });
+        $dns_zone_count++;
+    }
+
+
+    ############################################################
+    # Add dnsZones
+    &print_title("dnsZones to be added:");
+    $dns_zone_count=1;
+    foreach my $dns_zone (@adding_dnszones){
+	print "        $dns_zone\n";
+        &AD_dns_zonecreate({ldap=>$ldap, 
+                            root_dse=>$root_dse,
+                            dns_server=>$root_dns,
+                            dns_zone=>$dns_zone,
+                            smb_pwd=>$smb_admin_pass,
+                          });
+        $dns_zone_count++;
+    }
+
 
     ############################################################
     # Add dnsNodes
