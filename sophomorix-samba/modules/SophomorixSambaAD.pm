@@ -216,9 +216,10 @@ sub AD_dns_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $smb_pwd = $arg_ref->{smb_pwd};
     my $dns_server = $arg_ref->{dns_server};
-    my $dns_zone = $arg_ref->{dns_zone};
+    #my $dns_zone = $arg_ref->{dns_zone};
     my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
@@ -226,6 +227,10 @@ sub AD_dns_create {
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
 #    my $dns_line = $arg_ref->{dns_line};
+
+    my @octets=split(/\./,$dns_ipv4);
+    my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+
 
     # extract host from line (may become obsolete) ?????????????????ß
 #    if (defined $dns_line and not defined $dns_node){
@@ -256,12 +261,14 @@ sub AD_dns_create {
     if (not defined $dns_type){
         $dns_type="A";
     }
-    if (not defined $dns_zone){
-        $dns_zone=&AD_dns_get($root_dse);
-    }
+#    if (not defined $dns_zone){
+#        $dns_zone=&AD_dns_get($root_dse);
+#    }
     
     # adding dnsNode with samba-tool
-    my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
+#    my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
+#                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    my $command="  samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "$command\n";
     system($command);
@@ -277,8 +284,14 @@ sub AD_dns_create {
                                        cn => $dns_cn,
                                       });
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
-             return;
-         }
+    }
+
+    # adding reverse lookup with samba-tool
+    my $command_reverse="  samba-tool dns add $dns_server $dns_zone 1 PTR $dns_node ".
+                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    print "$command_reverse\n";
+    system($command_reverse);
+    return;
 }
 
 

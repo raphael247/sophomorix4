@@ -4,11 +4,11 @@ user status change in userAccountControl + tests
 sophomorix-check, .add , .kill workflow
 DNS reverse lookups
 
-Zone anlegen: samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa 
-samba-tool dns zonedelete <Your-AD-DNS-Server-IP-or-hostname> 0.99.10.in-addr.arpa
+Zone anlegen: samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password='Muster!' -U administrator
+samba-tool dns zonedelete <Your-AD-DNS-Server-IP-or-hostname> 0.99.10.in-addr.arpa --password='Muster!' -U administrator
 
 
-Host anlegen: samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR r100-pc01.linuxmuster.local
+Host anlegen: samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR r100-pc01.linuxmuster.local --password='Muster!' -U administrator
 dns delete <Your-AD-DNS-Server-IP-or-hostname> samdom.example.com demo A 10.99.0.55
 
 

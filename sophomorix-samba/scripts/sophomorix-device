@@ -1234,6 +1234,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $dns_node (@adding_dnsnodes){
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
+                        root_dns=>$root_dns,
                         dns_node=>$dns_node,
                         dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
                         smb_pwd=>$smb_admin_pass,
@@ -1553,8 +1554,8 @@ sub analyze_device_line {
 
         # dnsZone
         my @octets=split(/\./,$ip);
-        my $dnszone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
-        $devices_file{'dnsZone'}{$dnszone}="seen";
+        my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+        $devices_file{'dnsZone'}{$dns_zone}="seen";
 
         # dnsNode
         $devices_file{'dnsNode'}{$host_token}=$ip;
