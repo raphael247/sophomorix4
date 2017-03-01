@@ -189,6 +189,7 @@ my %devices_file=();
 #                       -> MAC
 #                       -> CLASSROOM=TRUE/FALSE 
 # dnsNode  -> $dnsNode  -> $IP
+# dnsZone  -> $dnsZone  -> name
 # computer -> $computer -> ROOM
 #                       -> OU
 #                       -> SCHOOL
@@ -307,6 +308,10 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_administrator,
 my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
                             });
+
+# set linuxmuster.local as a dnsZone needed in files
+$devices_file{'dnsZone'}{$root_dns}="seen";
+
 #print Dumper(\%sophomorix_config{'FILES'});
 #my $resulthash=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{'bsz.devices.csv'}{'OU'};
 #print "HASH: >$resulthash<\n";
