@@ -500,6 +500,7 @@ if ($dns_show==1 or $dns_kill==1){
             if ($dns_kill==1){
                 &AD_dns_kill({ldap=>$ldap, 
                               root_dse=>$root_dse,
+                              root_dns=>$root_dns,
                               dns_zone=>$zone,
                               dns_node=>$name,
                               dns_ipv4=>$ipv4,
@@ -1186,6 +1187,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     foreach my $dns_node (@killing_dnsnodes){
         &AD_dns_kill({ldap=>$ldap, 
                       root_dse=>$root_dse,
+                      root_dns=>$root_dns,
                       dns_zone=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'dnsZone'},
                       dns_node=>$dns_node,
                       dns_ipv4=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'},

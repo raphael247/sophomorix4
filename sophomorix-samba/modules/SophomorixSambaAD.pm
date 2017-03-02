@@ -353,6 +353,7 @@ sub AD_dns_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
     my $smb_pwd = $arg_ref->{smb_pwd};
     my $dns_server = $arg_ref->{dns_server};
     my $dns_zone = $arg_ref->{dns_zone};
@@ -367,9 +368,16 @@ sub AD_dns_kill {
         $dns_type="A";
     }
 
+    # delete dnsNode
     my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "     * $command\n";
     system($command);
+
+    # delete reverse lookup ?????? deleted with the zone?
+    #$dns_type="PTR";
+    #my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    #print "     * $command\n";
+    #system($command);
 }
 
 
