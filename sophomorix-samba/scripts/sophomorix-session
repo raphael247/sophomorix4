@@ -388,6 +388,7 @@ if ($session ne "" and $set_exam_mode ne ""){
                                       participant=>$participant,
                                       user_count=>$user_count,
                                       sessions_ref=>\%sessions,
+                                      date_now=> $time_stamp_AD,
                                    });
             } else {
                 print "   * Doing nothing: $participant is not in the session\n";
@@ -415,6 +416,7 @@ if ($session ne "" and $unset_exam_mode ne ""){
                                     participant=>$participant,
                                     user_count=>$user_count,
                                     sessions_ref=>\%sessions,
+                                    date_now=> $time_stamp_AD,
                                   });
         } else {
             print "   * Doing nothing: $participant is not in the session\n";

@@ -1559,6 +1559,8 @@ sub analyze_device_line {
         my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
         $devices_file{'dnsZone'}{$dns_zone}="seen";
 
+	print "Zone: $dns_zone needed\n";
+
         # dnsNode
         $devices_file{'dnsNode'}{$host_token}=$ip;
 

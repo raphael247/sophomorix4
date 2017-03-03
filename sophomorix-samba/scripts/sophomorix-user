@@ -749,6 +749,7 @@ if ($user ne "" and defined $comment){
                      user=>$user,
                      comment=>$comment,
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -761,6 +762,7 @@ if ($user ne "" and defined $webui_dashboard){
                      user=>$user,
                      webui_dashboard=>$webui_dashboard,
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -776,6 +778,7 @@ if (defined $user_permissions and $user ne ""){
                       user=>$user,
                       user_permissions=>$user_permissions,
                       user_count=>"",
+                      date_now=> $time_stamp_AD,
                     });
 }
 
@@ -792,6 +795,7 @@ if (defined $add_user_permissions and $user ne ""){
                       user=>$user,
                       user_permissions=>$user_permissions,
                       user_count=>"",
+                      date_now=> $time_stamp_AD,
                     });
 }
 
@@ -807,6 +811,7 @@ if (defined $remove_user_permissions){
                       user=>$user,
                       user_permissions=>$user_permissions,
                       user_count=>"",
+                      date_now=> $time_stamp_AD,
                     });
 }
 
@@ -826,6 +831,7 @@ if ($freeze==1){
                      user=>$user,
                      status=>"F",
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -860,6 +866,7 @@ if ($permanent==1){
                      user=>$user,
                      status=>"P",
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -895,6 +902,7 @@ if ($removable==1){
 #                     tolerationdate=> $tolerationdate=$DevelConf::default_date,
 #                     deactivationdate=> $deactivationdate=$DevelConf::default_date,
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -929,6 +937,7 @@ if ($killable==1){
                      user=>$user,
                      status=>"K",
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -962,6 +971,7 @@ if ($activate==1){
                      user=>$user,
                      status=>"A",
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -995,9 +1005,9 @@ if ($usable==1){
                      user=>$user,
                      status=>"U",
                      user_count=>"",
+                     date_now=> $time_stamp_AD,
                    });
 }
-
 
 
 
@@ -1123,15 +1133,6 @@ if ($usable==1){
 #     }
 #     &log_script_exit("",0,1,0,@arguments);
 # }
-
-
-
-
-
-
-
-
-
 
 &AD_unbind_admin($ldap);
 &log_script_end(@arguments);

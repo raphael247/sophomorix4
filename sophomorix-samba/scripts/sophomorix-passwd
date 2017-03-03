@@ -65,7 +65,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                     );
 
 my @arguments = @ARGV;
-
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
 
 # ===========================================================================
 # Variablen
@@ -395,6 +396,7 @@ if ($set_firstpassword==1){
                      user_count=>$user_count,
                      firstpassword=>$firstpassword,
                      plain_password=>$firstpassword,
+                     date_now=> $time_stamp_AD,
                    });
     }
 }

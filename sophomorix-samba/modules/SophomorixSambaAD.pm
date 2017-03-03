@@ -1036,6 +1036,8 @@ sub AD_session_set_exam {
     my $participant = $arg_ref->{participant};
     my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
+    my $date_now = $arg_ref->{date_now};
+
     print "   * Setting exam mode for session participant $participant (Supervisor: $supervisor)\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
@@ -1048,6 +1050,7 @@ sub AD_session_set_exam {
                      user=>$participant,
                      user_count=>$user_count,
                      exammode=>$supervisor,
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -1061,6 +1064,8 @@ sub AD_session_unset_exam {
     my $participant = $arg_ref->{participant};
     my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
+    my $date_now = $arg_ref->{date_now};
+
     print "   * Unsetting exam mode for session participant $participant (Supervisor: $supervisor)\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
@@ -1073,6 +1078,7 @@ sub AD_session_unset_exam {
                      user=>$participant,
                      user_count=>$user_count,
                      exammode=>"---",
+                     date_now=> $time_stamp_AD,
                    });
 }
 
@@ -1371,11 +1377,25 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
-    my $user_account_control = $arg_ref->{user_account_control};
+#    my $user_account_control = $arg_ref->{user_account_control};
     my $school = $arg_ref->{school};
+    my $date_now = $arg_ref->{date_now};
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
 
+    my ($firstname_AD,
+        $lastname_AD,
+        $adminclass_AD,
+        $existing_AD,
+        $exammode_AD,
+        $role_AD,
+        $home_directory_AD,
+        $user_account_control_AD)=
+                        &AD_get_user({ldap=>$ldap,
+                                      root_dse=>$root_dse,
+                                      root_dns=>$root_dns,
+                                      user=>$user,
+                           });
     my $displayname;
     # hash of what to replace
     my %replace=();
@@ -1403,11 +1423,11 @@ sub AD_user_update {
 
     if (defined $firstname_utf8 and $firstname_utf8 ne "---"){
         $replace{'givenName'}=$firstname_utf8;
-        print "   givenName:                 $firstname_utf8\n";
+        print "   givenName:                  $firstname_utf8\n";
     }
     if (defined $surname_utf8 and $surname_utf8 ne "---"){
         $replace{'sn'}=$surname_utf8;
-        print "   sn:                        $surname_utf8\n";
+        print "   sn:                         $surname_utf8\n";
     }
     if (defined $firstname_utf8 and 
         $surname_utf8 and 
@@ -1416,52 +1436,76 @@ sub AD_user_update {
        ){
         $display_name = $firstname_utf8." ".$surname_utf8;
         $replace{'displayName'}=$display_name;
-        print "   displayName:               $display_name\n";
+        print "   displayName:                $display_name\n";
     }
     if (defined $firstname_ascii and $firstname_ascii ne "---" ){
         $replace{'sophomorixFirstnameASCII'}=$firstname_ascii;
-        print "   sophomorixFirstnameASCII:  $firstname_ascii\n";
+        print "   sophomorixFirstnameASCII:   $firstname_ascii\n";
     }
     if (defined $surname_ascii and $surname_ascii ne "---"){
         $replace{'sophomorixSurnameASCII'}=$surname_ascii;
-        print "   sophomorixSurnameASCII:    $surname_ascii\n";
+        print "   sophomorixSurnameASCII:     $surname_ascii\n";
     }
     if (defined $birthdate and $birthdate ne "---"){
         $replace{'sophomorixBirthdate'}=$birthdate;
-        print "   sophomorixBirthdate:       $birthdate\n";
+        print "   sophomorixBirthdate:        $birthdate\n";
     }
     if (defined $filename and $filename ne "---"){
         $replace{'sophomorixAdminFile'}=$filename;
-        print "   sophomorixAdminFile:       $filename\n";
+        print "   sophomorixAdminFile:        $filename\n";
     }
     if (defined $unid and $unid ne "---"){
         if ($unid eq ""){
             $unid="---"; # upload --- for empty unid
         }
         $replace{'sophomorixUnid'}=$unid;
-        print "   sophomorixUnid:            $unid\n";
+        print "   sophomorixUnid:             $unid\n";
     }
     if (defined $firstpassword){
         $replace{'sophomorixFirstpassword'}=$firstpassword;
-        print "   Firstpassword:             $firstpassword\n";
+        print "   Firstpassword:              $firstpassword\n";
     }
     if (defined $plain_password){
         my $uni_password=&_unipwd_from_plainpwd($plain_password);
         $replace{'unicodePwd'}=$uni_password;
-        print "   unicodePwd:                **********\n";
+        print "   unicodePwd:                 **********\n";
     }
     if (defined $status and $status ne "---"){
         $replace{'sophomorixStatus'}=$status;
-        print "   sophomorixStatus:          $status\n";
+        print "   sophomorixStatus:           $status\n";
+        # setting userAccountControl and Dates
+        my $user_account_control;
+        if ($status eq "P"){
+            $user_account_control=&_uac_enable_user($user_account_control_AD);
+            $replace{'userAccountControl'}=$user_account_control;
+            $replace{'sophomorixTolerationDate'}=$DevelConf::default_date;
+            $replace{'sophomorixDeactivationDate'}=$DevelConf::default_date;
+            print "   sophomorixTolerationDate:   $DevelConf::default_date\n";
+            print "   sophomorixDeactivationDate: $DevelConf::default_date\n";
+        } elsif  ($status eq "F"){
+            $user_account_control=&_uac_disable_user($user_account_control_AD);
+            $replace{'userAccountControl'}=$user_account_control;
+            $replace{'sophomorixDeactivationDate'}=$date_now;
+            print "   sophomorixDeactivationDate:  $date_now\n";
+            print "   sophomorixTolerationDate:    keep old date\n";
+
+        }
+
+        print "   userAccountControl:         $user_account_control",
+              " (was: $user_account_control_AD)\n";
+
+
+
+
     }
-    if (defined $user_account_control and $user_account_control ne "---"){
-        $replace{'userAccountControl'}=$user_account_control;
-        print "   userAccountControl:        $user_account_control\n";
-    }
+#    if (defined $user_account_control and $user_account_control ne "---"){
+#        $replace{'userAccountControl'}=$user_account_control;
+#        print "   userAccountControl:        $user_account_control\n";
+#    }
     if (defined $school and $school ne "---"){
         # update sophomorixSchoolname AND sophomorixSchoolPrefix
         $replace{'sophomorixSchoolname'}=$school;
-        print "   sophomorixSchoolname:      $school\n";
+        print "   sophomorixSchoolname:       $school\n";
         my $prefix;
         if ($school eq $DevelConf::name_default_school){
             $prefix="---";
@@ -1469,11 +1513,11 @@ sub AD_user_update {
             $prefix=$school;
         }
         $replace{'sophomorixSchoolPrefix'}=$prefix;
-        print "   sophomorixSchoolPrefix:    $prefix\n";
+        print "   sophomorixSchoolPrefix:     $prefix\n";
     }
     if (defined $role and $role ne "---"){
         $replace{'sophomorixRole'}=$role;
-        print "   sophomorixRole:            $role\n";
+        print "   sophomorixRole:             $role\n";
     }
     if (defined $examteacher and $examteacher ne ""){
         $replace{'sophomorixExamMode'}=$examteacher;
@@ -1486,7 +1530,7 @@ sub AD_user_update {
         } else {
             $replace{'sophomorixComment'}=$comment;
         }
-        print "   sophomorixComment:         $comment\n";
+        print "   sophomorixComment:          $comment\n";
     }
     if (defined $webui_dashboard){
         if ($webui_dashboard eq ""){
@@ -1495,7 +1539,7 @@ sub AD_user_update {
         } else {
             $replace{'sophomorixWebuiDashboard'}=$webui_dashboard;
         }
-        print "   sophomorixWebuiDashboard:  $webui_dashboard\n";
+        print "   sophomorixWebuiDashboard:   $webui_dashboard\n";
     }
     if (defined $user_permissions){
         my @user_permissions=split(/,/,$user_permissions);
@@ -1511,11 +1555,11 @@ sub AD_user_update {
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
-    # delete
-    my $mesg2 = $ldap->modify( $dn, 
-                       delete => [@delete]
-                );
-    &AD_debug_logdump($mesg2,2,(caller(0))[3]);
+#    # delete
+#    my $mesg2 = $ldap->modify( $dn, 
+#                       delete => [@delete]
+#                );
+#    &AD_debug_logdump($mesg2,2,(caller(0))[3]);
 }
 
 
@@ -1540,6 +1584,7 @@ sub AD_get_user {
                               'givenName',
                               'sn',
                               'homeDirectory',
+                              'userAccountControl',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -1555,8 +1600,10 @@ sub AD_get_user {
         my $role = $entry->get_value('sophomorixRole');
         my $exammode = $entry->get_value('sophomorixExamMode');
         my $home_directory = $entry->get_value('homeDirectory');
+        my $user_account_control = $entry->get_value('userAccountControl');
         my $existing="TRUE";
-        return ($firstname,$lastname,$class,$existing,$exammode,$role,$home_directory);
+        return ($firstname,$lastname,$class,$existing,$exammode,$role,
+                $home_directory,$user_account_control);
     }
 }
 
@@ -4776,6 +4823,23 @@ sub next_free_gidnumber_get {
     my $gidnumber_free_next=$gidnumber_free+1;
     &next_free_gidnumber_set($ldap,$root_dse,$gidnumber_free_next);
     return $gidnumber_free;
+}
+
+
+sub _uac_disable_user {
+    my ($uac)=@_;
+    # bit 2 to set must be 1, OR
+    my $set_disable_bit = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+    my $res = $uac | $set_disable_bit;
+    return $res;
+}
+
+sub _uac_enable_user {
+    my ($uac)=@_;
+    # bit 2 to set must be 0, AND
+    my $set_enable_bit =  0b1111_1111_1111_1111_1111_1111_1111_1101;
+    my $res = $uac & $set_enable_bit;
+    return $res;
 }
 
 
