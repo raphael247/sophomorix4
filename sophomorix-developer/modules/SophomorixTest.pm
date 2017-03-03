@@ -647,7 +647,16 @@ sub AD_test_object {
             &test_multivalue($member_of,"memberOf",$entry,$sam_account);
         }
         ##################################################
-        if ($objectclass eq "user"){
+        # test login only if status is U,E,A,S,P,T
+        if ($objectclass eq "user" and 
+            ($s_status eq "U" or
+             $s_status eq "E" or
+             $s_status eq "A" or
+             $s_status eq "S" or
+             $s_status eq "P" or
+             $s_status eq "T"
+            )
+           ){
             my $res=&Sophomorix::SophomorixSambaAD::AD_login_test($ldap,$root_dse,$dn);
             my $firstpass=$entry->get_value ('sophomorixFirstPassword');
             is ($res,0,"  * Login OK (pwd=$firstpass): $dn");
