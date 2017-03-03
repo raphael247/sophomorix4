@@ -1242,7 +1242,7 @@ sub AD_user_create {
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
                    sophomorixExamMode => "---", 
-                   userAccountControl => '512',
+                   userAccountControl => $DevelConf::default_user_account_control,
                    uidNumber => $uidnumber_wish,
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
@@ -1296,7 +1296,7 @@ sub AD_user_create {
         if ($school eq "global"){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.administrator_home",
-                                   school=>$DevelConf::homedir_global_smb_share,,
+                                   school=>$DevelConf::homedir_global_smb_share,
                                    administrator_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
