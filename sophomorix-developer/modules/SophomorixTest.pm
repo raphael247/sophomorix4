@@ -503,7 +503,6 @@ sub AD_test_object {
             my $strg_ok="201";
             if ($s_creationdate eq "exists"){
                 # test first 3 digits
-                $strg_ok="201";
                 is ($test_date,$strg_ok,
 		    "  * CreationDate $date beginns with $strg_ok ");
             } else {
@@ -519,7 +518,6 @@ sub AD_test_object {
             my $strg_ok="201";
             if ($s_tolerationdate eq "exists"){
                 # test first 3 digits
-                $strg_ok="201";
                 is ($test_date,$strg_ok,
 		    "  * TolerationDate $date beginns with $strg_ok ");
             } elsif ($s_tolerationdate eq "default") {
@@ -535,7 +533,6 @@ sub AD_test_object {
             my $strg_ok="201";
             if ($s_deactivationdate eq "exists"){
                 # test first 3 digits
-                $strg_ok="201";
                 is ($test_date,$strg_ok,
 		    "  * DeactivationDate $date beginns with $strg_ok ");
             } elsif ($s_deactivationdate eq "default") {
