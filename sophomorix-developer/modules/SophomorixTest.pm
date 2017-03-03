@@ -505,11 +505,11 @@ sub AD_test_object {
                 # test first 3 digits
                 $strg_ok="201";
                 is ($test_date,$strg_ok,
-		    "  * $date beginns with $strg_ok ");
+		    "  * CreationDate $date beginns with $strg_ok ");
             } else {
                 $strg_ok=$s_creationdate;
                 is ($date,$strg_ok,
-   		    "  * $date is $strg_ok ");
+   		    "  * CreationDate $date is $strg_ok ");
             }
         }
         if (defined $s_tolerationdate){
@@ -521,11 +521,11 @@ sub AD_test_object {
                 # test first 3 digits
                 $strg_ok="201";
                 is ($test_date,$strg_ok,
-		    "  * $date beginns with $strg_ok ");
+		    "  * TolerationDate $date beginns with $strg_ok ");
             } elsif ($s_tolerationdate eq "default") {
                 $strg_ok=$DevelConf::default_date;
                 is ($date,$strg_ok,
-   		    "  * $date is $strg_ok ");
+   		    "  * TolerationDate $date is $strg_ok ");
             }
         }
         if (defined $s_deactivationdate){
@@ -537,11 +537,11 @@ sub AD_test_object {
                 # test first 3 digits
                 $strg_ok="201";
                 is ($test_date,$strg_ok,
-		    "  * $date beginns with $strg_ok ");
+		    "  * DeactivationDate $date beginns with $strg_ok ");
             } elsif ($s_deactivationdate eq "default") {
                 $strg_ok=$DevelConf::default_date;
                 is ($date,$strg_ok,
-   		    "  * $date is $strg_ok ");
+   		    "  * DeactivationDate $date is $strg_ok ");
             }
         }
         if (defined $s_comment){
