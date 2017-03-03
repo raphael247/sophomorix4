@@ -497,24 +497,52 @@ sub AD_test_object {
 		"  * sophomorixHidden is $s_hidden");
         }
         if (defined $s_creationdate){
-            my $strg_ok="201";
-            if ($s_creationdate ne "exists"){
-                $strg_ok=$s_creationdate;
-            }
             my $date=$entry->get_value ('sophomorixCreationDate');
-            $test_date=substr($date,0,3);
-            is ($test_date,$strg_ok,
-		"  * $date beginns with $strg_ok ");
+            $test_date=substr($date,0,3); # first 3 chars
+            # set string ok
+            my $strg_ok="201";
+            if ($s_creationdate eq "exists"){
+                # test first 3 digits
+                $strg_ok="201";
+                is ($test_date,$strg_ok,
+		    "  * $date beginns with $strg_ok ");
+            } else {
+                $strg_ok=$s_creationdate;
+                is ($date,$strg_ok,
+   		    "  * $date is $strg_ok ");
+            }
         }
         if (defined $s_tolerationdate){
             my $date=$entry->get_value ('sophomorixTolerationDate');
-            is ($date,$DevelConf::default_date,
-		"  * sophomorixTolerationDate $date is default date $DevelConf::default_date");
+            $test_date=substr($date,0,3); # first 3 chars
+            # set string ok
+            my $strg_ok="201";
+            if ($s_tolerationdate eq "exists"){
+                # test first 3 digits
+                $strg_ok="201";
+                is ($test_date,$strg_ok,
+		    "  * $date beginns with $strg_ok ");
+            } elsif ($s_tolerationdate eq "default") {
+                $strg_ok=$DevelConf::default_date;
+                is ($date,$strg_ok,
+   		    "  * $date is $strg_ok ");
+            }
         }
         if (defined $s_deactivationdate){
             my $date=$entry->get_value ('sophomorixDeactivationDate');
-            is ($date,$DevelConf::default_date,
-		"  * sophomorixDeactivationDate $date is default date $DevelConf::default_date ");
+            $test_date=substr($date,0,3); # first 3 chars
+            # set string ok
+            my $strg_ok="201";
+            if ($s_deactivationdate eq "exists"){
+                # test first 3 digits
+                $strg_ok="201";
+                is ($test_date,$strg_ok,
+		    "  * $date beginns with $strg_ok ");
+            } elsif ($s_deactivationdate eq "default") {
+                $strg_ok=$DevelConf::default_date;
+                is ($date,$strg_ok,
+   		    "  * $date is $strg_ok ");
+            }
         }
         if (defined $s_comment){
             is ($entry->get_value ('sophomorixComment'),$s_comment,
