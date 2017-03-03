@@ -74,6 +74,7 @@ sub AD_computers_any {
 
 sub AD_test_dns {
     my ($res,$host,$ipv4)=@_;
+    # Test lookup
     my $reply = $res->search($host);
     if ($reply) {
         foreach my $rr ($reply->answer) {
@@ -83,6 +84,11 @@ sub AD_test_dns {
     } else {
         is (0,1,"  * dns query succesful (1) or not (0)");
     }
+    # Test reverse lookup
+    my $nslookup=system("nslookup $ipv4 >> /dev/null");
+    print "nslookup result was $nslookup\n";
+    is ($nslookup,0,"  * nslookup returned $nslookup (reverse lookup)");
+
 }
 
 
