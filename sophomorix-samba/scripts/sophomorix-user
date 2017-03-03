@@ -113,12 +113,19 @@ my $add_user_permissions;
 my $remove_user_permissions;
 
 my $comment;
-my $freeze=0;
-my $permanent=0;
-my $removable=0;
-my $killable=0;
-my $activate=0;
+
+
+# stati
 my $usable=0;
+my $enable=0;
+my $activate=0;
+my $selfactivate=0;
+my $permanent=0;
+my $tolerate=0;
+my $deactivate=0;
+my $freeze=0;
+my $killable=0;
+my $removable=0;
 
 my $kill_all_users=0;
 my $teacher="";
@@ -146,13 +153,16 @@ my $testopt=GetOptions(
        "user-permissions=s" => \$user_permissions,
        "add-user-permissions=s" => \$add_user_permissions,
        "remove-user-permissions=s" => \$remove_user_permissions,
-       "F|freeze" => \$freeze,
-       "P|permanent" => \$permanent,
-       "R|removable" => \$removable,
-       "K|killable" => \$killable,
-       "A|activate" => \$activate,
        "U|usable" => \$usable,
-
+       "E|enable" => \$enable,
+       "A|activate" => \$activate,
+       "S|selfactivate" => \$selfactivate,
+       "P|permanent" => \$permanent,
+       "T|tolerate" => \$tolerate,
+       "D|deactivate" => \$deactivate,
+       "F|freeze" => \$freeze,
+       "K|killable" => \$killable,
+       "R|removable" => \$removable,
 #       "old-uid=s" => \$old_uid,
 #       "new-uid=s" => \$new_uid,
 #       "old-mailbox=s" => \$old_mailbox,
@@ -196,12 +206,16 @@ Choose the school:
   --school <school>
 
 Changing status of a user:
-  -F --user <user>  /   --freeze --user <user>
-  -P --user <user>  /   --permanent --user <user>
-  -R --user <user>  /   --removable --user <user>
-  -K --user <user>  /   --killable --user <user>
-  -A --user <user>  /   --activate --user <user>
   -U --user <user>  /   --usable --user <user>
+  -E --user <user>  /   --enable --user <user>
+  -A --user <user>  /   --activate --user <user>
+  -S --user <user>  /   --selfactivate --user <user>
+  -P --user <user>  /   --permanent --user <user>
+  -T --user <user>  /   --tolerate --user <user>
+  -D --user <user>  /   --deactivate --user <user>
+  -F --user <user>  /   --freeze --user <user>
+  -K --user <user>  /   --killable --user <user>
+  -R --user <user>  /   --removable --user <user>
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
@@ -212,10 +226,7 @@ Updating WebuiDashboard of a user:
   --user <user> --add-user-permissions permission1,permission2,permission3, ...
   --user <user> --remove-user-permissions permission1,permission2,permission3, ...
 
-
-
 -> continue here
-
   --list-teachers-by-year
 
 Todo:
@@ -822,6 +833,21 @@ if (defined $remove_user_permissions){
 
 
 
+# -D --user <user> / --deactivate --user <user>
+if ($deactivate==1){
+    print "Deactivating the account of $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     status=>"D",
+                     user_count=>"",
+                     date_now=> $time_stamp_AD,
+                   });
+}
+
+
+
 # -F --user <user> / --freeze --user <user>
 if ($freeze==1){
     print "Freezing the account of $user:\n";
@@ -865,6 +891,20 @@ if ($permanent==1){
                      dn=>$dn,
                      user=>$user,
                      status=>"P",
+                     user_count=>"",
+                     date_now=> $time_stamp_AD,
+                   });
+}
+
+
+# -T --user <user> / --tolerate --user <user>
+if ($tolerate==1){
+    print "Tolerating the account of $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     status=>"T",
                      user_count=>"",
                      date_now=> $time_stamp_AD,
                    });
@@ -975,6 +1015,19 @@ if ($activate==1){
                    });
 }
 
+# -S --user <user> / --selfactivate --user <user>
+if ($selfactivate==1){
+    print "Selfctvating the account of $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     status=>"S",
+                     user_count=>"",
+                     date_now=> $time_stamp_AD,
+                   });
+}
+
 
 # # --activate
 # if ($activate ne""){
@@ -1004,6 +1057,20 @@ if ($usable==1){
                      dn=>$dn,
                      user=>$user,
                      status=>"U",
+                     user_count=>"",
+                     date_now=> $time_stamp_AD,
+                   });
+}
+
+
+# -E --user <user> / --enable --user <user>
+if ($enable==1){
+    print "Setting the account of $user to enable:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     status=>"E",
                      user_count=>"",
                      date_now=> $time_stamp_AD,
                    });

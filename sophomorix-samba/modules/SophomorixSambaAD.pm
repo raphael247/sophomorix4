@@ -1390,12 +1390,14 @@ sub AD_user_update {
         $exammode_AD,
         $role_AD,
         $home_directory_AD,
-        $user_account_control_AD)=
-                        &AD_get_user({ldap=>$ldap,
-                                      root_dse=>$root_dse,
-                                      root_dns=>$root_dns,
-                                      user=>$user,
-                           });
+        $user_account_control_AD,
+        $toleration_date_AD,
+        $deactivation_date_AD,
+       )=&AD_get_user({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       user=>$user,
+                     });
     my $displayname;
     # hash of what to replace
     my %replace=();
@@ -1475,22 +1477,48 @@ sub AD_user_update {
         print "   sophomorixStatus:           $status\n";
         # setting userAccountControl and Dates
         my $user_account_control;
-        if ($status eq "P"){
+        my $toleration_date;
+        my $deactivation_date;
+        if ($status eq "U" or
+            $status eq "E" or
+            $status eq "A" or
+            $status eq "S" or
+            $status eq "P" 
+            ){
+            # Status U,E,A,S,P
             $user_account_control=&_uac_enable_user($user_account_control_AD);
-            $replace{'userAccountControl'}=$user_account_control;
-            $replace{'sophomorixTolerationDate'}=$DevelConf::default_date;
-            $replace{'sophomorixDeactivationDate'}=$DevelConf::default_date;
-            print "   sophomorixTolerationDate:   $DevelConf::default_date\n";
-            print "   sophomorixDeactivationDate: $DevelConf::default_date\n";
-        } elsif  ($status eq "F"){
+            $toleration_date=$DevelConf::default_date;
+            $deactivation_date=$DevelConf::default_date;
+        } elsif  ($status eq "T"){
+            # Status T
+            $user_account_control=&_uac_enable_user($user_account_control_AD);
+            $toleration_date=$date_now;
+            $deactivation_date=$DevelConf::default_date;
+        } elsif  ($status eq "D" or
+                  $status eq "F"){
+            # Status D,F
             $user_account_control=&_uac_disable_user($user_account_control_AD);
-            $replace{'userAccountControl'}=$user_account_control;
-            $replace{'sophomorixDeactivationDate'}=$date_now;
-            print "   sophomorixDeactivationDate:  $date_now\n";
-            print "   sophomorixTolerationDate:    keep old date\n";
-
+            $toleration_date=$toleration_date_AD;
+            $deactivation_date=$date_now;
+        } elsif  ($status eq "K" or
+                  $status eq "R"){
+            # Status K,R
+            $user_account_control=&_uac_disable_user($user_account_control_AD);
+            $toleration_date=$toleration_date_AD;
+            $deactivation_date=$deactivation_date_AD;
+        } else {
+            # unknown status
+            print "\nERROR: status $status not definned\n\n";
+            return;
         }
 
+        # setting the hash
+        $replace{'userAccountControl'}=$user_account_control;
+        $replace{'sophomorixTolerationDate'}=$toleration_date;
+        $replace{'sophomorixDeactivationDate'}=$deactivation_date;
+        # print what is set
+        print "   sophomorixTolerationDate:   $toleration_date\n";
+        print "   sophomorixDeactivationDate: $deactivation_date\n";
         print "   userAccountControl:         $user_account_control",
               " (was: $user_account_control_AD)\n";
 
@@ -1585,6 +1613,8 @@ sub AD_get_user {
                               'sn',
                               'homeDirectory',
                               'userAccountControl',
+                              'sophomorixTolerationDate',
+                              'sophomorixDeactivationDate',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -1601,9 +1631,12 @@ sub AD_get_user {
         my $exammode = $entry->get_value('sophomorixExamMode');
         my $home_directory = $entry->get_value('homeDirectory');
         my $user_account_control = $entry->get_value('userAccountControl');
+        my $toleration_date = $entry->get_value('sophomorixTolerationDate');
+        my $deactivation_date = $entry->get_value('sophomorixDeactivationDate');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,
-                $home_directory,$user_account_control);
+                $home_directory,$user_account_control,$toleration_date,
+                $deactivation_date);
     }
 }
 
