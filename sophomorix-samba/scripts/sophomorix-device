@@ -1095,6 +1095,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill the rooms of computers
+    print "\n";
     &print_title("Computer rooms to be killed:");
     my $kill_computer_room_count=1;
     foreach my $room (@killing_computer_rooms){
@@ -1110,6 +1111,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill computers
+    print "\n";
     &print_title("Computers to be killed:");
     my $count=1;
     foreach my $computer (@killing_computers){
@@ -1123,6 +1125,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Add computers
+    print "\n";
     &print_title("Computers to be added:");
     my $ws_count=1;
     foreach my $computer (@adding_computers){
@@ -1182,6 +1185,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill dnsNodes
+    print "\n";
     &print_title("dnsNodes to be killed:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
@@ -1199,6 +1203,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Kill dnsZones
+    print "\n";
     &print_title("dnsZones to be killed:");
     my $dns_zone_count=1;
     foreach my $dns_zone (@killing_dnszones){
@@ -1215,10 +1220,11 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Add dnsZones
+    print "\n";
     &print_title("dnsZones to be added:");
     $dns_zone_count=1;
     foreach my $dns_zone (@adding_dnszones){
-	print "        $dns_zone\n";
+
         &AD_dns_zonecreate({ldap=>$ldap, 
                             root_dse=>$root_dse,
                             dns_server=>$root_dns,
@@ -1231,12 +1237,15 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 
     ############################################################
     # Add dnsNodes
+    print "\n";
     &print_title("dnsNodes to be added:");
     $dns_node_count=1;
     foreach my $dns_node (@adding_dnsnodes){
+        my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
                         root_dns=>$root_dns,
+                        filename=>$filename,
                         dns_node=>$dns_node,
                         dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
                         smb_pwd=>$smb_admin_pass,

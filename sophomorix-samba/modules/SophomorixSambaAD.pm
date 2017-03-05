@@ -223,7 +223,7 @@ sub AD_dns_create {
     my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
-    my $dns_admin_description = $arg_ref->{dns_admin_description};
+    my $filename = $arg_ref->{filename};
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
 
@@ -231,6 +231,7 @@ sub AD_dns_create {
     my @octets=split(/\./,$dns_ipv4);
     my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
     my $dns_last_octet=$octets[3];
+    my $dns_admin_description=$DevelConf::dns_node_prefix_string." from ".$filename;
 
     if($Conf::log_level>=1){
         print "\n";
@@ -241,9 +242,6 @@ sub AD_dns_create {
     # set defaults if not defined
     if (not defined $filename){
         $filename="---";
-    }
-     if (not defined $dns_admin_description){
-        $dns_admin_description=$DevelConf::dns_node_prefix_string." from ".$filename;
     }
     if (not defined $dns_cn){
         $dns_cn=$dns_node;
@@ -261,10 +259,12 @@ sub AD_dns_create {
     # adding dnsNode with samba-tool
 #    my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
 #                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
-    my $command="  samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
+    my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
-    print "$command\n";
-    system($command);
+    print "   * $command\n";
+    # system($command);
+    my $res=`$command`;
+    print "       -> $res";
 
     # adding comments to recognize the dnsNode as created by sophomorix
     my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node);
@@ -280,14 +280,16 @@ sub AD_dns_create {
     }
 
     # adding reverse lookup with samba-tool
-    my $command_reverse="  samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
+    my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
-    print "$command_reverse\n";
-    system($command_reverse);
+    print "   * $command_reverse\n";
+    # system($command_reverse);
+    my $res2=`$command_reverse`;
+    print "       -> $res2";
 
     # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
-    print "   * dnsNode $dns_node (reverse lookop)\n";
+    print "   * dnsNode $dns_node (reverse lookup)\n";
     my $mesg = $ldap->modify( $dns_node_reverse, add => {
                       adminDescription => $dns_admin_description,
                       cn => $dns_cn,
@@ -330,9 +332,11 @@ sub AD_dns_zonecreate {
     }
 
     # adding dnsNode with samba-tool
-    my $command="  samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
-    print "$command\n";
-    system($command);
+    my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    print "   * $command\n";
+    #system($command);
+    my $res=`$command`;
+    print "       -> $res";
 
     # adding comments to recognize the dnsZone as created by sophomorix
     my ($count,$dn_exist_dnszone,$cn_exist_dnszone)=&AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
