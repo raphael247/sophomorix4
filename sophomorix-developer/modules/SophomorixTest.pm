@@ -84,6 +84,7 @@ sub AD_test_dns {
     } else {
         is (0,1,"  * dns query succesful (1) or not (0)");
     }
+
     # Test reverse lookup
     my $nslookup=system("nslookup $ipv4 >> /dev/null");
     print "nslookup result was $nslookup\n";
@@ -286,6 +287,11 @@ sub AD_test_object {
     my $member_of = $arg_ref->{memberOf};
     #my $not_member_of = $arg_ref->{not_memberOf};
 
+    # dnsNode/dnsZone
+    my $admin_description = $arg_ref->{adminDescription};
+
+
+
     my $filter="(cn=*)";
     my $mesg = $ldap->search(
                       base   => $dn,
@@ -310,12 +316,20 @@ sub AD_test_object {
                 $objectclass="user";
             } elsif ($oc eq "computer"){
                 $objectclass="computer";
+            } elsif ($oc eq "dnsNode"){
+                $objectclass="dnsNode";
+            } elsif ($oc eq "dnsZone"){
+                $objectclass="dnsZone";
             }
         }
         print "*********** objectClass: $objectclass\n";
 
 
         # Testing attributes
+        if (defined $admin_description){
+            is ($entry->get_value ('adminDescription'),$admin_description,
+                                   "  * adminDescription is $admin_description");
+        }
         if (defined $cn){
             is ($entry->get_value ('cn'),$cn,
                                    "  * cn is $cn");

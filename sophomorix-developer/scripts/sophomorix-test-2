@@ -312,8 +312,30 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/J1008P01,".
                                            "RestrictedKrbHost/J1008P01.".$root_dns.",",
                   });
+
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1008p01","10.170.208.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1008p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1008p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1008p01",
+                   });
+    # dns reverse lookup
+
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.170.10.in-addr.arpa",
+                   });
+
 
     ############################################################
     # j1008p02
