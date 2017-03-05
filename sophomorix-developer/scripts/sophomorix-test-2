@@ -326,7 +326,12 @@ if ($test_ws_1==1){
                      cn=>"j1008p01",
                    });
     # dns reverse lookup
-
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -335,7 +340,6 @@ if ($test_ws_1==1){
                      adminDescription=>"SophomorixdnsZone from ---",
                      cn=>"208.170.10.in-addr.arpa",
                    });
-
 
     ############################################################
     # j1008p02
@@ -398,16 +402,67 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/J1008P02,".
                                            "RestrictedKrbHost/J1008P02.".$root_dns.",",
                   });
+
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1008p02","10.170.208.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1008p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1008p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1008p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # laser1008
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1008\$");
-    #dns 
-    &AD_test_dns($res,"laser1008","10.170.208.30");
 
+    ##############################
+    #dns 
+    ##############################
+    &AD_test_dns($res,"laser1008","10.170.208.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=laser1008,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"laser1008",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"laser1008",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.170.10.in-addr.arpa",
+                   });
     ############################################################
     # # j1010p01
     # &AD_test_object({ldap=>$ldap,
@@ -482,8 +537,34 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/J1010P01,".
                                            "RestrictedKrbHost/J1010P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1010p01","10.170.210.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1010p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1010p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1010p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.170.10.in-addr.arpa",
+                   });
+
 
     ############################################################
     # # j1010p02
@@ -546,15 +627,65 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/J1010P02,".
                                            "RestrictedKrbHost/J1010P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1010p02","10.170.210.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1010p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1010p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1010p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # laser1010
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1010\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"laser1010","10.170.210.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=laser1010,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"laser1010",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"laser1010",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # c001p01
@@ -592,8 +723,33 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/C001P01,".
                                            "RestrictedKrbHost/C001P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"c001p01","10.170.1.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=c001p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"c001p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"c001p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=1.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"1.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # c002p01
@@ -631,8 +787,33 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/C002P01,".
                                            "RestrictedKrbHost/C002P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"c002p01","10.170.2.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=c002p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"c002p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"c002p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=2.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=2.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"2.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"2.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz.devices.csv
@@ -709,8 +890,33 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-J1008P01,".
                                            "RestrictedKrbHost/BSZ-J1008P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1008p01","10.171.208.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1008p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1008p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1008p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # bsz-j1008p02
@@ -775,15 +981,65 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-J1008P02,".
                                            "RestrictedKrbHost/BSZ-J1008P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1008p02","10.171.208.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1008p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1008p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1008p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-laser1008
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-laser1008","10.171.208.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-laser1008,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-laser1008",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-laser1008",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # bsz-j1010p01
@@ -858,8 +1114,33 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-J1010P01,".
                                            "RestrictedKrbHost/BSZ-J1010P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1010p01","10.171.210.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1010p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1010p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1010p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # bsz-j1010p02
@@ -922,15 +1203,65 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-J1010P02,".
                                            "RestrictedKrbHost/BSZ-J1010P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1010p02","10.171.210.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1010p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1010p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1010p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-laser1010
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1010\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-laser1010","10.171.210.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-laser1010,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-laser1010",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-laser1010",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-d001p01
@@ -968,8 +1299,33 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-D001P01,".
                                            "RestrictedKrbHost/BSZ-D001P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-d001p01","10.171.1.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-d001p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-d001p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-d001p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=1.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"1.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-d002p01
@@ -1007,8 +1363,33 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-D002P01,".
                                            "RestrictedKrbHost/BSZ-D002P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-d002p01","10.171.2.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-d002p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-d002p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-d002p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=2.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=2.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"2.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"2.171.10.in-addr.arpa",
+                   });
 }
 
 
@@ -1105,8 +1486,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/J1008P03,".
                                            "RestrictedKrbHost/J1008P03.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1008p03","10.170.208.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1008p03,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1008p03",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1008p03",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # j1008p02
@@ -1182,15 +1588,65 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/J1008P02,".
                                            "RestrictedKrbHost/J1008P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1008p02","10.170.208.4");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1008p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1008p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1008p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # laser1008
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1008\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"laser1008","10.170.208.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=laser1008,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"laser1008",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"laser1008",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # j1010p01
@@ -1253,8 +1709,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/J1010P01,".
                                            "RestrictedKrbHost/J1010P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1010p01","10.170.210.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1010p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1010p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1010p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # j1010p02
@@ -1317,15 +1798,65 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/J1010P02,".
                                            "RestrictedKrbHost/J1010P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"j1010p02","10.170.210.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=j1010p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"j1010p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"j1010p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # laser1010
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1010\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"laser1010","10.170.210.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=laser1010,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"laser1010",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"laser1010",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # c001p01
@@ -1363,8 +1894,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/C001P01,".
                                            "RestrictedKrbHost/C001P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"c001p01","10.170.1.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=c001p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"c001p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"c001p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=1.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"1.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # c002p01
@@ -1402,8 +1958,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/C002P01,".
                                            "RestrictedKrbHost/C002P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"c002p01","10.170.2.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=c002p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"c002p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"c002p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=2.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=2.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"2.170.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"2.170.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz.devices.csv
@@ -1480,8 +2061,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/BSZ-J1008P01,".
                                            "RestrictedKrbHost/BSZ-J1008P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1008p01","10.171.208.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1008p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1008p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1008p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # bsz-j1008p02
@@ -1544,15 +2150,65 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/BSZ-J1008P02,".
                                            "RestrictedKrbHost/BSZ-J1008P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1008p02","10.171.208.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1008p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1008p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1008p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-laser1008
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-laser1008","10.171.208.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-laser1008,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-laser1008",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-laser1008",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"208.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"208.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # bsz-j1010p01
@@ -1627,8 +2283,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/BSZ-J1010P01,".
                                            "RestrictedKrbHost/BSZ-J1010P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1010p01","10.171.210.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1010p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1010p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1010p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # # bsz-j1010p02
@@ -1691,15 +2372,65 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/BSZ-J1010P02,".
                                            "RestrictedKrbHost/BSZ-J1010P02.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-j1010p02","10.171.210.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-j1010p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-j1010p02",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-j1010p02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-laser1010
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1010\$");
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-laser1010","10.171.210.30");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-laser1010,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-laser1010",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-laser1010",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"210.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-d001p01
@@ -1737,8 +2468,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/BSZ-D001P01,".
                                            "RestrictedKrbHost/BSZ-D001P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-d001p01","10.171.1.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-d001p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-d001p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-d001p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=1.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"1.171.10.in-addr.arpa",
+                   });
 
     ############################################################
     # bsz-d002p01
@@ -1776,8 +2532,33 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/BSZ-D002P01,".
                                            "RestrictedKrbHost/BSZ-D002P01.".$root_dns.",",
                   });
+    ##############################
     #dns 
+    ##############################
     &AD_test_dns($res,"bsz-d002p01","10.171.2.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=bsz-d002p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"bsz-d002p01",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                     cn=>"bsz-d002p01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=2.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from ---",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=2.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"2.171.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from ---",
+                     cn=>"2.171.10.in-addr.arpa",
+                   });
 }
 
 

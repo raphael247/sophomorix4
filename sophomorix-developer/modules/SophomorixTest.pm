@@ -292,7 +292,7 @@ sub AD_test_object {
 
 
 
-    my $filter="(cn=*)";
+    my $filter="(|(cn=*)(dn=*))";
     my $mesg = $ldap->search(
                       base   => $dn,
                       scope => 'base',

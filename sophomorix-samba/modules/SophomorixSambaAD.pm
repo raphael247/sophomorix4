@@ -226,18 +226,10 @@ sub AD_dns_create {
     my $dns_admin_description = $arg_ref->{dns_admin_description};
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
-#    my $dns_line = $arg_ref->{dns_line};
 
+    # calc dnsNode, reverse lookup
     my @octets=split(/\./,$dns_ipv4);
     my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
-
-
-    # extract host from line (may become obsolete) ?????????????????ß
-#    if (defined $dns_line and not defined $dns_node){
-#        my @items = split(/;/,$dns_line);
-#        $dns_node=$items[1];
-#        $dns_ipv4=$items[4];
-#    }
 
     if($Conf::log_level>=1){
         print "\n";
@@ -291,6 +283,25 @@ sub AD_dns_create {
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "$command_reverse\n";
     system($command_reverse);
+
+#    # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
+    my $dns_node_reverse="DC=1,DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+    print "REVERSE $dns_node_reverse\n";
+#    my ($count2,$dn_exist_dns_reverse,$cn_exist_dns_reverse)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node_reverse);
+#    print "   * Adding Comments to dnsNode $dns_node_reverse (reverse lookup)\n";
+
+#    print "Count: $count2\n";
+
+#    if ($count2 > 0){
+             print "   * dnsNode $dns_node (reverse lookop)\n";
+             my $mesg = $ldap->modify( $dns_node_reverse, add => {
+                                       adminDescription => $dns_admin_description,
+                                       cn => $dns_cn,
+                                      });
+             &AD_debug_logdump($mesg,2,(caller(0))[3]);
+#    }
+
+
     return;
 }
 
