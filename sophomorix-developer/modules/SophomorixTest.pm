@@ -87,7 +87,6 @@ sub AD_test_dns {
 
     # Test reverse lookup
     my $nslookup=system("nslookup $ipv4 >> /dev/null");
-    print "nslookup result was $nslookup\n";
     is ($nslookup,0,"  * nslookup returned $nslookup (reverse lookup)");
 
 }

@@ -230,6 +230,7 @@ sub AD_dns_create {
     # calc dnsNode, reverse lookup
     my @octets=split(/\./,$dns_ipv4);
     my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+    my $dns_last_octet=$octets[3];
 
     if($Conf::log_level>=1){
         print "\n";
@@ -279,29 +280,19 @@ sub AD_dns_create {
     }
 
     # adding reverse lookup with samba-tool
-    my $command_reverse="  samba-tool dns add $dns_server $dns_zone 1 PTR $dns_node ".
+    my $command_reverse="  samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
     print "$command_reverse\n";
     system($command_reverse);
 
-#    # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
-    my $dns_node_reverse="DC=1,DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
-    print "REVERSE $dns_node_reverse\n";
-#    my ($count2,$dn_exist_dns_reverse,$cn_exist_dns_reverse)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node_reverse);
-#    print "   * Adding Comments to dnsNode $dns_node_reverse (reverse lookup)\n";
-
-#    print "Count: $count2\n";
-
-#    if ($count2 > 0){
-             print "   * dnsNode $dns_node (reverse lookop)\n";
-             my $mesg = $ldap->modify( $dns_node_reverse, add => {
-                                       adminDescription => $dns_admin_description,
-                                       cn => $dns_cn,
-                                      });
-             &AD_debug_logdump($mesg,2,(caller(0))[3]);
-#    }
-
-
+    # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
+    my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+    print "   * dnsNode $dns_node (reverse lookop)\n";
+    my $mesg = $ldap->modify( $dns_node_reverse, add => {
+                      adminDescription => $dns_admin_description,
+                      cn => $dns_cn,
+                    });
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
     return;
 }
 
