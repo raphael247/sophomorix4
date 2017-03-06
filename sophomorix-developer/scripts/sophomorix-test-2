@@ -57,6 +57,7 @@ use Sophomorix::SophomorixTest qw(
                                  AD_computers_any
                                  AD_examaccounts_any
                                  AD_dnsnodes_any
+                                 AD_dnszones_any
                                  AD_rooms_any
                                  run_command
                                  );
@@ -2677,6 +2678,7 @@ if ($test_ws_5==1){
     &AD_computers_any($ldap,$root_dse);
     &AD_examaccounts_any($ldap,$root_dse);
     &AD_dnsnodes_any($ldap,$root_dse);
+    &AD_dnszones_any($ldap,$root_dse);
     &AD_rooms_any($ldap,$root_dse);
 }
 

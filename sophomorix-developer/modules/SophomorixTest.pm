@@ -35,14 +35,12 @@ $Data::Dumper::Terse = 1;
             AD_computers_any
             AD_examaccounts_any
             AD_dnsnodes_any
+            AD_dnszones_any
             AD_rooms_any
             ACL_test
             directory_tree_test
             run_command
-
             );
-
-
 
 sub AD_test_session_count {
     my ($ldap,$root_dse,$root_dns,$should) = @_;
@@ -88,8 +86,8 @@ sub AD_test_dns {
     # Test reverse lookup
     my $nslookup=system("nslookup $ipv4 >> /dev/null");
     is ($nslookup,0,"  * nslookup returned $nslookup (reverse lookup)");
-
 }
+
 
 
 sub AD_test_nondns {
@@ -127,7 +125,6 @@ sub AD_examaccounts_any {
 
 
 
-
 sub AD_rooms_any {
     my ($ldap,$root_dse) = @_;
     $mesg = $ldap->search( # perform a search
@@ -140,10 +137,10 @@ sub AD_rooms_any {
     is ($max_user,0,"  * All room groups are deleted");
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
-            print "   * ",$entry->get_value('sAMAccountName'),
-                  "  sophomorixType:  ".$entry->get_value('sophomorixType')."\n";
+            print "   * ",$entry->get_value('sAMAccountName')."\n";
     }
 }
+
 
 
 sub AD_dnsnodes_any {
@@ -153,7 +150,7 @@ sub AD_dnsnodes_any {
                             "*))";
 
     $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
+                   base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
                    filter => $filter_node,
                    attrs => ['dc',"adminDescription"]
@@ -162,8 +159,28 @@ sub AD_dnsnodes_any {
     is ($max_user,0,"  * All sophomorix dnsNodes are deleted");
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
-            print "   * ",$entry->get_value('dc'),
-                  "  adminDescription:  ".$entry->get_value('adminDescription')."\n";
+        printf "   * %-14s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('adminDescription');
+    }
+}
+
+
+
+sub AD_dnszones_any {
+    my ($ldap,$root_dse) = @_;
+    my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
+                             $DevelConf::dns_zone_prefix_string.
+                            "*))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_zone,
+                   attrs => ['dc',"adminDescription"]
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,0,"  * All sophomorix dnsZones are deleted");
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+        printf "   * %-24s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('adminDescription');
     }
 }
 
@@ -196,6 +213,7 @@ sub AD_object_nonexist {
 }
 
 
+
 sub AD_dn_nonexist {
     my ($ldap,$root_dse,$dn) = @_;
     my $mesg = $ldap->search(
@@ -211,7 +229,6 @@ sub AD_dn_nonexist {
 
 
 }
-
 
 
 
@@ -718,6 +735,7 @@ sub AD_test_object {
 }
 
 
+
 sub test_multivalue {
     my ($should,$attr,$entry,$sam_account) = @_;
     # get actual attrs
@@ -835,7 +853,6 @@ sub ACL_test {
         is ($test[$i],$fs[$i],"     * ACL entry $line_num is $test[$i]");
     }
 } 
-
 
 
 
