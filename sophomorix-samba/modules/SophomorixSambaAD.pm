@@ -223,7 +223,6 @@ sub AD_dns_create {
     my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
-    my $filename = $arg_ref->{filename};
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
 
