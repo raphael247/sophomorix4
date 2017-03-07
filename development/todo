@@ -23,14 +23,40 @@ angleichen variablennamen: $dnszone, $dns_zone
                            $dnsnode, $dns_node
 
 
-test1: test all options and flows of user account status changes      OK: This works
+test1: test all options and flows of user account status changes      OK: 
 
-Apache Directory studio in git
-  - passendes java,
-  - passendes startscript, das
-    - konfig dir in git verlinkt
-    - java im git-repo benutzt
-  - Anleitungen/script, wie man 
+
+############################################################
+Konfigurationsdateien, ini smb
+school.conf default Datei erstellen
+  - festlegen der zulässigen Parameter
+  - festlegen der default-werte
+
+Ablauf beim lesen der Konfiguration:
+- für jede Schule:
+  - default-lesen (option: no-check)
+    und in %sophomorix_config rein 
+  - config der Schule lesen (option: check)
+    - parameter einzeln durchgehen
+      - wenn es den Parameternamen schon gibt (von default)
+        dann überschreiben
+      - wenn es den Namen nicht gibt, 
+        Fehler, unzulässiger Parameter
+  - evtl. checken, welche Parameter NICHT in school.conf sind:
+    ausgeben, als unused features ausgeben
+
+Neue Parameter definieren:
+  1) Eintragen in default.conf
+  2) Dann ist der Parameter möglich 
+
+Frage: beim setup(Later): Entwicklertreffen
+ - A) vereinfachte config kopieren? (Grundschule, Gymnasium, ... zu Wahl)?
+ - B) volle config kopieren? für 
+Default-config durch schulkonsole wählbar?
+
+############################################################
+
+
 
 
 sophomorix-check, .add , .kill workflow
