@@ -482,7 +482,7 @@ sub AD_repdir_using_file {
             # /var
             $dir=~s/>\$path_log</${DevelConf::path_log}/;
             $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
-            # /home
+            # /srv/samba
             $dir=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
             $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
             # other
@@ -516,7 +516,9 @@ sub AD_repdir_using_file {
             my $path=$path_with_var;
             my $path_smb=$path_with_var;
             if ($school eq $DevelConf::homedir_global_smb_share){
-                $path_smb=~s/\/home\/global\///; # for school
+#                $path_smb=~s/\/home\/global\///; # for school
+#                $path_smb=~s/\/srv\/samba\/global\///; # for school
+                $path_smb=~s/$DevelConf::homedir_global//; # for school
                 $path_smb=~s/\@\@SCHOOL\@\@\///; # for homdirs
             } else {
                 $path=~s/\@\@SCHOOL\@\@/$school/;
