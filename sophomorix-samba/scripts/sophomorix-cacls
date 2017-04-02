@@ -55,8 +55,8 @@ $Conf::log_level=1;
 my $help=0;
 
 
-my $user=$DevelConf::sophomorix_admin;
-my ($pass)=&AD_get_passwd($DevelConf::sophomorix_admin,$DevelConf::secret_file_sophomorix_admin);
+my $user=$DevelConf::sophomorix_AD_admin;
+my ($pass)=&AD_get_passwd($DevelConf::sophomorix_AD_admin,$DevelConf::secret_file_sophomorix_AD_admin);
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);

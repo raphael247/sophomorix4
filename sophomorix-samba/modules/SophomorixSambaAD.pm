@@ -103,19 +103,19 @@ sub AD_get_passwd {
 
 
 sub AD_bind_admin {
-    if (not -e $DevelConf::secret_file_sophomorix_admin){
+    if (not -e $DevelConf::secret_file_sophomorix_AD_admin){
         print "\nERROR: Connection to AD failed: No password found!\n\n";
-        print "sophomorix connects to AD with the user $DevelConf::sophomorix_admin:\n";
-        print "  A) Make sure $DevelConf::sophomorix_admin exists:\n";
-        print "     samba-tool user create $DevelConf::sophomorix_admin %Muster!% \n";
+        print "sophomorix connects to AD with the user $DevelConf::sophomorix_AD_admin:\n";
+        print "  A) Make sure $DevelConf::sophomorix_AD_admin exists:\n";
+        print "     samba-tool user create $DevelConf::sophomorix_AD_admin %Muster!% \n";
         print "     (Replace Muster! according to: samba-tool domain passwordsettings show)\n";
-        print "  B) Store the Password of $DevelConf::sophomorix_admin (without newline character) in:\n";
-        print "     $DevelConf::secret_file_sophomorix_admin\n";
+        print "  B) Store the Password of $DevelConf::sophomorix_AD_admin (without newline character) in:\n";
+        print "     $DevelConf::secret_file_sophomorix_AD_admin\n";
         print "\n";
         exit;
     }
 
-    my ($smb_pwd)=&AD_get_passwd($DevelConf::sophomorix_admin,$DevelConf::secret_file_sophomorix_admin);
+    my ($smb_pwd)=&AD_get_passwd($DevelConf::sophomorix_AD_admin,$DevelConf::secret_file_sophomorix_AD_admin);
     my $host="ldaps://localhost";
     # check connection to Samba4 AD
     if($Conf::log_level>=3){
@@ -149,11 +149,11 @@ sub AD_bind_admin {
     }
 
     # admin bind
-    my $sophomorix_admin_dn="CN=".$DevelConf::sophomorix_admin.",CN=Users,".$root_dse;
+    my $sophomorix_AD_admin_dn="CN=".$DevelConf::sophomorix_AD_admin.",CN=Users,".$root_dse;
     if($Conf::log_level>=2){
-        print "Binding with $sophomorix_admin_dn\n";
+        print "Binding with $sophomorix_AD_admin_dn\n";
     }
-    my $mesg = $ldap->bind($sophomorix_admin_dn, password => $smb_pwd);
+    my $mesg = $ldap->bind($sophomorix_AD_admin_dn, password => $smb_pwd);
     # show errors from bind
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -257,9 +257,9 @@ sub AD_dns_create {
     
     # adding dnsNode with samba-tool
 #    my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
-#                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+#                " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
-                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+                " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command\n";
     # system($command);
     my $res=`$command`;
@@ -280,7 +280,7 @@ sub AD_dns_create {
 
     # adding reverse lookup with samba-tool
     my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
-                " --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+                " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command_reverse\n";
     # system($command_reverse);
     my $res2=`$command_reverse`;
@@ -331,7 +331,7 @@ sub AD_dns_zonecreate {
     }
 
     # adding dnsNode with samba-tool
-    my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command\n";
     #system($command);
     my $res=`$command`;
@@ -374,13 +374,13 @@ sub AD_dns_kill {
     }
 
     # delete dnsNode
-    my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "     * $command\n";
     system($command);
 
     # delete reverse lookup ?????? deleted with the zone?
     #$dns_type="PTR";
-    #my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    #my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     #print "     * $command\n";
     #system($command);
 }
@@ -399,7 +399,7 @@ sub AD_dns_zonekill {
         $dns_server="localhost";
     }
 
-    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_admin";
+    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command\n";
     system($command);
 }
@@ -593,7 +593,7 @@ sub AD_repdir_using_file {
 	            }
                     if ($entry_type eq "SMB"){
                         # smbclient
-                        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_administrator."%'".
+                        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_file_admin."%'".
                                               $smb_admin_pass."'"." //$root_dns/$school -c 'mkdir $path_after_user_smb'";
                         my $user_typeout;
                         if ($user eq ""){
@@ -662,7 +662,7 @@ sub AD_user_kill {
         if ($role eq "student" or 
             $role eq "teacher" or 
             $role eq "administrator"){
-              my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+              my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                password  => $smb_admin_pass,
                                                debug     => 1);
               #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
@@ -757,7 +757,7 @@ sub AD_group_kill {
             # deleting share if possible, when succesful  the account
             # do not delete ./homes if not empty !
             if ($smb_share ne  "unknown"){
-                my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+                my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                  password  => $smb_admin_pass,
                                                  debug     => 1);
                 # trying to delete homes (success only if it is empty)
@@ -784,7 +784,7 @@ sub AD_group_kill {
 	} elsif ($type eq "project"){
             # delete the share, when succesful the group
             if ($smb_share ne  "unknown"){
-                my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_administrator,
+                my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                  password  => $smb_admin_pass,
                                                  debug     => 1);
                 # trying to delete homes (success only if it is empty)
@@ -1885,7 +1885,7 @@ sub AD_user_move {
         # smbclient ... rename (=move)
 #        my $smbclient_command="smbclient -U Administrator%'Muster!'".
 #                              " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
-        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_administrator."%'".$smb_admin_pass."'".
+        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
                               " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
         print "$smbclient_command\n";
         system($smbclient_command);
