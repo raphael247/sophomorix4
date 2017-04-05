@@ -457,6 +457,8 @@ if ($dump_matches==1){
 #     - sophomorix.kill (if status and times say so)
 
 
+my $add=$DevelConf::path_result."/sophomorix.add";
+open (ADD, ">$add");
 my $update=$DevelConf::path_result."/sophomorix.update";
 open (UPDATE, ">$update");
 my $move=$DevelConf::path_result."/sophomorix.move";
@@ -483,10 +485,12 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
             print NOCHANGE "$line_new\n";
         }
     } else {
+        # no sAMAccountName found
         &write_add_file($line_new);
     }
 }
 
+close(ADD);
 close(UPDATE);
 close(MOVE);
 close(KILL);
@@ -510,14 +514,35 @@ close(NOCHANGE);
 
 sub write_add_file {
     my ($line_new)=@_;
-    my $add=0;
-    if($Conf::log_level>=2){
+#    my $add=0;
+#    if($Conf::log_level>=2){
         print "$line_new\n";
         print "   * not matched to any sAMAccountName\n";
-    }
+#    }
+    
+    my $add_line=$Match{'action'}{$line_new}{'filename'}."::".
+                 $Match{'action'}{$line_new}{'class'}."::".
+                 $Match{'action'}{$line_new}{'identifier_ascii'}."::".
+                 "---::". # login
+                 "---::". # firstpassword
+                 "---::". # uid
+                 "---::". # gid
+                 $Match{'action'}{$line_new}{'unid'}."::".
+                 $Match{'action'}{$line_new}{'school'}."::".
+                 $Match{'action'}{$line_new}{'role'}."::".
+                 $Match{'action'}{$line_new}{'surname_utf8'}."::".
+                 $Match{'action'}{$line_new}{'firstname_utf8'}."::".
+                 "U::".   # status
+                 "---::". # creationdate
+                 "---::". # tolerationdate
+                 "---::". # deactivationdate
+                 "---::". # sambantpassword
+                 "---::". # userpassword
+                 "\n";
 
+    print ADD $add_line;
 
-    return $add;
+#    return $add;
 }
 
 sub write_update_file {
