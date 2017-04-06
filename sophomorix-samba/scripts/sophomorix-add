@@ -324,147 +324,140 @@ while(<SOPHOMORIXADD>){
         next;
     }
 
-   chomp();
-   # split data
-   ($file,
-    $class_group,
-    $identifier,
-    $login_wish,
-    $password_wish,
-    $uidnumber_wish,
-    $gidnumber_wish,
-    $unid,
-    $school,
-    $role,
-    $surname_utf8,
-    $firstname_utf8,
-    $status,
-    $creationdate,
-    $tolerationdate,
-    $deactivationdate,
-   )=split("::");
+    chomp();
+    # split data
+    ($file,
+     $class_group,
+     $identifier,
+     $login_wish,
+     $password_wish,
+     $uidnumber_wish,
+     $gidnumber_wish,
+     $unid,
+     $school,
+     $role,
+     $surname_utf8,
+     $firstname_utf8,
+     $status,
+     $creationdate,
+     $tolerationdate,
+     $deactivationdate,
+    )=split("::");
 
-#   if (not defined $unid){
-#       $unid="";
-#   }
-   ($surname_ascii,$firstname_ascii,$birthdate)=split(";", $identifier);
-   # GECOS-Feld:
-   $gecos=$firstname_ascii." ".$surname_ascii; 
+    ($surname_ascii,$firstname_ascii,$birthdate)=split(";", $identifier);
+    # GECOS-field:
+    $gecos=$firstname_ascii." ".$surname_ascii; 
 
-   # Falls Wunsch-Login-Namen gegeben, diesen benutzen
-   if ($login_wish ne "---"){
-    $login_name_to_check="$login_wish";
-   } else {
-    # Sonst: Login-Name bilden
-    # remove - from login
-    my $surname_login=$surname_ascii;
-    $surname_login=~s/-//g;
-    #$surname_login=&recode_to_ascii($surname_login);
+    my $login_name_to_check;
+    if ($login_wish eq "---"){
+        # create login and check it
+        # remove - from login
+        my $surname_login=$surname_ascii;
+        $surname_login=~s/-//g;
+        my $firstname_login=$firstname_ascii;
+        $firstname_login=~s/-//g;
 
-    my $firstname_login=$firstname_ascii;
-    $firstname_login=~s/-//g;
-    #$firstname_login=&recode_to_ascii($firstname_login);
-
-    # firstname+surname or surname+firstname
-#    if ($Conf::reverse_loginname_creation eq "yes"){
-    if ( $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
-#        $login_teil_2=substr($surname_login,0,$Conf::student_login_surname_charnum);
-#        $login_teil_1=substr($firstname_login,0,$Conf::student_login_firstname_charnum);
-        $login_teil_2=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
-        $login_teil_1=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
+        if ($sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
+            print "\n   WARNING: File $file is not configured for auto login creation\n\n";
+        }
+        # firstname+surname or surname+firstname
+        if ( $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
+            $login_teil_2=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
+            $login_teil_1=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
+        } else {
+            $login_teil_1=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
+            $login_teil_2=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
+        }
+        # proposed login
+        $login_name_to_check="$login_teil_1"."$login_teil_2";
+        $login_name_to_check=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
     } else {
-#        $login_teil_1=substr($surname_login,0,$Conf::student_login_surname_charnum);
-#        $login_teil_2=substr($firstname_login,0,$Conf::student_login_firstname_charnum);
-        $login_teil_1=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
-        $login_teil_2=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
+        # check wish login
+        $login_name_to_check="$login_wish";
     }
 
-    # Zu prüfender Loginname
-    $login_name_to_check="$login_teil_1"."$login_teil_2";
-    $login_name_to_check=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
-   }
-
-   # Existenz prüfen ???ldap
-   if (not exists($forbidden_login_hash{$login_name_to_check})){
-       # Wenn der zu prüfende Login-Name nicht schon vorhanden
-       # Kann er benutzt werden 
-       $login_check_ok=$login_name_to_check;
-   } elsif ($login_wish ne "---"){
-       # Wunsch-Login angegeben
-       # Abbrechen, Wunsch-Login soll nicht verändert werden
-       print "\nERROR:\n";
-       print "Cannot add user $firstname_ascii $surname_ascii ($firstname_utf8 $surname_utf8) \n";
-       print "Login $login_wish exists already ($forbidden_login_hash{$login_name_to_check})!\n\n";
-       my $error_line="   ERROR: $login_wish not added ($forbidden_login_hash{$login_name_to_check})";
-       push @loglines,$error_line;
-       next;
-   } else {
-       # Wenn schon vorhanden, muss Login-Namen modifiziert werden
-       $login_name_to_check_mod="$login_name_to_check";
-       my $i=1; # Erster Wert für Zusatzziffer
-       while (exists($forbidden_login_hash{$login_name_to_check_mod})) { 
-          # An zu prüfenden Loginame eine Ziffer anhängen
-          $login_name_to_check_mod="$login_name_to_check"."$i";
-          $i=$i+1;
-       }
-       # Nun kann modifizierter Loginname benutzt werden
-       $login_check_ok=$login_name_to_check_mod;
-   }
-
-   # Login-Name des anzulegenden users darf ab jetzt nicht mehr verwendet werden,
-   # deshalb dem Hash mit vorhandenen Loginnamen hinzufügen
-   $forbidden_login_hash{$login_check_ok}="neu";
-
-   # Klartext-Passwort
-   if ($password_wish eq "---") {
-       $plain_password=&get_plain_password(
-                       $role,
-                       $file,
-                       $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
-                       $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGHT'}, # length of random pwd
-                       @passwort_zeichen);
-   } else {
-       $plain_password=$password_wish;
-   }
-
-   # Abbruch, wenn nicht der richtige loginname angelegt wird
-   if ($loginname ne "") {
-     if ($login_name_to_check ne $loginname) {
-        print "##### $login_name_to_check wird nicht angelegt!\n";
-        print STILLTOADD "$_\n";
+    # Existenz prüfen ???ldap
+    if (not exists($forbidden_login_hash{$login_name_to_check})){
+        # Wenn der zu prüfende Login-Name nicht schon vorhanden
+        # Kann er benutzt werden 
+        $login_check_ok=$login_name_to_check;
+    } elsif ($login_wish ne "---"){
+        # Wunsch-Login angegeben
+        # Abbrechen, Wunsch-Login soll nicht verändert werden
+        print "\nERROR:\n";
+        print "Cannot add user $firstname_ascii $surname_ascii ($firstname_utf8 $surname_utf8) \n";
+        print "Login $login_wish exists already ($forbidden_login_hash{$login_name_to_check})!\n\n";
+        my $error_line="   ERROR: $login_wish not added ($forbidden_login_hash{$login_name_to_check})";
+        push @loglines,$error_line;
         next;
-     }
-   }
+    } else {
+        # Wenn schon vorhanden, muss Login-Namen modifiziert werden
+        $login_name_to_check_mod="$login_name_to_check";
+        my $i=1; # Erster Wert für Zusatzziffer
+        while (exists($forbidden_login_hash{$login_name_to_check_mod})) { 
+            # An zu prüfenden Loginame eine Ziffer anhängen
+            $login_name_to_check_mod="$login_name_to_check"."$i";
+            $i=$i+1;
+        }
+        # Nun kann modifizierter Loginname benutzt werden
+        $login_check_ok=$login_name_to_check_mod;
+    } 
 
-   # Abbruch, wenn nicht die richtige klasse angelegt wird
-   if ($gruppe ne "") {
-     if ($class_group ne $gruppe) {
-        print "$login_name_to_check ($class_group) wird nicht angelegt!\n";
-        print STILLTOADD "$_\n";
-        next;
-     }
-   }
+    # Login-Name des anzulegenden users darf ab jetzt nicht mehr verwendet werden,
+    # deshalb dem Hash mit vorhandenen Loginnamen hinzufügen
+    $forbidden_login_hash{$login_check_ok}="neu";
 
-   # Status
-   if ($status eq "---") {
-       $status="U";
-   }
-   # creationdate
-   if ($creationdate eq "---"){
-       $creationdate=$time_stamp_AD;
-   }
-   # 0. rember login to set quota later
-   push @users_for_quota, $login_check_ok;
+    # Klartext-Passwort
+    if ($password_wish eq "---") {
+        $plain_password=&get_plain_password(
+                        $role,
+                        $file,
+                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
+                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGHT'}, # length of random pwd
+                        @passwort_zeichen);
+    } else {
+        $plain_password=$password_wish;
+    }
 
-   # Nun wird der User angelegt
-   ##############################
-   $user_count++;
+    # Abbruch, wenn nicht der richtige loginname angelegt wird
+    if ($loginname ne "") {
+        if ($login_name_to_check ne $loginname) {
+            print "##### $login_name_to_check wird nicht angelegt!\n";
+            print STILLTOADD "$_\n";
+            next;
+        }
+    }
 
-   # --- -> default-school
-   $school=&AD_get_schoolname($school);
+    # Abbruch, wenn nicht die richtige klasse angelegt wird
+    if ($gruppe ne "") {
+        if ($class_group ne $gruppe) {
+            print "$login_name_to_check ($class_group) wird nicht angelegt!\n";
+            print STILLTOADD "$_\n";
+            next;
+        }
+    }
 
-   # 1. Entry in AD
-   if (not exists $school_created{$school}){
+    # Status
+    if ($status eq "---") {
+        $status="U";
+    }
+    # creationdate
+    if ($creationdate eq "---"){
+        $creationdate=$time_stamp_AD;
+    }
+    # 0. rember login to set quota later
+    push @users_for_quota, $login_check_ok;
+
+    # Nun wird der User angelegt
+    ##############################
+    $user_count++;
+
+    # --- -> default-school
+    $school=&AD_get_schoolname($school);
+
+    # 1. Entry in AD
+    if (not exists $school_created{$school}){
         # create ou
         &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
@@ -476,61 +469,57 @@ while(<SOPHOMORIXADD>){
                          });
         # remember ou
         $school_created{$school}="already created";
-   } else {
+    } else {
         print "   * OU $school already created\n";
-   }
-   my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
-   my $login_token=&AD_get_name_tokened($login_check_ok,$school,$role);
+    }
+    my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
+    my $login_token=&AD_get_name_tokened($login_check_ok,$school,$role);
 
+   &AD_group_create({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     root_dns=>$root_dns,
+                     group=>$group_token,
+                     group_basename=>$class_group,
+                     school=>$school,
+                     status=>"P",
+                     type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
+                     joinable=>"TRUE",
+                     description=>$group_token,
+                     creationdate=>$time_stamp_AD,
+                     gidnumber_wish=>$gidnumber_wish,
+                     file=>$file,
+                     smb_admin_pass=>$smb_admin_pass,
+                     sophomorix_config=>\%sophomorix_config,
+                   });
 
-  &AD_group_create({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    root_dns=>$root_dns,
-                    group=>$group_token,
-                    group_basename=>$class_group,
-                    school=>$school,
-                    status=>"P",
-                    type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{RT_sophomorixType_PRIMARY},
-                    joinable=>"TRUE",
-                    description=>$group_token,
-                    creationdate=>$time_stamp_AD,
-                    gidnumber_wish=>$gidnumber_wish,
-                    file=>$file,
-                    smb_admin_pass=>$smb_admin_pass,
-                    sophomorix_config=>\%sophomorix_config,
-                  });
-
-
-
-
-   &AD_user_create({ldap=>$ldap,
-                    root_dse=>$root_dse, 
-                    root_dns=>$root_dns, 
-                    user_count=>$user_count,
-                    identifier=>$identifier,
-                    login=>$login_token,
-                    group=>$group_token,
-                    group_basename=>$class_group,
-                    firstname_ascii=>$firstname_ascii,
-                    surname_ascii=>$surname_ascii,
-                    firstname_utf8=>$firstname_utf8,
-                    surname_utf8=>$surname_utf8,
-                    birthdate=>$birthdate,
-                    plain_password=>$plain_password,
-                    unid=>$unid,
-                    uidnumber_wish=>$uidnumber_wish,
-                    gidnumber_wish=>$gidnumber_wish,
-                    role=>$role,
-                    type=>"adminclass",
-                    school=>$school,
-                    creationdate=>$creationdate,
-                    tolerationdate=>$tolerationdate,
-                    deactivationdate=>$deactivationdate,
-                    status=>$status,
-                    file=>$file,  
-                    smb_admin_pass=>$smb_admin_pass,
-                    sophomorix_config=>\%sophomorix_config,
-                  });
+    &AD_user_create({ldap=>$ldap,
+                     root_dse=>$root_dse, 
+                     root_dns=>$root_dns, 
+                     user_count=>$user_count,
+                     identifier=>$identifier,
+                     login=>$login_token,
+                     group=>$group_token,
+                     group_basename=>$class_group,
+                     firstname_ascii=>$firstname_ascii,
+                     surname_ascii=>$surname_ascii,
+                     firstname_utf8=>$firstname_utf8,
+                     surname_utf8=>$surname_utf8,
+                     birthdate=>$birthdate,
+                     plain_password=>$plain_password,
+                     unid=>$unid,
+                     uidnumber_wish=>$uidnumber_wish,
+                     gidnumber_wish=>$gidnumber_wish,
+                     role=>$role,
+                     type=>"adminclass",
+                     school=>$school,
+                     creationdate=>$creationdate,
+                     tolerationdate=>$tolerationdate,
+                     deactivationdate=>$deactivationdate,
+                     status=>$status,
+                     file=>$file,  
+                     smb_admin_pass=>$smb_admin_pass,
+                     sophomorix_config=>\%sophomorix_config,
+                   });
 
    # 1. Entry in sophomorix database and auth system
    #&create_user_db_entry($surname,
@@ -575,22 +564,22 @@ while(<SOPHOMORIXADD>){
 #                      });   
 
 
-  # NEW
-  # add student/teacher to its adminclass-group
-  # find dn of adminclass.group
-  my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$group_token);
-  # fetch old members from sophomorixmembers
-  my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
-  # create a unique list of new members
-  my @members = uniq(@old_members,$login_token); 
-  my $members=join(",",@members);
-  # update group
-  &AD_group_update({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    dn=>$dn_class,
-                    type=>"adminclass",
-                    members=>$members,
-                  });
+    # NEW
+    # add student/teacher to its adminclass-group
+    # find dn of adminclass.group
+    my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$group_token);
+    # fetch old members from sophomorixmembers
+    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+    # create a unique list of new members
+    my @members = uniq(@old_members,$login_token); 
+    my $members=join(",",@members);
+    # update group
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_class,
+                      type=>"adminclass",
+                      members=>$members,
+                    });
 
 
 #    if ($role eq "student"){

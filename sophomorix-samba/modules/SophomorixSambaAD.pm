@@ -1205,7 +1205,7 @@ sub AD_user_create {
         print "   Creationdate:       $creationdate\n";
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
-        print " c  Unid:               $unid\n";
+        print "   Unid:               $unid\n";
         print "   Unix-uidNumber:     $uidnumber_wish\n";
         print "   File:               $file\n";
         print "   homeDirectory:      $homedirectory\n";
