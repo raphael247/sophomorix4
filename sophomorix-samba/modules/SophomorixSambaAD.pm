@@ -2630,7 +2630,7 @@ sub AD_get_AD {
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-                       filter => '(&(objectClass=group)(sophomorixType=admins))',
+                       filter => '(&(objectClass=group)(|(sophomorixType=admins) (sophomorixType=globaladmins)))',
                        attrs => ['sAMAccountName',
                                  'sophomorixSchoolname',
                                  'sophomorixStatus',
