@@ -118,31 +118,11 @@ if ($full==1){
 # Adding users --add
 ############################################################
 if ($add==1){
-#    &run_command("sophomorix-check --injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" --injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" --injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" --injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ");
-#    &run_command("sophomorix-add");
+    &run_command("sophomorix-check --injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" --injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" --injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" --injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ");
+    &run_command("sophomorix-add");
 
 }
 
-# fetch loginnames:
-my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
-                                       root_dse=>$root_dse,
-                                       sn=>"Halldórsson",
-                                       givenName=>"Hannes Þór",
-                                       birthdate=>"27.04.1984",
-                                      });
-
-my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
-                                       root_dse=>$root_dse,
-                                       sn=>"Gunnarsson",
-                                       givenName=>"Aron",
-                                       birthdate=>"22.04.1989",
-                                      });
-
-print "U: $halldoha\n";
-print "U: $gunnarar\n";
-
-
-#$ldap,$root_dse,"Halldórsson","Hannes Þór");
 
 
 
@@ -150,6 +130,22 @@ print "U: $gunnarar\n";
 # Run the tests
 ############################################################
 if ($modify==1){
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
     &run_command("");
 
 }
@@ -160,10 +156,26 @@ if ($modify==1){
 # Deleting users --kill
 ############################################################
 if ($kill==1){
-        &run_command("sophomorix-user -K --user olinst99");
-        &run_command("sophomorix-user -K --user rukri99");
-        &run_command("sophomorix-user -K --user $halldoha");
-        &run_command("sophomorix-user -K --user $gunnarar");
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    &run_command("sophomorix-user -K --user olinst99");
+    &run_command("sophomorix-user -K --user rukri99");
+    &run_command("sophomorix-user -K --user $halldoha");
+    &run_command("sophomorix-user -K --user $gunnarar");
 }
 
 

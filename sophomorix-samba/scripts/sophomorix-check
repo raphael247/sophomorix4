@@ -754,7 +754,9 @@ sub write_move_file {
 
 sub write_kill_file {
     # walk through all users
-    foreach my $sam ( keys %AD{'sam'} ) {
+#    foreach my $sam ( keys $AD{'sam'} ) {
+#    foreach my $sam ( keys %AD{'sam'} ) {
+    foreach my $sam ( keys %{$AD{'sam'}} ) {
         if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "K" or
              $AD{'sam'}{$sam}{'sophomorixStatus'} eq "R"){
             print "User $sam must be killed (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
