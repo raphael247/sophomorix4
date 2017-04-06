@@ -40,6 +40,7 @@ $Data::Dumper::Terse = 1;
             ACL_test
             directory_tree_test
             run_command
+            AD_get_samaccountname
             );
 
 sub AD_test_session_count {
@@ -230,6 +231,37 @@ sub AD_dn_nonexist {
 
 }
 
+
+sub AD_get_samaccountname {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $given_name = $arg_ref->{givenName};
+    my $sn = $arg_ref->{sn};
+    my $birthdate = $arg_ref->{birthdate};
+    my $filter="(&(sn=".$sn.") (givenName=".$given_name.
+               ") (sophomorixBirthdate=".$birthdate."))";
+    print "Finding Loginname with the following filter:\n";
+    print "   $filter\n";
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                   attrs => ['sAMAccountName',
+                            ]);
+    my $res = $mesg->count; 
+    if ($res!=1){
+            print "   * Problem $res\n";
+        exit;
+    } elsif ($res==1){
+        my ($entry,@entries) = $mesg->entries;
+        my $dn = $entry->dn();
+        my $sam = $entry->get_value('sAMAccountName');
+        print "   * DN:      $dn\n";
+        print "   * ACCOUNT: $sam\n";
+        return ($sam,$dn);
+    }
+}
 
 
 sub AD_test_object {
