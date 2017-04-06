@@ -1307,20 +1307,25 @@ sub get_passwd_charlist {
 
 sub get_plain_password {
     my $role=shift;
+    my $file=shift;
+    my $random=shift;
+    my $length=shift;
     my @password_chars=@_;
     my $password="";
     my $i;
     if ($role eq "teacher") {
         # Teacher
-        if ($Conf::teacher_password_random eq "yes") {
-	    $password=&create_plain_password($Conf::teacher_password_random_charnumber,@password_chars);
+#        if ($Conf::teacher_password_random eq "yes") {
+        if ( $random eq "yes") {
+	    $password=&create_plain_password($length,@password_chars);
         } else {
             $password=$DevelConf::student_password_default;
 	}
     } elsif ($role eq "student") {
         # Student
-        if ($Conf::student_password_random eq "yes") {
-	    $password=&create_plain_password($Conf::student_password_random_charnumber,@password_chars);
+#        if ($Conf::student_password_random eq "yes") {
+        if ($random  eq "yes") {
+	    $password=&create_plain_password($length,@password_chars);
         } else {
             $password=$DevelConf::teacher_password_default;
         }

@@ -419,8 +419,8 @@ if ($set_firstpassword==1){
 # # --common
 # if ($common==1){
 #    if ($char_num==0){
-#       $password_lehrer=&get_plain_password(${DevelConf::teacher},@chars);
-#       $password_other=&get_plain_password("",@chars);
+#       $password_lehrer=&get_plain_password(${DevelConf::teacher},$file,$random,$length,@chars);
+#       $password_other=&get_plain_password("",$file,$random,$length,@chars);
 #    } else {
 #       $password_lehrer=&get_random_password($char_num,${DevelConf::teacher},@chars);
 #       $password_other=&get_random_password($char_num,"",@chars);
@@ -542,7 +542,7 @@ if ($set_firstpassword==1){
 #        $password=&get_random_password($char_num,$group,@chars);
 #     } elsif ($config==1){
 #        # nothing specified: use sophomorix.conf
-#        $password=&get_plain_password($group,@chars)
+#        $password=&get_plain_password($group,$file,$random,$length,@chars)
 #     } elsif ($shell eq "" and $smb_pw_m_change==2){
 #        $show_help=1;
 #        if($Conf::log_level>=2){

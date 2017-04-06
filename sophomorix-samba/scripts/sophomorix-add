@@ -365,13 +365,18 @@ while(<SOPHOMORIXADD>){
     $firstname_login=~s/-//g;
     #$firstname_login=&recode_to_ascii($firstname_login);
 
-    # firstname+surname oder surname+firstname
-    if ($Conf::reverse_loginname_creation eq "yes"){
-        $login_teil_2=substr($surname_login,0,$Conf::student_login_surname_charnum);
-        $login_teil_1=substr($firstname_login,0,$Conf::student_login_firstname_charnum);
+    # firstname+surname or surname+firstname
+#    if ($Conf::reverse_loginname_creation eq "yes"){
+    if ( $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
+#        $login_teil_2=substr($surname_login,0,$Conf::student_login_surname_charnum);
+#        $login_teil_1=substr($firstname_login,0,$Conf::student_login_firstname_charnum);
+        $login_teil_2=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
+        $login_teil_1=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
     } else {
-        $login_teil_1=substr($surname_login,0,$Conf::student_login_surname_charnum);
-        $login_teil_2=substr($firstname_login,0,$Conf::student_login_firstname_charnum);
+#        $login_teil_1=substr($surname_login,0,$Conf::student_login_surname_charnum);
+#        $login_teil_2=substr($firstname_login,0,$Conf::student_login_firstname_charnum);
+        $login_teil_1=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
+        $login_teil_2=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
     }
 
     # Zu prüfender Loginname
@@ -412,7 +417,12 @@ while(<SOPHOMORIXADD>){
 
    # Klartext-Passwort
    if ($password_wish eq "---") {
-       $plain_password=&get_plain_password($role,@passwort_zeichen);
+       $plain_password=&get_plain_password(
+                       $role,
+                       $file,
+                       $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
+                       $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGHT'}, # length of random pwd
+                       @passwort_zeichen);
    } else {
        $plain_password=$password_wish;
    }
