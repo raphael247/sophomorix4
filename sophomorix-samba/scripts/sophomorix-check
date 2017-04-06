@@ -520,7 +520,7 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
         }
         my $update=&write_update_file($line_new);
         my $move=&write_move_file($line_new);
-        my $kill=&write_kill_file($line_new);
+        #my $kill=&write_kill_file_old($line_new);
         my $sum=$update+$move+$kill;
         if ($sum==0){
             print NOCHANGE "$line_new\n";
@@ -530,6 +530,13 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
         &write_add_file($line_new);
     }
 }
+
+
+&write_kill_file();
+
+
+
+
 
 close(ADD);
 close(UPDATE);
@@ -736,12 +743,39 @@ sub write_move_file {
 
 
 
-sub write_kill_file {
-    my ($line_new)=@_;
-    my $sam=$Match{'action'}{$line_new}{'sAMAccountName'};
-    my $kill=0;
+#sub write_kill_file_old {
+#    my ($line_new)=@_;
+#    my $sam=$Match{'action'}{$line_new}{'sAMAccountName'};
+#    my $kill=0;
+#
+#    return $kill;
+#}
 
-    return $kill;
+
+sub write_kill_file {
+    # walk through all users
+    foreach my $sam ( keys %AD{'sam'} ) {
+        if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "K" or
+             $AD{'sam'}{$sam}{'sophomorixStatus'} eq "R"){
+            print "User $sam must be killed (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
+
+            # calculation school name
+            my $school;
+            if ($AD{'sam'}{$sam}{'sophomorixSchoolname'} eq 
+                $DevelConf::name_default_school){
+                $school="---";
+	    } else {
+                $school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
+            }
+            # creating the line
+            my $kill_line=
+               $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}."::".
+               $sam."::".
+               $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
+               $school."::\n";               
+            print KILL $kill_line;
+        }
+    }
 }
 
 
