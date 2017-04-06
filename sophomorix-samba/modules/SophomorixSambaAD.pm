@@ -1120,7 +1120,6 @@ sub AD_user_create {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-
     if($Conf::log_level>=1){
         print "\n";
         &Sophomorix::SophomorixBase::print_title(
@@ -1130,9 +1129,6 @@ sub AD_user_create {
     # set defaults if not defined
     if (not defined $identifier){
         $identifier="---";
-    }
-    if (not defined $unid){
-        $unid="---";
     }
     if (not defined $uidnumber_wish or $uidnumber_wish eq "---"){
         $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
@@ -1209,7 +1205,7 @@ sub AD_user_create {
         print "   Creationdate:       $creationdate\n";
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
-        print "   Unid:               $unid\n";
+        print " c  Unid:               $unid\n";
         print "   Unix-uidNumber:     $uidnumber_wish\n";
         print "   File:               $file\n";
         print "   homeDirectory:      $homedirectory\n";

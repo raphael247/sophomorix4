@@ -323,12 +323,13 @@ foreach my  $user_file (@filelist){
 }
 
 
+
+my $count=0;
 # ============================================================
 # reading and checking all filtered user files
 # ============================================================
 system("mkdir -p $DevelConf::path_conf_tmp");
 foreach my $user_file (@filelist){
-    my $count=0;
     my $filename = basename($user_file);
     my $user_file_utf8=$DevelConf::path_conf_tmp."/".$filename.".utf8";
 
@@ -343,8 +344,11 @@ foreach my $user_file (@filelist){
          die "ERROR: $user_file_utf8 not found!";  
     while(<USERS>){
         $count++;
-        &analyze_user_line($_,$user_file,$filename,$school,$count,$enc_used);
+        my $line=$_;
+        &analyze_user_line($line,$user_file,$filename,$school,$count,$enc_used,"no");
     }
+
+
     close(USERS);
     close(USERSUTF8);
 }
@@ -353,14 +357,28 @@ foreach my $user_file (@filelist){
 # injecing lines given by option
 # ============================================================
 
-&print_title("Working on injected lines");
+&print_title("Reading injected lines ...");
 foreach my $inject (@injectlines){
     print "    * $inject\n";
     my ($filename,$line)=split(/:/,$inject,2); # split in 2 parts
-    $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
-    print "        file:   $filename\n";
-    print "        school: $school\n";
-    print "        line:   $line\n";
+    if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'}){
+        $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
+        print "        file:   $filename\n";
+        print "        school: $school\n";
+        print "        line:   $line\n";
+        $count++;
+        my $file_abs=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS'};
+        # opening the output file to APPEND entries
+        my $user_file_utf8=$DevelConf::path_conf_tmp."/".$filename.".utf8";
+        open(USERSUTF8,">>$user_file_utf8") || 
+             die "ERROR: $user_file_utf8 not found!";  
+        &analyze_user_line($line,$file_abs,$filename,$school,$count,"utf8","yes");
+        close(USERSUTF8);
+        
+    } else {
+        print "        WARNING: $filename is not valid on this ",
+              "server (skipping this line)\n";
+    }
     # append the line to the correct file
 }
 
@@ -532,19 +550,22 @@ close(NOCHANGE);
 # writing lines into files
 ################################################################################
 
-
 sub write_add_file {
     my ($line_new)=@_;
-#    my $add=0;
-#    if($Conf::log_level>=2){
+    if($Conf::log_level>=2){
         print "$line_new\n";
         print "   * not matched to any sAMAccountName\n";
-#    }
-    
+    }
+    my $status;
+    if ($Match{'action'}{$line_new}{'inject'} eq "yes"){
+        $status="S"; # injected users have status S=selfactivated
+    } else {
+        $status="U";
+    }
     my $add_line=$Match{'action'}{$line_new}{'filename'}."::".
                  $Match{'action'}{$line_new}{'class'}."::".
                  $Match{'action'}{$line_new}{'identifier_ascii'}."::".
-                 "---::". # login
+                 $Match{'action'}{$line_new}{'login'}."::".
                  "---::". # firstpassword
                  "---::". # uid
                  "---::". # gid
@@ -553,7 +574,7 @@ sub write_add_file {
                  $Match{'action'}{$line_new}{'role'}."::".
                  $Match{'action'}{$line_new}{'surname_utf8'}."::".
                  $Match{'action'}{$line_new}{'firstname_utf8'}."::".
-                 "U::".   # status
+                 $status."::".   # status
                  "---::". # creationdate
                  "---::". # tolerationdate
                  "---::". # deactivationdate
@@ -562,9 +583,8 @@ sub write_add_file {
                  "\n";
 
     print ADD $add_line;
-
-#    return $add;
 }
+
 
 sub write_update_file {
     my ($line_new)=@_;
@@ -973,8 +993,9 @@ sub edit_distance {
 # checking stuff
 ################################################################################
 sub analyze_user_line {
-    my ($line,$file_abs,$filename,$school,$count,$enc_used) = @_;
-    if (/^#/ or /^\s*$/){
+    my ($line,$file_abs,$filename,$school,$count,$enc_used,$injected) = @_;
+#    if (m/^#/ or m/^\s*$/){
+    if ($line=~m/^#/ or $line=~m/^\s*$/){
         return 0;
     } else {
         chomp($line);
@@ -997,7 +1018,12 @@ sub analyze_user_line {
         } elsif ($field5_key eq "UNID"){
             $unid=&check_unid($field5);
         }
-
+        if ($unid eq ""){
+	    $unid="---";
+        }
+        if ($login eq ""){
+	    $login="---";
+        }
 
         # converting names to utf8 and then to ascii
         my $conv = Text::Iconv->new($enc_used,"utf8");
@@ -1027,6 +1053,8 @@ sub analyze_user_line {
         $users_file{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}=$count;
         $users_file{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
+        $users_file{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
+
 
         # add here more stuff to create sophomorix.add, ...
         $users_file{'identifier_ascii'}{$identifier_ascii}{ROLE}=
@@ -1063,6 +1091,8 @@ sub analyze_user_line {
         $Match{'action'}{$line_new}{'role'}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
 	$Match{'action'}{$line_new}{'unid'}=$unid;
+	$Match{'action'}{$line_new}{'login'}=$login;
+	$Match{'action'}{$line_new}{'inject'}=$injected;
 
 
         # status for the user 
