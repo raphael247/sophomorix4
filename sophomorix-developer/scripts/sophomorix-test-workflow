@@ -1,0 +1,147 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-test-workflow) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 check_options
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_dns_get
+                                 AD_object_search
+                                    );
+use Sophomorix::SophomorixTest qw(
+                                 AD_object_nonexist
+                                 AD_dn_nonexist
+                                 AD_test_object
+                                 directory_tree_test
+                                 run_command
+                                 AD_test_session_count
+                                 ACL_test
+                                 );
+
+$Conf::log_level=1;
+my $add=0;
+my $kill=0;
+my $modify=0;
+
+my $full=0;
+my $help=0;
+my $verbose_options="";
+
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "verbose|v+" => \$Conf::log_level,
+           "add|a" => \$add,
+           "modify|m" => \$modify,
+           "kill|k" => \$kill,
+           "full|f" => \$full,
+          );
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+if ($Conf::log_level==1){
+    $verbose_options="";
+} elsif ($Conf::log_level==2){
+    $verbose_options="-v";
+} elsif ($Conf::log_level==3){
+    $verbose_options="-vv";
+}
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-test-workflow tests sophomorix-add,sophomorix-move and sophomorix-kill.
+
+I should run safely on an productive system. But PLEASE have a backup ready.
+
+Options
+  -h  / --help
+
+Full automated test:
+
+  -f, --full 
+   full test (adding, modifying, killing users)
+
+Step by step Test:
+
+  Adding users:
+      sophomorix-test-workflow --add
+
+  Work with the users:
+      sophomorix-test-workflow --modify
+
+  Kill the added users:
+      sophomorix-test-workflow --kill
+');
+   print "\n";
+   exit;
+}
+
+
+
+
+############################################################
+# Check preliminaries
+############################################################
+
+&run_command("mkdir -p $DevelConf::path_result");
+
+
+# --full
+if ($full==1){
+    $add=1;
+    $kill=1;
+}
+
+
+############################################################
+# Adding users --add
+############################################################
+if ($add==1){
+    &run_command("");
+
+}
+
+
+############################################################
+# Run the tests
+############################################################
+if ($modify==1){
+    &run_command("");
+
+}
+
+
+
+############################################################
+# Deleting users --kill
+############################################################
+if ($kill==1){
+        &run_command("");
+}
+
+
+
+&AD_unbind_admin($ldap);
+
+
+
