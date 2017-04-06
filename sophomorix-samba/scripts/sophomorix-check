@@ -141,6 +141,7 @@ my $show_special_char_lines=0;
 my $non_umlaut=0;
 my @special_char_lines=();
 my $follow="";
+my @injectlines=(); # list of injected lines
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -155,6 +156,7 @@ my $testopt=GetOptions(
            "analyze-encoding=s" => \$analyze_encoding,
            "follow=s" => \$follow,
            "unlock" => \$unlock,
+           "injectline=s" => \@injectlines,
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
            "help|h" => \$help,
@@ -308,6 +310,9 @@ if ($analyze_encoding ne ""){
 # Start
 ################################################################################
 
+
+
+
 # ============================================================
 # analyzing encoding of all filtered user files in tmp
 # ============================================================
@@ -343,6 +348,22 @@ foreach my $user_file (@filelist){
     close(USERS);
     close(USERSUTF8);
 }
+
+# ============================================================
+# injecing lines given by option
+# ============================================================
+
+&print_title("Working on injected lines");
+foreach my $inject (@injectlines){
+    print "    * $inject\n";
+    my ($filename,$line)=split(/:/,$inject,2); # split in 2 parts
+    $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
+    print "        file:   $filename\n";
+    print "        school: $school\n";
+    print "        line:   $line\n";
+    # append the line to the correct file
+}
+
 
 
 # --dump-files
