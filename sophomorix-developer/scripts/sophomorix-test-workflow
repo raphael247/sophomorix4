@@ -33,7 +33,9 @@ use Sophomorix::SophomorixTest qw(
 $Conf::log_level=1;
 my $add=0;
 my $kill=0;
-my $modify=0;
+#my $modify=0;
+my $modify_1=0;
+my $modify_2=0;
 
 my $full=0;
 my $help=0;
@@ -43,7 +45,8 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "add|a" => \$add,
-           "modify|m" => \$modify,
+           "modify-1" => \$modify_1,
+           "modify-2" => \$modify_2,
            "kill|k" => \$kill,
            "full|f" => \$full,
           );
@@ -88,7 +91,8 @@ Step by step Test:
       sophomorix-test-workflow --add
 
   Work with the users:
-      sophomorix-test-workflow --modify
+      sophomorix-test-workflow --modify-1
+      sophomorix-test-workflow --modify-2
 
   Kill the added users:
       sophomorix-test-workflow --kill
@@ -330,9 +334,33 @@ if ($add==1){
 
 
 ############################################################
-# Run the tests
+# --modify-1
 ############################################################
-if ($modify==1){
+if ($modify_1==1){
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    &run_command("");
+
+}
+
+############################################################
+# --modify-2
+############################################################
+if ($modify_2==1){
     # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
