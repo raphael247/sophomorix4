@@ -499,16 +499,16 @@ if ($dump_matches==1){
 #     - sophomorix.kill (if status and times say so)
 
 
-my $add=$DevelConf::path_result."/sophomorix.add";
-open (ADD, ">$add");
-my $update=$DevelConf::path_result."/sophomorix.update";
-open (UPDATE, ">$update");
-my $move=$DevelConf::path_result."/sophomorix.move";
-open (MOVE, ">$move");
-my $kill=$DevelConf::path_result."/sophomorix.kill";
-open (KILL, ">$kill");
-my $nochange=$DevelConf::path_result."/sophomorix.nochange";
-open (NOCHANGE, ">$nochange");
+my $add_file=$DevelConf::path_result."/sophomorix.add";
+open (ADD, ">$add_file");
+my $update_file=$DevelConf::path_result."/sophomorix.update";
+open (UPDATE, ">$update_file");
+my $move_file=$DevelConf::path_result."/sophomorix.move";
+open (MOVE, ">$move_file");
+my $kill_file=$DevelConf::path_result."/sophomorix.kill";
+open (KILL, ">$kill_file");
+my $nochange_file=$DevelConf::path_result."/sophomorix.nochange";
+open (NOCHANGE, ">$nochange_file");
 
 &print_title("Writing the files:");
 
@@ -519,9 +519,13 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
             print "Testing: $line_new\n";
             print "   * matched to: $Match{'action'}{$line_new}{'sAMAccountName'} --> $Match{'action'}{$line_new}{'MATCH_SUB'}\n";
         }
-        my $update=&write_update_file($line_new);
-        my $move=&write_move_file($line_new);
-        #my $kill=&write_kill_file_old($line_new);
+        my $update=0;
+        my $move=0;
+        my $kill=0;
+        $update=&write_update_file($line_new);
+        $move=&write_move_file($line_new);
+        # $kill=&write_kill_file_old($line_new);
+	print "$update $move $kill\n";
         my $sum=$update+$move+$kill;
         if ($sum==0){
             print NOCHANGE "$line_new\n";
