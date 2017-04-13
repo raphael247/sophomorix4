@@ -244,10 +244,86 @@ if ($add==1){
                   });
 
 
+    # olinst99
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=olinst99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ólafur Indriði Stefánsson",
+                   givenName=>"Ólafur Indriði",
+                   name=>"olinst99",
+                   sAMAccountname=>"olinst99",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\olinst99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/olinst99",
+                   sn=>"Stefánsson",
+                   userPrincipalName => "olinst99@".$root_dns,
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Olafur Indridi",
+                   sophomorixSurnameASCII  => "Stefansson",
+                   sophomorixBirthdate  => "03.07.1973",
+                   sophomorixRole => "teacher",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
 
-
-
-
+    # rukri99
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=rukri99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Rúnar Kristinsson",
+                   givenName=>"Rúnar",
+                   name=>"rukri99",
+                   sAMAccountname=>"rukri99",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\rukri99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/rukri99",
+                   sn=>"Kristinsson",
+                   userPrincipalName => "rukri99@".$root_dns,
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Runar",
+                   sophomorixSurnameASCII  => "Kristinsson",
+                   sophomorixBirthdate  => "05.09.1969",
+                   sophomorixRole => "teacher",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+    ##### Testing the users ou-teachers group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"teachers",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   sophomorixMembers=>"rukri99|olinst99",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "global-teachers",
+                   member => "rukri99|olinst99",
+                  });
 }
 
 
