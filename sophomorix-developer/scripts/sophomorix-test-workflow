@@ -131,15 +131,13 @@ if ($add==1){
                 "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".
                 "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ".
                 "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ";
-
-#    &run_command("sophomorix-check --injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" --injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" --injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" --injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" --injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" --injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" --injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" --injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ");
-
     &run_command($command_add);
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
     &run_command("sophomorix-kill");
 
+    # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Halldórsson",
@@ -496,7 +494,20 @@ if ($add==1){
 # --modify-1
 ############################################################
 if ($modify_1==1){
-
+    my $command_modify_1="sophomorix-check ".
+                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
+                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".
+                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".
+                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".
+                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
+                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".
+                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ".
+                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ";
+    &run_command($command_modify_1);
+    &run_command("sophomorix-add");
+    &run_command("sophomorix-update");
+    &run_command("sophomorix-move");
+    &run_command("sophomorix-kill");
 
     # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -512,9 +523,340 @@ if ($modify_1==1){
                                 givenName=>"Aron",
                                 birthdate=>"22.04.1989",
                                });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+    my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Gylfi Þór",
+                                birthdate=>"08.09.1989",
+                               });
     print "U: $halldoha\n";
     print "U: $gunnarar\n";
-    &run_command("");
+    print "U: $sigurdra\n";
+    print "U: $sigurdgy\n";
+
+
+    # $halldoha
+    my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_test_object({ldap=>$ldap,
+                   dn=>$dn_halldoha,
+                   #####
+                   displayName=>"Hannes Þór Halldórsson",
+                   givenName=>"Hannes Þór",
+                   name=>$halldoha,
+                   sAMAccountname=>$halldoha,
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\7a\\homes\\".$halldoha,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/homes/".$halldoha,
+                   sn=>"Halldórsson",
+                   userPrincipalName => $halldoha."@".$root_dns,
+                   sophomorixAdminClass => "7a",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Hannes Thor",
+                   sophomorixSurnameASCII  => "Halldorsson",
+                   sophomorixBirthdate  => "27.04.1984",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                  });
+    # $gunnarar
+    my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_test_object({ldap=>$ldap,
+                   dn=>$dn_gunnarar,
+                   #####
+                   displayName=>"Aron Gunnarsson",
+                   givenName=>"Aron",
+                   name=>$gunnarar,
+                   sAMAccountname=>$gunnarar,
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\7a\\homes\\".$gunnarar,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/homes/".$gunnarar,
+                   sn=>"Gunnarsson",
+                   userPrincipalName => $gunnarar."@".$root_dns,
+                   sophomorixAdminClass => "7a",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Aron",
+                   sophomorixSurnameASCII  => "Gunnarsson",
+                   sophomorixBirthdate  => "22.04.1989",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                  });
+    # $sigurdra
+    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_test_object({ldap=>$ldap,
+                   dn=>$dn_sigurdra,
+                   #####
+                   displayName=>"Ragnar Sigurðsson",
+                   givenName=>"Ragnar",
+                   name=>$sigurdra,
+                   sAMAccountname=>$sigurdra,
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\7a\\homes\\".$sigurdra,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/homes/".$sigurdra,
+                   sn=>"Sigurðsson",
+                   userPrincipalName => $sigurdra."@".$root_dns,
+                   sophomorixAdminClass => "7a",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Ragnar",
+                   sophomorixSurnameASCII  => "Sigurdsson",
+                   sophomorixBirthdate  => "19.06.1986",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                  });
+    # $sigurdgy
+    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_test_object({ldap=>$ldap,
+                   dn=>$dn_sigurdgy,
+                   #####
+                   displayName=>"Gylfi Þór Sigurðsson",
+                   givenName=>"Gylfi Þór",
+                   name=>$sigurdgy,
+                   sAMAccountname=>$sigurdgy,
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\7a\\homes\\".$sigurdgy,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/homes/".$sigurdgy,
+                   sn=>"Sigurðsson",
+                   userPrincipalName => $sigurdgy."@".$root_dns,
+                   sophomorixAdminClass => "7a",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Gylfi Thor",
+                   sophomorixSurnameASCII  => "Sigurdsson",
+                   sophomorixBirthdate  => "08.09.1989",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                  });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=7a,OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"7a",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"7a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>$halldoha."|".$gunnarar."|".$sigurdra."|".$sigurdgy,
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => $halldoha."|".$gunnarar."|".$sigurdra."|".$sigurdgy,
+                  });
+    ##### Testing the users ou-students group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=students,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"students",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                    sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "global-students",
+                   member => "7a",
+                  });
+
+
+    # olinst99
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=olinst99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ólafur Indriði Stefánsson",
+                   givenName=>"Ólafur Indriði",
+                   name=>"olinst99",
+                   sAMAccountname=>"olinst99",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\olinst99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/olinst99",
+                   sn=>"Stefánsson",
+                   userPrincipalName => "olinst99@".$root_dns,
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Olafur Indridi",
+                   sophomorixSurnameASCII  => "Stefansson",
+                   sophomorixBirthdate  => "03.07.1973",
+                   sophomorixRole => "teacher",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # rukri99
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=rukri99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Rúnar Kristinsson",
+                   givenName=>"Rúnar",
+                   name=>"rukri99",
+                   sAMAccountname=>"rukri99",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\rukri99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/rukri99",
+                   sn=>"Kristinsson",
+                   userPrincipalName => "rukri99@".$root_dns,
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Runar",
+                   sophomorixSurnameASCII  => "Kristinsson",
+                   sophomorixBirthdate  => "05.09.1969",
+                   sophomorixRole => "teacher",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+    # skula99
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula99",
+                   sAMAccountname=>"skula99",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\skula99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/skula99",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula99@".$root_dns,
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+    # bjarna99
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Theódór Elmar Bjarnason",
+                   givenName=>"Theódór Elmar",
+                   name=>"bjarna99",
+                   sAMAccountname=>"bjarna99",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\bjarna99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/bjarna99",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna99@".$root_dns,
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Theodor Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+    ##### Testing the users ou-teachers group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"teachers",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   sophomorixMembers=>"rukri99|olinst99|skula99|bjarna99",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "global-teachers",
+                   member => "rukri99|olinst99|skula99|bjarna99",
+                  });
 
 }
 
