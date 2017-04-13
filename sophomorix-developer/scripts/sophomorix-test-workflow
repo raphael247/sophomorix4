@@ -138,7 +138,7 @@ if ($add==1){
     print "U: $gunnarar\n";
 
 
-    # maiersa42
+    # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_halldoha,
@@ -172,6 +172,40 @@ if ($add==1){
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
+    # $gunnarar
+    my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_test_object({ldap=>$ldap,
+                   dn=>$dn_gunnarar,
+                   #####
+                   displayName=>"Aron Gunnarsson",
+                   givenName=>"Aron",
+                   name=>$gunnarar,
+                   sAMAccountname=>$gunnarar,
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\7a\\homes\\".$gunnarar,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/homes/".$gunnarar,
+                   sn=>"Gunnarsson",
+                   userPrincipalName => $gunnarar."@".$root_dns,
+                   sophomorixAdminClass => "7a",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Aron",
+                   sophomorixSurnameASCII  => "Gunnarsson",
+                   sophomorixBirthdate  => "22.04.1989",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "S",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                  });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=7a,OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -188,12 +222,12 @@ if ($add==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$halldoha."|".$gunnarar,
+                   sophomorixMembers=>$gunnarar."|".$gunnarar,
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "students",
-                   member => $halldoha."|".$gunnarar,
+                   member => $gunnarar."|".$gunnarar,
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
