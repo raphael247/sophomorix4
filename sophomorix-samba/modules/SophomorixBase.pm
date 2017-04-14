@@ -410,7 +410,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
             } elsif ($var eq "USER_FILE"){
                 my ($file,$filter_script,$enc,$enc_force,$sur_chars,$first_chars,
-                    $reverse,$rand_pwd,$pwd_length)=split(/::/,$value);
+                    $reverse,$rand_pwd,$pwd_length,$toleration_time,$deactivation_time)=split(/::/,$value);
                 my $token_file;
                 if ($school eq $DevelConf::name_default_school){
                     $token_file=$file;
@@ -472,6 +472,8 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{RANDOM_PWD}=$rand_pwd;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PWD_LENGHT}=$pwd_length;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{TOLERATION_TIME}=$toleration_time;
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{DEACTIVATION_TIME}=$deactivation_time;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU}=
                     $sophomorix_config{'SCHOOLS'}{$school}{OU};
 #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP_GLOBAL}=
