@@ -501,7 +501,7 @@ if ($modify_1==1){
 #                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
                 "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
                 "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".
-                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";
+                "--injectline \"students.csv:7a;Sigurðsson;Rugonar;19.06.1986;\" ";                         # Ragnar -> Rugonar
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_1);
@@ -527,7 +527,7 @@ if ($modify_1==1){
     my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Sigurðsson",
-                                givenName=>"Ragnar",
+                                givenName=>"Rugonar",
                                 birthdate=>"19.06.1986",
                                });
     my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -615,8 +615,8 @@ if ($modify_1==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_sigurdra,
                    #####
-                   displayName=>"Ragnar Sigurðsson",
-                   givenName=>"Ragnar",
+                   displayName=>"Rugonar Sigurðsson",
+                   givenName=>"Rugonar",
                    name=>$sigurdra,
                    sAMAccountname=>$sigurdra,
                    uidNumber=>"-1",
@@ -628,7 +628,7 @@ if ($modify_1==1){
                    sophomorixAdminClass => "7a",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Ragnar",
+                   sophomorixFirstnameASCII => "Rugonar",
                    sophomorixSurnameASCII  => "Sigurdsson",
                    sophomorixBirthdate  => "19.06.1986",
                    sophomorixRole => "student",
