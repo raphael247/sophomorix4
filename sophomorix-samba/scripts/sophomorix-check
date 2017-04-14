@@ -852,10 +852,57 @@ sub write_status_update_file {
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "D" or
                   $AD{'sam'}{$sam}{'sophomorixStatus'} eq "L"
                 ){
-            print "HERE3: User $sam must be checked (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
             # update to R if 
             #     - not matched to a user in files
             #     - and deactivation time expired
+            print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'},",
+                  " DeactivationDate: $AD{'sam'}{$sam}{'sophomorixDeactivationDate'}\n";
+            my $file=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
+            my $deactivation_date_epoch=&ymdhms_to_epoch($AD{'sam'}{$sam}{'sophomorixDeactivationDate'});
+            my $deactivation_end_epoch=$deactivation_date_epoch+86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'};
+            
+            print "    Deactivation end: $deactivation_end_epoch ($AD{'sam'}{$sam}{'sophomorixDeactivationDate'}",
+                  " + $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'} days)\n";
+            print "    Today:            $time_stamp_epoch\n";
+
+            if (not exists $Match{'action_by_sam'}{$sam} and 
+                $time_stamp_epoch > $deactivation_end_epoch){
+                # 1) update status to R
+                print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> R\n";
+                my $line=$sam."::".
+                         "---::". # unid
+                         "---::". # surname_ascii
+                         "---::". # firstname_ascii
+                         "---::". # birthdate
+                         "---::". # surname_utf8
+                         "---::". # firstname_utf8
+                         "---::". # filename
+                         "R::". # status
+                         "---::". # userAccountControl
+                         "---::". # school
+                         "---::". # role
+	    	         "\n";
+                print UPDATE $line;
+                # 2) put user in kill file
+                print "    ----> $sam is put into kill file\n";
+                # calculation school name
+                my $school;
+                if ($AD{'sam'}{$sam}{'sophomorixSchoolname'} eq 
+                    $DevelConf::name_default_school){
+                    $school="---";
+	        } else {
+                    $school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
+                }
+                # creating the line
+                my $kill_line=
+                    $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}."::".
+                    $sam."::".
+                    $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
+                    $school."::\n";               
+                print KILL $kill_line;
+	    } else {
+                print "    ----> Deactivation end not reached\n";
+            }
         }
     }
 }
