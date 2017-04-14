@@ -271,8 +271,9 @@ sub AD_get_samaccountname {
                             ]);
     my $res = $mesg->count; 
     if ($res!=1){
-            print "   * Problem $res\n";
-        exit;
+            print "   * WARNUNG $res for $given_name $sn $birthdate\n";
+        #exit;
+        return
     } elsif ($res==1){
         my ($entry,@entries) = $mesg->entries;
         my $dn = $entry->dn();
