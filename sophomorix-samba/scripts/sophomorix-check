@@ -29,6 +29,7 @@ use Sophomorix::SophomorixBase qw(
                                  print_title
                                  time_stamp_AD
                                  time_stamp_file
+                                 ymdhms_to_epoch
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -65,6 +66,7 @@ my @arguments = @ARGV;
 
 my $time_stamp_file=&time_stamp_file();
 my $time_stamp_AD=&time_stamp_AD();
+my $time_stamp_epoch=time;
 my $user_count=0;
 
 my $school="";
@@ -787,7 +789,7 @@ sub write_kill_file {
 
 sub write_status_update_file {
     # walk through all users
-    &Sophomorix::SophomorixBase::print_title("Testing for status updates");
+    &Sophomorix::SophomorixBase::print_title("Testing all users for status updates");
     foreach my $sam ( keys %{$AD{'sam'}} ) {
         if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "U" or
              $AD{'sam'}{$sam}{'sophomorixStatus'} eq "E" or
@@ -813,31 +815,23 @@ sub write_status_update_file {
 		         "\n";
                 print UPDATE $line;
             }
-
-
-#            # calculation school name
-#            my $school;
-#            if ($AD{'sam'}{$sam}{'sophomorixSchoolname'} eq 
-#                $DevelConf::name_default_school){
-#                $school="---";
-#	    } else {
-#                $school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
-#            }
-#            # creating the line
-#            my $kill_line=
-#               $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}."::".
-#               $sam."::".
-#               $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
-#               $school."::\n";               
-#            print KILL $kill_line;
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "T"){
-            print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'},",
-                  " TolerationDate: $AD{'sam'}{$sam}{'sophomorixTolerationDate'}\n";
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
-            if (not exists $Match{'action_by_sam'}{$sam}){
-                print "   * $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> D\n";
+            print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'},",
+                  " TolerationDate: $AD{'sam'}{$sam}{'sophomorixTolerationDate'}\n";
+            my $file=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
+            my $toleration_date_epoch=&ymdhms_to_epoch($AD{'sam'}{$sam}{'sophomorixTolerationDate'});
+            my $toleration_end_epoch=$toleration_date_epoch+86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'};
+            
+            print "    Toleration end: $toleration_end_epoch ($AD{'sam'}{$sam}{'sophomorixTolerationDate'}",
+                  " + $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'} days)\n";
+            print "    Today:          $time_stamp_epoch\n";
+
+            if (not exists $Match{'action_by_sam'}{$sam} and 
+                $time_stamp_epoch > $toleration_end_epoch){
+                print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> D\n";
                 my $line=$sam."::".
                          "---::". # unid
                          "---::". # surname_ascii
@@ -852,7 +846,9 @@ sub write_status_update_file {
                          "---::". # role
 		         "\n";
                 print UPDATE $line;
-	    }
+	    } else {
+                print "    ----> Toleration end not reached\n";
+            }
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "D" or
                   $AD{'sam'}{$sam}{'sophomorixStatus'} eq "L"
                 ){

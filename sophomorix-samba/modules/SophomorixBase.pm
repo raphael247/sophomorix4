@@ -11,6 +11,7 @@ require Exporter;
 #use Time::localtime;
 #use Quota;
 #use Sys::Filesystem ();
+use Time::Local;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -29,6 +30,7 @@ $Data::Dumper::Terse = 1;
             remove_from_list
             time_stamp_AD
             time_stamp_file
+            ymdhms_to_epoch
             unlock_sophomorix
             lock_sophomorix
             log_script_start
@@ -154,6 +156,8 @@ sub time_stamp_AD {
   return $timestamp;
 }
 
+
+
 # use this timestamp for filenames
 sub time_stamp_file {
    my $zeit = `date +%Y-%m-%d_%H-%M-%S`;
@@ -162,6 +166,17 @@ sub time_stamp_file {
 }
 
 
+
+sub ymdhms_to_epoch {
+    my ($string)=@_;
+    my ($ymdhms,$timezone)=split(/\./,$string);
+    #print "YMDHMS: $ymdhms\n";
+    my($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$ymdhms;
+    #print "$year $month $day $hour $minute $second\n";
+    my $epoch=timelocal($second, $minute, $hour, $day , ($month-1), $year);
+    #print "epoch of $string is $epoch\n";
+    return $epoch;
+}
 
 
 
