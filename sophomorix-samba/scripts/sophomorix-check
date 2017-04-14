@@ -795,6 +795,7 @@ sub write_status_update_file {
              $AD{'sam'}{$sam}{'sophomorixStatus'} eq "S"
            ){
             # update to T if not matched to a user in files
+            print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'}\n";
             if (not exists $Match{'action_by_sam'}{$sam}){
                 print "   * $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> T\n";
                 my $line=$sam."::".
@@ -830,10 +831,28 @@ sub write_status_update_file {
 #               $school."::\n";               
 #            print KILL $kill_line;
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "T"){
-            print "HERE2: User $sam must be checked (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
+            print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'},",
+                  " TolerationDate: $AD{'sam'}{$sam}{'sophomorixTolerationDate'}\n";
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
+            if (not exists $Match{'action_by_sam'}{$sam}){
+                print "   * $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> D\n";
+                my $line=$sam."::".
+                         "---::". # unid
+                         "---::". # surname_ascii
+                         "---::". # firstname_ascii
+                         "---::". # birthdate
+                         "---::". # surname_utf8
+                         "---::". # firstname_utf8
+                         "---::". # filename
+                         "D::". # status
+                         "---::". # userAccountControl
+                         "---::". # school
+                         "---::". # role
+		         "\n";
+                print UPDATE $line;
+	    }
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "D" or
                   $AD{'sam'}{$sam}{'sophomorixStatus'} eq "L"
                 ){

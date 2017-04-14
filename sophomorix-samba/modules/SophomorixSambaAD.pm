@@ -2724,6 +2724,8 @@ sub AD_get_AD {
                                  'sophomorixSchoolname',
                                  'sophomorixSchoolPrefix',
                                  'sophomorixAdminFile',
+                                 'sophomorixTolerationDate',
+                                 'sophomorixDeactivationDate',
                                  'sophomorixUnid',
                                  'sophomorixRole',
                                  'userAccountControl',
@@ -2755,6 +2757,10 @@ sub AD_get_AD {
                 $entry->get_value('sophomorixPrefix');
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminFile'}=
                 $entry->get_value('sophomorixAdminFile');
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixTolerationDate'}=
+                $entry->get_value('sophomorixTolerationDate');
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixDeactivationDate'}=
+                $entry->get_value('sophomorixDeactivationDate');
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixUnid'}=
                 $entry->get_value('sophomorixUnid');
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixRole'}=
@@ -2799,6 +2805,10 @@ sub AD_get_AD {
                 $entry->get_value('sophomorixPrefix');
             $AD{'sam'}{$sam}{'sophomorixAdminFile'}=
                 $entry->get_value('sophomorixAdminFile');
+            $AD{'sam'}{$sam}{'sophomorixTolerationDate'}=
+                $entry->get_value('sophomorixTolerationDate');
+            $AD{'sam'}{$sam}{'sophomorixDeactivationDate'}=
+                $entry->get_value('sophomorixDeactivationDate');
             $AD{'sam'}{$sam}{'sophomorixUnid'}=
                 $entry->get_value('sophomorixUnid');
             $AD{'sam'}{$sam}{'sophomorixRole'}=

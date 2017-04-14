@@ -37,6 +37,7 @@ $Data::Dumper::Terse = 1;
             AD_dnsnodes_any
             AD_dnszones_any
             AD_rooms_any
+            AD_user_timeupdate
             ACL_test
             directory_tree_test
             run_command
@@ -142,6 +143,25 @@ sub AD_rooms_any {
     }
 }
 
+
+sub AD_user_timeupdate {
+    my ($ldap,$root_dse,$dn,$toleration_date,$deactivation_date)=@_;
+    print "Updating: $dn\n";
+    if ($toleration_date ne "---"){
+        $replace{'sophomorixTolerationDate'}=$toleration_date;
+        print "   sophomorixTolerationDate:      $toleration_date  \n";
+    }
+    if ($deactivation_date ne "---"){
+        $replace{'sophomorixDeactivationDate'}=$deactivation_date;
+        print "   sophomorixDeactivationDate:    $deactivation_date  \n";
+    }
+
+    # modify
+    my $mesg = $ldap->modify( $dn,
+		      replace => { %replace }
+               );
+    #&AD_debug_logdump($mesg,2,(caller(0))[3]);
+}
 
 
 sub AD_dnsnodes_any {
