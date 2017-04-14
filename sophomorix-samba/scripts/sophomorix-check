@@ -349,16 +349,15 @@ foreach my $user_file (@filelist){
         my $line=$_;
         &analyze_user_line($line,$user_file,$filename,$school,$count,$enc_used,"no");
     }
-
-
     close(USERS);
     close(USERSUTF8);
 }
 
+
+
 # ============================================================
 # injecing lines given by option
 # ============================================================
-
 &print_title("Reading injected lines ...");
 foreach my $inject (@injectlines){
     print "    * $inject\n";
@@ -376,12 +375,10 @@ foreach my $inject (@injectlines){
              die "ERROR: $user_file_utf8 not found!";  
         &analyze_user_line($line,$file_abs,$filename,$school,$count,"utf8","yes");
         close(USERSUTF8);
-        
     } else {
         print "        WARNING: $filename is not valid on this ",
               "server (skipping this line)\n";
     }
-    # append the line to the correct file
 }
 
 
@@ -394,6 +391,7 @@ if ($dump_files==1){
                 hash_ref=>\%users_file,
                });
 }
+
 
 
 # --follow
@@ -409,11 +407,11 @@ if ($follow ne ""){
 }
 
 
+
 # ============================================================
 # asking AD for users
 # ============================================================
 &print_title("Asking the system for users ...");
-
 # fetch system data
 my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            root_dse=>$root_dse,
@@ -429,6 +427,7 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
 my %AD= %$ref_AD; 
 
 
+
 # --dump-AD
 if ($dump_AD==1){
     &json_dump({json => $json,
@@ -440,7 +439,7 @@ if ($dump_AD==1){
 
 
 # ============================================================
-# Walk thhrough all files and identifiers in %users_file
+# Find Matches: Walk thhrough all files and identifiers in %users_file
 # ============================================================
 
 # dynamic matching data ist contained in %Match
@@ -449,25 +448,29 @@ if ($dump_AD==1){
 # and populated from AD by subs (AD identifiers): 
 # $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
 
-
 # no migration
 #&populate_ad_dynamic_identifiers_utf8();
 
 # migration
 &populate_ad_dynamic_identifiers_ascii();
 
+# find exact matches
 &find_migration_unid_matches();
 &find_migration_ascii_matches();
 
-# schleife erstellen, die abbricht wenn es nix mehr zu tun gibt
+# find approx matches
+# create loop that stopps itself???
 &find_migration_ascii_approx_matches(1);
 &find_migration_ascii_approx_matches(2);
 &find_migration_ascii_approx_matches(3);
 &find_migration_ascii_approx_matches(4);
-# marriage, birthdate, ... and such matches
+
+# marriage, birthdate, ... and such matches ???
 
 # check if this is so:
 # track approx number with matches 
+
+
 
 # --dump-matches
 if ($dump_matches==1){
@@ -480,6 +483,9 @@ if ($dump_matches==1){
 
 
 
+# ============================================================
+# Write results into files
+# ============================================================
 
 # write into files
 #   - go through matches lines in line order
@@ -513,6 +519,8 @@ open (NOCHANGE, ">$nochange_file");
 &print_title("Writing the files:");
 
 foreach my $line_new ( @{ $Match{'lines'} } ){
+    # walk through all matches
+    # check for update or move
     if (defined $Match{'action'}{$line_new}{'sAMAccountName'}){
         if($Conf::log_level>=2){
             print "\n";
@@ -524,13 +532,13 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
         my $kill=0;
         $update=&write_update_file($line_new);
         $move=&write_move_file($line_new);
-        # $kill=&write_kill_file_old($line_new);
 	print "$update $move $kill\n";
         my $sum=$update+$move+$kill;
         if ($sum==0){
             print NOCHANGE "$line_new\n";
         }
     } else {
+        # walk through lines that could not be matched
         # no sAMAccountName found
         &write_add_file($line_new);
     }
@@ -538,7 +546,7 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
 
 
 &write_kill_file();
-
+&write_status_update_file();
 
 
 
@@ -598,6 +606,7 @@ sub write_add_file {
 
     print ADD $add_line;
 }
+
 
 
 sub write_update_file {
@@ -712,8 +721,6 @@ sub write_update_file {
         $user_account_control=$Match{'action'}{$line_new}{'userAccountControl'};
     }
 
-
-
     # create line for sophomorix.update
     my $update_line=$sam."::".
                     $unid."::".
@@ -748,14 +755,6 @@ sub write_move_file {
 
 
 
-#sub write_kill_file_old {
-#    my ($line_new)=@_;
-#    my $sam=$Match{'action'}{$line_new}{'sAMAccountName'};
-#    my $kill=0;
-#
-#    return $kill;
-#}
-
 
 sub write_kill_file {
     # walk through all users
@@ -784,6 +783,68 @@ sub write_kill_file {
         }
     }
 }
+
+
+sub write_status_update_file {
+    # walk through all users
+    &Sophomorix::SophomorixBase::print_title("Testing for status updates");
+    foreach my $sam ( keys %{$AD{'sam'}} ) {
+        if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "U" or
+             $AD{'sam'}{$sam}{'sophomorixStatus'} eq "E" or
+             $AD{'sam'}{$sam}{'sophomorixStatus'} eq "A" or
+             $AD{'sam'}{$sam}{'sophomorixStatus'} eq "S"
+           ){
+            # update to T if not matched to a user in files
+            if (not exists $Match{'action_by_sam'}{$sam}){
+                print "   * $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> T\n";
+                my $line=$sam."::".
+                         "---::". # unid
+                         "---::". # surname_ascii
+                         "---::". # firstname_ascii
+                         "---::". # birthdate
+                         "---::". # surname_utf8
+                         "---::". # firstname_utf8
+                         "---::". # filename
+                         "T::". # status
+                         "---::". # userAccountControl
+                         "---::". # school
+                         "---::". # role
+		         "\n";
+                print UPDATE $line;
+            }
+
+
+#            # calculation school name
+#            my $school;
+#            if ($AD{'sam'}{$sam}{'sophomorixSchoolname'} eq 
+#                $DevelConf::name_default_school){
+#                $school="---";
+#	    } else {
+#                $school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
+#            }
+#            # creating the line
+#            my $kill_line=
+#               $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}."::".
+#               $sam."::".
+#               $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
+#               $school."::\n";               
+#            print KILL $kill_line;
+        } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "T"){
+            print "HERE2: User $sam must be checked (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
+            # update to D if 
+            #     - not matched to a user in files
+            #     - and toleration time expired
+        } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "D" or
+                  $AD{'sam'}{$sam}{'sophomorixStatus'} eq "L"
+                ){
+            print "HERE3: User $sam must be checked (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
+            # update to R if 
+            #     - not matched to a user in files
+            #     - and deactivation time expired
+        }
+    }
+}
+
 
 
 
@@ -893,7 +954,8 @@ sub find_migration_ascii_approx_matches {
                 $Match{'action'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
                 $Match{'action'}{$line_new}{'status'}=
                     $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii};
-
+                # reverse action_by_sam
+                $Match{'action_by_sam'}{$sam}=$line_new;
             }
         }
     }
@@ -927,6 +989,8 @@ sub find_migration_ascii_matches {
             $Match{'action'}{$line_new}{'MATCH_SUB'}="$sub";
             $Match{'action'}{$line_new}{'status'}=
                 $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii};
+            # reverse action_by_sam
+            $Match{'action_by_sam'}{$sam}=$line_new;
 
             # remove from ad_to_be_matched
             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
@@ -991,6 +1055,8 @@ sub find_migration_unid_matches {
                 $Match{'action'}{$line_new}{'MATCH_SUB'}="$sub";
                 $Match{'action'}{$line_new}{'status'}=
                     $AD{'lookup'}{'status_by_identifier_ascii'}{$identifier_ascii};
+                # reverse action_by_sam
+                $Match{'action_by_sam'}{$sam}=$line_new;
 
             } else {
                 # NO MATCH
