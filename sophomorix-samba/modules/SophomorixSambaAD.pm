@@ -1380,7 +1380,7 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
-#    my $user_account_control = $arg_ref->{user_account_control};
+    my $user_account_control = $arg_ref->{user_account_control};
     my $school = $arg_ref->{school};
     my $date_now = $arg_ref->{date_now};
     my $role = $arg_ref->{role};

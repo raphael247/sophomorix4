@@ -747,14 +747,11 @@ sub write_move_file {
 
 sub write_kill_file {
     # walk through all users
-#    foreach my $sam ( keys $AD{'sam'} ) {
-#    foreach my $sam ( keys %AD{'sam'} ) {
     foreach my $sam ( keys %{$AD{'sam'}} ) {
         if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "K" or
              ($AD{'sam'}{$sam}{'sophomorixStatus'} eq "R" and not exists $Match{'action_by_sam'}{$sam})
            ){
-            print "User $sam must be killed (Status $AD{'sam'}{$sam}{'sophomorixStatus'})\n";
-
+            print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> sophomorix.kill\n";
             # calculation school name
             my $school;
             if ($AD{'sam'}{$sam}{'sophomorixSchoolname'} eq 
@@ -780,35 +777,27 @@ sub write_status_update_file {
     # walk through all users
     &Sophomorix::SophomorixBase::print_title("Testing all users for status updates");
     foreach my $sam ( keys %{$AD{'sam'}} ) {
+        print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'}\n";
+        ############################################################
         if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "U" or
              $AD{'sam'}{$sam}{'sophomorixStatus'} eq "E" or
              $AD{'sam'}{$sam}{'sophomorixStatus'} eq "A" or
              $AD{'sam'}{$sam}{'sophomorixStatus'} eq "S"
            ){
             # update to T if not matched to a user in files
-            print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'}\n";
             if (not exists $Match{'action_by_sam'}{$sam}){
                 print "   * $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> T\n";
-                my $line=$sam."::".
-                         "---::". # unid
-                         "---::". # surname_ascii
-                         "---::". # firstname_ascii
-                         "---::". # birthdate
-                         "---::". # surname_utf8
-                         "---::". # firstname_utf8
-                         "---::". # filename
-                         "T::".   # status
-                         "---::". # school
-                         "---::". # role
-		         "\n";
+                my $line=&statusupdate_line_from_sam($sam,"T");
                 print UPDATE $line;
             }
+        ############################################################
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "T"){
             print "* Testing $sam: $AD{'sam'}{$sam}{'sophomorixStatus'},",
                   " TolerationDate: $AD{'sam'}{$sam}{'sophomorixTolerationDate'}\n";
             my $file=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
             my $toleration_date_epoch=&ymdhms_to_epoch($AD{'sam'}{$sam}{'sophomorixTolerationDate'});
-            my $toleration_end_epoch=$toleration_date_epoch+86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'};
+            my $toleration_end_epoch=$toleration_date_epoch+
+                86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'};
             
             print "    Toleration end: $toleration_end_epoch ($AD{'sam'}{$sam}{'sophomorixTolerationDate'}",
                   " + $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'} days)\n";
@@ -820,18 +809,7 @@ sub write_status_update_file {
                 #     - not matched to a user in files
                 #     - and toleration time expired
                 print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> D\n";
-                my $line=$sam."::".
-                         "---::". # unid
-                         "---::". # surname_ascii
-                         "---::". # firstname_ascii
-                         "---::". # birthdate
-                         "---::". # surname_utf8
-                         "---::". # firstname_utf8
-                         "---::". # filename
-                         "D::".   # status
-                         "---::". # school
-                         "---::". # role
-		         "\n";
+                my $line=&statusupdate_line_from_sam($sam,"D");
                 print UPDATE $line;
 	    } elsif (exists $Match{'action_by_sam'}{$sam}){
                 # update to A if 
@@ -843,6 +821,7 @@ sub write_status_update_file {
                 # do nothing
                 print "    ----> Toleration end not reached\n";
             }
+        ############################################################
         } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "D" or
                   $AD{'sam'}{$sam}{'sophomorixStatus'} eq "L"
                 ){
@@ -850,12 +829,13 @@ sub write_status_update_file {
                   " DeactivationDate: $AD{'sam'}{$sam}{'sophomorixDeactivationDate'}\n";
             my $file=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
             my $deactivation_date_epoch=&ymdhms_to_epoch($AD{'sam'}{$sam}{'sophomorixDeactivationDate'});
-            my $deactivation_end_epoch=$deactivation_date_epoch+86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'};
+            my $deactivation_end_epoch=$deactivation_date_epoch+
+                86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'};
             
             print "    Deactivation end: $deactivation_end_epoch ($AD{'sam'}{$sam}{'sophomorixDeactivationDate'}",
                   " + $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'} days)\n";
             print "    Today:            $time_stamp_epoch\n";
-
+            ########################################
             if (not exists $Match{'action_by_sam'}{$sam} and 
                 $time_stamp_epoch > $deactivation_end_epoch){
                 # update to R/put in kill-file  if 
@@ -863,18 +843,7 @@ sub write_status_update_file {
                 #     - and deactivation time expired
                 # 1) update status to R
                 print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> R\n";
-                my $line=$sam."::".
-                         "---::". # unid
-                         "---::". # surname_ascii
-                         "---::". # firstname_ascii
-                         "---::". # birthdate
-                         "---::". # surname_utf8
-                         "---::". # firstname_utf8
-                         "---::". # filename
-                         "R::". # status
-                         "---::". # school
-                         "---::". # role
-	    	         "\n";
+                my $line=&statusupdate_line_from_sam($sam,"R");
                 print UPDATE $line;
                 # 2) put user in kill file
                 print "    ----> $sam is put into kill file\n";
@@ -893,6 +862,7 @@ sub write_status_update_file {
                     $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
                     $school."::\n";               
                 print KILL $kill_line;
+            ########################################
             } elsif (exists $Match{'action_by_sam'}{$sam} and 
                      $AD{'sam'}{$sam}{'sophomorixStatus'} eq "D"){
                 # update to A if 
@@ -901,13 +871,15 @@ sub write_status_update_file {
                 print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> A\n";
                 my $line=&activation_line_from_sam($sam);
                 print UPDATE $line;
+            ########################################
 	    } else {
                 print "    ----> Deactivation end not reached\n";
             }
-
-        } elsif ( exists $Match{'action_by_sam'}{$sam} and 
-                  $AD{'sam'}{$sam}{'sophomorixStatus'} eq "R"){
-            # update to A if 
+        ############################################################
+        } elsif ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "R" and 
+                  exists $Match{'action_by_sam'}{$sam} 
+                  ){
+            # update R to A if 
             #     - matched to a user in files
             print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> A\n";
             my $line=&activation_line_from_sam($sam);
@@ -1445,6 +1417,22 @@ sub reading_firstname_errors {
 }
 
 
+sub statusupdate_line_from_sam {
+    my ($sam,$status)=@_;
+    my $line=$sam."::".
+             "---::". # unid
+             "---::". # surname_ascii
+             "---::". # firstname_ascii
+             "---::". # birthdate
+             "---::". # surname_utf8
+             "---::". # firstname_utf8
+             "---::". # filename
+             $status."::".   # status
+             "---::". # school
+             "---::". # role
+             "\n";
+    return $line;
+}
 
 sub activation_line_from_sam {
     my ($sam)=@_;
