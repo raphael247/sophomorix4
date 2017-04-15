@@ -808,7 +808,7 @@ sub write_status_update_file {
                          "---::". # surname_utf8
                          "---::". # firstname_utf8
                          "---::". # filename
-                         "T::". # status
+                         "T::".   # status
                          "---::". # userAccountControl
                          "---::". # school
                          "---::". # role
@@ -840,12 +840,31 @@ sub write_status_update_file {
                          "---::". # surname_utf8
                          "---::". # firstname_utf8
                          "---::". # filename
-                         "D::". # status
+                         "D::".   # status
                          "---::". # userAccountControl
                          "---::". # school
                          "---::". # role
 		         "\n";
                 print UPDATE $line;
+	    } elsif (exists $Match{'action_by_sam'}{$sam}){
+                print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> A\n";
+                my $identifier=$Match{'action_by_sam'}{$sam};
+		print "ID: $identifier\n";
+                # constructing new entry
+                my $line=$sam."::".
+                         $Match{'action'}{$identifier}{'unid'}."::". # unid
+                         $Match{'action'}{$identifier}{'surname_ascii'}."::". # surname_ascii
+                         $Match{'action'}{$identifier}{'firstname_ascii'}."::". # firstname_ascii
+                         $Match{'action'}{$identifier}{'birthdate'}."::". # birthdate
+                         $Match{'action'}{$identifier}{'surname_utf8'}."::". # surname_utf8
+                         $Match{'action'}{$identifier}{'firstname_utf8'}."::". # firstname_utf8
+                         $Match{'action'}{$identifier}{'filename'}."::". # filename
+                         "A::".   # status
+                         "---::". # userAccountControl
+                         $Match{'action'}{$identifier}{'school'}."::". # school
+                         $Match{'action'}{$identifier}{'role'}."::". # role
+		         "\n";
+                         print UPDATE $line;
 	    } else {
                 print "    ----> Toleration end not reached\n";
             }
