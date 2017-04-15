@@ -624,7 +624,6 @@ sub write_update_file {
     my $school;
     my $role;
     my $status;
-#    my $user_account_control;
     my $update=0;
 
     # unid
@@ -713,16 +712,6 @@ sub write_update_file {
     # status
     $status="---";
 
-#    # userAccountControl
-#    if ( ($Match{'action'}{$line_new}{'userAccountControl'} eq $AD{'sam'}{$sam}{'userAccountControl'} )){
-#        # no update
-#        $user_account_control="---";
-#    } else {
-#        # update
-#        $update++;
-#        $user_account_control=$Match{'action'}{$line_new}{'userAccountControl'};
-#    }
-
     # create line for sophomorix.update
     my $update_line=$sam."::".
                     $unid."::".
@@ -733,7 +722,6 @@ sub write_update_file {
                     $firstname_utf8."::".
                     $filename."::".
                     $status."::".
-#                    $user_account_control."::".
                     $school."::".
                     $role."::".
                     "\n";
@@ -1286,12 +1274,6 @@ sub analyze_user_line {
 	$Match{'action'}{$line_new}{'login'}=$login;
 	$Match{'action'}{$line_new}{'inject'}=$injected;
 
-
-        # status for the user 
-        # ????????? calulate from schools,conf
-        # at the moment: always 512 (enabled account)
-	#$Match{'action'}{$line_new}{'userAccountControl'}="512";
-
          # list of lines
          push @{ $Match{'lines'} }, $line_new;
     }
@@ -1478,7 +1460,6 @@ sub activation_line_from_sam {
         $Match{'action'}{$identifier}{'firstname_utf8'}."::". # firstname_utf8
         $Match{'action'}{$identifier}{'filename'}."::". # filename
         "A::".   # status
-#        "---::". # userAccountControl
         $Match{'action'}{$identifier}{'school'}."::". # school
         $Match{'action'}{$identifier}{'role'}."::". # role
 	"\n";
