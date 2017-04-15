@@ -123,6 +123,7 @@ my $selfactivate=0;
 my $permanent=0;
 my $tolerate=0;
 my $deactivate=0;
+my $lock=0;
 my $freeze=0;
 my $killable=0;
 my $removable=0;
@@ -160,6 +161,7 @@ my $testopt=GetOptions(
        "P|permanent" => \$permanent,
        "T|tolerate" => \$tolerate,
        "D|deactivate" => \$deactivate,
+       "L|lock" => \$lock,
        "F|freeze" => \$freeze,
        "K|killable" => \$killable,
        "R|removable" => \$removable,
@@ -206,16 +208,21 @@ Choose the school:
   --school <school>
 
 Changing status of a user:
-  -U --user <user>  /   --usable --user <user>
   -E --user <user>  /   --enable --user <user>
+  -P --user <user>  /   --permanent --user <user>
+  -F --user <user>  /   --freeze --user <user>
+  -L --user <user>  /   --lock --user <user>
+  -K --user <user>  /   --killable --user <user>
+
+These are done by the automatic workflow, you shold not need them
+  -U --user <user>  /   --usable --user <user>
   -A --user <user>  /   --activate --user <user>
   -S --user <user>  /   --selfactivate --user <user>
-  -P --user <user>  /   --permanent --user <user>
   -T --user <user>  /   --tolerate --user <user>
   -D --user <user>  /   --deactivate --user <user>
-  -F --user <user>  /   --freeze --user <user>
-  -K --user <user>  /   --killable --user <user>
   -R --user <user>  /   --removable --user <user>
+
+
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
@@ -296,6 +303,8 @@ if ($user eq "" and $info==1){
     my @teachers_s=();
     my @students_d=();
     my @teachers_d=();
+    my @students_l=();
+    my @teachers_l=();
     my @students_r=();
     my @teachers_r=();
     my @students_k=();
@@ -359,6 +368,10 @@ if ($user eq "" and $info==1){
             push @students_d, $dn;
 	} elsif ($role eq "teacher" and $status eq "D"){
             push @teachers_d, $dn;
+	} elsif ($role eq "student" and $status eq "L"){
+            push @students_l, $dn;
+	} elsif ($role eq "teacher" and $status eq "L"){
+            push @teachers_l, $dn;
 	} elsif ($role eq "student" and $status eq "R"){
             push @students_r, $dn;
 	} elsif ($role eq "teacher" and $status eq "R"){
@@ -400,6 +413,8 @@ if ($user eq "" and $info==1){
     $results{'count'}{'teachers'}{'S'}=$#teachers_s+1;
     $results{'count'}{'students'}{'D'}=$#students_d+1;
     $results{'count'}{'teachers'}{'D'}=$#teachers_d+1;
+    $results{'count'}{'students'}{'L'}=$#students_l+1;
+    $results{'count'}{'teachers'}{'L'}=$#teachers_l+1;
     $results{'count'}{'students'}{'R'}=$#students_r+1;
     $results{'count'}{'teachers'}{'R'}=$#teachers_r+1;
     $results{'count'}{'students'}{'K'}=$#students_k+1;
@@ -422,6 +437,7 @@ if ($user eq "" and $info==1){
                     $results{'count'}{'students'}{'A'}+
                     $results{'count'}{'students'}{'S'}+
                     $results{'count'}{'students'}{'D'}+
+                    $results{'count'}{'students'}{'L'}+
                     $results{'count'}{'students'}{'R'}+
                     $results{'count'}{'students'}{'K'}+
                     $results{'count'}{'students'}{'F'}+
@@ -433,6 +449,7 @@ if ($user eq "" and $info==1){
                     $results{'count'}{'teachers'}{'A'}+
                     $results{'count'}{'teachers'}{'S'}+
                     $results{'count'}{'teachers'}{'D'}+
+                    $results{'count'}{'teachers'}{'L'}+
                     $results{'count'}{'teachers'}{'R'}+
                     $results{'count'}{'teachers'}{'K'}+
                     $results{'count'}{'teachers'}{'F'}+
@@ -447,29 +464,31 @@ if ($user eq "" and $info==1){
     print "status    |   | stud | teach| exam| comp| adm | oth |\n";
     print "----------+---+------+------+-----+-----+-----+-----+\n";
     printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "usable    | U",$results{'count'}{'students'}{'U'},$results{'count'}{'teachers'}{'U'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "enabled   | E",$results{'count'}{'students'}{'E'},$results{'count'}{'teachers'}{'E'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "tolerated | T",$results{'count'}{'students'}{'T'},$results{'count'}{'teachers'}{'T'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "activated | A",$results{'count'}{'students'}{'A'},$results{'count'}{'teachers'}{'A'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "selfactiv.| S",$results{'count'}{'students'}{'S'},$results{'count'}{'teachers'}{'S'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "disabled  | D",$results{'count'}{'students'}{'D'},$results{'count'}{'teachers'}{'D'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "removeable| R",$results{'count'}{'students'}{'R'},$results{'count'}{'teachers'}{'R'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "killable  | K",$results{'count'}{'students'}{'K'},$results{'count'}{'teachers'}{'K'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "frozen    | F",$results{'count'}{'students'}{'F'},$results{'count'}{'teachers'}{'F'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
            "permanent | P",
            $results{'count'}{'students'}{'P'},
            $results{'count'}{'teachers'}{'P'},
            $results{'count'}{'examaccounts'}{'P'},
            $results{'count'}{'computers'}{'P'},"","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "usable    | U",$results{'count'}{'students'}{'U'},$results{'count'}{'teachers'}{'U'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "activated | A",$results{'count'}{'students'}{'A'},$results{'count'}{'teachers'}{'A'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "enabled   | E",$results{'count'}{'students'}{'E'},$results{'count'}{'teachers'}{'E'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "selfactiv.| S",$results{'count'}{'students'}{'S'},$results{'count'}{'teachers'}{'S'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "tolerated | T",$results{'count'}{'students'}{'T'},$results{'count'}{'teachers'}{'T'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "disabled  | D",$results{'count'}{'students'}{'D'},$results{'count'}{'teachers'}{'D'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "locked    | L",$results{'count'}{'students'}{'L'},$results{'count'}{'teachers'}{'L'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "frozen    | F",$results{'count'}{'students'}{'F'},$results{'count'}{'teachers'}{'F'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "removeable| R",$results{'count'}{'students'}{'R'},$results{'count'}{'teachers'}{'R'},"-","-","","-";
+    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+           "killable  | K",$results{'count'}{'students'}{'K'},$results{'count'}{'teachers'}{'K'},"-","-","","-";
     print "----------+---+------+------+-----+-----+-----+-----+\n";
     printf "%-10s|%2s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
            "sum: $max","",$sum_student,$sum_teacher,$sum_examaccounts,$sum_computers,"",$results{'count'}{'others'};
@@ -841,6 +860,21 @@ if ($deactivate==1){
                      dn=>$dn,
                      user=>$user,
                      status=>"D",
+                     user_count=>"",
+                     date_now=> $time_stamp_AD,
+                   });
+}
+
+
+
+# -L --user <user> / --deactivate --user <user>
+if ($lock==1){
+    print "Locking the account of $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     status=>"L",
                      user_count=>"",
                      date_now=> $time_stamp_AD,
                    });

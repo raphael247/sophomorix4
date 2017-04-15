@@ -1498,8 +1498,9 @@ sub AD_user_update {
             $toleration_date=$date_now;
             $deactivation_date=$DevelConf::default_date;
         } elsif  ($status eq "D" or
-                  $status eq "F"){
-            # Status D,F
+                  $status eq "F" or
+                  $status eq "L"){
+            # Status D,F,L
             $user_account_control=&_uac_disable_user($user_account_control_AD);
             $toleration_date=$toleration_date_AD;
             $deactivation_date=$date_now;
