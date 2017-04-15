@@ -507,14 +507,14 @@ if ($add==1){
 # --modify-1
 ############################################################
 if ($modify_1==1){
-    my $command_modify_1="sophomorix-check ".
-                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
-                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".
-                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".
+    my $command_modify_1="sophomorix-check ";
+#                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".   # removed
+#                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".            # removed
+#                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".           # removed
 #                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
-                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
-                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".
-                "--injectline \"students.csv:7a;Sigurðsson;Rugonar;19.06.1986;\" ";                         # Ragnar -> Rugonar
+#                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".                    # removed
+#                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".                           # removed
+#                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                         # removed
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_1);
@@ -540,7 +540,7 @@ if ($modify_1==1){
     my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Sigurðsson",
-                                givenName=>"Rugonar",
+                                givenName=>"Ragnar",
                                 birthdate=>"19.06.1986",
                                });
     my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -580,11 +580,11 @@ if ($modify_1==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
+                   sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "T",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -614,11 +614,11 @@ if ($modify_1==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
+                   sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "T",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -628,8 +628,8 @@ if ($modify_1==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_sigurdra,
                    #####
-                   displayName=>"Rugonar Sigurðsson",
-                   givenName=>"Rugonar",
+                   displayName=>"Ragnar Sigurðsson",
+                   givenName=>"Ragnar",
                    name=>$sigurdra,
                    sAMAccountname=>$sigurdra,
                    uidNumber=>"-1",
@@ -641,18 +641,18 @@ if ($modify_1==1){
                    sophomorixAdminClass => "7a",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Rugonar",
+                   sophomorixFirstnameASCII => "Ragnar",
                    sophomorixSurnameASCII  => "Sigurdsson",
                    sophomorixBirthdate  => "19.06.1986",
                    sophomorixRole => "student",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
+                   sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "T",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -753,11 +753,11 @@ if ($modify_1==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
+                   sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "T",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
@@ -787,11 +787,11 @@ if ($modify_1==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
+                   sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "T",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
@@ -819,11 +819,11 @@ if ($modify_1==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
+                   sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "T",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
@@ -897,7 +897,7 @@ if ($modify_2==1){
     my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Sigurðsson",
-                                givenName=>"Rugonar",
+                                givenName=>"Ragnar",
                                 birthdate=>"19.06.1986",
                                });
     my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -912,21 +912,29 @@ if ($modify_2==1){
     print "U: $sigurdgy\n";
 
 
+    my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_gunnarar,"20170101000001.0Z","---");
+    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20170101000001.0Z","---");
     my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20170101000001.0Z","---");
 
+    my $dn_rukri99="CN=rukri99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_rukri99,"20170101000002.0Z","---");
+    my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20170101000002.0Z","---");
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20170101000002.0Z","---");
 
 
     my $command_modify_2="sophomorix-check ".
-                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
-                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".
-                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".
+                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".    # back
+#                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".            # removed
+#                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".           # removed
 #                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
-                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
-                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".
-                "--injectline \"students.csv:7a;Sigurðsson;Rugonar;19.06.1986;\" --dump-AD -j ";                         # Ragnar -> Rugonar
+                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" --dump-matches -j";                     # back
+#                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".                           # removed
+#                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                         # removed
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_2);
@@ -964,13 +972,13 @@ if ($modify_2==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
     # $gunnarar
-    my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    # my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_gunnarar,
                    #####
@@ -994,22 +1002,22 @@ if ($modify_2==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "D",
                    sophomorixUnid => "---",
-                   userAccountControl => "512",
+                   userAccountControl => "514",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
     # $sigurdra
-    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    # my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_sigurdra,
                    #####
-                   displayName=>"Rugonar Sigurðsson",
-                   givenName=>"Rugonar",
+                   displayName=>"Ragnar Sigurðsson",
+                   givenName=>"Ragnar",
                    name=>$sigurdra,
                    sAMAccountname=>$sigurdra,
                    uidNumber=>"-1",
@@ -1021,20 +1029,20 @@ if ($modify_2==1){
                    sophomorixAdminClass => "7a",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Rugonar",
+                   sophomorixFirstnameASCII => "Ragnar",
                    sophomorixSurnameASCII  => "Sigurdsson",
                    sophomorixBirthdate  => "19.06.1986",
                    sophomorixRole => "student",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "D",
                    sophomorixUnid => "---",
-                   userAccountControl => "512",
+                   userAccountControl => "514",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
     # $sigurdgy
@@ -1137,7 +1145,7 @@ if ($modify_2==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
@@ -1167,12 +1175,12 @@ if ($modify_2==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
-                   userAccountControl => "512",
+                   sophomorixStatus => "D",
+                   userAccountControl => "514",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
     # skula99
@@ -1199,12 +1207,12 @@ if ($modify_2==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
-                   userAccountControl => "512",
+                   sophomorixStatus => "D",
+                   userAccountControl => "514",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
     # bjarna99
@@ -1279,7 +1287,7 @@ if ($modify_3==1){
     my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Sigurðsson",
-                                givenName=>"Rugonar",
+                                givenName=>"Ragnar",
                                 birthdate=>"19.06.1986",
                                });
 
@@ -1297,22 +1305,25 @@ if ($modify_3==1){
 
     my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20160101000001.0Z","20170101000001.0Z");
+    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20160101000001.0Z","20170101000001.0Z");
 
+    my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20160101000002.0Z","20170101000002.0Z");
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20160101000002.0Z","20170101000002.0Z");
 
-
-    my $command_modify_2="sophomorix-check ".
+    my $command_modify_3="sophomorix-check ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
-                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".
-                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".
+                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
+#                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".           # removed
 #                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
                 "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
-                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".
-                "--injectline \"students.csv:7a;Sigurðsson;Rugonar;19.06.1986;\" --dump-AD -j ";                         # Ragnar -> Rugonar
+                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ";                            # back
+#                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                         # removed
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
-    &run_command($command_modify_2);
+    &run_command($command_modify_3);
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
@@ -1348,7 +1359,7 @@ if ($modify_3==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -1382,18 +1393,18 @@ if ($modify_3==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
     # $sigurdra
-    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    # my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_sigurdra,
                    #####
-                   displayName=>"Rugonar Sigurðsson",
-                   givenName=>"Rugonar",
+                   displayName=>"Ragnar Sigurðsson",
+                   givenName=>"Ragnar",
                    name=>$sigurdra,
                    sAMAccountname=>$sigurdra,
                    uidNumber=>"-1",
@@ -1405,20 +1416,20 @@ if ($modify_3==1){
                    sophomorixAdminClass => "7a",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Rugonar",
+                   sophomorixFirstnameASCII => "Ragnar",
                    sophomorixSurnameASCII  => "Sigurdsson",
                    sophomorixBirthdate  => "19.06.1986",
                    sophomorixRole => "student",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "R",
                    sophomorixUnid => "---",
-                   userAccountControl => "512",
+                   userAccountControl => "514",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
     # $sigurdgy
@@ -1521,7 +1532,7 @@ if ($modify_3==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
@@ -1555,7 +1566,7 @@ if ($modify_3==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
@@ -1583,12 +1594,12 @@ if ($modify_3==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
-                   userAccountControl => "512",
+                   sophomorixStatus => "R",
+                   userAccountControl => "514",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
     # bjarna99
@@ -1663,7 +1674,7 @@ if ($modify_4==1){
     my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Sigurðsson",
-                                givenName=>"Rugonar",
+                                givenName=>"Ragnar",
                                 birthdate=>"19.06.1986",
                                });
 
@@ -1678,12 +1689,27 @@ if ($modify_4==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
+
+    my $command_modify_4="sophomorix-check ".
+                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
+                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
+                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".            # back
+#                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
+                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
+                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".                            # back
+                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                          # back
+#                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
+
+
+
     ############################################################
     # kill the users, that can be killed and test again
     ############################################################
+    &run_command($command_modify_4);
+    &run_command("sophomorix-add");
+    &run_command("sophomorix-update");
+    &run_command("sophomorix-move");
     &run_command("sophomorix-kill");
-
-
 
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -1714,7 +1740,7 @@ if ($modify_4==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -1748,7 +1774,7 @@ if ($modify_4==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -1758,8 +1784,8 @@ if ($modify_4==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_sigurdra,
                    #####
-                   displayName=>"Rugonar Sigurðsson",
-                   givenName=>"Rugonar",
+                   displayName=>"Ragnar Sigurðsson",
+                   givenName=>"Ragnar",
                    name=>$sigurdra,
                    sAMAccountname=>$sigurdra,
                    uidNumber=>"-1",
@@ -1771,7 +1797,7 @@ if ($modify_4==1){
                    sophomorixAdminClass => "7a",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Rugonar",
+                   sophomorixFirstnameASCII => "Ragnar",
                    sophomorixSurnameASCII  => "Sigurdsson",
                    sophomorixBirthdate  => "19.06.1986",
                    sophomorixRole => "student",
@@ -1782,7 +1808,7 @@ if ($modify_4==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
@@ -1889,7 +1915,7 @@ if ($modify_4==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
@@ -1923,7 +1949,7 @@ if ($modify_4==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
@@ -1955,7 +1981,7 @@ if ($modify_4==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
-                   sophomorixStatus => "S",
+                   sophomorixStatus => "A",
                    userAccountControl => "512",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
@@ -2036,7 +2062,7 @@ if ($kill==1){
     my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Sigurðsson",
-                                givenName=>"Rugonar",
+                                givenName=>"Ragnar",
                                 birthdate=>"19.06.1986",
                                });
     print "U: $halldoha\n";
