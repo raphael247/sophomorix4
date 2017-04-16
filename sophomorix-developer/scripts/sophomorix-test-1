@@ -5090,31 +5090,325 @@ if ($cp_kill==1){
 
 if ($kill==1 or $test_kill==1){
     if ($kill==1){
+        # kill the users, keep the classes
         &run_command("cp -v $file_kill_test $file_kill");
         &run_command("sophomorix-kill -i");
         &run_command("sophomorix-kill $verbose_options");
+    }
 
+    ############################################################
+    # checking if classes are really empty after deleting users
+    # member, sophomorixMembers, sophomorixAdmins
+
+    # empty classes in default-school
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=s6ade,OU=s6ade,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"s6ade",
+                   gidNumber=>"99001",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"s6ade",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=s7ade,OU=s7ade,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"s7ade",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"s7ade",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=alumni,OU=alumni,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"alumni",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"alumni",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+
+    # empty class in ghs
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=ghs-alumni,OU=alumni,OU=Students,OU=ghs,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"ghs-alumni",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"ghs-alumni",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "ghs",
+                   memberOf => "ghs-students",
+                   member => "",
+                  });
+
+    # empty classes in lin
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=lin-attic,OU=attic,OU=Students,OU=lin,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"lin-attic",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"lin-attic",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "lin",
+                   memberOf => "lin-students",
+                   member => "",
+                  });
+
+    # empty classes in bsz
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-attic,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-attic",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-attic",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-alumni,OU=alumni,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-alumni",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-alumni",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m7ab,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m7ab",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m7ab",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m8cd,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m8cd",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m8cd",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m9cd,OU=m9cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m9cd",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m9cd",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+
+    # empty classes in uni
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=uni-alumni,OU=alumni,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"uni-alumni",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"uni-alumni",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "uni",
+                   memberOf => "uni-students",
+                   member => "",
+                  });
+
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=uni-12abc,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"uni-12abc",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"uni-12abc",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "uni",
+                   memberOf => "uni-students",
+                   member => "",
+                  });
+
+
+    if ($kill==1){
+        # kill the classes, one exception: alumni
         # creating files to avoid deletion
         &run_command("touch /srv/samba/schools/uni/students/alumni/homes/fakeuser");
 
         # removing adminclasses
-        &run_command("sophomorix-class --kill --class m7ab $verbose_options");
-        &run_command("sophomorix-class --kill --class m8cd $verbose_options");
-        &run_command("sophomorix-class --kill --class uni-12abc $verbose_options");
-        &run_command("sophomorix-class --kill --class s6ade $verbose_options");
-        &run_command("sophomorix-class --kill --class attic $verbose_options");
-        &run_command("sophomorix-class --kill --class lin-attic $verbose_options");
-        &run_command("sophomorix-class --kill --class m9cd $verbose_options");
-        &run_command("sophomorix-class --kill --class s7ade $verbose_options");
-        &run_command("sophomorix-class --kill --class alumni $verbose_options");
-        &run_command("sophomorix-class --kill --class ghs-alumni $verbose_options");
-        &run_command("sophomorix-class --kill --class bsz-alumni $verbose_options");
-        &run_command("sophomorix-class --kill --class bsz-attic $verbose_options");
+        &run_command("sophomorix-class --kill --class m7ab $verbose_options");       # NOT checked above: exists only in lin and bsz
+        &run_command("sophomorix-class --kill --class m8cd $verbose_options");       # NOT checked above: exists only in bsz
+        &run_command("sophomorix-class --kill --class uni-12abc $verbose_options");  # checked above
+        &run_command("sophomorix-class --kill --class s6ade $verbose_options");      # checked above
+        &run_command("sophomorix-class --kill --class attic $verbose_options");      # NOT checked above: exists only in lin and bsz
+        &run_command("sophomorix-class --kill --class lin-attic $verbose_options");  # checked above
+        &run_command("sophomorix-class --kill --class m9cd $verbose_options");       # NOT checked above: exists only in bsz
+        &run_command("sophomorix-class --kill --class s7ade $verbose_options");      # checked above
+        &run_command("sophomorix-class --kill --class alumni $verbose_options");     # checked above 
 
-        &run_command("sophomorix-class --kill --class bsz-m7ab $verbose_options");
-        &run_command("sophomorix-class --kill --class bsz-m8cd $verbose_options");
-        &run_command("sophomorix-class --kill --class bsz-m9cd $verbose_options");
-        &run_command("sophomorix-class --kill --class uni-alumni $verbose_options");
+        &run_command("sophomorix-class --kill --class ghs-alumni $verbose_options"); # checked above
+
+        &run_command("sophomorix-class --kill --class bsz-alumni $verbose_options"); #checked above
+        &run_command("sophomorix-class --kill --class bsz-attic $verbose_options");  #checked above
+        &run_command("sophomorix-class --kill --class bsz-m7ab $verbose_options");   #checked above
+        &run_command("sophomorix-class --kill --class bsz-m8cd $verbose_options");   #checked above
+        &run_command("sophomorix-class --kill --class bsz-m9cd $verbose_options");   #checked above
+
+        # should not work to kill class alumni
+        &run_command("sophomorix-class --kill --class uni-alumni $verbose_options"); #checked above
     }
 
     &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
@@ -5230,7 +5524,7 @@ if ($kill==1 or $test_kill==1){
 
     # remove files to avoid deletion
     &run_command("rm -f /srv/samba/schools/uni/students/alumni/homes/fakeuser");
-    # kill the class that coldnz be killed
+    # kill the class that could not be killed
     &run_command("sophomorix-class --kill --class uni-alumni $verbose_options");
 
     &AD_object_nonexist($ldap,$root_dse,"group","uni-alumni");

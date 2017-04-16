@@ -795,6 +795,8 @@ sub AD_group_kill {
         &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,$school,$group,$type);
 
     &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school):");
+    &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"group",$group);
+
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
 
     if ($count > 0){
