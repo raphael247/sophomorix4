@@ -47,6 +47,7 @@ $Data::Dumper::Terse = 1;
             AD_computer_create
             AD_user_move
             AD_user_kill
+            AD_remove_sam_from_sophomorix_attributes
             AD_computer_kill
             AD_group_create
             AD_group_kill
@@ -655,6 +656,8 @@ sub AD_user_kill {
 
     &Sophomorix::SophomorixBase::print_title("Killing User $user ($user_count):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
+    &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$user);
+
     if ($count > 0){
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
@@ -682,6 +685,47 @@ sub AD_user_kill {
     }
 }
 
+
+
+sub AD_remove_sam_from_sophomorix_attributes {
+    my ($ldap,$root_dse,$objectclass,$object)=@_;
+    # removes a username/groupname from the listed sophomorix attributes
+    # $objectclass: user,group (Objectclass of the object that will be removed)
+    # $object: sAMAccountName of the object that will be removed 
+    &Sophomorix::SophomorixBase::print_title("Removing object $object from sophomorix attributes");
+    my @attr_list=();
+    if ($objectclass eq "user"){
+        @attr_list=("sophomorixMembers","sophomorixAdmins");
+    } elsif ($objectclass eq "group"){
+        @attr_list=("sophomorixMemberGroups","sophomorixAdminGroups");
+    } else {
+        print "\nWARNING: Could not determine attribute list ( AD_remove_sam_from_sophomorix_attributes)\n\n";
+        return;
+    }
+    foreach my $attr (@attr_list){
+        my $filter="(&(objectClass=group)(".$attr."=".$object."))";
+        my $mesg = $ldap->search( # perform a search
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attrs => ['sAMAccountName']
+                                );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        my $max_attr = $mesg->count; 
+        for( my $index = 0 ; $index < $max_attr ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            print "   * user $object is in $attr of $sam -> removing ...\n";
+            #print "     $dn\n";
+            my $mesg2 = $ldap->modify( $dn,
+     	    	              delete => {
+                              $attr => $object,
+                              });
+            &AD_debug_logdump($mesg2,2,(caller(0))[3]);
+        }
+    }
+}
 
 
 sub AD_computer_kill {

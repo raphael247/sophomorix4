@@ -24,6 +24,42 @@ user bjarna99 und sigurdgy werde nicht aus attribut sophomorixMembers der Gruppe
 -> müssen bei Klassen sophomorixMembers ausgefüllt werden?
 -> gleiches problem bei Projekten?
 
+Lösung:
+
+löschen eines users:
+
+AD_user_kill: 
+  austragen aus multivalue Attribut der gruppen/Projekte 
+      - sophomorixMembers (multivalue)
+      - sophomorixAdmins (multivalue)
+AD_computer kill: ???
+
+ AD_group_kill (klassen und projekte)
+   austragen aus multivalue Attribut der gruppen/Projekte 
+     sophomorixMemberGroups
+     sophomorixAdminGroups
+
+test script: suche nach userfragmenten|gruppen fragmenten im AD
+
+
+neues attribut: sophomorixLockingDateEnd
+sophomorix-check/update ativiert den user wieder zu status A
+
+
+sophomorix-user -i
+   --> alle zeigen, wie bisher
+-i -K
+   --> alle killable zeigen (einer pro Zeile)
+
+-i -K -v
+   --> alle zeigen, wichtige Attribute
+
+-i -K -vv 
+   --> alle zeigen, dump der Net::LDAP abfrage
+
+ebenso mit -u user
+           -s searchstring
+
 
 supertest schreiben
 --> mehrmals full reset (automatisch)
