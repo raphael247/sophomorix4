@@ -1711,6 +1711,7 @@ if ($modify_4==1){
     &run_command("sophomorix-move");
     &run_command("sophomorix-kill");
 
+
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
@@ -2035,6 +2036,46 @@ if ($modify_4==1){
                   });
 
 
+    # create the project p_full-blown
+    my $pro_command="sophomorix-project $verbose_options ".
+                    "--create -p full-blown  --description 'Full blown project' ".
+                    "--addquota 100+60 --addmailquota 200 ".
+                    "--mailalias --maillist ".
+                    "--status P --join --nohide --maxmembers 36 ".
+                    "--admins rukri99,olinst99 --members skula99,".$gunnarar.",".$halldoha." ".
+                    "--membergroups 7a --admingroups teachers";
+
+    &run_command("$pro_command");
+
+    # test the project p_full-blown
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_full-blown,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"p_full-blown",
+                   gidNumber=>"-1",
+                   description=>"Full blown project",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+60",
+                   sophomorixAddMailQuota=>"200",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"36",
+                   sophomorixAdmins => "rukri99|olinst99",
+                   sophomorixMembers => $halldoha."|".$gunnarar."|skula99",
+                   sophomorixAdminGroups => "teachers",
+                   sophomorixMemberGroups => "7a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "",
+                   member => "7a|teachers|rukri99|olinst99|skula99|".$halldoha."|".$gunnarar,
+                  });
+
+
+
+
+
 
 
 }
@@ -2090,8 +2131,36 @@ if ($kill==1){
     &AD_object_nonexist($ldap,$root_dse,"user","rukri99");
     &AD_object_nonexist($ldap,$root_dse,"user","skula99");
 
+    # killing rukri99,olinst99 should remove them from the project p_full-blown
+    # 7a and teachers are still members, because they still exist
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_full-blown,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"p_full-blown",
+                   gidNumber=>"-1",
+                   description=>"Full blown project",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+60",
+                   sophomorixAddMailQuota=>"200",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"36",
+                   sophomorixAdmins => "",
+                   sophomorixMembers => "",
+                   sophomorixAdminGroups => "teachers",
+                   sophomorixMemberGroups => "7a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "",
+                   member => "7a|teachers",
+                  });
+
+
+
     ##### Testing the users ou-teachers group
-    # should be empty
+    # empty sophomorixMembers,sophomorixAdmins but teachers is still member of project p_full-blown
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"teachers",
@@ -2103,12 +2172,12 @@ if ($kill==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-teachers",
+                   memberOf => "global-teachers|p_full-blown",
                    member => "",
                   });
 
     ##### Testing the users class
-    # should be empty
+    # empty sophomorixMembers,sophomorixAdmins but 7a is still member of project p_full-blown
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=7a,OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"7a",
@@ -2128,7 +2197,7 @@ if ($kill==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "students",
+                   memberOf => "students|p_full-blown",
                    member => "",
                   });
 
@@ -2152,6 +2221,72 @@ if ($kill==1){
     &run_command("sophomorix-class --kill --class 7a $verbose_options");
     &AD_object_nonexist($ldap,$root_dse,"group","7a");
 
+    # killing 7a should remove it from the project p_full-blown
+    # group teachers is still a member, because it still exists
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_full-blown,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"p_full-blown",
+                   gidNumber=>"-1",
+                   description=>"Full blown project",
+                   sophomorixType=>"project",
+                   sophomorixAddQuota=>"100+60",
+                   sophomorixAddMailQuota=>"200",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"36",
+                   sophomorixAdmins => "",
+                   sophomorixMembers => "",
+                   sophomorixAdminGroups => "teachers",
+                   sophomorixMemberGroups => "",
+                   sophomorixCreationDate => "exists",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "",
+                   member => "teachers",
+                  });
+
+
+    ##### Testing the users ou-teachers group
+    # empty sophomorixMembers,sophomorixAdmins but teachers is still member of project p_full-blown
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"teachers",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "global-teachers|p_full-blown",
+                   member => "",
+                  });
+
+    # kill the project p_full-blown
+    &run_command("sophomorix-project $verbose_options --kill -p full-blown");
+
+    # test if project was deleted
+    &AD_object_nonexist($ldap,$root_dse,"group","p_full-blown");
+
+    ##### Testing the users ou-teachers group
+    # teachers should be removed from p_full-blown
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"teachers",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "global-teachers",
+                   member => "",
+                  });
 
     ##### Testing the users ou-students group
     # should be empty
@@ -2167,8 +2302,6 @@ if ($kill==1){
                    memberOf => "global-students",
                    member => "",
                   });
-
-
 
 }
 
