@@ -1,7 +1,41 @@
 Next Entwicklertreffen 25/26.3.17
 
-sophomorix-check legt user an
--> sophomorix.add creation OK
+
+
+
+weiter:
+
+sophomorix-check:
+
+write_update_file:         geht alle matches durch (AD und files)
+
+write_status_update_file: geht alle user im AD durch
+
+Beides könnte in eine Schleife, die von write_status_update_file
+
+alle user im ad durchgehen {
+      -> status prüfen
+#  falls kein match 
+#      -> nix mehr
+  falls ein match
+      -> update des Namens prüfen
+      -> move prüfen
+-> dann  update-Zeile schreiben Zeile schreiben (wenn änderungen)
+-> sonst nochange-Zeile schreiben
+}
+
+
+
+sophomorix.move befüllen
+wieso wird der status genötigt? -> raus
+wieseo wird alte und neue rolle benötigt 
+(rolle wird bei update upgedated)
+
+move evtl. in update einpflegen?
+
+sophomorix-move: variablen in englisch
+
+
 
 todo: login creation in sophomorix-add
       login in 5th field teachers.csv OK
@@ -10,36 +44,24 @@ todo: login creation in sophomorix-add
 sophomorix-test-workflow
  - add more users in other schools
  - test added users
- 
-
+ - add them to project
+   - check if they are removed from project correctly
+     -members
+     - sophomorixMembers (multivalue)
+     - sophomorixAdmins (multivalue)
+     - sophomorixMemberGroups (multivalue)
+     - sophomorixAdminGroups (multivalue)
+test wenn user leicht verändert kommt 
+test-3 
 
 
 Testing: test with users that would create the same loginname
          (differ only in birthdate and class)
 
 
-Bugs: sophomorix-test-workflow
-
-user bjarna99 und sigurdgy werde nicht aus attribut sophomorixMembers der Gruppe teachers bzw. 7a entfernt
--> müssen bei Klassen sophomorixMembers ausgefüllt werden?
--> gleiches problem bei Projekten?
-
-Lösung:
-
-löschen eines users:
-
-AD_user_kill: 
-  austragen aus multivalue Attribut der gruppen/Projekte 
-      - sophomorixMembers (multivalue)
-      - sophomorixAdmins (multivalue)
-AD_computer kill: ???
-
- AD_group_kill (klassen und projekte)
-   austragen aus multivalue Attribut der gruppen/Projekte 
-     sophomorixMemberGroups
-     sophomorixAdminGroups
 
 test script: suche nach userfragmenten|gruppen fragmenten im AD
+   - wo ist der user xyz42 noch in einem attribut
 
 
 neues attribut: sophomorixLockingDateEnd
@@ -60,14 +82,6 @@ sophomorix-user -i
 ebenso mit -u user
            -s searchstring
 
-
-supertest schreiben
---> mehrmals full reset (automatisch)
---> jeder test loggt in eine Datei /tmp/scriptname.log
---> tail -n 2 /tmp/scriptname.log zeigt übersicht an
-
-userAccountControl aus sophomorix.update heraus ????
-
 Status wechseln 
   R und K??? wie wars
   E und a tauschen hat Vorteil:
@@ -77,13 +91,16 @@ Status wechseln
 statuskorrektur bei migration erforderlich???
 
 
-sophomorix-workflow: .nochange und hochladen
-die user die T und D sind und sich der status nicht ändert auch nach nochange?
+sophomorix-workflow: .nochange
+  - die user die T und D sind und sich der status nicht ändert auch nach nochange?
 
+######
+überlegen: funktionen 
+&get_all roles  (all user roles)
+&get_all_types  (all group types)
 
-
-Blade Server:
-
+return as search filters, commaseparated, ....
+######
 
 Dateisystem:
 /home/  -> /srv/samba
