@@ -48,6 +48,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_get_user
                                  AD_user_kill
+                                 AD_remove_sam_from_sophomorix_attributes
                                  AD_dns_get
                                  AD_unbind_admin
                                  AD_user_create
@@ -94,6 +95,12 @@ my @filelist=&filelist_fetch({filetype=>"users",
 my $json=0;
 my $dump_AD=0;
 # fetch system data
+
+
+my $object="halldoha";
+#my $object="7a";
+
+&AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$object);
 
 # my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
 #                            root_dse=>$root_dse,
@@ -150,20 +157,20 @@ my $dump_AD=0;
 #   $smb->rmdir_recurse("smb://linuxmuster.local/bsz/students/alumni/homes/oe42")
 #     or print "Error rmdir_recurse: ", $!, "\n";
 
-my $school="bsz";
-my $group="bsz-7a";
-my $type="project";
+# my $school="bsz";
+# my $group="bsz-7a";
+# my $type="project";
 
-   my ($smb_share,$unix_dir,$unc,$smb_rel_path)=
-        &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,
-                                                        $school,
-                                                        $group,
-                                                        $type);
+#    my ($smb_share,$unix_dir,$unc,$smb_rel_path)=
+#         &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,
+#                                                         $school,
+#                                                         $group,
+#                                                         $type);
 
-print "$smb_share\n";
-print "$unix_dir\n";
-print "$unc\n";
-print "$smb_rel_path\n";
+# print "$smb_share\n";
+# print "$unix_dir\n";
+# print "$unc\n";
+# print "$smb_rel_path\n";
 
 
 

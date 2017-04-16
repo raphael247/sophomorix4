@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 sophomorix-samba --restore-samba ohne-user --schema-load
 
 rm -rf /srv/samba
@@ -7,6 +7,7 @@ sleep 4
 
 #./tools/add-sophomorix-admin
 
+#sshpass -p "Muster!" samba-tool user setpassword Administrator
 samba-tool user setpassword Administrator
 
 sophomorix-test-$1 --full
