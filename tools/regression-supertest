@@ -5,7 +5,7 @@
 
 
 case $1 in
-   reset)
+   r|re|res|rese|reset)
       echo "### Resetting samba  for $test ... ###"
       sophomorix-samba --restore-samba ohne-user --schema-load
       rm -rf /srv/samba
@@ -13,6 +13,7 @@ case $1 in
       #./tools/add-sophomorix-admin
       sshpass -p "Muster!" samba-tool user setpassword Administrator
       scriptlist=""
+      exit
       ;;
    1)
       scriptlist="sophomorix-test-1"
@@ -29,12 +30,33 @@ case $1 in
    5)
       scriptlist="sophomorix-test-5"
       ;;
-   w|work|workflow)
+   w|wo|wor|work|workf|workfl|workflo|workflow)
       scriptlist="sophomorix-test-workflow"
       ;;
-   *)
+   a|al|all)
       # all scripts
       scriptlist="sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow"
+      ;;
+
+   *)
+      echo ""
+      echo "Usage:"
+      echo ""
+      echo "  Run all tests:"
+      echo "     regression-supertest all"
+      echo ""
+      echo "  Run a single test:"
+      echo "     regression-supertest 1"
+      echo "     regression-supertest 2"
+      echo "     regression-supertest 3"
+      echo "     regression-supertest 4"
+      echo "     regression-supertest 5"
+      echo "     regression-supertest workflow"
+      echo ""
+      echo "  Reset samba only:"
+      echo "     regression-supertest reset"
+      echo ""
+      exit
       ;;
 esac
 
