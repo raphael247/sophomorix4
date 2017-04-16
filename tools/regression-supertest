@@ -1,9 +1,48 @@
 #!/bin/bash
 
 
+#scriptlist="sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow"
+
+
+case $1 in
+   reset)
+      echo "### Resetting samba  for $test ... ###"
+      sophomorix-samba --restore-samba ohne-user --schema-load
+      rm -rf /srv/samba
+      sleep 5
+      #./tools/add-sophomorix-admin
+      sshpass -p "Muster!" samba-tool user setpassword Administrator
+      scriptlist=""
+      ;;
+   1)
+      scriptlist="sophomorix-test-1"
+      ;;
+   2)
+      scriptlist="sophomorix-test-2"
+      ;;
+   3)
+      scriptlist="sophomorix-test-3"
+      ;;
+   4)
+      scriptlist="sophomorix-test-4"
+      ;;
+   5)
+      scriptlist="sophomorix-test-5"
+      ;;
+   w|work|workflow)
+      scriptlist="sophomorix-test-workflow"
+      ;;
+   *)
+      # all scripts
+      scriptlist="sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow"
+      ;;
+esac
+
+
+
 # run the tests
 
-for test in sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow
+for test in $scriptlist
 do
     echo "### Resetting samba  for $test ... ###"
     sophomorix-samba --restore-samba ohne-user --schema-load
@@ -24,10 +63,10 @@ done
 echo ""
 echo ""
 echo ""
-echo "Test results follow"
+echo "Test results follow:"
 echo ""
 
-for test in sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow
+for test in $scriptlist
 do
     echo "######################################################################"
     echo "########## $test result:##############################"
@@ -35,4 +74,6 @@ do
     echo "########## $test errors:##############################"
     cat /tmp/$test.error | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
     echo "##### done with $test"
+    echo ""
+    echo ""
 done
