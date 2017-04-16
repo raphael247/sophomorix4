@@ -1,0 +1,38 @@
+#!/bin/bash
+
+
+# run the tests
+
+for test in sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow
+do
+    echo "### Resetting samba  for $test ... ###"
+    sophomorix-samba --restore-samba ohne-user --schema-load
+    rm -rf /srv/samba
+    sleep 5
+    #./tools/add-sophomorix-admin
+    sshpass -p "Muster!" samba-tool user setpassword Administrator
+    #samba-tool user setpassword Administrator
+    echo "######################################################################"
+    echo "### Running $test ... ###"
+    time $test --full 1> /tmp/$test.log 2> /tmp/$test.error
+    echo "######################################################################"
+done
+
+
+
+# show summary of results
+echo ""
+echo ""
+echo ""
+echo "Test results follow"
+echo ""
+
+for test in sophomorix-test-1 sophomorix-test-2 sophomorix-test-3 sophomorix-test-4 sophomorix-test-5 sophomorix-test-workflow
+do
+    echo "######################################################################"
+    echo "########## $test result:##############################"
+    tail -n 3 /tmp/$test.log
+    echo "########## $test errors:##############################"
+    cat /tmp/$test.error | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+    echo "##### done with $test"
+done
