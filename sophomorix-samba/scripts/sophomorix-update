@@ -282,6 +282,9 @@ while(<USERUPDATE>){
           )=split(/::/);
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 
+
+    # do NOT update move stuff: class,role,school 
+    # leave it to AD_user_move
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -293,8 +296,8 @@ while(<USERUPDATE>){
                      firstname_utf8=>$firstname_utf8_new,
                      filename=>$filename_new,
                      status=>$status_new,
-                     school=>$school_new,
-                     role=>$role_new,
+#                     school=>$school_new,
+ #                    role=>$role_new,
                      unid=>$unid_new,
                      user_count=>$user_count,
                      date_now=> $time_stamp_AD,
