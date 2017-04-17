@@ -1447,26 +1447,33 @@ sub AD_user_update {
                        root_dns=>$root_dns,
                        user=>$user,
                      });
-    my $displayname;
+#    if (not defined $firstname_utf8 or $firstname_utf8 eq "---"){
+#        $firstname_utf8=$firstname_AD;
+#    }
+#    if (not defined $surname_utf8 or $surname_utf8 eq "---"){
+#        $surname_utf8=$lastname_AD;
+#    }
+
+#    my $displayname;
     # hash of what to replace
     my %replace=();
     # list of what to delete
     my @delete=();
 
-    if (defined $firstname_utf8 and 
-        defined $surname_utf8 and
-        defined $firstname_ascii and
-        defined $surname_ascii){
-        # ok if all 4 are defined
-    } elsif (not defined $firstname_utf8 and 
-             not defined $surname_utf8 and
-             not defined $firstname_ascii and
-             not defined $surname_ascii){
-        # ok if none are defined
-    } else {
-        print "ERROR updating $user -> givenName,sn,sophomorixFirstnameASCII,sophomorixSurnameASCII\n";
-        return;
-    }
+#    if (defined $firstname_utf8 and 
+#        defined $surname_utf8 and
+#        defined $firstname_ascii and
+#        defined $surname_ascii){
+#        # ok if all 4 are defined
+#    } elsif (not defined $firstname_utf8 and 
+#             not defined $surname_utf8 and
+#             not defined $firstname_ascii and
+#             not defined $surname_ascii){
+#        # ok if none are defined
+#    } else {
+#        print "ERROR updating $user -> givenName,sn,sophomorixFirstnameASCII,sophomorixSurnameASCII\n";
+#        return;
+#    }
 
     &Sophomorix::SophomorixBase::print_title(
           "Updating User ${user_count}: $user");
@@ -1480,15 +1487,33 @@ sub AD_user_update {
         $replace{'sn'}=$surname_utf8;
         print "   sn:                         $surname_utf8\n";
     }
-    if (defined $firstname_utf8 and 
-        $surname_utf8 and 
-        $firstname_utf8 ne "---" and 
-        $surname_utf8 ne "---"
-       ){
-        $display_name = $firstname_utf8." ".$surname_utf8;
+ 
+
+#   if (defined $firstname_utf8 and 
+#        $surname_utf8 and 
+#        $firstname_utf8 ne "---" and 
+#        $surname_utf8 ne "---"
+#       ){
+#        $display_name = $firstname_utf8." ".$surname_utf8;
+#        $replace{'displayName'}=$display_name;
+#        print "   displayName:                $display_name\n";
+#    }
+   
+   # if first and last are defined and one of them is not ---: update displayname
+   if ( (defined $firstname_utf8 and defined $surname_utf8) and 
+        ($firstname_utf8 ne "---" or $surname_utf8 ne "---") ){
+        # update displayname
+        if ($firstname_utf8 ne "---" and $surname_utf8 ne "---"  ){
+           $display_name = $firstname_utf8." ".$surname_utf8;
+        } elsif ($firstname_utf8 eq "---"){
+           $display_name = $firstname_AD." ".$surname_utf8;
+        } elsif ($surname_utf8 eq "---"){
+           $display_name = $firstname_utf8." ".$lastname_AD;
+        }
         $replace{'displayName'}=$display_name;
         print "   displayName:                $display_name\n";
     }
+
     if (defined $firstname_ascii and $firstname_ascii ne "---" ){
         $replace{'sophomorixFirstnameASCII'}=$firstname_ascii;
         print "   sophomorixFirstnameASCII:   $firstname_ascii\n";

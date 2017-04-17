@@ -138,9 +138,9 @@ if ($info==1) {
    }
     open(USERUPDATE,"$update_file") 
             || die "ERROR: $!";
-    print "\nThe following users can be updated:\n\n";
-    printf "%-10s %-21s %-21s %-12s %-10s %-1s\n",
-           "Login","NewNameUTF8","NewNameASCII","Newunid","NBirthdate","S";
+    print "\nThe following users can be updated:\n";
+#    printf "%-10s %-21s %-21s %-12s %-10s %-1s\n",
+#           "Login","NewNameUTF8","NewNameASCII","Newunid","NBirthdate","S";
     &print_line;
 
     my @lines=();
@@ -164,31 +164,87 @@ if ($info==1) {
     foreach my $line (@sorted_lines){
        chomp($line);
        $count++;
+#       my ($login,
+#           $unid,
+#           $surname_ascii,
+#           $firstname_ascii,
+#           $birthdate,
+#           $surname_utf8,
+#           $firstname_utf8,
+#           $filename,
+#           $status,
+#           $school,
+#           $role,
+#          )=split(/::/,$line);
        my ($login,
-           $unid,
-           $surname_ascii,
-           $firstname_ascii,
-           $birthdate,
-           $surname_utf8,
-           $firstname_utf8,
-           $filename,
-           $status,
-           $school,
-           $role,
+           $unid_old,
+           $unid_new,
+           $surname_ascii_old,
+           $surname_ascii_new,
+           $firstname_ascii_old,
+           $firstname_ascii_new,
+           $birthdate_old,
+           $birthdate_new,
+           $surname_utf8_old,
+           $surname_utf8_new,
+           $firstname_utf8_old,
+           $firstname_utf8_new,
+           $filename_old,
+           $filename_new,
+           $status_old,
+           $status_new,
+           $role_old,
+           $role_new,
+           $class_old,
+           $class_new,
+           $school_old,
+           $school_new,
           )=split(/::/,$line);
-
-    my $name_ascii=$surname_ascii.", ".$firstname_ascii;
-    my $name_utf8=$surname_utf8.", ".$firstname_utf8;
+    my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
+    my $name_utf8_new=$surname_utf8_new.", ".$firstname_utf8_new;
     # Ausgabe
-    printf "%-10s %-21s %-21s %-12s %-10s %-1s\n",
-           $login,
-           $name_utf8, 
-           $name_ascii, 
-           $unid, 
-           $birthdate,
-           $status; 
+    if ($unid_new ne "---"){
+        print "$login.sophomorixUnid:           $unid_old  --> $unid_new:\n";
     }
+    if ($surname_ascii_new ne "---"){
+        print "$login.sophomorixSurnameASCII:   $surname_ascii_old  --> $surname_ascii_new\n";
+    }
+    if ($firstname_ascii_new ne "---"){
+        print "$login.sophomorixFirstnameASCII: $firstname_ascii_old  --> $firstname_ascii_new\n";
+    }
+    if ($birthdate_new ne "---"){
+        print "$login.sophomorixBirthdate:      $birthdate_old  --> $birthdate_new\n";
+    }
+    if ($surname_utf8_new ne "---"){
+        print "$login.sn:                       $surname_utf8_old  --> $surname_utf8_new\n";
+    }
+    if ($firstname_utf8_new ne "---"){
+        print "$login.givenName:                $firstname_utf8_old  --> $firstname_utf8_new\n";
+    }
+    if ($filename_new ne "---"){
+        print "$login.sophomorixAdminFile:      $filename_old  --> $filename_new\n";
+    }
+    if ($status_new ne "---"){
+        print "$login.sophomorixStatus:         $status_old  --> $status_new\n";
+    }
+    if ($role_new ne "---"){
+        print "$login.sophomorixRole:           $role_old  --> $role_new\n";
+    }
+    if ($class_new ne "---"){
+        print "$login.sophomorixAdminClass:     $class_old  --> $class_new\n";
+    }
+    if ($school_new ne "---"){
+        print "$login.sophomorixSchoolname:     $school_old  --> $school_new\n";
+    }
+#    printf "%-10s %-21s %-21s %-12s %-10s %-1s\n",
+#           $login,
+#           $name_utf8, 
+#           $name_ascii, 
+#           $unid, 
+#           $birthdate,
+#           $status; 
     &print_line;
+    }
     print "$count users can be updated\n";
     &log_script_exit("",1,1,0,@arguments);
 }
@@ -219,35 +275,58 @@ while(<USERUPDATE>){
     }
     chomp();
     $user_count++;
-    my ($user,
-        $unid,
-        $surname_ascii,
-        $firstname_ascii,
-        $birthdate,
-        $surname_utf8,
-        $firstname_utf8,
-        $filename,
-        $status,
-        $school,
-        $role,
-       )=split(/::/);
-
+    # my ($user,
+    #     $unid,
+    #     $surname_ascii,
+    #     $firstname_ascii,
+    #     $birthdate,
+    #     $surname_utf8,
+    #     $firstname_utf8,
+    #     $filename,
+    #     $status,
+    #     $school,
+    #     $role,
+    #    )=split(/::/);
+       my ($user,
+           $unid_old,
+           $unid_new,
+           $surname_ascii_old,
+           $surname_ascii_new,
+           $firstname_ascii_old,
+           $firstname_ascii_new,
+           $birthdate_old,
+           $birthdate_new,
+           $surname_utf8_old,
+           $surname_utf8_new,
+           $firstname_utf8_old,
+           $firstname_utf8_new,
+           $filename_old,
+           $filename_new,
+           $status_old,
+           $status_new,
+           $role_old,
+           $role_new,
+           $class_old,
+           $class_new,
+           $school_old,
+           $school_new,
+          )=split(/::/);
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$user,
-                     birthdate=>$birthdate,
-                     surname_ascii=>$surname_ascii,
-                     surname_utf8=>$surname_utf8,
-                     firstname_ascii=>$firstname_ascii,
-                     firstname_utf8=>$firstname_utf8,
-                     filename=>$filename,
-                     status=>$status,
-                     school=>$school,
-                     role=>$role,
-                     unid=>$unid,
+                     birthdate=>$birthdate_new,
+                     surname_ascii=>$surname_ascii_new,
+                     surname_utf8=>$surname_utf8_new,
+                     firstname_ascii=>$firstname_ascii_new,
+                     firstname_utf8=>$firstname_utf8_new,
+                     filename=>$filename_new,
+                     status=>$status_new,
+                     school=>$school_new,
+                     role=>$role_new,
+                     unid=>$unid_new,
                      user_count=>$user_count,
                      date_now=> $time_stamp_AD,
                    });
