@@ -28,8 +28,10 @@ use Sophomorix::SophomorixBase qw(
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_move
                                  AD_bind_admin
+                                 AD_dns_get
                                  AD_unbind_admin
                                  AD_user_update
+                                 AD_get_passwd
                                  AD_object_search
                                  AD_get_name_tokened
                                     );
@@ -90,7 +92,10 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 # --help
 if ($help==1) {
@@ -282,26 +287,67 @@ while(<USERUPDATE>){
           )=split(/::/);
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 
+    if ($unid_new ne "---" or 
+        $surname_ascii_new ne "---" or 
+        $firstname_ascii_new ne "---" or 
+        $birthdate_new ne "---" or 
+        $surname_utf8_new ne "---" or
+        $firstname_utf8_new ne "---"  or
+        $filename_new ne "---" or
+        $status_new ne "---"  
+       ){
+        # do NOT update move stuff: class,role,school 
+        # leave it to AD_user_move
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$dn,
+                         user=>$user,
+                         birthdate=>$birthdate_new,
+                         surname_ascii=>$surname_ascii_new,
+                         surname_utf8=>$surname_utf8_new,
+                         firstname_ascii=>$firstname_ascii_new,
+                         firstname_utf8=>$firstname_utf8_new,
+                         filename=>$filename_new,
+                         status=>$status_new,
+                         unid=>$unid_new,
+                         user_count=>$user_count,
+                         date_now=> $time_stamp_AD,
+                       });
+    }
 
-    # do NOT update move stuff: class,role,school 
-    # leave it to AD_user_move
-    &AD_user_update({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     dn=>$dn,
-                     user=>$user,
-                     birthdate=>$birthdate_new,
-                     surname_ascii=>$surname_ascii_new,
-                     surname_utf8=>$surname_utf8_new,
-                     firstname_ascii=>$firstname_ascii_new,
-                     firstname_utf8=>$firstname_utf8_new,
-                     filename=>$filename_new,
-                     status=>$status_new,
-#                     school=>$school_new,
- #                    role=>$role_new,
-                     unid=>$unid_new,
-                     user_count=>$user_count,
-                     date_now=> $time_stamp_AD,
-                   });
+    # test if user mustbe moved
+    if ($school_new ne "---" or $class_new ne "---" or $role_new ne "---"){
+        if ($school_new eq "---"){
+            $school_new=$school_old;
+        }
+        if ($class_new eq "---"){
+            $class_new=$class_old;
+        }
+        if ($role_new eq "---"){
+            $role_new=$role_old;
+        }
+
+        my $group_token_old=&AD_get_name_tokened($class_old,$school_old,"adminclass");
+        my $group_token_new=&AD_get_name_tokened($class_new,$school_new,"adminclass");
+        # move the user
+        &AD_user_move({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       user=>$user,
+                       user_count=>$user_count,
+                       group_old_basename=>$class_old,
+                       group_new_basename=>$class_new,
+                       group_old=>$group_token_old,
+                       group_new=>$group_token_new,
+                       school_old=>$school_old,
+                       school_new=>$school_new,
+                       role_old=>$role_old,
+                       role_new=>$role_new,
+                       creationdate=>$time_stamp_AD, 
+                       smb_admin_pass=>$smb_admin_pass,
+                       sophomorix_config=>\%sophomorix_config,
+                      });
+    }
 }
 
 
