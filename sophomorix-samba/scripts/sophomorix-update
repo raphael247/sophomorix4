@@ -164,18 +164,6 @@ if ($info==1) {
     foreach my $line (@sorted_lines){
        chomp($line);
        $count++;
-#       my ($login,
-#           $unid,
-#           $surname_ascii,
-#           $firstname_ascii,
-#           $birthdate,
-#           $surname_utf8,
-#           $firstname_utf8,
-#           $filename,
-#           $status,
-#           $school,
-#           $role,
-#          )=split(/::/,$line);
        my ($login,
            $unid_old,
            $unid_new,
@@ -202,7 +190,7 @@ if ($info==1) {
           )=split(/::/,$line);
     my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
     my $name_utf8_new=$surname_utf8_new.", ".$firstname_utf8_new;
-    # Ausgabe
+    # Printout
     if ($unid_new ne "---"){
         print "$login.sophomorixUnid:           $unid_old  --> $unid_new:\n";
     }
@@ -236,13 +224,6 @@ if ($info==1) {
     if ($school_new ne "---"){
         print "$login.sophomorixSchoolname:     $school_old  --> $school_new\n";
     }
-#    printf "%-10s %-21s %-21s %-12s %-10s %-1s\n",
-#           $login,
-#           $name_utf8, 
-#           $name_ascii, 
-#           $unid, 
-#           $birthdate,
-#           $status; 
     &print_line;
     }
     print "$count users can be updated\n";
@@ -275,18 +256,6 @@ while(<USERUPDATE>){
     }
     chomp();
     $user_count++;
-    # my ($user,
-    #     $unid,
-    #     $surname_ascii,
-    #     $firstname_ascii,
-    #     $birthdate,
-    #     $surname_utf8,
-    #     $firstname_utf8,
-    #     $filename,
-    #     $status,
-    #     $school,
-    #     $role,
-    #    )=split(/::/);
        my ($user,
            $unid_old,
            $unid_new,

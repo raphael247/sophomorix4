@@ -1426,7 +1426,6 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $user_permissions = $arg_ref->{user_permissions};
-    my $user_account_control = $arg_ref->{user_account_control};
     my $school = $arg_ref->{school};
     my $date_now = $arg_ref->{date_now};
     my $role = $arg_ref->{role};
@@ -1447,33 +1446,11 @@ sub AD_user_update {
                        root_dns=>$root_dns,
                        user=>$user,
                      });
-#    if (not defined $firstname_utf8 or $firstname_utf8 eq "---"){
-#        $firstname_utf8=$firstname_AD;
-#    }
-#    if (not defined $surname_utf8 or $surname_utf8 eq "---"){
-#        $surname_utf8=$lastname_AD;
-#    }
 
-#    my $displayname;
     # hash of what to replace
     my %replace=();
     # list of what to delete
     my @delete=();
-
-#    if (defined $firstname_utf8 and 
-#        defined $surname_utf8 and
-#        defined $firstname_ascii and
-#        defined $surname_ascii){
-#        # ok if all 4 are defined
-#    } elsif (not defined $firstname_utf8 and 
-#             not defined $surname_utf8 and
-#             not defined $firstname_ascii and
-#             not defined $surname_ascii){
-#        # ok if none are defined
-#    } else {
-#        print "ERROR updating $user -> givenName,sn,sophomorixFirstnameASCII,sophomorixSurnameASCII\n";
-#        return;
-#    }
 
     &Sophomorix::SophomorixBase::print_title(
           "Updating User ${user_count}: $user");
@@ -1487,19 +1464,8 @@ sub AD_user_update {
         $replace{'sn'}=$surname_utf8;
         print "   sn:                         $surname_utf8\n";
     }
- 
 
-#   if (defined $firstname_utf8 and 
-#        $surname_utf8 and 
-#        $firstname_utf8 ne "---" and 
-#        $surname_utf8 ne "---"
-#       ){
-#        $display_name = $firstname_utf8." ".$surname_utf8;
-#        $replace{'displayName'}=$display_name;
-#        print "   displayName:                $display_name\n";
-#    }
-   
-   # if first and last are defined and one of them is not ---: update displayname
+   # IF first AND last are defined AND one of them is NOT "---" -> update displayname
    if ( (defined $firstname_utf8 and defined $surname_utf8) and 
         ($firstname_utf8 ne "---" or $surname_utf8 ne "---") ){
         # update displayname
@@ -1596,15 +1562,7 @@ sub AD_user_update {
         print "   sophomorixDeactivationDate: $deactivation_date\n";
         print "   userAccountControl:         $user_account_control",
               " (was: $user_account_control_AD)\n";
-
-
-
-
     }
-#    if (defined $user_account_control and $user_account_control ne "---"){
-#        $replace{'userAccountControl'}=$user_account_control;
-#        print "   userAccountControl:        $user_account_control\n";
-#    }
     if (defined $school and $school ne "---"){
         # update sophomorixSchoolname AND sophomorixSchoolPrefix
         $replace{'sophomorixSchoolname'}=$school;
@@ -1657,12 +1615,6 @@ sub AD_user_update {
 		      replace => { %replace }
                );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
-
-#    # delete
-#    my $mesg2 = $ldap->modify( $dn, 
-#                       delete => [@delete]
-#                );
-#    &AD_debug_logdump($mesg2,2,(caller(0))[3]);
 }
 
 
