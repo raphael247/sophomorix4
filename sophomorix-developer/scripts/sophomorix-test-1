@@ -34,15 +34,12 @@ my $add=0;
 my $mod=0;
 my $ses=0;
 my $update=0;
-my $move=0;
 my $kill=0;
 my $cp_add=0;
 my $cp_update=0;
-my $cp_move=0;
 my $cp_kill=0;
 my $test_add=0;
 my $test_update=0;
-my $test_move=0;
 my $test_kill=0;
 my $full=0;
 my $help=0;
@@ -54,17 +51,14 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "cp-add" => \$cp_add,
            "cp-update" => \$cp_update,
-           "cp-move" => \$cp_move,
            "cp-kill" => \$cp_kill,
            "test-add" => \$test_add,
            "test-update" => \$test_update,
-           "test-move" => \$test_move,
            "test-kill" => \$test_kill,
            "add|a" => \$add,
            "mod" => \$mod,
            "ses" => \$ses,
            "update|u" => \$update,
-           "move|m" => \$move,
            "kill|k" => \$kill,
            "full|f" => \$full,
            "skip|s" => \$skip_warning,
@@ -116,7 +110,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-test-1 tests sophomorix-add,sophomorix-update,sophomorix-session,sophomorix-move and sophomorix-kill.
+sophomorix-test-1 tests sophomorix-add,sophomorix-update,sophomorix-session and sophomorix-kill.
 
 Created users or groups might clash with users or groups already added.
 It is recommended that sophomorix-test-1  is only run on test servers without 
@@ -161,14 +155,6 @@ Step by step Test:
   Test updated users:
       sophomorix-test-1 --test-update
 
-  Copy sophomorix.move:
-      sophomorix-test-1 --cp-move
-  Move the users:
-      sophomorix-move -i
-      sophomorix-move
-  Test moved users:
-      sophomorix-test-1 --test-move
-
   Copy sophomorix.kill:
       sophomorix-test-1 --cp-kill
   Kill the users:
@@ -201,7 +187,6 @@ if ($full==1){
     $mod=1;
     $ses=1;
     $update=1;
-    $move=1;
     $kill=1;
     $skip_warning=1;
 }
@@ -3468,206 +3453,6 @@ if ($update==1 or $test_update==1){
         &run_command("cp -v $file_update_test $file_update");
         &run_command("sophomorix-update -i");
         &run_command("sophomorix-update $verbose_options");
-    }
-
-    ##### Testing the users
-    # maiersa42 ->  surname
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Sarina Mayer",
-                   givenName=>"Sarina",
-                   name=>"maiersa42",
-                   sAMAccountname=>"maiersa42",
-                   uidNumber=>"-1",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa42",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",
-                   sn=>"Mayer",
-                   userPrincipalName => "maiersa42@".$root_dns,
-                   sophomorixAdminClass => "bsz-m7ab",
-                   sophomorixExitAdminClass => "unknown",
-                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Sarina",
-                   sophomorixSurnameASCII  => "Mayer",
-                   sophomorixBirthdate => "25.01.1991",
-                   sophomorixRole => "student",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "U",
-                   sophomorixUnid => "unid1234",
-                   userAccountControl => "512",
-                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
-
-    # muellegr42 -> birthday
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=muellegr42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Gregor Müller",
-                   givenName=>"Gregor",
-                   name=>"muellegr42",
-                   sAMAccountname=>"muellegr42",
-                   uidNumber=>"-1",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\muellegr42",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",
-                   sn=>"Müller",
-                   userPrincipalName => "muellegr42@".$root_dns,
-                   sophomorixAdminClass => "bsz-m7ab",
-                   sophomorixExitAdminClass => "unknown",
-                   sophomorixFirstPassword => "Muster23!",
-                   sophomorixFirstnameASCII => "Gregor",
-                   sophomorixSurnameASCII  => "Mueller",
-                   sophomorixBirthdate  => "12.12.1989",
-                   sophomorixRole => "student",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "U",
-                   sophomorixUnid => "unid2345",
-                   userAccountControl => "512",
-                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
-
-    # samardze42
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=samardze42,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Schellko Samardžić",
-                   givenName=>"Schellko",
-                   name=>"samardze42",
-                   sAMAccountname=>"samardze42",
-                   uidNumber=>"-1",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze42",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze42",
-                   sn=>"Samardžić",
-                   userPrincipalName => "samardze42@".$root_dns,
-                   sophomorixAdminClass => "bsz-m8cd",
-                   sophomorixExitAdminClass => "unknown",
-                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Schellko",
-                   sophomorixSurnameASCII  => "Samardzic",
-                   sophomorixBirthdate  => "22.04.1992",
-                   sophomorixRole => "student",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "U",
-                   sophomorixUnid => "unid4567",
-                   userAccountControl => "512",
-                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
-    &directory_tree_test("/srv/samba/schools",
-                         "/srv/samba/schools",
-                         "/srv/samba/schools/bsz",
-                         "/srv/samba/schools/bsz/management",
-                         "/srv/samba/schools/bsz/projects",
-                         "/srv/samba/schools/bsz/students",
-                         "/srv/samba/schools/bsz/teachers",
-                         "/srv/samba/schools/bsz/teachers/homes",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher2",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher2",
-                         "/srv/samba/schools/bsz/teachers/share",
-                         "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/homes",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir2",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir2",
-                         "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
-                         "/srv/samba/schools/bsz/students/m8cd/homes",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir2",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir2",
-                         "/srv/samba/schools/uni",
-                         "/srv/samba/schools/uni/management",
-                         "/srv/samba/schools/uni/projects",
-                         "/srv/samba/schools/uni/students",
-                         "/srv/samba/schools/uni/students/12abc",
-                         "/srv/samba/schools/uni/students/12abc/share",
-                         "/srv/samba/schools/uni/students/12abc/homes",
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42",
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir2",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir2",
-                         "/srv/samba/schools/uni/teachers",
-                         "/srv/samba/schools/uni/teachers/homes",
-                         "/srv/samba/schools/uni/teachers/homes/kep42",
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher2",
-                         "/srv/samba/schools/uni/teachers/homes/gal42",
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher2",
-                         "/srv/samba/schools/uni/teachers/share",
-                         "/srv/samba/schools/default-school",
-                         "/srv/samba/schools/default-school/management",
-                         "/srv/samba/schools/default-school/projects",
-                         "/srv/samba/schools/default-school/students",
-                         "/srv/samba/schools/default-school/students/s6ade",
-                         "/srv/samba/schools/default-school/students/s6ade/share",
-                         "/srv/samba/schools/default-school/students/s6ade/homes",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir2",
-                         "/srv/samba/schools/default-school/teachers",
-                         "/srv/samba/schools/default-school/teachers/homes",
-                         "/srv/samba/schools/default-school/teachers/homes/sch42",
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
-                         "/srv/samba/schools/default-school/teachers/share",
-                        ); 
-    &directory_tree_test("/srv/samba/global",
-                         "/srv/samba/global",
-                         "/srv/samba/global/management",
-                         "/srv/samba/global/projects",
-                         "/srv/samba/global/students",
-                         "/srv/samba/global/teachers",
-                        ); 
-}
-
-
-############################################################
-# Moving users --move
-############################################################
-if ($cp_move==1){
-    # copy sophomorix.move
-    &run_command("cp -v $file_move_test $file_move");
-}
-
-if ($move==1 or $test_move==1){
-    if ($move==1){
-        # copy sophomorix.move
-        &run_command("cp -v $file_move_test $file_move");
-        &run_command("sophomorix-move -i");
-        &run_command("sophomorix-move $verbose_options");
     }
 
     ##### Testing the users
