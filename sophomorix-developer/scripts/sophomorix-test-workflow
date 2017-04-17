@@ -32,12 +32,19 @@ use Sophomorix::SophomorixTest qw(
                                  );
 
 $Conf::log_level=1;
-my $add=0;
-my $modify_1=0;
-my $modify_2=0;
-my $modify_3=0;
-my $modify_4=0;
-my $kill=0;
+my $add_check=0;
+my $modify_1_check=0;
+my $modify_2_check=0;
+my $modify_3_check=0;
+my $modify_4_check=0;
+my $kill_check=0;
+
+my $add_do=0;
+my $modify_1_do=0;
+my $modify_2_do=0;
+my $modify_3_do=0;
+my $modify_4_do=0;
+my $kill_do=0;
 
 my $full=0;
 my $help=0;
@@ -46,12 +53,18 @@ my $verbose_options="";
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
-           "add|a" => \$add,
-           "modify-1" => \$modify_1,
-           "modify-2" => \$modify_2,
-           "modify-3" => \$modify_3,
-           "modify-4" => \$modify_4,
-           "kill|k" => \$kill,
+           "add-check" => \$add_check,
+           "add-do" => \$add_do,
+           "modify-1-check" => \$modify_1_check,
+           "modify-2-check" => \$modify_2_check,
+           "modify-3-check" => \$modify_3_check,
+           "modify-4-check" => \$modify_4_check,
+           "modify-1-do" => \$modify_1_do,
+           "modify-2-do" => \$modify_2_do,
+           "modify-3-do" => \$modify_3_do,
+           "modify-4-do" => \$modify_4_do,
+           "kill-check" => \$kill_check,
+           "kill-do" => \$kill_do,
            "full|f" => \$full,
           );
 
@@ -92,16 +105,26 @@ Full automated test:
 Step by step Test:
 
   Adding users:
-      sophomorix-test-workflow --add
+      sophomorix-test-workflow --add-check
+      sophomorix-test-workflow --add-do
 
   Work with the users:
-      sophomorix-test-workflow --modify-1
-      sophomorix-test-workflow --modify-2
-      sophomorix-test-workflow --modify-3
-      sophomorix-test-workflow --modify-4
+      sophomorix-test-workflow --modify-1-check
+      sophomorix-test-workflow --modify-1-do
+
+      sophomorix-test-workflow --modify-2-check
+      sophomorix-test-workflow --modify-2-do
+
+      sophomorix-test-workflow --modify-3-check
+      sophomorix-test-workflow --modify-3-do
+
+      sophomorix-test-workflow --modify-4-check
+      sophomorix-test-workflow --modify-4-do
 
   Kill the added users:
-      sophomorix-test-workflow --kill
+      sophomorix-test-workflow --kill-check
+      sophomorix-test-workflow --kill-do
+
 ');
    print "\n";
    exit;
@@ -119,19 +142,25 @@ Step by step Test:
 
 # --full
 if ($full==1){
-    $add=1;
-    $modify_1=1;
-    $modify_2=1;
-    $modify_3=1;
-    $modify_4=1;
-    $kill=1;
+    $add_check=1;
+    $modify_1_check=1;
+    $modify_2_check=1;
+    $modify_3_check=1;
+    $modify_4_check=1;
+    $kill_check=1;
+    $add_do=1;
+    $modify_1_do=1;
+    $modify_2_do=1;
+    $modify_3_do=1;
+    $modify_4_do=1;
+    $kill_do=1;
 }
 
 
 ############################################################
 # Adding users --add
 ############################################################
-if ($add==1){
+if ($add_check==1){
     my $command_add="sophomorix-check ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
                 "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".
@@ -142,6 +171,9 @@ if ($add==1){
                 "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ".
                 "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ";
     &run_command($command_add);
+}
+############################################################
+if ($add_do==1){
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
@@ -504,9 +536,9 @@ if ($add==1){
 
 
 ############################################################
-# --modify-1
+# --modify-1-check --modify-1-do
 ############################################################
-if ($modify_1==1){
+if ($modify_1_check==1){
     my $command_modify_1="sophomorix-check ";
 #                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".   # removed
 #                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".            # removed
@@ -518,6 +550,9 @@ if ($modify_1==1){
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_1);
+}
+############################################################
+if ($modify_1_do==1){
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
@@ -877,9 +912,9 @@ if ($modify_1==1){
 }
 
 ############################################################
-# --modify-2
+# --modify-2-check  --modify-2-do
 ############################################################
-if ($modify_2==1){
+if ($modify_2_check==1){
     # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
@@ -887,7 +922,6 @@ if ($modify_2==1){
                                 givenName=>"Hannes Þór",
                                 birthdate=>"27.04.1984",
                                });
-
     my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Gunnarsson",
@@ -910,8 +944,6 @@ if ($modify_2==1){
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
-
-
     my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_gunnarar,"20170101000001.0Z","---");
     my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -926,7 +958,6 @@ if ($modify_2==1){
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20170101000002.0Z","---");
 
-
     my $command_modify_2="sophomorix-check ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".    # back
 #                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".            # removed
@@ -938,6 +969,46 @@ if ($modify_2==1){
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_2);
+}
+############################################################
+if ($modify_2_do==1){
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+    my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Gylfi Þór",
+                                birthdate=>"08.09.1989",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
+    print "U: $sigurdgy\n";
+    my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+
+    my $dn_rukri99="CN=rukri99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
@@ -1267,9 +1338,9 @@ if ($modify_2==1){
 
 
 ############################################################
-# --modify-3
+# --modify-3-check --modify-3-do
 ############################################################
-if ($modify_3==1){
+if ($modify_3_check==1){
     # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
@@ -1277,7 +1348,6 @@ if ($modify_3==1){
                                 givenName=>"Hannes Þór",
                                 birthdate=>"27.04.1984",
                                });
-
     my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Gunnarsson",
@@ -1301,8 +1371,6 @@ if ($modify_3==1){
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
-
-
     my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20160101000001.0Z","20170101000001.0Z");
     my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -1324,6 +1392,44 @@ if ($modify_3==1){
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_3);
+}
+############################################################
+if ($modify_3_do==1){
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+
+    my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Gylfi Þór",
+                                birthdate=>"08.09.1989",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
+    print "U: $sigurdgy\n";
+    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
@@ -1654,9 +1760,9 @@ if ($modify_3==1){
 
 
 ############################################################
-# --modify-4
+# --modify-4-check --modify-4-do
 ############################################################
-if ($modify_4==1){
+if ($modify_4_check==1){
     # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
@@ -1664,7 +1770,52 @@ if ($modify_4==1){
                                 givenName=>"Hannes Þór",
                                 birthdate=>"27.04.1984",
                                });
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
 
+    my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Gylfi Þór",
+                                birthdate=>"08.09.1989",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
+    print "U: $sigurdgy\n";
+    my $command_modify_4="sophomorix-check ".
+                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
+                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
+                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".            # back
+#                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
+                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
+                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".                            # back
+                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                          # back
+#                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
+    ############################################################
+    # kill the users, that can be killed and test again
+    ############################################################
+    &run_command($command_modify_4);
+}
+############################################################
+if ($modify_4_do==1){
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
     my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Gunnarsson",
@@ -1689,28 +1840,10 @@ if ($modify_4==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
-
-    my $command_modify_4="sophomorix-check ".
-                "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
-                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
-                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".            # back
-#                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
-                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" ".
-                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".                            # back
-                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                          # back
-#                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
-
-
-
-    ############################################################
-    # kill the users, that can be killed and test again
-    ############################################################
-    &run_command($command_modify_4);
     &run_command("sophomorix-add");
     &run_command("sophomorix-update");
     &run_command("sophomorix-move");
     &run_command("sophomorix-kill");
-
 
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -2085,7 +2218,7 @@ if ($modify_4==1){
 ############################################################
 # Deleting users --kill
 ############################################################
-if ($kill==1){
+if ($kill_check==1){
     # fetch loginnames:
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
@@ -2118,11 +2251,36 @@ if ($kill==1){
     &run_command("sophomorix-user -K --user $gunnarar");
     &run_command("sophomorix-user -K --user $sigurdra");
 
-
     &run_command("sophomorix-check");
+}
+
+############################################################
+if ($kill_check==1){
+    # fetch loginnames:
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
 
     &run_command("sophomorix-kill");
-
 
     &AD_object_nonexist($ldap,$root_dse,"user",$halldoha);
     &AD_object_nonexist($ldap,$root_dse,"user",$gunnarar);
@@ -2156,8 +2314,6 @@ if ($kill==1){
                    memberOf => "",
                    member => "7a|teachers",
                   });
-
-
 
     ##### Testing the users ou-teachers group
     # empty sophomorixMembers,sophomorixAdmins but teachers is still member of project p_full-blown

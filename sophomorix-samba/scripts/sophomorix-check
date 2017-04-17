@@ -532,16 +532,28 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
 ############################################################
 foreach my $sam ( keys %{$AD{'sam'}} ) {
     my $update=0; # if > 0 write to sophomorix-update, else sophomorix.nochange
-    my $new_status="---";
+    my $old_unid="---";
     my $new_unid="---";
+    my $old_surname_ascii="---";
     my $new_surname_ascii="---";
+    my $old_firstname_ascii="---";
     my $new_firstname_ascii="---";
-    my $new_surname_utf8="---";
-    my $new_firstname_utf8="---";
+    my $old_birthdate="---";
     my $new_birthdate="---";
+    my $old_surname_utf8="---";
+    my $new_surname_utf8="---";
+    my $old_firstname_utf8="---";
+    my $new_firstname_utf8="---";
+    my $old_filename="---";
     my $new_filename="---";
-    my $new_school="---";
+    my $old_status="---";
+    my $new_status="---";
+    my $old_role="---";
     my $new_role="---";
+    my $old_class="---";
+    my $new_class="---";
+    my $old_school="---";
+    my $new_school="---";
 
     ##################################################
     # check status
@@ -569,16 +581,28 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
     if ($update>0){
         # things to update
         my $update_line=$sam."::".
+                        $old_unid."::".
                         $new_unid."::".
+                        $old_surname_ascii."::".
                         $new_surname_ascii."::".
+                        $old_firstname_ascii."::".
                         $new_firstname_ascii."::".
+                        $old_birthdate."::".
                         $new_birthdate."::".
+                        $old_surname_utf8."::".
                         $new_surname_utf8."::".
+                        $old_firstname_utf8."::".
                         $new_firstname_utf8."::".
+                        $old_filename."::".
                         $new_filename."::".
+                        $old_status."::".
                         $new_status."::".
-                        $new_school."::".
+                        $old_role."::".
                         $new_role."::".
+                        $old_class."::".
+                        $new_class."::".
+                        $old_school."::".
+                        $new_school."::".
                         "\n";
         print UPDATE $update_line;
     } else {
