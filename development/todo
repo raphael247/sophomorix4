@@ -7,22 +7,35 @@ weiter:
 
 sophomorix-check:
 
-write_update_file:         geht alle matches durch (AD und files)
+weiter: move anhangen an update
+update soll auch moven
 
-write_status_update_file: geht alle user im AD durch
 
-Beides könnte in eine Schleife, die von write_status_update_file
+# write_update_file:         geht alle matches durch (AD und files)
 
-alle user im ad durchgehen {
-      -> status prüfen
-#  falls kein match 
-#      -> nix mehr
-  falls ein match
-      -> update des Namens prüfen
-      -> move prüfen
--> dann  update-Zeile schreiben Zeile schreiben (wenn änderungen)
--> sonst nochange-Zeile schreiben
-}
+# write_status_update_file: geht alle user im AD durch
+
+# Beides könnte in eine Schleife, die von write_status_update_file
+
+# alle user im ad durchgehen {
+# $update=0;
+#       -> status prüfen
+#          $newstat,$update=&test_UEAS_T_update($sam,$update)  (status ist U,E,A,S) wirds T?
+#          $newstat,$update=&test_T_DA_update                  (status ist T) wirds D oder A?
+#          $newstat,$update=&test_DL_RA_update                 (status ist D,L) wirds R oder A?
+#          $newstat,$update=&test_R_A_update                   (status ist D,L) wirds A?
+       
+
+# #  falls kein match 
+# #      -> nix mehr
+#   falls ein match
+#       -> update des Namens prüfen
+#        $name,surname=&test_user_update()  (update des accounts)
+#       -> move prüfen
+#        $name,surname=&test_move_update  (update des accounts)
+# -> wenn $update>0, dann  update-Zeile schreiben Zeile schreiben (wenn änderungen)
+# -> sonst nochange-Zeile schreiben
+# }
 
 
 
