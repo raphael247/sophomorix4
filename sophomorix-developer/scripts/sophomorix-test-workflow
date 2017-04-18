@@ -181,10 +181,10 @@ if ($full==1){
 ############################################################
 if ($add_check==1){
     my $command_add="sophomorix-check $verbose_options ".
-                "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
-                "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Wallace;Alfred Russel;01.01.2000;\" ".
+                "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1982;koperni99\" ".
+                "--injectline \"bsz.teachers.csv:teachers;Darwing;Charles;12.02.2009;darwi99\" ".
+                "--injectline \"bsz.students.csv:m3KK3T;Mondel;Gregor;01.02.2000;\" ".
+                "--injectline \"bsz.students.csv:m3KK3T;Wallace;Alfred Rusel;01.01.2000;\" ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
                 "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".
                 "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".
@@ -209,14 +209,14 @@ if ($add_do==1){
     # fetch loginnames:
     my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
-                                sn=>"Mendel",
+                                sn=>"Mondel",
                                 givenName=>"Gregor",
-                                birthdate=>"01.01.2000",
+                                birthdate=>"01.02.2000",
                                });
     my ($wallacal,$wallacal_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 sn=>"Wallace",
-                                givenName=>"Alfred Russel",
+                                givenName=>"Alfred Rusel",
                                 birthdate=>"01.01.2000",
                                });
     my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -255,7 +255,7 @@ if ($add_do==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_mendelgr,
                    #####
-                   displayName=>"Gregor Mendel",
+                   displayName=>"Gregor Mondel",
                    givenName=>"Gregor",
                    name=>$mendelgr,
                    sAMAccountname=>$mendelgr,
@@ -263,14 +263,14 @@ if ($add_do==1){
                    homeDrive=>"H:",
                    homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk3t\\homes\\".$mendelgr,
                    unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk3t/homes/".$mendelgr,
-                   sn=>"Mendel",
+                   sn=>"Mondel",
                    userPrincipalName => $mendelgr."@".$root_dns,
                    sophomorixAdminClass => "bsz-m3kk3t",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Gregor",
-                   sophomorixSurnameASCII  => "Mendel",
-                   sophomorixBirthdate  => "01.01.2000",
+                   sophomorixSurnameASCII  => "Mondel",
+                   sophomorixBirthdate  => "01.02.2000",
                    sophomorixRole => "student",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
@@ -289,8 +289,8 @@ if ($add_do==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_wallacal,
                    #####
-                   displayName=>"Alfred Russel Wallace",
-                   givenName=>"Alfred Russel",
+                   displayName=>"Alfred Rusel Wallace",
+                   givenName=>"Alfred Rusel",
                    name=>$wallacal,
                    sAMAccountname=>$wallacal,
                    uidNumber=>"-1",
@@ -302,7 +302,7 @@ if ($add_do==1){
                    sophomorixAdminClass => "bsz-m3kk3t",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Alfred Russel",
+                   sophomorixFirstnameASCII => "Alfred Rusel",
                    sophomorixSurnameASCII  => "Wallace",
                    sophomorixBirthdate  => "01.01.2000",
                    sophomorixRole => "student",
@@ -544,7 +544,7 @@ if ($add_do==1){
 #                   sophomorixFirstPassword => "LinuxMuster23!",
                    sophomorixFirstnameASCII => "Nikolaus",
                    sophomorixSurnameASCII  => "Kopernikus",
-                   sophomorixBirthdate  => "19.02.1973",
+                   sophomorixBirthdate  => "19.02.1982",
                    sophomorixRole => "teacher",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
@@ -563,7 +563,7 @@ if ($add_do==1){
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=darwi99,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
-                   displayName=>"Charles Darwin",
+                   displayName=>"Charles Darwing",
                    givenName=>"Charles",
                    name=>"darwi99",
                    sAMAccountname=>"darwi99",
@@ -571,13 +571,13 @@ if ($add_do==1){
                    homeDrive=>"H:",
                    homeDirectory=>"\\\\linuxmuster.local\\bsz\\teachers\\homes\\darwi99",
                    unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/homes/darwi99",
-                   sn=>"Darwin",
+                   sn=>"Darwing",
                    userPrincipalName => "darwi99@".$root_dns,
                    sophomorixAdminClass => "bsz-teachers",
                    sophomorixExitAdminClass => "unknown",
 #                   sophomorixFirstPassword => "LinuxMuster23!",
                    sophomorixFirstnameASCII => "Charles",
-                   sophomorixSurnameASCII  => "Darwin",
+                   sophomorixSurnameASCII  => "Darwing",
                    sophomorixBirthdate  => "12.02.2009",
                    sophomorixRole => "teacher",
                    sophomorixSchoolPrefix => "bsz",
@@ -777,9 +777,9 @@ if ($modify_1_check==1){
 
     &run_command($command_modify_1);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",4);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
 }
 ############################################################
 if ($modify_1_do==1){
