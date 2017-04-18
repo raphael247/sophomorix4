@@ -510,8 +510,6 @@ my $add_file_new=$DevelConf::path_result."/sophomorix.add";
 open (ADD, ">$add_file_new");
 my $update_file_new=$DevelConf::path_result."/sophomorix.update";
 open (UPDATE, ">$update_file_new");
-my $move_file_new=$DevelConf::path_result."/sophomorix.move";
-open (MOVE, ">$move_file_new");
 my $kill_file_new=$DevelConf::path_result."/sophomorix.kill";
 open (KILL, ">$kill_file_new");
 my $nochange_file_new=$DevelConf::path_result."/sophomorix.nochange";
@@ -617,7 +615,6 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
 
 close(ADD);
 close(UPDATE);
-close(MOVE);
 close(KILL);
 close(NOCHANGE);
 
