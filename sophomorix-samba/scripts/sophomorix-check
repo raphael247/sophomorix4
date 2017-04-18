@@ -485,26 +485,9 @@ if ($dump_matches==1){
 
 
 
-# ============================================================
+###########################################################################
 # Write results into files
-# ============================================================
-
-# write into files
-#   - go through matches lines in line order
-#####################################
-#   - check for each matched line:
-#     - compare ldap entries, class and school
-#      - write to:
-#        - sophomorix.nochange -> do nothing, just for information
-#        - sophomorix.update   -> update ldap-data and status (+times, if not current)
-#        - sophomorix.move     -> move to another class or school
-#####################################
-#   - unmatched line:
-#     - new user: write sophomorix.add
-#####################################
-#   - unmatched user in ldap:
-#     - sophomorix.update mit status und time
-#     - sophomorix.kill (if status and times say so)
+###########################################################################
 
 my $add_file_new=$DevelConf::path_result."/sophomorix.add";
 open (ADD, ">$add_file_new");
@@ -518,7 +501,7 @@ open (NOCHANGE, ">$nochange_file_new");
 &print_title("Writing the files:");
 
 
-# ADD
+# ADD users that could not be matched to AD users
 ############################################################
 foreach my $line_new ( @{ $Match{'lines'} } ){
     if (not defined $Match{'action'}{$line_new}{'sAMAccountName'}){
@@ -526,10 +509,11 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
     }
 }
 
+# Users in AD:
 # UPDATE or KILL or NOCHANGE
 ############################################################
 foreach my $sam ( keys %{$AD{'sam'}} ) {
-    # test all existing users
+    # test all users in AD
     my $update=0; # if > 0 write to sophomorix.update
     my $kill=0; # if > 0 write to sophomorix.kill
     my $old_unid="---";
@@ -556,14 +540,14 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
     my $new_school="---";
 
     ##################################################
-    # check status update for existing users
+    # check status update for users in AD
     &test_UEAS_T_update($sam,\$update,\$new_status);
     &test_T_DA_update($sam,\$update,\$new_status);
     &test_DL_RA_update($sam,\$update,\$new_status);
     &test_R_A_update($sam,\$update,\$new_status);
     ##################################################
     if (exists $Match{'action_by_sam'}{$sam}){
-        # check identifier update for matched users
+        # check identifier update for matched users in AD
         &test_user_update($sam,
                           \$update,
                           \$new_unid,
@@ -637,6 +621,8 @@ close(NOCHANGE);
 
 &AD_unbind_admin($ldap);
 &log_script_end(@arguments);
+
+
 
 
 ################################################################################
