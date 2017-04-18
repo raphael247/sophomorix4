@@ -516,27 +516,27 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
     # test all users in AD
     my $update=0; # if > 0 write to sophomorix.update
     my $kill=0; # if > 0 write to sophomorix.kill
-    my $old_unid="---";
+    my $old_unid=$AD{'sam'}{$sam}{'sophomorixUnid'};
     my $new_unid="---";
-    my $old_surname_ascii="---";
+    my $old_surname_ascii=$AD{'sam'}{$sam}{'sophomorixSurnameASCII'};
     my $new_surname_ascii="---";
-    my $old_firstname_ascii="---";
+    my $old_firstname_ascii=$AD{'sam'}{$sam}{'sophomorixFirstnameASCII'};
     my $new_firstname_ascii="---";
-    my $old_birthdate="---";
+    my $old_birthdate=$AD{'sam'}{$sam}{'sophomorixBirthdate'};
     my $new_birthdate="---";
-    my $old_surname_utf8="---";
+    my $old_surname_utf8=$AD{'sam'}{$sam}{'sn'};
     my $new_surname_utf8="---";
-    my $old_firstname_utf8="---";
+    my $old_firstname_utf8=$AD{'sam'}{$sam}{'givenName'};
     my $new_firstname_utf8="---";
-    my $old_filename="---";
+    my $old_filename=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
     my $new_filename="---";
-    my $old_status="---";
+    my $old_status=$AD{'sam'}{$sam}{'sophomorixStatus'};
     my $new_status="---";
-    my $old_role="---";
+    my $old_role=$AD{'sam'}{$sam}{'sophomorixRole'};
     my $new_role="---";
-    my $old_class="---";
+    my $old_class=$AD{'sam'}{$sam}{'sophomorixAdminClass'};
     my $new_class="---";
-    my $old_school="---";
+    my $old_school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
     my $new_school="---";
 
     ##################################################
@@ -550,14 +550,23 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
         # check identifier update for matched users in AD
         &test_user_update($sam,
                           \$update,
+#                          \$old_unid,
                           \$new_unid,
+                          \$old_surname_ascii,
                           \$new_surname_ascii,
+                          \$old_firstname_ascii,
                           \$new_firstname_ascii,
-                          \$new_surname_utf8,
-                          \$new_firstname_utf8,
+                          \$old_birthdate,
                           \$new_birthdate,
+                          \$old_surname_utf8,
+                          \$new_surname_utf8,
+                          \$old_firstname_utf8,
+                          \$new_firstname_utf8,
+                          \$old_filename,
                           \$new_filename,
+                          \$old_school,
                           \$new_school,
+                          \$old_role,
                           \$new_role);
     }
 
@@ -772,15 +781,24 @@ sub test_RK_kill{
 sub test_user_update {
     my ($sam,
         $update_ref,
-        $unid_ref,
-        $surname_ascii_ref,
-        $firstname_ascii_ref,
-        $surname_utf8_ref,
-        $firstname_utf8_ref,
-        $birthdate_ref,
-        $filename_ref,
-        $school_ref,
-        $role_ref,
+#        $old_unid_ref,
+        $new_unid_ref,
+        $old_surname_ascii_ref,
+        $new_surname_ascii_ref,
+        $old_firstname_ascii_ref,
+        $new_firstname_ascii_ref,
+        $old_birthdate_ref,
+        $new_birthdate_ref,
+        $old_surname_utf8_ref,
+        $new_surname_utf8_ref,
+        $old_firstname_utf8_ref,
+        $new_firstname_utf8_ref,
+        $old_filename_ref,
+        $new_filename_ref,
+        $old_school_ref,
+        $new_school_ref,
+        $old_role_ref,
+        $new_role_ref,
        )=@_;
     my $line_new=$Match{'action_by_sam'}{$sam};
 
@@ -788,83 +806,92 @@ sub test_user_update {
     if ( ($Match{'action'}{$line_new}{'unid'} eq $AD{'sam'}{$sam}{'sophomorixUnid'}) or
          ($Match{'action'}{$line_new}{'unid'} eq "" and $AD{'sam'}{$sam}{'sophomorixUnid'} eq "---") ){
         # no update
-        ${$unid_ref}="---";
+        ${$new_unid_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$unid_ref}=$Match{'action'}{$line_new}{'unid'};
+        ${$new_unid_ref}=$Match{'action'}{$line_new}{'unid'};
     }
 
-    # surname_ascii
+    # new_surname_ascii
     if ( ($Match{'action'}{$line_new}{'surname_ascii'} eq $AD{'sam'}{$sam}{'sophomorixSurnameASCII'})){
         # no update
-        ${$surname_ascii_ref}="---";
+        ${$new_surname_ascii_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$surname_ascii_ref}=$Match{'action'}{$line_new}{'surname_ascii'};
+        ${$new_surname_ascii_ref}=$Match{'action'}{$line_new}{'surname_ascii'};
     }
 
-    # firstname_ascii
+    # new_firstname_ascii
     if ( ($Match{'action'}{$line_new}{'firstname_ascii'} eq $AD{'sam'}{$sam}{'sophomorixFirstnameASCII'} )){
         # no update
-        ${$firstname_ascii_ref}="---";
+        ${$new_firstname_ascii_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$firstname_ascii_ref}=$Match{'action'}{$line_new}{'firstname_ascii'};
+        ${$new_firstname_ascii_ref}=$Match{'action'}{$line_new}{'firstname_ascii'};
     }
 
-    # firstname_utf8 and surname_utf8
-    if ( ($Match{'action'}{$line_new}{'firstname_utf8'} ne $AD{'sam'}{$sam}{'givenName'}) or
-         ($Match{'action'}{$line_new}{'surname_utf8'} ne $AD{'sam'}{$sam}{'sn'}) ){
-        ${$update_ref}++;
-        ${$firstname_utf8_ref}=$Match{'action'}{$line_new}{'firstname_utf8'};
-        ${$surname_utf8_ref}=$Match{'action'}{$line_new}{'surname_utf8'};
-    } else {
+
+    # new_surname_utf8
+    if ( ($Match{'action'}{$line_new}{'surname_utf8'} eq $AD{'sam'}{$sam}{'sn'})){
         # no update
-        ${$firstname_utf8_ref}="---";
-        ${$surname_utf8_ref}="---";
+        ${$new_surname_utf8_ref}="---";
+    } else {
+        # update
+        ${$update_ref}++;
+        ${$new_surname_utf8_ref}=$Match{'action'}{$line_new}{'surname_utf8'};
+    }
+
+    # new_firstname_utf8
+    if ( ($Match{'action'}{$line_new}{'firstname_utf8'} eq $AD{'sam'}{$sam}{'givenName'} )){
+        # no update
+        ${$new_firstname_utf8_ref}="---";
+    } else {
+        # update
+        ${$update_ref}++;
+        ${$new_firstname_utf8_ref}=$Match{'action'}{$line_new}{'firstname_utf8'};
     }
 
     # birthdate
     if ( ($Match{'action'}{$line_new}{'birthdate'} eq $AD{'sam'}{$sam}{'sophomorixBirthdate'} )){
         # no update
-        ${$birthdate_ref}="---";
+        ${$new_birthdate_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$birthdate_ref}=$Match{'action'}{$line_new}{'birthdate'};
+        ${$new_birthdate_ref}=$Match{'action'}{$line_new}{'birthdate'};
     }
 
     # filename
     if ( ($Match{'action'}{$line_new}{'filename'} eq $AD{'sam'}{$sam}{'sophomorixAdminFile'} )){
         # no update
-        ${$filename_ref}="---";
+        ${$new_filename_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$filename_ref}=$Match{'action'}{$line_new}{'filename'};
+        ${$new_filename_ref}=$Match{'action'}{$line_new}{'filename'};
     }
 
     # school
     if ( ($Match{'action'}{$line_new}{'school'} eq $AD{'sam'}{$sam}{'sophomorixSchoolname'} )){
         # no update
-        ${$school_ref}="---";
+        ${$new_school_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$school_ref}=$Match{'action'}{$line_new}{'school'};
+        ${$new_school_ref}=$Match{'action'}{$line_new}{'school'};
     }
 
     # role
     if ( ($Match{'action'}{$line_new}{'role'} eq $AD{'sam'}{$sam}{'sophomorixRole'} )){
         # no update
-        ${$role_ref}="---";
+        ${$new_role_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-        ${$role_ref}=$Match{'action'}{$line_new}{'role'};
+        ${$new_role_ref}=$Match{'action'}{$line_new}{'role'};
     }
 }
 
