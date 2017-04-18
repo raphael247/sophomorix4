@@ -256,7 +256,7 @@ if ($add==1 or $test_add==1){
     if ($add==1){
         # copy sophomorix.add
         &run_command("cp -v $file_add_test $file_add");
-        &run_command("sophomorix-add -i");
+        &run_command("sophomorix-add -i $verbose_options");
         &run_command("sophomorix-add $verbose_options");
     }
 
@@ -3451,7 +3451,7 @@ if ($update==1 or $test_update==1){
     if ($update==1){
         # copy sophomorix.update
         &run_command("cp -v $file_update_test $file_update");
-        &run_command("sophomorix-update -i");
+        &run_command("sophomorix-update -i $verbose_options");
         &run_command("sophomorix-update $verbose_options");
     }
 
@@ -4877,7 +4877,7 @@ if ($kill==1 or $test_kill==1){
     if ($kill==1){
         # kill the users, keep the classes
         &run_command("cp -v $file_kill_test $file_kill");
-        &run_command("sophomorix-kill -i");
+        &run_command("sophomorix-kill -i $verbose_options");
         &run_command("sophomorix-kill $verbose_options");
     }
 
