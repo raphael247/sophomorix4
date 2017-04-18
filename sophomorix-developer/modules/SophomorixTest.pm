@@ -41,6 +41,7 @@ $Data::Dumper::Terse = 1;
             ACL_test
             directory_tree_test
             run_command
+            file_test_lines
             AD_get_samaccountname
             );
 
@@ -907,6 +908,63 @@ sub ACL_test {
     }
 } 
 
+
+
+sub file_test_lines {
+    # abs path to file
+    # line number -1=skip test
+    # list of lines that mus be in the file (one test each)
+    my ($abs,$is_line_num,@lines)=@_;
+    my $exists=0;
+    my %hit=();
+    my %hit_count=();
+
+    # existence
+    if (-e $abs){
+        $exists=1;
+    }
+    is ($exists,1,"* $abs exists");
+    if ($exists==0){
+        return;
+    }
+   
+    # read lines
+    my $line_num=0;
+    open(FILE,"$abs") || die "Cannot open $abs \n";
+    while(<FILE>){
+        $line_num++;
+        chomp;
+        #print;
+        foreach my $grep (@lines){
+            if (m/$grep/){
+                #print "$_ contains $grep\n";
+                $hit{$grep}=$_;
+                if (not exists $hit_count{$grep}){
+                    $hit_count{$grep}=1;
+                } else {
+                    $hit_count{$grep}=$hit_count{$grep}+1;
+                }
+            }
+        }
+    }
+    close(FILE);
+
+    # line num test
+    is ($line_num,$is_line_num,"  * File has $is_line_num lines");
+
+    # grep tests
+    foreach my $grep (@lines){
+        my $seen=0;
+        if (exists $hit{$grep}){
+            $seen=1;
+            $line=$hit{$grep};
+        } else {
+            $line="... no match ...";
+        }
+          is ($seen,1,"  * >$grep< in >$line<");
+          is ($hit_count{$grep},1,"  * >$grep< found only once");
+    }
+}
 
 
 sub run_command {
