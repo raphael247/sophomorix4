@@ -526,10 +526,12 @@ foreach my $line_new ( @{ $Match{'lines'} } ){
     }
 }
 
-# UPDATE or NOCHANGE
+# UPDATE or KILL or NOCHANGE
 ############################################################
 foreach my $sam ( keys %{$AD{'sam'}} ) {
-    my $update=0; # if > 0 write to sophomorix-update, else sophomorix.nochange
+    # test all existing users
+    my $update=0; # if > 0 write to sophomorix.update
+    my $kill=0; # if > 0 write to sophomorix.kill
     my $old_unid="---";
     my $new_unid="---";
     my $old_surname_ascii="---";
@@ -554,16 +556,14 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
     my $new_school="---";
 
     ##################################################
-    # check status
+    # check status update for existing users
     &test_UEAS_T_update($sam,\$update,\$new_status);
     &test_T_DA_update($sam,\$update,\$new_status);
     &test_DL_RA_update($sam,\$update,\$new_status);
     &test_R_A_update($sam,\$update,\$new_status);
-    print "nEW:   * $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> $new_status ($update)\n";
     ##################################################
-    # check identifier update
     if (exists $Match{'action_by_sam'}{$sam}){
-        #my $line_new=$Match{'action_by_sam'}{$sam};
+        # check identifier update for matched users
         &test_user_update($sam,
                           \$update,
                           \$new_unid,
@@ -576,8 +576,9 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
                           \$new_school,
                           \$new_role);
     }
+
     if ($update>0){
-        # things to update
+        # write to sophomorix.update
         my $update_line=$sam."::".
                         $old_unid."::".
                         $new_unid."::".
@@ -604,14 +605,30 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
                         "\n";
         print UPDATE $update_line;
     } else {
-        # nothing to update
-        print NOCHANGE "$sam\n";
+        # nothing to update 
+        # write to sophomorix.kill or sophomorix.nochange
+        &test_RK_kill($sam,\$kill);
+        if ($kill>0){
+            # write to sophomorix.kill
+            my $kill_line=$AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}."::".
+                          $sam."::".
+                          $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
+                          $AD{'sam'}{$sam}{'sophomorixSchoolname'}."::\n";               
+            print KILL $kill_line;
+        } else {
+            # write to sophomorix.nochange
+            my $nochange_line=$sam."::".
+                              $AD{'sam'}{$sam}{'sn'}."::".
+                              $AD{'sam'}{$sam}{'givenName'}."::".
+                              $AD{'sam'}{$sam}{'sophomorixBirthdate'}."::".
+                              $AD{'sam'}{$sam}{'sophomorixStatus'}."::".
+                              $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
+                              $AD{'sam'}{$sam}{'sophomorixAdminFile'}."::".
+                              "\n";
+            print NOCHANGE $nochange_line;
+        }
     }
 }
-
-# KILL
-############################################################
-&write_kill_file();
 
 close(ADD);
 close(UPDATE);
@@ -747,6 +764,18 @@ sub test_R_A_update{
         print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> A\n";
         ${$new_status_ref}="A";
         ${$update_ref}++;
+    }
+}
+
+
+sub test_RK_kill{
+    my ($sam,$kill_ref)=@_;
+    if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "K" or
+         ($AD{'sam'}{$sam}{'sophomorixStatus'} eq "R" and not exists $Match{'action_by_sam'}{$sam})
+       ){
+        # kill if status is  R or K
+        print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> sophomorix.kill\n";
+        ${$kill_ref}++;
     }
 }
 
@@ -890,34 +919,6 @@ sub write_add_file {
                  "\n";
 
     print ADD $add_line;
-}
-
-
-
-sub write_kill_file {
-    # walk through all users
-    foreach my $sam ( keys %{$AD{'sam'}} ) {
-        if ( $AD{'sam'}{$sam}{'sophomorixStatus'} eq "K" or
-             ($AD{'sam'}{$sam}{'sophomorixStatus'} eq "R" and not exists $Match{'action_by_sam'}{$sam})
-           ){
-            print "    ----> $sam: $AD{'sam'}{$sam}{'sophomorixStatus'} -> sophomorix.kill\n";
-            # calculation school name
-            my $school;
-            if ($AD{'sam'}{$sam}{'sophomorixSchoolname'} eq 
-                $DevelConf::name_default_school){
-                $school="---";
-	    } else {
-                $school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
-            }
-            # creating the line
-            my $kill_line=
-               $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}."::".
-               $sam."::".
-               $AD{'sam'}{$sam}{'sophomorixAdminClass'}."::".
-               $school."::\n";               
-            print KILL $kill_line;
-        }
-    }
 }
 
 

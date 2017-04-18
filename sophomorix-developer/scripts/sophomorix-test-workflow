@@ -27,6 +27,7 @@ use Sophomorix::SophomorixTest qw(
                                  run_command
                                  AD_test_session_count
                                  ACL_test
+                                 file_test_lines
                                  AD_user_timeupdate
                                  AD_get_samaccountname
                                  );
@@ -37,14 +38,18 @@ my $modify_1_check=0;
 my $modify_2_check=0;
 my $modify_3_check=0;
 my $modify_4_check=0;
-my $kill_check=0;
+my $kill_1_check=0;
+my $kill_2_check=0;
+my $kill_3_check=0;
 
 my $add_do=0;
 my $modify_1_do=0;
 my $modify_2_do=0;
 my $modify_3_do=0;
 my $modify_4_do=0;
-my $kill_do=0;
+my $kill_1_do=0;
+my $kill_2_do=0;
+my $kill_3_do=0;
 
 my $full=0;
 my $help=0;
@@ -63,8 +68,12 @@ my $testopt=GetOptions(
            "modify-2-do" => \$modify_2_do,
            "modify-3-do" => \$modify_3_do,
            "modify-4-do" => \$modify_4_do,
-           "kill-check" => \$kill_check,
-           "kill-do" => \$kill_do,
+           "kill-1-check" => \$kill_1_check,
+           "kill-1-do" => \$kill_1_do,
+           "kill-2-check" => \$kill_2_check,
+           "kill-2-do" => \$kill_2_do,
+           "kill-3-check" => \$kill_3_check,
+           "kill-3-do" => \$kill_3_do,
            "full|f" => \$full,
           );
 
@@ -122,8 +131,14 @@ Step by step Test:
       sophomorix-test-workflow --modify-4-do
 
   Kill the added users:
-      sophomorix-test-workflow --kill-check
-      sophomorix-test-workflow --kill-do
+      sophomorix-test-workflow --kill-1-check
+      sophomorix-test-workflow --kill-1-do
+
+      sophomorix-test-workflow --kill-2-check
+      sophomorix-test-workflow --kill-2-do
+
+      sophomorix-test-workflow --kill-3-check
+      sophomorix-test-workflow --kill-3-do
 
 ');
    print "\n";
@@ -147,13 +162,17 @@ if ($full==1){
     $modify_2_check=1;
     $modify_3_check=1;
     $modify_4_check=1;
-    $kill_check=1;
+    $kill_1_check=1;
+    $kill_2_check=1;
+    $kill_3_check=1;
     $add_do=1;
     $modify_1_do=1;
     $modify_2_do=1;
     $modify_3_do=1;
     $modify_4_do=1;
-    $kill_do=1;
+    $kill_1_do=1;
+    $kill_2_do=1;
+    $kill_3_do=1;
 }
 
 
@@ -175,6 +194,11 @@ if ($add_check==1){
                 "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ".
                 "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ";
     &run_command($command_add);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",12);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
+
 }
 ############################################################
 if ($add_do==1){
@@ -752,6 +776,10 @@ if ($modify_1_check==1){
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_1);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",4);
 }
 ############################################################
 if ($modify_1_do==1){
@@ -1384,6 +1412,10 @@ if ($modify_2_check==1){
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",4);
 }
 ############################################################
 if ($modify_2_do==1){
@@ -2024,6 +2056,10 @@ if ($modify_3_check==1){
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_3);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",6);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",4);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",6);
 }
 ############################################################
 if ($modify_3_do==1){
@@ -2654,6 +2690,10 @@ if ($modify_4_check==1){
     # kill the users, that can be killed and test again
     ############################################################
     &run_command($command_modify_4);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",8);
 }
 ############################################################
 if ($modify_4_do==1){
@@ -3263,7 +3303,7 @@ if ($modify_4_do==1){
 ############################################################
 # Deleting users --kill
 ############################################################
-if ($kill_check==1){
+if ($kill_1_check==1){
     # fetch loginnames:
     my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
@@ -3301,19 +3341,29 @@ if ($kill_check==1){
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
 
-    &run_command("sophomorix-user -K --user olinst99");
-    &run_command("sophomorix-user -K --user rukri99");
-    &run_command("sophomorix-user -K --user skula99");
+    &run_command("sophomorix-user -K --user koperni99");
+    &run_command("sophomorix-user -K --user darwi99");
 
-    &run_command("sophomorix-user -K --user $halldoha");
-    &run_command("sophomorix-user -K --user $gunnarar");
-    &run_command("sophomorix-user -K --user $sigurdra");
+    &run_command("sophomorix-user -R --user olinst99");
+    &run_command("sophomorix-user -R --user rukri99");
+    &run_command("sophomorix-user -R --user skula99");
+
+    &run_command("sophomorix-user -K --user $mendelgr");
+    &run_command("sophomorix-user -K --user $wallacal");
+
+    &run_command("sophomorix-user -R --user $halldoha");
+    &run_command("sophomorix-user -R --user $gunnarar");
+    &run_command("sophomorix-user -R --user $sigurdra");
 
     &run_command("sophomorix-check");
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",10);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
 }
 
 ############################################################
-if ($kill_check==1){
+if ($kill_1_do==1){
     # fetch loginnames:
     my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
                                 root_dse=>$root_dse,
@@ -3353,9 +3403,16 @@ if ($kill_check==1){
 
     &run_command("sophomorix-kill");
 
+    &AD_object_nonexist($ldap,$root_dse,"user",$mendelgr);
+    &AD_object_nonexist($ldap,$root_dse,"user",$wallacal);
+
     &AD_object_nonexist($ldap,$root_dse,"user",$halldoha);
     &AD_object_nonexist($ldap,$root_dse,"user",$gunnarar);
     &AD_object_nonexist($ldap,$root_dse,"user",$sigurdra);
+
+    &AD_object_nonexist($ldap,$root_dse,"user","koperni99");
+    &AD_object_nonexist($ldap,$root_dse,"user","darwi99");
+
     &AD_object_nonexist($ldap,$root_dse,"user","olinst99");
     &AD_object_nonexist($ldap,$root_dse,"user","rukri99");
     &AD_object_nonexist($ldap,$root_dse,"user","skula99");
@@ -3409,12 +3466,12 @@ if ($kill_check==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"koperni99|darwi99",
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-teachers",
-                   member => "koperni99|darwi99",
+                   member => "",
                   });
 
     ##### Testing the users class
@@ -3456,12 +3513,12 @@ if ($kill_check==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$mendelgr."|".$wallacal,
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $mendelgr."|".$wallacal,
+                   member => "",
                   });
 
 
@@ -3490,10 +3547,25 @@ if ($kill_check==1){
                    memberOf => "global-students",
                    member => "bsz-m3kk3t",
                   });
+}
 
 
+if ($kill_2_check==1){
     # kill class 7a
     &run_command("sophomorix-class --kill --class 7a $verbose_options");
+    &run_command("sophomorix-check $verbose_options");
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
+}
+
+
+if ($kill_2_do==1){
+    &run_command("sophomorix-add");
+    &run_command("sophomorix-update");
+    &run_command("sophomorix-kill");
+
     &AD_object_nonexist($ldap,$root_dse,"group","7a");
 
     # killing 7a should remove it from the project p_full-blown
@@ -3546,17 +3618,29 @@ if ($kill_check==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"koperni99|darwi99",
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-teachers",
-                   member => "koperni99|darwi99",
+                   member => "",
                   });
 
+}
+
+
+if ($kill_3_check==1){
     # kill the project p_full-blown
     &run_command("sophomorix-project $verbose_options --kill -p full-blown");
+    &run_command("sophomorix-check $verbose_options");
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
+}
 
+
+if ($kill_3_do==1){
     # test if project was deleted
     &AD_object_nonexist($ldap,$root_dse,"group","p_full-blown");
 
@@ -3583,12 +3667,12 @@ if ($kill_check==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"koperni99|darwi99",
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-teachers",
-                   member => "koperni99|darwi99",
+                   member => "",
                   });
 
     ##### Testing the users ou-students group
@@ -3617,7 +3701,6 @@ if ($kill_check==1){
                    memberOf => "global-students",
                    member => "bsz-m3kk3t",
                   });
-
 }
 
 
