@@ -1405,23 +1405,23 @@ if ($modify_2_check==1){
     #  $wallacal
     my $command_modify_2="sophomorix-check $verbose_options ".
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
-                "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
+                "--injectline \"bsz.students.csv:m3KK4T;Darwin;Charles;12.02.2009\" ".
+                "--injectline \"bsz.teachers.csv:teachers;Mendel;Gregor;01.01.2000;\" ".
                 "--injectline \"bsz.students.csv:m3KK4T;Wallace;Alfred Russel;01.01.2000;\" ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".    # back
 #                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".            # removed
 #                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".           # removed
 #                "--injectline \"teachers.csv:teachers;Bjarnason;Theódór Elmar;04.03.1987;bjarna99\" ".     # removed
-                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\" --dump-matches -j";                     # back
+                "--injectline \"students.csv:7a;Halldórsson;Hannes Þór;27.04.1984;\"";                      # back
 #                "--injectline \"students.csv:7a;Gunnarsson;Aron;22.04.1989;\" ".                           # removed
 #                "--injectline \"students.csv:7a;Sigurðsson;Ragnar;19.06.1986;\" ";                         # removed
 #                "--injectline \"students.csv:7a;Sigurðsson;Gylfi Þór;08.09.1989;\" ".""                    # removed
 
     &run_command($command_modify_2);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",11);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",3);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",1);
 }
 ############################################################
 if ($modify_2_do==1){
@@ -1482,7 +1482,7 @@ if ($modify_2_do==1){
     &run_command("sophomorix-kill $verbose_options");
 
     # $mendelgr
-    my $dn_mendelgr="CN=".$mendelgr.",OU=m3kk3t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    my $dn_mendelgr="CN=".$mendelgr.",OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_mendelgr,
                    #####
@@ -1492,17 +1492,17 @@ if ($modify_2_do==1){
                    sAMAccountname=>$mendelgr,
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk3t\\homes\\".$mendelgr,
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk3t/homes/".$mendelgr,
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\teachers\\homes\\".$mendelgr,
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/homes/".$mendelgr,
                    sn=>"Mendel",
                    userPrincipalName => $mendelgr."@".$root_dns,
-                   sophomorixAdminClass => "bsz-m3kk3t",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "bsz-m3kk3t",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Gregor",
                    sophomorixSurnameASCII  => "Mendel",
                    sophomorixBirthdate  => "01.01.2000",
-                   sophomorixRole => "student",
+                   sophomorixRole => "teacher",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixCreationDate => "exists",
@@ -1513,7 +1513,7 @@ if ($modify_2_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $wallacal
     my $dn_wallacal="CN=".$wallacal.",OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
@@ -1723,12 +1723,12 @@ if ($modify_2_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$mendelgr,
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $mendelgr,
+                   member => "",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m3kk4t,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1745,12 +1745,12 @@ if ($modify_2_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$wallacal,
+                   sophomorixMembers=>"darwi99|".$wallacal,
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $wallacal,
+                   member => "darwi99|".$wallacal,
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -1815,7 +1815,7 @@ if ($modify_2_do==1){
 
     # darwi99
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=darwi99,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=darwi99,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Charles Darwin",
                    givenName=>"Charles",
@@ -1823,17 +1823,17 @@ if ($modify_2_do==1){
                    sAMAccountname=>"darwi99",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\teachers\\homes\\darwi99",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/homes/darwi99",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk4t\\homes\\darwi99",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk4t/homes/darwi99",
                    sn=>"Darwin",
                    userPrincipalName => "darwi99@".$root_dns,
-                   sophomorixAdminClass => "bsz-teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "bsz-m3kk4t",
+                   sophomorixExitAdminClass => "bsz-teachers",
 #                   sophomorixFirstPassword => "LinuxMuster23!",
                    sophomorixFirstnameASCII => "Charles",
                    sophomorixSurnameASCII  => "Darwin",
                    sophomorixBirthdate  => "12.02.2009",
-                   sophomorixRole => "teacher",
+                   sophomorixRole => "student",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixCreationDate => "exists",
@@ -1844,7 +1844,7 @@ if ($modify_2_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "bsz-m3kk4t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
     # olinst99
@@ -1999,12 +1999,12 @@ if ($modify_2_do==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"koperni99|darwi99",
+                   sophomorixMembers=>$mendelgr."|koperni99",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-teachers",
-                   member => "koperni99|darwi99",
+                   member => $mendelgr."|koperni99",
                   });
 }
 
