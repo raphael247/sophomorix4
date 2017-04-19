@@ -1406,8 +1406,8 @@ if ($modify_2_check==1){
     my $command_modify_2="sophomorix-check $verbose_options ".
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
                 "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
-                "--injectline \"bsz.students.csv:m3KK4T;Mendel;Gregor;01.01.2000;\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Wallace;Alfred Russel;01.01.2000;\" ".
+                "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
+                "--injectline \"bsz.students.csv:m3KK4T;Wallace;Alfred Russel;01.01.2000;\" ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".    # back
 #                "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".            # removed
 #                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".           # removed
@@ -1419,9 +1419,9 @@ if ($modify_2_check==1){
 
     &run_command($command_modify_2);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",9);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",4);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",3);
 }
 ############################################################
 if ($modify_2_do==1){
@@ -1516,7 +1516,7 @@ if ($modify_2_do==1){
                    memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $wallacal
-    my $dn_wallacal="CN=".$wallacal.",OU=m3kk3t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    my $dn_wallacal="CN=".$wallacal.",OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_wallacal,
                    #####
@@ -1526,12 +1526,12 @@ if ($modify_2_do==1){
                    sAMAccountname=>$wallacal,
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk3t\\homes\\".$wallacal,
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk3t/homes/".$wallacal,
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk4t\\homes\\".$wallacal,
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk4t/homes/".$wallacal,
                    sn=>"Wallace",
                    userPrincipalName => $wallacal."@".$root_dns,
-                   sophomorixAdminClass => "bsz-m3kk3t",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "bsz-m3kk4t",
+                   sophomorixExitAdminClass => "bsz-m3kk3t",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Alfred Russel",
                    sophomorixSurnameASCII  => "Wallace",
@@ -1547,7 +1547,7 @@ if ($modify_2_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "bsz-m3kk4t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -1723,12 +1723,34 @@ if ($modify_2_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$mendelgr."|".$wallacal,
+                   sophomorixMembers=>$mendelgr,
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $mendelgr."|".$wallacal,
+                   member => $mendelgr,
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m3kk4t,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m3kk4t",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m3kk4t",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>$wallacal,
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => $wallacal,
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -1753,7 +1775,7 @@ if ($modify_2_do==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-students",
-                   member => "bsz-m3kk3t",
+                   member => "bsz-m3kk3t|bsz-m3kk4t",
                   });
 
 
@@ -2051,7 +2073,7 @@ if ($modify_3_check==1){
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
                 "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
                 "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Wallace;Alfred Russel;01.01.2000;\" ".
+                "--injectline \"bsz.students.csv:m3KK4T;Wallace;Alfred Russel;01.01.2000;\" ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
                 "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
 #                "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".           # removed
@@ -2158,7 +2180,7 @@ if ($modify_3_do==1){
                    memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $wallacal
-    my $dn_wallacal="CN=".$wallacal.",OU=m3kk3t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    my $dn_wallacal="CN=".$wallacal.",OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_wallacal,
                    #####
@@ -2168,12 +2190,12 @@ if ($modify_3_do==1){
                    sAMAccountname=>$wallacal,
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk3t\\homes\\".$wallacal,
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk3t/homes/".$wallacal,
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk4t\\homes\\".$wallacal,
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk4t/homes/".$wallacal,
                    sn=>"Wallace",
                    userPrincipalName => $wallacal."@".$root_dns,
-                   sophomorixAdminClass => "bsz-m3kk3t",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "bsz-m3kk4t",
+                   sophomorixExitAdminClass => "bsz-m3kk3t",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Alfred Russel",
                    sophomorixSurnameASCII  => "Wallace",
@@ -2189,7 +2211,7 @@ if ($modify_3_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "bsz-m3kk4t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -2365,12 +2387,34 @@ if ($modify_3_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$mendelgr."|".$wallacal,
+                   sophomorixMembers=>$mendelgr,
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $mendelgr."|".$wallacal,
+                   member => $mendelgr,
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m3kk4t,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m3kk4t",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m3kk4t",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>$wallacal,
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => $wallacal,
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -2395,7 +2439,7 @@ if ($modify_3_do==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-students",
-                   member => "bsz-m3kk3t",
+                   member => "bsz-m3kk3t|bsz-m3kk4t",
                   });
 
 
@@ -2683,7 +2727,7 @@ if ($modify_4_check==1){
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
                 "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
                 "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Wallace;Alfred Russel;01.01.2000;\" ".
+                "--injectline \"bsz.students.csv:m3KK4T;Wallace;Alfred Russel;01.01.2000;\" ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
                 "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
                 "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".            # back
@@ -2787,7 +2831,7 @@ if ($modify_4_do==1){
                    memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $wallacal
-    my $dn_wallacal="CN=".$wallacal.",OU=m3kk3t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    my $dn_wallacal="CN=".$wallacal.",OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_wallacal,
                    #####
@@ -2797,12 +2841,12 @@ if ($modify_4_do==1){
                    sAMAccountname=>$wallacal,
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk3t\\homes\\".$wallacal,
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk3t/homes/".$wallacal,
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk4t\\homes\\".$wallacal,
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk4t/homes/".$wallacal,
                    sn=>"Wallace",
                    userPrincipalName => $wallacal."@".$root_dns,
-                   sophomorixAdminClass => "bsz-m3kk3t",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "bsz-m3kk4t",
+                   sophomorixExitAdminClass => "bsz-m3kk3t",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Alfred Russel",
                    sophomorixSurnameASCII  => "Wallace",
@@ -2818,7 +2862,7 @@ if ($modify_4_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "bsz-m3kk4t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -2996,12 +3040,34 @@ if ($modify_4_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$mendelgr."|".$wallacal,
+                   sophomorixMembers=>$mendelgr,
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $mendelgr."|".$wallacal,
+                   member => $mendelgr,
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m3kk4t,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m3kk4t",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m3kk4t",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>$wallacal,
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => $wallacal,
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -3026,7 +3092,7 @@ if ($modify_4_do==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-students",
-                   member => "bsz-m3kk3t",
+                   member => "bsz-m3kk3t|bsz-m3kk4t",
                   });
 
 
@@ -3526,6 +3592,28 @@ if ($kill_1_do==1){
                    memberOf => "bsz-students",
                    member => "",
                   });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m3kk4t,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m3kk4t",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   description=>"bsz-m3kk4t",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
 
 
     ##### Testing the users ou-students group
@@ -3551,7 +3639,7 @@ if ($kill_1_do==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-students",
-                   member => "bsz-m3kk3t",
+                   member => "bsz-m3kk3t|bsz-m3kk4t",
                   });
 }
 
@@ -3640,6 +3728,7 @@ if ($kill_3_check==1){
     &run_command("sophomorix-project $verbose_options --kill -p full-blown");
     &run_command("sophomorix-class --kill --class 7a $verbose_options");
     &run_command("sophomorix-class --kill --class bsz-m3kk3t $verbose_options");
+    &run_command("sophomorix-class --kill --class bsz-m3kk4t $verbose_options");
     &run_command("sophomorix-check $verbose_options");
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
@@ -3653,6 +3742,7 @@ if ($kill_3_do==1){
     &AD_object_nonexist($ldap,$root_dse,"group","p_full-blown");
     &AD_object_nonexist($ldap,$root_dse,"group","7a");
     &AD_object_nonexist($ldap,$root_dse,"group","bsz-m3kk3t");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m3kk4t");
 
     ##### Testing the users ou-teachers group
     # teachers should be removed from p_full-blown

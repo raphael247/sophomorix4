@@ -534,11 +534,15 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
     my $new_status="---";
     my $old_role=$AD{'sam'}{$sam}{'sophomorixRole'};
     my $new_role="---";
-    my $old_class=$AD{'sam'}{$sam}{'sophomorixAdminClass'};
+
     my $new_class="---";
     my $old_school=$AD{'sam'}{$sam}{'sophomorixSchoolname'};
     my $new_school="---";
 
+    # dirty fix to have class without
+    my $old_class=$AD{'sam'}{$sam}{'sophomorixAdminClass'};
+    $old_class=~s/^$old_school-//;
+    
     ##################################################
     # check status update for users in AD
     &test_UEAS_T_update($sam,\$update,\$new_status);
@@ -550,24 +554,17 @@ foreach my $sam ( keys %{$AD{'sam'}} ) {
         # check identifier update for matched users in AD
         &test_user_update($sam,
                           \$update,
-#                          \$old_unid,
                           \$new_unid,
-                          \$old_surname_ascii,
                           \$new_surname_ascii,
-                          \$old_firstname_ascii,
                           \$new_firstname_ascii,
-                          \$old_birthdate,
                           \$new_birthdate,
-                          \$old_surname_utf8,
                           \$new_surname_utf8,
-                          \$old_firstname_utf8,
                           \$new_firstname_utf8,
-                          \$old_filename,
                           \$new_filename,
-                          \$old_school,
-                          \$new_school,
-                          \$old_role,
-                          \$new_role);
+                          \$new_role,
+                          \$new_class,
+	                  \$new_school,
+                         );
     }
 
     if ($update>0){
@@ -781,24 +778,16 @@ sub test_RK_kill{
 sub test_user_update {
     my ($sam,
         $update_ref,
-#        $old_unid_ref,
         $new_unid_ref,
-        $old_surname_ascii_ref,
         $new_surname_ascii_ref,
-        $old_firstname_ascii_ref,
         $new_firstname_ascii_ref,
-        $old_birthdate_ref,
         $new_birthdate_ref,
-        $old_surname_utf8_ref,
         $new_surname_utf8_ref,
-        $old_firstname_utf8_ref,
         $new_firstname_utf8_ref,
-        $old_filename_ref,
         $new_filename_ref,
-        $old_school_ref,
-        $new_school_ref,
-        $old_role_ref,
         $new_role_ref,
+        $new_class_ref,
+        $new_school_ref,
        )=@_;
     my $line_new=$Match{'action_by_sam'}{$sam};
 
@@ -874,16 +863,6 @@ sub test_user_update {
         ${$new_filename_ref}=$Match{'action'}{$line_new}{'filename'};
     }
 
-    # school
-    if ( ($Match{'action'}{$line_new}{'school'} eq $AD{'sam'}{$sam}{'sophomorixSchoolname'} )){
-        # no update
-        ${$new_school_ref}="---";
-    } else {
-        # update
-        ${$update_ref}++;
-        ${$new_school_ref}=$Match{'action'}{$line_new}{'school'};
-    }
-
     # role
     if ( ($Match{'action'}{$line_new}{'role'} eq $AD{'sam'}{$sam}{'sophomorixRole'} )){
         # no update
@@ -892,6 +871,35 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_role_ref}=$Match{'action'}{$line_new}{'role'};
+    }
+
+    # adminclass(with prefix) must be created from school and class
+    my $adminclass;
+    if ($adminclass=$Match{'action'}{$line_new}{'school'} eq $DevelConf::name_default_school){
+        # default-school
+        $adminclass=$Match{'action'}{$line_new}{'class'};
+    } else {
+        $adminclass=$Match{'action'}{$line_new}{'school'}."-".$Match{'action'}{$line_new}{'class'};
+    }
+
+    if ( ($adminclass eq $AD{'sam'}{$sam}{'sophomorixAdminClass'} )){
+        # no update
+        ${$new_class_ref}="---";
+    } else {
+        # update
+        ${$update_ref}++;
+        # ${$new_class_ref}=$adminclass; # with prefix
+        ${$new_class_ref}=$Match{'action'}{$line_new}{'class'}; # without prefix
+    }
+
+    # school
+    if ( ($Match{'action'}{$line_new}{'school'} eq $AD{'sam'}{$sam}{'sophomorixSchoolname'} )){
+        # no update
+        ${$new_school_ref}="---";
+    } else {
+        # update
+        ${$update_ref}++;
+        ${$new_school_ref}=$Match{'action'}{$line_new}{'school'};
     }
 }
 
