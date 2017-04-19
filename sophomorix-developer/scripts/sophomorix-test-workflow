@@ -38,6 +38,8 @@ my $modify_1_check=0;
 my $modify_2_check=0;
 my $modify_3_check=0;
 my $modify_4_check=0;
+my $modify_5_check=0;
+#my $modify_10_check=0;
 my $kill_1_check=0;
 my $kill_2_check=0;
 my $kill_3_check=0;
@@ -47,6 +49,8 @@ my $modify_1_do=0;
 my $modify_2_do=0;
 my $modify_3_do=0;
 my $modify_4_do=0;
+my $modify_5_do=0;
+my $modify_10_do=0;
 my $kill_1_do=0;
 my $kill_2_do=0;
 my $kill_3_do=0;
@@ -64,10 +68,14 @@ my $testopt=GetOptions(
            "modify-2-check" => \$modify_2_check,
            "modify-3-check" => \$modify_3_check,
            "modify-4-check" => \$modify_4_check,
+           "modify-5-check" => \$modify_5_check,
+#           "modify-10-check" => \$modify_10_check,
            "modify-1-do" => \$modify_1_do,
            "modify-2-do" => \$modify_2_do,
            "modify-3-do" => \$modify_3_do,
            "modify-4-do" => \$modify_4_do,
+           "modify-5-do" => \$modify_5_do,
+           "modify-10-do" => \$modify_10_do,
            "kill-1-check" => \$kill_1_check,
            "kill-1-do" => \$kill_1_do,
            "kill-2-check" => \$kill_2_check,
@@ -129,6 +137,12 @@ Step by step Test:
 
       sophomorix-test-workflow --modify-4-check
       sophomorix-test-workflow --modify-4-do
+
+      sophomorix-test-workflow --modify-5-check
+      sophomorix-test-workflow --modify-5-do
+
+  Test project stuff
+      sophomorix-test-workflow --modify-10-do
 
   Kill the added users:
       sophomorix-test-workflow --kill-1-check
@@ -2782,10 +2796,10 @@ if ($modify_4_check==1){
     print "U: $sigurdgy\n";
 
     my $command_modify_4="sophomorix-check $verbose_options ".
-                "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
-                "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
-                "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
-                "--injectline \"bsz.students.csv:m3KK4T;Wallace;Alfred Russel;01.01.2000;\" ".
+                "--injectline \"uni.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
+                "--injectline \"teachers.csv:teachers;Darwin;Charles;12.02.2009\" ".
+                "--injectline \"students.csv:9b;Mendel;Gregor;01.01.2000;\" ".
+                "--injectline \"uni.students.csv:12b;Wallace;Alfred Russel;01.01.2000;\" ".
                 "--injectline \"teachers.csv:teachers;Stefánsson;Ólafur Indriði;03.07.1973;olinst99\" ".
                 "--injectline \"teachers.csv:teachers;Kristinsson;Rúnar;05.09.1969;rukri99\" ".             # back
                 "--injectline \"teachers.csv:teachers;Skúlason;Ari Freyr;14.05.1987;skula99\" ".            # back
@@ -2799,9 +2813,9 @@ if ($modify_4_check==1){
     ############################################################
     &run_command($command_modify_4);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",4);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",2);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",6);
 }
 ############################################################
 if ($modify_4_do==1){
@@ -2855,7 +2869,7 @@ if ($modify_4_do==1){
     &run_command("sophomorix-kill $verbose_options");
 
     # $mendelgr
-    my $dn_mendelgr="CN=".$mendelgr.",OU=m3kk3t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    my $dn_mendelgr="CN=".$mendelgr.",OU=9b,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_mendelgr,
                    #####
@@ -2865,19 +2879,19 @@ if ($modify_4_do==1){
                    sAMAccountname=>$mendelgr,
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk3t\\homes\\".$mendelgr,
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk3t/homes/".$mendelgr,
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\9b\\homes\\".$mendelgr,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/9b/homes/".$mendelgr,
                    sn=>"Mendel",
                    userPrincipalName => $mendelgr."@".$root_dns,
-                   sophomorixAdminClass => "bsz-m3kk3t",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "9b",
+                   sophomorixExitAdminClass => "teachers",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Gregor",
                    sophomorixSurnameASCII  => "Mendel",
                    sophomorixBirthdate  => "01.01.2000",
                    sophomorixRole => "student",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
@@ -2886,10 +2900,10 @@ if ($modify_4_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-m3kk3t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "9b|wifi|internet|webfilter|intranet|printing",
                   });
     # $wallacal
-    my $dn_wallacal="CN=".$wallacal.",OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    my $dn_wallacal="CN=".$wallacal.",OU=12b,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
                    dn=>$dn_wallacal,
                    #####
@@ -2899,19 +2913,19 @@ if ($modify_4_do==1){
                    sAMAccountname=>$wallacal,
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m3kk4t\\homes\\".$wallacal,
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m3kk4t/homes/".$wallacal,
+                   homeDirectory=>"\\\\linuxmuster.local\\uni\\students\\12b\\homes\\".$wallacal,
+                   unixHomeDirectory=>"/srv/samba/schools/uni/students/12b/homes/".$wallacal,
                    sn=>"Wallace",
                    userPrincipalName => $wallacal."@".$root_dns,
-                   sophomorixAdminClass => "bsz-m3kk4t",
-                   sophomorixExitAdminClass => "bsz-m3kk3t",
+                   sophomorixAdminClass => "uni-12b",
+                   sophomorixExitAdminClass => "bsz-m3kk4t",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Alfred Russel",
                    sophomorixSurnameASCII  => "Wallace",
                    sophomorixBirthdate  => "01.01.2000",
                    sophomorixRole => "student",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
+                   sophomorixSchoolPrefix => "uni",
+                   sophomorixSchoolname => "uni",
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
@@ -2920,8 +2934,9 @@ if ($modify_4_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-m3kk4t|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "uni-12b|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
+
     # $halldoha
     my $dn_halldoha="CN=".$halldoha.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_test_object({ldap=>$ldap,
@@ -3098,12 +3113,12 @@ if ($modify_4_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$mendelgr,
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $mendelgr,
+                   member => "",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m3kk4t,OU=m3kk4t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -3120,12 +3135,12 @@ if ($modify_4_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$wallacal,
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz-students",
-                   member => $wallacal,
+                   member => "",
                   });
     ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -3138,7 +3153,7 @@ if ($modify_4_do==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-students",
-                   member => "7a",
+                   member => "7a|9b",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -3156,7 +3171,7 @@ if ($modify_4_do==1){
 
     # koperni99
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=koperni99,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=koperni99,OU=Teachers,OU=uni,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Nikolaus Kopernikus",
                    givenName=>"Nikolaus",
@@ -3164,19 +3179,19 @@ if ($modify_4_do==1){
                    sAMAccountname=>"koperni99",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\teachers\\homes\\koperni99",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/homes/koperni99",
+                   homeDirectory=>"\\\\linuxmuster.local\\uni\\teachers\\homes\\koperni99",
+                   unixHomeDirectory=>"/srv/samba/schools/uni/teachers/homes/koperni99",
                    sn=>"Kopernikus",
                    userPrincipalName => "koperni99@".$root_dns,
-                   sophomorixAdminClass => "bsz-teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "uni-teachers",
+                   sophomorixExitAdminClass => "bsz-teachers",
 #                   sophomorixFirstPassword => "LinuxMuster23!",
                    sophomorixFirstnameASCII => "Nikolaus",
                    sophomorixSurnameASCII  => "Kopernikus",
                    sophomorixBirthdate  => "19.02.1973",
                    sophomorixRole => "teacher",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
+                   sophomorixSchoolPrefix => "uni",
+                   sophomorixSchoolname => "uni",
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
@@ -3185,12 +3200,12 @@ if ($modify_4_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "uni-teachers|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
     # darwi99
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=darwi99,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=darwi99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Charles Darwin",
                    givenName=>"Charles",
@@ -3198,19 +3213,19 @@ if ($modify_4_do==1){
                    sAMAccountname=>"darwi99",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\teachers\\homes\\darwi99",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/homes/darwi99",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\teachers\\homes\\darwi99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/homes/darwi99",
                    sn=>"Darwin",
                    userPrincipalName => "darwi99@".$root_dns,
-                   sophomorixAdminClass => "bsz-teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "9b",
 #                   sophomorixFirstPassword => "LinuxMuster23!",
                    sophomorixFirstnameASCII => "Charles",
                    sophomorixSurnameASCII  => "Darwin",
                    sophomorixBirthdate  => "12.02.2009",
                    sophomorixRole => "teacher",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
@@ -3219,7 +3234,7 @@ if ($modify_4_do==1){
                    sophomorixStatus => "S",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # olinst99
@@ -3361,12 +3376,12 @@ if ($modify_4_do==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"rukri99|olinst99|skula99",
+                   sophomorixMembers=>"darwi99|rukri99|olinst99|skula99",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-teachers",
-                   member => "rukri99|olinst99|skula99",
+                   member => "darwi99|rukri99|olinst99|skula99",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-teachers,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -3375,14 +3390,142 @@ if ($modify_4_do==1){
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
-                   sophomorixMembers=>"koperni99|darwi99",
+                   sophomorixMembers=>"",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "global-teachers",
-                   member => "koperni99|darwi99",
+                   member => "",
                   });
+}
 
+if ($modify_5_check==1){
+    # fetch loginnames:
+    my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Mendel",
+                                givenName=>"Gregor",
+                                birthdate=>"01.01.2000",
+                               });
+    my ($wallacal,$wallacal_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Wallace",
+                                givenName=>"Alfred Russel",
+                                birthdate=>"01.01.2000",
+                               });
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+
+    my ($sigurdgy,$sigurdgy_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Gylfi Þór",
+                                birthdate=>"08.09.1989",
+                               });
+    print "U: $mendelgr\n";
+    print "U: $wallacal\n";
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
+    print "U: $sigurdgy\n";
+
+}
+
+if ($modify_5_do==1){
+    # fetch loginnames:
+    my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Mendel",
+                                givenName=>"Gregor",
+                                birthdate=>"01.01.2000",
+                               });
+    my ($wallacal,$wallacal_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Wallace",
+                                givenName=>"Alfred Russel",
+                                birthdate=>"01.01.2000",
+                               });
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+
+    print "U: $mendelgr\n";
+    print "U: $wallacal\n";
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
+
+}
+
+if ($modify_10_do==1){
+    # fetch loginnames:
+    my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Mendel",
+                                givenName=>"Gregor",
+                                birthdate=>"01.01.2000",
+                               });
+    my ($wallacal,$wallacal_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Wallace",
+                                givenName=>"Alfred Russel",
+                                birthdate=>"01.01.2000",
+                               });
+    my ($halldoha,$halldoha_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Halldórsson",
+                                givenName=>"Hannes Þór",
+                                birthdate=>"27.04.1984",
+                               });
+    my ($gunnarar,$gunnarar_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Gunnarsson",
+                                givenName=>"Aron",
+                                birthdate=>"22.04.1989",
+                               });
+    my ($sigurdra,$sigurdra_dn)=&AD_get_samaccountname({ldap=>$ldap,
+                                root_dse=>$root_dse,
+                                sn=>"Sigurðsson",
+                                givenName=>"Ragnar",
+                                birthdate=>"19.06.1986",
+                               });
+
+    print "U: $mendelgr\n";
+    print "U: $wallacal\n";
+    print "U: $halldoha\n";
+    print "U: $gunnarar\n";
+    print "U: $sigurdra\n";
 
     # create the project p_full-blown
     my $pro_command="sophomorix-project $verbose_options ".
@@ -3419,13 +3562,6 @@ if ($modify_4_do==1){
                    memberOf => "",
                    member => "7a|teachers|rukri99|olinst99|skula99|".$halldoha."|".$gunnarar,
                   });
-
-
-
-
-
-
-
 }
 
 
