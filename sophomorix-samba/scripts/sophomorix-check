@@ -1197,11 +1197,17 @@ sub edit_distance {
 ################################################################################
 sub analyze_user_line {
     my ($line,$file_abs,$filename,$school,$count,$enc_used,$injected) = @_;
-#    if (m/^#/ or m/^\s*$/){
     if ($line=~m/^#/ or $line=~m/^\s*$/){
+        # begins with #
+        # or contains only whitespace
         return 0;
     } else {
         chomp($line);
+        $line=&remove_whitespace($line);
+        # add trailing ; if not there
+        if (not $line=~m/;$/){
+            $line=$line.";";
+        }
         my ($class_raw,
             $last_raw,
             $first_raw,
