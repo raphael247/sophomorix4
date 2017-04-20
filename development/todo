@@ -7,82 +7,52 @@ weiter:
 
 sophomorix-check:
 
-weiter: move anhangen an update
-update soll auch moven
+- Bug: automatische encoding erkennen tut nicht
+
+# ???? what to do here
+  todo: login creation in sophomorix-add
+        login in 5th field teachers.csv OK
+        testing random password creation
+JETZT:
+students: Feld 5 wird als unid gesehen:
+   - upload bei exact matches
+   - upload bei approx-matches (ist das gut so?, besser nur bei exact matches)
+
+Options to be added ????:
+--dummy-bithdate (also konfigurable), use 01.01.1970 as birthdate
+  for all users
+--skip unids 
+  (ignore the unids in files, do not upload)
+--upload unids (upload unids for exacr matches, this might be default)
 
 
-# write_update_file:         geht alle matches durch (AD und files)
-
-# write_status_update_file: geht alle user im AD durch
-
-# Beides könnte in eine Schleife, die von write_status_update_file
-
-# alle user im ad durchgehen {
-# $update=0;
-#       -> status prüfen
-#          $newstat,$update=&test_UEAS_T_update($sam,$update)  (status ist U,E,A,S) wirds T?
-#          $newstat,$update=&test_T_DA_update                  (status ist T) wirds D oder A?
-#          $newstat,$update=&test_DL_RA_update                 (status ist D,L) wirds R oder A?
-#          $newstat,$update=&test_R_A_update                   (status ist D,L) wirds A?
-       
-
-# #  falls kein match 
-# #      -> nix mehr
-#   falls ein match
-#       -> update des Namens prüfen
-#        $name,surname=&test_user_update()  (update des accounts)
-#       -> move prüfen
-#        $name,surname=&test_move_update  (update des accounts)
-# -> wenn $update>0, dann  update-Zeile schreiben Zeile schreiben (wenn änderungen)
-# -> sonst nochange-Zeile schreiben
-# }
-
-
-
-sophomorix.move befüllen
-wieso wird der status genötigt? -> raus
-wieseo wird alte und neue rolle benötigt 
-(rolle wird bei update upgedated)
-
-move evtl. in update einpflegen?
-
-sophomorix-move: variablen in englisch
-
-
-
-todo: login creation in sophomorix-add
-      login in 5th field teachers.csv OK
-      testing random password creation
 
 sophomorix-test-workflow
- - add more users in other schools
- - test added users
- - add them to project
-   - check if they are removed from project correctly
-     -members
-     - sophomorixMembers (multivalue)
-     - sophomorixAdmins (multivalue)
-     - sophomorixMemberGroups (multivalue)
-     - sophomorixAdminGroups (multivalue)
-test wenn user leicht verändert kommt 
-test-3 
+ - add more projects
+   - make projects member of project
 
+test: sophomorix-test-workflow
+   test wenn user leicht verändert wieder kommt 
 
 Testing: test with users that would create the same loginname
          (differ only in birthdate and class)
 
 
-
-test script: suche nach userfragmenten|gruppen fragmenten im AD
+test script: suche nach user fragmenten|gruppen fragmenten im AD
    - wo ist der user xyz42 noch in einem attribut
 
 
 neues attribut: sophomorixLockingDateEnd
 sophomorix-check/update ativiert den user wieder zu status A
+   sophomorix-user -u user -L --days <day-num>
+neues Attribut????:
+        sophomorixFullAdminClass
+        --> bsz-m3kk3t
+        (sophomorixAdminClass --> m3kk3t)
 
 
 sophomorix-user -i
-   --> alle zeigen, wie bisher
+   --> Übersicht zeigen, wie bisher
 -i -K
    --> alle killable zeigen (einer pro Zeile)
 
@@ -100,9 +70,11 @@ Status wechseln
   E und a tauschen hat Vorteil:
    automatismus: deacrivated and activated
    von hand: enabled
+--> statuskorrektur bei migration erforderlich???
+    ??? Option repair status bei sophomori-check ???
 
-statuskorrektur bei migration erforderlich???
 
+script sophomorix-nochange to show sophomorix.nochange ???
 
 sophomorix-workflow: .nochange
   - die user die T und D sind und sich der status nicht ändert auch nach nochange?
