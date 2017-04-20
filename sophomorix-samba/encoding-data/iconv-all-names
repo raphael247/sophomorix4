@@ -35,8 +35,8 @@ use Text::Iconv;
 #     D) convert this file to a unicode file uni:
 #        iconv --verbose -f 8859_1 -t utf-8 file -o uni
 #     E) Add/Append the contents of the file to 
-#        firstname_errors.utf8.txt with emacs or:
-#        cat uni >> firstname_errors.utf8.txt
+#        firstname_errors.UTF8.txt with emacs or:
+#        cat uni >> firstname_errors.UTF8.txt
 #     D) Run iconv-all-names to create all other target 
 #        encoding files:
 #         firstnames.<enc>.txt
@@ -49,8 +49,8 @@ use Text::Iconv;
 
 
 # the utf8 master file
-my $file_in="./firstnames.utf8.txt";
-my $file_error_in="./firstname_errors.utf8.txt";
+my $file_in="./firstnames.UTF8.txt";
+my $file_error_in="./firstname_errors.UTF8.txt";
 
 # target encodings
 my @target_encodings=(
@@ -65,14 +65,14 @@ my @target_encodings=(
 
 # correct names
 foreach my $encoding (@target_encodings){
-    # converting the utf8 file to targets
+    # converting the UTF8 file to targets
     my $target_name="./firstnames.".$encoding.".txt";
     &convert($file_in,$target_name,$encoding);
 }
 
 # error names
 foreach my $encoding (@target_encodings){
-    # converting the utf8 error file to targets
+    # converting the UTF8 error file to targets
     my $target_name="./firstname_errors.".$encoding.".txt";
     &convert($file_error_in,$target_name,$encoding);
 }
@@ -95,7 +95,7 @@ sub convert {
         chomp();
         my $inline=$_;
         print "$inline\n";
-        my $conv = Text::Iconv->new("utf8",$enc);
+        my $conv = Text::Iconv->new("UTF8",$enc);
         my $outline = $conv->convert($inline);
         if (defined $outline){
             print "$inline --> $outline\n";

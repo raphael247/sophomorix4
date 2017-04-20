@@ -71,6 +71,7 @@ my $user_count=0;
 
 my $school="";
 my %users_file=();
+my %unid_seen=();
 
 # allowed numbers for days
 my %convert_day = qw(
@@ -341,7 +342,6 @@ foreach my $user_file (@filelist){
     $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
 
     my $enc_used=&get_encoding($filename);
-    &print_title("Reading $user_file");
     open(USERS,"$user_file") || 
          die "ERROR: $user_file not found!";  
     open(USERSUTF8,">$user_file_utf8") || 
@@ -821,7 +821,8 @@ sub test_user_update {
         # no update
         ${$new_unid_ref}="---";
     } else {
-        # update
+	print "UNID: $Match{'action'}{$line_new}{'unid'}\n";
+        # update only if user is identically matched
         ${$update_ref}++;
         ${$new_unid_ref}=$Match{'action'}{$line_new}{'unid'};
     }
@@ -1254,6 +1255,13 @@ sub analyze_user_line {
         if ($unid eq ""){
 	    $unid="---";
         }
+        if ($unid ne "---" and exists $unid_seen{$filename}{$unid}){
+            print "\nERROR: Unid $unid is double in $filename\n\n";
+            exit;
+        } else {
+            $unid_seen{$filename}{$unid}="seen";
+        }
+
         if ($login eq ""){
 	    $login="---";
         }
@@ -1435,7 +1443,7 @@ sub check_login {
 # Encoding stuff
 ################################################################################
 sub reading_firstnames {
-    my @datafiles=("firstnames.utf8.txt", 
+    my @datafiles=("firstnames.UTF8.txt", 
                    "firstnames.ISO_8859-1.txt", 
                   );
     foreach my $file_rel (@datafiles){
@@ -1461,13 +1469,19 @@ sub reading_firstnames {
             print "   Reading $file_abs for encoding: $enc\n";
         }
         close(DATAFILE);
+        if($Conf::log_level>=3){
+            print "Read the following firstnames:\n";
+            foreach my $firstname (keys %{ $firstnames_data{$enc} }) {
+                print "$firstname\n";
+            }
+        }
     }
 }
 
 
 
 sub reading_firstname_errors {
-    my @datafiles=("firstname_errors.utf8.txt", 
+    my @datafiles=("firstname_errors.UTF8.txt", 
                    "firstname_errors.ISO_8859-1.txt", 
                   );
     foreach my $file_rel (@datafiles){
@@ -1494,6 +1508,13 @@ sub reading_firstname_errors {
             print "   Reading $file_abs for errors: $enc\n";
         }
         close(DATAFILE);
+        if($Conf::log_level>=3){
+            print "Read the following firstname errors:\n";
+            foreach my $firstname_err (keys %{ $firstnames_errors{$enc} }) {
+                print "$firstname_err\n";
+            }
+        }
+
     }
 }
 
@@ -1505,6 +1526,7 @@ sub get_encoding {
     my $enc=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING};
     my $enc_force=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE};
     my $enc_checked=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED};
+    &print_title("Encoding results for  $filename");
     print "   * ENCODING:          $enc\n";
     print "   * ENCODING_FORCE:    $enc_force\n";
     print "   * ENCODING_CHECKED:  $enc_checked\n";
@@ -1665,7 +1687,7 @@ sub print_analyzed_encoding {
     # print valid firstnames
     if($Conf::log_level>=2){
     print "\nValid firstnames: ",
-          "($encoding_check_results{$file}{'firstnames'}{'result'} ---> ut8)f\n";
+          "($encoding_check_results{$file}{'firstnames'}{'result'} ---> utf8)\n";
     print "==========================================================================\n";
     foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} } ){
         printf  "%-20s %-12s %-20s\n",
@@ -1705,7 +1727,7 @@ sub print_analyzed_encoding {
     }
 
     # Print Result
-    print "S\n";
+    print "\n";
     print "+---------------------+--------+--------+--------+\n";
     printf  "| %-20s|%7s |%7s |%7s |\n",
             "Tested Encodings:",
