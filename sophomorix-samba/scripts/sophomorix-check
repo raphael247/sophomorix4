@@ -489,14 +489,14 @@ if ($dump_matches==1){
 # Write results into files
 ###########################################################################
 
-my $add_file_new=$DevelConf::path_result."/sophomorix.add";
-open (ADD, ">$add_file_new");
-my $update_file_new=$DevelConf::path_result."/sophomorix.update";
-open (UPDATE, ">$update_file_new");
-my $kill_file_new=$DevelConf::path_result."/sophomorix.kill";
-open (KILL, ">$kill_file_new");
-my $nochange_file_new=$DevelConf::path_result."/sophomorix.nochange";
-open (NOCHANGE, ">$nochange_file_new");
+my $add_file=$DevelConf::path_result."/sophomorix.add";
+open (ADD, ">$add_file");
+my $update_file=$DevelConf::path_result."/sophomorix.update";
+open (UPDATE, ">$update_file");
+my $kill_file=$DevelConf::path_result."/sophomorix.kill";
+open (KILL, ">$kill_file");
+my $nochange_file=$DevelConf::path_result."/sophomorix.nochange";
+open (NOCHANGE, ">$nochange_file");
 
 &print_title("Writing the files:");
 
@@ -624,6 +624,30 @@ close(ADD);
 close(UPDATE);
 close(KILL);
 close(NOCHANGE);
+
+&print_title("Overview of what can be done:");
+
+# show overview
+my $linecount_add=`wc -l $add_file`;
+chomp($linecount_add);
+my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
+printf "%-21s%7s\n",basename($add_file),$lc_add;
+
+my $linecount_update=`wc -l $update_file`;
+chomp($linecount_update);
+my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
+printf "%-21s%7s\n",basename($update_file),$lc_update;
+
+my $linecount_kill=`wc -l $kill_file`;
+chomp($linecount_kill);
+my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
+printf "%-21s%7s\n",basename($kill_file),$lc_kill;
+
+my $linecount_nochange=`wc -l $nochange_file`;
+chomp($linecount_nochange);
+my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
+printf "%-21s%7s\n",basename($nochange_file),$lc_nochange;
+
 
 &AD_unbind_admin($ldap);
 &log_script_end(@arguments);
