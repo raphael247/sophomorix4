@@ -308,7 +308,7 @@ sub config_sophomorix_read {
     }
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
-    # Adding some defaults:
+    # Adding some defaults: ????? better to move the defaults to an external file ?????
     $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
         "adminclass";
     # default school
@@ -333,7 +333,7 @@ sub config_sophomorix_read {
     }
     closedir REPDIR;
 
-    # school list
+    # add default school to school list
     push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $DevelConf::name_default_school; 
 
     ##################################################
@@ -355,6 +355,7 @@ sub config_sophomorix_read {
         $var=&remove_whitespace($var);
         $value=&remove_whitespace($value);
         if ($var eq "SCHOOL"){
+            # add default school to school list
             $sophomorix_config{'SCHOOLS'}{$value}{'OU'}="unknown";
             push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $value; 
             $sophomorix_config{'SCHOOLS'}{$value}{'CONF_FILE'}=
@@ -373,7 +374,13 @@ sub config_sophomorix_read {
     close(SOPHOMORIX);
 
     ##################################################
-    # SCHOOLS    
+    # SCHOOLS   
+    #### new code
+    # do that once
+    my %master=&read_master_ini($DevelConf::path_conf_master_school);
+    #### new code
+
+
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
@@ -397,6 +404,20 @@ sub config_sophomorix_read {
                          $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                  }
 
+
+
+
+        #### new code
+        # do that for every school
+
+
+
+        #### new code
+
+
+
+
+        ######## ?????????????????????????  ################     replace this with ini import
         &print_title("Reading $conf_school");
         open(SCHOOL,"$conf_school") || 
              die "ERROR: $conf_school not found!\n";
@@ -550,6 +571,13 @@ sub config_sophomorix_read {
             }
         }
         close(SCHOOL);
+        ######## ?????????????????????????  ################     replace this with ini import
+
+
+
+
+
+
     }
     # GLOBAL
 #    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
@@ -884,6 +912,14 @@ sub config_sophomorix_read {
     return %sophomorix_config; 
 }
  
+
+sub read_master_ini {
+    my ($masterfile)=@_;
+    my %master=();
+    &print_title("Reading $masterfile");
+    
+    return %master;
+}
 
 
 sub filelist_fetch {
