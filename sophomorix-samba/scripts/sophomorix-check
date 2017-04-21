@@ -1467,10 +1467,7 @@ sub check_login {
 # Encoding stuff
 ################################################################################
 sub reading_firstnames {
-    my @datafiles=("firstnames.UTF8.txt", 
-                   "firstnames.ISO_8859-1.txt", 
-                  );
-    foreach my $file_rel (@datafiles){
+    foreach my $file_rel ( @DevelConf::enc_firstnames ){
         my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
         my @list = split(/\//,$file_abs);
         my $filename = pop @list;
@@ -1499,10 +1496,7 @@ sub reading_firstnames {
 
 
 sub reading_firstname_errors {
-    my @datafiles=("firstname_errors.UTF8.txt", 
-                   "firstname_errors.ISO_8859-1.txt", 
-                  );
-    foreach my $file_rel (@datafiles){
+    foreach my $file_rel ( @DevelConf::enc_err_firstnames ){
         my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
         my @list = split(/\//,$file_abs);
         my $filename = pop @list;
