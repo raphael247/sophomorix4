@@ -12,6 +12,7 @@ require Exporter;
 #use Quota;
 #use Sys::Filesystem ();
 use Time::Local;
+use Config::IniFiles;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -377,8 +378,21 @@ sub config_sophomorix_read {
     # SCHOOLS   
     #### new code
     # do that once
-    my %master=&read_master_ini($DevelConf::path_conf_master_school);
+    my $ref_master=&read_master_ini($DevelConf::path_conf_master_school);
+
+    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+        my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
+        # romove this later ??????
+        $conf_school="/root/abc.school.conf";
+        $ref_modmaster=&check_config_ini($ref_master,$conf_school);
+        &load_school_ini($school,$ref_modmaster,\%sophomorix_config);
+
+    }
     #### new code
+
+
+
+
 
 
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -913,13 +927,119 @@ sub config_sophomorix_read {
 }
  
 
+
 sub read_master_ini {
     my ($masterfile)=@_;
     my %master=();
     &print_title("Reading $masterfile");
-    
-    return %master;
+    tie %master, 'Config::IniFiles',
+        ( -file => $masterfile, 
+          -handle_trailing_comment => 1,
+        );
+    return \%master;
 }
+
+
+
+sub check_config_ini {
+    my ($ref_master,$configfile)=@_;
+    my %modmaster= %{ $ref_master }; # copies ref_master
+    &print_title("Reading $configfile");
+    tie %config, 'Config::IniFiles',
+        ( -file => $configfile, 
+          -handle_trailing_comment => 1,
+        );
+    # walk through all settings in the fonfig
+    foreach my $section ( keys %config ) {
+        print "Section: $section\n";
+        foreach my $parameter ( keys %{$config{$section}} ) {
+            #print "Verifying if parameter $parameter is valid in section $section\n";
+            if (exists $modmaster{$section}{$parameter}){
+                #print "parameter $parameter is valid OK\n";
+                # overwrite  %modmaster
+                $modmaster{$section}{$parameter}=$config{$section}{$parameter};
+            } else {
+                print "\n    WARNING: $parameter is NOT valid in section $section\n\n";
+            }
+        }
+    }
+    #print Dumper(\%modmaster);
+    return \%modmaster;
+}
+
+
+
+sub load_school_ini {
+    my ($school,$ref_modmaster,$ref_sophomorix_config)=@_;
+     foreach my $section ( keys %{ $ref_modmaster } ) {
+        print "S: $section\n";
+	if ($section eq "school"){
+            ############################## school section
+
+            # walk through parameters
+            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+                print "    $school: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'SCHOOLSXXX'}{$school}{$parameter}=
+                    $ref_modmaster->{$section}{$parameter};
+            }
+	} elsif ($section eq "file.students.csv" or 
+                 $section eq "file.teachers.csv" or
+                 $section eq "file.extrastudents.csv"){
+            ############################## file.***.csv user section
+	    my ($string,$name,$extension)=split(/\./,$section);
+            my $filename;
+            if ($school eq $DevelConf::name_default_school){
+                $filename=$name.".".$extension;
+            } else {
+                $filename=$school.".".$name.".".$extension;
+            }
+            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+	        print "FILENAME: $filename\n";
+                print "    $filename: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'FILESXXX'}{'USER_FILE'}{$filename}{$parameter}=
+                    $ref_modmaster->{$section}{$parameter};
+            }
+	} elsif ($section eq "file.extraclasses.csv"){
+            ############################## file.***.csv class section
+	    my ($string,$name,$extension)=split(/\./,$section);
+            my $filename;
+            if ($school eq $DevelConf::name_default_school){
+                $filename=$name.".".$extension;
+            } else {
+                $filename=$school.".".$name.".".$extension;
+            }
+            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+	        print "FILENAME: $filename\n";
+                print "    $filename: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'FILESXXX'}{'CLASS_FILE'}{$filename}{$parameter}=
+                    $ref_modmaster->{$section}{$parameter};
+            }
+
+	} elsif ($section eq "file.devices.csv"){
+            ############################## file.***.csv device section
+	    my ($string,$name,$extension)=split(/\./,$section);
+            my $filename;
+            if ($school eq $DevelConf::name_default_school){
+                $filename=$name.".".$extension;
+            } else {
+                $filename=$school.".".$name.".".$extension;
+            }
+            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+	        print "FILENAME: $filename\n";
+                print "    $filename: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'FILESXXX'}{'DEVICE_FILE'}{$filename}{$parameter}=
+                    $ref_modmaster->{$section}{$parameter};
+            }
+
+	} elsif ($section eq "managementgroup.wifi"){
+            # ???????????? all managenmentgroups are handles
+	} elsif ($section eq "managementgroup.internet"){
+
+        }
+    }
+
+}
+
 
 
 sub filelist_fetch {
