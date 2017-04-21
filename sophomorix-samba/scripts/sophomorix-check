@@ -814,18 +814,10 @@ sub test_user_update {
         $new_school_ref,
        )=@_;
     my $line_new=$Match{'action_by_sam'}{$sam};
-
-    # unid
-    if ( ($Match{'action'}{$line_new}{'unid'} eq $AD{'sam'}{$sam}{'sophomorixUnid'}) or
-         ($Match{'action'}{$line_new}{'unid'} eq "" and $AD{'sam'}{$sam}{'sophomorixUnid'} eq "---") ){
-        # no update
-        ${$new_unid_ref}="---";
-    } else {
-	print "UNID: $Match{'action'}{$line_new}{'unid'}\n";
-        # update only if user is identically matched
-        ${$update_ref}++;
-        ${$new_unid_ref}=$Match{'action'}{$line_new}{'unid'};
-    }
+   
+    # count changes to attributes, 
+    # update unid only when ALL other values are the same
+    my $identifier_class_changes=0;
 
     # new_surname_ascii
     if ( ($Match{'action'}{$line_new}{'surname_ascii'} eq $AD{'sam'}{$sam}{'sophomorixSurnameASCII'})){
@@ -835,6 +827,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_surname_ascii_ref}=$Match{'action'}{$line_new}{'surname_ascii'};
+        $identifier_class_changes++;
     }
 
     # new_firstname_ascii
@@ -845,6 +838,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_firstname_ascii_ref}=$Match{'action'}{$line_new}{'firstname_ascii'};
+        $identifier_class_changes++;
     }
 
 
@@ -856,6 +850,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_surname_utf8_ref}=$Match{'action'}{$line_new}{'surname_utf8'};
+        $identifier_class_changes++;
     }
 
     # new_firstname_utf8
@@ -866,6 +861,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_firstname_utf8_ref}=$Match{'action'}{$line_new}{'firstname_utf8'};
+        $identifier_class_changes++;
     }
 
     # birthdate
@@ -876,6 +872,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_birthdate_ref}=$Match{'action'}{$line_new}{'birthdate'};
+        $identifier_class_changes++;
     }
 
     # filename
@@ -886,6 +883,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_filename_ref}=$Match{'action'}{$line_new}{'filename'};
+        $identifier_class_changes++;
     }
 
     # role
@@ -896,6 +894,7 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_role_ref}=$Match{'action'}{$line_new}{'role'};
+        $identifier_class_changes++;
     }
 
     # adminclass(with prefix) must be created from school and class
@@ -915,6 +914,7 @@ sub test_user_update {
         ${$update_ref}++;
         # ${$new_class_ref}=$adminclass; # with prefix
         ${$new_class_ref}=$Match{'action'}{$line_new}{'class'}; # without prefix
+        $identifier_class_changes++;
     }
 
     # school
@@ -925,6 +925,30 @@ sub test_user_update {
         # update
         ${$update_ref}++;
         ${$new_school_ref}=$Match{'action'}{$line_new}{'school'};
+        $identifier_class_changes++;
+    }
+
+    # unid
+    if ( ($Match{'action'}{$line_new}{'unid'} eq $AD{'sam'}{$sam}{'sophomorixUnid'}) or
+         ($Match{'action'}{$line_new}{'unid'} eq "" and $AD{'sam'}{$sam}{'sophomorixUnid'} eq "---") ){
+        # no update
+        ${$new_unid_ref}="---";
+    } else {
+	print "UNID: $Match{'action'}{$line_new}{'unid'}\n";
+        # update only if user is identically matched
+        if ($identifier_class_changes==0){
+            if ($Match{'action'}{$line_new}{'unid'} eq "---"){
+                # write empty value to sophomorix.update, so sophomorix-update 
+                # will not skip it ("---" would mean skip it)
+                ${$new_unid_ref}="";
+                ${$update_ref}++;
+            } else {
+                ${$new_unid_ref}=$Match{'action'}{$line_new}{'unid'};
+                ${$update_ref}++;
+            }
+        } else {
+            print "$sam not uploading new unid: identifier or class changed\n";
+        }
     }
 }
 
@@ -1469,12 +1493,6 @@ sub reading_firstnames {
             print "   Reading $file_abs for encoding: $enc\n";
         }
         close(DATAFILE);
-        if($Conf::log_level>=3){
-            print "Read the following firstnames:\n";
-            foreach my $firstname (keys %{ $firstnames_data{$enc} }) {
-                print "$firstname\n";
-            }
-        }
     }
 }
 
@@ -1508,13 +1526,6 @@ sub reading_firstname_errors {
             print "   Reading $file_abs for errors: $enc\n";
         }
         close(DATAFILE);
-        if($Conf::log_level>=3){
-            print "Read the following firstname errors:\n";
-            foreach my $firstname_err (keys %{ $firstnames_errors{$enc} }) {
-                print "$firstname_err\n";
-            }
-        }
-
     }
 }
 

@@ -7,16 +7,23 @@ weiter:
 
 sophomorix-check:
 
-- Bug: automatische encoding erkennen tut nicht
-
 # ???? what to do here
   todo: login creation in sophomorix-add
         login in 5th field teachers.csv OK
         testing random password creation
 JETZT:
 students: Feld 5 wird als unid gesehen:
-   - upload bei exact matches
-   - upload bei approx-matches (ist das gut so?, besser nur bei exact matches)
+   - upload bei exact matches (ALLES außer unid gleich, auch Klasse,Schule)
+
+unid double problem:
+   what if unid is double in different files?
+   this cant be avoided
+   ---> upload filename.unid to AD attribute unid?
+        ohne unid --- nach sophomorixUnid
+   ---> bei schulwechsel eines schülers: neue unid (wäre ohne filename auch so)
+                                    ---> neuer Account
+        ist das OK so?
+   ---> zusammenführen der accounts per script???
 
 Options to be added ????:
 --dummy-bithdate (also konfigurable), use 01.01.1970 as birthdate
