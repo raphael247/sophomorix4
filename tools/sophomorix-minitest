@@ -13,7 +13,8 @@ use Sophomorix::SophomorixConfig;
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
-use Test::More "no_plan";
+#use Test::More "no_plan";
+use Config::IniFiles;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -43,6 +44,9 @@ use Sophomorix::SophomorixBase qw(
                                  check_options
                                  config_sophomorix_read
                                  );
+use Sophomorix::SophomorixTest qw(
+                                 file_test_lines
+                                 );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
                                  AD_bind_admin
@@ -67,12 +71,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  next_free_uidnumber_get
                                     );
 
-
-
-
 $Conf::log_level=1;
 my $help=0;
-
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -89,18 +89,87 @@ my @filelist=&filelist_fetch({filetype=>"users",
                             });
 
 
+
 ############################################################
 # BEGIN: Test code goes here
 ############################################################
-my $json=0;
-my $dump_AD=0;
-# fetch system data
+
+#my $cfg = Config::IniFiles->new( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
+#                                 -handle_trailing_comment => 1
+#                               );
+
+# show errors
+#print @Config::IniFiles::errors;
+
+#print "The value is >" . $cfg->val( 'school', 'MAILQUOTA_DEFAULT_TEACHER' ) . "<\n" 
+#    if $cfg->val( 'school', 'MAILQUOTA_DEFAULT_TEACHER' );
+
+#print "The value is >" . $cfg->val( 'managementgroup.wifi', 'allow_group' ) . "<.\n" 
+#   if $cfg->val( 'managementgroup.wifi', 'allow_group' );
+
+#my %ini;
+#tie %ini, 'Config::IniFiles', ( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
+#                                -handle_trailing_comment => 1
+#                              );
+#print Dumper(\%ini);
 
 
-my $object="halldoha";
+my %master=();
+&read_ini_file("/usr/share/sophomorix/devel/master/school.conf.master");
+
+print Dumper(\%master);
+
+print "We have >".$master{'managementgroup.wifi'}{'allow_group'}."<\n";
+# if ${managementgroup.wifi}{allow_group};
+
+
+# walk through all parameters
+foreach my $section ( keys %master ) {
+    print "Section: $section\n";
+    foreach my $parameter ( keys %{$master{$section}} ) {
+        print "    Parameter: $parameter -> >$master{$section}{$parameter}<\n";
+    }
+}
+
+foreach my $parameter ( keys %{$master{'managementgroup.wifi'}} ) {
+    print "Parameter: $parameter\n";
+}
+
+
+sub read_ini_file {
+    my ($filename)=@_;
+    tie %master, 'Config::IniFiles', ( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
+                                       -handle_trailing_comment => 1
+                                     );
+}
+
+#&file_test_lines("/etc/linuxmuster/sophomorix/sophomorix.conf",11,"ltg","bsz");
+
+# my @list=("one","two");
+
+# foreach my $num (@list){
+#     my $update=0;
+#     my $stat="---";
+
+#     print "$num UP1: $update $stat\n";
+#     &increase_update(\$update,\$stat);
+#     print "$num UP2: $update $stat\n";
+# }
+
+# sub increase_update {
+#     my ($update,$stat_ref)=@_;
+#     ${$update}++;
+#     ${$stat_ref}="T";
+# }
+
+
+
+
+
+#my $object="halldoha";
 #my $object="7a";
 
-&AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$object);
+#&AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$object);
 
 # my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
 #                            root_dse=>$root_dse,

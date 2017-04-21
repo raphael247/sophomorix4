@@ -41,12 +41,13 @@
 	PWD_LENGHT=10
 	TOLERATION_TIME=40
 	DEACTIVATION_TIME=80
-[file.extraclasses.csv]
+#[file.extraclasses.csv]
 	# is a file extraclasses needed? 
         # or can we configure these classes here? 
 [file.devices.csv]
 	# extrafields go here
-[managementgroup.wifi] # every managementgroup
+# every managementgroup can have the following section
+[managementgroup.wifi]
      allow_group=12a,12b,teachers # students
      allow_users=maierle,muellerle
      except_users=lucifer   # lucifer ist in 12a
@@ -58,6 +59,6 @@
      revert_cron=...  # Line für cronjob to revert??
      # allow:  only these users can be added by supervisors
      # revert: that is the default, when a cronjob sets back memberships
-[managementgroup.internet] # every managementgroup
+[managementgroup.internet]
      allow_group=students,teachers
      revert_allow_group=students,teachers
