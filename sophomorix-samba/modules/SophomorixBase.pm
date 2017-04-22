@@ -951,7 +951,6 @@ sub check_config_ini {
         );
     # walk through all settings in the fonfig
     foreach my $section ( keys %config ) {
-        print "Section: $section\n";
         foreach my $parameter ( keys %{$config{$section}} ) {
             #print "Verifying if parameter $parameter is valid in section $section\n";
             if (exists $modmaster{$section}{$parameter}){
@@ -959,7 +958,7 @@ sub check_config_ini {
                 # overwrite  %modmaster
                 $modmaster{$section}{$parameter}=$config{$section}{$parameter};
             } else {
-                print "\n    WARNING: $parameter is NOT valid in section $section\n\n";
+                print "   * WARNING: $parameter is NOT valid in section $section\n";
             }
         }
     }
@@ -976,7 +975,10 @@ sub load_school_ini {
             ##### school section ########################################################################
             # walk through parameters
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                print "    $school: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                if($Conf::log_level>=3){
+                    print "   * SCHOOL $school: Para: $parameter -> <".
+                          $ref_modmaster->{$section}{$parameter}.">\n";
+                }
                 $ref_sophomorix_config->{'SCHOOLSXXX'}{$school}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
@@ -989,15 +991,16 @@ sub load_school_ini {
             } else {
                 $filename=$school.".".$name.".".$extension;
             }
-	    print "FILENAME: $filename\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                print "    $filename: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                if($Conf::log_level>=3){
+                    print "   * FILE $filename: $parameter ---> <".
+                          $ref_modmaster->{$section}{$parameter}.">\n";
+                }
                 $ref_sophomorix_config->{'FILESXXX'}{'USER_FILE'}{$filename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
 	} elsif ($section=~m/^role\./){ 
             ##### role.* section ########################################################################
-	    print "FOUND in subsection role: $section\n";
 	    my ($string,$name)=split(/\./,$section);
             my $rolename;
             if ($school eq $DevelConf::name_default_school){
@@ -1005,15 +1008,16 @@ sub load_school_ini {
             } else {
                 $rolename=$school."-".$name;
             }
-	    print "ROLE: $rolename\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                print "    $rolename: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                if($Conf::log_level>=3){
+                    print "   * ROLE $rolename: $parameter ---> <".
+                          $ref_modmaster->{$section}{$parameter}.">\n";
+                }
                 $ref_sophomorix_config->{'ROLES'}{$rolename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
 	} elsif ($section=~m/^type\./){ 
             ##### type.* section ########################################################################
-	    print "FOUND in subsection type: $section\n";
 	    my ($string,$name)=split(/\./,$section);
             my $typename;
             if ($school eq $DevelConf::name_default_school){
@@ -1021,15 +1025,16 @@ sub load_school_ini {
             } else {
                 $typename=$school."-".$name;
             }
-	    print "TYPE: $typename\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                print "    $typename: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                if($Conf::log_level>=3){
+                    print "   * TYPE $typename: $parameter ---> <".
+                          $ref_modmaster->{$section}{$parameter}.">\n";
+                }
                 $ref_sophomorix_config->{'TYPES'}{$typename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
 	} elsif ($section=~m/^managementgroup\./){ 
             ##### managementgroup.* section ########################################################################
-	    print "FOUND in subsection managementgroup: $section\n";
 	    my ($string,$name)=split(/\./,$section);
             my $managementgroupname;
             if ($school eq $DevelConf::name_default_school){
@@ -1037,9 +1042,11 @@ sub load_school_ini {
             } else {
                 $managementgroupname=$school."-".$name;
             }
-	    print "MANAGEMENTGROUP: $managementgroupname\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                print "    $managementgroupname: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                if($Conf::log_level>=3){
+                    print "   * MANAGEMENTGROUP $managementgroupname: $parameter ---> <".
+                          $ref_modmaster->{$section}{$parameter}.">\n";
+                }
                 $ref_sophomorix_config->{'MANAGEMENTGROUPS'}{$managementgroupname}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
