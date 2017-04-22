@@ -971,21 +971,17 @@ sub check_config_ini {
 
 sub load_school_ini {
     my ($school,$ref_modmaster,$ref_sophomorix_config)=@_;
-     foreach my $section ( keys %{ $ref_modmaster } ) {
-        print "S: $section\n";
+    foreach my $section ( keys %{ $ref_modmaster } ) {
 	if ($section eq "school"){
-            ############################## school section
-
+            ##### school section ########################################################################
             # walk through parameters
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
                 print "    $school: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
                 $ref_sophomorix_config->{'SCHOOLSXXX'}{$school}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
-	} elsif ($section eq "file.students.csv" or 
-                 $section eq "file.teachers.csv" or
-                 $section eq "file.extrastudents.csv"){
-            ############################## file.***.csv user section
+	} elsif ($section=~m/^file\./){ 
+            ##### file.* section ########################################################################
 	    my ($string,$name,$extension)=split(/\./,$section);
             my $filename;
             if ($school eq $DevelConf::name_default_school){
@@ -993,51 +989,66 @@ sub load_school_ini {
             } else {
                 $filename=$school.".".$name.".".$extension;
             }
+	    print "FILENAME: $filename\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-	        print "FILENAME: $filename\n";
-                print "    $filename: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                print "    $filename: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
                 $ref_sophomorix_config->{'FILESXXX'}{'USER_FILE'}{$filename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
-	} elsif ($section eq "file.extraclasses.csv"){
-            ############################## file.***.csv class section
-	    my ($string,$name,$extension)=split(/\./,$section);
-            my $filename;
+	} elsif ($section=~m/^role\./){ 
+            ##### role.* section ########################################################################
+	    print "FOUND in subsection role: $section\n";
+	    my ($string,$name)=split(/\./,$section);
+            my $rolename;
             if ($school eq $DevelConf::name_default_school){
-                $filename=$name.".".$extension;
+                $rolename=$name;
             } else {
-                $filename=$school.".".$name.".".$extension;
+                $rolename=$school."-".$name;
             }
+	    print "ROLE: $rolename\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-	        print "FILENAME: $filename\n";
-                print "    $filename: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
-                $ref_sophomorix_config->{'FILESXXX'}{'CLASS_FILE'}{$filename}{$parameter}=
+                print "    $rolename: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'ROLES'}{$rolename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
-
-	} elsif ($section eq "file.devices.csv"){
-            ############################## file.***.csv device section
-	    my ($string,$name,$extension)=split(/\./,$section);
-            my $filename;
+	} elsif ($section=~m/^type\./){ 
+            ##### type.* section ########################################################################
+	    print "FOUND in subsection type: $section\n";
+	    my ($string,$name)=split(/\./,$section);
+            my $typename;
             if ($school eq $DevelConf::name_default_school){
-                $filename=$name.".".$extension;
+                $typename=$name;
             } else {
-                $filename=$school.".".$name.".".$extension;
+                $typename=$school."-".$name;
             }
+	    print "TYPE: $typename\n";
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-	        print "FILENAME: $filename\n";
-                print "    $filename: Para: $parameter -> <".$ref_modmaster->{$section}{$parameter}.">\n";
-                $ref_sophomorix_config->{'FILESXXX'}{'DEVICE_FILE'}{$filename}{$parameter}=
+                print "    $typename: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'TYPES'}{$typename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
-
-	} elsif ($section eq "managementgroup.wifi"){
-            # ???????????? all managenmentgroups are handles
-	} elsif ($section eq "managementgroup.internet"){
-
+	} elsif ($section=~m/^managementgroup\./){ 
+            ##### managementgroup.* section ########################################################################
+	    print "FOUND in subsection managementgroup: $section\n";
+	    my ($string,$name)=split(/\./,$section);
+            my $managementgroupname;
+            if ($school eq $DevelConf::name_default_school){
+                $managementgroupname=$name;
+            } else {
+                $managementgroupname=$school."-".$name;
+            }
+	    print "MANAGEMENTGROUP: $managementgroupname\n";
+            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+                print "    $managementgroupname: $parameter ---> <".$ref_modmaster->{$section}{$parameter}.">\n";
+                $ref_sophomorix_config->{'MANAGEMENTGROUPS'}{$managementgroupname}{$parameter}=
+                    $ref_modmaster->{$section}{$parameter};
+            }
+        } else {
+            ##### unnown section ########################################################################
+            print "ERROR: Section $section: unknown, not processed\n\n";
+            exit;
         }
     }
-
 }
 
 
