@@ -385,19 +385,17 @@ sub config_sophomorix_read {
     # load the master once
     my $ref_master=&read_master_ini($DevelConf::path_conf_master_school);
 
+    # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-
                  if ($school eq $DevelConf::name_default_school){
                      # default-school
                      $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=
                           $DevelConf::name_default_school;
                      $sophomorix_config{'SCHOOLS'}{$school}{PREFIX}="";
                      $sophomorix_config{'SCHOOLS'}{$school}{POSTFIX}="";
-                     #$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
-                     #    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
                  } else {
                      # *school
                      $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=$school;
@@ -407,8 +405,6 @@ sub config_sophomorix_read {
                          $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                  }
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
-        # romove this later ??????
-#        $conf_school="/root/abc.school.conf";
         my $ref_modmaster=&check_config_ini($ref_master,$conf_school);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config);
     }
@@ -418,7 +414,6 @@ sub config_sophomorix_read {
 #         $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
 #         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
 #             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-
 #                  if ($school eq $DevelConf::name_default_school){
 #                      # default-school
 #                      $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=
@@ -449,11 +444,9 @@ sub config_sophomorix_read {
 #             if ($_ eq ""){# next on empty line
 #                 next;
 #             }
-
 #             my ($var,$value)=split(/=/);
 #             $var=&remove_whitespace($var);
 #             $value=&remove_whitespace($value);
-
 #             if ($var eq "SCHOOL_NAME" or
 #                 $var eq "QUOTA_DEFAULT_TEACHER" or
 #                 $var eq "QUOTA_DEFAULT_STUDENT" or
@@ -593,7 +586,7 @@ sub config_sophomorix_read {
 #         ######## ?????????????????????????  ################     replace this with ini import
 #     }
 
-    # GLOBAL
+#    # GLOBAL
 #    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
 #        "OU=".$DevelConf::AD_global_ou.",".$DevelConf::AD_schools_ou.",".$root_dse;
     $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
