@@ -1009,9 +1009,7 @@ sub load_school_ini {
 
             # add some redundant stuff for convenience
             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
-                $DevelConf::path_conf_tmp."/".$filename.".filter.utf8";
-            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'FILTERTARGET'}=
-                $DevelConf::path_conf_tmp."/".$filename.".filter";
+                $DevelConf::path_conf_tmp."/".$filename.".utf8";
             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'OU_TOP_GLOBAL'}=
                 "OU=GLOBAL,".$root_dse;
 
@@ -1170,13 +1168,11 @@ sub load_sophomorix_ini {
 		    my @schools=split(/,/,$ref_modmaster_sophomorix->{$section}{$parameter});
                     foreach my $school (@schools){
                         $school=&remove_whitespace($school);
-			print "SCH: >$school <\n";
                         push @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }, $school; 
                         $ref_sophomorix_config->{'SCHOOLS'}{$school}{'CONF_FILE'}=
                             $DevelConf::path_conf_sophomorix."/".$school."/".$school.".school.conf";
                     }
                 } else {
-                    print "Other: >$parameter<\n";
                     $ref_sophomorix_config->{$DevelConf::AD_global_ou}{$parameter}=
                         $ref_modmaster_sophomorix->{$section}{$parameter};
                 }

@@ -314,8 +314,10 @@ if ($analyze_encoding ne ""){
 ################################################################################
 # Start
 ################################################################################
-
-
+# cleaning up last check
+&print_title("Cleaning up last check");
+system("rm -f $DevelConf::path_conf_tmp/*.csv*");
+system("rm -f $DevelConf::path_result/sophomorix.*");
 
 
 # ============================================================
@@ -336,16 +338,14 @@ my $count=0;
 system("mkdir -p $DevelConf::path_conf_tmp");
 foreach my $user_file (@filelist){
     my $filename = basename($user_file);
-    my $user_file_utf8=$DevelConf::path_conf_tmp."/".$filename.".utf8";
-
     # fetching some config data
     $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
 
     my $enc_used=&get_encoding($filename);
     open(USERS,"$user_file") || 
          die "ERROR: $user_file not found!";  
-    open(USERSUTF8,">$user_file_utf8") || 
-         die "ERROR: $user_file_utf8 not found!";  
+    open(USERSUTF8,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
+         die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
     while(<USERS>){
         $count++;
         my $line=$_;
@@ -372,9 +372,8 @@ foreach my $inject (@injectlines){
         $count++;
         my $file_abs=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS'};
         # opening the output file to APPEND entries
-        my $user_file_utf8=$DevelConf::path_conf_tmp."/".$filename.".utf8";
-        open(USERSUTF8,">>$user_file_utf8") || 
-             die "ERROR: $user_file_utf8 not found!";  
+        open(USERSUTF8,">>$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
+             die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
         &analyze_user_line($line,$file_abs,$filename,$school,$count,"utf8","yes");
         close(USERSUTF8);
     } else {
