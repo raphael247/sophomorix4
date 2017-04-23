@@ -339,45 +339,50 @@ sub config_sophomorix_read {
 
     ##################################################
     # sophomorix.conf 
-    my $conf_file=$DevelConf::file_conf_sophomorix;
-    &print_title("Reading $conf_file");
-    open(SOPHOMORIX,"$conf_file") || 
-         die "ERROR: $conf_file not found!";
-    while (<SOPHOMORIX>){
-        $_=~s/\s+$//g;# remove trailing whitespace
-        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-            next;
-        }
-        chomp();
-        if ($_ eq ""){# next on empty line
-            next;
-        }
-        my ($var,$value)=split(/=/);
-        $var=&remove_whitespace($var);
-        $value=&remove_whitespace($value);
-        if ($var eq "SCHOOL"){
-            # add default school to school list
-            $sophomorix_config{'SCHOOLS'}{$value}{'OU'}="unknown";
-            push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $value; 
-            $sophomorix_config{'SCHOOLS'}{$value}{'CONF_FILE'}=
-                $DevelConf::path_conf_sophomorix."/".$value."/".$value.".school.conf";
-        } elsif ($var eq "LANG"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
-        } elsif ($var eq "USE_QUOTA"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
-        } elsif ($var eq "ADMINS_PRINT"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
-        } else {
-            print "$var is not a valid variable\n";
-            exit;
-        }
-    }
-    close(SOPHOMORIX);
+    my $ref_master_sophomorix=&read_master_ini($DevelConf::path_conf_master_sophomorix);
+    my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,$DevelConf::file_conf_sophomorix);
+    &load_sophomorix_ini($ref_modmaster_sophomorix,\%sophomorix_config);
+
+    # ### old
+    # my $conf_file=$DevelConf::file_conf_sophomorix;
+    # &print_title("Reading $conf_file");
+    # open(SOPHOMORIX,"$conf_file") || 
+    #      die "ERROR: $conf_file not found!";
+    # while (<SOPHOMORIX>){
+    #     $_=~s/\s+$//g;# remove trailing whitespace
+    #     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+    #         next;
+    #     }
+    #     chomp();
+    #     if ($_ eq ""){# next on empty line
+    #         next;
+    #     }
+    #     my ($var,$value)=split(/=/);
+    #     $var=&remove_whitespace($var);
+    #     $value=&remove_whitespace($value);
+    #     if ($var eq "SCHOOL"){
+    #         # add default school to school list
+    #         $sophomorix_config{'SCHOOLS'}{$value}{'OU'}="unknown";
+    #         push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $value; 
+    #         $sophomorix_config{'SCHOOLS'}{$value}{'CONF_FILE'}=
+    #             $DevelConf::path_conf_sophomorix."/".$value."/".$value.".school.conf";
+    #     } elsif ($var eq "LANG"){
+    #         $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
+    #     } elsif ($var eq "USE_QUOTA"){
+    #         $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
+    #     } elsif ($var eq "ADMINS_PRINT"){
+    #         $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
+    #     } else {
+    #         print "$var is not a valid variable\n";
+    #         exit;
+    #     }
+    # }
+    # close(SOPHOMORIX);
+    # ### old
 
     ##################################################
     # SCHOOLS   
-    #### new code
-    # do that once
+    # load the master once
     my $ref_master=&read_master_ini($DevelConf::path_conf_master_school);
 
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -404,15 +409,9 @@ sub config_sophomorix_read {
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         # romove this later ??????
 #        $conf_school="/root/abc.school.conf";
-        $ref_modmaster=&check_config_ini($ref_master,$conf_school);
+        my $ref_modmaster=&check_config_ini($ref_master,$conf_school);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config);
     }
-    #### new code
-
-
-
-
-
 
 #     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
 #         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
@@ -436,19 +435,6 @@ sub config_sophomorix_read {
 #                      $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
 #                          $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
 #                  }
-
-
-
-
-#         #### new code
-#         # do that for every school
-
-
-
-#         #### new code
-
-
-
 
 #         ######## ?????????????????????????  ################     replace this with ini import
 #         &print_title("Reading $conf_school");
@@ -606,8 +592,6 @@ sub config_sophomorix_read {
 # #        close(SCHOOL);
 #         ######## ?????????????????????????  ################     replace this with ini import
 #     }
-
-
 
     # GLOBAL
 #    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
@@ -948,6 +932,10 @@ sub read_master_ini {
     my ($masterfile)=@_;
     my %master=();
     &print_title("Reading $masterfile");
+    if (not -e $masterfile){
+        print "\nERROR: $masterfile not found!\n\n";
+        exit;
+    }
     tie %master, 'Config::IniFiles',
         ( -file => $masterfile, 
           -handle_trailing_comment => 1,
@@ -961,6 +949,10 @@ sub check_config_ini {
     my ($ref_master,$configfile)=@_;
     my %modmaster= %{ $ref_master }; # copies ref_master
     &print_title("Reading $configfile");
+    if (not -e $configfile){
+        print "\nERROR: $configfile not found!\n\n";
+        exit;
+    }
     tie %config, 'Config::IniFiles',
         ( -file => $configfile, 
           -handle_trailing_comment => 1,
@@ -1169,6 +1161,40 @@ sub load_school_ini {
                 }
                 $ref_sophomorix_config->{'MANAGEMENTGROUPS'}{$managementgroupname}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
+            }
+        } else {
+            ##### unnown section ########################################################################
+            print "ERROR: Section $section: unknown, not processed\n\n";
+            exit;
+        }
+    }
+}
+
+
+
+sub load_sophomorix_ini {
+    my ($ref_modmaster_sophomorix,$ref_sophomorix_config)=@_;
+    foreach my $section ( keys %{ $ref_modmaster_sophomorix } ) {
+        if ($section eq "global"){
+            foreach my $parameter ( keys %{ $ref_modmaster_sophomorix->{$section}} ) {
+                if ($Conf::log_level>=3){
+                    print "   * $section: $parameter ---> <".
+                          $ref_modmaster_sophomorix->{$section}{$parameter}.">\n";
+                }
+                if ($parameter eq "SCHOOLS"){
+		    my @schools=split(/,/,$ref_modmaster_sophomorix->{$section}{$parameter});
+                    foreach my $school (@schools){
+                        $school=&remove_whitespace($school);
+			print "SCH: >$school <\n";
+                        push @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }, $school; 
+                        $ref_sophomorix_config->{'SCHOOLS'}{$school}{'CONF_FILE'}=
+                            $DevelConf::path_conf_sophomorix."/".$school."/".$school.".school.conf";
+                    }
+                } else {
+                    print "Other: >$parameter<\n";
+                    $ref_sophomorix_config->{$DevelConf::AD_global_ou}{$parameter}=
+                        $ref_modmaster_sophomorix->{$section}{$parameter};
+                }
             }
         } else {
             ##### unnown section ########################################################################

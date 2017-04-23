@@ -164,7 +164,7 @@ install-sophomorix-samba:
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix.conf $(CONF)/user
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix-schools.conf $(CONF)/user
 #	# New, temporary
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template $(CONF)/sophomorix.conf
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini $(CONF)/sophomorix.conf
 	@install -d -m755 -oroot -groot $(CONF)/default-school
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template.ini $(CONF)/default-school/school.conf
 	@install -d -m755 -oroot -groot $(CONF)/abc
@@ -198,6 +198,7 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/README.repdir $(DEVELCONF)/devel
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/master
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/master/school.conf.master $(DEVELCONF)/devel/master
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/master/sophomorix.conf.master $(DEVELCONF)/devel/master
 # repdir files
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.linux $(DEVELCONF)/devel/repdir

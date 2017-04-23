@@ -1,0 +1,36 @@
+Adding a new variable to
+   sophomorix.conf
+   *.school.conf
+
+
+1) Add the variable to the master file
+
+   A) The master file will be read first by sophomorix
+      in &read_master_ini();
+      ### (new variable apears)
+
+   B) The master file ist copied
+
+   C) Then the config file is read and the copied master file updated
+      in &check_config_ini();
+      
+      Updated are Sections/Parameters that
+
+      - are a valid combination (existing in the master file)
+        ---> continue to C
+
+      - if its not valid (not existing in master file)
+        ignore it/exit it
+
+      ### (new variable is there from master file, perhaps overwritten from config)
+ 
+   D) load the data from B) into sophomorix_config
+
+      - check the data
+        (i.e. if filterscript is existing and executable)
+      - put the data in the correct place in sophomorix_config
+      - put redundant data in sophomorix_config for easier lookup
+
+     ### (new variable is in in sophomorix_config)
+
+    
