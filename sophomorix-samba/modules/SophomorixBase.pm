@@ -313,7 +313,6 @@ sub config_sophomorix_read {
     $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
         "adminclass";
     # default school
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU'}=$DevelConf::name_default_school; 
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'CONF_FILE'}=
         $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/school.conf"; 
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'SCHOOL_NAME'}=
@@ -387,7 +386,7 @@ sub config_sophomorix_read {
 
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
+###        $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
                  if ($school eq $DevelConf::name_default_school){
@@ -711,7 +710,7 @@ sub config_sophomorix_read {
                 if($Conf::log_level>=3){
                     print "* Match: Inserting data...\n";
                 }
-                my $ou_file=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU};
+                my $ou_file=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{'SCHOOL'};
 
                 # user
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixRole}=$sophomorix_role;
@@ -1013,9 +1012,6 @@ sub load_school_ini {
             }
 
             # add some redundant stuff for convenience
-            # do we need OU ist the same as school???
-            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'OU'}=$school;
-
             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
                 $DevelConf::path_conf_tmp."/".$filename.".filter.utf8";
             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'FILTERTARGET'}=
