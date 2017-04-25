@@ -51,6 +51,7 @@ $Data::Dumper::Terse = 1;
             get_sharedirectory
             get_group_basename
             recode_utf8_to_ascii
+            read_smb_conf
             );
 
 
@@ -931,6 +932,14 @@ sub read_smb_conf {
         ( -file => $DevelConf::smb_conf, 
           -handle_trailing_comment => 1,
         );
+    # add some calculated stuff
+    # Domain DNS: i.e. DC=linuxmuster,DC=local or DC=LINUXMUSTER,DC=LOCAL
+    my $domain=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'};
+    $domain=~tr/A-Z/a-z/; # make lowercase
+    my @dns=split(/\./,$domain);
+    $domain_dns = join(',DC=', @dns);
+    $domain_dns="DC=".$domain_dns;
+    $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'DomainDNS'}=$domain_dns;
 }
 
 

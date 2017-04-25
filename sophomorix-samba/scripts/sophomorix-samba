@@ -12,9 +12,17 @@ Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Sophomorix::SophomorixBase qw(
                                  check_options
+                                 read_smb_conf
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                     );
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+#    return \%master;
+
 
 my @arguments = @ARGV;
 
@@ -34,6 +42,9 @@ my $restart=0;
 my $samba_private="/var/lib/samba/private";
 my $samba_private_d="/var/lib/samba/private/sam.ldb.d";
 
+my %smb_conf=();
+&read_smb_conf(\%smb_conf);
+#print Dumper( \%smb_conf );
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -123,7 +134,8 @@ if ($restore_samba ne ""){
 # --schema-load
 if ($schema_load==1){
     print "\nLoading sophomorix schema into ldap\n\n";
-    my $dn=&get_dn_from_smb_conf();
+#    my $dn=&get_dn_from_smb_conf();
+    my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
     &samba_stop();
     system("cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges");
     &samba_start();
@@ -153,27 +165,27 @@ sub samba_start {
 }
 
 
-sub get_dn_from_smb_conf {
-    my $domain="";
-    my $entry;
-    my $domain_dns;
-    open(SMBCONF, "/etc/samba/smb.conf");
-    while(<SMBCONF>) {
-        if (m/realm/){
-            ($entry,$domain)=split(/=/);
-            chomp($domain);
-            $domain=~s/^\s+//g;# remove leading whitespace
-            $domain=~s/\s+$//g;# remove trailing whitespace
-            $domain=~tr/A-Z/a-z/; # make lowercase
-            my @dns=split(/\./,$domain);
-            $domain_dns = join(',DC=', @dns);
-            $domain_dns="DC=".$domain_dns;
-            print "DomainDNS from smb.conf: $domain_dns\n";
-        }
-    }
-    close(SMBCONF);
-    return $domain_dns;
-}
+# sub get_dn_from_smb_conf {
+#     my $domain="";
+#     my $entry;
+#     my $domain_dns;
+#     open(SMBCONF, "/etc/samba/smb.conf");
+#     while(<SMBCONF>) {
+#         if (m/realm/){
+#             ($entry,$domain)=split(/=/);
+#             chomp($domain);
+#             $domain=~s/^\s+//g;# remove leading whitespace
+#             $domain=~s/\s+$//g;# remove trailing whitespace
+#             $domain=~tr/A-Z/a-z/; # make lowercase
+#             my @dns=split(/\./,$domain);
+#             $domain_dns = join(',DC=', @dns);
+#             $domain_dns="DC=".$domain_dns;
+#             print "DomainDNS from smb.conf: $domain_dns\n";
+#         }
+#     }
+#     close(SMBCONF);
+#     return $domain_dns;
+# }
 
 
 sub get_ldb_files {
