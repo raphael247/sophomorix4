@@ -311,6 +311,8 @@ sub config_sophomorix_read {
 
     # read smb.conf
     &read_smb_conf(\%sophomorix_config);
+    # read more samba stuff
+    &read_smb_net_conf_list(\%sophomorix_config);
 
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
@@ -940,6 +942,20 @@ sub read_smb_conf {
     $domain_dns = join(',DC=', @dns);
     $domain_dns="DC=".$domain_dns;
     $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'DomainDNS'}=$domain_dns;
+}
+
+
+
+sub read_smb_net_conf_list {
+    my ($ref_sophomorix_config)=@_;
+    my $tmpfile="/tmp/net_conf_list";
+    &print_title("Parsing: net conf list");
+    system("net conf list > $tmpfile");
+    tie %{ $ref_sophomorix_config->{'samba'}{'net_conf_list'} }, 'Config::IniFiles',
+        ( -file => $tmpfile, 
+          -handle_trailing_comment => 1,
+        );
+    system("rm $tmpfile");
 }
 
 
