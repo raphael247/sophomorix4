@@ -307,6 +307,10 @@ sub config_sophomorix_read {
         $sophomorix_config{'ENCODINGS'}{$coding}=$coding_orig;
         #$encodings_set{$coding}=$coding_orig;
     }
+
+    # read smb.conf
+    &read_smb_conf(\%sophomorix_config);
+
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
     # Adding some defaults: ????? better to move the defaults to an external file ?????
@@ -914,6 +918,21 @@ sub config_sophomorix_read {
     return %sophomorix_config; 
 }
  
+
+
+sub read_smb_conf {
+    my ($ref_sophomorix_config)=@_;
+    &print_title("Reading $DevelConf::smb_conf");
+    if (not -e $DevelConf::smb_conf){
+        print "\nERROR: $DevelConf::smb_conf not found!\n\n";
+        exit;
+    }
+    tie %{ $ref_sophomorix_config->{'samba'}{'smb.conf'} }, 'Config::IniFiles',
+        ( -file => $DevelConf::smb_conf, 
+          -handle_trailing_comment => 1,
+        );
+}
+
 
 
 sub read_master_ini {
