@@ -2110,6 +2110,7 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
+        &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
     # school share
@@ -2125,6 +2126,7 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
+        &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (begin) ...");
