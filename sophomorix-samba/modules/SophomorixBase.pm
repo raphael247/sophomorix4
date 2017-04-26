@@ -297,6 +297,9 @@ sub config_sophomorix_read {
     my ($ldap,$root_dse)=@_;
     my %sophomorix_config=();
 
+    my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
+                                                                $DevelConf::secret_file_sophomorix_AD_admin);
+
     # read available encodings from iconv --list
     my %encodings_set=();
     my $available_encodings = `iconv --list`;  #Backticks return a string.
@@ -313,6 +316,7 @@ sub config_sophomorix_read {
     &read_smb_conf(\%sophomorix_config);
     # read more samba stuff
     &read_smb_net_conf_list(\%sophomorix_config);
+    &read_smb_domain_passwordsettings(\%sophomorix_config,$smb_pwd);
 
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
@@ -956,6 +960,29 @@ sub read_smb_net_conf_list {
           -handle_trailing_comment => 1,
         );
     system("rm $tmpfile");
+}
+
+
+
+sub read_smb_domain_passwordsettings {
+    my ($ref_sophomorix_config,$smb_pwd)=@_;
+    &print_title("Asking domain passwordsettings from samba");
+    my $string=`samba-tool domain passwordsettings show --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin`;
+    my @lines=split(/\n/,$string);
+    foreach my $line (@lines){
+        my ($key,$value)=split(/:/,$line);
+        if (defined $value){
+            $key=&remove_whitespace($key);
+            $key=~s/\)//g;
+            $key=~s/\(//g;
+            $key=~s/ /_/g;
+            $value=&remove_whitespace($value);
+            if($Conf::log_level>=3){
+                print "   * <$key> ---> <$value>\n";
+            }
+            $ref_sophomorix_config->{'samba'}{'domain_passwordsettings'}{$key}=$value;
+        }
+    }
 }
 
 
