@@ -2094,7 +2094,40 @@ sub AD_school_create {
     $school=&AD_get_schoolname($school);
 
     print "\n";
-    &Sophomorix::SophomorixBase::print_title("Adding school $school (begin) ...");
+    &Sophomorix::SophomorixBase::print_title("Testing smb shares ...");
+    ############################################################
+    # providing smb shares
+    ############################################################
+    # global share
+    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$DevelConf::homedir_global_smb_share}){
+        print "   * Nothing to do: Global share $DevelConf::homedir_global_smb_share exists.\n";
+    } else {
+        &Sophomorix::SophomorixBase::print_title("Creating $DevelConf::homedir_global_smb_share");
+        system("mkdir -p $DevelConf::homedir_global");
+        my $command="net conf addshare ".
+                    $DevelConf::homedir_global_smb_share." ".
+                    $DevelConf::homedir_global.
+                    " writeable=y guest_ok=y 'Share for school global'";
+        print "   * $command\n";
+        system($command);
+    }
+
+    # school share
+    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}){
+        print "   * nothing to do: School share $school exists.\n";
+    } else {
+        &Sophomorix::SophomorixBase::print_title("Creating share for school $school");
+        my $unix_path=$DevelConf::homedir_all_schools."/".$school;
+        system("mkdir -p $unix_path");
+        my $command="net conf addshare ".
+                    $school." ".
+                    $unix_path.
+                    " writeable=y guest_ok=y 'Share for school global'";
+        print "   * $command\n";
+        system($command);
+    }
+
+    &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (begin) ...");
     ############################################################
     # providing OU=SCHOOLS
     ############################################################
@@ -2257,7 +2290,7 @@ sub AD_school_create {
                            sophomorix_config=>$ref_sophomorix_config,
                          });
 
-    &Sophomorix::SophomorixBase::print_title("Adding school $school (end) ...");
+    &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (end) ...");
     print "\n";
 }
 
