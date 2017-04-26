@@ -134,7 +134,6 @@ if ($restore_samba ne ""){
 # --schema-load
 if ($schema_load==1){
     print "\nLoading sophomorix schema into ldap\n\n";
-#    my $dn=&get_dn_from_smb_conf();
     my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
     &samba_stop();
     system("cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges");
@@ -160,32 +159,11 @@ sub samba_stop {
 }
 
 
+
 sub samba_start {
     system("/etc/init.d/samba start");
 }
 
-
-# sub get_dn_from_smb_conf {
-#     my $domain="";
-#     my $entry;
-#     my $domain_dns;
-#     open(SMBCONF, "/etc/samba/smb.conf");
-#     while(<SMBCONF>) {
-#         if (m/realm/){
-#             ($entry,$domain)=split(/=/);
-#             chomp($domain);
-#             $domain=~s/^\s+//g;# remove leading whitespace
-#             $domain=~s/\s+$//g;# remove trailing whitespace
-#             $domain=~tr/A-Z/a-z/; # make lowercase
-#             my @dns=split(/\./,$domain);
-#             $domain_dns = join(',DC=', @dns);
-#             $domain_dns="DC=".$domain_dns;
-#             print "DomainDNS from smb.conf: $domain_dns\n";
-#         }
-#     }
-#     close(SMBCONF);
-#     return $domain_dns;
-# }
 
 
 sub get_ldb_files {
@@ -202,6 +180,7 @@ sub get_ldb_files {
     @files = sort @files;
     return @files;
 }
+
 
 
 sub get_ldb_d_files {
