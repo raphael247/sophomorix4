@@ -16,6 +16,16 @@ case $1 in
       net conf delshare ltg
       net conf delshare test
       net conf delshare uni
+
+      rm -f /etc/linuxmuster/sophomorix/bsz/bsz.devices.csv
+      rm -f /etc/linuxmuster/sophomorix/bsz/bsz.teachers.csv
+      rm -f /etc/linuxmuster/sophomorix/bsz/bsz.students.csv
+      rm -f /etc/linuxmuster/sophomorix/uni/uni.teachers.csv
+      rm -f /etc/linuxmuster/sophomorix/uni/uni.students.csv
+      rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv
+      rm -f /etc/linuxmuster/sophomorix/default-school/students.csv
+      rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv
+
       sophomorix-samba --restore-samba ohne-user --schema-load
       rm -rf /srv/samba
       sleep 5
@@ -85,6 +95,16 @@ do
     net conf delshare ltg
     net conf delshare test
     net conf delshare uni
+
+    rm -f /etc/linuxmuster/sophomorix/bsz/bsz.devices.csv
+    rm -f /etc/linuxmuster/sophomorix/bsz/bsz.teachers.csv
+    rm -f /etc/linuxmuster/sophomorix/bsz/bsz.students.csv
+    rm -f /etc/linuxmuster/sophomorix/uni/uni.teachers.csv
+    rm -f /etc/linuxmuster/sophomorix/uni/uni.students.csv
+    rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv
+    rm -f /etc/linuxmuster/sophomorix/default-school/students.csv
+    rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv
+
     sophomorix-samba --restore-samba ohne-user --schema-load
     rm -rf /srv/samba
     sleep 5
