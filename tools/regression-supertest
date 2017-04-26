@@ -7,6 +7,15 @@
 case $1 in
    r|re|res|rese|reset)
       echo "### Resetting samba  for $test ... ###"
+      net conf delshare linuxmuster-global
+      net conf delshare abc
+      net conf delshare bsz
+      net conf delshare default-school
+      net conf delshare ghs
+      net conf delshare lin
+      net conf delshare ltg
+      net conf delshare test
+      net conf delshare uni
       sophomorix-samba --restore-samba ohne-user --schema-load
       rm -rf /srv/samba
       sleep 5
@@ -67,6 +76,15 @@ esac
 for test in $scriptlist
 do
     echo "### Resetting samba  for $test ... ###"
+    net conf delshare linuxmuster-global
+    net conf delshare abc
+    net conf delshare bsz
+    net conf delshare default-school
+    net conf delshare ghs
+    net conf delshare lin
+    net conf delshare ltg
+    net conf delshare test
+    net conf delshare uni
     sophomorix-samba --restore-samba ohne-user --schema-load
     rm -rf /srv/samba
     sleep 5
