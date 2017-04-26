@@ -684,10 +684,16 @@ sub test_T_DA_update{
                " TolerationDate: $AD{'sam'}{$sam}{'sophomorixTolerationDate'}\n";
         my $file=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
         my $toleration_date_epoch=&ymdhms_to_epoch($AD{'sam'}{$sam}{'sophomorixTolerationDate'});
-        my $toleration_end_epoch=$toleration_date_epoch+
-            86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'};
+        my $toleration_time_days;
+        if (defined $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'} ){
+            $toleration_time_days=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'};
+        } else {
+            # for migration, high enough to be sure it is not updated
+            $toleration_time_days=1000;
+        }
+        my $toleration_end_epoch=$toleration_date_epoch+86400*$toleration_time_days;
         print "    Toleration end: $toleration_end_epoch ($AD{'sam'}{$sam}{'sophomorixTolerationDate'}",
-              " + $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'} days)\n";
+              " +  $toleration_time_days days)\n";
         print "    Today:          $time_stamp_epoch\n";
         if (not exists $Match{'action_by_sam'}{$sam} and 
             $time_stamp_epoch > $toleration_end_epoch){
@@ -720,11 +726,16 @@ sub test_DL_RA_update{
               " DeactivationDate: $AD{'sam'}{$sam}{'sophomorixDeactivationDate'}\n";
         my $file=$AD{'sam'}{$sam}{'sophomorixAdminFile'};
         my $deactivation_date_epoch=&ymdhms_to_epoch($AD{'sam'}{$sam}{'sophomorixDeactivationDate'});
-        my $deactivation_end_epoch=$deactivation_date_epoch+
-            86400*$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'};
-            
+        my $deactivation_time_days;
+        if (defined $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'} ){
+            $deactivation_time_days=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'};
+        } else {
+            # for migration, high enough to be sure it is not updated
+            $deactivation_time_days=1000;
+        }
+        my $deactivation_end_epoch=$deactivation_date_epoch+86400*$deactivation_time_days;
         print "    Deactivation end: $deactivation_end_epoch ($AD{'sam'}{$sam}{'sophomorixDeactivationDate'}",
-              " + $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'DEACTIVATION_TIME'} days)\n";
+              " + $deactivation_time_days days)\n";
         print "    Today:            $time_stamp_epoch\n";
         ########################################
         if (not exists $Match{'action_by_sam'}{$sam} and 
