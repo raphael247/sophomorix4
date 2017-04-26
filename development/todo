@@ -1,16 +1,42 @@
 
-todo:
-außerdem funktion um die die remote shares in sophomorix_config zu schreiben
+todo wie erkennt man remote shares?:
+tauchen die in net config list auf?
+    - wenn ja: OK
+    - evtl. remote shares in sophomorix_config zu schreiben
 
-Beim Schule anlegen, abfragen ob share in sophomorix_config
-existiert, falls nicht anlegen und sophomorix_config updaten
 
-
+--------------------------------------------------
 ??? DomainDNS:
 DC=LINUXMUSTER,DC=LOCAL
 oder
 DC=linuxmuster,DC=local
 oder ist das egal???
+--------------------------------------------------
+
+
+--------------------------------------------------
+result hash VOR sophomorix_config
+%sophomorix_result=&sophomorix_result_init("scriptname", ...);
+
+... initialisiert einen result hash
+
+&sophomorix_result_init(\%sophomorix_result,"WARNING|ERROR",EXIT|NOEXIT ...);
+
+.. schreibt etwas in den result hash
+
+&sophomorix_result_check_exit(\%sophomorix_result);
+
+... checks if WARN/ERR were so severe (misconfigured) that the script should exit, and exits
+... called before something ist changed
+
+&sophomorix_result_print(\%sophomorix_result,$json);
+
+... called at the end of the script
+... prints JSON with option --JSON
+... prints on Terminal iithout --JSON
+
+--------------------------------------------------
+
 
 Configs:
 
@@ -21,8 +47,25 @@ when checking config against master:
 if hits are below 10%, exit with error: seems strange
 read master returns count of parameters
 
+Was tun wenn die samba server passwortlänge sich mit den 
+Einstellungen der USER_FILES beißt 
+
+
+
 encoding und encoding force
 Nochmal überlegen, welche Fälle auftreten können
+
+ENCODING=auto: sophomorix ermitelt
+
+ENCODIG = UTF8
+FORCE=no
+--> UTF8 annehmen, evtl. ändern? oder warnen?
+ENCODIG = UTF8
+FORCE=yes
+--> Umcodierung nach UTF8 forcen, egal was kommt
+
+
+
 
 what to do if configuration is bad: warn or exit?
 
