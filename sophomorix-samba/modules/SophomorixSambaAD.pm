@@ -1238,6 +1238,19 @@ sub AD_user_create {
         $prefix="---";
     }
 
+    # settingthe dates according to status
+    if (defined $status and $status eq "T"){
+        $deactivationdate=$DevelConf::default_date;
+    } elsif (defined $status and 
+       ($status eq "U" or 
+        $status eq "A" or 
+        $status eq "E" or 
+        $status eq "S" or 
+        $status eq "P" )){
+        $deactivationdate=$DevelConf::default_date;
+        $tolerationdate=$DevelConf::default_date;
+    }
+
     if($Conf::log_level>=1){
         print "   DN:                 $dn\n";
         print "   DN(Parent):         $dn_class\n";
