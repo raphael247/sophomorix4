@@ -2124,7 +2124,7 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
-        my $command_mod="net conf setparm ".$homedir_global_smb_share." \"msdfs root\" \"yes\"";
+        my $command_mod="net conf setparm ".$DevelConf::homedir_global_smb_share." 'msdfs root' 'yes'";
         print "   * $command_mod\n";
         system($command_mod);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
@@ -2140,10 +2140,10 @@ sub AD_school_create {
         my $command="net conf addshare ".
                     $school." ".
                     $unix_path.
-                    " writeable=y guest_ok=y 'Share for school global'";
+                    " writeable=y guest_ok=y 'Share for school $school'";
         print "   * $command\n";
         system($command);
-        my $command_mod="net conf setparm ".$school." \"msdfs root\" \"yes\"";
+        my $command_mod="net conf setparm ".$school." 'msdfs root' 'yes'";
         print "   * $command_mod\n";
         system($command_mod);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
