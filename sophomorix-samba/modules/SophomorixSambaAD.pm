@@ -1261,6 +1261,20 @@ sub AD_user_create {
     # make sure $dn_class exists
     $ldap->add($dn_class,attr => ['objectclass' => ['top', 'organizationalUnit']]);
 
+    my $user_account_control;
+    if (defined $status and $status ne "---"){
+        if ($status eq "L" or
+            $status eq "D" or
+            $status eq "F" or
+            $status eq "R" or
+            $status eq "K"
+            ){
+	    $user_account_control=$DevelConf::default_user_account_control_disabled;
+	} else {
+	    $user_account_control=$DevelConf::default_user_account_control;
+        }
+   }
+
     # add the user
     my $result = $ldap->add( $dn,
                    attr => [
@@ -1291,7 +1305,7 @@ sub AD_user_create {
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
                    sophomorixExamMode => "---", 
-                   userAccountControl => $DevelConf::default_user_account_control,
+                   userAccountControl => $user_account_control,
                    uidNumber => $uidnumber_wish,
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
@@ -2110,6 +2124,9 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
+        my $command_mod="net conf setparm ".$homedir_global_smb_share." \"msdfs root\" \"yes\"";
+        print "   * $command_mod\n";
+        system($command_mod);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
@@ -2126,6 +2143,9 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
+        my $command_mod="net conf setparm ".$school." \"msdfs root\" \"yes\"";
+        print "   * $command_mod\n";
+        system($command_mod);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
