@@ -375,13 +375,18 @@ sub AD_dns_kill {
     }
 
     # delete dnsNode
-    my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    print "     * $command\n";
-    system($command);
+    if ($dns_ipv4 ne "NXDOMAIN"){
+        my $command="samba-tool dns delete $dns_server ".
+                    "$dns_zone $dns_node $dns_type $dns_ipv4 ".
+                    "--password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+        system($command);
+    }
 
     # delete reverse lookup ?????? deleted with the zone?
     #$dns_type="PTR";
-    #my $command="samba-tool dns delete $dns_server $dns_zone $dns_node $dns_type $dns_ipv4 --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+    #my $command="samba-tool dns delete $dns_server ".
+    #            "$dns_zone $dns_node $dns_type $dns_ipv4 ".
+    #            "--password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     #print "     * $command\n";
     #system($command);
 }

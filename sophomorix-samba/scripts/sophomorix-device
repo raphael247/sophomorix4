@@ -235,7 +235,6 @@ $class_rooms{'bsz-j1010'}="seen";
 $class_rooms{'bsz-j1008'}="seen";
 
 my $set_computer_passwords=0;
-my $test_dns=0;
 my $dns_test=0;
 my $dns_show=0;
 my $dns_kill=0;
@@ -1565,7 +1564,7 @@ sub analyze_device_line {
         my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
         $devices_file{'dnsZone'}{$dns_zone}=$filename;
 
-	print "Zone: $dns_zone needed\n";
+	print "   * Zone: $dns_zone needed\n";
 
         # dnsNode
         $devices_file{'dnsNode'}{$host_token}=$ip;
