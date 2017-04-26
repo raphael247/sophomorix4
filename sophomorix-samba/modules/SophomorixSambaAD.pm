@@ -289,8 +289,12 @@ sub AD_dns_create {
 
     # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
-    print "   * dnsNode $dns_node (reverse lookup)\n";
-    my $mesg = $ldap->modify( $dns_node_reverse, add => {
+    print "   * dnsNode $dns_node (reverse lookup $dns_node_reverse)\n";
+#    my $mesg = $ldap->modify( $dns_node_reverse, add => {
+#                      adminDescription => $dns_admin_description,
+#                      cn => $dns_cn,
+#                    });
+    my $mesg = $ldap->modify( $dns_node_reverse, replace => {
                       adminDescription => $dns_admin_description,
                       cn => $dns_cn,
                     });
