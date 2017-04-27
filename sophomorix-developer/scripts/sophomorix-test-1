@@ -951,7 +951,7 @@ if ($add==1 or $test_add==1){
                    givenName=>"Martha",
                    name=>"schnmar42",
                    sAMAccountname=>"schnmar42",
-                   uidNumber=>"99000",
+                   uidNumber=>"99002",
                    homeDrive=>"H:",
                    homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\s6ade\\homes\\schnmar42",
                    unixHomeDirectory=>"/srv/samba/schools/default-school/students/s6ade/homes/schnmar42",
@@ -966,7 +966,7 @@ if ($add==1 or $test_add==1){
                    sophomorixRole => "student",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
-                   sophomorixCreationDate => "exists",
+                   sophomorixCreationDate => "20110915182409.0Z",
                    sophomorixTolerationDate => "exists",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
@@ -974,6 +974,72 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus => "T",
                    sophomorixUnid => "mig1234",
                    userAccountControl => "512",
+                   memberOf => "s6ade|wifi|internet|webfilter|intranet|printing",
+                  });
+    # schaf42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=schaf42,OU=s6ade,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Heinz Schaf",
+                   givenName=>"Heinz",
+                   name=>"schaf42",
+                   sAMAccountname=>"schaf42",
+                   uidNumber=>"99003",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\s6ade\\homes\\schaf42",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/s6ade/homes/schaf42",
+                   sn=>"Schaf",
+                   userPrincipalName => "schaf42@".$root_dns,
+                   sophomorixAdminClass => "s6ade",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Heinz",
+                   sophomorixSurnameASCII  => "Schaf",
+                   sophomorixBirthdate  => "11.02.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "20110915182409.0Z",
+                   sophomorixTolerationDate => "20120918000000.0Z",
+                   sophomorixDeactivationDate => "20131013000000.0Z",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "D",
+                   sophomorixUnid => "mig2345",
+                   userAccountControl => "514",
+                   memberOf => "s6ade|wifi|internet|webfilter|intranet|printing",
+                  });
+    # hund42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=hund42,OU=s6ade,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Karl Hund",
+                   givenName=>"Karl",
+                   name=>"hund42",
+                   sAMAccountname=>"hund42",
+                   uidNumber=>"99004",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\students\\s6ade\\homes\\hund42",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/s6ade/homes/hund42",
+                   sn=>"Hund",
+                   userPrincipalName => "hund42@".$root_dns,
+                   sophomorixAdminClass => "s6ade",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Karl",
+                   sophomorixSurnameASCII  => "Hund",
+                   sophomorixBirthdate  => "11.01.1991",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixCreationDate => "20110915182409.0Z",
+                   sophomorixTolerationDate => "20120918000000.0Z",
+                   sophomorixDeactivationDate => "20131013000000.0Z",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "R",
+                   sophomorixUnid => "mig3456",
+                   userAccountControl => "514",
                    memberOf => "s6ade|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users class
@@ -993,12 +1059,12 @@ if ($add==1 or $test_add==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixMembers=>"schnmar42|schneima42",
+                   sophomorixMembers=>"hund42|schaf42|schnmar42|schneima42",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "students",
-                   member => "schnmar42|schneima42",
+                   member => "hund42|schaf42|schnmar42|schneima42",
                   });
     ##### Testing the users ou-students group    ##### Testing the users ou-students group
     &AD_test_object({ldap=>$ldap,
@@ -1067,7 +1133,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-wifi",
-                   member => "schnmar42|schneima42|sch42",
+                   member => "hund42|schaf42|schnmar42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=internet,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1079,7 +1145,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-internet",
-                   member => "schnmar42|schneima42|sch42",
+                   member => "hund42|schaf42|schnmar42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=admins,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1103,7 +1169,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-webfilter",
-                   member => "schnmar42|schneima42|sch42",
+                   member => "hund42|schaf42|schnmar42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=intranet,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1115,7 +1181,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-intranet",
-                   member => "schnmar42|schneima42|sch42",
+                   member => "hund42|schaf42|schnmar42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=printing,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1127,7 +1193,7 @@ if ($add==1 or $test_add==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "global-printing",
-                   member => "schnmar42|schneima42|sch42",
+                   member => "hund42|schaf42|schnmar42|schneima42|sch42",
                   });
 
     ##### Testing the school groups of bsz
@@ -1468,6 +1534,12 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/schools/default-school/students/s6ade/homes/schnmar42",
                          "/srv/samba/schools/default-school/students/s6ade/homes/schnmar42/dir1",
                          "/srv/samba/schools/default-school/students/s6ade/homes/schnmar42/dir2",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42/dir1",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42/dir2",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42/dir1",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42/dir2",
                          "/srv/samba/schools/default-school/teachers",
                          "/srv/samba/schools/default-school/teachers/homes",
                          "/srv/samba/schools/default-school/teachers/homes/sch42",
@@ -1493,11 +1565,15 @@ if ($add==1 or $test_add==1){
 if ($migration_kill==1){
     # killing the migration users
     &run_command("sophomorix-user $verbose_options -K --user schnmar42");
+    &run_command("sophomorix-user $verbose_options -K --user schaf42");
+    &run_command("sophomorix-user $verbose_options -K --user hund42");
     &run_command("sophomorix-check $verbose_options");
     &run_command("sophomorix-kill $verbose_options");
 
     # testing the users
     &AD_object_nonexist($ldap,$root_dse,"user","schnmar42");
+    &AD_object_nonexist($ldap,$root_dse,"user","schaf4242");
+    &AD_object_nonexist($ldap,$root_dse,"user","hund42");
 
 }
 
