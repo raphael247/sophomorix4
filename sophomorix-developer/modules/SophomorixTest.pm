@@ -582,39 +582,44 @@ sub AD_test_object {
         }
         if (defined $s_creationdate){
             my $date=$entry->get_value ('sophomorixCreationDate');
-            $test_date=substr($date,0,3); # first 3 chars
+            $test_date=substr($date,0,4); # first 4 chars
             # set string ok
-            my $strg_ok="201";
+            my $strg_ok="2017";
             if ($s_creationdate eq "exists"){
-                # test first 3 digits
+                # test first 4 digits
                 is ($test_date,$strg_ok,
 		    "  * CreationDate $date beginns with $strg_ok ");
             } else {
-                $strg_ok=$s_creationdate;
-                is ($date,$strg_ok,
-   		    "  * CreationDate $date is $strg_ok ");
+                is ($date,$s_creationdate,
+   		    "  * CreationDate $date is $s_creationdate ");
+#                $strg_ok=$s_creationdate;
+#                is ($date,$strg_ok,
+#   		    "  * CreationDate $date is $strg_ok ");
             }
         }
         if (defined $s_tolerationdate){
             my $date=$entry->get_value ('sophomorixTolerationDate');
-            $test_date=substr($date,0,3); # first 3 chars
+            $test_date=substr($date,0,4); # first 3 chars
             # set string ok
-            my $strg_ok="201";
+            my $strg_ok="2017";
             if ($s_tolerationdate eq "exists"){
-                # test first 3 digits
+                # test first 4 digits
                 is ($test_date,$strg_ok,
 		    "  * TolerationDate $date beginns with $strg_ok ");
             } elsif ($s_tolerationdate eq "default") {
                 $strg_ok=$DevelConf::default_date;
                 is ($date,$strg_ok,
    		    "  * TolerationDate $date is $strg_ok ");
+            } else {
+                is ($date,$s_tolerationdate,
+   		    "  * TolerationDate $date is $s_tolerationdate ");
             }
         }
         if (defined $s_deactivationdate){
             my $date=$entry->get_value ('sophomorixDeactivationDate');
-            $test_date=substr($date,0,3); # first 3 chars
+            $test_date=substr($date,0,4); # first 4 chars
             # set string ok
-            my $strg_ok="201";
+            my $strg_ok="2017";
             if ($s_deactivationdate eq "exists"){
                 # test first 3 digits
                 is ($test_date,$strg_ok,
@@ -623,6 +628,9 @@ sub AD_test_object {
                 $strg_ok=$DevelConf::default_date;
                 is ($date,$strg_ok,
    		    "  * DeactivationDate $date is $strg_ok ");
+            } else {
+                is ($date,$s_deactivationdate,
+   		    "  * DeactivationDate $date is $s_deactivationdate ");
             }
         }
         if (defined $s_comment){
