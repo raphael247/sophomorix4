@@ -2005,7 +2005,8 @@ sub AD_get_name_tokened {
         $role eq "project" or
         $role eq "management" or
         $role eq "administrator" or
-        $role eq "sophomorix-group"){
+        $role eq "sophomorix-group" or
+        $role eq "group"){
         if ($school eq "---" 
             or $school eq ""
             or $school eq $DevelConf::name_default_school
@@ -2287,6 +2288,15 @@ sub AD_school_create {
                           smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>$ref_sophomorix_config,
                          });
+    }
+    ############################################################
+    # adding groups to <schoolname>-group
+    foreach my $membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
+    &AD_group_addmember({ldap => $ldap,
+                         root_dse => $root_dse, 
+                         group => $school,
+                         addgroup => $membergroup,
+                        }); 
     }
 
     # creating filesystem for school

@@ -1049,6 +1049,11 @@ sub load_school_ini {
                 $ref_sophomorix_config->{'SCHOOLS'}{$school}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
+                # add more stuff
+                foreach my $member ( @DevelConf::AD_schools_group_members ){
+                    my ($group)=&Sophomorix::SophomorixSambaAD::AD_get_name_tokened($member,$school,"group");
+                    push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} }, $group;
+                }
 	} elsif ($section=~m/^file\./){ 
             ##### file.* section ########################################################################
 	    my ($string,$name,$extension)=split(/\./,$section);
