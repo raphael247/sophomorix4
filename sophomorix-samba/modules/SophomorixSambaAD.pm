@@ -2180,7 +2180,7 @@ sub AD_school_create {
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
     ############################################################
-    # providing group SCHOOLS
+    # providing group 'SCHOOLS'
     ############################################################
     my $dn_schools="CN=".$DevelConf::AD_schools_group.",".$DevelConf::AD_schools_ou.",".$root_dse;
     &AD_group_create({ldap=>$ldap,
@@ -2190,7 +2190,7 @@ sub AD_school_create {
                       school=>$DevelConf::AD_schools_group,
                       group=>$DevelConf::AD_schools_group,
                       group_basename=>$DevelConf::AD_schools_group,
-                      description=>"The group for all schols",
+                      description=>"The group that includes all schools",
                       type=>"globalschool",
                       status=>"P",
                       creationdate=>$creationdate,
@@ -2205,6 +2205,29 @@ sub AD_school_create {
     my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
+    ############################################################
+    # providing group <schoolname>
+    ############################################################
+    my $dn_schoolname="CN=".$school.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    print "$dn_schoolname\n";
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      dn_wish=>$dn_schoolname,
+                      school=>$school,
+                      group=>$school,
+                      group_basename=>$school,
+                      description=>"The school group of school ".$school,
+                      type=>"school",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"FALSE",
+                      hidden=>"FALSE",
+                      smb_admin_pass=>$smb_admin_pass,
+                      sophomorix_config=>$ref_sophomorix_config,
+                     });
+
+
     ############################################################
     # sub ou's for OU=*    
     if($Conf::log_level>=2){
