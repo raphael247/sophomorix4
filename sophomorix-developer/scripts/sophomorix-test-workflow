@@ -1424,16 +1424,16 @@ if ($modify_2_check==1){
     my $dn_gunnarar="CN=".$gunnarar.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_gunnarar,"20170101000001.0Z","---");
     my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20170101000001.0Z","---");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20170101000002.0Z","---");
     my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20170101000001.0Z","---");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20170101000003.0Z","---");
 
     my $dn_rukri99="CN=rukri99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_rukri99,"20170101000002.0Z","---");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_rukri99,"20170101000004.0Z","---");
     my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20170101000002.0Z","---");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20170101000005.0Z","---");
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20170101000002.0Z","---");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20170101000006.0Z","---");
 
     # moving 
     #  koperni99
@@ -1645,7 +1645,7 @@ if ($modify_2_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
+                   sophomorixTolerationDate => "20170101000001.0Z",
                    sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
@@ -1679,7 +1679,7 @@ if ($modify_2_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
+                   sophomorixTolerationDate => "20170101000002.0Z",
                    sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
@@ -1713,7 +1713,7 @@ if ($modify_2_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
+                   sophomorixTolerationDate => "20170101000003.0Z",
                    sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
@@ -1942,7 +1942,7 @@ if ($modify_2_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
+                   sophomorixTolerationDate => "20170101000004.0Z",
                    sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
@@ -1974,7 +1974,7 @@ if ($modify_2_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
+                   sophomorixTolerationDate => "20170101000005.0Z",
                    sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
@@ -2006,7 +2006,7 @@ if ($modify_2_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
+                   sophomorixTolerationDate => "20170101000006.0Z",
                    sophomorixDeactivationDate => "exists",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
@@ -2096,15 +2096,15 @@ if ($modify_3_check==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
-    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20160101000001.0Z","20170101000001.0Z");
     my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20160101000001.0Z","20170101000001.0Z");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20160101000002.0Z","20170101000002.0Z");
+    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20160101000003.0Z","20170101000003.0Z");
 
     my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20160101000002.0Z","20170101000002.0Z");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20160101000005.0Z","20170101000005.0Z");
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
-    &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20160101000002.0Z","20170101000002.0Z");
+    &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20160101000006.0Z","20170101000006.0Z");
 
     my $command_modify_3="sophomorix-check $verbose_options ".
                 "--injectline \"uni.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
@@ -2343,8 +2343,8 @@ if ($modify_3_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "exists",
+                   sophomorixTolerationDate => "20160101000002.0Z",
+                   sophomorixDeactivationDate => "20170101000002.0Z",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "R",
@@ -2377,8 +2377,8 @@ if ($modify_3_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "exists",
+                   sophomorixTolerationDate => "20160101000003.0Z",
+                   sophomorixDeactivationDate => "20170101000003.0Z",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "R",
@@ -2695,8 +2695,8 @@ if ($modify_3_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "exists",
+                   sophomorixTolerationDate => "20160101000005.0Z",
+                   sophomorixDeactivationDate => "20170101000005.0Z",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "R",
@@ -2727,8 +2727,8 @@ if ($modify_3_do==1){
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "exists",
+                   sophomorixTolerationDate => "20160101000006.0Z",
+                   sophomorixDeactivationDate => "20170101000006.0Z",
                    sophomorixComment => "created by sophomorix",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "R",
