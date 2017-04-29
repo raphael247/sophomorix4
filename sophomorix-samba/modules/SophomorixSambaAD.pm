@@ -2226,8 +2226,12 @@ sub AD_school_create {
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
                      });
-
-
+    # make group <schoolname> member in SCHOOLS
+    &AD_group_addmember({ldap => $ldap,
+                         root_dse => $root_dse, 
+                         group => $DevelConf::AD_schools_group,
+                         addgroup => $school,
+                        }); 
     ############################################################
     # sub ou's for OU=*    
     if($Conf::log_level>=2){
