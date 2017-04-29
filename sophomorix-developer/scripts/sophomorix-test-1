@@ -337,7 +337,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                    member => "bsz-m7ab|bsz-m8cd",
                   });
 
@@ -409,7 +409,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -480,7 +480,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -551,7 +551,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -632,7 +632,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-teachers",
+                   memberOf => "bsz|global-teachers",
                    member => "oe42|wu42",
                   });
 
@@ -704,7 +704,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-students",
+                   memberOf => "uni|global-students",
                   });
 
 
@@ -775,7 +775,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-students",
+                   memberOf => "uni|global-students",
                   });
 
 
@@ -824,7 +824,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                    member => "kep42|gal42",
               });
     ##### Testing the users ou-teachers group
@@ -839,7 +839,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                    member => "kep42|gal42",
                   });
 
@@ -889,7 +889,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                    member => "kep42|gal42",
               });
     ##### Testing the users ou-teachers group
@@ -904,7 +904,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                    member => "kep42|gal42",
                   });
 
@@ -1307,7 +1307,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-students",
+                   memberOf => "default-school|global-students",
                   });
     # sch42
     &AD_test_object({ldap=>$ldap,
@@ -1349,7 +1349,7 @@ if ($add==1 or $test_add==1){
                    gidNumber=>"-1",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-teachers",
+                   memberOf => "default-school|global-teachers",
                    member => "sch42",
                   });
 
@@ -1387,7 +1387,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-admins",
+                   memberOf => "default-school|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1461,7 +1461,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-admins",
+                   memberOf => "bsz|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1535,7 +1535,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-admins",
+                   memberOf => "uni|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1586,7 +1586,7 @@ if ($add==1 or $test_add==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "bsz-teachers|bsz-students|bsz-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1599,7 +1599,7 @@ if ($add==1 or $test_add==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "teachers|students|admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -1612,7 +1612,7 @@ if ($add==1 or $test_add==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "uni-teachers|uni-students|uni-admins",
                   });
     # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
@@ -3972,7 +3972,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -4043,7 +4043,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-students",
+                   memberOf => "lin|global-students",
                   });
 
 
@@ -4114,7 +4114,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -4185,7 +4185,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -4256,7 +4256,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
     # wu42
@@ -4304,7 +4304,7 @@ if ($update==1 or $test_update==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                    member => "wu42|lordjo42",
               });
 
@@ -4354,7 +4354,7 @@ if ($update==1 or $test_update==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                    member => "wu42|lordjo42",
                   });
 
@@ -4404,7 +4404,7 @@ if ($update==1 or $test_update==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-teachers",
+                   memberOf => "lin|global-teachers",
                    member => "blackmri42",
                 });
 
@@ -4476,7 +4476,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-students",
+                   memberOf => "uni|global-students",
                   });
 
     # gal42
@@ -4546,7 +4546,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "global-students",
+                   memberOf => "ghs|global-students",
                   });
 
    # schneima42
@@ -4616,7 +4616,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-students",
+                   memberOf => "default-school|global-students",
                   });
     
     # sch42
@@ -4687,7 +4687,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-students",
+                   memberOf => "default-school|global-students",
                   });
 
     ##### Testing the school groups of default-school
@@ -4724,7 +4724,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-admins",
+                   memberOf => "default-school|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4848,7 +4848,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-admins",
+                   memberOf => "uni|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4922,7 +4922,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "global-admins",
+                   memberOf => "ghs|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4996,7 +4996,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-admins",
+                   memberOf => "lin|global-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5047,7 +5047,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "bsz-teachers|bsz-students|bsz-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -5060,7 +5060,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "teachers|students|admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -5073,7 +5073,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "uni-teachers|uni-students|uni-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=ghs,OU=ghs,OU=SCHOOLS,".$root_dse,
@@ -5086,7 +5086,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "ghs",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "ghs-teachers|ghs-students|ghs-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lin,OU=lin,OU=SCHOOLS,".$root_dse,
@@ -5099,7 +5099,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "lin",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "lin-teachers|lin-students|lin-admins",
                   });
     # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
@@ -5860,7 +5860,7 @@ if ($kill==1 or $test_kill==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "bsz-teachers|bsz-students|bsz-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -5873,7 +5873,7 @@ if ($kill==1 or $test_kill==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "teachers|students|admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -5886,7 +5886,7 @@ if ($kill==1 or $test_kill==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "uni-teachers|uni-students|uni-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=ghs,OU=ghs,OU=SCHOOLS,".$root_dse,
@@ -5899,7 +5899,7 @@ if ($kill==1 or $test_kill==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "ghs",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "ghs-teachers|ghs-students|ghs-admins",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lin,OU=lin,OU=SCHOOLS,".$root_dse,
@@ -5912,7 +5912,7 @@ if ($kill==1 or $test_kill==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "lin",
                    memberOf => "SCHOOLS",
-                   member => "",
+                   member => "lin-teachers|lin-students|lin-admins",
                   });
     # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
