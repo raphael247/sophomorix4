@@ -2173,14 +2173,35 @@ sub AD_school_create {
 
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (begin) ...");
     ############################################################
-    # providing OU=SCHOOLS
+    # providing OU=SCHOOLS and group SCHOOLS
     ############################################################
     my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
     my $result1 = $ldap->add($schools_ou,
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
-
-    # providing the OU=* for schools
+    ############################################################
+    # providing group SCHOOLS
+    ############################################################
+    my $dn_schools="CN=".$DevelConf::AD_schools_group.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      dn_wish=>$dn_schools,
+                      school=>$DevelConf::AD_schools_group,
+                      group=>$DevelConf::AD_schools_group,
+                      group_basename=>$DevelConf::AD_schools_group,
+                      description=>"The group for all schols",
+                      type=>"globalschool",
+                      status=>"P",
+                      creationdate=>$creationdate,
+                      joinable=>"FALSE",
+                      hidden=>"FALSE",
+                      smb_admin_pass=>$smb_admin_pass,
+                      sophomorix_config=>$ref_sophomorix_config,
+                     });
+    ############################################################
+    # providing the OU=<school>,OU=SCHOOLS for schools
+    ############################################################
     my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
                         attr => ['objectclass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
@@ -2218,7 +2239,6 @@ sub AD_school_create {
     foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
-#        &AD_ou_create($ldap,$root_dse,$dn,$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn});
         my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
         my $description=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group};
         my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
