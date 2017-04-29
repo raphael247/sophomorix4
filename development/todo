@@ -34,6 +34,110 @@ Sollen auch global-students, global-teachers und global-admins in SCHOOLS?
 --------------------------------------------------
 
 
+--------------------------------------------------
+sophomorix-devel.conf.ini ZUSÄTZLICH lesen
+
+Einige Parameter aus sophomorix-devel.conf
+in die sophomorix-devel.conf.ini umlagern
+
+- laden der sophomorix-devel.conf.ini in sophomorix_config->DEVELCONF
+
+Roletype.conf
+-> statt parsen der Rolytype.conf und Einträge verarbeiten
+   in sophomorix-devel.cong.ini scchon verarbeitet angeben
+
+-> RoleType.conf abschaffen
+-> sophomorix-devel.conf abschaffen
+
+sophomorix-devel.conf.ini für Pfade:
+
+[PATH]
+	CONF_SOPHOMORIX=/etc/linuxmuster/sophomorix
+	CONF_TMP=/var/lib/sophomorix/tmp
+
+[NAME]
+	DEFAULT_SCHOOL=default-school
+
+[ENCODING]
+	FIRSTNAMES=firstnames.UTF8.txt,firstnames.ISO_8859-1.txt
+	FIRSTNAME_ERRORS=firstname_errors.UTF8.txt,firstname_errors.ISO_8859-1.txt
+...
+
+
+sophomorix-devel.conf.ini mit angaben, um eine neue Rolle zu definieren
+
+
+[ROLE.students.csv]
+	FIELD_5=UNID
+	FIELD_6=...
+	...
+	USER_ROLE=student
+
+        PRIMARY_GROUP_TYPE=adminclass
+        PRIMARY_GROUP_NAME=*multi*
+#        PRIMARY_GROUP_NAME=teachers
+        PRIMARY_GROUP_OU=Students
+#        PRIMARY_GROUP_OU=Teachers
+
+        SECONDARY_GROUP_TYPE=ouclass
+        SECONDARY_GROUP_NAME=students
+#        SECONDARY_GROUP_NAME=          # none
+        SECONDARY_GROUP_OU=Students
+
+        TERTIARY_GROUP_TYPE=globalclass
+        TERTIARY_GROUP_NAME=global-students
+#        TERTIARY_GROUP_NAME=global-teachers
+        TERTIARY_GROUP_OU=Groups
+
+        QUATERNARY_GROUP_TYPE=globalclass
+        QUATERNARY_GROUP_NAME=
+        QUATERNARY_GROUP_OU=Groups
+
+Oder:
+------------------------------
+# user roles
+[role.students.csv]
+	FIELD_5=UNID
+	FIELD_6=...
+	...
+	USER_ROLE=student
+        PRIMARY_GROUP_TYPE=adminclass
+        SECONDARY_GROUP_TYPE=ouclass
+        TERTIARY_GROUP_TYPE=globalclass
+        QUATERNARY_GROUP_TYPE=globalclass
+#        GROUP_TYPE_LEVEL1=adminclass
+#        GROUP_TYPE_LEVEL2=ouclass
+#        GROUP_TYPE_LEVEL3=globalstudents
+#        GROUP_TYPE_LEVEL4=globalclass
+
+# group types
+[type.adminclass]
+	GROUP_NAME=*multi*
+	GROUP_SUB_OU=Students     # -> OU=Students, ...
+[type.teacherclass]
+	GROUP_NAME=teachers
+	GROUP_SUB_OU=OU=Teachers  # -> OU=Teachers, ...
+[type.ouclass]
+	GROUP_NAME=students
+	GROUP_SUB_OU=OU=Students
+#[type.globalclass]
+[type.globalstudents]
+	GROUP_NAME=global-students
+	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
+[type.globalteachers]
+	GROUP_NAME=global-teachers
+	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
+[type.globalclass]
+	GROUP_NAME=global-teachers
+	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
+	
+
+
+--------------------------------------------------
+
+
+
+
 sophomorix-check
 my %AD= %$ref_AD; 
 Ist diese Kopie notwendig?
