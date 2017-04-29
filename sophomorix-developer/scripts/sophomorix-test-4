@@ -219,7 +219,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -282,7 +282,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -340,7 +340,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -398,7 +398,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-students",
+                   memberOf => "bsz|global-students",
                   });
 
 
@@ -444,7 +444,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-teachers",
+                   memberOf => "bsz|global-teachers",
                   });
 
 
@@ -490,7 +490,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-teachers",
+                   memberOf => "bsz|global-teachers",
                   });
 
 
@@ -548,7 +548,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-students",
+                   memberOf => "uni|global-students",
                   });
 
 
@@ -606,7 +606,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-students",
+                   memberOf => "uni|global-students",
                   });
 
 
@@ -652,7 +652,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                   });
 
 
@@ -698,7 +698,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-teachers",
+                   memberOf => "uni|global-teachers",
                   });
     # schneima38
     &AD_test_object({ldap=>$ldap,
@@ -754,7 +754,7 @@ if ($test_add_class==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-students",
+                   memberOf => "default-school|global-students",
                   });
     # sch38
     &AD_test_object({ldap=>$ldap,
@@ -793,9 +793,12 @@ if ($test_add_class==1){
                    dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"teachers",
                    gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-teachers",
+                   memberOf => "default-school|global-teachers",
                   });
 
     ##### Testing the global groups
