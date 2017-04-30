@@ -623,7 +623,7 @@ if ($kill==1 and $project ne ""){
                     smb_admin_pass=>$smb_admin_pass,
                     type=>"project",
                   });
-  exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -634,10 +634,10 @@ my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
 if ($count>1){
     print "\n$count Projects found.\n";
     print "Specify the school-token to choose a project\n\n";
-    exit $count;
+    &log_script_exit("Specify the school-token to choose a project",$count,1,0,\@arguments,\%sophomorix_result);
 } elsif ($count==0){
     print "\nERROR retrieving project $project: $count project found.\n\n";
-    exit $count;
+    &log_script_exit("ERROR retrieving project $project: $count project found.",$count,1,0,\@arguments,\%sophomorix_result);
 }
 
 

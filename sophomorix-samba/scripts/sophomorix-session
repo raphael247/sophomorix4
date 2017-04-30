@@ -262,7 +262,7 @@ if ($kill_all_sessions==1){
                             sessions_ref=>\%sessions,
                         });
     }
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -276,7 +276,7 @@ if ($session ne "" and $kill==1){
                         create=>"FALSE",
                         sessions_ref=>\%sessions,
                     });
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -294,7 +294,7 @@ if ($create==1 and $supervisor ne ""){
                         developer_session=>$developer_session,
                         sessions_ref=>\%sessions,
                     });
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -311,7 +311,7 @@ if ($session ne "" and $participants ne ""){
                         participants=>$participants,
                         sessions_ref=>\%sessions,
                     });
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -328,7 +328,7 @@ if ($session ne "" and $comment ne ""){
                         comment=>$comment,
                         sessions_ref=>\%sessions,
                     });
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -349,7 +349,7 @@ if ($session ne "" and $add_participants ne ""){
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
 
 
@@ -369,8 +369,10 @@ if ($session ne "" and $remove_participants ne ""){
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result);
 }
+
+
 
 # --set-exam-mode
 if ($session ne "" and $set_exam_mode ne ""){
@@ -403,6 +405,7 @@ if ($session ne "" and $set_exam_mode ne ""){
 }
 
 
+
 # --unset-exam-mode
 if ($session ne "" and $unset_exam_mode ne ""){
     # get chief of session
@@ -431,11 +434,9 @@ if ($session ne "" and $unset_exam_mode ne ""){
 }
 
 
+
 &AD_unbind_admin($ldap);
-
 &log_script_end(\@arguments,\%sophomorix_result);
-
-
 
 ################################################################################
 # Sub
