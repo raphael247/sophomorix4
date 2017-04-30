@@ -39,6 +39,10 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
@@ -125,6 +129,7 @@ my $testopt=GetOptions(
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_result=&result_sophomorix_init("sophomorix-session");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
@@ -239,7 +244,7 @@ if ($info==1) {
 
 
 
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result);
 
 
 ################################################################################
@@ -428,7 +433,7 @@ if ($session ne "" and $unset_exam_mode ne ""){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);
 
 
 

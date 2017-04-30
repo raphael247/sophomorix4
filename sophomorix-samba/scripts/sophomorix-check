@@ -41,6 +41,8 @@ use Sophomorix::SophomorixBase qw(
                                  check_options
                                  config_sophomorix_read
                                  result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
                                  result_sophomorix_print
                                  filelist_fetch
                                  remove_whitespace
@@ -251,7 +253,7 @@ if ($unlock==1) {
 
 # --lock
 if ($lock==1) {
-    &lock_sophomorix("lock",0,@arguments);
+    &lock_sophomorix("lock",0,\@arguments);
     exit;
 }
 
@@ -282,6 +284,7 @@ if ($list_files==1) {
        exit;
    }
 
+&log_script_start(\@arguments,\%sophomorix_result);
 
 # --analyze-encoding
 # analyze one file
@@ -311,10 +314,9 @@ if ($analyze_encoding ne ""){
         }
     }
     &print_analyzed_encoding($analyze_encoding);
-    &log_script_exit("",1,1,0,@arguments);
+    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result);
 }
 
-&log_script_start(@arguments);
 
 
 ################################################################################
@@ -655,7 +657,7 @@ printf "%-21s%7s\n",basename($nochange_file),$lc_nochange;
 
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);
 
 
 

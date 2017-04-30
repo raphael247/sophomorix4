@@ -36,6 +36,10 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
@@ -125,6 +129,7 @@ Please see the sophomorix-newfile(8) man pages for full documentation
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_result=&result_sophomorix_init("sophomorix-newfile");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
@@ -138,7 +143,7 @@ if ($info==1) {
     exit;
 }
 
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result);
 
 
 ################################################################################
@@ -294,7 +299,7 @@ if ($filter_script eq "---"){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);
 
 
 

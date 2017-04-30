@@ -21,6 +21,10 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_exit
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -92,6 +96,7 @@ my $testopt=GetOptions(
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
+my %sophomorix_result=&result_sophomorix_init("sophomorix-managementgroup");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # --help
@@ -131,7 +136,7 @@ Please see the sophomorix-managementgroup(8) man pages for full documentation
 #} 
 
 
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result);
 
 
 ############################################################
@@ -219,7 +224,7 @@ if ($noadmins ne ""){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);
 
 
 
@@ -242,7 +247,7 @@ sub manage_groupmemberships {
 
         my $count = $mesg->count;
         if ($count==0){
-            &log_script_exit("ERROR: Could not find user $user",1,1,0,@arguments);
+            &log_script_exit("ERROR: Could not find user $user",1,1,0,\@arguments,\%sophomorix_result);
         }
         my $entry = $mesg->entry(0);
         my $school = $entry->get_value('sophomorixSchoolname');

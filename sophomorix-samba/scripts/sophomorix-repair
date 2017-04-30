@@ -33,6 +33,10 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
@@ -109,6 +113,7 @@ my $testopt=GetOptions(
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_result=&result_sophomorix_init("sophomorix-repair");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
@@ -194,7 +199,7 @@ print "dumcp $dump_AD \n";
 # ============================================================
 # changing the filesystem
 # ============================================================
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result);
 
 # --all
 if ($all==1) {
@@ -330,7 +335,7 @@ if ($student_home==1) {
 
 
 
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);
 
 
 ############################################################

@@ -43,6 +43,8 @@ $Data::Dumper::Terse = 1;
             check_options
             config_sophomorix_read
             result_sophomorix_init
+            result_sophomorix_add
+            result_sophomorix_check_exit
             result_sophomorix_print
             filelist_fetch
             dir_listing
@@ -220,7 +222,8 @@ sub unlock_sophomorix{
 
 
 sub lock_sophomorix {
-    my ($type,$pid,@arguments) = @_;
+    #my ($type,$pid,@arguments) = @_;
+    my ($type,$pid,$ref_arguments) = @_;
     # $type: lock (lock when not existing)
     # $type, steal when existing
     # $pid: steal only when this pid is in the lock file
@@ -229,7 +232,8 @@ sub lock_sophomorix {
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $lock="lock::${timestamp}::creator::$0";
-    foreach my $arg (@arguments){
+#    foreach my $arg (@arguments){
+    foreach my $arg ( @{ $ref_arguments}  ){    
         if ($arg eq "--skiplock"){
             $skiplock=1;
         }
@@ -1274,6 +1278,14 @@ sub result_sophomorix_init {
     return %sophomorix_result; 
 }
 
+sub result_sophomorix_add {
+
+}
+
+sub result_sophomorix_check_exit {
+
+}
+
 sub result_sophomorix_print {
     my ($ref_sophomorix_result,$json)=@_;
       if ($json==0){
@@ -1399,7 +1411,8 @@ sub quota_listing_session_participant {
 ######################################################################
 sub log_script_start {
     my $stolen=0;
-    my @arguments = @_;
+#    my @arguments = @_;
+    my ($ref_arguments,$ref_result) = @_;
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $skiplock=0;
@@ -1407,7 +1420,8 @@ sub log_script_start {
     my $log="${timestamp}::start::  $0";
     my $log_locked="${timestamp}::locked:: $0";
     my $count=0;
-    foreach my $arg (@arguments){
+#    foreach my $arg (@arguments){
+    foreach my $arg ( @{ $ref_arguments}  ){ 
         $count++;
         # count numbers arguments beginning with 1
         # @arguments numbers arguments beginning with 0
@@ -1417,7 +1431,8 @@ sub log_script_start {
 
         # change argument of option to xxxxxx if password is expected
         if (exists $DevelConf::forbidden_log_options{$arg}){
-            $arguments[$count]="xxxxxx";
+            $ { $ref_arguments }[$count]="xxxxxx";
+            # $arguments[$count]="xxxxxx";
         }
 
         if ($arg eq ""){
@@ -1453,7 +1468,8 @@ sub log_script_start {
             # locking process nonexisting
 	    print "PID $locking_pid not running anymore\n";
 	    print "   I'm stealing the lockfile\n";
-            $stolen=&lock_sophomorix("steal",$locking_pid,@arguments);
+#            $stolen=&lock_sophomorix("steal",$locking_pid,@arguments);
+            $stolen=&lock_sophomorix("steal",$locking_pid,$ref_arguments);
             last;
         } else {
 	    print "Process with PID $locking_pid is still running\n";
@@ -1472,7 +1488,8 @@ sub log_script_start {
     if (exists ${DevelConf::lock_scripts}{$0} 
            and $stolen==0
            and $skiplock==0){
-	&lock_sophomorix("lock",0,@arguments);
+#	&lock_sophomorix("lock",0,@arguments);
+	&lock_sophomorix("lock",0,$ref_arguments);
     }
     &print_title("$0 started ...");
     #&nscd_stop();
@@ -1528,7 +1545,8 @@ sub log_script_exit {
     # 4) skiplock (unused)
     my $skiplock=shift;
 
-    my @arguments = @_;
+#    my @arguments = @_;
+    my ($ref_arguments,$ref_results) = @_;
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::exit ::  $0";
@@ -1542,7 +1560,14 @@ sub log_script_exit {
         }
     } 
 
-    foreach my $arg (@arguments){
+#    foreach my $arg (@arguments){
+    foreach my $arg ( @{ $ref_arguments}  ){  
+        # count numbers arguments beginning with 1
+        # @arguments numbers arguments beginning with 0
+        # change argument of option to xxxxxx if password is expected
+        if (exists $DevelConf::forbidden_log_options{$arg}){
+            $ { $ref_arguments }[$count]="xxxxxx";
+        }
 	$log=$log." ".$arg ;
     }
     $log=$log."::"."$$"."::$message\n";

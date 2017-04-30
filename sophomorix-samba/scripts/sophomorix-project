@@ -31,6 +31,10 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  remove_from_list
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -179,6 +183,7 @@ my $testopt=GetOptions(
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_result=&result_sophomorix_init("sophomorix-project");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
@@ -398,7 +403,7 @@ if ($user_info==1){
 #        &show_project_userinfo($project);
 #        exit;
 #        #&log_script_exit("Project $project showed!",
-#        #                  1,1,0,@arguments);
+#        #                  1,1,0,\@arguments,\%sophomorix_result);
 #    } else {
 #        print "\n   Option --userinfo has be used together with a project\n\n";
 #        exit;
@@ -407,7 +412,7 @@ if ($user_info==1){
 
 
 
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result);
 
 # --current-member
 # --new-member
@@ -464,7 +469,7 @@ if ($curr_member ne ""){
 #     #        print "You must use --caller name to modify such a project!\n";
 #     #        &Sophomorix::SophomorixBase::log_script_exit(
 #     #            "Request to modify nojoin project without --caller!",
-#     #            1,1,0,@arguments);
+#     #            1,1,0,\@arguments,\%sophomorix_result);
 
 #     #     } else {
 #     #        print "I must check if $caller is allowed\n";
@@ -488,7 +493,7 @@ if ($curr_member ne ""){
 #     #            print "$caller is NOT allowed to change userlist\n";
 #     #            &Sophomorix::SophomorixBase::log_script_exit(
 #     #            "Nonadmin tried to change nojoin project!",
-#     #            1,1,0,@arguments);
+#     #            1,1,0,\@arguments,\%sophomorix_result);
 #     #        }
 #     #     }
 #     # }
@@ -506,7 +511,7 @@ if ($project eq "" and $dump_all_projects ne ""){
 #    &dump_all_projects("$dump_all_projects",@arguments);
 #    &Sophomorix::SophomorixBase::log_script_exit(
 #    "All projects dumped!",
-#    0,1,0,@arguments);
+#    0,1,0,\@arguments,\%sophomorix_result);
 }
 
 
@@ -515,7 +520,7 @@ if ($project eq "" and $create_from_file ne ""){
 #    &project_from_file($create_from_file,"--create",@arguments);
 #    &Sophomorix::SophomorixBase::log_script_exit(
 #    "All projects created!",
-#    0,1,0,@arguments);
+#    0,1,0,\@arguments,\%sophomorix_result);
 }
 
 
@@ -524,7 +529,7 @@ if ($project eq "" and $update_from_file ne ""){
 #    &project_from_file($update_from_file,"",@arguments);
 #    &Sophomorix::SophomorixBase::log_script_exit(
 #    "All projects updated!",
-#    0,1,0,@arguments);
+#    0,1,0,\@arguments,\%sophomorix_result);
 }
 
 
@@ -537,7 +542,7 @@ if ($project eq "" and $update_from_file ne ""){
 #       print "   contains invalid characters. \n";
 #       print "   or is too short or too long (6-32 characters). \n\n";
 #       &log_script_exit("Invalid characters in argument!",
-#                         1,1,0,@arguments);
+#                         1,1,0,\@arguments,\%sophomorix_result);
 #   }
 #}
 
@@ -552,7 +557,7 @@ if ($project eq "" and $update_from_file ne ""){
 #        print "   contains invalid characters. \n";
 #        print "   or is too short or too long (3-14 characters after p_). \n\n";
 #        &log_script_exit("Invalid characters in argument!",
-#                          1,1,0,@arguments);
+#                          1,1,0,\@arguments,\%sophomorix_result);
 #    }
 # }
 
@@ -998,4 +1003,4 @@ if (defined $removeadmingroups){
 # }
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);

@@ -26,6 +26,10 @@ use Sophomorix::SophomorixBase qw(
                                  backup_amku_file
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
@@ -89,6 +93,7 @@ my $testopt=GetOptions(
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_result=&result_sophomorix_init("sophomorix-kill");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
@@ -128,7 +133,7 @@ if ($unlock==1) {
 
 # --lock
 if ($lock==1) {
-    &lock_sophomorix("lock",0,@arguments);
+    &lock_sophomorix("lock",0,\@arguments);
     exit;
 }
 
@@ -139,14 +144,14 @@ if ($loginname ne "") {
   print "Loginname $loginname angegeben.\n";
 }
 
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result);
 
 # ===========================================================================
 # Abbruch, wenn sophomorix.kill fehlt oder leer
 # ===========================================================================
 if (not (-s "$kill_file")
     and $killuser eq "") {
-  &log_script_exit("No users to kill!",1,1,0,@arguments);
+  &log_script_exit("No users to kill!",1,1,0,\@arguments,\%sophomorix_result);
 }
 
 
@@ -207,7 +212,7 @@ if ($info==1) {
 
     &print_line;
     print "$count users can be killed\n";
-    &log_script_exit("",1,1,0,@arguments);
+    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result);
 }
 
 
@@ -312,7 +317,7 @@ rename("$kill_file_new","$kill_file");
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments);
+&log_script_end(\@arguments,\%sophomorix_result);
 
 
 
