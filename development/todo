@@ -35,6 +35,8 @@ Sollen auch global-students, global-teachers und global-admins in SCHOOLS?
 
 
 --------------------------------------------------
+Übergang:
+----------
 sophomorix-devel.conf.ini ZUSÄTZLICH lesen
 
 Einige Parameter aus sophomorix-devel.conf
@@ -66,8 +68,11 @@ sophomorix-devel.conf.ini für Pfade:
 
 sophomorix-devel.conf.ini mit angaben, um eine neue Rolle zu definieren
 
-
+# ONE import file equals to ONE role
+# ---> for a new role you need a new file
 [ROLE.students.csv]
+	FIELD1=PRIMARY_GROUP
+#	FIELD1=
 	FIELD_5=UNID
 	FIELD_6=...
 	...
@@ -75,6 +80,7 @@ sophomorix-devel.conf.ini mit angaben, um eine neue Rolle zu definieren
 
         PRIMARY_GROUP_TYPE=adminclass
         PRIMARY_GROUP_NAME=*multi*
+        PRIMARY_GROUP_NAME=FIELD1
 #        PRIMARY_GROUP_NAME=teachers
         PRIMARY_GROUP_OU=Students
 #        PRIMARY_GROUP_OU=Teachers
@@ -132,33 +138,32 @@ Oder:
 	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
 	
 
-
+----------
+Final
+sophomorix-devel.conf
+UND
+sophomorix-Roletype.conf
+in einer datei
+sophomorix-devel.conf.ini
 --------------------------------------------------
-
-
-
-
-sophomorix-check
-my %AD= %$ref_AD; 
-Ist diese Kopie notwendig?
 
 
 --------------------------------------------------
 result hash VOR sophomorix_config
-%sophomorix_result=&sophomorix_result_init("scriptname", ...);
+OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
 
 ... initialisiert einen result hash
 
-&sophomorix_result_init(\%sophomorix_result,"WARNING|ERROR",EXIT|NOEXIT ...);
+&result_sophomorix_add(\%sophomorix_result,"WARNING|ERROR",EXIT|NOEXIT ...);
 
 .. schreibt etwas in den result hash
 
-&sophomorix_result_check_exit(\%sophomorix_result);
+&result_sophomorix_check_exit(\%sophomorix_result);
 
 ... checks if WARN/ERR were so severe (misconfigured) that the script should exit, and exits
 ... called before something ist changed
 
-&sophomorix_result_print(\%sophomorix_result,$json);
+OK &result_sophomorix_print(\%sophomorix_result,$json);
 
 ... called at the end of the script
 ... prints JSON with option --JSON
@@ -442,6 +447,11 @@ Later:
     sophomorixAdminFile (Vorname,Nachname,Gebdat,schule)
   - Falls derselbe user dann in einer Schuldatei auftaucht wird integriert/zusammengefpührt
     (sophomorixAdminFile, ...)
+* Referenzen statt Kopien großer hashes:
+  Beispiel: sophomorix-check
+            my %AD= %$ref_AD; 
+            Ist diese Kopie notwendig?
+            Suchen, ob weitere Kopien gibt wo Referenzen möglich wären
 
 ############################################################
 

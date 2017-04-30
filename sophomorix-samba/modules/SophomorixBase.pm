@@ -42,6 +42,8 @@ $Data::Dumper::Terse = 1;
             get_plain_password
             check_options
             config_sophomorix_read
+            result_sophomorix_init
+            result_sophomorix_print
             filelist_fetch
             dir_listing
             dns_query_ip
@@ -1261,7 +1263,44 @@ sub load_sophomorix_ini {
     }
 }
 
+# working with the JSON result hash
+######################################################################
+sub result_sophomorix_init {
+    my ($scriptname)=@_;
+    my %sophomorix_result=();
+    $sophomorix_result{'SCRIPTNAME'}=$scriptname;
+    $sophomorix_result{'JSONINFO'}="RESULT";
+    $sophomorix_result{'JSONCOMMENT'}="---";
+    return %sophomorix_result; 
+}
 
+sub result_sophomorix_print {
+    my ($ref_sophomorix_result,$json)=@_;
+      if ($json==0){
+          # be quiet
+          print "Calling console printout\n";
+      } elsif ($json==1){
+          # pretty output
+          $ref_sophomorix_result->{'JSONINFO'}=$jsoninfo;
+          #$ref_sophomorix_result->{'JSONCOMMENT'}=$jsoncomment;
+          my $json_obj = JSON->new->allow_nonref;
+          my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_sophomorix_result );
+          print "$utf8_pretty_printed";
+      } elsif ($json==2){
+          # compact output
+          $ref_sophomorix_result->{'JSONINFO'}=$jsoninfo;
+          #$ref_sophomorix_result->{'JSONCOMMENT'}=$jsoncomment;
+          my $json_obj = JSON->new->allow_nonref;
+          my $utf8_json_line   = $json_obj->encode( $ref_sophomorix_result  );
+          print "$utf8_json_line";
+      } elsif ($json==3){
+          &print_title("DUMP: ".$ref_sophomorix_result->{'JSONCOMMENT'});
+          print Dumper( $ref_sophomorix_result );
+      }
+}
+
+# other
+######################################################################
 
 sub filelist_fetch {
     # listing existing files of the given FILETYPE
