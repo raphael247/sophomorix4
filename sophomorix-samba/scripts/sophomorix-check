@@ -40,6 +40,8 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_print
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
@@ -179,10 +181,14 @@ if ($follow ne ""){
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_result=&result_sophomorix_init("sophomorix-check");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
+
+#&result_sophomorix_print(\%sophomorix_result,$json);
+#exit;
 
 # --help
 if ($help==1) {
@@ -649,7 +655,7 @@ printf "%-21s%7s\n",basename($nochange_file),$lc_nochange;
 
 
 &AD_unbind_admin($ldap);
-&log_script_end(@arguments);
+&log_script_end(\@arguments);
 
 
 

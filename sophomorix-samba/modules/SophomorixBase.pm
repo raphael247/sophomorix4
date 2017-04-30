@@ -1481,18 +1481,18 @@ sub log_script_start {
 
 
 sub log_script_end {
-    my @arguments = @_;
+    my ($ref_arguments,$ref_result) = @_;
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::end  ::  $0";
     my $count=0;
-    foreach my $arg (@arguments){
+   foreach my $arg ( @{ $ref_arguments}  ){    
         $count++;
         # count numbers arguments beginning with 1
         # @arguments numbers arguments beginning with 0
         # change argument of option to xxxxxx if password is expected
         if (exists $DevelConf::forbidden_log_options{$arg}){
-            $arguments[$count]="xxxxxx";
+            $ { $ref_arguments }[$count]="xxxxxx";
         }
 	$log=$log." ".$arg ;
     }

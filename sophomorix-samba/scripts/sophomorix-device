@@ -1474,7 +1474,7 @@ if ($set_computer_passwords==1){
 #     } else {
 #         print "\nPlease add a key ${italc_key_dir_teacher}/key!\n\n";
 #     }
-#     &log_script_end(@arguments);
+#     &log_script_end(\@arguments);
 # }
 
 
@@ -1482,6 +1482,7 @@ if ($set_computer_passwords==1){
 &AD_unbind_admin($ldap);
 
 # syntax was OK
+#&log_script_end(\@arguments);
 exit 0;
 
 
