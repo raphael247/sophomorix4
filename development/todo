@@ -155,9 +155,11 @@ OK option -j+
 OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
 ... initialisiert einen result hash
 
-&result_sophomorix_add(\%sophomorix_result,"WARNING|ERROR",EXIT|NOEXIT ...);
+&result_sophomorix_add(\%sophomorix_result,"ERROR|WARNING",$err_num,$string);
+   ... schreibt ERROR|WARNING in den result hash
 
-.. schreibt etwas in den result hash
+&result_sophomorix_add_log(\%sophomorix_result,$string);
+   ... loggt etwas in den result hash
 
 &result_sophomorix_check_exit(\%sophomorix_result);
 

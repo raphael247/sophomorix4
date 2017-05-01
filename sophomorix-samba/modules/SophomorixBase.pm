@@ -1278,30 +1278,68 @@ sub result_sophomorix_init {
     return %sophomorix_result; 
 }
 
-sub result_sophomorix_add {
 
+sub result_sophomorix_add {
+    # $type: ERROR|WARNUNG
+    # $num: -1, no number, else look in ERROR|WARNING db
+    # $ref_parameter: list of parameters to be fitted in db string
+    # $message: used if errnumber is not found in db
+    my ($ref_sophomorix_result,$type,$num,$ref_parameter,$message)=@_;
+
+#    print "LIST of parameters:\n";
+#    foreach my $para ( @{ $ref_parameter}  ){ 
+#        print "$para\n";
+#    } 
+
+    if ($type eq "ERROR" or $type eq "WARNING" ){
+        # get error from db, update $message_de, $message_en
+        push @{ $ref_sophomorix_result->{'OUTPUT'} }, 
+            {TYPE       => $type, 
+             NUMBER     => $num,
+             MESSAGE_EN => $message,
+             MESSAGE_DE => $message,
+            };
+    } else {
+        push @{ $ref_sophomorix_result->{'OUTPUT'} }, 
+            {TYPE           => "UNKNOWN", 
+             INTERNAL_ERROR => "unknown type ".$type."in  result_sophomorix_add",
+            };
+        print "Unknown result type $type";
+    }
 }
+
+
+sub result_sophomorix_add_log {
+    # $type: ERROR|WARNUNG
+    # $num: -1, no number, else look in ERROR|WARNING db
+    # $ref_parameter: list of parameters to be fitted in db string
+    # $message: used if errnumber is not found in db
+    my ($ref_sophomorix_result,$log_message)=@_;
+    push @{ $ref_sophomorix_result->{'OUTPUT'} }, 
+        {TYPE       => "LOG", 
+         LOG => $log_message,
+        };
+}
+
 
 sub result_sophomorix_check_exit {
 
 }
+
 
 sub result_sophomorix_print {
     my ($ref_sophomorix_result,$json)=@_;
       if ($json==0){
           # be quiet
           print "Calling console printout\n";
+          ##### more to follow ?????????????ß
       } elsif ($json==1){
           # pretty output
-          $ref_sophomorix_result->{'JSONINFO'}=$jsoninfo;
-          #$ref_sophomorix_result->{'JSONCOMMENT'}=$jsoncomment;
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_sophomorix_result );
           print "$utf8_pretty_printed";
       } elsif ($json==2){
           # compact output
-          $ref_sophomorix_result->{'JSONINFO'}=$jsoninfo;
-          #$ref_sophomorix_result->{'JSONCOMMENT'}=$jsoncomment;
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_json_line   = $json_obj->encode( $ref_sophomorix_result  );
           print "$utf8_json_line";
@@ -1310,6 +1348,7 @@ sub result_sophomorix_print {
           print Dumper( $ref_sophomorix_result );
       }
 }
+
 
 # other
 ######################################################################
@@ -1498,7 +1537,7 @@ sub log_script_start {
 
 
 sub log_script_end {
-    my ($ref_arguments,$ref_result) = @_;
+    my ($ref_arguments,$ref_result,$json) = @_;
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::end  ::  $0";
@@ -1528,6 +1567,8 @@ sub log_script_end {
     # flush_cache tut nur bei laufendem nscd
     #&nscd_flush_cache();
     &print_title("$0 terminated regularly");
+    # output the result object
+    &result_sophomorix_print($ref_result,$json);
     exit;
 }
 
@@ -1546,7 +1587,16 @@ sub log_script_exit {
     my $skiplock=shift;
 
 #    my @arguments = @_;
-    my ($ref_arguments,$ref_results) = @_;
+#    my ($ref_arguments,$ref_result,$json,$ref_parameter) = @_;
+    # 5) arguments of calling script
+    my $ref_arguments=shift;
+    # 6) reference to result hsh
+    my $ref_result=shift;
+    # 7) $json option
+    my $json=shift;
+    # 8) replacement parameter list for error scripts
+    my $ref_parameter=shift;
+
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::exit ::  $0";
@@ -1584,7 +1634,13 @@ sub log_script_exit {
     if ($message ne ""){
         &print_title("$message");
     }
+    # put message in json object
+    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,"Error not in db: $message");
+#    &result_sophomorix_add($ref_result,"ERROR",-1,\@{["one","two","three"]},"Error not in db: $message");
+
     #&nscd_start();
+    # output the result object
+    &result_sophomorix_print($ref_result,$json);
     exit $return;
 }
 
@@ -1670,8 +1726,8 @@ sub NTACL_set_file {
     close(NTACL);
 }
 
-
-sub ACL_set_file_obsolete {
+# ?????? deprecated ???
+sub old_ACL_set_file_obsolete {
     # $path and $aclname are mandatory
     # $workgroup will be later mandatory 
     my ($arg_ref) = @_;
