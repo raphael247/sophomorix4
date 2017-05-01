@@ -103,10 +103,10 @@ my $unset_exam_mode="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-           "verbose|v+" => \$Conf::log_level,
+           "help|h" => \$help,
            "info|i" => \$info,
            "json|j+" => \$json,
-           "help|h" => \$help,
+           "verbose|v+" => \$Conf::log_level,
            "create|c" => \$create,
            "dump-AD" => \$dump_AD,
            "kill" => \$kill,
@@ -262,7 +262,7 @@ if ($kill_all_sessions==1){
                             sessions_ref=>\%sessions,
                         });
     }
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -276,7 +276,7 @@ if ($session ne "" and $kill==1){
                         create=>"FALSE",
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -294,7 +294,7 @@ if ($create==1 and $supervisor ne ""){
                         developer_session=>$developer_session,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -311,7 +311,7 @@ if ($session ne "" and $participants ne ""){
                         participants=>$participants,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -328,7 +328,7 @@ if ($session ne "" and $comment ne ""){
                         comment=>$comment,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -349,7 +349,7 @@ if ($session ne "" and $add_participants ne ""){
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -369,7 +369,7 @@ if ($session ne "" and $remove_participants ne ""){
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -436,7 +436,7 @@ if ($session ne "" and $unset_exam_mode ne ""){
 
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 ################################################################################
 # Sub

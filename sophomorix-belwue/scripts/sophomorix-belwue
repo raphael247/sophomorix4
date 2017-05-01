@@ -12,13 +12,35 @@ use Getopt::Long;
 #use DBI;
 #use utf8;
 use HTML::TableExtract;
-
 use Net::LDAP;
+use JSON;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 );
+
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_dns_get
+                                    );
 
 my @arguments = @ARGV;
 
@@ -30,6 +52,7 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $ldap_fetch=1;
 my $no_ldap_fetch=0;
 my $copy_to_teachershare=0;
@@ -51,8 +74,9 @@ system("mkdir -p /var/lib/sophomorix/belwue");
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
-           "verbose|v+" => \$Conf::log_level,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "dump-belwue-data" => \$dump_belwue_data,
            "create-login-data=s" => \$create_login_data,
            "copy-to-teachershare" => \$copy_to_teachershare,

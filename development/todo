@@ -149,9 +149,10 @@ sophomorix-devel.conf.ini
 
 
 --------------------------------------------------
-result hash VOR sophomorix_config
+Create result hash VOR sophomorix_config
+OK use JSON
+OK option -j+
 OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
-
 ... initialisiert einen result hash
 
 &result_sophomorix_add(\%sophomorix_result,"WARNING|ERROR",EXIT|NOEXIT ...);
@@ -162,6 +163,7 @@ OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
 
 ... checks if WARN/ERR were so severe (misconfigured) that the script should exit, and exits
 ... called before something ist changed
+... display EXIT Error  
 
 OK &result_sophomorix_print(\%sophomorix_result,$json);
 
@@ -170,6 +172,9 @@ OK &result_sophomorix_print(\%sophomorix_result,$json);
 ... prints on Terminal iithout --JSON
 
 --------------------------------------------------
+
+??? add logging to tests ??? 
+so we ca see in commnd log, which commands were execuded by wich test
 
 
 Configs:

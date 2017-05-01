@@ -12,6 +12,7 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Net::LDAP;
+use JSON;
 #use IMAP::Admin;
 use Sophomorix::SophomorixBase qw(
                                  print_line
@@ -70,6 +71,7 @@ my $kill_file_new=${DevelConf::path_result}."/sophomorix.kill.new";
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $loginname="";
 my $lock=0;
 my $skiplock=0;
@@ -77,14 +79,15 @@ my $unlock=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-           "user|u=s" => \$loginname,
-           "killuser=s" => \$killuser,
-           "verbose|v+" => \$Conf::log_level,
-           "info|i" => \$info,
-           "skiplock" => \$skiplock,
            "help|h" => \$help,
+           "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "lock" => \$lock,
            "unlock" => \$unlock,
+           "skiplock" => \$skiplock,
+           "user|u=s" => \$loginname,
+           "killuser=s" => \$killuser,
           );
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
@@ -151,7 +154,7 @@ if ($loginname ne "") {
 # ===========================================================================
 if (not (-s "$kill_file")
     and $killuser eq "") {
-  &log_script_exit("No users to kill!",1,1,0,\@arguments,\%sophomorix_result);
+  &log_script_exit("No users to kill!",1,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -212,7 +215,7 @@ if ($info==1) {
 
     &print_line;
     print "$count users can be killed\n";
-    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result);
+    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -317,7 +320,7 @@ rename("$kill_file_new","$kill_file");
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 

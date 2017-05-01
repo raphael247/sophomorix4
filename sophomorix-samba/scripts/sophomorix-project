@@ -16,6 +16,7 @@ use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -73,7 +74,7 @@ $Conf::log_level=1;
 my $help=0;
 my $tree=0;
 my $info=0;
-
+my $json=0;
 
 my $user_info=0;
 my $admininfo=0;
@@ -136,12 +137,13 @@ my @addorder_list=();   # order in which projects have to be added
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
 #           "user|user-info|u" => \$user_info,
 #           "admininfo" => \$admininfo,
            "create" => \$create,
            "gidnumber=i" => \$gidnumber,
            "kill" => \$kill,
-           "verbose|v+" => \$Conf::log_level,
            "join!" => \$join,
            "hide!" => \$hide,
 #           "tree" => \$tree,
@@ -403,7 +405,7 @@ if ($user_info==1){
 #        &show_project_userinfo($project);
 #        exit;
 #        #&log_script_exit("Project $project showed!",
-#        #                  1,1,0,\@arguments,\%sophomorix_result);
+#        #                  1,1,0,\@arguments,\%sophomorix_result,$json);
 #    } else {
 #        print "\n   Option --userinfo has be used together with a project\n\n";
 #        exit;
@@ -469,7 +471,7 @@ if ($curr_member ne ""){
 #     #        print "You must use --caller name to modify such a project!\n";
 #     #        &Sophomorix::SophomorixBase::log_script_exit(
 #     #            "Request to modify nojoin project without --caller!",
-#     #            1,1,0,\@arguments,\%sophomorix_result);
+#     #            1,1,0,\@arguments,\%sophomorix_result,$json);
 
 #     #     } else {
 #     #        print "I must check if $caller is allowed\n";
@@ -493,7 +495,7 @@ if ($curr_member ne ""){
 #     #            print "$caller is NOT allowed to change userlist\n";
 #     #            &Sophomorix::SophomorixBase::log_script_exit(
 #     #            "Nonadmin tried to change nojoin project!",
-#     #            1,1,0,\@arguments,\%sophomorix_result);
+#     #            1,1,0,\@arguments,\%sophomorix_result,$json);
 #     #        }
 #     #     }
 #     # }
@@ -511,7 +513,7 @@ if ($project eq "" and $dump_all_projects ne ""){
 #    &dump_all_projects("$dump_all_projects",@arguments);
 #    &Sophomorix::SophomorixBase::log_script_exit(
 #    "All projects dumped!",
-#    0,1,0,\@arguments,\%sophomorix_result);
+#    0,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -520,7 +522,7 @@ if ($project eq "" and $create_from_file ne ""){
 #    &project_from_file($create_from_file,"--create",@arguments);
 #    &Sophomorix::SophomorixBase::log_script_exit(
 #    "All projects created!",
-#    0,1,0,\@arguments,\%sophomorix_result);
+#    0,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -529,7 +531,7 @@ if ($project eq "" and $update_from_file ne ""){
 #    &project_from_file($update_from_file,"",@arguments);
 #    &Sophomorix::SophomorixBase::log_script_exit(
 #    "All projects updated!",
-#    0,1,0,\@arguments,\%sophomorix_result);
+#    0,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -542,7 +544,7 @@ if ($project eq "" and $update_from_file ne ""){
 #       print "   contains invalid characters. \n";
 #       print "   or is too short or too long (6-32 characters). \n\n";
 #       &log_script_exit("Invalid characters in argument!",
-#                         1,1,0,\@arguments,\%sophomorix_result);
+#                         1,1,0,\@arguments,\%sophomorix_result,$json);
 #   }
 #}
 
@@ -557,7 +559,7 @@ if ($project eq "" and $update_from_file ne ""){
 #        print "   contains invalid characters. \n";
 #        print "   or is too short or too long (3-14 characters after p_). \n\n";
 #        &log_script_exit("Invalid characters in argument!",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #    }
 # }
 
@@ -623,7 +625,7 @@ if ($kill==1 and $project ne ""){
                     smb_admin_pass=>$smb_admin_pass,
                     type=>"project",
                   });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -634,10 +636,10 @@ my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
 if ($count>1){
     print "\n$count Projects found.\n";
     print "Specify the school-token to choose a project\n\n";
-    &log_script_exit("Specify the school-token to choose a project",$count,1,0,\@arguments,\%sophomorix_result);
+    &log_script_exit("Specify the school-token to choose a project",$count,1,0,\@arguments,\%sophomorix_result,$json);
 } elsif ($count==0){
     print "\nERROR retrieving project $project: $count project found.\n\n";
-    &log_script_exit("ERROR retrieving project $project: $count project found.",$count,1,0,\@arguments,\%sophomorix_result);
+    &log_script_exit("ERROR retrieving project $project: $count project found.",$count,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -1003,4 +1005,4 @@ if (defined $removeadmingroups){
 # }
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);

@@ -31,6 +31,7 @@ Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -88,7 +89,7 @@ my @users=();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
-
+my $json=0;
 
 my $school="";
 my $test_firstpassword=0;
@@ -120,6 +121,7 @@ my $char_num=0;
 
 my $hide=0;
 my $force=0;
+
 # flag, if (1) user has specified ONE password for all (-p or --common)  , 
 #    or if (2) password must be calculated for each user
 my $password_given=0;
@@ -131,6 +133,10 @@ my $info_line="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "users|user|u=s" => \$user,
            "class|classes|c=s" => \$classes,
            "project|projects=s" => \$projects,
@@ -147,15 +153,12 @@ my $testopt=GetOptions(
            "all-characters" => \$all_characters,
            "nofirstpassupdate" => \$nofirstpassupdate,
            "plength=i" => \$char_num,
-           "verbose|v+" => \$Conf::log_level,
            "hide" => \$hide,
            "samba-pwd-must-change!" => \$smb_pw_m_change,
            "shell|loginshell=s" => \$shell,
            "force" => \$force,
            "test-firstpassword" => \$test_firstpassword,
            "set-firstpassword" => \$set_firstpassword,
-           "info|i" => \$info,
-           "help|h" => \$help
           );
 
 
@@ -590,7 +593,7 @@ if ($set_firstpassword==1){
 # }
 
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 

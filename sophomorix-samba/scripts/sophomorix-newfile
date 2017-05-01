@@ -69,14 +69,16 @@ my $time_stamp_AD=&time_stamp_AD();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $filter_only=0;
 my $name="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-           "verbose|v+" => \$Conf::log_level,
-           "info|i" => \$info,
            "help|h" => \$help,
+           "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "name=s" => \$name,
            "filter-only" => \$filter_only,
           );
@@ -299,7 +301,7 @@ if ($filter_script eq "---"){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 

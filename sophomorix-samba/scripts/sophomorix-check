@@ -14,12 +14,12 @@ use List::MoreUtils qw(uniq);
 use String::Approx 'amatch';
 use String::Approx 'adist';
 use Net::LDAP;
+use JSON;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
-use JSON;
 use File::Basename qw( basename
                        dirname
                      ); 
@@ -135,8 +135,8 @@ my @loglines=();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
-my %Match=();
 my $json=0;
+my %Match=();
 my $dump_matches=0;
 my $dump_files=0;
 my $dump_AD=0;
@@ -152,21 +152,21 @@ my @injectlines=(); # list of injected lines
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-           "verbose|v+" => \$Conf::log_level,
+           "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
+           "lock" => \$lock,
+           "unlock" => \$unlock,
            "dump-files" => \$dump_files,
            "dump-AD" => \$dump_AD,
            "dump-matches" => \$dump_matches,
-           "json|j+" => \$json,
            "list-files" => \$list_files,
-           "lock" => \$lock,
            "analyze-encoding=s" => \$analyze_encoding,
            "follow=s" => \$follow,
-           "unlock" => \$unlock,
            "injectline=s" => \@injectlines,
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
-           "help|h" => \$help,
           );
 
 

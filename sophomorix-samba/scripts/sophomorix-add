@@ -14,6 +14,7 @@ use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -83,7 +84,6 @@ my $file="";
 my $class_group="";
 my $school="";
 my $role="unknown";
-
 my @loglines=();
 
 my @users_for_quota=();
@@ -104,6 +104,7 @@ my $add_file_new=${DevelConf::path_result}."/sophomorix.add.new";
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $loginname="";
 my $gruppe="";
 my $password="";
@@ -113,14 +114,15 @@ my $unlock=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-           "users|user|u=s" => \$loginname,
-           "class|classes|c=s" => \$gruppe,
-           "verbose|v+" => \$Conf::log_level,
-           "password" => \$password,
+           "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "lock" => \$lock,
            "unlock" => \$unlock,
-           "help|h" => \$help
+           "users|user|u=s" => \$loginname,
+           "class|classes|c=s" => \$gruppe,
+           "password" => \$password,
           );
 
 
@@ -282,7 +284,7 @@ if ($gruppe ne "") {
 # Abbruch, wenn sophomorix.add fehlt oder leer
 # ===========================================================================
 if (not (-s "$add_file") ) {
-  &log_script_exit("No users to add!",1,1,0,\@arguments,\%sophomorix_result);
+  &log_script_exit("No users to add!",1,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 my $epoche_jetzt=time;
@@ -695,7 +697,7 @@ rename("$add_file_new","$add_file" );
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 

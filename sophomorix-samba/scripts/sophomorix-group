@@ -11,6 +11,7 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -51,6 +52,7 @@ my $time_stamp_AD=&time_stamp_AD();
 
 my $help=0;
 my $info=0;
+my $json=0;
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -75,7 +77,9 @@ my $skiplock=0;
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
+           "skiplock" => \$skiplock,
            "group=s" => \$group,
            "create" => \$create,
            "kill" => \$kill,
@@ -84,7 +88,6 @@ my $testopt=GetOptions(
            "removemember=s" => \$removemember,
            "addgroup=s" => \$addgroup,
            "removegroup=s" => \$removegroup,
-           "skiplock" => \$skiplock,
           );
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
@@ -243,4 +246,4 @@ if ($addgroup ne ""){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);

@@ -20,6 +20,7 @@ use List::MoreUtils qw(uniq);
 #use DBI;
 #use Net::LDAP;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -77,11 +78,11 @@ my $time_stamp_AD=&time_stamp_AD();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $create="";
 my $school="";
 my $password="";
 my $kill="";
-
 my $reset_class="";
 $Conf::log_level=1;
 
@@ -91,11 +92,12 @@ $Conf::log_level=1;
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "create|c=s" => \$create,
            "school|s=s" => \$school,
            "password=s" => \$password,
            "kill=s" => \$kill,
-           "verbose|v+" => \$Conf::log_level,
           );
 
 # Prüfen, ob Optionen erkannt wurden
@@ -270,7 +272,7 @@ if ($kill ne ""){
 # Ende des Scripts
 # ===========================================================================
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 # subs
 sub print_valid_schools{

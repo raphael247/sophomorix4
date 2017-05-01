@@ -12,6 +12,7 @@ Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Sophomorix::SophomorixBase;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -81,16 +82,18 @@ my $update_file_new=${DevelConf::path_result}."/sophomorix.update.new";
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $lock=0;
 my $unlock=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,           
+           "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "lock" => \$lock,
            "unlock" => \$unlock,
-           "info|i" => \$info,           
-           "help|h" => \$help
           );
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
@@ -239,7 +242,7 @@ if ($info==1) {
     &print_line;
     }
     print "$count users can be updated\n";
-    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result);
+    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -376,4 +379,4 @@ rename("$update_file_new","$update_file");
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);

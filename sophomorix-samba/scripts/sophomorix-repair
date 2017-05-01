@@ -17,7 +17,6 @@ $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
 use JSON;
-
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -69,6 +68,7 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
+
 my $dump_AD=0;
 my $linux=0;
 my $global=0;
@@ -91,8 +91,8 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
            "json|j+" => \$json,
-           "dump-AD" => \$dump_AD,
            "verbose|v+" => \$Conf::log_level,
+           "dump-AD" => \$dump_AD,
            "linux|unix" => \$linux,
            "global" => \$global,
            "school" => \$school,
@@ -335,7 +335,7 @@ if ($student_home==1) {
 
 
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 ############################################################

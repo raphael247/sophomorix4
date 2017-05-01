@@ -17,6 +17,7 @@ use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -109,8 +110,9 @@ chomp($today);
 # ==========================================================================
 $Conf::log_level=1;
 
-my $info=0;
 my $help=0;
+my $info=0;
+my $json=0;
 my $empty_password=0;
 
 my $webui_dashboard;
@@ -150,9 +152,10 @@ my $school="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-       "verbose|v+" => \$Conf::log_level,
        "help|h" => \$help,
        "i|info" => \$info,
+       "json|j+" => \$json,
+       "verbose|v+" => \$Conf::log_level,
        "school=s" => \$school,
        "u|user=s" => \$user,
        "comment=s" => \$comment,
@@ -575,7 +578,7 @@ if ($user eq "" and $info==1){
 #         print "$user has scheduled action: $line_seen\n";
 #     }
 
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -587,7 +590,7 @@ if ($user eq "" and $info==1){
 
 #     if (exists($forbidden_login_hash{$new_uid})){
 #         &log_script_exit("ERROR: New login $new_uid exists in the system",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 
 #     # Fetch old data
@@ -596,7 +599,7 @@ if ($user eq "" and $info==1){
 
 #     if ($old_home eq ""){
 #         &log_script_exit("Could not find old-uid $old_uid",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 #     my $dbh=&db_connect();
 #     my ($old_dn)= $dbh->selectrow_array( "SELECT dn
@@ -715,7 +718,7 @@ if ($user eq "" and $info==1){
 #     print " CYRUS mailbox dir:\n";
 #     print "    OLD: $old_mailbox_dir_result\n";
 #     print "    NEW: $new_mailbox_dir_result\n";
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 ######################################################################
@@ -724,7 +727,7 @@ if ($user eq "" and $info==1){
 
 #if ($user eq "" and $list_teachers_by_year==0){
 #   print "I don't know what to search for! (searchstring is empty)\n";
-#   &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#   &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 #}
 
 
@@ -913,7 +916,7 @@ if ($freeze==1){
 # 	print "   - $freeze is a valid username.\n";
 #     } else {
 #         &log_script_exit("$freeze is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 #     # doing the freeze
 #     &update_user_db_entry($freeze, 
@@ -922,7 +925,7 @@ if ($freeze==1){
 #        #                   "DeactivationDate="
 #                          );
 #     &user_deaktivieren($freeze);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -961,7 +964,7 @@ if ($tolerate==1){
 # 	print "   - $permanent is a valid username.\n";
 #     } else {
 #         &log_script_exit("$permanent is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 #     # making the account permanent
 #     &update_user_db_entry($permanent, 
@@ -970,7 +973,7 @@ if ($tolerate==1){
 #     #                      "DeactivationDate="
 #                          );
 #     &user_reaktivieren($permanent);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -998,7 +1001,7 @@ if ($removable==1){
 # 	print "   - $removable is a valid username.\n";
 #     } else {
 #         &log_script_exit("$removable is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 #     # doing the removable
 #     &update_user_db_entry($removable, 
@@ -1006,7 +1009,7 @@ if ($removable==1){
 #                           "TolerationDate=01.01.1970",
 #                           "DeactivationDate=01.01.1970");
 #     &user_deaktivieren($removable);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -1032,7 +1035,7 @@ if ($killable==1){
 # 	print "   - $killable is a valid username.\n";
 #     } else {
 #         &log_script_exit("$killable is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 #     # doing the killable
 #     &update_user_db_entry($killable, 
@@ -1041,7 +1044,7 @@ if ($killable==1){
 #  #                         "DeactivationDate=01.01.1970"
 #                          );
 #     &user_deaktivieren($killable);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -1080,7 +1083,7 @@ if ($selfactivate==1){
 # 	print "   - $activate is a valid username.\n";
 #     } else {
 #         &log_script_exit("$activate is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 #     # activating the account
 #     &update_user_db_entry($activate, 
@@ -1088,7 +1091,7 @@ if ($selfactivate==1){
 #                           "TolerationDate=$today",
 #                           "DeactivationDate=");
 #     &user_reaktivieren($activate);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -1125,7 +1128,7 @@ if ($enable==1){
 # if ($old_mailbox ne "" and $new_mailbox ne ""){
 #     print "Renaming mailbox: $old_mailbox --> $new_mailbox\n";
 #     &move_mailbox($old_mailbox,$new_mailbox);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -1149,7 +1152,7 @@ if ($enable==1){
 #         system("sophomorix-user -K $user_kill");
 #     }
 #     # kein nscd_stop, da exit folgt.
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -1161,7 +1164,7 @@ if ($enable==1){
  
 #     if ($type ne "teacher"){
 #         &log_script_exit("$teacher is NOT a valid username of type teacher",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     } else {
 #         print "   - $teacher is a valid username and of type 'teacher'\n";
 #     }
@@ -1214,7 +1217,7 @@ if ($enable==1){
 #         &update_user_db_entry($teacher, 
 #                               "ScheduledToleration=$sc_toleration");
 #     }
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 
@@ -1232,7 +1235,7 @@ if ($enable==1){
 # 	    print "   - $user is a valid username.\n";
 #         } else {
 #             &log_script_exit("$user is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #         }
 #         # reset the account
 #         &reset_user($user);
@@ -1241,11 +1244,11 @@ if ($enable==1){
 #             &set_sophomorix_passwd($user,"");
 #         }
 #     }
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 # }
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 

@@ -20,6 +20,7 @@ use List::MoreUtils qw(uniq);
 #use DBI;
 #use Net::LDAP;
 use Net::LDAP;
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -73,6 +74,7 @@ my $time_stamp_AD=&time_stamp_AD();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $class="";
 my $create=0;
 my $gidnumber_wish="---"; # used on creation of class
@@ -106,6 +108,8 @@ $Conf::log_level=1;
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "class|c=s" => \$class,
            "create" => \$create,
            "gidnumber=i" => \$gidnumber_wish,
@@ -130,7 +134,6 @@ my $testopt=GetOptions(
            "removemembers=s" => \$removemembers,
 #           "reset-class=s" => \$reset_class,
 #           "hide!" => \$hide,
-           "verbose|v+" => \$Conf::log_level,
           );
 
 # Prüfen, ob Optionen erkannt wurden
@@ -263,7 +266,7 @@ if ($kill==1 and $class ne ""){
                     smb_admin_pass=>$smb_admin_pass,
                     type=>"adminclass",
                   });
-    &log_script_end(\@arguments,\%sophomorix_result);
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -274,10 +277,10 @@ my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
 if ($count>1){
     print "\n$count classes found.\n";
     print "Specify the school-token to choose a project\n\n";
-    &log_script_exit("Specify the school-token to choose a class",$count,1,0,\@arguments,\%sophomorix_result);
+    &log_script_exit("Specify the school-token to choose a class",$count,1,0,\@arguments,\%sophomorix_result,$json);
 } elsif ($count==0){
     print "\nERROR retrieving class $class: $count class found.\n\n";
-    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,\@arguments,\%sophomorix_result);
+    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,\@arguments,\%sophomorix_result,$json);
 }
 
 ##################################################
@@ -494,7 +497,7 @@ if (defined $removeadmins){
 # if ($reset_class ne ""){
 #     if ($reset_class eq ${DevelConf::teacher}){
 #         &log_script_exit("ERROR: This option cannot be used with $reset_class",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 
 #     my ($group_type)=&pg_get_group_type($reset_class);
@@ -505,7 +508,7 @@ if (defined $removeadmins){
 #         print   "         The option --reset-class can only be used\n",
 #                 "         with type adminclass/hiddenclass\n\n";
 #         &log_script_exit("ERROR: option works only with admin/hiddenclass",
-#                          1,1,0,\@arguments,\%sophomorix_result);
+#                          1,1,0,\@arguments,\%sophomorix_result,$json);
 #     }
 
 #     print "Type: $group_type\n";
@@ -570,7 +573,7 @@ if (defined $removeadmins){
 # Ende des Scripts
 # ===========================================================================
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 

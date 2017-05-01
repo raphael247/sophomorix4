@@ -84,15 +84,17 @@ my $kill=0;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
-           "verbose|v+" => \$Conf::log_level,
+           "help|h" => \$help,
            "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
            "create|c" => \$create,
            "kill" => \$kill,
            "school=s" => \$school,
-           "help|h" => \$help,
           );
 
 
@@ -219,7 +221,7 @@ if ($school ne "" and $kill==1){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
 
 
 
