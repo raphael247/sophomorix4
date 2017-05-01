@@ -1337,7 +1337,11 @@ sub result_sophomorix_print {
 
           # print OUTPUT
           foreach my $line ( @{ $ref_sophomorix_result->{'OUTPUT'}}  ){
-	      printf "%-7s%3s: %-65s \n",$line->{'TYPE'},$line->{'NUMBER'},$line->{'MESSAGE_EN'};
+              if ($line->{'TYPE'} eq "LOG"){
+	          printf "%-7s%3s: %-65s \n",$line->{'TYPE'},"",$line->{'LOG'};
+              } else {
+	          printf "%-7s%3s: %-65s \n",$line->{'TYPE'},$line->{'NUMBER'},$line->{'MESSAGE_EN'};
+              }
           } 
 
           ##### more to follow ?????????????
@@ -1575,6 +1579,7 @@ sub log_script_end {
     # flush_cache tut nur bei laufendem nscd
     #&nscd_flush_cache();
     &print_title("$0 terminated regularly");
+    &result_sophomorix_add_log($ref_result,"$0 terminated regularly");
     # output the result object
     &result_sophomorix_print($ref_result,$json);
     exit;
