@@ -125,13 +125,8 @@ sub AD_bind_admin {
     }
 
     #my $ldap = Net::LDAP->new('ldaps://localhost')  or  die "$@";
-    my $ldap = Net::LDAP->new($host)  or  
-#         &Sophomorix::SophomorixBase::log_script_exit(
-#                            "No connection to Samba4 AD!",
-#         1,1,0,@arguments);
-         &Sophomorix::SophomorixBase::log_script_exit(
-                            "No connection to Samba4 AD!",
-         1,1,0,$ref_arguments,$ref_result,$json);
+    my $ldap = Net::LDAP->new($host) or &Sophomorix::SophomorixBase::log_script_exit(
+         "No connection to Samba4 AD!",1,1,0,$ref_arguments,$ref_result,$json);
 
     if($Conf::log_level>=2){
         print "Retrieving RootDSE...\n";

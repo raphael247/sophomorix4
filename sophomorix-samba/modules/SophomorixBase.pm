@@ -1332,7 +1332,15 @@ sub result_sophomorix_print {
       if ($json==0){
           # be quiet
           print "Calling console printout\n";
-          ##### more to follow ?????????????ß
+          
+          # print result
+
+          # print OUTPUT
+          foreach my $line ( @{ $ref_sophomorix_result->{'OUTPUT'}}  ){
+	      printf "%-7s%3s: %-65s \n",$line->{'TYPE'},$line->{'NUMBER'},$line->{'MESSAGE_EN'};
+          } 
+
+          ##### more to follow ?????????????
       } elsif ($json==1){
           # pretty output
           my $json_obj = JSON->new->allow_nonref;
@@ -1635,7 +1643,7 @@ sub log_script_exit {
         &print_title("$message");
     }
     # put message in json object
-    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,"Error not in db: $message");
+    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$message);
 #    &result_sophomorix_add($ref_result,"ERROR",-1,\@{["one","two","three"]},"Error not in db: $message");
 
     #&nscd_start();
