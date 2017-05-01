@@ -66,6 +66,10 @@ push @{ $result{'OUTPUT'} }, {TYPE => WARNING,
 
 $number++;
 
+push @{ $result{'OUTPUT'} }, {TYPE => LOG, 
+                              LOG => "Configuration file read!",
+                             };
+
 push @{ $result{'OUTPUT'} }, {TYPE => ERROR, 
                               NUMBER => $number, 
                               MESSAGE_DE => "Fehlermeldung $number",
@@ -79,10 +83,34 @@ push @{ $result{'OUTPUT'} }, {TYPE => WARNING,
 
 # summary at end of script
 ############################################################
-push @{ $result{'SUMMARY'} }, {ERROR_COUNT=> 2, 
-                               WARNING_COUNT=> 2, 
-                               USER_ADDED=> 223, 
-                             };
+my %data = ( RESULT => 0, 
+             RESULT_TYPE => "integer",
+             DESCRIPTION_PRE => "Total number of Errors:", 
+             FORMAT_TYPE => 2 );
+push @{ $result{'SUMMARY'} }, {ERROR_COUNT => \%data};
+
+
+my %data = ( RESULT => 123,
+             RESULT_TYPE => "integer",
+             DESCRIPTION_POST => "users can be added in sophomorix.add", 
+             FORMAT_TYPE => 1 );
+push @{ $result{'SUMMARY'} }, {ADD => \%data};
+
+
+my %data = ( RESULT => 6, 
+             RESULT_TYPE => "integer",
+             DESCRIPTION_POST => "users can be updated in sophomorix.update", 
+             FORMAT_TYPE => 1 );
+push @{ $result{'SUMMARY'} }, {UPDATE => \%data};
+
+
+my %data = ( RESULT => 98, 
+             RESULT_TYPE => "integer",
+             DESCRIPTION_POST => "users can be killed in sophomorix.kill", 
+             FORMAT_TYPE => 1 );
+push @{ $result{'SUMMARY'} }, {KILL => \%data};
+
+
 
 # create JSON object
 ############################################################
@@ -113,9 +141,17 @@ for my $ref ( @{ $result{'OUTPUT'} } ){
 ############################################################
 print "\nThe OUTPUT LINES 2:\n\n";
 for my $ref ( @{ $result{'OUTPUT'} } ){
-    print "   * Output number $ref->{'NUMBER'} is of type $ref->{'TYPE'}\n";
-    print "   * and the german Message is: $ref->{'MESSAGE_DE'} (EN: $ref->{'MESSAGE_EN'})\n";
-    print "\n";
+    if ($ref->{'TYPE'} eq "LOG"){
+        print "   * Output is of type $ref->{'TYPE'}\n";
+        print "   * and the Message is: $ref->{'LOG'}\n";
+        print "\n";
+
+
+    } else {
+        print "   * Output number $ref->{'NUMBER'} is of type $ref->{'TYPE'}\n";
+        print "   * and the german Message is: $ref->{'MESSAGE_DE'} (EN: $ref->{'MESSAGE_EN'})\n";
+        print "\n";
+    }
 }
 
 
