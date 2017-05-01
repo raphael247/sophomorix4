@@ -38,6 +38,8 @@ my $backup_samba="";
 my $restore_samba="";
 my $schema_load=0;
 my $restart=0;
+my $stop=0;
+my $start=0;
 
 my $samba_private="/var/lib/samba/private";
 my $samba_private_d="/var/lib/samba/private/sam.ldb.d";
@@ -53,6 +55,8 @@ my $testopt=GetOptions(
            "backup-samba=s" => \$backup_samba,
            "restore-samba=s" => \$restore_samba,
            "schema-load" => \$schema_load,
+           "start" => \$start,
+           "stop" => \$stop,
            "restart" => \$restart,
           );
 
@@ -141,13 +145,26 @@ if ($schema_load==1){
 }
 
 
+# --start
+if ($start==1){
+    print "\nStarting samba\n\n";
+    &samba_start();
+}
+
+
+# --stop
+if ($stop==1){
+    print "\nStopping samba\n\n";
+    &samba_stop();
+}
+
+
 # --restart
-if ($restart ne ""){
+if ($restart==1){
     print "\nRestarting samba\n\n";
     &samba_stop();
     &samba_start();
 }
-
 
 
 ############################################################
