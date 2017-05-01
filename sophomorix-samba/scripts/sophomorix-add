@@ -32,6 +32,7 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  result_sophomorix_init
                                  result_sophomorix_add
+                                 result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  );
@@ -692,7 +693,17 @@ rename("$add_file_new","$add_file" );
 #&db_disconnect($dbh);
 #&imap_disconnect($imap);
 
-&print_title("$user_count users added");
+#&print_title("$user_count users added");
+&result_sophomorix_add_summary({
+                     NAME=>"ADDED", 
+                     RESULT=>$user_count, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => "users added", 
+                     DESCRIPTION_PRE => "added users", 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+
 
 &AD_unbind_admin($ldap);
 
