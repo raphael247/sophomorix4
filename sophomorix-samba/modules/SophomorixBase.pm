@@ -1332,9 +1332,6 @@ sub result_sophomorix_print {
       if ($json==0){
           # be quiet
           print "Calling console printout\n";
-          
-          # print result
-
           # print OUTPUT
           foreach my $line ( @{ $ref_sophomorix_result->{'OUTPUT'}}  ){
               if ($line->{'TYPE'} eq "LOG"){
@@ -1343,8 +1340,23 @@ sub result_sophomorix_print {
 	          printf "%-7s%3s: %-65s \n",$line->{'TYPE'},$line->{'NUMBER'},$line->{'MESSAGE_EN'};
               }
           } 
-
-          ##### more to follow ?????????????
+          # print RESULT
+          foreach my $line ( @{ $ref_sophomorix_result->{'SUMMARY'}}  ){
+              foreach my $name ( keys %{ $line } ) {
+		  #print "Name: $name\n";
+                  if ($name eq "HEADER"){
+                      print "##### ".$line->{$name}{'TITLE'}."\n";
+                  } elsif ($line->{$name}{'FORMAT_TYPE'}==1){
+                      #print "Format 1\n";
+                      printf "%6s %-65s \n",$line->{$name}{'RESULT'},$line->{$name}{'DESCRIPTION_POST'};
+                  } elsif ($line->{$name}{'FORMAT_TYPE'}==2){
+                      #print "Format 2\n";
+                      print $line->{$name}{'DESCRIPTION_PRE'}.": ".$line->{$name}{'RESULT'}."\n";
+	          } else {
+                      print "Format unknown\n";
+                  }
+              }
+          }
       } elsif ($json==1){
           # pretty output
           my $json_obj = JSON->new->allow_nonref;
