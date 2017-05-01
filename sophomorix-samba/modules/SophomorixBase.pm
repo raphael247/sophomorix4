@@ -44,6 +44,8 @@ $Data::Dumper::Terse = 1;
             config_sophomorix_read
             result_sophomorix_init
             result_sophomorix_add
+            result_sophomorix_add_log
+            result_sophomorix_add_summary
             result_sophomorix_check_exit
             result_sophomorix_print
             filelist_fetch
@@ -1319,6 +1321,41 @@ sub result_sophomorix_add_log {
         {TYPE       => "LOG", 
          LOG => $log_message,
         };
+}
+
+
+sub result_sophomorix_add_summary {
+ my ($arg_ref) = @_;
+    my $ref_result = $arg_ref->{sophomorix_result};
+    my $name = $arg_ref->{NAME};
+    my $title = $arg_ref->{TITLE};
+    my $result = $arg_ref->{RESULT};
+    my $result_type = $arg_ref->{RESULT_TYPE};
+    my $description_pre  = $arg_ref->{DESCRIPTION_PRE};
+    my $description_post = $arg_ref->{DESCRIPTION_POST};
+    my $format_type = $arg_ref->{FORMAT_TYPE};
+    if ($name eq "HEADER"){
+        my %header = (TITLE => $title);
+        push @{ $ref_result->{'SUMMARY'} }, {$name => \%header};
+    } else {
+        my %hash=();
+        if (defined $result){
+            $hash{'RESULT'}=$result;
+        }
+        if (defined $result_type){
+            $hash{'RESULT_TYPE'}=$result_type;
+        }
+        if (defined $description_pre){
+            $hash{'DESCRIPTION_PRE'}=$description_pre;
+        }
+        if (defined $description_post){
+            $hash{'DESCRIPTION_POST'}=$description_post;
+        }
+        if (defined $format_type){
+            $hash{'FORMAT_TYPE'}=$format_type;
+        }
+        push @{ $ref_result->{'SUMMARY'} }, {$name => \%hash};
+    }
 }
 
 
