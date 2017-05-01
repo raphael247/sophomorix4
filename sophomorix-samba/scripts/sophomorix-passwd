@@ -161,9 +161,9 @@ my $testopt=GetOptions(
            "set-firstpassword" => \$set_firstpassword,
           );
 
-
+my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
-&check_options($testopt);
+&check_options($testopt,\%sophomorix_result,$json);
 
 # Setting the filters
 
@@ -239,9 +239,8 @@ Please see the sophomorix-passwd(8) man pages for full documentation
 }
 
 
-my ($ldap,$root_dse) = &AD_bind_admin();
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
-my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 

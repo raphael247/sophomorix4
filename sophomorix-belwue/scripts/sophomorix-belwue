@@ -82,6 +82,7 @@ my $testopt=GetOptions(
            "copy-to-teachershare" => \$copy_to_teachershare,
           );
 
+my %sophomorix_result=&result_sophomorix_init("sophomorix-belwue");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 

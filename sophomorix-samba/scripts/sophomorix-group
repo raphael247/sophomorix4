@@ -90,13 +90,13 @@ my $testopt=GetOptions(
            "removegroup=s" => \$removegroup,
           );
 
+my %sophomorix_result=&result_sophomorix_init("sophomorix-group");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
-&check_options($testopt);
+&check_options($testopt,\%sophomorix_result,$json);
 
 # Reading Configuration
-my ($ldap,$root_dse) = &AD_bind_admin();
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
-my %sophomorix_result=&result_sophomorix_init("sophomorix-group");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);

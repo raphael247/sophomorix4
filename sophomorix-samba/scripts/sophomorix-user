@@ -188,8 +188,9 @@ my $testopt=GetOptions(
           );
 
 
+my %sophomorix_result=&result_sophomorix_init("sophomorix-user");
 # Prüfen, ob Optionen erkannt wurden
-&check_options($testopt);
+&check_options($testopt,\%sophomorix_result,$json);
 #&check_connections();
 
 # --help
@@ -279,9 +280,8 @@ Please see the sophomorix-user(8) man pages for full documentation
    exit;
 }
 
-my ($ldap,$root_dse) = &AD_bind_admin();
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
-my %sophomorix_result=&result_sophomorix_init("sophomorix-user");
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
 
 # Setting the filters
