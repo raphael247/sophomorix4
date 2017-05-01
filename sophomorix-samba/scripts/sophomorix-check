@@ -632,26 +632,18 @@ close(KILL);
 close(NOCHANGE);
 
 
+############################################################
+# create overview in %sophomorix_result
+############################################################
 &result_sophomorix_add_summary({
                      NAME=>"HEADER", 
                      TITLE=>"Overview of what can be done:", 
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-
-
-#&print_title("Overview of what can be done:");
-my %header = (TITLE => "...Overview of what can be done:", 
-              FORMAT_TYPE => "unused" );
-push @{ $sophomorix_result{'SUMMARY'} }, {HEADER => \%header};
-
-
-# show overview
 my $linecount_add=`wc -l $add_file`;
 chomp($linecount_add);
 my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
-#printf "%-21s%7s\n",basename($add_file),$lc_add;
-# fill result hash
 &result_sophomorix_add_summary({
                      NAME=>"ADD", 
                      RESULT=>$lc_add, 
@@ -662,19 +654,9 @@ my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#my %add = ( RESULT => $lc_add,
-#            RESULT_TYPE => "integer",
-#            DESCRIPTION_POST => "users can be added in ".basename($add_file), 
-#            DESCRIPTION_PRE => "users in ".basename($add_file), 
-#            FORMAT_TYPE => 1 );
-#push @{ $sophomorix_result{'SUMMARY'} }, {ADD => \%add};
-
-
 my $linecount_update=`wc -l $update_file`;
 chomp($linecount_update);
 my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
-#printf "%-21s%7s\n",basename($update_file),$lc_update;
-# fill result hash
 &result_sophomorix_add_summary({
                      NAME=>"UPDATE", 
                      RESULT=>$lc_update, 
@@ -684,19 +666,10 @@ my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
                      FORMAT_TYPE => 1,
                      sophomorix_result=>\%sophomorix_result,
 			       });
-#my %update = ( RESULT => $lc_update,
-#               RESULT_TYPE => "integer",
-#               DESCRIPTION_POST => "users can be updated in ".basename($update_file), 
-#               DESCRIPTION_PRE => "users in ".basename($update_file), 
-#               FORMAT_TYPE => 1 );
-#push @{ $sophomorix_result{'SUMMARY'} }, {UPDATE => \%update};
-
 
 my $linecount_kill=`wc -l $kill_file`;
 chomp($linecount_kill);
 my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
-#printf "%-21s%7s\n",basename($kill_file),$lc_kill;
-# fill result hash
 &result_sophomorix_add_summary({
                      NAME=>"KILL", 
                      RESULT=>$lc_kill, 
@@ -706,19 +679,10 @@ my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
                      FORMAT_TYPE => 1,
                      sophomorix_result=>\%sophomorix_result,
 			       });
-#my %kill = ( RESULT => $lc_kill,
-#             RESULT_TYPE => "integer",
-#             DESCRIPTION_POST => "users can be killed in ".basename($kill_file), 
-#             DESCRIPTION_PRE => "users in ".basename($kill_file), 
-#             FORMAT_TYPE => 1 );
-#push @{ $sophomorix_result{'SUMMARY'} }, {KILL => \%kill};
-
 
 my $linecount_nochange=`wc -l $nochange_file`;
 chomp($linecount_nochange);
 my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
-#printf "%-21s%7s\n",basename($nochange_file),$lc_nochange;
-# fill result hash
 &result_sophomorix_add_summary({
                      NAME=>"NOCHANGE", 
                      RESULT=>$lc_nochange, 
@@ -728,18 +692,12 @@ my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
                      FORMAT_TYPE => 1,
                      sophomorix_result=>\%sophomorix_result,
 			       });
-#my %nochange = ( RESULT => $lc_nochange,
-#                 RESULT_TYPE => "integer",
-#                 DESCRIPTION_POST => "users are not to be changed in ".basename($nochange_file), 
-#                 DESCRIPTION_PRE => "users in ".basename($nochange_file), 
-#                 FORMAT_TYPE => 1 );
-#push @{ $sophomorix_result{'SUMMARY'} }, {NOCHANGE => \%nochange};
+
+
 
 
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,$json);
-
-
 
 
 ################################################################################
