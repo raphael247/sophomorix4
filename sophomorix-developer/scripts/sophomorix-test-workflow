@@ -60,14 +60,15 @@ my $kill_user_test=0;
 my $kill_adminclasses_test=0;
 my $kill_projects_test=0;
 
-
 my $full=0;
 my $help=0;
-my $verbose_options="";
+my $all_options="";
+my $json=0;
 
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
            "add-check" => \$add_check,
            "add-do" => \$add_do,
            "modify-1-check" => \$modify_1_check,
@@ -99,16 +100,25 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 if ($Conf::log_level==1){
-    $verbose_options="";
+    $all_options="";
 } elsif ($Conf::log_level==2){
-    $verbose_options="-v";
+    $all_options="-v";
 } elsif ($Conf::log_level==3){
-    $verbose_options="-vv";
+    $all_options="-vv";
 }
+
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
-
 
 # --help
 if ($help==1) {
@@ -217,7 +227,7 @@ if ($full==1){
 # Adding users --add
 ############################################################
 if ($add_check==1){
-    my $command_add="sophomorix-check $verbose_options ".
+    my $command_add="sophomorix-check $all_options ".
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1982;koperni99\" ".
                 "--injectline \"bsz.teachers.csv:teachers;Darwing;Charles;12.02.2009;darwi99\" ".
                 "--injectline \"bsz.students.csv:m3KK3T;Mondel;Gregor;01.02.2000;\" ".
@@ -239,9 +249,9 @@ if ($add_check==1){
 }
 ############################################################
 if ($add_do==1){
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 
     # fetch loginnames:
     my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -799,7 +809,7 @@ if ($add_do==1){
 ############################################################
 if ($modify_1_check==1){
     # name/birthday correction koperni99,darwi99,$mendelgr,$wallacal
-    my $command_modify_1="sophomorix-check --dump-AD $verbose_options ".
+    my $command_modify_1="sophomorix-check --dump-AD $all_options ".
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
                 "--injectline \"bsz.teachers.csv:teachers;Darwin;Charles;12.02.2009;darwi99\" ".
                 "--injectline \"bsz.students.csv:m3KK3T;Mendel;Gregor;01.01.2000;\" ".
@@ -821,9 +831,9 @@ if ($modify_1_check==1){
 }
 ############################################################
 if ($modify_1_do==1){
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 
     # fetch loginnames:
     my ($mendelgr,$mendelgr_dn)=&AD_get_samaccountname({ldap=>$ldap,
@@ -1440,7 +1450,7 @@ if ($modify_2_check==1){
     #  darwi99
     #  $mendelgr m3KK3T -> m3KK4T
     #  $wallacal
-    my $command_modify_2="sophomorix-check $verbose_options ".
+    my $command_modify_2="sophomorix-check $all_options ".
                 "--injectline \"bsz.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
                 "--injectline \"bsz.students.csv:m3KK4T;Darwin;Charles;12.02.2009;\" ".
                 "--injectline \"bsz.teachers.csv:teachers;Mendel;Gregor;01.01.2000;\" ".
@@ -1514,9 +1524,9 @@ if ($modify_2_do==1){
     my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
 
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 
     # $mendelgr
     my $dn_mendelgr="CN=".$mendelgr.",OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse;
@@ -2106,7 +2116,7 @@ if ($modify_3_check==1){
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20160101000006.0Z","20170101000006.0Z");
 
-    my $command_modify_3="sophomorix-check $verbose_options ".
+    my $command_modify_3="sophomorix-check $all_options ".
                 "--injectline \"uni.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99\" ".
                 "--injectline \"students.csv:9b;Darwin;Charles;12.02.2009;\" ".
                 "--injectline \"teachers.csv:teachers;Mendel;Gregor;01.01.2000;\" ".
@@ -2178,8 +2188,8 @@ if ($modify_3_do==1){
     my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
     my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
 
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
     # do not kill the users now (first test if they have status R)
 
     # $mendelgr
@@ -2831,7 +2841,7 @@ if ($modify_4_check==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
-    my $command_modify_4="sophomorix-check $verbose_options ".
+    my $command_modify_4="sophomorix-check $all_options ".
                 "--injectline \"uni.teachers.csv:teachers;Kopernikus;Nikolaus;19.02.1973;koperni99;\" ".
                 "--injectline \"teachers.csv:teachers;Darwin;Charles;12.02.2009\" ".
                 "--injectline \"students.csv:9b;Mendel;Gregor;01.01.2000\" ".
@@ -2900,9 +2910,9 @@ if ($modify_4_do==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 
     # $mendelgr
     my $dn_mendelgr="CN=".$mendelgr.",OU=9b,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -3544,7 +3554,7 @@ if ($modify_5_check==1){
     print "U: $halldoha\n";
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
-    my $command_modify_5="sophomorix-check $verbose_options ".
+    my $command_modify_5="sophomorix-check $all_options ".
                 "--injectline \"students.csv:9b;Kopernikus;Nikolaus;19.02.1973;\" ".
                 "--injectline \"uni.students.csv:12b;Darwin;Charles;12.02.2009;\" ".
                 "--injectline \"uni.teachers.csv:teachers;Mendel;Gregor;01.01.2000;\" ".
@@ -3607,9 +3617,9 @@ if ($modify_5_do==1){
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
 
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 
     # $mendelgr
     my $dn_mendelgr="CN=".$mendelgr.",OU=Teachers,OU=uni,OU=SCHOOLS,".$root_dse;
@@ -4261,7 +4271,7 @@ if ($modify_10_test==1){
     print "U: $sigurdra\n";
 
     # create the project p_full-blown
-    my $pro_command="sophomorix-project $verbose_options ".
+    my $pro_command="sophomorix-project $all_options ".
                     "--create -p full-blown  --description 'Full blown project' ".
                     "--addquota 100+60 --addmailquota 200 ".
                     "--mailalias --maillist ".
@@ -4340,21 +4350,21 @@ if ($kill_user_check==1){
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
 
-    &run_command("sophomorix-user $verbose_options -K --user koperni99");
-    &run_command("sophomorix-user $verbose_options -K --user darwi99");
+    &run_command("sophomorix-user $all_options -K --user koperni99");
+    &run_command("sophomorix-user $all_options -K --user darwi99");
 
-    &run_command("sophomorix-user $verbose_options -R --user olinst99");
-    &run_command("sophomorix-user $verbose_options -R --user rukri99");
-    &run_command("sophomorix-user $verbose_options -R --user skula99");
+    &run_command("sophomorix-user $all_options -R --user olinst99");
+    &run_command("sophomorix-user $all_options -R --user rukri99");
+    &run_command("sophomorix-user $all_options -R --user skula99");
 
-    &run_command("sophomorix-user $verbose_options -K --user $mendelgr");
-    &run_command("sophomorix-user $verbose_options -K --user $wallacal");
+    &run_command("sophomorix-user $all_options -K --user $mendelgr");
+    &run_command("sophomorix-user $all_options -K --user $wallacal");
 
-    &run_command("sophomorix-user $verbose_options -R --user $halldoha");
-    &run_command("sophomorix-user $verbose_options -R --user $gunnarar");
-    &run_command("sophomorix-user $verbose_options -R --user $sigurdra");
+    &run_command("sophomorix-user $all_options -R --user $halldoha");
+    &run_command("sophomorix-user $all_options -R --user $gunnarar");
+    &run_command("sophomorix-user $all_options -R --user $sigurdra");
 
-    &run_command("sophomorix-check $verbose_options");
+    &run_command("sophomorix-check $all_options");
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",10);
@@ -4400,9 +4410,9 @@ if ($kill_user_do==1){
     print "U: $gunnarar\n";
     print "U: $sigurdra\n";
 
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 }
 
 if ($kill_user_test==1){
@@ -4660,13 +4670,13 @@ if ($kill_user_test==1){
 
 
 if ($kill_adminclasses_check==1){
-    &run_command("sophomorix-class --kill --class 7a $verbose_options");
-    &run_command("sophomorix-class --kill --class 9b $verbose_options");
-    &run_command("sophomorix-class --kill --class bsz-m3kk3t $verbose_options");
-    &run_command("sophomorix-class --kill --class bsz-m3kk4t $verbose_options");
-    &run_command("sophomorix-class --kill --class uni-12b $verbose_options");
+    &run_command("sophomorix-class --kill --class 7a $all_options");
+    &run_command("sophomorix-class --kill --class 9b $all_options");
+    &run_command("sophomorix-class --kill --class bsz-m3kk3t $all_options");
+    &run_command("sophomorix-class --kill --class bsz-m3kk4t $all_options");
+    &run_command("sophomorix-class --kill --class uni-12b $all_options");
 
-    &run_command("sophomorix-check $verbose_options");
+    &run_command("sophomorix-check $all_options");
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
@@ -4674,9 +4684,9 @@ if ($kill_adminclasses_check==1){
 }
 
 if ($kill_adminclasses_do==1){
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 }
 
 if ($kill_adminclasses_test==1){
@@ -4763,9 +4773,9 @@ if ($kill_adminclasses_test==1){
 
 if ($kill_projects_check==1){
     # kill the project p_full-blown
-    &run_command("sophomorix-project $verbose_options --kill -p full-blown");
+    &run_command("sophomorix-project $all_options --kill -p full-blown");
 
-    &run_command("sophomorix-check $verbose_options");
+    &run_command("sophomorix-check $all_options");
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
@@ -4773,9 +4783,9 @@ if ($kill_projects_check==1){
 }
 
 if ($kill_projects_do==1){
-    &run_command("sophomorix-add $verbose_options");
-    &run_command("sophomorix-update $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
 }
 
 if ($kill_projects_test==1){

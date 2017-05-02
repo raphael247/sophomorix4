@@ -51,12 +51,14 @@ my $test_mod_admin=0;
 my $kill_admin=0;
 my $test_kill_admin=0;
 
-my $verbose_options="";
+my $all_options="";
+my $json=0;
 
 my $testopt=GetOptions(
            "help|h" => \$help,
            "full|f" => \$full,
            "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
            "add-admin" => \$add_admin,
            "test-add-admin" => \$test_add_admin,
            "mod-admin" => \$mod_admin,
@@ -69,24 +71,28 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
-
-
 if ($Conf::log_level==1){
-    $verbose_options="";
+    $all_options="";
 } elsif ($Conf::log_level==2){
-    $verbose_options="-v";
+    $all_options="-v";
 } elsif ($Conf::log_level==3){
-    $verbose_options="-vv";
+    $all_options="-vv";
 }
 
-
-
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 
 my $testdata="/usr/share/sophomorix-developer/testdata";
-
 
 # --help
 if ($help==1) {
@@ -145,14 +151,14 @@ if ($full==1){
 # --add-admin  
 if ($add_admin==1){
     # admin in OU=bsz
-    &run_command("sophomorix-admin $verbose_options --create admin-bsz-66 --school bsz --password 'Muster!'");
-    &run_command("sophomorix-admin $verbose_options --create admin-abc-666 --school abc --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create admin-bsz-66 --school bsz --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create admin-abc-666 --school abc --password 'Muster!'");
     # admin in OU=default-school
-    &run_command("sophomorix-admin $verbose_options --create admin-66 --school default-school --password 'Muster!'");
-    &run_command("sophomorix-admin $verbose_options --create admin-666 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create admin-66 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create admin-666 --school default-school --password 'Muster!'");
     # admin in OU=default-school
-    &run_command("sophomorix-admin $verbose_options --create global-admin-66 --school global --password 'Muster!'");
-    &run_command("sophomorix-admin $verbose_options --create global-admin-666 --school global --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create global-admin-66 --school global --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create global-admin-666 --school global --password 'Muster!'");
 
 }
 
@@ -495,14 +501,14 @@ if ($test_mod_admin==1){
 ############################################################
 # --kill-admin  
 if ($kill_admin==1){
-    &run_command("sophomorix-admin $verbose_options --kill admin-bsz-66");
-    &run_command("sophomorix-admin $verbose_options --kill admin-abc-666");
+    &run_command("sophomorix-admin $all_options --kill admin-bsz-66");
+    &run_command("sophomorix-admin $all_options --kill admin-abc-666");
     # admin in OU=default-school
-    &run_command("sophomorix-admin $verbose_options --kill admin-66");
-    &run_command("sophomorix-admin $verbose_options --kill admin-666");
+    &run_command("sophomorix-admin $all_options --kill admin-66");
+    &run_command("sophomorix-admin $all_options --kill admin-666");
     # admin in OU=default-school
-    &run_command("sophomorix-admin $verbose_options --kill global-admin-66");
-    &run_command("sophomorix-admin $verbose_options --kill global-admin-666");
+    &run_command("sophomorix-admin $all_options --kill global-admin-66");
+    &run_command("sophomorix-admin $all_options --kill global-admin-666");
 }
 
 

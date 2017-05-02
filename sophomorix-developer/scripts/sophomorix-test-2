@@ -87,7 +87,8 @@ my $login="";
 my $plain_password;
 my $ws_count=0;
 my $birthdate="1970-01-01";
-my $verbose_options="";
+my $all_options="";
+my $json=0;
 
 # dns
 my $res   = Net::DNS::Resolver->new;
@@ -95,6 +96,7 @@ my $res   = Net::DNS::Resolver->new;
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
            "copy-devfile-1" => \$copy_devfile_1,
            "test-dev-1" => \$test_ws_1,
            "copy-devfile-2" => \$copy_devfile_2,
@@ -113,12 +115,23 @@ my $testopt=GetOptions(
 &check_options($testopt);
 
 if ($Conf::log_level==1){
-    $verbose_options="";
+    $all_options="";
 } elsif ($Conf::log_level==2){
-    $verbose_options="-v";
+    $all_options="-v";
 } elsif ($Conf::log_level==3){
-    $verbose_options="-vv";
+    $all_options="-vv";
 }
+
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
+
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
@@ -233,7 +246,7 @@ if ($copy_devfile_1==1){
 }
 
 if ($full==1){
-    &run_command("sophomorix-device $verbose_options");
+    &run_command("sophomorix-device $all_options");
 }
 
 if ($test_ws_1==1){
@@ -1407,7 +1420,7 @@ if ($copy_devfile_2==1){
 }
 
 if ($full==1){
-    &run_command("sophomorix-device $verbose_options");
+    &run_command("sophomorix-device $all_options");
 }
 
 
@@ -2613,7 +2626,7 @@ if ($copy_devfile_5==1){
 }
 
 if ($full==1){
-    &run_command("sophomorix-device $verbose_options");
+    &run_command("sophomorix-device $all_options");
 }
 
 if ($test_ws_5==1){

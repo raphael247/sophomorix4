@@ -48,12 +48,14 @@ my $test_mod_class=0;
 my $kill_class=0;
 my $test_kill_class=0;
 
-my $verbose_options="";
+my $all_options="";
+my $json=0;
 
 my $testopt=GetOptions(
            "help|h" => \$help,
            "full|f" => \$full,
            "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
            "add-class" => \$add_class,
            "test-add-class" => \$test_add_class,
            "mod-class" => \$mod_class,
@@ -66,24 +68,28 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
-
-
 if ($Conf::log_level==1){
-    $verbose_options="";
+    $all_options="";
 } elsif ($Conf::log_level==2){
-    $verbose_options="-v";
+    $all_options="-v";
 } elsif ($Conf::log_level==3){
-    $verbose_options="-vv";
+    $all_options="-vv";
 }
 
-
-
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
 
 my $testdata="/usr/share/sophomorix-developer/testdata";
-
 
 # --help
 if ($help==1) {
@@ -149,14 +155,14 @@ my $file_kill_test=$testdata."/sophomorix.kill-40";
 if ($add_class==1){
     # adding users
     &run_command("cp -v $file_add_test $file_add");
-    &run_command("sophomorix-add $verbose_options");
+    &run_command("sophomorix-add $all_options");
 
     # groups in OU=bsz
-    &run_command("sophomorix-class $verbose_options --create --class class6-38 --school bsz");
-    &run_command("sophomorix-class $verbose_options --create --class class7-38 --school bsz");
+    &run_command("sophomorix-class $all_options --create --class class6-38 --school bsz");
+    &run_command("sophomorix-class $all_options --create --class class7-38 --school bsz");
     # groups in OU=default-school
-    &run_command("sophomorix-class $verbose_options --create --class class12-38");
-    &run_command("sophomorix-class $verbose_options --create --class class13-38");
+    &run_command("sophomorix-class $all_options --create --class class12-38");
+    &run_command("sophomorix-class $all_options --create --class class13-38");
 }
 
 ############################################################
@@ -1017,7 +1023,7 @@ if ($test_add_class==1){
 if ($mod_class==1){
 
     # --description
-    &run_command("sophomorix-class $verbose_options -c class12-38 --description 'Klasse 12 TG'");
+    &run_command("sophomorix-class $all_options -c class12-38 --description 'Klasse 12 TG'");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1044,7 +1050,7 @@ if ($mod_class==1){
                    memberOf => "students",
                   });
     # --quota
-    &run_command("sophomorix-class $verbose_options -c class12-38 --quota 100+300");
+    &run_command("sophomorix-class $all_options -c class12-38 --quota 100+300");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1072,7 +1078,7 @@ if ($mod_class==1){
                   });
 
     # --mailquota 
-    &run_command("sophomorix-class $verbose_options -c class12-38 --mailquota 897");
+    &run_command("sophomorix-class $all_options -c class12-38 --mailquota 897");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1100,7 +1106,7 @@ if ($mod_class==1){
                   });
 
     # --mailalias
-    &run_command("sophomorix-class $verbose_options -c class12-38 --mailalias");
+    &run_command("sophomorix-class $all_options -c class12-38 --mailalias");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1128,7 +1134,7 @@ if ($mod_class==1){
                   });
 
     # --maillist
-    &run_command("sophomorix-class $verbose_options -c class12-38 --maillist");
+    &run_command("sophomorix-class $all_options -c class12-38 --maillist");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1156,7 +1162,7 @@ if ($mod_class==1){
                   });
 
     # --status
-    &run_command("sophomorix-class $verbose_options -c class12-38 --status S");
+    &run_command("sophomorix-class $all_options -c class12-38 --status S");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1184,7 +1190,7 @@ if ($mod_class==1){
                   });
 
     # --join
-    &run_command("sophomorix-class $verbose_options -c class12-38 --nojoin");
+    &run_command("sophomorix-class $all_options -c class12-38 --nojoin");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1212,7 +1218,7 @@ if ($mod_class==1){
                   });
 
     # --hide
-    &run_command("sophomorix-class $verbose_options -c class12-38 --hide");
+    &run_command("sophomorix-class $all_options -c class12-38 --hide");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1240,7 +1246,7 @@ if ($mod_class==1){
                   });
 
     # --maxmembers
-    &run_command("sophomorix-class $verbose_options -c class12-38 --maxmembers 16");
+    &run_command("sophomorix-class $all_options -c class12-38 --maxmembers 16");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1268,7 +1274,7 @@ if ($mod_class==1){
                   });
 
     # --creationdate
-    &run_command("sophomorix-class $verbose_options -c class12-38 --creationdate 19880529093330.0Z");
+    &run_command("sophomorix-class $all_options -c class12-38 --creationdate 19880529093330.0Z");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1296,7 +1302,7 @@ if ($mod_class==1){
                   });
 
     # --admins
-    &run_command("sophomorix-class $verbose_options -c class12-38 --admins maiersa38,muellegr38");
+    &run_command("sophomorix-class $all_options -c class12-38 --admins maiersa38,muellegr38");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1324,7 +1330,7 @@ if ($mod_class==1){
                   });
 
     # --members
-    &run_command("sophomorix-class $verbose_options -c class12-38 --members kep38,wu38");
+    &run_command("sophomorix-class $all_options -c class12-38 --members kep38,wu38");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1352,7 +1358,7 @@ if ($mod_class==1){
                   });
     
     # --addadmins
-    &run_command("sophomorix-class $verbose_options -c class12-38 --addadmins lordjo38,blackmri38");
+    &run_command("sophomorix-class $all_options -c class12-38 --addadmins lordjo38,blackmri38");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1380,7 +1386,7 @@ if ($mod_class==1){
                   });
 
     # --addmembers (1 adding to existing value)
-    &run_command("sophomorix-class $verbose_options -c class12-38 --addmembers samardze38,schneima38");
+    &run_command("sophomorix-class $all_options -c class12-38 --addmembers samardze38,schneima38");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1407,7 +1413,7 @@ if ($mod_class==1){
                    memberOf => "students",
                   });
     # --removeadmins (1 adding to existing value)
-    &run_command("sophomorix-class $verbose_options -c class12-38 --removeadmins muellegr38,lordjo38");
+    &run_command("sophomorix-class $all_options -c class12-38 --removeadmins muellegr38,lordjo38");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1435,7 +1441,7 @@ if ($mod_class==1){
                   });
 
     # --removemembers (1 adding to existing value)
-    &run_command("sophomorix-class $verbose_options -c class12-38 --removemembers kep38,schneima38");
+    &run_command("sophomorix-class $all_options -c class12-38 --removemembers kep38,schneima38");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1463,7 +1469,7 @@ if ($mod_class==1){
                   });
 
     # setting all back in one command
-    &run_command("sophomorix-class $verbose_options -c class12-38 --join --nohide --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38' --admins \"\" --members \"\" ");
+    &run_command("sophomorix-class $all_options -c class12-38 --join --nohide --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38' --admins \"\" --members \"\" ");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1599,19 +1605,19 @@ if ($test_mod_class==1){
 # --kill-class  
 if ($kill_class==1){
     &run_command("cp -v $file_kill_test $file_kill");
-    &run_command("sophomorix-kill -i $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-kill -i $all_options");
+    &run_command("sophomorix-kill $all_options");
     # groups
-#    &run_command("sophomorix-class $verbose_options --kill --class class6-38");
-#    &run_command("sophomorix-class $verbose_options --kill --class class7-38 ");
-    &run_command("sophomorix-class $verbose_options --kill --class class12-38");
-    &run_command("sophomorix-class $verbose_options --kill --class class13-38");
-    &run_command("sophomorix-class $verbose_options --kill --class s6ade");
-    &run_command("sophomorix-class $verbose_options --kill --class uni-12abc");
-    &run_command("sophomorix-class $verbose_options --kill --class bsz-m8cd");
-    &run_command("sophomorix-class $verbose_options --kill --class bsz-m7ab");
-    &run_command("sophomorix-class $verbose_options --kill --class bsz-class7-38");
-    &run_command("sophomorix-class $verbose_options --kill --class bsz-class6-38");
+#    &run_command("sophomorix-class $all_options --kill --class class6-38");
+#    &run_command("sophomorix-class $all_options --kill --class class7-38 ");
+    &run_command("sophomorix-class $all_options --kill --class class12-38");
+    &run_command("sophomorix-class $all_options --kill --class class13-38");
+    &run_command("sophomorix-class $all_options --kill --class s6ade");
+    &run_command("sophomorix-class $all_options --kill --class uni-12abc");
+    &run_command("sophomorix-class $all_options --kill --class bsz-m8cd");
+    &run_command("sophomorix-class $all_options --kill --class bsz-m7ab");
+    &run_command("sophomorix-class $all_options --kill --class bsz-class7-38");
+    &run_command("sophomorix-class $all_options --kill --class bsz-class6-38");
 
 }
 

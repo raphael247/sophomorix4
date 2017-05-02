@@ -45,11 +45,13 @@ my $migration_kill=0;
 my $full=0;
 my $help=0;
 my $skip_warning=0;
-my $verbose_options="";
+my $all_options="";
+my $json=0;
 
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
            "cp-add" => \$cp_add,
            "cp-update" => \$cp_update,
            "cp-kill" => \$cp_kill,
@@ -70,15 +72,23 @@ my $testopt=GetOptions(
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
-
 if ($Conf::log_level==1){
-    $verbose_options="";
+    $all_options="";
 } elsif ($Conf::log_level==2){
-    $verbose_options="-v";
+    $all_options="-v";
 } elsif ($Conf::log_level==3){
-    $verbose_options="-vv";
+    $all_options="-vv";
 }
 
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
@@ -262,8 +272,8 @@ if ($add==1 or $test_add==1){
     if ($add==1){
         # copy sophomorix.add
         &run_command("cp -v $file_add_test $file_add");
-        &run_command("sophomorix-add -i $verbose_options");
-        &run_command("sophomorix-add $verbose_options");
+        &run_command("sophomorix-add -i $all_options");
+        &run_command("sophomorix-add $all_options");
     }
 
 
@@ -1868,18 +1878,18 @@ if ($add==1 or $test_add==1){
 ############################################################
 if ($migration_kill==1){
     # killing the migration users
-    &run_command("sophomorix-user $verbose_options -K --user fisch42");
-    &run_command("sophomorix-user $verbose_options -K --user schaf42");
-    &run_command("sophomorix-user $verbose_options -K --user hund42");
-    &run_command("sophomorix-user $verbose_options -K --user katze42");
-    &run_command("sophomorix-user $verbose_options -K --user maus42");
-    &run_command("sophomorix-user $verbose_options -K --user hahn42");
-    &run_command("sophomorix-user $verbose_options -K --user gans42");
-    &run_command("sophomorix-user $verbose_options -K --user frosch42");
-    &run_command("sophomorix-user $verbose_options -K --user hamster42");
-    &run_command("sophomorix-user $verbose_options -K --user schwein42");
-    &run_command("sophomorix-check $verbose_options");
-    &run_command("sophomorix-kill $verbose_options");
+    &run_command("sophomorix-user $all_options -K --user fisch42");
+    &run_command("sophomorix-user $all_options -K --user schaf42");
+    &run_command("sophomorix-user $all_options -K --user hund42");
+    &run_command("sophomorix-user $all_options -K --user katze42");
+    &run_command("sophomorix-user $all_options -K --user maus42");
+    &run_command("sophomorix-user $all_options -K --user hahn42");
+    &run_command("sophomorix-user $all_options -K --user gans42");
+    &run_command("sophomorix-user $all_options -K --user frosch42");
+    &run_command("sophomorix-user $all_options -K --user hamster42");
+    &run_command("sophomorix-user $all_options -K --user schwein42");
+    &run_command("sophomorix-check $all_options");
+    &run_command("sophomorix-kill $all_options");
 
     # testing the users
     &AD_object_nonexist($ldap,$root_dse,"user","fisch42");
@@ -1899,7 +1909,7 @@ if ($migration_kill==1){
 # Modifying users --mod
 ############################################################
 if ($mod==1){
-    &run_command("sophomorix-user $verbose_options -T --user maiersa42");
+    &run_command("sophomorix-user $all_options -T --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1936,7 +1946,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -D --user maiersa42");
+    &run_command("sophomorix-user $all_options -D --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -1973,7 +1983,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -R --user maiersa42");
+    &run_command("sophomorix-user $all_options -R --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2010,7 +2020,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -E --user maiersa42");
+    &run_command("sophomorix-user $all_options -E --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2047,7 +2057,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -A --user maiersa42");
+    &run_command("sophomorix-user $all_options -A --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2084,7 +2094,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -K --user maiersa42");
+    &run_command("sophomorix-user $all_options -K --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2121,7 +2131,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -S --user maiersa42");
+    &run_command("sophomorix-user $all_options -S --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2158,7 +2168,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -R --user maiersa42");
+    &run_command("sophomorix-user $all_options -R --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2195,7 +2205,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -P --user maiersa42");
+    &run_command("sophomorix-user $all_options -P --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2231,7 +2241,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -F --user maiersa42");
+    &run_command("sophomorix-user $all_options -F --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2268,7 +2278,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -K --user maiersa42");
+    &run_command("sophomorix-user $all_options -K --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2305,7 +2315,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -A --user maiersa42");
+    &run_command("sophomorix-user $all_options -A --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2342,7 +2352,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -U --user maiersa42");
+    &run_command("sophomorix-user $all_options -U --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2379,7 +2389,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -L --user maiersa42");
+    &run_command("sophomorix-user $all_options -L --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2416,7 +2426,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -A --user maiersa42");
+    &run_command("sophomorix-user $all_options -A --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2453,7 +2463,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options --comment \"Test Comment!\" --user maiersa42");
+    &run_command("sophomorix-user $all_options --comment \"Test Comment!\" --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2489,7 +2499,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options --webui-dashboard \"Test webui!\" --user maiersa42");
+    &run_command("sophomorix-user $all_options --webui-dashboard \"Test webui!\" --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2526,7 +2536,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options --user-permissions one,two,three --user maiersa42");
+    &run_command("sophomorix-user $all_options --user-permissions one,two,three --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2564,7 +2574,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options --add-user-permissions four,five --user maiersa42");
+    &run_command("sophomorix-user $all_options --add-user-permissions four,five --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2602,7 +2612,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options --remove-user-permissions one,two --user maiersa42");
+    &run_command("sophomorix-user $all_options --remove-user-permissions one,two --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2640,7 +2650,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $verbose_options -U --user maiersa42 --remove-user-permissions three,four,five --webui-dashboard \"\" --comment \"created by sophomorix\"");
+    &run_command("sophomorix-user $all_options -U --user maiersa42 --remove-user-permissions three,four,five --webui-dashboard \"\" --comment \"created by sophomorix\"");
     # Testing if maiersa42 is feft as before
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2763,8 +2773,8 @@ if ($mod==1){
 ############################################################
 if ($ses==1){
     print "Session tests\n";
-    &run_command("sophomorix-session $verbose_options --create --supervisor maiersa42 --developer-session 666");
-    &run_command("sophomorix-session $verbose_options --create --supervisor maiersa42 --developer-session 777");
+    &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 666");
+    &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 777");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -2801,8 +2811,8 @@ if ($ses==1){
                    sophomorixSessions => "666;---;;|777;---;;",
                   });
 
-    &run_command("sophomorix-session $verbose_options --session 666 --participants lordjo42");
-    &run_command("sophomorix-session $verbose_options --session 777 --participants lordjo42,blackmri42");
+    &run_command("sophomorix-session $all_options --session 666 --participants lordjo42");
+    &run_command("sophomorix-session $all_options --session 777 --participants lordjo42,blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -2841,7 +2851,7 @@ if ($ses==1){
                   });
 
     # --remove-participants
-    &run_command("sophomorix-session $verbose_options --session 777 --remove-participants blackmri42");
+    &run_command("sophomorix-session $all_options --session 777 --remove-participants blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -2880,7 +2890,7 @@ if ($ses==1){
                   });
 
     # --remove-participants (removing nonexisting participant)
-    &run_command("sophomorix-session $verbose_options --session 777 --remove-participants blackmri42");
+    &run_command("sophomorix-session $all_options --session 777 --remove-participants blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -2920,7 +2930,7 @@ if ($ses==1){
 
 
     # --add-participants (adding already existing participant)
-    &run_command("sophomorix-session $verbose_options --session 777 --add-participants lordjo42");
+    &run_command("sophomorix-session $all_options --session 777 --add-participants lordjo42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -2960,7 +2970,7 @@ if ($ses==1){
 
 
     # --add-participants
-    &run_command("sophomorix-session $verbose_options --session 666 --add-participants blackmri42");
+    &run_command("sophomorix-session $all_options --session 666 --add-participants blackmri42");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -2999,8 +3009,8 @@ if ($ses==1){
                   });
 
     # --comment
-    &run_command("sophomorix-session $verbose_options --session 666 --comment \"Mondays Session\"");
-    &run_command("sophomorix-session $verbose_options --session 777 --comment \"No such ;;; allowed\"");
+    &run_command("sophomorix-session $all_options --session 666 --comment \"Mondays Session\"");
+    &run_command("sophomorix-session $all_options --session 777 --comment \"No such ;;; allowed\"");
     &AD_test_session_count($ldap,$root_dse,$root_dns,2);
 
     # maiersa42
@@ -3039,7 +3049,7 @@ if ($ses==1){
                   });
 
     # --set-exam-mode
-    &run_command("sophomorix-session $verbose_options --session 666 --set-exam-mode lordjo42,blackmri42");
+    &run_command("sophomorix-session $all_options --session 666 --set-exam-mode lordjo42,blackmri42");
 
     # lordjo42
     &AD_test_object({ldap=>$ldap,
@@ -3111,7 +3121,7 @@ if ($ses==1){
 
 
     # --unset-exam-mode
-    &run_command("sophomorix-session $verbose_options --session 666 --unset-exam-mode lordjo42,blackmri42");
+    &run_command("sophomorix-session $all_options --session 666 --unset-exam-mode lordjo42,blackmri42");
 
     # lordjo42
     &AD_test_object({ldap=>$ldap,
@@ -3183,14 +3193,14 @@ if ($ses==1){
 
 
 
-    &run_command("sophomorix-session $verbose_options --kill --session 666");
-    &run_command("sophomorix-session $verbose_options --kill --session 777");
+    &run_command("sophomorix-session $all_options --kill --session 666");
+    &run_command("sophomorix-session $all_options --kill --session 777");
     &AD_test_session_count($ldap,$root_dse,$root_dns,0);
 
 
     # create a full session in one blow
-    &run_command("sophomorix-session $verbose_options --create --supervisor schneima42 --developer-session 888 --comment \"Session 888 of schneima42\" --participants blackmri42");
-    &run_command("sophomorix-session $verbose_options --create --supervisor schneima42 --developer-session 999 --comment \"Session 999 of schneima42\" --participants lordjo42,blackmri42");
+    &run_command("sophomorix-session $all_options --create --supervisor schneima42 --developer-session 888 --comment \"Session 888 of schneima42\" --participants blackmri42");
+    &run_command("sophomorix-session $all_options --create --supervisor schneima42 --developer-session 999 --comment \"Session 999 of schneima42\" --participants lordjo42,blackmri42");
 
     # schneima42
     &AD_test_object({ldap=>$ldap,
@@ -3297,12 +3307,12 @@ if ($ses==1){
 
 
 
-    &run_command("sophomorix-session $verbose_options --kill-all-sessions");
+    &run_command("sophomorix-session $all_options --kill-all-sessions");
     &AD_test_session_count($ldap,$root_dse,$root_dns,0);
 
     #################### internet
     # --nointernet, 1 user
-    &run_command("sophomorix-managementgroup $verbose_options --nointernet lordjo42");
+    &run_command("sophomorix-managementgroup $all_options --nointernet lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3321,7 +3331,7 @@ if ($ses==1){
                   });
 
     # --internet, 1 user
-    &run_command("sophomorix-managementgroup $verbose_options --internet lordjo42");
+    &run_command("sophomorix-managementgroup $all_options --internet lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3340,7 +3350,7 @@ if ($ses==1){
                   });
 
     # --nointernet, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --nointernet lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --nointernet lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3359,7 +3369,7 @@ if ($ses==1){
                   });
 
     # --internet, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --internet lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --internet lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3380,7 +3390,7 @@ if ($ses==1){
 
     #################### intranet
     # --nointranet, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --nointranet lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --nointranet lordjo42");
     # # lordjo42
     &AD_test_object({ldap=>$ldap,
                     dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3399,7 +3409,7 @@ if ($ses==1){
                   });
 
     # # --intranet, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --intranet lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --intranet lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3418,7 +3428,7 @@ if ($ses==1){
                   });
 
     # # --nointranet, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --nointranet lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --nointranet lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3437,7 +3447,7 @@ if ($ses==1){
                   });
 
     # --intranet, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --intranet lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --intranet lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3458,7 +3468,7 @@ if ($ses==1){
 
     #################### wifi
     # --nowifi, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --nowifi lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --nowifi lordjo42");
     # # lordjo42
     &AD_test_object({ldap=>$ldap,
                     dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3477,7 +3487,7 @@ if ($ses==1){
                   });
 
     # # --wifi, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --wifi lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --wifi lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3496,7 +3506,7 @@ if ($ses==1){
                   });
 
     # # --nowifi, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --nowifi lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --nowifi lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3515,7 +3525,7 @@ if ($ses==1){
                   });
 
     # --wifi, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --wifi lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --wifi lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3536,7 +3546,7 @@ if ($ses==1){
 
     #################### webfilter
     # --nowebfilter, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --nowebfilter lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --nowebfilter lordjo42");
     # # lordjo42
     &AD_test_object({ldap=>$ldap,
                     dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3555,7 +3565,7 @@ if ($ses==1){
                   });
 
     # # --webfilter, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --webfilter lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --webfilter lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3574,7 +3584,7 @@ if ($ses==1){
                   });
 
     # # --nowebfilter, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --nowebfilter lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --nowebfilter lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3593,7 +3603,7 @@ if ($ses==1){
                   });
 
     # --webfilter, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --webfilter lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --webfilter lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3614,7 +3624,7 @@ if ($ses==1){
 
     #################### printing
     # --noprinting, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --noprinting lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --noprinting lordjo42");
     # # lordjo42
     &AD_test_object({ldap=>$ldap,
                     dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3633,7 +3643,7 @@ if ($ses==1){
                   });
 
     # # --printing, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --printing lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --printing lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3652,7 +3662,7 @@ if ($ses==1){
                   });
 
     # # --noprinting, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --noprinting lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --noprinting lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3671,7 +3681,7 @@ if ($ses==1){
                   });
 
     # --printing, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --printing lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --printing lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3692,7 +3702,7 @@ if ($ses==1){
 
     #################### admins
     # # --admins, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --admins lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --admins lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3711,7 +3721,7 @@ if ($ses==1){
                   });
 
     # --noadmins, 1 user
-     &run_command("sophomorix-managementgroup $verbose_options --noadmins lordjo42");
+     &run_command("sophomorix-managementgroup $all_options --noadmins lordjo42");
     # # lordjo42
     &AD_test_object({ldap=>$ldap,
                     dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3730,7 +3740,7 @@ if ($ses==1){
                   });
 
     # --admins, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --admins lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --admins lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3749,7 +3759,7 @@ if ($ses==1){
                   });
 
     # # --noadmins, 2 user
-    &run_command("sophomorix-managementgroup $verbose_options --noadmins lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --noadmins lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3770,7 +3780,7 @@ if ($ses==1){
 
     #################### manangement options combined
     # all options
-     &run_command("sophomorix-managementgroup $verbose_options --admins lordjo42,blackmri42 --noprinting lordjo42,blackmri42 --nointranet lordjo42,blackmri42 --nowebfilter lordjo42,blackmri42 --nointernet lordjo42,blackmri42 --nowifi lordjo42,blackmri42");
+     &run_command("sophomorix-managementgroup $all_options --admins lordjo42,blackmri42 --noprinting lordjo42,blackmri42 --nointranet lordjo42,blackmri42 --nowebfilter lordjo42,blackmri42 --nointernet lordjo42,blackmri42 --nowifi lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3788,7 +3798,7 @@ if ($ses==1){
                    memberOf => "uni-12abc|uni-admins",
                   });
 
-    &run_command("sophomorix-managementgroup $verbose_options --noadmins lordjo42,blackmri42 --printing lordjo42,blackmri42 --intranet lordjo42,blackmri42 --webfilter lordjo42,blackmri42 --internet lordjo42,blackmri42 --wifi lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --noadmins lordjo42,blackmri42 --printing lordjo42,blackmri42 --intranet lordjo42,blackmri42 --webfilter lordjo42,blackmri42 --internet lordjo42,blackmri42 --wifi lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -3900,8 +3910,8 @@ if ($update==1 or $test_update==1){
     if ($update==1){
         # copy sophomorix.update
         &run_command("cp -v $file_update_test $file_update");
-        &run_command("sophomorix-update -i $verbose_options");
-        &run_command("sophomorix-update $verbose_options");
+        &run_command("sophomorix-update -i $all_options");
+        &run_command("sophomorix-update $all_options");
     }
 
     ##### Testing the users
@@ -5408,8 +5418,8 @@ if ($kill==1 or $test_kill==1){
     if ($kill==1){
         # kill the users, keep the classes
         &run_command("cp -v $file_kill_test $file_kill");
-        &run_command("sophomorix-kill -i $verbose_options");
-        &run_command("sophomorix-kill $verbose_options");
+        &run_command("sophomorix-kill -i $all_options");
+        &run_command("sophomorix-kill $all_options");
     }
 
     ############################################################
@@ -5705,26 +5715,26 @@ if ($kill==1 or $test_kill==1){
         &run_command("touch /srv/samba/schools/uni/students/alumni/homes/fakeuser");
 
         # removing adminclasses
-        &run_command("sophomorix-class --kill --class m7ab $verbose_options");       # NOT checked above: exists only in lin and bsz
-        &run_command("sophomorix-class --kill --class m8cd $verbose_options");       # NOT checked above: exists only in bsz
-        &run_command("sophomorix-class --kill --class uni-12abc $verbose_options");  # checked above
-        &run_command("sophomorix-class --kill --class s6ade $verbose_options");      # checked above
-        &run_command("sophomorix-class --kill --class attic $verbose_options");      # NOT checked above: exists only in lin and bsz
-        &run_command("sophomorix-class --kill --class lin-attic $verbose_options");  # checked above
-        &run_command("sophomorix-class --kill --class m9cd $verbose_options");       # NOT checked above: exists only in bsz
-        &run_command("sophomorix-class --kill --class s7ade $verbose_options");      # checked above
-        &run_command("sophomorix-class --kill --class alumni $verbose_options");     # checked above 
+        &run_command("sophomorix-class --kill --class m7ab $all_options");       # NOT checked above: exists only in lin and bsz
+        &run_command("sophomorix-class --kill --class m8cd $all_options");       # NOT checked above: exists only in bsz
+        &run_command("sophomorix-class --kill --class uni-12abc $all_options");  # checked above
+        &run_command("sophomorix-class --kill --class s6ade $all_options");      # checked above
+        &run_command("sophomorix-class --kill --class attic $all_options");      # NOT checked above: exists only in lin and bsz
+        &run_command("sophomorix-class --kill --class lin-attic $all_options");  # checked above
+        &run_command("sophomorix-class --kill --class m9cd $all_options");       # NOT checked above: exists only in bsz
+        &run_command("sophomorix-class --kill --class s7ade $all_options");      # checked above
+        &run_command("sophomorix-class --kill --class alumni $all_options");     # checked above 
 
-        &run_command("sophomorix-class --kill --class ghs-alumni $verbose_options"); # checked above
+        &run_command("sophomorix-class --kill --class ghs-alumni $all_options"); # checked above
 
-        &run_command("sophomorix-class --kill --class bsz-alumni $verbose_options"); #checked above
-        &run_command("sophomorix-class --kill --class bsz-attic $verbose_options");  #checked above
-        &run_command("sophomorix-class --kill --class bsz-m7ab $verbose_options");   #checked above
-        &run_command("sophomorix-class --kill --class bsz-m8cd $verbose_options");   #checked above
-        &run_command("sophomorix-class --kill --class bsz-m9cd $verbose_options");   #checked above
+        &run_command("sophomorix-class --kill --class bsz-alumni $all_options"); #checked above
+        &run_command("sophomorix-class --kill --class bsz-attic $all_options");  #checked above
+        &run_command("sophomorix-class --kill --class bsz-m7ab $all_options");   #checked above
+        &run_command("sophomorix-class --kill --class bsz-m8cd $all_options");   #checked above
+        &run_command("sophomorix-class --kill --class bsz-m9cd $all_options");   #checked above
 
         # should not work to kill class alumni
-        &run_command("sophomorix-class --kill --class uni-alumni $verbose_options"); #checked above
+        &run_command("sophomorix-class --kill --class uni-alumni $all_options"); #checked above
     }
 
     &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
@@ -5844,7 +5854,7 @@ if ($kill==1 or $test_kill==1){
     # remove files to avoid deletion
     &run_command("rm -f /srv/samba/schools/uni/students/alumni/homes/fakeuser");
     # kill the class that could not be killed
-    &run_command("sophomorix-class --kill --class uni-alumni $verbose_options");
+    &run_command("sophomorix-class --kill --class uni-alumni $all_options");
 
     &AD_object_nonexist($ldap,$root_dse,"group","uni-alumni");
 
