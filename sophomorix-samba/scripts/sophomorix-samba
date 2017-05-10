@@ -140,7 +140,9 @@ if ($schema_load==1){
     print "\nLoading sophomorix schema into ldap\n\n";
     my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
     &samba_stop();
-    system("cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges");
+    my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
+    print "$command\n";
+    system($command);
     &samba_start();
 }
 
