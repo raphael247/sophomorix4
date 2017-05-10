@@ -1309,7 +1309,7 @@ sub result_sophomorix_add {
     # $num: -1, no number, else look in ERROR|WARNING db
     # $ref_parameter: list of parameters to be fitted in db string
     # $message: used if errnumber is not found in db
-    my ($ref_sophomorix_result,$type,$num,$ref_parameter,$message)=@_;
+    my ($ref_result,$type,$num,$ref_parameter,$message)=@_;
 
 #    print "LIST of parameters:\n";
 #    foreach my $para ( @{ $ref_parameter}  ){ 
@@ -1318,14 +1318,14 @@ sub result_sophomorix_add {
 
     if ($type eq "ERROR" or $type eq "WARNING" ){
         # get error from db, update $message_de, $message_en
-        push @{ $ref_sophomorix_result->{'OUTPUT'} }, 
+        push @{ $ref_result->{'OUTPUT'} }, 
             {TYPE       => $type, 
              NUMBER     => $num,
              MESSAGE_EN => $message,
              MESSAGE_DE => $message,
             };
     } else {
-        push @{ $ref_sophomorix_result->{'OUTPUT'} }, 
+        push @{ $ref_result->{'OUTPUT'} }, 
             {TYPE           => "UNKNOWN", 
              INTERNAL_ERROR => "unknown type ".$type."in  result_sophomorix_add",
             };
@@ -1339,8 +1339,8 @@ sub result_sophomorix_add_log {
     # $num: -1, no number, else look in ERROR|WARNING db
     # $ref_parameter: list of parameters to be fitted in db string
     # $message: used if errnumber is not found in db
-    my ($ref_sophomorix_result,$log_message)=@_;
-    push @{ $ref_sophomorix_result->{'OUTPUT'} }, 
+    my ($ref_result,$log_message)=@_;
+    push @{ $ref_result->{'OUTPUT'} }, 
         {TYPE       => "LOG", 
          LOG => $log_message,
         };
@@ -1412,12 +1412,12 @@ sub result_sophomorix_check_exit {
 
 
 sub result_sophomorix_print {
-    my ($ref_sophomorix_result,$json)=@_;
+    my ($ref_result,$json)=@_;
       if ($json==0){
           # be quiet
           print "Calling console printout\n";
           # print OUTPUT
-          foreach my $line ( @{ $ref_sophomorix_result->{'OUTPUT'}}  ){
+          foreach my $line ( @{ $ref_result->{'OUTPUT'}}  ){
               if ($line->{'TYPE'} eq "LOG"){
 	          printf "%-7s%3s: %-65s \n",$line->{'TYPE'},"",$line->{'LOG'};
               } else {
@@ -1425,7 +1425,7 @@ sub result_sophomorix_print {
               }
           } 
           # print RESULT
-          foreach my $line ( @{ $ref_sophomorix_result->{'SUMMARY'}}  ){
+          foreach my $line ( @{ $ref_result->{'SUMMARY'}}  ){
               foreach my $name ( keys %{ $line } ) {
 		  #print "Name: $name\n";
                   if ($name eq "HEADER"){
@@ -1444,16 +1444,16 @@ sub result_sophomorix_print {
       } elsif ($json==1){
           # pretty output
           my $json_obj = JSON->new->allow_nonref;
-          my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_sophomorix_result );
+          my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_result );
           print "$utf8_pretty_printed";
       } elsif ($json==2){
           # compact output
           my $json_obj = JSON->new->allow_nonref;
-          my $utf8_json_line   = $json_obj->encode( $ref_sophomorix_result  );
+          my $utf8_json_line   = $json_obj->encode( $ref_result  );
           print "$utf8_json_line";
       } elsif ($json==3){
-          &print_title("DUMP: ".$ref_sophomorix_result->{'JSONCOMMENT'});
-          print Dumper( $ref_sophomorix_result );
+          &print_title("DUMP: ".$ref_result->{'JSONCOMMENT'});
+          print Dumper( $ref_result );
       }
 }
 
