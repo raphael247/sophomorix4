@@ -302,7 +302,7 @@ sub read_lockfile {
 # reading configuration files
 ######################################################################
 sub config_sophomorix_read {
-    my ($ldap,$root_dse)=@_;
+    my ($ldap,$root_dse,$ref_result)=@_;
     my %sophomorix_config=();
 
     my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
@@ -321,10 +321,10 @@ sub config_sophomorix_read {
     }
 
     # read smb.conf
-    &read_smb_conf(\%sophomorix_config);
+    &read_smb_conf(\%sophomorix_config,$ref_result);
     # read more samba stuff
-    &read_smb_net_conf_list(\%sophomorix_config);
-    &read_smb_domain_passwordsettings(\%sophomorix_config,$smb_pwd);
+    &read_smb_net_conf_list(\%sophomorix_config,$ref_result);
+    &read_smb_domain_passwordsettings(\%sophomorix_config,$smb_pwd,$ref_result);
 
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
@@ -342,7 +342,8 @@ sub config_sophomorix_read {
         "OU=".$DevelConf::name_default_school.",".$DevelConf::AD_schools_ou.",".$root_dse; 
 
     # Adding repdir absolute paths
-    opendir REPDIR, $DevelConf::path_conf_devel_repdir or return;
+    opendir REPDIR, $DevelConf::path_conf_devel_repdir or 
+        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$DevelConf::path_conf_devel_repdir." not found!");
     foreach my $file (readdir REPDIR){
         my $abs_path=$DevelConf::path_conf_devel_repdir."/".$file;
         my $Type;
@@ -357,9 +358,9 @@ sub config_sophomorix_read {
 
     ##################################################
     # sophomorix.conf 
-    my $ref_master_sophomorix=&read_master_ini($DevelConf::path_conf_master_sophomorix);
-    my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,$DevelConf::file_conf_sophomorix);
-    &load_sophomorix_ini($ref_modmaster_sophomorix,\%sophomorix_config);
+    my $ref_master_sophomorix=&read_master_ini($DevelConf::path_conf_master_sophomorix,$ref_result);
+    my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,$DevelConf::file_conf_sophomorix,$ref_result);
+    &load_sophomorix_ini($ref_modmaster_sophomorix,\%sophomorix_config,$ref_result);
 
     # ### old
     # my $conf_file=$DevelConf::file_conf_sophomorix;
@@ -401,7 +402,7 @@ sub config_sophomorix_read {
     ##################################################
     # SCHOOLS   
     # load the master once
-    my $ref_master=&read_master_ini($DevelConf::path_conf_master_school);
+    my $ref_master=&read_master_ini($DevelConf::path_conf_master_school,$ref_result);
 
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -423,7 +424,7 @@ sub config_sophomorix_read {
                          $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                  }
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
-        my $ref_modmaster=&check_config_ini($ref_master,$conf_school);
+        my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config);
     }
 
@@ -936,11 +937,12 @@ sub config_sophomorix_read {
 
 
 sub read_smb_conf {
-    my ($ref_sophomorix_config)=@_;
+    my ($ref_sophomorix_config,$ref_result)=@_;
     &print_title("Reading $DevelConf::smb_conf");
     if (not -e $DevelConf::smb_conf){
         print "\nERROR: $DevelConf::smb_conf not found!\n\n";
-        exit;
+        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$DevelConf::smb_conf." not found!");
+        return;
     }
     tie %{ $ref_sophomorix_config->{'samba'}{'smb.conf'} }, 'Config::IniFiles',
         ( -file => $DevelConf::smb_conf, 
@@ -959,7 +961,7 @@ sub read_smb_conf {
 
 
 sub read_smb_net_conf_list {
-    my ($ref_sophomorix_config)=@_;
+    my ($ref_sophomorix_config,$ref_result)=@_;
     my $tmpfile="/tmp/net_conf_list";
     &print_title("Parsing: net conf list");
     system("net conf list > $tmpfile");
@@ -973,7 +975,7 @@ sub read_smb_net_conf_list {
 
 
 sub read_smb_domain_passwordsettings {
-    my ($ref_sophomorix_config,$smb_pwd)=@_;
+    my ($ref_sophomorix_config,$smb_pwd,$ref_result)=@_;
     &print_title("Asking domain passwordsettings from samba");
     my $string=`samba-tool domain passwordsettings show --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin`;
     my @lines=split(/\n/,$string);
@@ -996,12 +998,14 @@ sub read_smb_domain_passwordsettings {
 
 
 sub read_master_ini {
-    my ($masterfile)=@_;
+    my ($masterfile,$ref_result)=@_;
     my %master=();
     &print_title("Reading $masterfile");
     if (not -e $masterfile){
-        print "\nERROR: $masterfile not found!\n\n";
-        exit;
+        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$masterfile." not found!");
+        return;
+        #print "\nERROR: $masterfile not found!\n\n";
+        #exit;
     }
     tie %master, 'Config::IniFiles',
         ( -file => $masterfile, 
@@ -1013,12 +1017,14 @@ sub read_master_ini {
 
 
 sub check_config_ini {
-    my ($ref_master,$configfile)=@_;
+    my ($ref_master,$configfile,$ref_result)=@_;
     my %modmaster= %{ $ref_master }; # copies ref_master
     &print_title("Reading $configfile");
     if (not -e $configfile){
-        print "\nERROR: $configfile not found!\n\n";
-        exit;
+        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$configfile." not found!");
+        return;
+        #print "\nERROR: $configfile not found!\n\n";
+        #exit;
     }
     tie %config, 'Config::IniFiles',
         ( -file => $configfile, 
@@ -1033,7 +1039,8 @@ sub check_config_ini {
                 # overwrite  %modmaster
                 $modmaster{$section}{$parameter}=$config{$section}{$parameter};
             } else {
-                print "   * WARNING: $parameter is NOT valid in section $section\n";
+                &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$parameter." is NOT valid in section ".$section."!");
+                #print "   * WARNING: $parameter is NOT valid in section $section\n";
             }
         }
     }
@@ -1240,7 +1247,7 @@ sub load_school_ini {
 
 
 sub load_sophomorix_ini {
-    my ($ref_modmaster_sophomorix,$ref_sophomorix_config)=@_;
+    my ($ref_modmaster_sophomorix,$ref_sophomorix_config,$ref_result)=@_;
     foreach my $section ( keys %{ $ref_modmaster_sophomorix } ) {
         if ($section eq "global"){
             foreach my $parameter ( keys %{ $ref_modmaster_sophomorix->{$section}} ) {
@@ -1263,8 +1270,10 @@ sub load_sophomorix_ini {
             }
         } else {
             ##### unnown section ########################################################################
-            print "ERROR: Section $section: unknown, not processed\n\n";
-            exit;
+            &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,"Section ".$section.": unknown, not processed");
+            return;
+            #print "ERROR: Section $section: unknown, not processed\n\n";
+            #exit;
         }
     }
 }

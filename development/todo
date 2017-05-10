@@ -160,6 +160,17 @@ OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
 &result_sophomorix_add(\%sophomorix_result,"ERROR|WARNING",$err_num,$string);
    ... schreibt ERROR|WARNING in den result hash
 
+&result_sophomorix_add_summary({
+                     NAME=>"NOCHANGE", 
+                     RESULT=>$lc_nochange, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => "users are not to be changed in ".basename($nochange_file), 
+                     DESCRIPTION_PRE => "users in ".basename($nochange_file), 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+   ... schreibt ein Resultat mit beliebigem Namen
+
 &result_sophomorix_add_log(\%sophomorix_result,$string);
    ... loggt etwas in den result hash
 
