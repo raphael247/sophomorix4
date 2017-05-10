@@ -242,13 +242,12 @@ if ($info==1) {
 }
 
 
-
-&log_script_start(\@arguments,\%sophomorix_result);
-
-
+&result_sophomorix_check_exit(\%sophomorix_result,$json);
 ################################################################################
 # Start
 ################################################################################
+&log_script_start(\@arguments,\%sophomorix_result);
+
 
 if ($kill_all_sessions==1){
     &Sophomorix::SophomorixBase::print_title("Killing the following sessions:");

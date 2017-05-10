@@ -145,12 +145,13 @@ if ($info==1) {
     exit;
 }
 
-&log_script_start(\@arguments,\%sophomorix_result);
 
-
+&result_sophomorix_check_exit(\%sophomorix_result,$json);
 ################################################################################
 # Start
 ################################################################################
+&log_script_start(\@arguments,\%sophomorix_result);
+
 
 if (not defined $newfile){
     print "\n ERROR: You need to specify a file\n\n";

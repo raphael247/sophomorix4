@@ -302,7 +302,7 @@ sub read_lockfile {
 # reading configuration files
 ######################################################################
 sub config_sophomorix_read {
-    my ($ldap,$root_dse,$ref_result)=@_;
+    my ($ldap,$root_dse,$ref_result,$json)=@_;
     my %sophomorix_config=();
 
     my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
@@ -1383,7 +1383,31 @@ sub result_sophomorix_add_summary {
 
 
 sub result_sophomorix_check_exit {
+    my ($ref_result,$json)=@_;
+    my $log=0;
+    my $warn=0;
+    my $err=0;
+    # count results
+    foreach my $line ( @{ $ref_result->{'OUTPUT'}}  ){
+	print "$line\n";
+        if ($line->{'TYPE'} eq "ERROR"){
+            $err++;
+        } elsif ($line->{'TYPE'} eq "WARNING"){
+            $warn++;
+        } elsif ($line->{'TYPE'} eq "LOG"){
+            $log++;
+        } else {
 
+        }
+    } 
+    # check if i need to exit
+    if ($err>0 or $warn>0){
+        $ref_result->{'JSONCOMMENT'}="Configuration check failed";
+        &result_sophomorix_print($ref_result,$json);
+        exit;
+    } else {
+        &print_title("$err ERRORS, $warn WARNINGS -> let's go");
+    }
 }
 
 

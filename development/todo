@@ -155,12 +155,12 @@ Create result hash VOR sophomorix_config
 OK use JSON
 OK option -j+
 OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
-... initialisiert einen result hash
+   ... initialisiert einen result hash
 
-&result_sophomorix_add(\%sophomorix_result,"ERROR|WARNING",$err_num,$string);
+OK &result_sophomorix_add(\%sophomorix_result,"ERROR|WARNING",$err_num,$string);
    ... schreibt ERROR|WARNING in den result hash
 
-&result_sophomorix_add_summary({
+OK &result_sophomorix_add_summary({
                      NAME=>"NOCHANGE", 
                      RESULT=>$lc_nochange, 
                      RESULT_TYPE => "integer",
@@ -171,20 +171,18 @@ OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
 			       });
    ... schreibt ein Resultat mit beliebigem Namen
 
-&result_sophomorix_add_log(\%sophomorix_result,$string);
+OK &result_sophomorix_add_log(\%sophomorix_result,$string);
    ... loggt etwas in den result hash
 
-&result_sophomorix_check_exit(\%sophomorix_result);
-
-... checks if WARN/ERR were so severe (misconfigured) that the script should exit, and exits
-... called before something ist changed
-... display EXIT Error  
+OK &result_sophomorix_check_exit(\%sophomorix_result);
+   ... checks if WARN/ERR were so severe (misconfigured) that the script should exit, and exits
+   ... called before something ist changed
+   ... display EXIT Error  
 
 OK &result_sophomorix_print(\%sophomorix_result,$json);
-
-... called at the end of the script
-... prints JSON with option --JSON
-... prints on Terminal iithout --JSON
+   ... called at the end of the script
+   ... prints JSON with option --JSON
+   ... prints on Terminal iithout --JSON
 
 --------------------------------------------------
 

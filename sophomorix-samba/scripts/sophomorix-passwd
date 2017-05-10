@@ -301,9 +301,6 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 #     exit;
 # }
 
-################################################################################
-# Start
-################################################################################
 
 # --info, show only the users
 if ($info==1) {
@@ -312,6 +309,11 @@ if ($info==1) {
    exit;
 }
 
+
+&result_sophomorix_check_exit(\%sophomorix_result,$json);
+################################################################################
+# Start
+################################################################################
 &log_script_start(\@arguments,\%sophomorix_result);
 
 

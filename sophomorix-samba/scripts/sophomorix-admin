@@ -151,12 +151,13 @@ if ($info==1){
     &AD_admin_list($ldap,$root_dse);
 }
 
-&log_script_start(\@arguments,\%sophomorix_result);
 
-
+&result_sophomorix_check_exit(\%sophomorix_result,$json);
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
+&log_script_start(\@arguments,\%sophomorix_result);
+
 
 # exit if the user exists already
 my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create);
