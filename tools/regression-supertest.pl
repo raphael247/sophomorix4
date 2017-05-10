@@ -65,11 +65,11 @@ foreach my $script (@scriptlist){
     print "TEST: $script \n";
     &printline();
     my $res1_command="tail -n 3 /tmp/".$parts[0].".log";
-    print "STDOUT: $res1_command\n";
+    print "SHOW STDOUT: $res1_command\n";
     system($res1_command);
     &printline();
     my $res2_command="cat /tmp/".$parts[0].".error | grep -v \"Domain=\" | grep -v \"OS=\" | grep -v \"Server=\"";
-    print "ERRORS: $res2_command\n";
+    print "SHOW ERRORS: $res2_command\n";
     system($res2_command);
     &printline();
     print "\n";
