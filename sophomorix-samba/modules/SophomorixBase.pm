@@ -425,7 +425,7 @@ sub config_sophomorix_read {
                  }
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result);
-        &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config);
+        &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
     }
 
 #     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -624,8 +624,9 @@ sub config_sophomorix_read {
     ##################################################
     # RoleType
     &print_title("Reading $DevelConf::file_conf_roletype");
-    open(ROLETYPE,"$DevelConf::file_conf_roletype") || 
-         die "ERROR: $DevelConf::file_conf_roletype not found!";
+    open(ROLETYPE,"$DevelConf::file_conf_roletype") or
+        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$DevelConf::file_conf_roletype." not found!");
+        # die "ERROR: $DevelConf::file_conf_roletype not found!";
     while (<ROLETYPE>){
         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
             next;
@@ -717,8 +718,9 @@ sub config_sophomorix_read {
                 $group_primary=~s/^\*-//g;
                 $group_secondary=~s/^\*-//g;
             } else {
-                print "\nERROR: $dots dots in $key\n\n";
-                exit;
+                &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$dots." dots in ".$key);
+                #print "\nERROR: $dots dots in $key\n\n";
+                #exit;
             }
             my $matchname_of_user_file=$type_file.".".$extension_file;
             if($Conf::log_level>=3){
@@ -1051,7 +1053,7 @@ sub check_config_ini {
 
 
 sub load_school_ini {
-    my ($root_dse,$school,$ref_modmaster,$ref_sophomorix_config)=@_;
+    my ($root_dse,$school,$ref_modmaster,$ref_sophomorix_config,$ref_result)=@_;
     foreach my $section ( keys %{ $ref_modmaster } ) {
 	if ($section eq "school"){
             ##### school section ########################################################################
@@ -1150,14 +1152,16 @@ sub load_school_ini {
                     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
                 } else {
                     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
-                    print "   * ERROR: $filter_script \n";
-                    print "        must be:\n";
-                    print "          - an executable file\n";
-                    print "          - an absolute path\n";
-                    exit;
+#                    print "   * ERROR: $filter_script \n";
+#                    print "        must be:\n";
+#                    print "          - an executable file\n";
+#                    print "          - an absolute path\n";
+                    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                        "FILTERSCRIPT=".$filter_script." -> FILTERSCRIPT must be an absolute path to an executable script");
+                    #exit;
                 }
             }
-            
+
             # test encoding
             if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING}){
                 my $enc=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING};
@@ -1167,8 +1171,11 @@ sub load_school_ini {
                     #$ref_sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING}=$enc;
                 } else {
                     $ref_sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING}="ERROR_ENCODING";
-                    print "   * ERROR: ENCODING $enc not listed by \"iconv --list\" and not \"auto\"\n";
-                    exit;
+                    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                          "ENCODING ".$enc." not listed by 'iconv --list' and not 'auto'");
+                    #return;
+                    #print "   * ERROR: ENCODING $enc not listed by \"iconv --list\" and not \"auto\"\n";
+                    #exit;
                 }
             }
 
@@ -1178,10 +1185,15 @@ sub load_school_ini {
                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "no" ){
                     # OK
                 } else {
-                    print "   * ERROR: ENCODING_FORCE=".
+                    #print "   * ERROR: ENCODING_FORCE=".
+                    #      $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
+                    #      " accepts only \"yes\" or \"no\"\n";
+                    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                          "ENCODING_FORCE=".
                           $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
-                          " accepts only \"yes\" or \"no\"\n";
-		    exit;
+                          " -> ENCODING_FORCE accepts only 'yes' or 'no'");
+                    #return;
+		    #exit;
                 }
             }
 
@@ -1238,8 +1250,10 @@ sub load_school_ini {
             }
         } else {
             ##### unnown section ########################################################################
-            print "ERROR: Section $section: unknown, not processed\n\n";
-            exit;
+            &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                "Section ".$section." -> unknown, not processed");
+            #print "ERROR: Section $section: unknown, not processed\n\n";
+            #exit;
         }
     }
 }
