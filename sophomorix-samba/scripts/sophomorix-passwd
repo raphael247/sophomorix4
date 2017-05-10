@@ -241,7 +241,7 @@ Please see the sophomorix-passwd(8) man pages for full documentation
 
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
-my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 
 
 # # add teachers to classes if option is given

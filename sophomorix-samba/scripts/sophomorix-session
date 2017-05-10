@@ -129,7 +129,7 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-session");
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
-my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
