@@ -1,3 +1,47 @@
+
+
+--------------------------------------------------
+Übereinkunft Benennung:
+
+A) all-* Gruppen sind hierarchisch aufgebaut:
+    <user> -> memberof <school>-<class> memberof <school>-students memberof all-students
+
+B) Umgekehrt organisierte Gruppen heißen global-
+    also global-admins sind member of <school1>-admins,<school2>-admins,<school3>-admins
+
+
+Umsetzung:
+
+1) bisherige gruppen umbenennen:
+   global-*    ---> all-*
+   global-admins --> all-admins
+   global-teachers --> all-teachers
+   global-students --> all-students
+   global-wifi --> all-wifi
+
+Was ist mit den wifi|printing, .... gruppen?
+die werden auch in global gruppen zusammengefasst
+  A) soll auch in all umbenannt werden?
+     also: wifi,bszwifi,uni-wifi memberof all-wifi
+  B) brauchen wir die neue gruppe
+     global-wifi, die memberof wifi,bszwifi,uni-wifi ist?
+
+2) Neue Gruppen
+   global-* die memberof .... sind
+
+
+3) admins anlegen:
+   die globalen admins müssen in die gruppe global-admin
+   --> wie bisher, aber testen, ob das noch so ist
+   
+
+
+
+
+--------------------------------------------------
+
+
+
 todo wie erkennt man remote shares?:
 tauchen die in net config list auf?
     - wenn ja: OK
