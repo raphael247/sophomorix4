@@ -320,6 +320,8 @@ sub config_sophomorix_read {
         #$encodings_set{$coding}=$coding_orig;
     }
 
+    # read sophomorix.ini
+    &read_sophomorix_ini(\%sophomorix_config,$ref_result);
     # read smb.conf
     &read_smb_conf(\%sophomorix_config,$ref_result);
     # read more samba stuff
@@ -661,35 +663,35 @@ sub config_sophomorix_read {
         $group_quaternary=&remove_whitespace($group_quaternary);
         $ou_sub_quaternary=&remove_whitespace($ou_sub_quaternary);
 
-        # create list of sub ou's that are needed to create from sophomorix-RoleType.conf:
-        if ($ou_sub_primary ne ""){
-            $sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_primary}="from RoleType";
-        }
-        if ($ou_sub_secondary ne ""){
-            $sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_secondary}="from RoleType";
-        }
-        if ($ou_sub_tertiary ne ""){
-            $sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_tertiary}="from RoleType";
-        }
-        if ($ou_sub_quaternary ne ""){
-            $sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_quaternary}="from RoleType";
-        } 
+#         # create list of sub ou's that are needed to create from sophomorix-RoleType.conf:
+#         if ($ou_sub_primary ne ""){
+#             $sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_primary}="from RoleType";
+#         }
+#         if ($ou_sub_secondary ne ""){
+#             $sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_secondary}="from RoleType";
+#         }
+#         if ($ou_sub_tertiary ne ""){
+#             $sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_tertiary}="from RoleType";
+#         }
+#         if ($ou_sub_quaternary ne ""){
+#             $sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_quaternary}="from RoleType";
+#         } 
 
-        # adding school
-	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
-#	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
-	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-#	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
-	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
+#         # adding school
+# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
+# #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
+# #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
+# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
        
-        # adding global
-#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
-#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
-#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-#	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
-	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
+#         # adding global
+# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
+# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
+# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
+# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
+# 	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
+# 	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
 
         # remember for the following commented line:
         # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
@@ -958,6 +960,22 @@ sub read_smb_conf {
     $domain_dns = join(',DC=', @dns);
     $domain_dns="DC=".$domain_dns;
     $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'DomainDNS'}=$domain_dns;
+}
+
+
+
+sub read_sophomorix_ini {
+    my ($ref_sophomorix_config,$ref_result)=@_;
+    &print_title("Reading $DevelConf::sophomorix_ini");
+    if (not -e $DevelConf::sophomorix_ini){
+        print "\nERROR: $DevelConf::sophomorix_ini not found!\n\n";
+        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$DevelConf::sophomorix_ini." not found!");
+        return;
+    }
+    tie %{ $ref_sophomorix_config->{'INI'} }, 'Config::IniFiles',
+        ( -file => $DevelConf::sophomorix_ini, 
+          -handle_trailing_comment => 1,
+        );
 }
 
 

@@ -194,6 +194,7 @@ install-sophomorix-samba:
 # configs for developers
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-devel.conf $(DEVELCONF)/devel
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix.ini $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-RoleType.conf $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/README.repdir $(DEVELCONF)/devel
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/master
