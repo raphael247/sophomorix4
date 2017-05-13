@@ -861,13 +861,16 @@ sub config_sophomorix_read {
     ###############################################
     # GLOBAL
     # OU for Administrators
+#    $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
+#        $DevelConf::AD_management_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
     $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
-        $DevelConf::AD_management_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
+        $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
     # my @grouplist=("examaccounts","wifi","internet");
     my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
     foreach my $group (@grouplist){
-        my $sub_ou=$DevelConf::AD_management_ou;
+#        my $sub_ou=$DevelConf::AD_management_ou;
+        my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
          my $cn_group="CN=global-".$group.",".
             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
@@ -897,13 +900,17 @@ sub config_sophomorix_read {
     # SCHOOLS
     foreach my $ou (keys %{$sophomorix_config{'SCHOOLS'}}) {
         # OU for Administrators
+#        $sophomorix_config{'SCHOOLS'}{$ou}{ADMINS}{OU}=
+#            $DevelConf::AD_management_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
         $sophomorix_config{'SCHOOLS'}{$ou}{ADMINS}{OU}=
-            $DevelConf::AD_management_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
+            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
 
         # my @grouplist=("examaccounts","wifi","internet");
         my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
         foreach my $group (@grouplist){
-            my $sub_ou=$DevelConf::AD_management_ou;
+#            my $sub_ou=$DevelConf::AD_management_ou;
+            my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
+
             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
                    $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
             my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
