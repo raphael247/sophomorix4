@@ -888,6 +888,7 @@ sub AD_computer_create {
     my $ws_count = $arg_ref->{ws_count};
     my $school = $arg_ref->{school};
     my $creationdate = $arg_ref->{creationdate};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # calculation
     my $display_name=$name;
@@ -902,7 +903,7 @@ sub AD_computer_create {
                                 "RestrictedKrbHost/".$name,
                                 "RestrictedKrbHost/".$dns_name,
                                );
-    my $container=&AD_get_container($role,$room_basename);
+    my $container=&AD_get_container($role,$room_basename,$ref_sophomorix_config);
     my $dn_room = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "CN=".$name.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $prefix=$school;
@@ -1200,7 +1201,7 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
-    my $container=&AD_get_container($role,$group_basename);
+    my $container=&AD_get_container($role,$group_basename,$ref_sophomorix_config);
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
@@ -2048,36 +2049,44 @@ sub AD_get_container {
     # i.e. >< OR >CN=Students,< 
     # first option: role(user) OR type(group)
     # second option: groupname (with token, i.e. pks-7a) 
-    my ($role,$group) = @_;
+    my ($role,$group,$ref_sophomorix_config) = @_;
     my $group_strg="OU=".$group.",";
     my $container="";
     # for user container
     if ($role eq "student"){
-        $container=$group_strg.$DevelConf::AD_student_ou;
+        #$container=$group_strg.$DevelConf::AD_student_ou;
+        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
     }  elsif ($role eq "teacher"){
-#        $container=$group_strg.$DevelConf::AD_teacher_ou;
-        $container=$DevelConf::AD_teacher_ou;
+        #$container=$DevelConf::AD_teacher_ou;
+        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_teacher_ou'};
     }  elsif ($role eq "computer"){
-        $container=$group_strg.$DevelConf::AD_devices_ou;
+        #$container=$group_strg.$DevelConf::AD_devices_ou;
+        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_devices_ou'};
 #    }  elsif ($role eq "examaccount"){
 #        $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container
     }  elsif ($role eq "adminclass"){
-        $container=$group_strg.$DevelConf::AD_student_ou;
+        #$container=$group_strg.$DevelConf::AD_student_ou;
+        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
     }  elsif ($role eq "ouclass"){ # no additional ou with name of group
-        $container=$DevelConf::AD_student_ou;
+        #$container=$DevelConf::AD_student_ou;
+        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
     }  elsif ($role eq "teacherclass"){
-        #$container=$group_strg.$DevelConf::AD_teacher_ou;
-        $container=$DevelConf::AD_teacher_ou;
+        #$container=$DevelConf::AD_teacher_ou;
+        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_teacher_ou'};
     }  elsif ($role eq "project"){
-        $container=$DevelConf::AD_project_ou;
+        #$container=$DevelConf::AD_project_ou;
+        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_project_ou'};
     }  elsif ($role eq "sophomorix-group"){
-        $container=$DevelConf::AD_project_ou;
+        #$container=$DevelConf::AD_project_ou;
+        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_project_ou'};
     }  elsif ($role eq "room"){
-        $container=$group_strg.$DevelConf::AD_devices_ou;
+        #$container=$group_strg.$DevelConf::AD_devices_ou;
+        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_devices_ou'};
     # other
     }  elsif ($role eq "management"){
-        $container=$DevelConf::AD_management_ou;
+        #$container=$DevelConf::AD_management_ou;
+        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
     }
     # add the comma if necessary
     if ($container ne ""){
@@ -2240,7 +2249,7 @@ sub AD_school_create {
 
     foreach my $sub_ou (@{ $ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SUB_OU'} } ){
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
-        print "Z     * DN: $dn (RT_SCHOOL_OU) $school\n";
+        print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($result,2,(caller(0))[3]);
     }
@@ -2328,7 +2337,7 @@ sub AD_school_create {
 
     foreach my $sub_ou (@{ $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SUB_OU'} } ){
         $dn=$sub_ou.",".$ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP};
-        print "Y     * DN: $dn\n";
+        print "      * DN: $dn\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($result,2,(caller(0))[3]);
     }
@@ -4530,7 +4539,7 @@ sub AD_group_create {
     $school=&AD_get_schoolname($school);
 
     # calculate missing Attributes
-    my $container=&AD_get_container($type,$group_basename);
+    my $container=&AD_get_container($type,$group_basename,$ref_sophomorix_config);
 
     my $target_branch=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
 
