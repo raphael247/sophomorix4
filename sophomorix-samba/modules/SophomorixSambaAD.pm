@@ -2182,7 +2182,7 @@ sub AD_school_create {
 
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (begin) ...");
     ############################################################
-    # providing OU=SCHOOLS and group SCHOOLS
+    # providing OU=SCHOOLS 
     ############################################################
     my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
     my $result1 = $ldap->add($schools_ou,

@@ -866,47 +866,59 @@ sub config_sophomorix_read {
     $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
-    # my @grouplist=("examaccounts","wifi","internet");
-    my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
-    foreach my $group (@grouplist){
-#        my $sub_ou=$DevelConf::AD_management_ou;
-        my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
-         my $cn_group="CN=global-".$group.",".
-            $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
-        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
-
-        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{"global-".$group}=
-            $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
-        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{"global-".$group}="none";
-        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
-
-        if ($group eq "internet"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalinternetaccess";
-        } elsif ($group eq "wifi"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwifiaccess";
-        } elsif ($group eq "admins"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globaladmins";
-        } elsif ($group eq "webfilter"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwebfilter";
-        } elsif ($group eq "intranet"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalintranet";
-        } elsif ($group eq "printing"){
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalprinting";
-        } else {
-            $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalmanagementgroup";
-        }
+    # MANAGEMENTGROUP in section GLOBAL
+    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'MANAGEMENTGROUP'} } ){
+        print "ENTRY: $entry\n";
+        my ($groupname,$grouptype,$members)=split(/\|/,$entry);
+        # ????? prefix
+        my $cn_group="CN=".$groupname.",".
+            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+            $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
+        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
+        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
+            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+            $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
+        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
+        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
+        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
 
-    # SCHOOLS
+#     # my @grouplist=("examaccounts","wifi","internet");
+#     my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
+#     foreach my $group (@grouplist){
+# #        my $sub_ou=$DevelConf::AD_management_ou;
+#         my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
+#          my $cn_group="CN=global-".$group.",".
+#             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
+#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
+#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{"global-".$group}=
+#             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
+#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{"global-".$group}="none";
+#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
+
+#         if ($group eq "internet"){
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalinternetaccess";
+#         } elsif ($group eq "wifi"){
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwifiaccess";
+#         } elsif ($group eq "admins"){
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globaladmins";
+#         } elsif ($group eq "webfilter"){
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwebfilter";
+#         } elsif ($group eq "intranet"){
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalintranet";
+#         } elsif ($group eq "printing"){
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalprinting";
+#         } else {
+#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalmanagementgroup";
+#         }
+#     }
+
+    # MANAGEMENTGROUP in section SCHOOLS
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        print "MGR: $school\n";
-        # ??????
         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'MANAGEMENTGROUP'} } ){
             my ($groupname,$grouptype,$members)=split(/\|/,$entry);
-            print "   GR: <$groupname> <$grouptype> <$members>\n";
-            #my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname.",".
                          $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
                          $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
@@ -917,7 +929,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$group_prefix}="none";
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group_prefix}="LML $school $groupname";
-            # ?????neuer Eintrag in ini
+            # ????? this needs new entry in ini
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$group_prefix}="global-".$groupname;
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group_prefix}=$grouptype;
         }
