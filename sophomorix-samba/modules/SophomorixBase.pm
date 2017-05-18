@@ -338,8 +338,6 @@ sub config_sophomorix_read {
         $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/school.conf"; 
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'SCHOOL_NAME'}=
         "School"; 
-    #$sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
-    #    "OU=".$DevelConf::name_default_school.",".$root_dse; 
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
         "OU=".$DevelConf::name_default_school.",".$DevelConf::AD_schools_ou.",".$root_dse; 
 
@@ -364,43 +362,6 @@ sub config_sophomorix_read {
     my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,$DevelConf::file_conf_sophomorix,$ref_result);
     &load_sophomorix_ini($ref_modmaster_sophomorix,\%sophomorix_config,$ref_result);
 
-    # ### old
-    # my $conf_file=$DevelConf::file_conf_sophomorix;
-    # &print_title("Reading $conf_file");
-    # open(SOPHOMORIX,"$conf_file") || 
-    #      die "ERROR: $conf_file not found!";
-    # while (<SOPHOMORIX>){
-    #     $_=~s/\s+$//g;# remove trailing whitespace
-    #     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-    #         next;
-    #     }
-    #     chomp();
-    #     if ($_ eq ""){# next on empty line
-    #         next;
-    #     }
-    #     my ($var,$value)=split(/=/);
-    #     $var=&remove_whitespace($var);
-    #     $value=&remove_whitespace($value);
-    #     if ($var eq "SCHOOL"){
-    #         # add default school to school list
-    #         $sophomorix_config{'SCHOOLS'}{$value}{'OU'}="unknown";
-    #         push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $value; 
-    #         $sophomorix_config{'SCHOOLS'}{$value}{'CONF_FILE'}=
-    #             $DevelConf::path_conf_sophomorix."/".$value."/".$value.".school.conf";
-    #     } elsif ($var eq "LANG"){
-    #         $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
-    #     } elsif ($var eq "USE_QUOTA"){
-    #         $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
-    #     } elsif ($var eq "ADMINS_PRINT"){
-    #         $sophomorix_config{$DevelConf::AD_global_ou}{$var}=$value;
-    #     } else {
-    #         print "$var is not a valid variable\n";
-    #         exit;
-    #     }
-    # }
-    # close(SOPHOMORIX);
-    # ### old
-
     ##################################################
     # SCHOOLS  
     # load the master once
@@ -408,7 +369,6 @@ sub config_sophomorix_read {
 
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-###        $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
                  if ($school eq $DevelConf::name_default_school){
@@ -430,186 +390,8 @@ sub config_sophomorix_read {
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
     }
 
-#     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-#         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
-#         $sophomorix_config{'SCHOOLS'}{$school}{OU}=$school;
-#         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
-#             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-#                  if ($school eq $DevelConf::name_default_school){
-#                      # default-school
-#                      $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=
-#                           $DevelConf::name_default_school;
-#                      $sophomorix_config{'SCHOOLS'}{$school}{PREFIX}="";
-#                      $sophomorix_config{'SCHOOLS'}{$school}{POSTFIX}="";
-#                      #$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
-#                      #    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
-#                  } else {
-#                      # *school
-#                      $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=$school;
-#                      $sophomorix_config{'SCHOOLS'}{$school}{PREFIX}=$school."-";
-#                      $sophomorix_config{'SCHOOLS'}{$school}{POSTFIX}="-".$school;
-#                      $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
-#                          $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-#                  }
 
-#         ######## ?????????????????????????  ################     replace this with ini import
-#         &print_title("Reading $conf_school");
-#         open(SCHOOL,"$conf_school") || 
-#              die "ERROR: $conf_school not found!\n";
-#         while (<SCHOOL>){
-#             $_=~s/\s+$//g;# remove trailing whitespace
-#             if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-#                 next;
-#             }
-#             chomp();
-#             if ($_ eq ""){# next on empty line
-#                 next;
-#             }
-#             my ($var,$value)=split(/=/);
-#             $var=&remove_whitespace($var);
-#             $value=&remove_whitespace($value);
-#             if ($var eq "SCHOOL_NAME" or
-#                 $var eq "QUOTA_DEFAULT_TEACHER" or
-#                 $var eq "QUOTA_DEFAULT_STUDENT" or
-#                 $var eq "QUOTA_DEFAULT_EXAM" or
-#                 $var eq "MAILQUOTA_DEFAULT_TEACHER" or
-#                 $var eq "MAILQUOTA_DEFAULT_STUDENT" or
-#                 $var eq "MAILQUOTA_DEFAULT_EXAM"
-#                ){
-#                 $sophomorix_config{'SCHOOLS'}{$school}{$var}=$value;
-#             } elsif ($var eq "USER_FILE"){
-#                 my ($file,$filter_script,$enc,$enc_force,$sur_chars,$first_chars,
-#                     $reverse,$rand_pwd,$pwd_length,$toleration_time,$deactivation_time)=split(/::/,$value);
-#                 my $token_file;
-# #                if ($school eq $DevelConf::name_default_school){
-# #                    $token_file=$file;
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL}=
-# #                        $DevelConf::name_default_school;
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PREFIX}="";
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{POSTFIX}="";
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
-# #                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
-# #                } else {
-# #                    $token_file=$school.".".$file;
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SCHOOL}=$school;
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PREFIX}=$school."-";
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{POSTFIX}="-".$school;
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP}=
-# #                        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-# #                }
-
-# #                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS}=$path_abs;
-# #                my $path_abs_filter=$DevelConf::path_conf_tmp."/".$token_file.".filter";
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERTARGET}=$path_abs_filter;
-# #                my $path_abs_utf8=$DevelConf::path_conf_tmp."/".$token_file.".filter.utf8";
-#                 $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PATH_ABS_UTF8}=$path_abs_utf8;
-
-# #                # save unchecked filter script for error messages
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT_CONFIGURED}=$filter_script;
-
-# #                # save only abs_paths to executable scripts
-# #                if ($filter_script eq "---"){
-# #                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT}=$filter_script;
-# #	        } elsif (-f $filter_script and -x $filter_script and $filter_script=~m/^\//){
-# #                   # configured value is a file and executable
-# #                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT}=$filter_script;
-# #                } else {
-# #                   $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
-# #                    print "   * WARNING: $filter_script \n";
-# #                    print "        must be:\n";
-# #                    print "          - an executable file\n";
-# #                    print "          - an absolute path\n";
-# #                }
-
-# #                if (exists $sophomorix_config{'ENCODINGS'}{$enc} or $enc eq "auto"){
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}=$enc;
-# #	        } else {
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING}="ERROR_ENCODING";
-# #                    print "   * WARNING: ENCODING $enc not listed by \"iconv --list\" and not \"auto\"\n";
-# #                }
-
-# #                if ($enc_force eq "yes" or $enc_force eq "no"){
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING_FORCE}=$enc_force;
-# #                } else {
-# #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{ENCODING_FORCE}="ERROR_ENCODING_FORCE";
-# #                    print "   * WARNING: ENCODING_FORCE allows only \"yes\" or \"no\"\n";
-# #                }
-
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SURNAME_CHARS}=$sur_chars;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FIRSTNAME_CHARS}=$first_chars;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{SURNAME_FIRSTNAME_REVERSE}=$reverse;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{RANDOM_PWD}=$rand_pwd;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{PWD_LENGHT}=$pwd_length;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{TOLERATION_TIME}=$toleration_time;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{DEACTIVATION_TIME}=$deactivation_time;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU}=
-# #                    $sophomorix_config{'SCHOOLS'}{$school}{OU};
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP_GLOBAL}=
-# #                    "OU=GLOBAL,".$DevelConf::AD_schools_ou.",".$root_dse;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{OU_TOP_GLOBAL}=
-# #                    "OU=GLOBAL,".$root_dse;
-# #                $sophomorix_config{'FILES'}{'USER_FILE'}{$token_file}{FILETYPE}="users";
-# #            } elsif ($var eq "CLASS_FILE"){
-# #                my ($file,$rest)=split(/::/,$value);
-# #                my $token_file;
-# #                if ($school eq $DevelConf::name_default_school){
-# #                    $token_file=$file;
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL}=
-# #                        $DevelConf::name_default_school;
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}="";
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{POSTFIX}="";
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
-# #                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
-# #                } else {
-# #                    $token_file=$school.".".$file;
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{SCHOOL}=$school;
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PREFIX}=$school."-";
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{POSTFIX}="-".$school;
-# #                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{OU_TOP}=
-# #                        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-# #                }
-# #                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
-# #                $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{PATH_ABS}=$path_abs;
-# #                $sophomorix_config{'FILES'}{'CLASS_FILE'}{$token_file}{FILETYPE}="classes";
-# #            } elsif ($var eq "DEVICE_FILE"){
-# #                my ($file,$rest)=split(/::/,$value);
-# #                my $token_file;
-# #                if ($school eq $DevelConf::name_default_school){
-# #                    $token_file=$file;
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL}=
-# #                        $DevelConf::name_default_school;
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}="";
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="";
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
-# #                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
-# #                        $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU};
-# #                } else {
-# #                    $token_file=$school.".".$file;
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{SCHOOL}=$school;
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PREFIX}=$school."-";
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{POSTFIX}="-".$school;
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU_TOP}=
-# #                        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-# #                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{OU}=
-# #                        $sophomorix_config{'SCHOOLS'}{$school}{OU};
-# #                }
-# #                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$token_file;
-# #                $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{PATH_ABS}=$path_abs;
-# #                $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$token_file}{FILETYPE}="devices";
-# #            } else {
-# #                print "<$var> is not a valid variable name\n";
-# #                exit;
-# #            }
-# #        }
-# #        close(SCHOOL);
-#         ######## ?????????????????????????  ################     replace this with ini import
-#     }
-
-#    # GLOBAL
-#    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
-#        "OU=".$DevelConf::AD_global_ou.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    # GLOBAL
     $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
         "OU=".$DevelConf::AD_global_ou.",".$root_dse;
     $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="global";
@@ -662,36 +444,6 @@ sub config_sophomorix_read {
         $sophomorix_type_quaternary=&remove_whitespace($sophomorix_type_quaternary);
         $group_quaternary=&remove_whitespace($group_quaternary);
         $ou_sub_quaternary=&remove_whitespace($ou_sub_quaternary);
-
-#         # create list of sub ou's that are needed to create from sophomorix-RoleType.conf:
-#         if ($ou_sub_primary ne ""){
-#             $sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_primary}="from RoleType";
-#         }
-#         if ($ou_sub_secondary ne ""){
-#             $sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'RT_OU'}{$ou_sub_secondary}="from RoleType";
-#         }
-#         if ($ou_sub_tertiary ne ""){
-#             $sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_tertiary}="from RoleType";
-#         }
-#         if ($ou_sub_quaternary ne ""){
-#             $sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'RT_OU'}{$ou_sub_quaternary}="from RoleType";
-#         } 
-
-#         # adding school
-# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
-# #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
-# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-# #	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
-# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-# 	$sophomorix_config{'SUB_OU'}{'SCHOOLS'}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
-       
-#         # adding global
-# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_devices_ou}="from DevelConf";
-# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_examaccount_ou}="from DevelConf";
-# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_project_ou}="from DevelConf";
-# #	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_room_ou}="from DevelConf";
-# 	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_management_ou}="from DevelConf";
-# 	$sophomorix_config{'SUB_OU'}{$DevelConf::AD_global_ou}{'DEVELCONF_OU'}{$DevelConf::AD_custom_ou}="from DevelConf";
 
         # remember for the following commented line:
         # experimental warning: foreach my $key (keys $sophomorix_config{'user_file'}) {
@@ -861,14 +613,11 @@ sub config_sophomorix_read {
     ###############################################
     # GLOBAL
     # OU for Administrators
-#    $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
-#        $DevelConf::AD_management_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
     $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
     # MANAGEMENTGROUP in section GLOBAL
     foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'MANAGEMENTGROUP'} } ){
-        print "ENTRY: $entry\n";
         my ($groupname,$grouptype,$members)=split(/\|/,$entry);
         # ????? prefix
         my $cn_group="CN=".$groupname.",".
@@ -882,36 +631,6 @@ sub config_sophomorix_read {
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
-
-#     # my @grouplist=("examaccounts","wifi","internet");
-#     my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
-#     foreach my $group (@grouplist){
-# #        my $sub_ou=$DevelConf::AD_management_ou;
-#         my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
-#          my $cn_group="CN=global-".$group.",".
-#             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
-#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}="global-".$group;
-#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{"global-".$group}=
-#             $sub_ou.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
-#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{"global-".$group}="none";
-#         $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{"global-".$group}="LML GROUP";
-
-#         if ($group eq "internet"){
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalinternetaccess";
-#         } elsif ($group eq "wifi"){
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwifiaccess";
-#         } elsif ($group eq "admins"){
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globaladmins";
-#         } elsif ($group eq "webfilter"){
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalwebfilter";
-#         } elsif ($group eq "intranet"){
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalintranet";
-#         } elsif ($group eq "printing"){
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalprinting";
-#         } else {
-#             $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{"global-".$group}="globalmanagementgroup";
-#         }
-#     }
 
     # MANAGEMENTGROUP in section SCHOOLS
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -935,53 +654,7 @@ sub config_sophomorix_read {
         }
     }
 
-
-# ### old start
-#     foreach my $ou (keys %{$sophomorix_config{'SCHOOLS'}}) {
-#         # OU for Administrators
-# #        $sophomorix_config{'SCHOOLS'}{$ou}{ADMINS}{OU}=
-# #            $DevelConf::AD_management_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-#         $sophomorix_config{'SCHOOLS'}{$ou}{ADMINS}{OU}=
-#             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-
-#         # my @grouplist=("examaccounts","wifi","internet");
-#         my @grouplist=("wifi","internet","admins","webfilter","intranet","printing");
-#         foreach my $group (@grouplist){
-# #            my $sub_ou=$DevelConf::AD_management_ou;
-#             my $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_management_ou'};
-
-#             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group.",".
-#                    $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-#             my $group_prefix=$sophomorix_config{'SCHOOLS'}{$ou}{PREFIX}.$group;
-#             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_CN}{$cn_group}="$group_prefix";
-#             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP}{$group_prefix}=
-#                 $sub_ou.",".$sophomorix_config{'SCHOOLS'}{$ou}{OU_TOP};
-#             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_LEVEL}{$group_prefix}="none";
-
-#             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_DESCRIPTION}{$group_prefix}="LML $ou $group";
-#             $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_MEMBER}{$group_prefix}="global-".$group;
-#             if ($group eq "internet"){
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="internetaccess";
-#             } elsif ($group eq "wifi"){
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="wifiaccess";
-#             } elsif ($group eq "admins"){
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="admins";
-#             } elsif ($group eq "webfilter"){
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="webfilter";
-#             } elsif ($group eq "intranet"){
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="intranetaccess";
-#             } elsif ($group eq "printing"){
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="printing";
-#             } else {
-#                 $sophomorix_config{'SCHOOLS'}{$ou}{GROUP_TYPE}{$group_prefix}="managementgroup";
-# 	    }
-#         }
-#     }
-# ### old end
-
-
     close(ROLETYPE);
-
     # sorting some lists
     @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 
