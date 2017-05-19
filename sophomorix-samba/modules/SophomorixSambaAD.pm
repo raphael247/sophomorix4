@@ -2262,7 +2262,7 @@ sub AD_school_create {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
         my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
-        my $description=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group};
+        my $description="LML Group, change if you like";
         my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
         my $school=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL'};
         # create
@@ -2328,7 +2328,7 @@ sub AD_school_create {
         print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
         my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
-        my $description=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$group};
+        my $description="LML Group, change if you like";
         my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
         my $school=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'SCHOOL'};
         # create

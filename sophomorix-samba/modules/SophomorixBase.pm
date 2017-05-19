@@ -508,17 +508,17 @@ sub config_sophomorix_read {
                     # add with prefix
                     my $group=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{PREFIX}.$group_primary;
 #                      $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_PRIMARY}=$group;
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_LEVEL}{$group}="primary";
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_TYPE}{$group}=$sophomorix_type_primary;
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_DESCRIPTION}{$group}="$key -> primary group";
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_LEVEL}{$group}="primary";
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_TYPE}{$group}=$sophomorix_type_primary;
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_DESCRIPTION}{$group}="$key -> primary group";
                     if ($group_tertiary ne ""){
                         $sophomorix_config{'SCHOOLS'}{$school}{GROUP_MEMBER}{$group}=$group_tertiary;
                     }
                     my $ou_group=$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                     my $cn_group="CN=".$group.",".$ou_group;
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
-                        $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
+#                        $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
                     #print "GROUP: $group_primary\n";
@@ -534,17 +534,17 @@ sub config_sophomorix_read {
                     my $group=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{PREFIX}.$group_secondary;
                     # print "GROUP: $group\n";
 #                    $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group;
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_LEVEL}{$group}="secondary";
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_TYPE}{$group}=$sophomorix_type_secondary;
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_DESCRIPTION}{$group}="$key -> secondary group";
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_LEVEL}{$group}="secondary";
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_TYPE}{$group}=$sophomorix_type_secondary;
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_DESCRIPTION}{$group}="$key -> secondary group";
                     if ($group_tertiary ne ""){
                         $sophomorix_config{'SCHOOLS'}{$school}{GROUP_MEMBER}{$group}=$group_tertiary;
                     }
                     my $ou_group=$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                     my $cn_group="CN=".$group.",".$ou_group;
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
-                        $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
+#                        $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+#                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
                     #print "GROUP: $group_secondary\n";
@@ -613,8 +613,8 @@ sub config_sophomorix_read {
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
             $sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
-        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
+#        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
+#        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
 
@@ -632,8 +632,8 @@ sub config_sophomorix_read {
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$groupname}=
                 $sub_ou.",".
                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$groupname}="none";
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$groupname}="LML $school $groupname";
+#            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$groupname}="none";
+#            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$groupname}="LML $school $groupname";
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$groupname}=$grouptype;
         }
     }
