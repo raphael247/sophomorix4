@@ -616,6 +616,13 @@ sub config_sophomorix_read {
     $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
+    # GROUPMEMBERSHIP in section GLOBAL
+    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} } ){
+        my ($membergroup,$group)=split(/\|/,$entry);
+#???        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
+#???        print "   ENTRY: $membergroup will be member in $group\n";
+    }
+
     # MANAGEMENTGROUP in section GLOBAL
     foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'MANAGEMENTGROUP'} } ){
         my ($groupname,$grouptype)=split(/\|/,$entry);
@@ -648,9 +655,17 @@ sub config_sophomorix_read {
                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$group_prefix}="none";
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group_prefix}="LML $school $groupname";
-            # ????? this needs new entry in ini
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$group_prefix}="global-".$groupname;
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group_prefix}=$grouptype;
+        }
+    }
+    # GROUPMEMBERSHIP in section SCHOOLS
+    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+        print "SCHOOL: $school\n";
+        foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} } ){
+            my ($membergroup,$group)=split(/\|/,$entry);
+            $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
+            print "   ENTRY: $membergroup will be member in $group\n";
         }
     }
 
@@ -660,7 +675,13 @@ sub config_sophomorix_read {
 
     return %sophomorix_config; 
 }
+
  
+sub replace_vars {
+    my ($string,$ref_sophomorix_config,$school)=@_;
+    $string=~s/\@\@SCHOOLPREFIX\@\@/$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'}/g; 
+    return $string;
+}
 
 
 sub read_smb_conf {
