@@ -331,8 +331,9 @@ sub config_sophomorix_read {
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
     # Adding some defaults: ????? better to move the defaults to an external file ?????
-    $sophomorix_config{'FILES'}{'USER_FILE'}{'vampire.csv'}{RT_sophomorixType_PRIMARY}=
-        "adminclass";
+    my $vampire_file = $sophomorix_config{'INI'}{'VARS'}{'VAMPIRE_FILENAME'};
+    $sophomorix_config{'FILES'}{'USER_FILE'}{$vampire_file}{'sophomorixType'}=
+        $sophomorix_config{'INI'}{'VARS'}{'VAMPIRE_GROUP_TYPE'};
     # default school
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'CONF_FILE'}=
         $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/school.conf"; 
@@ -501,7 +502,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{FIELD5}=$sophomorix_field5;
 
                 # primary group
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
                     $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 if ($group_primary ne "" and not $group_primary eq "multi"){
