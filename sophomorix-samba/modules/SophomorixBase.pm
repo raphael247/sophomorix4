@@ -603,8 +603,8 @@ sub config_sophomorix_read {
 #???        print "   ENTRY: $membergroup will be member in $group\n";
 #    }
 
-    # MANAGEMENTGROUP in section GLOBAL
-    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'MANAGEMENTGROUP'} } ){
+    # GROUP in section GLOBAL
+    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'} } ){
         my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
         # ????? prefix
         my $cn_group="CN=".$groupname.",".
@@ -630,11 +630,11 @@ sub config_sophomorix_read {
         #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
 
-    # MANAGEMENTGROUP in section SCHOOLS
+    # GROUP in section SCHOOLS
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-        foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'MANAGEMENTGROUP'} } ){
+        foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'} } ){
             #new my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
             #new $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
             # old
