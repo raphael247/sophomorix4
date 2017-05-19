@@ -508,7 +508,6 @@ sub config_sophomorix_read {
                     my $cn_group="CN=".$group.",".$ou_group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
                         $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_OU}{$ou_group}=$group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
@@ -535,7 +534,6 @@ sub config_sophomorix_read {
                     my $cn_group="CN=".$group.",".$ou_group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
                         $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    $sophomorix_config{'SCHOOLS'}{$school}{GROUP_OU}{$ou_group}=$group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
                 } else {
                     # "" or "multi"
@@ -560,7 +558,6 @@ sub config_sophomorix_read {
 
 		    my $ou_group=$ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
                     my $cn_group="CN=".$group_tertiary.",".$ou_group;
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
                 }
 
@@ -576,8 +573,6 @@ sub config_sophomorix_read {
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_quaternary}="$key -> quaternary group";
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
                         $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$group_quaternary}=
-                      "OU=".$group_quaternary.",".$ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 }
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_QUATERNARY}=
                     $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
