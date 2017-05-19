@@ -618,7 +618,7 @@ sub config_sophomorix_read {
 
     # MANAGEMENTGROUP in section GLOBAL
     foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'MANAGEMENTGROUP'} } ){
-        my ($groupname,$grouptype,$members)=split(/\|/,$entry);
+        my ($groupname,$grouptype)=split(/\|/,$entry);
         # ????? prefix
         my $cn_group="CN=".$groupname.",".
             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
@@ -637,7 +637,7 @@ sub config_sophomorix_read {
         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'MANAGEMENTGROUP'} } ){
-            my ($groupname,$grouptype,$members)=split(/\|/,$entry);
+            my ($groupname,$grouptype)=split(/\|/,$entry);
             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname.",".
                          $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
                          $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};

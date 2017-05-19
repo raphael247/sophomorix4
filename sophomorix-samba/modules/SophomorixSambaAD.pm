@@ -2246,7 +2246,6 @@ sub AD_school_create {
     if($Conf::log_level>=2){
         print "   * Adding sub ou's for OU=$school ...\n";
     }
-
     foreach my $sub_ou (@{ $ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SUB_OU'} } ){
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
