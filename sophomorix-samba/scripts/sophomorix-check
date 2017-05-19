@@ -1381,7 +1381,7 @@ sub analyze_user_line {
 
         # add here more stuff to create sophomorix.add, ...
         $users_file{'identifier_ascii'}{$identifier_ascii}{ROLE}=
-            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{sophomorixRole};
         $users_file{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{SCHOOL};
 
@@ -1410,7 +1410,7 @@ sub analyze_user_line {
 	$Match{'action'}{$line_new}{'surname_utf8'}=$last_utf8;
 	$Match{'action'}{$line_new}{'line_count'}=$count;
         $Match{'action'}{$line_new}{'role'}=
-            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{RT_sophomorixRole};
+            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{sophomorixRole};
 	$Match{'action'}{$line_new}{'unid'}=$unid;
 	$Match{'action'}{$line_new}{'login'}=$login;
 	$Match{'action'}{$line_new}{'inject'}=$injected;
