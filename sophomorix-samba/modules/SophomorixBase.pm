@@ -504,14 +504,6 @@ sub config_sophomorix_read {
                     if ($group_tertiary ne ""){
                         $sophomorix_config{'SCHOOLS'}{$school}{GROUP_MEMBER}{$group}=$group_tertiary;
                     }
-
-                    #my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    #my $cn_group="CN=".$group.",".$ou_group;
-                    #$sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
-                    #    $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    #$sophomorix_config{'SCHOOLS'}{$school}{GROUP_OU}{$ou_group}=$group;
-                    #$sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
-
                     my $ou_group=$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                     my $cn_group="CN=".$group.",".$ou_group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
@@ -539,13 +531,6 @@ sub config_sophomorix_read {
                     if ($group_tertiary ne ""){
                         $sophomorix_config{'SCHOOLS'}{$school}{GROUP_MEMBER}{$group}=$group_tertiary;
                     }
-                    #my $ou_group="OU=".$group.",".$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    #my $cn_group="CN=".$group.",".$ou_group;
-                    #$sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
-                    #    $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
-                    #$sophomorix_config{'SCHOOLS'}{$school}{GROUP_OU}{$ou_group}=$group;
-                    #$sophomorix_config{'SCHOOLS'}{$school}{GROUP_CN}{$cn_group}=$group;
-
                     my $ou_group=$ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                     my $cn_group="CN=".$group.",".$ou_group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP}{$group}=
@@ -560,13 +545,10 @@ sub config_sophomorix_read {
 
                 # tertiary group
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_TERTIARY}=
                     $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
                 if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
-#		    my $ou_group="OU=".$group_tertiary.",".$ou_sub_tertiary.",".
-#                                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-#                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
@@ -580,8 +562,6 @@ sub config_sophomorix_read {
                     my $cn_group="CN=".$group_tertiary.",".$ou_group;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
                     $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
-#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_OU}{$ou_group}=$group_tertiary;
-#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
                 }
 
                 # quaternary group
@@ -617,26 +597,37 @@ sub config_sophomorix_read {
         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
     # GROUPMEMBERSHIP in section GLOBAL
-    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} } ){
-        my ($membergroup,$group)=split(/\|/,$entry);
+#    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} } ){
+#        my ($membergroup,$group)=split(/\|/,$entry);
 #???        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
 #???        print "   ENTRY: $membergroup will be member in $group\n";
-    }
+#    }
 
     # MANAGEMENTGROUP in section GLOBAL
     foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'MANAGEMENTGROUP'} } ){
-        my ($groupname,$grouptype)=split(/\|/,$entry);
+        my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
         # ????? prefix
         my $cn_group="CN=".$groupname.",".
-            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+            $sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
-            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+            $sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
+
+        #my $cn_group="CN=".$groupname.",".
+        #    $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+        #    $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
+        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
+        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
+        #    $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+        #    $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
+        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
+        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
+        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
 
     # MANAGEMENTGROUP in section SCHOOLS
@@ -644,6 +635,9 @@ sub config_sophomorix_read {
         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'MANAGEMENTGROUP'} } ){
+            #new my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
+            #new $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
+            # old
             my ($groupname,$grouptype)=split(/\|/,$entry);
             my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname.",".
                          $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
@@ -660,12 +654,10 @@ sub config_sophomorix_read {
     }
     # GROUPMEMBERSHIP in section SCHOOLS
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        print "SCHOOL: $school\n";
         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} } ){
             my ($membergroup,$group)=split(/\|/,$entry);
             $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
-            print "   ENTRY: $membergroup will be member in $group\n";
         }
     }
 
