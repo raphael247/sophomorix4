@@ -541,41 +541,41 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
                 }
 
-                # tertiary group
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
-#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_TERTIARY}=
-                    $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
-                    if ($group_quaternary ne ""){
-                        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_MEMBER}{$group_tertiary}=$group_quaternary;
-                    }
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
-                        $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-
-		    my $ou_group=$ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
-                }
-
-                # quaternary group
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
-                if ($group_quaternary ne "" and not $group_quaternary eq "multi"){
-		    my $ou_group="OU=".$group_quaternary.",".$ou_sub_quaternary.",".
-                                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                    my $cn_group="CN=".$group_quaternary.",".$ou_group;
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_quaternary}=$sophomorix_type_quaternary;
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_quaternary}="$key -> quaternary group";
-                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
-                        $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
-                }
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_QUATERNARY}=
-                    $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#                # tertiary group
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_TERTIARY}=$sophomorix_type_tertiary;
+##                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_TERTIARY}=$group_tertiary;
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_TERTIARY}=
+#                    $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#                if ($group_tertiary ne "" and not $group_tertiary eq "multi"){
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_tertiary}="tertiary";
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_tertiary}=$sophomorix_type_tertiary;
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_tertiary}="$key -> tertiary group";
+#                    if ($group_quaternary ne ""){
+#                        $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_MEMBER}{$group_tertiary}=$group_quaternary;
+#                    }
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_tertiary}=
+#                        $ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#
+#		    my $ou_group=$ou_sub_tertiary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#                    my $cn_group="CN=".$group_tertiary.",".$ou_group;
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_CN}{$cn_group}=$group_tertiary;
+#                }
+#
+#                # quaternary group
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_QUATERNARY}=$sophomorix_type_quaternary;
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_QUATERNARY}=$group_quaternary;
+#                if ($group_quaternary ne "" and not $group_quaternary eq "multi"){
+#		    my $ou_group="OU=".$group_quaternary.",".$ou_sub_quaternary.",".
+#                                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#                    my $cn_group="CN=".$group_quaternary.",".$ou_group;
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_LEVEL}{$group_quaternary}="quaternary";
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_TYPE}{$group_quaternary}=$sophomorix_type_quaternary;
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP_DESCRIPTION}{$group_quaternary}="$key -> quaternary group";
+#                    $sophomorix_config{$DevelConf::AD_global_ou}{GROUP}{$group_quaternary}=
+#                        $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
+#                }
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_QUATERNARY}=
+#                    $ou_sub_quaternary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP_GLOBAL};
             } else {
                 if($Conf::log_level>=3){
                     print "No match. Nothing to do!\n";
