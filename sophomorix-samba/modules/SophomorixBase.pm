@@ -601,9 +601,7 @@ sub config_sophomorix_read {
     # GROUP in section GLOBAL
     foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'} } ){
         my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
-        # ????? prefix
-        my $cn_group="CN=".$groupname.",".
-            $sub_ou.",".
+        my $cn_group="CN=".$groupname.",".$sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
@@ -612,17 +610,6 @@ sub config_sophomorix_read {
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
-
-        #my $cn_group="CN=".$groupname.",".
-        #    $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
-        #    $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
-        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
-        #    $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
-        #    $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
-        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
-        #$sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
 
     # GROUP in section SCHOOLS
@@ -630,21 +617,18 @@ sub config_sophomorix_read {
         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'} } ){
-            #new my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
-            #new $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
-            # old
-            my ($groupname,$grouptype)=split(/\|/,$entry);
-            my $cn_group="CN=".$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname.",".
-                         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
-                         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-            my $group_prefix=$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname;
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_CN'}{$cn_group}=$group_prefix;
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$group_prefix}=
-                $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".
+            my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
+            $groupname=&replace_vars($groupname,\%sophomorix_config,$school);
+            my $cn_group="CN=".$groupname.",".$sub_ou.",".
                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$group_prefix}="none";
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$group_prefix}="LML $school $groupname";
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group_prefix}=$grouptype;
+            #my $group_prefix=$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname;
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_CN'}{$cn_group}=$groupname;
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$groupname}=
+                $sub_ou.",".
+                $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$groupname}="none";
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$groupname}="LML $school $groupname";
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$groupname}=$grouptype;
         }
     }
     # GROUPMEMBERSHIP in section SCHOOLS
