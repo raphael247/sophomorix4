@@ -502,13 +502,12 @@ sub config_sophomorix_read {
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{FIELD5}=$sophomorix_field5;
 
                 # primary group
-#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_PRIMARY}=$sophomorix_type_primary;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
-                    $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
+#                    $ou_sub_primary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 if ($group_primary ne "" and not $group_primary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{PREFIX}.$group_primary;
-                      $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_PRIMARY}=$group;
+#                      $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_PRIMARY}=$group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_LEVEL}{$group}="primary";
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_TYPE}{$group}=$sophomorix_type_primary;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_DESCRIPTION}{$group}="$key -> primary group";
@@ -523,18 +522,18 @@ sub config_sophomorix_read {
                 } else {
                     # "" or "multi"
                     #print "GROUP: $group_primary\n";
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
+#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_PRIMARY}=$group_primary;
                 }
 
                 # secondary group
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_SECONDARY}=
-                    $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_sophomorixType_SECONDARY}=$sophomorix_type_secondary;
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_SECONDARY}=
+#                    $ou_sub_secondary.",".$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{OU_TOP};
                 if ($group_secondary ne "" and not $group_secondary eq "multi"){
                     # add with prefix
                     my $group=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{PREFIX}.$group_secondary;
                     # print "GROUP: $group\n";
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group;
+#                    $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_LEVEL}{$group}="secondary";
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_TYPE}{$group}=$sophomorix_type_secondary;
                     $sophomorix_config{'SCHOOLS'}{$school}{GROUP_DESCRIPTION}{$group}="$key -> secondary group";
@@ -549,7 +548,7 @@ sub config_sophomorix_read {
                 } else {
                     # "" or "multi"
                     #print "GROUP: $group_secondary\n";
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
+ #                   $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_GROUP_SECONDARY}=$group_secondary;
                 }
             } else {
                 if($Conf::log_level>=3){
