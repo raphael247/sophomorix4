@@ -1328,7 +1328,7 @@ sub analyze_user_line {
         my $birthdate=&check_birthdate($birthdate_raw);
         my $unid="";
         my $login="";
-        my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD5};
+        my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_5};
         if ($field5_key eq "LOGIN"){
             $login=&check_login($field5);
         } elsif ($field5_key eq "UNID"){

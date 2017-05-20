@@ -499,7 +499,7 @@ sub config_sophomorix_read {
                 my $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$key}{'SCHOOL'};
 
                 # user
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{FIELD5}=$sophomorix_field5;
+#                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{FIELD5}=$sophomorix_field5;
 
                 # primary group
 #                $sophomorix_config{'FILES'}{'USER_FILE'}{$key}{RT_OU_SUB_PRIMARY}=
@@ -582,7 +582,12 @@ sub config_sophomorix_read {
                 # type
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixType'}=
                     $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
-
+                # field5
+                $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
+                    $sophomorix_config{'INI'}{$section}{'FIELD_5'};
+                #
+                #$sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER_XXX'}{'GROUPMEMBERSHIP'}=
+                #    $sophomorix_config{'INI'}{$section}{'GROUPMEMBERSHIP'};
             }
         }
     }
