@@ -585,7 +585,7 @@ sub config_sophomorix_read {
                 # field5
                 $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
                     $sophomorix_config{'INI'}{$section}{'FIELD_5'};
-                #
+                # not here
                 #$sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER_XXX'}{'GROUPMEMBERSHIP'}=
                 #    $sophomorix_config{'INI'}{$section}{'GROUPMEMBERSHIP'};
             }
@@ -598,56 +598,65 @@ sub config_sophomorix_read {
     # Management groups: 
     ###############################################
     # GLOBAL
-    # OU for Administrators
+    # OU for Administrators ????
     $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
     # GROUPMEMBERSHIP in section GLOBAL
-#    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} } ){
-#        my ($membergroup,$group)=split(/\|/,$entry);
+    if (exists $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} ){
+        foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} } ){
+            my ($membergroup,$group)=split(/\|/,$entry);
 #???        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
-#???        print "   ENTRY: $membergroup will be member in $group\n";
-#    }
+            print "   ENTRY: $membergroup will be member in $group\n";
+        }
+    }
 
     # GROUP in section GLOBAL
-    foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'} } ){
-        my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
-        my $cn_group="CN=".$groupname.",".$sub_ou.",".
-            $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
-        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
-            $sub_ou.",".
-            $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-#        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
-#        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
-        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
+    if (exists $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'}  ){
+        foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'} } ){
+            my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
+            my $cn_group="CN=".$groupname.",".$sub_ou.",".
+                $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
+            $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
+            $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
+                $sub_ou.",".
+                $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
+#            $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_LEVEL'}{$groupname}="none";
+#            $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_DESCRIPTION'}{$groupname}="LML GROUP";
+            $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
+        }
     }
 
     # GROUP in section SCHOOLS
-    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
-            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-        foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'} } ){
-            my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
-            $groupname=&replace_vars($groupname,\%sophomorix_config,$school);
-            my $cn_group="CN=".$groupname.",".$sub_ou.",".
-                $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-            #my $group_prefix=$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname;
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_CN'}{$cn_group}=$groupname;
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$groupname}=
-                $sub_ou.",".
-                $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-#            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$groupname}="none";
-#            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$groupname}="LML $school $groupname";
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$groupname}=$grouptype;
+    if (exists $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'}  ){
+        foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+            $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
+                $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
+            foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'} } ){
+                my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
+                $groupname=&replace_vars($groupname,\%sophomorix_config,$school);
+                my $cn_group="CN=".$groupname.",".$sub_ou.",".
+                    $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
+                #my $group_prefix=$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname;
+                $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_CN'}{$cn_group}=$groupname;
+                $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$groupname}=
+                    $sub_ou.",".
+                    $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
+#                $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_LEVEL'}{$groupname}="none";
+#                $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_DESCRIPTION'}{$groupname}="LML $school $groupname";
+                $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$groupname}=$grouptype;
+            }
         }
     }
+
     # GROUPMEMBERSHIP in section SCHOOLS
-    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} } ){
-            my ($membergroup,$group)=split(/\|/,$entry);
-            $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
+    if (exists $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} ){
+        foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+            foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} } ){
+                my ($membergroup,$group)=split(/\|/,$entry);
+                $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
+                $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
+            }
         }
     }
 
