@@ -1155,11 +1155,10 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              name=>$ws_saved,
                              room=>$room_saved,
                              room_basename=>$room_basename,
-#                             role=>"computer",
-#      		              type=>"roomws",
                              role=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'},
 		             type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
                              school=>$school,
+                             filename=>$filename,
                              creationdate=>$time_stamp_AD,
                              sophomorix_config=>\%sophomorix_config,
                            });

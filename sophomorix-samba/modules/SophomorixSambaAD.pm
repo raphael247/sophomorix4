@@ -887,6 +887,7 @@ sub AD_computer_create {
     my $role = $arg_ref->{role};
     my $ws_count = $arg_ref->{ws_count};
     my $school = $arg_ref->{school};
+    my $filename = $arg_ref->{filename};
     my $creationdate = $arg_ref->{creationdate};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
@@ -903,9 +904,9 @@ sub AD_computer_create {
                                 "RestrictedKrbHost/".$name,
                                 "RestrictedKrbHost/".$dns_name,
                                );
-    my $container=&AD_get_container($role,$room_basename,$ref_sophomorix_config);
-    print "$container $role , $room_basename\n";
-    my $dn_room = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $room_ou=$ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'GROUP_OU'};
+    $room_ou=~s/\@\@FIELD_1\@\@/$room_basename/g; 
+    my $dn_room = $room_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "CN=".$name.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
