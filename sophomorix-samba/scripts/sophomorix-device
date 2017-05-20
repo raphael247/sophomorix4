@@ -1133,6 +1133,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
         my $room_basename=$devices_file{'computer'}{$computer}{'ROOM_BASENAME'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'COMPUTER'};
+        my $filename=$devices_file{'computer'}{$computer}{'FILENAME'};
         if (not exists $school_created{$school}){
             # create ou
             &AD_school_create({ldap=>$ldap,
@@ -1154,8 +1155,10 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              name=>$ws_saved,
                              room=>$room_saved,
                              room_basename=>$room_basename,
-                             role=>"computer",
-		             type=>"roomws",
+#                             role=>"computer",
+#      		              type=>"roomws",
+                             role=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'},
+		             type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
                              school=>$school,
                              creationdate=>$time_stamp_AD,
                              sophomorix_config=>\%sophomorix_config,
@@ -1590,6 +1593,7 @@ sub analyze_device_line {
             $devices_file{'computer'}{$ws_token_account}{'ROOM_BASENAME'}=$room;
             $devices_file{'computer'}{$ws_token_account}{'COMPUTER'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'COMPUTER_DOLLAR'}=$ws_token_account;
+            $devices_file{'computer'}{$ws_token_account}{'FILENAME'}=$filename;
         }
     }
 }

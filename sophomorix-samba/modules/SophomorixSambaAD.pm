@@ -904,6 +904,7 @@ sub AD_computer_create {
                                 "RestrictedKrbHost/".$dns_name,
                                );
     my $container=&AD_get_container($role,$room_basename,$ref_sophomorix_config);
+    print "$container $role , $room_basename\n";
     my $dn_room = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn = "CN=".$name.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $prefix=$school;
@@ -2060,8 +2061,11 @@ sub AD_get_container {
         #$container=$DevelConf::AD_teacher_ou;
         $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_teacher_ou'};
     }  elsif ($role eq "computer"){
+
         #$container=$group_strg.$DevelConf::AD_devices_ou;
         $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_devices_ou'};
+
+
 #    }  elsif ($role eq "examaccount"){
 #        $container=$group_strg.$DevelConf::AD_examaccount_ou;
     # group container

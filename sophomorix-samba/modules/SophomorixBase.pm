@@ -411,7 +411,7 @@ sub config_sophomorix_read {
     foreach my $section  (keys %{$sophomorix_config{'INI'}}) {
         if ($section eq "SCHOOLS"){
             # do something
-        } elsif ($section=~m/^userfile\./){ 
+        } elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
             my ($string,$name,$extension)=split(/\./,$section);
             foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
                 my $filename;
@@ -420,15 +420,27 @@ sub config_sophomorix_read {
                 } else {
                     $filename = $school.".".$name.".".$extension;
                 }
-                # role
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixRole'}=
-                    $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
-                # type
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixType'}=
-                    $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
-                # field5
-                $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
-                    $sophomorix_config{'INI'}{$section}{'FIELD_5'};
+                if ($string eq "userfile"){
+                    # role
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixRole'}=
+                        $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+                    # type
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixType'}=
+                        $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
+                    # field5
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
+                        $sophomorix_config{'INI'}{$section}{'FIELD_5'};
+                } elsif ($string eq "devicefile"){
+                    # role
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'}=
+                        $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+                    # type
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'}=
+                        $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
+                    # GROUP_OU
+                    $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'GROUP_OU'}=
+                        $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
+                }
             }
         }
     }
@@ -657,7 +669,7 @@ sub load_school_ini {
                     my ($group)=&Sophomorix::SophomorixSambaAD::AD_get_name_tokened($member,$school,"group");
                     push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} }, $group;
                 }
-	} elsif ($section=~m/^file\./){ 
+	} elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
             ##### file.* section ########################################################################
 	    my ($string,$name,$extension)=split(/\./,$section);
             my $filename;
@@ -686,15 +698,16 @@ sub load_school_ini {
                     $ref_modmaster->{$section}{$parameter};
             }
 
-            # add some redundant stuff for convenience
-            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
-                $DevelConf::path_conf_tmp."/".$filename.".utf8";
-            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'OU_TOP_GLOBAL'}=
-                "OU=GLOBAL,".$root_dse;
-
-            # save unchecked filter script for error messages
-            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
+            if ($string eq "userfile"){
+                # add some redundant stuff for convenience
+                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
+                    $DevelConf::path_conf_tmp."/".$filename.".utf8";
+                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'OU_TOP_GLOBAL'}=
+                    "OU=GLOBAL,".$root_dse;
+                # save unchecked filter script for error messages
+                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
+                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
+            }
 
             if ($name eq "students" or
                 $name eq "extrastudents"or
@@ -782,7 +795,8 @@ sub load_school_ini {
 		    #exit;
                 }
             }
-
+	} elsif ($section=~m/^classfile\./){ 
+            # classfile
 	} elsif ($section=~m/^role\./){ 
             ##### role.* section ########################################################################
 	    my ($string,$name)=split(/\./,$section);
