@@ -907,7 +907,7 @@ sub AD_computer_create {
     my $room_ou=$ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'GROUP_OU'};
     $room_ou=~s/\@\@FIELD_1\@\@/$room_basename/g; 
     my $dn_room = $room_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    my $dn = "CN=".$name.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $dn="CN=".$name.",".$dn_room;
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
@@ -1203,7 +1203,10 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
-    my $container=&AD_get_container($role,$group_basename,$ref_sophomorix_config);
+
+    # old
+#    my $container_old=&AD_get_container($role,$group_basename,$ref_sophomorix_config);
+    # old
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
@@ -1211,9 +1214,30 @@ sub AD_user_create {
                                                        $group_basename,
                                                        $login,
                                                        $role);
+    # old
+#    my $dn_class_old = $container_old."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+#    my $dn_old = "cn=".$login.",".$container_old."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    # old
 
-    my $dn_class = $container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    my $dn = "cn=".$login.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    # new
+    my $class_ou;
+    if ($file eq "no file"){
+        $class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
+    } else {
+        $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+    }
+        print "XFILENAME: $file\n";
+    $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+    my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $dn="CN=".$login.",".$dn_class;
+    # new
+
+#    print "$dn_class_old\n";
+#    print "$dn_class\n";
+#    print "$dn_class_ou\n";
+#    print "DNOLD$dn_old\n";
+#    print "$dn\n";
+
     # ou for administrators
     if ($role eq "administrator"){
         # bei global muss im hash in GLOBAL gesucht werden 
@@ -4478,7 +4502,6 @@ sub AD_group_create {
     my $cn = $arg_ref->{cn};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $file = $arg_ref->{file};
-
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $joinable){
@@ -4497,11 +4520,29 @@ sub AD_group_create {
     $school=&AD_get_schoolname($school);
 
     # calculate missing Attributes
+    # old
     my $container=&AD_get_container($type,$group_basename,$ref_sophomorix_config);
-
     my $target_branch=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-
     my $dn = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    # old
+
+    # new
+#    my $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+#    $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+#
+#    my $target_branch_new = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+#
+#    my $dnnew_="CN=".$login.",".$target_branch_new;
+    # new
+
+
+#    print "CONT: $container\n";
+#    print "$group_ou\n";
+#    print "$target_branch_new\n";
+#    print "$target_branch\n";
+#    print "$dn_new\n";
+#    print "$dn\n";
+
     if (defined $dn_wish){
         # override DN
         $dn=$dn_wish;

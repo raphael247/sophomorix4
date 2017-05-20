@@ -427,6 +427,9 @@ sub config_sophomorix_read {
                     # type
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixType'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
+                    # GROUP_OU
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'GROUP_OU'}=
+                        $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
                     # field5
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
                         $sophomorix_config{'INI'}{$section}{'FIELD_5'};
