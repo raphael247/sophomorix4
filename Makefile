@@ -195,7 +195,6 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-devel.conf $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix.ini $(DEVELCONF)/devel
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-RoleType.conf $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/README.repdir $(DEVELCONF)/devel
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/master
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/master/school.conf.master $(DEVELCONF)/devel/master
