@@ -1671,11 +1671,14 @@ sub AD_user_update {
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
 
-    # modify
-    my $mesg = $ldap->modify( $dn,
-		      replace => { %replace }
-               );
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    #print Dumper(\$replace);
+    if (%replace){
+        # modify
+        my $mesg = $ldap->modify( $dn,
+	  	          replace => { %replace }
+                         );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
 }
 
 
