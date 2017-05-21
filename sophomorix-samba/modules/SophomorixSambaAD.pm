@@ -1226,7 +1226,6 @@ sub AD_user_create {
     } else {
         $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
     }
-        print "XFILENAME: $file\n";
     $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
     my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$login.",".$dn_class;
@@ -1786,6 +1785,8 @@ sub AD_user_move {
     my $school_new = $arg_ref->{school_new};
     my $role_old = $arg_ref->{role_old};
     my $role_new = $arg_ref->{role_new};
+    my $filename_old = $arg_ref->{filename_old};
+    my $filename_new = $arg_ref->{filename_new};
     my $creationdate = $arg_ref->{creationdate};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -1802,6 +1803,13 @@ sub AD_user_move {
     if ($school_new eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
         $prefix_new="---";
+    }
+
+    my $filename;
+    if ($filename_new eq "---"){
+        $filename=$filename_old;
+    } else {
+        $filename=$filename_new;
     }
 
     my $target_branch;
@@ -1854,6 +1862,7 @@ sub AD_user_move {
         print "   School(New):       $school_new\n";
         print "   Prefix(New):       $prefix_new\n";
         print "   Rename:            $smb_rel_path_old -> $smb_rel_path_new\n";
+        print "   filename:          $filename\n";
         print "   homeDirectory:     $homedirectory_new\n";
         print "   unixHomeDirectory: $unix_home_new\n";
         print "   Creationdate:      $creationdate (if new group must be added)\n";
@@ -1887,6 +1896,7 @@ sub AD_user_move {
                       type=>$group_type_new,
                       joinable=>"TRUE",
                       status=>"P",
+                      file=>$filename,
                       creationdate=>$creationdate,
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
@@ -4522,26 +4532,32 @@ sub AD_group_create {
     # calculate missing Attributes
     # old
     my $container=&AD_get_container($type,$group_basename,$ref_sophomorix_config);
-    my $target_branch=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    my $dn = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $target_branch_old=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $dn_old = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     # old
 
     # new
-#    my $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
-#    $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+    print "JFILENAME: $file\n";
+    my $group_ou;
+    if ($file eq "none"){
+        $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
+    } else {
+        $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+    }
+    $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
 #
-#    my $target_branch_new = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
 #
-#    my $dnnew_="CN=".$login.",".$target_branch_new;
+    my $dn="CN=".$group.",".$target_branch;
     # new
 
 
-#    print "CONT: $container\n";
-#    print "$group_ou\n";
-#    print "$target_branch_new\n";
-#    print "$target_branch\n";
-#    print "$dn_new\n";
-#    print "$dn\n";
+    print "CONT: $container\n";
+    print "<$group_ou>\n";
+    print "$target_branch_old\n";
+    print "$target_branch\n";
+    print "OLD: $dn_old\n";
+    print "OK:  $dn\n";
 
     if (defined $dn_wish){
         # override DN
@@ -4550,6 +4566,8 @@ sub AD_group_create {
         my ($unused,@used)=split(/,/,$dn);
         $target_branch=join(",",@used);
     }
+    print "WISH3:$dn\n";
+
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
         # adding the group

@@ -81,21 +81,21 @@ Sollen auch global-students, global-teachers und global-admins in SCHOOLS?
 --------------------------------------------------
 Übergang:
 ----------
-sophomorix-devel.conf.ini ZUSÄTZLICH lesen
+sophomorix.ini ZUSÄTZLICH lesen
 
 Einige Parameter aus sophomorix-devel.conf
-in die sophomorix-devel.conf.ini umlagern
+in die sophomorix.ini umlagern
 
-- laden der sophomorix-devel.conf.ini in sophomorix_config->DEVELCONF
+- laden der sophomorix.ini in sophomorix_config->DEVELCONF
 
-Roletype.conf
--> statt parsen der Rolytype.conf und Einträge verarbeiten
-   in sophomorix-devel.cong.ini scchon verarbeitet angeben
+-> sophomorix-devel.conf abschaffen? teilweise ja, aber hashes dort behalten?
 
--> RoleType.conf abschaffen
--> sophomorix-devel.conf abschaffen
+lesen der School. ini:
 
-sophomorix-devel.conf.ini für Pfade:
+trailing whitespace abschneiden
+
+
+sophomorix.ini für Pfade:
 
 [PATH]
 	CONF_SOPHOMORIX=/etc/linuxmuster/sophomorix
@@ -110,7 +110,7 @@ sophomorix-devel.conf.ini für Pfade:
 ...
 
 
-sophomorix-devel.conf.ini mit angaben, um eine neue Rolle zu definieren
+sophomorix.ini mit angaben, um eine neue Rolle zu definieren
 
 # ONE import file equals to ONE role
 # ---> for a new role you need a new file
@@ -188,7 +188,7 @@ sophomorix-devel.conf
 UND
 sophomorix-Roletype.conf
 in einer datei
-sophomorix-devel.conf.ini
+sophomorix.ini
 --------------------------------------------------
 
 Test von Gruppe SCHOOLS und Schulen in test 2-5
@@ -480,7 +480,6 @@ Later:
 ############################################################
 * hwk groups in sophomorix-device
 * man pages
-* RoleType.conf in smb .conf format
 * sophomorixAdminClass 
   - used by rooms, classes, ... better name: 
       sophomorixGroup            the group name
@@ -880,7 +879,7 @@ beschränken
 ------------------------------------------------------------
 ouclass umbenennen in studentsclass oder students
 -> muss in SophomorixSamba ersetzt werden
--> muss in RoleType ersetzt werden
+-> muss in sophomorix.ini ersetzt werden
 -> und in Tests
 
 
@@ -1008,7 +1007,7 @@ save dnsZone by each dnsNode when reading into %AD hash : ist that so?
 
 
 check Dateinamen in *.school.conf:
-USER:FILE: nur aus Roletype.conf
+USER:FILE: nur aus sophomorix.ini
 CLASS_FILE: alle Namen zulässig
 DEVICE_FILE: alle Namen zulässig
 
@@ -1844,7 +1843,7 @@ sophomorixPrefix ist undef?
 AD_get_AD
 
 auch teacher ermitteln
-und andere Rollen (rollenliste bei der ldapsuche aus Roletype.conf)
+und andere Rollen (rollenliste bei der ldapsuche aus sophomorix.ini)
 speichern nach rollen,
 identifier
 unid

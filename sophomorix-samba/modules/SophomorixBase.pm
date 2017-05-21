@@ -428,6 +428,8 @@ sub config_sophomorix_read {
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixType'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
                     # GROUP_OU
+#                    $sophomorix_config{'INI'}{$section}{'GROUP_OU'}=
+#                        &remove_whitespace($sophomorix_config{'INI'}{$section}{'GROUP_OU'});
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'GROUP_OU'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
                     # field5
