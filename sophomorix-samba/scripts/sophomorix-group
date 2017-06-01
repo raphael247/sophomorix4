@@ -186,6 +186,7 @@ if ($create==1 and $group ne ""){
                       type=>"sophomorix-group",
                       status=>"P",
                       creationdate=>$time_stamp_AD,
+		      sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
                     });

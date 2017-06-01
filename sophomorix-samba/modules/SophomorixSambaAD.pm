@@ -4515,6 +4515,7 @@ sub AD_group_create {
     my $cn = $arg_ref->{cn};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $file = $arg_ref->{file};
+    my $sub_ou = $arg_ref->{sub_ou};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $joinable){
@@ -4542,7 +4543,9 @@ sub AD_group_create {
     # new
     print "JFILENAME: $file\n";
     my $group_ou;
-    if ($file eq "none"){
+    if (defined $sub_ou){
+        $group_ou=$sub_ou;
+    } elsif ($file eq "none"){
         $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
     } else {
         $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
