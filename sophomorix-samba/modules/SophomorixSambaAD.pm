@@ -2117,12 +2117,15 @@ sub AD_get_container {
         #$container=$DevelConf::AD_teacher_ou;
         $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_teacher_ou'};
     }  elsif ($role eq "project"){
+	# ok
         #$container=$DevelConf::AD_project_ou;
         $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_project_ou'};
     }  elsif ($role eq "sophomorix-group"){
+        # ok
         #$container=$DevelConf::AD_project_ou;
         $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_project_ou'};
     }  elsif ($role eq "room"){
+	# ok
         #$container=$group_strg.$DevelConf::AD_devices_ou;
         $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_devices_ou'};
     # other

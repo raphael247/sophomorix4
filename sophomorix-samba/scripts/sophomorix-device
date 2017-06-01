@@ -1175,6 +1175,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           status=>"P",
                           type=>"room",
                           creationdate=>$time_stamp_AD,
+			  sub_ou=>"OU=".$room_basename.",".$sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'},
                           smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>\%sophomorix_config,
                          });
