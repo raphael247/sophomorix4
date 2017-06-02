@@ -1177,11 +1177,9 @@ sub AD_user_create {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    if($Conf::log_level>=1){
-        print "\n";
-        &Sophomorix::SophomorixBase::print_title(
-              "Creating User $user_count : $login");
-    }
+    print "\n";
+    &Sophomorix::SophomorixBase::print_title(
+          "Creating User $user_count : $login (start)");
 
     # set defaults if not defined
     if (not defined $identifier){
@@ -1204,22 +1202,12 @@ sub AD_user_create {
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@"."linuxmuster.local";
 
-    # old
-#    my $container_old=&AD_get_container($role,$group_basename,$ref_sophomorix_config);
-    # old
-
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                        $school,
                                                        $group_basename,
                                                        $login,
                                                        $role);
-    # old
-#    my $dn_class_old = $container_old."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-#    my $dn_old = "cn=".$login.",".$container_old."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    # old
-
-    # new
     my $class_ou;
     if ($file eq "no file"){
         $class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
@@ -1229,13 +1217,6 @@ sub AD_user_create {
     $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
     my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$login.",".$dn_class;
-    # new
-
-#    print "$dn_class_old\n";
-#    print "$dn_class\n";
-#    print "$dn_class_ou\n";
-#    print "DNOLD$dn_old\n";
-#    print "$dn\n";
 
     # ou for administrators
     if ($role eq "administrator"){
@@ -1366,6 +1347,12 @@ sub AD_user_create {
     my @grouplist=("wifi","internet","webfilter","intranet","printing");
     foreach my $group (@grouplist){
         my $management_group=&AD_get_name_tokened($group,$school,"management");
+	print "WRONG1: $management_group \n";
+        ## prefix global- used instead of all-
+        ## ???????????????????????????????ßßß
+
+
+
         &AD_group_addmember_management({ldap => $ldap,
                                         root_dse => $root_dse, 
                                         group => $management_group,
@@ -1375,14 +1362,15 @@ sub AD_user_create {
 
     # add administrators to admin group
     if ($role eq "administrator"){
-        # add to *-admins of the school, or global-admins
+        # add to *-admins of the school, or all-admins
         my $management_group=&AD_get_name_tokened("admins",$school,"management");
+	print "WRONG2: $management_group \n";
         &AD_group_addmember_management({ldap => $ldap,
                                         root_dse => $root_dse, 
                                         group => $management_group,
                                         addmember => $login,
                                        }); 
-        if ($school eq "global"){ # not GLOBAL (its the sophomorix-admin option --school)
+        if ($school eq "global"){ # not GLOBAL (it's the sophomorix-admin option --school)
             # global admin users are 'Domain Admins'
             &AD_group_addmember({ldap => $ldap,
                                  root_dse => $root_dse, 
@@ -1394,11 +1382,11 @@ sub AD_user_create {
             # do nothing
         }
         # deprecated becaus school-admin users would result as 'Domain Admins'
-        ## add/make sure group global-admins to 'Domain admins'
+        ## add/make sure group all-admins to 'Domain admins'
         #&AD_group_addmember({ldap => $ldap,
         #                     root_dse => $root_dse, 
         #                     group => "Domain Admins",
-        #                     addgroup => "global-admins",
+        #                     addgroup => "all-admins",
         #                   });
     }
 
@@ -1462,7 +1450,8 @@ sub AD_user_create {
         }
     }  
 
-    &Sophomorix::SophomorixBase::print_title("Creating User $user_count (end)");
+    &Sophomorix::SophomorixBase::print_title("Creating User $user_count: $login (end)");
+    print "\n";
 }
 
 
@@ -2068,7 +2057,7 @@ sub AD_get_name_tokened {
         }
         if ($role eq "project"){
             unless ($name_tokened =~ m/^p\_/) { 
-                # add refix to projects: p_ 
+                # add prefix to projects: p_ 
                 $name_tokened="p_".$name_tokened;
             }
         }
@@ -4532,19 +4521,20 @@ sub AD_group_create {
         $file="none";    
     }
 
+    print "\n";
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (begin):");
 
     $school=&AD_get_schoolname($school);
 
     # calculate missing Attributes
-    # old
-    my $container=&AD_get_container($type,$group_basename,$ref_sophomorix_config);
-    my $target_branch_old=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    my $dn_old = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    # old
+#    # old
+#    my $container=&AD_get_container($type,$group_basename,$ref_sophomorix_config);
+#    my $target_branch_old=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+#    my $dn_old = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+#    # old
 
-    # new
-    print "JFILENAME: $file\n";
+#    # new
+##    print "JFILENAME: $file\n";
     my $group_ou;
     if (defined $sub_ou){
         $group_ou=$sub_ou;
@@ -4554,19 +4544,17 @@ sub AD_group_create {
         $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
     }
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
-#
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-#
     my $dn="CN=".$group.",".$target_branch;
-    # new
+#    # new
 
 
-    print "CONT: $container\n";
-    print "<$group_ou>\n";
-    print "$target_branch_old\n";
-    print "$target_branch\n";
-    print "OLD: $dn_old\n";
-    print "OK:  $dn\n";
+#    print "CONT: $container\n";
+#    print "<$group_ou>\n";
+#    print "$target_branch_old\n";
+#    print "$target_branch\n";
+#    print "OLD: $dn_old\n";
+#    print "OK:  $dn\n";
 
     if (defined $dn_wish){
         # override DN
@@ -4575,7 +4563,7 @@ sub AD_group_create {
         my ($unused,@used)=split(/,/,$dn);
         $target_branch=join(",",@used);
     }
-    print "WISH3:$dn\n";
+#    print "WISH3:$dn\n";
 
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
@@ -4639,10 +4627,10 @@ sub AD_group_create {
                                  addgroup => $group,
                                });
         }
-        # add group <token>-students to global-students
+        # add group <token>-students to all-students
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
-                             group => "global-".$DevelConf::student,
+                             group => $ref_sophomorix_config->{'INI'}{'VARS'}{'HIERARCHY_PREFIX'}."-".$DevelConf::student,
                              addgroup => $token_students,
                            });
         &AD_repdir_using_file({root_dns=>$root_dns,
@@ -4653,10 +4641,10 @@ sub AD_group_create {
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     } elsif ($type eq "teacherclass"){
-        # add <token>-teachers to global-teachers
+        # add <token>-teachers to all-teachers
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
-                             group => "global-".$DevelConf::teacher,
+                             group => $ref_sophomorix_config->{'INI'}{'VARS'}{'HIERARCHY_PREFIX'}."-".$DevelConf::teacher,
                              addgroup => $group,
                            });
         &AD_repdir_using_file({root_dns=>$root_dns,
@@ -4674,10 +4662,10 @@ sub AD_group_create {
         #                     group => $token_examaccounts,
         #                     addgroup => $group,
         #                   });
-        ## add group <token>-examaccounts to global-examaccounts
+        ## add group <token>-examaccounts to all-examaccounts
         #&AD_group_addmember({ldap => $ldap,
         #                     root_dse => $root_dse, 
-        #                     group => "global-".$DevelConf::examaccount,
+        #                     group => $ref_sophomorix_config->{'INI'}{'VARS'}{'HIERARCHY_PREFIX'}."-".$DevelConf::examaccount,
         #                     addgroup => $token_examaccounts,
         #                   });
     } elsif ($type eq "project"){
@@ -4690,6 +4678,7 @@ sub AD_group_create {
                              });
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
+    print "\n";
     return;
 }
 
