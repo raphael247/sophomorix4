@@ -447,6 +447,12 @@ sub config_sophomorix_read {
                         $member=&replace_vars($member,\%sophomorix_config,$school);
                         push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MEMBER'} }, $member; 
                     }
+                    # SOPHOMORIXMEMBER
+                    my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBER'});
+                    foreach my $s_member (@s_member){
+                        $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
+                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SOPHOMORIXMEMBER'} }, $s_member; 
+                    }
                 } elsif ($string eq "devicefile"){
                     # role
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'}=
@@ -468,6 +474,12 @@ sub config_sophomorix_read {
                     foreach my $member (@member){
                         $member=&replace_vars($member,\%sophomorix_config,$school);
                         push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MEMBER'} }, $member; 
+                    }
+                    # SOPHOMORIXMEMBER
+                    my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBER'});
+                    foreach my $s_member (@s_member){
+                        $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
+                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SOPHOMORIXMEMBER'} }, $s_member; 
                     }
                 }
             }
@@ -544,7 +556,8 @@ sub config_sophomorix_read {
  
 sub replace_vars {
     my ($string,$ref_sophomorix_config,$school)=@_;
-    $string=~s/\@\@SCHOOLPREFIX\@\@/$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'}/g; 
+    my $replacement=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'};
+    $string=~s/\@\@SCHOOLPREFIX\@\@/$replacement/g; 
     return $string;
 }
 

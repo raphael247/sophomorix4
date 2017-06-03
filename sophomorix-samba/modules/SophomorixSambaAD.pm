@@ -1270,7 +1270,7 @@ sub AD_user_create {
         print "   Role(User):         $role\n";
         print "   Status:             $status\n";
         print "   Type(Group):        $type\n";
-        print "   Group:              $group\n"; # lehrer oder klasse
+        print "   Group:              $group ($group_basename)\n"; # lehrer oder klasse
         #print "   GECOS:              $gecos\n";
         #print "   Login (to check):   $login_name_to_check\n";
         print "   Login (check OK):   $login\n";
@@ -1343,21 +1343,9 @@ sub AD_user_create {
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
 
-    # if ($role ne "administrator"){
-    #     # add user to management groups (not to admin)
-    #     my @grouplist=("wifi","internet","webfilter","intranet","printing");
-    #     foreach my $group (@grouplist){
-    #         my $management_group=&AD_get_name_tokened($group,$school,"management");
-    # 	    print "WRONG1: $management_group from $school ($group)\n";
-    #         ## prefix global- used instead of all-
-    #         ## ???????????????????????????????ßßß
-    #         &AD_group_addmember_management({ldap => $ldap,
-    #                                         root_dse => $root_dse, 
-    #                                         group => $management_group,
-    #                                         addmember => $login,
-    #                                        }); 
-    #     }
-    # }
+    ######################################################################
+    # memberships of created user
+    ######################################################################
     if ($role eq "administrator" and $school eq "global"){
         #######################################################
         # global administrator
@@ -1405,38 +1393,48 @@ sub AD_user_create {
         # user from a file -> get groups from sophomorix_config 
         #######################################################
         # add user to groups
-        foreach my $group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MEMBER'} }){
-	    print "HERE: adding $login to $group\n";
-        #    &AD_group_addmember({ldap => $ldap,
-        #                         root_dse => $root_dse, 
-        #                         group => $group,
-        #                         addmember => $login,
-        #                       }); 
+        # MEMBER
+        foreach my $ref_group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MEMBER'} }){
+            my $group=$ref_group; # make copy to not modify the hash 
+            $group=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+            &AD_group_addmember({ldap => $ldap,
+                                 root_dse => $root_dse, 
+                                 group => $group,
+                                 addmember => $login,
+                               }); 
 	}
 
+        # SOPHOMORIXMEMBER = MEMBER + sophomorixMember attribute
+        foreach my $ref_s_group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SOPHOMORIXMEMBER'} }){
+            my $s_group=$ref_s_group; # make copy to not modify the hash 
+            $s_group=&Sophomorix::SophomorixBase::replace_vars($s_group,$ref_sophomorix_config,$school);
+            $s_group=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+            # find dn of adminclass.group
+            my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$s_group);
+            # fetch old members from sophomorixmembers
+            my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+            # create a unique list of new members
+            my @members = uniq(@old_members,$login); 
+            my $members=join(",",@members);
+            # update group
+            &AD_group_update({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              dn=>$dn_class,
+                              type=>"adminclass",
+                              members=>$members,
+                            });
+	}
+
+        # MANMEMBER
         # add user to management groups
-        foreach my $mangroup (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MANMEMBER'} }){
-	    print "HERE2: adding $login to $mangroup\n";
+        foreach my $ref_mangroup (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MANMEMBER'} }){
+            my $mangroup=$ref_mangroup; # make copy to not modify the hash 
             &AD_group_addmember_management({ldap => $ldap,
                                             root_dse => $root_dse, 
                                             group => $mangroup,
                                             addmember => $login,
                                            }); 
         }
-        my @grouplist=("wifi","internet","webfilter","intranet","printing");
-        foreach my $group (@grouplist){
-print "HERE3: adding $login to $group\n";
-#            my $management_group=&AD_get_name_tokened($group,$school,"management");#
-#	    print "WRONG1: $management_group from $school ($group)\n";
-#            ## prefix global- used instead of all-
-#            ## ???????????????????????????????ßßß
-#            &AD_group_addmember_management({ldap => $ldap,
-#                                            root_dse => $root_dse, 
-#                                            group => $management_group,
-#                                            addmember => $login,
-#                                           }); 
-        }
-
     }
 
     ############################################################
@@ -2332,7 +2330,8 @@ sub AD_school_create {
     if($Conf::log_level>=2){
         print "   * Adding sub ou's for OU=$school ...\n";
     }
-    foreach my $sub_ou (@{ $ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SUB_OU'} } ){
+    foreach my $ref_sub_ou (@{ $ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SUB_OU'} } ){
+        my $sub_ou=$ref_sub_ou; # make copy to not modify the hash 
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
         my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -2371,7 +2370,8 @@ sub AD_school_create {
     }
     ############################################################
     # adding groups to <schoolname>-group
-    foreach my $membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
+    foreach my $ref_membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
+    my $membergroup=$ref_membergroup; # make copy to not modify the hash 
     &AD_group_addmember({ldap => $ldap,
                          root_dse => $root_dse, 
                          group => $school,

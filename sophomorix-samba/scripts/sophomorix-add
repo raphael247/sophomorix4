@@ -562,66 +562,25 @@ while(<SOPHOMORIXADD>){
   #&add_newuser_to_her_projects($login_check_ok,$class_group);
 
 
-# OLD
-#  # add student/teacher to its adminclass-group
-#  &AD_group_addmember({ldap => $ldap,
-#                       root_dse => $root_dse, 
-#                       group => $group_token,
-#                       addmember => $login_token,
-#                      });   
-
-
-    # NEW
     # add student/teacher to its adminclass-group
     # find dn of adminclass.group
-    my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$group_token);
-    # fetch old members from sophomorixmembers
-    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
-    # create a unique list of new members
-    my @members = uniq(@old_members,$login_token); 
-    my $members=join(",",@members);
-    # update group
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-                      type=>"adminclass",
-                      members=>$members,
-                    });
+#    my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$group_token);
+#    # fetch old members from sophomorixmembers
+#    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+#    # create a unique list of new members
+#    my @members = uniq(@old_members,$login_token); 
+#    my $members=join(",",@members);
+#    # update group
 
 
-#    if ($role eq "student"){
-# not necessary ????????
-#        my $group_token=&AD_get_name_tokened($DevelConf::student,$school,"adminclass");
-#        &AD_group_addmember({ldap => $ldap,
-#                             root_dse => $root_dse, 
-#                             group => $DevelConf::student,
-#                             addgroup => $group_token,
-#                           });
-        # <student> directly in <token>-students 
-        #&AD_group_addmember({ldap => $ldap,
-        #                     root_dse => $root_dse, 
-        #                     group => $group,
-        #                     addmember => $login_check_ok,
-        #                    });
-        # add token-students to students
-   
-#    } elsif ($role eq "teacher"){
-#        #my $group=$school."-".$DevelConf::teacher;
-#        my $group_token=&AD_get_name_tokened($DevelConf::teacher,$school,"adminclass");
-#        &AD_group_addmember({ldap => $ldap,
-#                             root_dse => $root_dse, 
-#                             group => $DevelConf::teacher,
-#                             addgroup => $group_token,
-#                           });
-        ## <teacher> in <token>-teachers
-        #&AD_group_addmember({ldap => $ldap,
-#                             root_dse => $root_dse, 
-        #                     group => $DevelConf::teacher,
-        #                     addmember => $login_check_ok,
-        #                    });   
-        # add token-students to students
-#    }
-
+# use this instead of sophomorix.ini MEMBER 
+# to add a user NOT only as a member, but also in sophomorixMember
+#    &AD_group_update({ldap=>$ldap,
+#                      root_dse=>$root_dse,
+#                      dn=>$dn_class,
+#                      type=>"adminclass",
+#                      members=>$members,
+#                    });
 
 
   # 6. Add a mailbox for the user
