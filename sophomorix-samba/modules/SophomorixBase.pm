@@ -564,6 +564,31 @@ sub read_sophomorix_ini {
 }
 
 
+sub ini_list {
+    my ($ref)=@_;
+    # returns empty list if parameter not given
+    if (not defined $ref){
+        my @list=();
+        return @list;
+    }
+    
+    # returns one element list if parameter is key->value
+    if ($#{ $ref }==-1 ){
+        my @list=($ref);
+        return @list;
+    }
+
+    # returns multi element list if parameter is specified multiple times
+    return @{ $ref };
+
+    # example code
+    #my @list=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MEMBERSHIP'});
+    #    foreach my $item (@list){
+    #        print "ITEM: $item\n";
+    #    }
+}
+
+
 
 sub read_smb_net_conf_list {
     my ($ref_sophomorix_config,$ref_result)=@_;
