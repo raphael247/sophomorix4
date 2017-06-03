@@ -126,8 +126,11 @@ Options
   -vv / --verbose --verbose
   -i  / --info
 
-# create a global-admin (for linuxmuster-base):
+# create an global-admin (for linuxmuster-base):
 sophomorix-admin --create global-admin --school global --password <fdrTfdtti>
+
+# create an all-admin 
+sophomorix-admin --create all-admin --school global --password <fdrTfdtti>
 
 # create another global-admin
 sophomorix-admin --create <name-of-admin> --school global --password <fdrTfdtti>
@@ -185,8 +188,17 @@ if ($create ne "" and $school ne "" and $password ne ""){
         exit;
     }
 
-    my $group_basename="admins";
-    my $group_token=&AD_get_name_tokened($group_basename,$school,"administrator");
+    my $group_token;
+    if ($school eq $DevelConf::name_default_school){
+        $group_token=$sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
+    } elsif ($school eq "global"){ 
+        $group_token=$sophomorix_config{'INI'}{'administrator.global'}{'GROUPPREFIX'}.
+	             $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
+    } else {
+        $group_token=$school."-".
+	             $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
+    }
+
     # make sure school exists
     my $school_provide;
     if ($school eq "global"){
@@ -206,7 +218,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
     my $sn="Admin";
     my $given_name=$school;
     if ($school eq "global"){
-        $given_name="Global";
+        $given_name="All";
     }
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -214,7 +226,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
                     user_count => "1",
                     login => $create,
                     group => $group_token,
-                    group_basename => $group_basename,
+                    group_basename => $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'},
                     firstname_ascii => $given_name,
                     surname_ascii => $sn,
                     firstname_utf8 => $given_name,

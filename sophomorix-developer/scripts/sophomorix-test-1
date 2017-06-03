@@ -1397,7 +1397,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|global-admins",
+                   memberOf => "default-school|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1471,7 +1471,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-admins",
+                   memberOf => "bsz|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1545,7 +1545,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-admins",
+                   memberOf => "uni|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1664,8 +1664,8 @@ if ($add==1 or $test_add==1){
                    member => "bsz-internet|uni-internet|internet",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-admins,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-admins",
+                   dn=>"CN=all-admins,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-admins",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -4734,7 +4734,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|global-admins",
+                   memberOf => "default-school|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4858,7 +4858,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-admins",
+                   memberOf => "uni|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4932,7 +4932,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "ghs|global-admins",
+                   memberOf => "ghs|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5006,7 +5006,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"admins",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "lin|global-admins",
+                   memberOf => "lin|all-admins",
                    member => "",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5152,8 +5152,8 @@ if ($update==1 or $test_update==1){
                    member => "ghs-internet|lin-internet|bsz-internet|uni-internet|internet",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-admins,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-admins",
+                   dn=>"CN=all-admins,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-admins",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
