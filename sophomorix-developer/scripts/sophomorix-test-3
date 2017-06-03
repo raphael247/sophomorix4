@@ -232,7 +232,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-students",
+                   memberOf => "bsz|all-students",
                   });
 
 
@@ -290,7 +290,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-students",
+                   memberOf => "bsz|all-students",
                   });
 
 
@@ -348,7 +348,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-students",
+                   memberOf => "bsz|all-students",
                   });
 
 
@@ -406,7 +406,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-students",
+                   memberOf => "bsz|all-students",
                   });
 
 
@@ -556,7 +556,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-students",
+                   memberOf => "uni|all-students",
                   });
 
 
@@ -614,7 +614,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-students",
+                   memberOf => "uni|all-students",
                   });
 
 
@@ -762,7 +762,7 @@ if ($test_add_pro==1){
                    sophomorixType=>"ouclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|global-students",
+                   memberOf => "default-school|all-students",
                   });
     # sch23
     &AD_test_object({ldap=>$ldap,
@@ -857,8 +857,8 @@ if ($test_add_pro==1){
     #                member => "bsz-examaccounts|uni-examaccounts|examaccounts,",
     #               });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-students,OU=Groups,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-students",
+                   dn=>"CN=all-students,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-students",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
