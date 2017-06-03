@@ -1343,53 +1343,25 @@ sub AD_user_create {
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
 
-    if ($role ne "administrator"){
-        # add user to management groups (not to admin)
-        my @grouplist=("wifi","internet","webfilter","intranet","printing");
-        foreach my $group (@grouplist){
-            my $management_group=&AD_get_name_tokened($group,$school,"management");
-	    print "WRONG1: $management_group from $school ($group)\n";
-            ## prefix global- used instead of all-
-            ## ???????????????????????????????ßßß
-            &AD_group_addmember_management({ldap => $ldap,
-                                            root_dse => $root_dse, 
-                                            group => $management_group,
-                                            addmember => $login,
-                                           }); 
-        }
-    }
-    # # add administrators to admin group
-    # if ($role eq "administrator"){
-    #     # add to *-admins of the school, or all-admins
-    #     my $management_group=&AD_get_name_tokened("admins",$school,"management");
-    # 	print "WRONG2: $management_group from $school\n";
-    #     &AD_group_addmember_management({ldap => $ldap,
-    #                                     root_dse => $root_dse, 
-    #                                     group => $management_group,
-    #                                     addmember => $login,
-    #                                    }); 
-    #     if ($school eq "global"){ # not GLOBAL (it's the sophomorix-admin option --school)
-    #         # global admin users are 'Domain Admins'
-    #         &AD_group_addmember({ldap => $ldap,
-    #                              root_dse => $root_dse, 
-    #                              group => "Domain Admins",
-    #                              addmember => $login,
-    #                            });
-    #     } else {
-    #         # school admin users are NOT 'Domain Admins'
-    #         # do nothing
+    # if ($role ne "administrator"){
+    #     # add user to management groups (not to admin)
+    #     my @grouplist=("wifi","internet","webfilter","intranet","printing");
+    #     foreach my $group (@grouplist){
+    #         my $management_group=&AD_get_name_tokened($group,$school,"management");
+    # 	    print "WRONG1: $management_group from $school ($group)\n";
+    #         ## prefix global- used instead of all-
+    #         ## ???????????????????????????????ßßß
+    #         &AD_group_addmember_management({ldap => $ldap,
+    #                                         root_dse => $root_dse, 
+    #                                         group => $management_group,
+    #                                         addmember => $login,
+    #                                        }); 
     #     }
-    #     # deprecated becaus school-admin users would result as 'Domain Admins'
-    #     ## add/make sure group all-admins to 'Domain admins'
-    #     #&AD_group_addmember({ldap => $ldap,
-    #     #                     root_dse => $root_dse, 
-    #     #                     group => "Domain Admins",
-    #     #                     addgroup => "all-admins",
-    #     #                   });
     # }
-    # print "HERE: $role $school\n";
     if ($role eq "administrator" and $school eq "global"){
+        #######################################################
         # global administrator
+        #######################################################
         my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MANMEMBER'});
         foreach my $mangroup (@manmember){
             &AD_group_addmember_management({ldap => $ldap,
@@ -1407,7 +1379,9 @@ sub AD_user_create {
                                 });
         }
     } elsif ($role eq "administrator"){
+        #######################################################
         # school administrator
+        #######################################################
         my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.school'}{'MANMEMBER'});
         foreach my $mangroup (@manmember){
             $mangroup=&Sophomorix::SophomorixBase::replace_vars($mangroup,$ref_sophomorix_config,$school);
@@ -1426,6 +1400,43 @@ sub AD_user_create {
                                  addmember => $login,
                                });
         }
+    } else {
+        #######################################################
+        # user from a file -> get groups from sophomorix_config 
+        #######################################################
+        # add user to groups
+        foreach my $group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MEMBER'} }){
+	    print "HERE: adding $login to $group\n";
+        #    &AD_group_addmember({ldap => $ldap,
+        #                         root_dse => $root_dse, 
+        #                         group => $group,
+        #                         addmember => $login,
+        #                       }); 
+	}
+
+        # add user to management groups
+        foreach my $mangroup (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MANMEMBER'} }){
+	    print "HERE2: adding $login to $mangroup\n";
+            &AD_group_addmember_management({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $mangroup,
+                                            addmember => $login,
+                                           }); 
+        }
+        my @grouplist=("wifi","internet","webfilter","intranet","printing");
+        foreach my $group (@grouplist){
+print "HERE3: adding $login to $group\n";
+#            my $management_group=&AD_get_name_tokened($group,$school,"management");#
+#	    print "WRONG1: $management_group from $school ($group)\n";
+#            ## prefix global- used instead of all-
+#            ## ???????????????????????????????ßßß
+#            &AD_group_addmember_management({ldap => $ldap,
+#                                            root_dse => $root_dse, 
+#                                            group => $management_group,
+#                                            addmember => $login,
+#                                           }); 
+        }
+
     }
 
     ############################################################

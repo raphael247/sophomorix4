@@ -435,6 +435,18 @@ sub config_sophomorix_read {
                     # field5
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
                         $sophomorix_config{'INI'}{$section}{'FIELD_5'};
+                    # MANMEMBER
+                    my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBER'});
+                    foreach my $manmember (@manmember){
+                        $manmember=&replace_vars($manmember,\%sophomorix_config,$school);
+                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MANMEMBER'} }, $manmember; 
+                    }
+                    # MEMBER
+                    my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBER'});
+                    foreach my $member (@member){
+                        $member=&replace_vars($member,\%sophomorix_config,$school);
+                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MEMBER'} }, $member; 
+                    }
                 } elsif ($string eq "devicefile"){
                     # role
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'}=
@@ -445,12 +457,24 @@ sub config_sophomorix_read {
                     # GROUP_OU
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'GROUP_OU'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
+                    # MANMEMBER
+                    my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBER'});
+                    foreach my $manmember (@manmember){
+                        $manmember=&replace_vars($manmember,\%sophomorix_config,$school);
+                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MANMEMBER'} }, $manmember; 
+                    }
+                    # MEMBER
+                    my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBER'});
+                    foreach my $member (@member){
+                        $member=&replace_vars($member,\%sophomorix_config,$school);
+                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MEMBER'} }, $member; 
+                    }
                 }
             }
         }
     }
 
-    # Working oh the Lists of sophomorix.ini
+    # Working on the Lists of sophomorix.ini
     ###############################################
     # GLOBAL
     # OU for Administrators ????
