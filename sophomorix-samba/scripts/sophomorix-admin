@@ -165,8 +165,6 @@ if ($info==1){
 # exit if the user exists already
 my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create);
 
-#my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group","m7ab");
-#print "DN=$dn_class\n";
 if ($count==0){
     # ok
 } else {
@@ -190,13 +188,13 @@ if ($create ne "" and $school ne "" and $password ne ""){
 
     my $group_token;
     if ($school eq $DevelConf::name_default_school){
-        $group_token=$sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
+        $group_token=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
     } elsif ($school eq "global"){ 
-        $group_token=$sophomorix_config{'INI'}{'administrator.global'}{'GROUPPREFIX'}.
-	             $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
+        $group_token=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPPREFIX'}.
+	             $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
     } else {
         $group_token=$school."-".
-	             $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
+	             $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
     }
 
     # make sure school exists
@@ -226,7 +224,7 @@ if ($create ne "" and $school ne "" and $password ne ""){
                     user_count => "1",
                     login => $create,
                     group => $group_token,
-                    group_basename => $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'},
+                    group_basename => $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'},
                     firstname_ascii => $given_name,
                     surname_ascii => $sn,
                     firstname_utf8 => $given_name,

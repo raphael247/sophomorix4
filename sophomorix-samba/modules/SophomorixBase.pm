@@ -619,7 +619,7 @@ sub ini_list {
     return @{ $ref };
 
     # example code
-    #my @list=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MEMBERSHIP'});
+    #my @list=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MEMBERSHIP'});
     #    foreach my $item (@list){
     #        print "ITEM: $item\n";
     #    }

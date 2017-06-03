@@ -1350,7 +1350,7 @@ sub AD_user_create {
         #######################################################
         # global administrator
         #######################################################
-        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MANMEMBER'});
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MANMEMBER'});
         foreach my $mangroup (@manmember){
             &AD_group_addmember_management({ldap => $ldap,
                                             root_dse => $root_dse, 
@@ -1358,7 +1358,7 @@ sub AD_user_create {
                                             addmember => $login,
                                            }); 
         }
-        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MEMBER'});
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MEMBER'});
         foreach my $group (@member){
             &AD_group_addmember({ldap => $ldap,
                                   root_dse => $root_dse, 
