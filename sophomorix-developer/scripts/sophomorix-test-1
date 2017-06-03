@@ -1373,7 +1373,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "schwein42|hamster42|frosch42|gans42|hahn42|maus42|katze42|hund42|schaf42|fisch42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1447,7 +1447,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1521,7 +1521,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1640,8 +1640,8 @@ if ($add==1 or $test_add==1){
                   });
     ##### Testing the global groups
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-wifi,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-wifi",
+                   dn=>"CN=all-wifi,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-wifi",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -4710,7 +4710,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4784,7 +4784,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "maiersa42|jonsonad42|samardze42|oe42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4834,7 +4834,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "lordjo42|kep42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4908,7 +4908,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "gal42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4982,7 +4982,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"wifiaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-wifi",
+                   memberOf => "all-wifi",
                    member => "muellegr42|blackmri42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5128,8 +5128,8 @@ if ($update==1 or $test_update==1){
 
     ##### Testing the global groups
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-wifi,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-wifi",
+                   dn=>"CN=all-wifi,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-wifi",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
