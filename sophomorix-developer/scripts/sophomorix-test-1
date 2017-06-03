@@ -1409,7 +1409,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "schwein42|hamster42|frosch42|gans42|hahn42|maus42|katze42|hund42|schaf42|fisch42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1421,7 +1421,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "schwein42|hamster42|frosch42|gans42|hahn42|maus42|katze42|hund42|schaf42|fisch42|schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1433,7 +1433,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "schwein42|hamster42|frosch42|gans42|hahn42|maus42|katze42|hund42|schaf42|fisch42|schneima42|sch42",
                   });
 
@@ -1483,7 +1483,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1495,7 +1495,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1507,7 +1507,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
 
@@ -1557,7 +1557,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1569,7 +1569,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "lordjo42|blackmri42|kep42|gal42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1581,7 +1581,7 @@ if ($add==1 or $test_add==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "lordjo42|blackmri42|kep42|gal42",
                   });
     # group <schoolname>
@@ -1676,8 +1676,8 @@ if ($add==1 or $test_add==1){
                    member => "bsz-admins|uni-admins|admins",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-webfilter,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-webfilter",
+                   dn=>"CN=all-webfilter,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-webfilter",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -1688,8 +1688,8 @@ if ($add==1 or $test_add==1){
                    member => "bsz-webfilter|uni-webfilter|webfilter",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-intranet,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-intranet",
+                   dn=>"CN=all-intranet,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-intranet",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -1700,8 +1700,8 @@ if ($add==1 or $test_add==1){
                    member => "bsz-intranet|uni-intranet|intranet",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-printing,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-printing",
+                   dn=>"CN=all-printing,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-printing",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -4746,7 +4746,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4758,7 +4758,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "schneima42|sch42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4770,7 +4770,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "schneima42|sch42",
                   });
 
@@ -4808,7 +4808,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "maiersa42|jonsonad42|samardze42|oe42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4820,7 +4820,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "maiersa42|jonsonad42|samardze42|oe42",
                   });
 
@@ -4870,7 +4870,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "lordjo42|kep42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4882,7 +4882,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "lordjo42|kep42|wu42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4894,7 +4894,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "lordjo42|kep42|wu42",
                   });
 
@@ -4944,7 +4944,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "gal42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4956,7 +4956,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "gal42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4968,7 +4968,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "ghs",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "gal42",
                   });
 
@@ -5018,7 +5018,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"webfilter",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-webfilter",
+                   memberOf => "all-webfilter",
                    member => "muellegr42|blackmri42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5030,7 +5030,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"intranetaccess",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-intranet",
+                   memberOf => "all-intranet",
                    member => "muellegr42|blackmri42",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5042,7 +5042,7 @@ if ($update==1 or $test_update==1){
                    sophomorixType=>"printing",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "global-printing",
+                   memberOf => "all-printing",
                    member => "muellegr42|blackmri42",
                   });
     # group <schoolname>
@@ -5164,8 +5164,8 @@ if ($update==1 or $test_update==1){
                    member => "ghs-admins|lin-admins|bsz-admins|uni-admins|admins",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-webfilter,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-webfilter",
+                   dn=>"CN=all-webfilter,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-webfilter",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -5176,8 +5176,8 @@ if ($update==1 or $test_update==1){
                    member => "ghs-webfilter|lin-webfilter|bsz-webfilter|uni-webfilter|webfilter",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-intranet,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-intranet",
+                   dn=>"CN=all-intranet,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-intranet",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -5188,8 +5188,8 @@ if ($update==1 or $test_update==1){
                    member => "ghs-intranet|lin-intranet|bsz-intranet|uni-intranet|intranet",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-printing,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-printing",
+                   dn=>"CN=all-printing,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-printing",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
