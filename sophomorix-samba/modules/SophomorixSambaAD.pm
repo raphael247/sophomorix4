@@ -1179,7 +1179,7 @@ sub AD_user_create {
 
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
-          "Creating User $user_count : $login (start)");
+          "Creating user $user_count : $login (start)");
 
     # set defaults if not defined
     if (not defined $identifier){
@@ -1422,6 +1422,7 @@ sub AD_user_create {
                               dn=>$dn_class,
                               type=>"adminclass",
                               members=>$members,
+                              sophomorix_config=>$ref_sophomorix_config,
                             });
 	}
 
@@ -1500,7 +1501,7 @@ sub AD_user_create {
         }
     }  
 
-    &Sophomorix::SophomorixBase::print_title("Creating User $user_count: $login (end)");
+    &Sophomorix::SophomorixBase::print_title("Creating user $user_count: $login (end)");
     print "\n";
 }
 
@@ -1968,6 +1969,7 @@ sub AD_user_move {
                       dn=>$dn_oldclass,
                       type=>"adminclass",
                       members=>$members_oldgroup,
+                      sophomorix_config=>$ref_sophomorix_config,
                     });
     # add user to new group 
     my ($count_newclass,$dn_newclass,$cn_newclass,$info_newclass)=&AD_object_search($ldap,$root_dse,"group",$group_new);
@@ -1981,6 +1983,7 @@ sub AD_user_move {
                       dn=>$dn_newclass,
                       type=>"adminclass",
                       members=>$members_newgroup,
+                      sophomorix_config=>$ref_sophomorix_config,
                     });
     # move the object in ldap tree
     &AD_object_move({ldap=>$ldap,
@@ -2000,6 +2003,7 @@ sub AD_user_move {
                                     root_dse => $root_dse, 
                                     group => $management_group,
                                     removemember => $user,
+                                    sophomorix_config=>$ref_sophomorix_config,
                                    });   
         }
         # adding
@@ -2055,6 +2059,7 @@ sub AD_user_move {
                              });
     }
     &Sophomorix::SophomorixBase::print_title("Moving user $user, (end)");
+    print "\n";
 }
 
 
@@ -4082,10 +4087,12 @@ sub AD_group_update {
     my $admingroups = $arg_ref->{admingroups};
     my $creationdate = $arg_ref->{creationdate};
     my $gidnumber = $arg_ref->{gidnumber};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my $sync_members=0;
 
-    &Sophomorix::SophomorixBase::print_title("Updating $dn");
+    print "\n";
+    &Sophomorix::SophomorixBase::print_title("Updating $dn (start)");
     # description   
     if (defined $description){
         print "   * Setting Description to '$description'\n";
@@ -4198,15 +4205,18 @@ sub AD_group_update {
 
     # sync memberships if necessary
     if ($sync_members>0){
-        &AD_project_sync_members($ldap,$root_dse,$dn);
+        &AD_project_sync_members($ldap,$root_dse,$dn,$ref_sophomorix_config);
     }
-}
+    &Sophomorix::SophomorixBase::print_title("Updating $dn (end)");
+    print "\n";
+ }
 
 
 
 sub AD_project_sync_members {
-    my ($ldap,$root_dse,$dn) = @_;
-    print "   * Sync member: $dn\n";
+    my ($ldap,$root_dse,$dn,$ref_sophomorix_config) = @_;
+    print "\n";
+    &Sophomorix::SophomorixBase::print_title("Sync member: $dn (start)");
     my $filter="cn=*";
     my $mesg = $ldap-> search( # perform a search
                        base   => $dn,
@@ -4296,12 +4306,14 @@ sub AD_project_sync_members {
                                             root_dse => $root_dse, 
                                             group => $cn,
                                             removemember => $key,
+                                            sophomorix_config=>$ref_sophomorix_config,
                                           });   
                 } elsif ($actual{$key} eq "group"){
                     &AD_group_removemember({ldap => $ldap,
                                             root_dse => $root_dse, 
                                             group => $cn,
                                             removegroup => $key,
+                                            sophomorix_config=>$ref_sophomorix_config,
                                           });   
                 }
             }
@@ -4334,6 +4346,8 @@ sub AD_project_sync_members {
     } else {
         print "ERROR: Sync failed: $max_pro projects found\n";
     }
+    &Sophomorix::SophomorixBase::print_title("Sync member: $dn (end)");
+    print "\n";
 }
 
 
@@ -4850,6 +4864,8 @@ sub AD_group_removemember {
     my $group = $arg_ref->{group};
     my $removeuser = $arg_ref->{removemember};
     my $removegroup = $arg_ref->{removegroup};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
     &Sophomorix::SophomorixBase::print_title("Removing member from $group:");
 
     my ($count_group,$dn_exist_group,$cn_exist_group)=&AD_object_search($ldap,$root_dse,"group",$group);
@@ -4879,18 +4895,21 @@ sub AD_group_removemember {
             return;
         }
     } elsif (defined $removegroup){
-         print "   * Removing group $removegroup from $group\n";
-         my ($count_group,$dn_exist_removegroup,$cn_exist_removegroup)=&AD_object_search($ldap,$root_dse,"group",$removegroup);
-         if ($count_group > 0){
-             print "   * Group $removegroup exists ($count_group results)\n";
-             my $mesg = $ldap->modify( $dn_exist_group,
-     	    	                   delete => {
-                                   member => $dn_exist_removegroup,
-                                   }
-                               );
-             &AD_debug_logdump($mesg,2,(caller(0))[3]);
-             return;
-         }
+        if (not exists $ref_sophomorix_config->{'INI'}{'SYNC_MEMBER'}{'KEEPGROUP_LOOKUP'}{$removegroup}){
+            print "   * Removing group $removegroup from $group\n";
+            my ($count_group,$dn_exist_removegroup,$cn_exist_removegroup)=&AD_object_search($ldap,$root_dse,"group",$removegroup);
+            if ($count_group > 0){
+                print "   * Group $removegroup exists ($count_group results)\n";
+                my $mesg = $ldap->modify( $dn_exist_group,
+     	                          delete => {
+                                  member => $dn_exist_removegroup,
+                                });
+                &AD_debug_logdump($mesg,2,(caller(0))[3]);
+                return;
+            }
+	} else {
+            print "   * NOT Removing group $removegroup from $group (sophomorix.ini: SYNC_MEMBER -> KEEPGROUP)\n";
+        }
     } else {
         return;
     }
