@@ -133,7 +133,7 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-#my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD);
+#my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,\%sophomorix_config);
 my %sessions=();
 
 
@@ -187,10 +187,10 @@ Please see the sophomorix-session(8) man pages for full documentation
 
 if ($session ne ""){
     # get the session $session
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,$session);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,$session,\%sophomorix_config);
 } else {
     # get all sessions
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,"all");
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,"all",\%sophomorix_config);
 }
 
 

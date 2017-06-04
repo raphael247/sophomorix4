@@ -538,6 +538,7 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            #examaccounts=>"TRUE",
                            dnszones=>"TRUE",
                            dnsnodes=>"TRUE",
+                           sophomorix_config=>\%sophomorix_config,
              });
 my %AD= %$ref_AD; 
 
@@ -1276,6 +1277,7 @@ if ($set_computer_passwords==1){
                            #examaccounts=>"TRUE",
                            dnszones=>"TRUE",
                            dnsnodes=>"TRUE",
+                           sophomorix_config=>\%sophomorix_config,
              });
 
     my $count=1;

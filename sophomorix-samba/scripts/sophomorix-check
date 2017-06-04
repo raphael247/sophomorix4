@@ -433,6 +433,7 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            users=>"TRUE",
                            dnszones=>"FALSE",
                            dnsnodes=>"FALSE",
+                           sophomorix_config=>\%sophomorix_config,
              });
 my %AD= %$ref_AD; 
 
