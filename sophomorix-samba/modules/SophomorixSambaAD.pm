@@ -2284,7 +2284,7 @@ sub AD_school_create {
                       group=>$DevelConf::AD_schools_group,
                       group_basename=>$DevelConf::AD_schools_group,
                       description=>"The group that includes all schools",
-                      type=>"globalschool",
+                      type=>$ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SCHOOL_GROUP_TYPE'},
                       status=>"P",
                       creationdate=>$creationdate,
                       joinable=>"FALSE",
@@ -2851,7 +2851,7 @@ sub AD_get_AD {
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-                       filter => '(&(objectClass=group)(|(sophomorixType=admins) (sophomorixType=globaladmins)))',
+                       filter => '(&(objectClass=group)(|(sophomorixType=admins) (sophomorixType=alladmins)))',
                        attrs => ['sAMAccountName',
                                  'sophomorixSchoolname',
                                  'sophomorixStatus',

@@ -1,6 +1,20 @@
 weiter:
 global-> all umbenenen
 
+sophomorix-admin
+
+--create ---> --create-all-admin
+--create erzeugt neuer global-admin
+
+alladmins ersetzen in AD_get_AD
+--> sophomorix_config als parameter in AD_get_AD
+
+test-3
+all-intranet test u.a. fehlen
+
+sophomorix-device:
+use settings from [devicefile.devices.csv]
+
 Sophomorix::SophomorixBase::ini_list nutzen
 
 
@@ -166,77 +180,6 @@ sophomorix.ini für Pfade:
 ...
 
 
-sophomorix.ini mit angaben, um eine neue Rolle zu definieren
-
-# ONE import file equals to ONE role
-# ---> for a new role you need a new file
-[ROLE.students.csv]
-	FIELD1=PRIMARY_GROUP
-#	FIELD1=
-	FIELD_5=UNID
-	FIELD_6=...
-	...
-	USER_ROLE=student
-
-        PRIMARY_GROUP_TYPE=adminclass
-        PRIMARY_GROUP_NAME=*multi*
-        PRIMARY_GROUP_NAME=FIELD1
-#        PRIMARY_GROUP_NAME=teachers
-        PRIMARY_GROUP_OU=Students
-#        PRIMARY_GROUP_OU=Teachers
-
-        SECONDARY_GROUP_TYPE=ouclass
-        SECONDARY_GROUP_NAME=students
-#        SECONDARY_GROUP_NAME=          # none
-        SECONDARY_GROUP_OU=Students
-
-        TERTIARY_GROUP_TYPE=globalclass
-        TERTIARY_GROUP_NAME=global-students
-#        TERTIARY_GROUP_NAME=global-teachers
-        TERTIARY_GROUP_OU=Groups
-
-        QUATERNARY_GROUP_TYPE=globalclass
-        QUATERNARY_GROUP_NAME=
-        QUATERNARY_GROUP_OU=Groups
-
-Oder:
-------------------------------
-# user roles
-[role.students.csv]
-	FIELD_5=UNID
-	FIELD_6=...
-	...
-	USER_ROLE=student
-        PRIMARY_GROUP_TYPE=adminclass
-        SECONDARY_GROUP_TYPE=ouclass
-        TERTIARY_GROUP_TYPE=globalclass
-        QUATERNARY_GROUP_TYPE=globalclass
-#        GROUP_TYPE_LEVEL1=adminclass
-#        GROUP_TYPE_LEVEL2=ouclass
-#        GROUP_TYPE_LEVEL3=globalstudents
-#        GROUP_TYPE_LEVEL4=globalclass
-
-# group types
-[type.adminclass]
-	GROUP_NAME=*multi*
-	GROUP_SUB_OU=Students     # -> OU=Students, ...
-[type.teacherclass]
-	GROUP_NAME=teachers
-	GROUP_SUB_OU=OU=Teachers  # -> OU=Teachers, ...
-[type.ouclass]
-	GROUP_NAME=students
-	GROUP_SUB_OU=OU=Students
-#[type.globalclass]
-[type.globalstudents]
-	GROUP_NAME=global-students
-	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
-[type.globalteachers]
-	GROUP_NAME=global-teachers
-	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
-[type.globalclass]
-	GROUP_NAME=global-teachers
-	GROUP_SUB_OU=OU=Groups    # -> OU=Groups, ...
-	
 
 ----------
 Final
