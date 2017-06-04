@@ -151,14 +151,14 @@ if ($full==1){
 # --add-admin  
 if ($add_admin==1){
     # admin in OU=bsz
-    &run_command("sophomorix-admin $all_options --create admin-bsz-66 --school bsz --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create admin-abc-666 --school abc --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-school-admin admin-bsz-66 --school bsz --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-school-admin admin-abc-666 --school abc --password 'Muster!'");
     # admin in OU=default-school
-    &run_command("sophomorix-admin $all_options --create admin-66 --school default-school --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create admin-666 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-school-admin admin-66 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-school-admin admin-666 --school default-school --password 'Muster!'");
     # admin in OU=default-school
-    &run_command("sophomorix-admin $all_options --create all-admin-66 --school global --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create all-admin-666 --school global --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-all-admin all-admin-66 --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-all-admin all-admin-666 --password 'Muster!'");
 
 }
 

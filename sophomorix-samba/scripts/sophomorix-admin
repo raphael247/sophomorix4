@@ -170,6 +170,7 @@ if ($info==1){
 my $create_count=0;
 
 # exit if the user exists already
+# --create-school-admin
 if ($create_school_admin ne ""){
     $create_count++;
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create_school_admin);
@@ -218,6 +219,53 @@ if ($create_count>1){
         exit;
 
 }
+
+
+
+# --create-all-admin <user>
+if ($create_all_admin ne "" and $password ne ""){
+    my $group=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPPREFIX'}.
+       $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
+    &print_title("Creating admin $create_all_admin in group $group $sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'}");
+    &AD_school_create({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       school=>$DevelConf::name_default_school,
+                       creationdate=>$time_stamp_AD,
+                       smb_admin_pass=>$smb_admin_pass,
+                       sophomorix_config=>\%sophomorix_config,
+                     });
+    my $sn="Admin";
+    my $given_name="All";
+    &AD_user_create({ldap=>$ldap,
+                    root_dse => $root_dse, 
+                    root_dns => $root_dns, 
+                    user_count => "1",
+                    login => $create_all_admin,
+                    group => $group,
+                    group_basename => $group,
+                    firstname_ascii => $given_name,
+                    surname_ascii => $sn,
+                    firstname_utf8 => $given_name,
+                    surname_utf8 => $sn,
+                    birthdate => "---",
+                    plain_password => $password,
+                    unid => "---",
+                    role => "administrator",
+                    type => "sophomorixalladmin",
+                    school => $sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'},
+                    creationdate => $time_stamp_AD,
+                    tolerationdate => "---",
+                    deactivationdate => "---",
+                    status => "P",
+                    file => "no file",
+                    smb_admin_pass=>$smb_admin_pass,
+                    sophomorix_config=>\%sophomorix_config,
+                  });
+} elsif ($create_all_admin ne "" and ($school eq "" or $password eq "")){
+    print "\nERROR: A password is needed to create the admin $create_all_admin\n\n";
+    exit;
+} 
 
 
 

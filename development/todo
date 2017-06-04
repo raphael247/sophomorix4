@@ -1,15 +1,6 @@
 weiter:
 global-> all umbenenen
 
-sophomorix-admin
-
-rename: --create ---> --create-all-admin
-new:    --create erzeugt neuer global-admin
-
-alladmins ersetzen in AD_get_AD
---> sophomorix_config als parameter in AD_get_AD
-sophomorixType-Angaben aus sophomorix.ini
-
 
 test-3
 all-intranet test u.a. fehlen
@@ -20,7 +11,11 @@ use settings from [devicefile.devices.csv]
 Sophomorix::SophomorixBase::ini_list nutzen
 
 grep nach TYPEFILTER und ROLEFILTER
+rename:
+TYPEFILTER-> TYPE
+ROLEFILTER-> ROLE
 
+OU_TOP_GLOBAL aus USER_FILE im hash raus (passt nicht da rein)
 
 
 nextcloud:
