@@ -2438,6 +2438,7 @@ sub AD_school_create {
 
     # all groups created, add some memberships
     foreach my $group (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBER'}}) {
+	print "HERE:\n";
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
                              group => $ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$group},

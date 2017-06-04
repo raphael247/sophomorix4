@@ -542,6 +542,7 @@ sub config_sophomorix_read {
             foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} } ){
                 my ($membergroup,$group)=split(/\|/,$entry);
                 $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
+                $group=&replace_vars($group,\%sophomorix_config,$school);
                 $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
             }
         }
