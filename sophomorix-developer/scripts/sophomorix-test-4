@@ -450,7 +450,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-teachers",
+                   memberOf => "bsz|all-teachers",
                   });
 
 
@@ -496,7 +496,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-teachers",
+                   memberOf => "bsz|all-teachers",
                   });
 
 
@@ -658,7 +658,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                   });
 
 
@@ -704,7 +704,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                   });
     # schneima38
     &AD_test_object({ldap=>$ldap,
@@ -804,7 +804,7 @@ if ($test_add_class==1){
                    sophomorixType=>"teacherclass",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|global-teachers",
+                   memberOf => "default-school|all-teachers",
                   });
 
     ##### Testing the global groups
@@ -829,8 +829,8 @@ if ($test_add_class==1){
                    sophomorixSchoolname => "global",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-teachers",
+                   dn=>"CN=all-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",

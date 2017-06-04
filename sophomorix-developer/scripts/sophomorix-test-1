@@ -642,7 +642,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|global-teachers",
+                   memberOf => "bsz|all-teachers",
                    member => "oe42|wu42",
                   });
 
@@ -834,7 +834,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                    member => "kep42|gal42",
               });
     ##### Testing the users ou-teachers group
@@ -849,7 +849,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                    member => "kep42|gal42",
                   });
 
@@ -899,7 +899,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                    member => "kep42|gal42",
               });
     ##### Testing the users ou-teachers group
@@ -914,7 +914,7 @@ if ($add==1 or $test_add==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                    member => "kep42|gal42",
                   });
 
@@ -1359,7 +1359,7 @@ if ($add==1 or $test_add==1){
                    gidNumber=>"-1",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|global-teachers",
+                   memberOf => "default-school|all-teachers",
                    member => "sch42",
                   });
 
@@ -1736,8 +1736,8 @@ if ($add==1 or $test_add==1){
                    member => "bsz-students|uni-students|students",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-teachers",
+                   dn=>"CN=all-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
@@ -4314,7 +4314,7 @@ if ($update==1 or $test_update==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                    member => "wu42|lordjo42",
               });
 
@@ -4364,7 +4364,7 @@ if ($update==1 or $test_update==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|global-teachers",
+                   memberOf => "uni|all-teachers",
                    member => "wu42|lordjo42",
                   });
 
@@ -4414,7 +4414,7 @@ if ($update==1 or $test_update==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "lin",
-                   memberOf => "lin|global-teachers",
+                   memberOf => "lin|all-teachers",
                    member => "blackmri42",
                 });
 
@@ -5224,8 +5224,8 @@ if ($update==1 or $test_update==1){
                    member => "bsz-students|uni-students|lin-students|ghs-students|students",
                   });
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-teachers",
+                   dn=>"CN=all-teachers,OU=Groups,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"all-teachers",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
