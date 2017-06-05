@@ -678,7 +678,6 @@ sub AD_user_kill {
             $role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
             $role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'} or
             $role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
-#            $role eq "administrator"
            ){
               my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                password  => $smb_admin_pass,
@@ -1224,17 +1223,6 @@ sub AD_user_create {
     my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$login.",".$dn_class;
 
-    # # ou for administrators
-    # if ($role eq "administrator"){
-    #     # bei global muss im hash in GLOBAL gesucht werden 
-    #     if ($school eq $DevelConf::AD_global_ou or $school eq "global"){
-    #         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
-    # 	    $dn="cn=".$login.",".$dn_class;
-    #     } else {
-    #         $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
-    # 	    $dn="cn=".$login.",".$dn_class;
-    #     }
-    # }
     # ou for administrators
     if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
@@ -1365,7 +1353,6 @@ sub AD_user_create {
     ######################################################################
     # memberships of created user
     ######################################################################
-#    if ($role eq "administrator" and $school eq "global"){
     if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         #######################################################
         # global administrator
@@ -1408,7 +1395,6 @@ sub AD_user_create {
         }
 
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
-#    } elsif ($role eq "administrator"){
         #######################################################
         # school administrator
         #######################################################
@@ -1483,51 +1469,31 @@ sub AD_user_create {
     ############################################################
     # Create filesystem
     ############################################################
-   #  if ($role eq "administrator"){
-   #      if ($school eq "global"){
-   #          &AD_repdir_using_file({root_dns=>$root_dns,
-   #                                 repdir_file=>"repdir.administrator_home",
-   #                                 school=>$DevelConf::homedir_global_smb_share,
-   #                                 administrator_home=>$login,
-   #                                 smb_admin_pass=>$smb_admin_pass,
-   #                                 sophomorix_config=>$ref_sophomorix_config,
-   #                               });
-   #      } else {
-   #          &AD_repdir_using_file({root_dns=>$root_dns,
-   #                                 repdir_file=>"repdir.administrator_home",
-   #                                 school=>$school,
-   #                                 administrator_home=>$login,
-   #                                 smb_admin_pass=>$smb_admin_pass,
-   #                                 sophomorix_config=>$ref_sophomorix_config,
-   #                               });
-   #      }
-   # } els
-
-   if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
-       &AD_repdir_using_file({root_dns=>$root_dns,
-                              repdir_file=>"repdir.alladministrator_home",
-                              school=>$DevelConf::homedir_global_smb_share,
-                              administrator_home=>$login,
-                              smb_admin_pass=>$smb_admin_pass,
-                              sophomorix_config=>$ref_sophomorix_config,
-                            });
-   } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
-       &AD_repdir_using_file({root_dns=>$root_dns,
-                              repdir_file=>"repdir.schooladministrator_home",
-                              school=>$school,
-                              administrator_home=>$login,
-                              smb_admin_pass=>$smb_admin_pass,
-                              sophomorix_config=>$ref_sophomorix_config,
-                            });
-   } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
-       &AD_repdir_using_file({root_dns=>$root_dns,
-                              repdir_file=>"repdir.globaladministrator_home",
-                              school=>$DevelConf::homedir_global_smb_share,
-                              administrator_home=>$login,
-                              smb_admin_pass=>$smb_admin_pass,
-                              sophomorix_config=>$ref_sophomorix_config,
-                            });
-   } elsif ($role eq "teacher"){
+    if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.alladministrator_home",
+                               school=>$DevelConf::homedir_global_smb_share,
+                               administrator_home=>$login,
+                               smb_admin_pass=>$smb_admin_pass,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.schooladministrator_home",
+                               school=>$school,
+                               administrator_home=>$login,
+                               smb_admin_pass=>$smb_admin_pass,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.globaladministrator_home",
+                               school=>$DevelConf::homedir_global_smb_share,
+                               administrator_home=>$login,
+                               smb_admin_pass=>$smb_admin_pass,
+                               sophomorix_config=>$ref_sophomorix_config,
+                             });
+    } elsif ($role eq "teacher"){
         if ($school eq "global"){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.teacher_home",

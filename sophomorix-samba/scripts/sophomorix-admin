@@ -115,6 +115,7 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -149,9 +150,6 @@ Please see the sophomorix--admin(8) man pages for full documentation
 }
 
 
-############################################################
-# config values
-############################################################
 
 # --info
 if ($info==1){
@@ -161,15 +159,16 @@ if ($info==1){
 
 &result_sophomorix_check_exit(\%sophomorix_result,$json);
 # ===========================================================================
-# Programmbeginn
+# Start
 # ===========================================================================
 &log_script_start(\@arguments,\%sophomorix_result);
 
-
+############################################################
+# Test if options are mixed correctly
+############################################################
 # avoid double create
 my $create_count=0;
 
-# exit if the user exists already
 # --create-school-admin
 if ($create_school_admin ne ""){
     $create_count++;
@@ -185,6 +184,8 @@ if ($create_school_admin ne ""){
         exit;
     }
 }
+
+# --create-all-admin
 if ($create_all_admin ne ""){
     $create_count++;
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create_all_admin);
@@ -199,6 +200,8 @@ if ($create_all_admin ne ""){
         exit;
     }
 }
+
+# --create-global-admin
 if ($create_global_admin ne ""){
     $create_count++;
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create_global_admin);
@@ -220,8 +223,9 @@ if ($create_count>1){
 
 }
 
-
-
+############################################################
+# Options do it
+############################################################
 # --create-all-admin <user>
 if ($create_all_admin ne "" and $password ne ""){
     my $group=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPPREFIX'}.
@@ -281,21 +285,12 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
     my $group_token;
     if ($school eq $DevelConf::name_default_school){
         $group_token=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
-#    } elsif ($school eq "global"){ 
-#        $group_token=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPPREFIX'}.
-#	             $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
     } else {
         $group_token=$school."-".
 	             $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
     }
 
-#    # make sure school exists
-#    my $school_provide;
-#    if ($school eq "global"){
-#        $school_provide=$DevelConf::name_default_school;
-#    } else {
-#        $school_provide=$school;
-#    }
+    # make sure school exists
     &print_title("Creating admin $create_school_admin in school $school");
     &AD_school_create({ldap=>$ldap,
                        root_dse=>$root_dse,
@@ -305,11 +300,7 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
                        smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
                      });
-#    my $sn="Admin";
-#    my $given_name=$school;
-#    if ($school eq "global"){
-#        $given_name="All";
-#    }
+
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
                     root_dns => $root_dns, 
@@ -317,16 +308,10 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
                     login => $create_school_admin,
                     group => $group_token,
                     group_basename => $sophomorix_config{'INI'}{'administrator.school'}{'GROUPBASENAME'},
-#                    firstname_ascii => $sophomorix_config{'INI'}{'administrator.school'}{'DEFAULT_givenName_ASCII'},
                     firstname_ascii => $school,
                     surname_ascii => $sophomorix_config{'INI'}{'administrator.school'}{'DEFAULT_sn_ASCII'},
                     firstname_utf8 => $school,
-#                    firstname_utf8 => $sophomorix_config{'INI'}{'administrator.school'}{'DEFAULT_givenName'},
                     surname_utf8 => $sophomorix_config{'INI'}{'administrator.school'}{'DEFAULT_sn'},
-#                    firstname_ascii => $given_name,
-#                    surname_ascii => $sn,
-#                    firstname_utf8 => $given_name,
-#                    surname_utf8 => $sn,
                     birthdate => "---",
                     plain_password => $password,
                     unid => "---",
@@ -349,7 +334,6 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
 
 
 
-
 # --create-global-admin <user>
 if ($create_global_admin ne "" and $password ne ""){
     $school=$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
@@ -364,8 +348,7 @@ if ($create_global_admin ne "" and $password ne ""){
                        smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
                      });
-#    my $sn="Admin";
-#    my $given_name="Global";
+
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
                     root_dns => $root_dns, 
@@ -377,10 +360,6 @@ if ($create_global_admin ne "" and $password ne ""){
                     surname_ascii => $sophomorix_config{'INI'}{'administrator.global'}{'DEFAULT_sn_ASCII'},
                     firstname_utf8 => $sophomorix_config{'INI'}{'administrator.global'}{'DEFAULT_givenName'},
                     surname_utf8 => $sophomorix_config{'INI'}{'administrator.global'}{'DEFAULT_sn'},
-#                    firstname_ascii => $given_name,
-#                    surname_ascii => $sn,
-#                    firstname_utf8 => $given_name,
-#                    surname_utf8 => $sn,
                     birthdate => "---",
                     plain_password => $password,
                     unid => "---",
@@ -413,7 +392,6 @@ if ($kill ne ""){
                   user=>$kill,
                 });
 
-    print "RO: $role\n";
     if ($existing eq "FALSE"){
         print "\nERROR: User $kill does not exist\n\n";
         exit;
@@ -436,13 +414,17 @@ if ($kill ne ""){
 }
 
 
-# ===========================================================================
-# Ende des Scripts
-# ===========================================================================
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,$json);
+############################################################
+# End
+############################################################
 
+
+
+############################################################
 # subs
+############################################################
 sub print_valid_schools{
     my @list=();
     foreach my $key (keys %{$sophomorix_config{'SCHOOLS'}}) {
