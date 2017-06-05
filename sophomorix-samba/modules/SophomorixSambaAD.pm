@@ -434,7 +434,7 @@ sub AD_repdir_using_file {
     my $teacher_home = $arg_ref->{teacher_home};
     my $adminclass = $arg_ref->{adminclass};
     my $student_home = $arg_ref->{student_home};
-
+    print "HERE: $repdir_file\n";
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
     my $entry_num=0; # was $num
@@ -589,7 +589,7 @@ sub AD_repdir_using_file {
                         @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
                     } else {
                         print "\n";
-                        print "##### No users in $group #####\n";
+                        print "##### No users in $group (school $school) #####\n";
                         # empty list means do nothing in next loop
                         @users=();
                     }
@@ -612,8 +612,9 @@ sub AD_repdir_using_file {
                         } else {
                             $user_typeout=$user;
                         }
-                        print "   User: $user_typeout\n";
-                        print "$smbclient_command\n";
+                        print "\nUser: $user_typeout in group $group in school $school\n";
+                        print "---------------------------------------------------------------\n";
+                        print "* $smbclient_command\n";
                         system($smbclient_command);
 
                         # smbcacls

@@ -74,7 +74,9 @@ my $linux=0;
 my $global=0;
 my $school=0;
 my $project=0;
-my $administrator_home=0;
+my $alladministrator_home=0;
+my $globaladministrator_home=0;
+my $schooladministrator_home=0;
 my $teacherclass=0;
 my $teacher_home=0;
 my $adminclass=0;
@@ -97,7 +99,9 @@ my $testopt=GetOptions(
            "global" => \$global,
            "school" => \$school,
            "project" => \$project,
-           "administrator-home" => \$administrator_home,
+           "alladministrator-home" => \$alladministrator_home,
+           "globaladministrator-home" => \$globaladministrator_home,
+           "schooladministrator-home" => \$schooladministrator_home,
            "teacherclass" => \$teacherclass,
            "teacher-home" => \$teacher_home,
            "adminclass" => \$adminclass,
@@ -140,7 +144,9 @@ What to repair in the Filesystem:
   --global                   (use repdir.global, repairs the global part)
   --school                   (use repdir.school, repairs a school and subdirs)
   --project                  (use repdir.project, repairs projects)
-  --administrator-home       (use repdir.administrator_home, repairs homes of administrators)
+  --alladministrator-home    (use repdir.alladministrator_home, repairs homes of alladministrators)
+  --globaladministrator-home (use repdir.globaladministrator_home, repairs homes of globaladministrators)
+  --schooladministrator-home (use repdir.schooladministrator_home, repairs homes of schooladministrators)
   --teacherclass             (use repdir.teacherclass, repairs teacherclasses)
   --teacher-home             (use repdir.teacher_home, repairs homes of teachers)
   --adminclass               (use repdir.adminclass, repairs adminclasses)
@@ -206,7 +212,9 @@ if ($all==1) {
     $global=1;
     $school=1;
     $project=1;
-    $administrator_home=1;
+    $alladministrator_home=1;
+    $globaladministrator_home=1;
+    $schooladministrator_home=1;
     $teacherclass=1;
     $teacher_home=1;
     $adminclass=1;
@@ -267,8 +275,8 @@ if ($project==1) {
 }
 
 
-# --administrator-home
-if ($administrator_home==1) {
+# --alladministrator-home
+if ($alladministrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
@@ -277,6 +285,11 @@ if ($administrator_home==1) {
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
+}
+
+
+# --globaladministrator-home
+if ($globaladministrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
@@ -285,6 +298,11 @@ if ($administrator_home==1) {
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                         });
+}
+
+
+# --schooladministrator-home
+if ($schooladministrator_home==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
