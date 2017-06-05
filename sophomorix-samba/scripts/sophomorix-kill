@@ -270,6 +270,7 @@ if ($killuser ne ""){
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
                        smb_admin_pass=>$smb_admin_pass,
+                       sophomorix_config=>\%sophomorix_config,
                      });
     }
 } else {
@@ -290,6 +291,7 @@ if ($killuser ne ""){
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
                        smb_admin_pass=>$smb_admin_pass,
+                       sophomorix_config=>\%sophomorix_config,
                      });
     }
     close(KILL);

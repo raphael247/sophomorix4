@@ -652,6 +652,7 @@ sub AD_user_kill {
     my $identifier = $arg_ref->{identifier};
     my $user_count = $arg_ref->{user_count};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
         &AD_get_user({ldap=>$ldap,
@@ -674,7 +675,11 @@ sub AD_user_kill {
         # deleting home
         if ($role eq "student" or 
             $role eq "teacher" or 
-            $role eq "administrator"){
+            $role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
+            $role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'} or
+            $role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
+#            $role eq "administrator"
+           ){
               my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                password  => $smb_admin_pass,
                                                debug     => 1);
@@ -1207,7 +1212,8 @@ sub AD_user_create {
                                                        $school,
                                                        $group_basename,
                                                        $login,
-                                                       $role);
+                                                       $role,
+                                                       $ref_sophomorix_config);
     my $class_ou;
     if ($file eq "no file"){
         $class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
@@ -1218,16 +1224,29 @@ sub AD_user_create {
     my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$login.",".$dn_class;
 
+    # # ou for administrators
+    # if ($role eq "administrator"){
+    #     # bei global muss im hash in GLOBAL gesucht werden 
+    #     if ($school eq $DevelConf::AD_global_ou or $school eq "global"){
+    #         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
+    # 	    $dn="cn=".$login.",".$dn_class;
+    #     } else {
+    #         $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
+    # 	    $dn="cn=".$login.",".$dn_class;
+    #     }
+    # }
     # ou for administrators
-    if ($role eq "administrator"){
-        # bei global muss im hash in GLOBAL gesucht werden 
-        if ($school eq $DevelConf::AD_global_ou or $school eq "global"){
-            $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
-	    $dn="cn=".$login.",".$dn_class;
-        } else {
-            $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
-	    $dn="cn=".$login.",".$dn_class;
-        }
+    if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+        $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
+        $dn="cn=".$login.",".$dn_class;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
+        $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
+	$dn="cn=".$login.",".$dn_class;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+        $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
+	$dn="cn=".$login.",".$dn_class;
+    } else {
+
     }
 
     # password generation
@@ -1346,9 +1365,30 @@ sub AD_user_create {
     ######################################################################
     # memberships of created user
     ######################################################################
-    if ($role eq "administrator" and $school eq "global"){
+#    if ($role eq "administrator" and $school eq "global"){
+    if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         #######################################################
         # global administrator
+        #######################################################
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MANMEMBER'});
+        foreach my $mangroup (@manmember){
+            &AD_group_addmember_management({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $mangroup,
+                                            addmember => $login,
+                                           }); 
+        }
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MEMBER'});
+        foreach my $group (@member){
+            &AD_group_addmember({ldap => $ldap,
+                                  root_dse => $root_dse, 
+                                  group => $group,
+                                  addmember => $login,
+                                });
+        }
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
+        #######################################################
+        # all administrator
         #######################################################
         my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MANMEMBER'});
         foreach my $mangroup (@manmember){
@@ -1366,7 +1406,9 @@ sub AD_user_create {
                                   addmember => $login,
                                 });
         }
-    } elsif ($role eq "administrator"){
+
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+#    } elsif ($role eq "administrator"){
         #######################################################
         # school administrator
         #######################################################
@@ -1441,25 +1483,51 @@ sub AD_user_create {
     ############################################################
     # Create filesystem
     ############################################################
-    if ($role eq "administrator"){
-        if ($school eq "global"){
-            &AD_repdir_using_file({root_dns=>$root_dns,
-                                   repdir_file=>"repdir.administrator_home",
-                                   school=>$DevelConf::homedir_global_smb_share,
-                                   administrator_home=>$login,
-                                   smb_admin_pass=>$smb_admin_pass,
-                                   sophomorix_config=>$ref_sophomorix_config,
-                                 });
-        } else {
-            &AD_repdir_using_file({root_dns=>$root_dns,
-                                   repdir_file=>"repdir.administrator_home",
-                                   school=>$school,
-                                   administrator_home=>$login,
-                                   smb_admin_pass=>$smb_admin_pass,
-                                   sophomorix_config=>$ref_sophomorix_config,
-                                 });
-        }
-    } elsif ($role eq "teacher"){
+   #  if ($role eq "administrator"){
+   #      if ($school eq "global"){
+   #          &AD_repdir_using_file({root_dns=>$root_dns,
+   #                                 repdir_file=>"repdir.administrator_home",
+   #                                 school=>$DevelConf::homedir_global_smb_share,
+   #                                 administrator_home=>$login,
+   #                                 smb_admin_pass=>$smb_admin_pass,
+   #                                 sophomorix_config=>$ref_sophomorix_config,
+   #                               });
+   #      } else {
+   #          &AD_repdir_using_file({root_dns=>$root_dns,
+   #                                 repdir_file=>"repdir.administrator_home",
+   #                                 school=>$school,
+   #                                 administrator_home=>$login,
+   #                                 smb_admin_pass=>$smb_admin_pass,
+   #                                 sophomorix_config=>$ref_sophomorix_config,
+   #                               });
+   #      }
+   # } els
+
+   if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
+       &AD_repdir_using_file({root_dns=>$root_dns,
+                              repdir_file=>"repdir.administrator_home",
+                              school=>$DevelConf::homedir_global_smb_share,
+                              administrator_home=>$login,
+                              smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>$ref_sophomorix_config,
+                            });
+   } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+       &AD_repdir_using_file({root_dns=>$root_dns,
+                              repdir_file=>"repdir.administrator_home",
+                              school=>$school,
+                              administrator_home=>$login,
+                              smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>$ref_sophomorix_config,
+                            });
+   } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+       &AD_repdir_using_file({root_dns=>$root_dns,
+                              repdir_file=>"repdir.administrator_home",
+                              school=>$DevelConf::homedir_global_smb_share,
+                              administrator_home=>$login,
+                              smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>$ref_sophomorix_config,
+                            });
+   } elsif ($role eq "teacher"){
         if ($school eq "global"){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.teacher_home",
@@ -1871,13 +1939,15 @@ sub AD_user_move {
                                                        $school_old,
                                                        $group_old_basename,
                                                        $user,
-                                                       $role_old);
+                                                       $role_old,
+                                                       $ref_sophomorix_config);
     my ($homedirectory_new,$unix_home_new,$unc_new,$smb_rel_path_new)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                        $school_new,
                                                        $group_new_basename,
                                                        $user,
-                                                       $role_new);
+                                                       $role_new,
+                                                       $ref_sophomorix_config);
 
     # fetch the dn (where the object really is)
     my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"user",$user);
@@ -2443,7 +2513,6 @@ sub AD_school_create {
 
     # all groups created, add some memberships
     foreach my $group (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBER'}}) {
-	print "HERE:\n";
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
                              group => $ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$group},
@@ -4353,16 +4422,22 @@ sub AD_project_sync_members {
 
 
 sub AD_admin_list {
-    my ($ldap,$root_dse)=@_;
+    my ($ldap,$root_dse,$ref_sophomorix_config)=@_;
+    # filter for all admin roles
+    my $filter="(&(objectClass=user) (| (sophomorixRole=".
+       $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}.") (sophomorixRole=".
+       $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}.") (sophomorixRole=".
+       $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}.") ))";
     # sophomorix students,teachers from ldap
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
                       scope => 'sub',
-                      filter => '(&(objectClass=user) (sophomorixRole=administrator))',
+                      filter => $filter,
                       attrs => ['sAMAccountName',
                                 'sophomorixAdminClass',
                                 'givenName',
                                 'sn',
+                                'displayname',
                                 'sophomorixStatus',
                                 'sophomorixSchoolname',
                                 'sophomorixSchoolPrefix',
@@ -4371,16 +4446,18 @@ sub AD_admin_list {
                                ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user sophomorix administrators found in AD");
-    print "+------------------------+----------------+\n";
-    printf "| %-22s | %-14s |\n","administrator","School";
-    print "+------------------------+----------------+\n";
+    print "+----------------+----------------------+---------------------+----------------+\n";
+    printf "| %-14s | %-20s | %-19s | %-14s |\n","administrator","displayName","sophomorixRole","sopho*School";
+    print "+----------------+----------------------+---------------------+----------------+\n";
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $school=$entry->get_value('sophomorixSchoolname');
-        printf "| %-22s | %-14s |\n",$sam,$school;
+        my $role=$entry->get_value('sophomorixRole');
+        my $displayname=$entry->get_value('displayname');
+        printf "| %-14s | %-20s | %-19s | %-14s |\n",$sam,$displayname,$role,$school;
     }
-    print "+------------------------+----------------+\n";
+    print "+----------------+----------------------+---------------------+----------------+\n";
 }
 
 

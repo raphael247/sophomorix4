@@ -1660,7 +1660,7 @@ sub create_plain_password {
 # filesystem
 ######################################################################
 sub get_homedirectory {
-    my ($root_dns,$school,$group_basename,$user,$role)=@_;
+    my ($root_dns,$school,$group_basename,$user,$role,$ref_sophomorix_config)=@_;
     my $homedirectory;  # as needed to fill the attribute 'homeDirectory (using \\)
     my $unix_home;      # (works only if share is on the same server)
     my $smb_rel_path;   # option for smbclient
@@ -1681,7 +1681,16 @@ sub get_homedirectory {
         $smb_rel_path="teachers/homes/".$user;
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\teachers\\homes\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/teachers/homes/".$user;
-    } elsif ($role eq "administrator"){
+#    } elsif ($role eq "administrator"){
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+        $smb_rel_path="management/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
+        $smb_rel_path="management/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
         $smb_rel_path="management/".$user;
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
