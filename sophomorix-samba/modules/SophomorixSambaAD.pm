@@ -2812,11 +2812,10 @@ sub AD_get_AD {
     if ($adminclasses eq "TRUE"){
         # sophomorixType adminclass from ldap
         my $filter="(&(objectClass=group)(sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPEFILTER'}{'ADMINCLASS'}."))";
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}."))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-#                       filter => '(&(objectClass=group)(sophomorixType=adminclass))',
                        filter => $filter,
                        attrs => ['sAMAccountName',
                                  'sophomorixSchoolname',
@@ -2856,11 +2855,10 @@ sub AD_get_AD {
     if ($teacherclasses eq "TRUE"){
         # sophomorixType teacherclass from ldap
         my $filter="(&(objectClass=group)(sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPEFILTER'}{'TEACHERCLASS'}."))";
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'TEACHERCLASS'}."))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-#                       filter => '(&(objectClass=group)(sophomorixType=teacherclass))',
                        filter => $filter,
                        attrs => ['sAMAccountName',
                                  'sophomorixSchoolname',
@@ -2899,12 +2897,11 @@ sub AD_get_AD {
     if ($administratorclasses eq "TRUE"){
         # sophomorixType teacherclass from ldap
         my $filter="(&(objectClass=group)(|(sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPEFILTER'}{'ADMINS'}.") (sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPEFILTER'}{'ALLADMINS'}.")))";
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINS'}.") (sophomorixType=".
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ALLADMINS'}.")))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-#                       filter => '(&(objectClass=group)(|(sophomorixType=admins) (sophomorixType=alladmins)))',
                        filter => $filter,
                        attrs => ['sAMAccountName',
                                  'sophomorixSchoolname',
@@ -2943,11 +2940,10 @@ sub AD_get_AD {
     if ($projects eq "TRUE"){
         # sophomorixType projects from ldap
         my $filter="(&(objectClass=group)(sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPEFILTER'}{'PROJECT'}."))";
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'PROJECT'}."))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-#                       filter => '(&(objectClass=group)(sophomorixType=project))',
                        filter => $filter,
                        attrs => ['sAMAccountName',
                                  'sophomorixSchoolname',
@@ -2987,13 +2983,12 @@ sub AD_get_AD {
     if ($users eq "TRUE"){
         # sophomorix students,teachers from ldap
         my $filter="(&(objectClass=user)(|(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLEFILTER'}{'STUDENT'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLEFILTER'}{'TEACHER'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLEFILTER'}{'ADMINISTRATOR'}.")))";
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'ADMINISTRATOR'}.")))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
-#                       filter => '(&(objectClass=user)(|(sophomorixRole=student)(sophomorixRole=teacher)(sophomorixRole=administrator)))',
                        filter => $filter,
                        attrs => ['sAMAccountName',
                                  'sophomorixAdminClass',
@@ -3138,7 +3133,7 @@ sub AD_get_AD {
     if ($rooms eq "TRUE"){
         # sophomorixType room from ldap
         my $filter="(&(objectClass=group)(sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPEFILTER'}{'ROOM'}."))";
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}."))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
@@ -3181,7 +3176,7 @@ sub AD_get_AD {
     if ($computers eq "TRUE"){
         # sophomorix computers from ldap
         my $filter="(&(objectClass=computer)(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLEFILTER'}{'COMPUTER'}."))";
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'COMPUTER'}."))";
         my $mesg = $ldap->search( # perform a search
                           base   => $root_dse,
                           scope => 'sub',
