@@ -1215,27 +1215,40 @@ sub AD_user_create {
                                                        $role,
                                                        $ref_sophomorix_config);
     my $class_ou;
-    if ($file eq "no file"){
-        $class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
-    } else {
-        $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
-    }
-    $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
-    my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    my $dn="CN=".$login.",".$dn_class;
+    # if ($file eq "no file"){
+    #     $class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
+    # } else {
+    #     $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+    # }
+    # $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+    # my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    # my $dn="CN=".$login.",".$dn_class;
 
-    # ou for administrators
+    my $dn_class;
+    my $dn;
+
+    # ou
     if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+        $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.global'}{'SUB_OU'};
+        #$class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
         $dn="cn=".$login.",".$dn_class;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
+        $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.all'}{'SUB_OU'};
+        #$class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
 	$dn="cn=".$login.",".$dn_class;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+        $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.school'}{'SUB_OU'};
+        #$class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
         $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
 	$dn="cn=".$login.",".$dn_class;
     } else {
-
+        # from file
+        $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+        $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+        $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+        $dn="CN=".$login.",".$dn_class;
     }
 
     # password generation
