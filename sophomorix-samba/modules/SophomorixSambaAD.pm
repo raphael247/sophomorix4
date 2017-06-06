@@ -1359,7 +1359,7 @@ sub AD_user_create {
         #######################################################
         # global administrator
         #######################################################
-        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MANMEMBER'});
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MANMEMBEROF'});
         foreach my $mangroup (@manmember){
             &AD_group_addmember_management({ldap => $ldap,
                                             root_dse => $root_dse, 
@@ -1367,7 +1367,7 @@ sub AD_user_create {
                                             addmember => $login,
                                            }); 
         }
-        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MEMBER'});
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.global'}{'MEMBEROF'});
         foreach my $group (@member){
             &AD_group_addmember({ldap => $ldap,
                                   root_dse => $root_dse, 
@@ -1379,7 +1379,7 @@ sub AD_user_create {
         #######################################################
         # all administrator
         #######################################################
-        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MANMEMBER'});
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MANMEMBEROF'});
         foreach my $mangroup (@manmember){
             &AD_group_addmember_management({ldap => $ldap,
                                             root_dse => $root_dse, 
@@ -1387,7 +1387,7 @@ sub AD_user_create {
                                             addmember => $login,
                                            }); 
         }
-        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MEMBER'});
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MEMBEROF'});
         foreach my $group (@member){
             &AD_group_addmember({ldap => $ldap,
                                   root_dse => $root_dse, 
@@ -1400,7 +1400,7 @@ sub AD_user_create {
         #######################################################
         # school administrator
         #######################################################
-        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.school'}{'MANMEMBER'});
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.school'}{'MANMEMBEROF'});
         foreach my $mangroup (@manmember){
             $mangroup=&Sophomorix::SophomorixBase::replace_vars($mangroup,$ref_sophomorix_config,$school);
             &AD_group_addmember_management({ldap => $ldap,
@@ -1409,7 +1409,7 @@ sub AD_user_create {
                                             addmember => $login,
                                            }); 
         }
-        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.school'}{'MEMBER'});
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.school'}{'MEMBEROF'});
         foreach my $group (@member){
             $group=&Sophomorix::SophomorixBase::replace_vars($group,$ref_sophomorix_config,$school);
             &AD_group_addmember({ldap => $ldap,
@@ -1423,8 +1423,8 @@ sub AD_user_create {
         # user from a file -> get groups from sophomorix_config 
         #######################################################
         # add user to groups
-        # MEMBER
-        foreach my $ref_group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MEMBER'} }){
+        # MEMBEROF
+        foreach my $ref_group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MEMBEROF'} }){
             my $group=$ref_group; # make copy to not modify the hash 
             $group=~s/\@\@FIELD_1\@\@/$group_basename/g; 
             &AD_group_addmember({ldap => $ldap,
@@ -1434,8 +1434,8 @@ sub AD_user_create {
                                }); 
 	}
 
-        # SOPHOMORIXMEMBER = MEMBER + sophomorixMember attribute
-        foreach my $ref_s_group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SOPHOMORIXMEMBER'} }){
+        # SOPHOMORIXMEMBEROF = MEMBEROF + sophomorixMember attribute
+        foreach my $ref_s_group (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SOPHOMORIXMEMBEROF'} }){
             my $s_group=$ref_s_group; # make copy to not modify the hash 
             $s_group=&Sophomorix::SophomorixBase::replace_vars($s_group,$ref_sophomorix_config,$school);
             $s_group=~s/\@\@FIELD_1\@\@/$group_basename/g; 
@@ -1456,9 +1456,9 @@ sub AD_user_create {
                             });
 	}
 
-        # MANMEMBER
+        # MANMEMBEROF
         # add user to management groups
-        foreach my $ref_mangroup (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MANMEMBER'} }){
+        foreach my $ref_mangroup (@{ $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'MANMEMBEROF'} }){
             my $mangroup=$ref_mangroup; # make copy to not modify the hash 
             &AD_group_addmember_management({ldap => $ldap,
                                             root_dse => $root_dse, 

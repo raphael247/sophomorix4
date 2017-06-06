@@ -443,23 +443,23 @@ sub config_sophomorix_read {
                     # field5
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
                         $sophomorix_config{'INI'}{$section}{'FIELD_5'};
-                    # MANMEMBER
-                    my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBER'});
+                    # MANMEMBEROF
+                    my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBEROF'});
                     foreach my $manmember (@manmember){
                         $manmember=&replace_vars($manmember,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MANMEMBER'} }, $manmember; 
+                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MANMEMBEROF'} }, $manmember; 
                     }
-                    # MEMBER
-                    my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBER'});
+                    # MEMBEROF
+                    my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBEROF'});
                     foreach my $member (@member){
                         $member=&replace_vars($member,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MEMBER'} }, $member; 
+                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MEMBEROF'} }, $member; 
                     }
-                    # SOPHOMORIXMEMBER
-                    my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBER'});
+                    # SOPHOMORIXMEMBEROF
+                    my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBEROF'});
                     foreach my $s_member (@s_member){
                         $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SOPHOMORIXMEMBER'} }, $s_member; 
+                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
                     }
                 } elsif ($string eq "devicefile"){
                     # role
@@ -471,23 +471,23 @@ sub config_sophomorix_read {
                     # GROUP_OU
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'GROUP_OU'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
-                    # MANMEMBER
-                    my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBER'});
+                    # MANMEMBEROF
+                    my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBEROF'});
                     foreach my $manmember (@manmember){
                         $manmember=&replace_vars($manmember,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MANMEMBER'} }, $manmember; 
+                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MANMEMBEROF'} }, $manmember; 
                     }
-                    # MEMBER
-                    my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBER'});
+                    # MEMBEROF
+                    my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBEROF'});
                     foreach my $member (@member){
                         $member=&replace_vars($member,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MEMBER'} }, $member; 
+                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'MEMBEROF'} }, $member; 
                     }
-                    # SOPHOMORIXMEMBER
-                    my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBER'});
+                    # SOPHOMORIXMEMBEROF
+                    my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBEROF'});
                     foreach my $s_member (@s_member){
                         $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SOPHOMORIXMEMBER'} }, $s_member; 
+                        push @{ $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
                     }
                 }
             }
@@ -535,19 +535,19 @@ sub config_sophomorix_read {
         }
     }
 
-    # GROUPMEMBERSHIP in section GLOBAL
-    if (exists $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} ){
-        foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBERSHIP'} } ){
+    # GROUPMEMBEROF in section GLOBAL
+    if (exists $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'} ){
+        foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'} } ){
             my ($membergroup,$group)=split(/\|/,$entry);
 #???        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
             print "   ENTRY: $membergroup will be member in $group\n";
         }
     }
 
-    # GROUPMEMBERSHIP in section SCHOOLS
-    if (exists $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} ){
+    # GROUPMEMBEROF in section SCHOOLS
+    if (exists $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBEROF'} ){
         foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-            foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBERSHIP'} } ){
+            foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBEROF'} } ){
                 my ($membergroup,$group)=split(/\|/,$entry);
                 $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
                 $group=&replace_vars($group,\%sophomorix_config,$school);
