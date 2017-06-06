@@ -215,7 +215,7 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz|all-admins",
-                   member => "admin-bsz-66|newglobal-admins",
+                   member => "admin-bsz-66|global-admins",
                   });
 
 
@@ -263,7 +263,7 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "abc",
                    memberOf => "abc|all-admins",
-                   member => "admin-abc-666|newglobal-admins",
+                   member => "admin-abc-666|global-admins",
                   });
 
     # admin-66
@@ -343,7 +343,7 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "default-school|all-admins",
-                   member => "admin-66|admin-666|newglobal-admins",
+                   member => "admin-66|admin-666|global-admins",
                   });
 
 
@@ -446,7 +446,7 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/global/management/global-admin-66",
                    sn=>"Admin",
                    userPrincipalName => "global-admin-66@".$root_dns,
-                   sophomorixAdminClass => "newglobal-admins",
+                   sophomorixAdminClass => "global-admins",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Global",
@@ -463,7 +463,7 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "newglobal-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
+                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
                   });
     # global-admin-666
     &AD_test_object({ldap=>$ldap,
@@ -479,7 +479,7 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/global/management/global-admin-666",
                    sn=>"Admin",
                    userPrincipalName => "global-admin-666@".$root_dns,
-                   sophomorixAdminClass => "newglobal-admins",
+                   sophomorixAdminClass => "global-admins",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Global",
@@ -496,12 +496,12 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "newglobal-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
+                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
                   });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=newglobal-admins,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"newglobal-admins",
+                   dn=>"CN=global-admins,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-admins",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
