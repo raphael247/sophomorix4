@@ -463,7 +463,7 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
+                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
                   });
     # global-admin-666
     &AD_test_object({ldap=>$ldap,
@@ -496,7 +496,7 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
+                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
                   });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
@@ -508,7 +508,7 @@ if ($test_add_admin==1){
                    sophomorixType=>"powergroup",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "global",
-                   memberOf => "admins|bsz-admins|bsz-admins",
+                   memberOf => "admins|bsz-admins|bsz-admins|Domain Admins",
                    member => "global-admin-66|global-admin-666",
                   });
 

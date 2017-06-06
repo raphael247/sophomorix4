@@ -536,12 +536,11 @@ sub config_sophomorix_read {
     }
 
     # GROUPMEMBEROF in section GLOBAL
-    if (exists $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'} ){
-        foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'} } ){
-            my ($membergroup,$group)=split(/\|/,$entry);
-#???        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
-            print "   ENTRY: $membergroup will be member in $group\n";
-        }
+    my @groupmember_global=&Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'});
+    foreach my $entry (@groupmember_global){
+        my ($membergroup,$group)=split(/\|/,$entry);
+        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
+        print "   ENTRY: $membergroup will be member in $group\n";
     }
 
     # GROUPMEMBEROF in section SCHOOLS
