@@ -2177,7 +2177,7 @@ sub AD_get_name_tokened {
 
 
 
-sub AD_get_container {
+sub AD_get_container_old {
     # returns empty string or container followed by comma
     # i.e. >< OR >CN=Students,< 
     # first option: role(user) OR type(group)
