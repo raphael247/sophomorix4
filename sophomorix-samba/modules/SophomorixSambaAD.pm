@@ -2985,7 +2985,10 @@ sub AD_get_AD {
         my $filter="(&(objectClass=user)(|(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'ADMINISTRATOR'}.")))";
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'ALLADMINISTRATOR'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
+	print "HERE: $filter";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
