@@ -434,7 +434,7 @@ sub AD_repdir_using_file {
     my $teacher_home = $arg_ref->{teacher_home};
     my $adminclass = $arg_ref->{adminclass};
     my $student_home = $arg_ref->{student_home};
-    print "HERE: $repdir_file\n";
+
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
     my $entry_num=0; # was $num
@@ -1214,33 +1214,20 @@ sub AD_user_create {
                                                        $login,
                                                        $role,
                                                        $ref_sophomorix_config);
+    # ou
     my $class_ou;
-    # if ($file eq "no file"){
-    #     $class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
-    # } else {
-    #     $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
-    # }
-    # $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
-    # my $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    # my $dn="CN=".$login.",".$dn_class;
-
     my $dn_class;
     my $dn;
-
-    # ou
     if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.global'}{'SUB_OU'};
-        #$class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
         $dn="cn=".$login.",".$dn_class;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
         $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.all'}{'SUB_OU'};
-        #$class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
         $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
 	$dn="cn=".$login.",".$dn_class;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
         $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.school'}{'SUB_OU'};
-        #$class_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
         $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
 	$dn="cn=".$login.",".$dn_class;
     } else {
@@ -2173,93 +2160,6 @@ sub AD_get_name_tokened {
     } else {
         return $name;
     }
-}
-
-
-
-sub AD_get_container_old {
-    # returns empty string or container followed by comma
-    # i.e. >< OR >CN=Students,< 
-    # first option: role(user) OR type(group)
-    # second option: groupname (with token, i.e. pks-7a) 
-    my ($role,$group,$ref_sophomorix_config) = @_;
-    my $group_strg="OU=".$group.",";
-    my $container="";
-    # for user container
-    if ($role eq "student"){
-        #$container=$group_strg.$DevelConf::AD_student_ou;
-        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
-    }  elsif ($role eq "teacher"){
-        #$container=$DevelConf::AD_teacher_ou;
-        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_teacher_ou'};
-    }  elsif ($role eq "computer"){
-
-        #$container=$group_strg.$DevelConf::AD_devices_ou;
-        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_devices_ou'};
-
-
-#    }  elsif ($role eq "examaccount"){
-#        $container=$group_strg.$DevelConf::AD_examaccount_ou;
-    # group container
-    }  elsif ($role eq "adminclass"){
-        #$container=$group_strg.$DevelConf::AD_student_ou;
-        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
-    }  elsif ($role eq "ouclass"){ # no additional ou with name of group
-        #$container=$DevelConf::AD_student_ou;
-        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
-    }  elsif ($role eq "teacherclass"){
-        #$container=$DevelConf::AD_teacher_ou;
-        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_teacher_ou'};
-    }  elsif ($role eq "project"){
-	# ok
-        #$container=$DevelConf::AD_project_ou;
-        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_project_ou'};
-    }  elsif ($role eq "sophomorix-group"){
-        # ok
-        #$container=$DevelConf::AD_project_ou;
-        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_project_ou'};
-    }  elsif ($role eq "room"){
-	# ok
-        #$container=$group_strg.$DevelConf::AD_devices_ou;
-        $container=$group_strg.$ref_sophomorix_config->{'INI'}{'OU'}{'AD_devices_ou'};
-    # other
-    }  elsif ($role eq "management"){
-        #$container=$DevelConf::AD_management_ou;
-        $container=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
-    }
-    # add the comma if necessary
-    if ($container ne ""){
-        $container=$container.",";
-    }
-    return $container;
-}
-
-
-
-sub AD_ou_create {
-#     my ($ldap,$root_dse,$dn,$ou)=@_;
-#    my $mesg = $ldap->search(
-#                       base   => $dn,
-#                       scope => 'sub',
-#                       filter => 'name=*',
-#                       attr => ['cn']
-#                             );
-#    my $count = $mesg->count;
-
-# print "AD_ou_create $count of $dn\n"; 
-#     if ($count==0){
-#     &Sophomorix::SophomorixBase::print_title("Creating ou $ou (begin):");
-#     print "      * DN:  $dn\n";
-#     print "      * OU:  $ou\n";
-#     my $result = $ldap->add($dn,attr => [
-# # 	                    ou => $ou,
-#                             objectclass => ['top', 
-#                                             'organizationalUnit']
-#                                      ]
-#         );
-#     &AD_debug_logdump($result,2,(caller(0))[3]);
-#     &Sophomorix::SophomorixBase::print_title("Creating ou $ou (end):");
-#     }
 }
 
 
@@ -4673,15 +4573,6 @@ sub AD_group_create {
 
     $school=&AD_get_schoolname($school);
 
-    # calculate missing Attributes
-#    # old
-#    my $container=&AD_get_container($type,$group_basename,$ref_sophomorix_config);
-#    my $target_branch_old=$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-#    my $dn_old = "CN=".$group.",".$container."OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-#    # old
-
-#    # new
-##    print "JFILENAME: $file\n";
     my $group_ou;
     if (defined $sub_ou){
         $group_ou=$sub_ou;
@@ -4693,15 +4584,6 @@ sub AD_group_create {
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$group.",".$target_branch;
-#    # new
-
-
-#    print "CONT: $container\n";
-#    print "<$group_ou>\n";
-#    print "$target_branch_old\n";
-#    print "$target_branch\n";
-#    print "OLD: $dn_old\n";
-#    print "OK:  $dn\n";
 
     if (defined $dn_wish){
         # override DN
@@ -4710,7 +4592,6 @@ sub AD_group_create {
         my ($unused,@used)=split(/,/,$dn);
         $target_branch=join(",",@used);
     }
-#    print "WISH3:$dn\n";
 
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
