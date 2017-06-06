@@ -780,6 +780,7 @@ sub AD_group_kill {
     my $type_opt = $arg_ref->{type};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $group_count = $arg_ref->{group_count};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my ($existing,
         $type,
@@ -798,14 +799,14 @@ sub AD_group_kill {
     if (defined $type_opt){
         $type=$type_opt; # override type
     }
-    if ($school eq "global"){
+    if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
         $school_smbshare=$DevelConf::homedir_global_smb_share;
     } elsif ($school eq "---"){
         $school=$DevelConf::name_default_school;
     }
 
     my ($smb_share,$unix_dir,$unc,$smb_rel_path)=
-        &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,$school,$group,$type);
+        &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,$school,$group,$type,$ref_sophomorix_config);
 
     &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school):");
     &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"group",$group);
@@ -1495,7 +1496,7 @@ sub AD_user_create {
                                sophomorix_config=>$ref_sophomorix_config,
                              });
     } elsif ($role eq "teacher"){
-        if ($school eq "global"){
+        if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.teacher_home",
                                    school=>$DevelConf::homedir_global_smb_share,,
@@ -1515,7 +1516,7 @@ sub AD_user_create {
                                  });
         }
     } elsif ($role eq "student"){
-        if ($school eq "global"){
+        if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.student_home",
                                    school=>$DevelConf::homedir_global_smb_share,,

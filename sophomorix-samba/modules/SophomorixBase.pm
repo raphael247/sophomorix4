@@ -394,7 +394,9 @@ sub config_sophomorix_read {
     # GLOBAL
     $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
         "OU=".$DevelConf::AD_global_ou.",".$root_dse;
-    $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="global";
+    # read global
+    $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}=$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
+    #$sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="global2";
     $sophomorix_config{$DevelConf::AD_global_ou}{PREFIX}="";
     # SCHOOL
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP}=
@@ -1666,7 +1668,7 @@ sub get_homedirectory {
     my $smb_rel_path;   # option for smbclient
     
     my $school_smbshare;
-    if ($school eq "global"){
+    if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
         $school_smbshare=$DevelConf::homedir_global_smb_share;
     } else {
         $school_smbshare=$school;
@@ -1705,7 +1707,7 @@ sub get_homedirectory {
 
 
 sub get_sharedirectory {
-    my ($root_dns,$school,$group,$type)=@_;
+    my ($root_dns,$school,$group,$type,$ref_sophomorix_config)=@_;
     my $smb_share; # as needed for perl module 'homeDirectory (using //)
     my $unix_dir; # unix-path (works only if share is on the same server)
     my $smb_rel_path; # option for smbclient
@@ -1714,7 +1716,7 @@ sub get_sharedirectory {
     if ($school eq "---"){
         $school=$DevelConf::name_default_school;
         $school_smbshare=$DevelConf::name_default_school;
-    } elsif ($school eq "global"){
+    } elsif ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
         $school_smbshare=$DevelConf::homedir_global_smb_share;
     } else {
         $school_smbshare=$school;

@@ -138,7 +138,7 @@ sophomorix-admin --create-global-admin <name-of-admin> --password <fdrTfdtti>
 sophomorix-admin --create-all-admin <name-of-admin> --password <fdrTfdtti>
 
 # create an school-admin
-sophomorix-admin --create-school-admin <name-of-admin> --school global --password <fdrTfdtti>
+sophomorix-admin --create-school-admin <name-of-admin> --school <schoolname> --password <fdrTfdtti>
 
 # kill an administrator created by sophomorix
 sophomorix-admin --kill <name-of-admin>
@@ -431,7 +431,7 @@ sub print_valid_schools{
 	push @list, $key;
     }
     @list=sort @list;
-    push @list, "global";
+    push @list, $sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
     print "   * Valid schools on are:\n";
     foreach my $file (@list){
         print "      * $file\n";
