@@ -150,15 +150,18 @@ if ($full==1){
 ############################################################
 # --add-admin  
 if ($add_admin==1){
-    # admin in OU=bsz
+    # schooladmin in OU=bsz and OU=abc
     &run_command("sophomorix-admin $all_options --create-school-admin admin-bsz-66 --school bsz --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-school-admin admin-abc-666 --school abc --password 'Muster!'");
-    # admin in OU=default-school
+    # schooladmin in OU=default-school
     &run_command("sophomorix-admin $all_options --create-school-admin admin-66 --school default-school --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-school-admin admin-666 --school default-school --password 'Muster!'");
-    # admin in OU=default-school
+    # alladmin in OU=GLOBAL
     &run_command("sophomorix-admin $all_options --create-all-admin all-admin-66 --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-all-admin all-admin-666 --password 'Muster!'");
+    # globaladmin in OU=GLOBAL
+    &run_command("sophomorix-admin $all_options --create-global-admin global-admin-66 --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-global-admin global-admin-666 --password 'Muster!'");
 
 }
 
@@ -212,6 +215,7 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "bsz|all-admins",
+                   member => "admin-bsz-66|newglobal-admins",
                   });
 
 
@@ -259,6 +263,7 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "abc",
                    memberOf => "abc|all-admins",
+                   member => "admin-abc-666|newglobal-admins",
                   });
 
     # admin-66
@@ -338,13 +343,8 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "default-school|all-admins",
+                   member => "admin-66|admin-666|newglobal-admins",
                   });
-
-
-
-
-
-
 
 
 
@@ -427,6 +427,89 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "global",
                    memberOf => "",
+                   member => "bsz-admins|abc-admins|admins|all-admin-66|all-admin-666",
+                  });
+
+
+
+    # global-admin-66
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-admin-66,OU=Management,OU=GLOBAL,".$root_dse,
+                   #####
+                   displayName=>"Global Admin",
+                   givenName=>"Global",
+                   name=>"global-admin-66",
+                   sAMAccountname=>"global-admin-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\linuxmuster-global\\management\\global-admin-66",
+                   unixHomeDirectory=>"/srv/samba/schools/global/management/global-admin-66",
+                   sn=>"Admin",
+                   userPrincipalName => "global-admin-66@".$root_dns,
+                   sophomorixAdminClass => "newglobal-admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Global",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "globaladministrator",
+                   sophomorixSchoolPrefix => "global",
+                   sophomorixSchoolname => "global",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "newglobal-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
+                  });
+    # global-admin-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-admin-666,OU=Management,OU=GLOBAL,".$root_dse,
+                   #####
+                   displayName=>"Global Admin",
+                   givenName=>"Global",
+                   name=>"global-admin-666",
+                   sAMAccountname=>"global-admin-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\linuxmuster-global\\management\\global-admin-666",
+                   unixHomeDirectory=>"/srv/samba/schools/global/management/global-admin-666",
+                   sn=>"Admin",
+                   userPrincipalName => "global-admin-666@".$root_dns,
+                   sophomorixAdminClass => "newglobal-admins",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Global",
+                   sophomorixSurnameASCII  => "Admin",
+                   sophomorixRole => "globaladministrator",
+                   sophomorixSchoolPrefix => "global",
+                   sophomorixSchoolname => "global",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "newglobal-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing|Domain Admins",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=newglobal-admins,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"newglobal-admins",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"powergroup",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "global",
+                   memberOf => "admins|bsz-admins|bsz-admins",
+                   member => "global-admin-66|global-admin-666",
                   });
 
     &directory_tree_test("/srv/samba/schools",
@@ -474,6 +557,12 @@ if ($test_add_admin==1){
                          "/srv/samba/global/management/all-admin-666",
                          "/srv/samba/global/management/all-admin-666/alladmindir1",
                          "/srv/samba/global/management/all-admin-666/alladmindir2",
+                         "/srv/samba/global/management/global-admin-66",
+                         "/srv/samba/global/management/global-admin-66/globaladmindir1",
+                         "/srv/samba/global/management/global-admin-66/globaladmindir2",
+                         "/srv/samba/global/management/global-admin-666",
+                         "/srv/samba/global/management/global-admin-666/globaladmindir1",
+                         "/srv/samba/global/management/global-admin-666/globaladmindir2",
                          "/srv/samba/global/projects",
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
@@ -507,14 +596,18 @@ if ($test_mod_admin==1){
 ############################################################
 # --kill-admin  
 if ($kill_admin==1){
+    # schooladmin in OU=bsz und OU=abc
     &run_command("sophomorix-admin $all_options --kill admin-bsz-66");
     &run_command("sophomorix-admin $all_options --kill admin-abc-666");
-    # admin in OU=default-school
+    # schooladmin in OU=default-school
     &run_command("sophomorix-admin $all_options --kill admin-66");
     &run_command("sophomorix-admin $all_options --kill admin-666");
-    # admin in OU=default-school
+    # alladmin in OU=GLOBAL
     &run_command("sophomorix-admin $all_options --kill all-admin-66");
     &run_command("sophomorix-admin $all_options --kill all-admin-666");
+    # globaladmin in OU=GLOBAL
+    &run_command("sophomorix-admin $all_options --kill global-admin-66");
+    &run_command("sophomorix-admin $all_options --kill global-admin-666");
 }
 
 
