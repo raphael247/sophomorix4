@@ -778,8 +778,6 @@ sub load_school_ini {
                 # add some redundant stuff for convenience
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
                     $DevelConf::path_conf_tmp."/".$filename.".utf8";
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'OU_TOP_GLOBAL'}=
-                    "OU=GLOBAL,".$root_dse;
                 # save unchecked filter script for error messages
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
                     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
