@@ -928,6 +928,7 @@ sub AD_computer_create {
         print "   Name:                  $name\n";
         print "   Room:                  $room\n";
         print "   School:                $school\n";
+        print "   File:                  $filename\n";
         print "   Prefix:                $prefix\n";
         print "   sAMAccountName:        $smb_name\n";
         print "   dNSHostName:           $dns_name\n";
@@ -959,6 +960,7 @@ sub AD_computer_create {
                    sophomorixRole => "computer",
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
+                   sophomorixAdminFile => $filename,
                    sophomorixCreationDate => $creationdate, 
                    userAccountControl => '4096',
                    instanceType => '4',
