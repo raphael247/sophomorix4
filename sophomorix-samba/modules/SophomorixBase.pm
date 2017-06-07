@@ -501,20 +501,6 @@ sub config_sophomorix_read {
     $sophomorix_config{$DevelConf::AD_global_ou}{ADMINS}{OU}=
         $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP};
 
-    # # GROUP in section GLOBAL
-    # if (exists $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'}  ){
-    #     foreach my $entry (@{ $sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'} } ){
-    #         my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
-    #         my $cn_group="CN=".$groupname.",".$sub_ou.",".
-    #             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-    #         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
-    #         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
-    #             $sub_ou.",".
-    #             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
-    #         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
-    #     }
-    # }
-
     # GROUP in section GLOBAL
     foreach my $entry ( &Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'GLOBAL'}{'GROUP'}) ){
         my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
@@ -526,28 +512,6 @@ sub config_sophomorix_read {
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
     }
-
-    # # GROUP in section SCHOOLS
-    # if (exists $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'}  ){
-    #     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-    #         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
-    #             $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
-
-    #         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'} } ){
-    #             my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
-    #             $groupname=&replace_vars($groupname,\%sophomorix_config,$school);
-    #             my $cn_group="CN=".$groupname.",".$sub_ou.",".
-    #                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-    #             #my $group_prefix=$sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}.$groupname;
-    #             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_CN'}{$cn_group}=$groupname;
-    #             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$groupname}=
-    #                 $sub_ou.",".
-    #                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
-    #             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$groupname}=$grouptype;
-    #         }
-    #     }
-    # }
-
 
     # GROUP in section SCHOOLS
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -566,7 +530,6 @@ sub config_sophomorix_read {
         }
     }
 
-
     # GROUPMEMBEROF in section GLOBAL
     foreach my $entry ( &Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'}) ){
         my ($membergroup,$group)=split(/\|/,$entry);
@@ -583,16 +546,6 @@ sub config_sophomorix_read {
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
         }
     }
-    # if (exists $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBEROF'} ){
-    #     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-    #         foreach my $entry (@{ $sophomorix_config{'INI'}{'SCHOOLS'}{'GROUPMEMBEROF'} } ){
-    #             my ($membergroup,$group)=split(/\|/,$entry);
-    #             $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
-    #             $group=&replace_vars($group,\%sophomorix_config,$school);
-    #             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
-    #         }
-    #     }
-    # }
 
     # sorting some lists
     @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
