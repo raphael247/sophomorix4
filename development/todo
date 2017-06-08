@@ -1,9 +1,49 @@
 
+fix smb -cacls
+sophomorix-cacls /srv/samba/schools/bsz/management/hallo
+unfolds to
+smbcacls -U administrator%Muster! //linuxmuster.local/linuxmuster-global management/hallo
+correct is:
+smbcacls -U administrator%'Muster!' //linuxmuster.local/bsz management/hallo
+
+
+
+new: sophomorix-exam-mode
+(set/unset exammode)
+Example:
+sophomorix-exam-mode --set --supervisor <supi>  --participant <user1> --participant <user2> ...
+sophomorix-exam-mode --unset --participant <user1> --participant <user2> ...
+
+-> NUR Eintrag sophomorixExamModein ldap aus dem user entfernen
+   -> später auch Klassenerbeitsdinge
+   -> unabhängig von einer session
+
+
+sernet-Anfrage
+
+smbstatus -b zeigt, wer eingeloggt ist
+Wir bräuchten:
+A) Test, ob ein bestimmter User eingeloggt ist.
+ -> wie kann man das einfach ermitteln? ohne smbstatus -b zu parsen
+B) wir kann man einen user per script zwangsweise ausloggen
+   (Klassenarbeit -> homeverzeichnis tauschen gegen leeres Klassenarbeitshome)
+
+
+ntacl:
+
+folgende Verzeichnisse brauchen auch acls:
+/srv/samba/schools/bsz
+
+------------------------------------------------------------
+
+
+
+
 Test von Gruppe SCHOOLS und Schulen in test 2-5
 
 sophomorix-repair (fix admins)
 
-sophomorix-device:
+sophomorix-device ???:
 use settings from [devicefile.devices.csv]
 --> nur noch aus Develconf::
 $dns_node_prefix_string="SophomorixdnsNode";
