@@ -1,13 +1,4 @@
 
-fix smb -cacls
-sophomorix-cacls /srv/samba/schools/bsz/management/hallo
-unfolds to
-smbcacls -U administrator%Muster! //linuxmuster.local/linuxmuster-global management/hallo
-correct is:
-smbcacls -U administrator%'Muster!' //linuxmuster.local/bsz management/hallo
-
-
-
 new: sophomorix-exam-mode
 (set/unset exammode)
 Example:
@@ -27,6 +18,11 @@ A) Test, ob ein bestimmter User eingeloggt ist.
  -> wie kann man das einfach ermitteln? ohne smbstatus -b zu parsen
 B) wir kann man einen user per script zwangsweise ausloggen
    (Klassenarbeit -> homeverzeichnis tauschen gegen leeres Klassenarbeitshome)
+
+Daten von einem share zum anderen verschieben
+- recursiv
+- acls sollen erhalten bleiben
+idealerweise mit rsync via smb-protocol, scheint es nicht zu geben
 
 
 ntacl:
