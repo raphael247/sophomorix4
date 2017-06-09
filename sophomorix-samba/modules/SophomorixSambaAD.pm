@@ -636,6 +636,7 @@ sub AD_repdir_using_file {
                                                                      ntacl=>$ntacl,
                                                                      smbpath=>$path_after_user_smb,
                                                                      smb_admin_pass=>$smb_admin_pass,
+                                                                     sophomorix_config=>$ref_sophomorix_config,
                                                                    });
                    } elsif ($entry_type eq "LINUX"){
                         mkdir $path_after_user;

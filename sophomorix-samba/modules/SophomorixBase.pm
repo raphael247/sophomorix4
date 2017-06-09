@@ -1452,7 +1452,8 @@ sub NTACL_set_file {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $user = $arg_ref->{user};
     my $group = $arg_ref->{group};
-   
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
     my $ntacl_abs=$DevelConf::path_conf_devel_ntacl."/".$ntacl.".template";
     if ($ntacl eq "noacl" or $ntacl eq "nontacl"){
         print "   Skipping ACL/NTACL creation for $smbpath\n";
@@ -1475,6 +1476,8 @@ sub NTACL_set_file {
         $line_count++;
         chomp($line);
         # replacements in line go here
+        $line=~s/\@\@WORKGROUP\@\@/$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}/;
+
         if ($user ne ""){
             $line=~s/\@\@USER\@\@/$user/;
         }
@@ -1482,7 +1485,10 @@ sub NTACL_set_file {
             $line=~s/\@\@GROUP\@\@/$group/;
         }
         if ($school ne ""){
+            my $prefix=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'};
+	    print "PREFIX: $school -> $prefix\n";
             $line=~s/\@\@SCHOOLNAME\@\@/$school/;
+            $line=~s/\@\@SCHOOLPREFIX\@\@/$prefix/;
         }
 
         # create multiple lines? from one line
