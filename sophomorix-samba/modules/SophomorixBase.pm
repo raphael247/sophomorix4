@@ -1450,8 +1450,8 @@ sub NTACL_set_file {
     my $ntacl = $arg_ref->{ntacl};
     my $smbpath = $arg_ref->{smbpath};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
-#    my $user = $arg_ref->{user};
-#    my $group = $arg_ref->{group};
+    my $user = $arg_ref->{user};
+    my $group = $arg_ref->{group};
    
     my $ntacl_abs=$DevelConf::path_conf_devel_ntacl."/".$ntacl.".template";
     if ($ntacl eq "noacl" or $ntacl eq "nontacl"){
@@ -1460,8 +1460,8 @@ sub NTACL_set_file {
     } elsif (not -r $ntacl_abs){ # -r: readable
         print "\nERROR: $ntacl_abs not found/readable\n\n";
         exit;
-    }
-    print "Setting the NTACL:\n";
+    } 
+    print "Setting the NTACL (user=$user, group=$group, school=$school):\n";
     my $smbcacls_option="";
     open(NTACL,"<$ntacl_abs");
     my $line_count=0;
@@ -1475,6 +1475,15 @@ sub NTACL_set_file {
         $line_count++;
         chomp($line);
         # replacements in line go here
+        if ($user ne ""){
+            $line=~s/\@\@USER\@\@/$user/;
+        }
+        if ($group ne ""){
+            $line=~s/\@\@GROUP\@\@/$group/;
+        }
+        if ($school ne ""){
+            $line=~s/\@\@SCHOOLNAME\@\@/$school/;
+        }
 
         # create multiple lines? from one line
         if ($line_count==1){

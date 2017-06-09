@@ -630,6 +630,8 @@ sub AD_repdir_using_file {
 
                         # smbcacls
                         &Sophomorix::SophomorixBase::NTACL_set_file({root_dns=>$root_dns,
+                                                                     user=>$user,
+                                                                     group=>$group,
                                                                      school=>$school,
                                                                      ntacl=>$ntacl,
                                                                      smbpath=>$path_after_user_smb,
@@ -2209,9 +2211,12 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
-        my $command_mod="net conf setparm ".$DevelConf::homedir_global_smb_share." 'msdfs root' 'yes'";
-        print "   * $command_mod\n";
-        system($command_mod);
+        my $command_mod1="net conf setparm ".$DevelConf::homedir_global_smb_share." 'msdfs root' 'yes'";
+        print "   * $command_mod1\n";
+        system($command_mod1);
+        my $command_mod2="net conf setparm ".$DevelConf::homedir_global_smb_share." 'hide unreadable' 'yes'";
+        print "   * $command_mod2\n";
+        system($command_mod2);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
@@ -2228,9 +2233,13 @@ sub AD_school_create {
                     " writeable=y guest_ok=y 'Share for school $school'";
         print "   * $command\n";
         system($command);
-        my $command_mod="net conf setparm ".$school." 'msdfs root' 'yes'";
-        print "   * $command_mod\n";
-        system($command_mod);
+        my $command_mod1="net conf setparm ".$school." 'msdfs root' 'yes'";
+        print "   * $command_mod1\n";
+        system($command_mod1);
+        my $command_mod2="net conf setparm ".$school." 'hide unreadable' 'yes'";
+        print "   * $command_mod2\n";
+        system($command_mod2);
+
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
