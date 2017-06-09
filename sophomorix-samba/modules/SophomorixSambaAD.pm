@@ -439,7 +439,7 @@ sub AD_repdir_using_file {
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
     my $entry_num=0; # was $num
     my $line_num=0;
-    &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file");
+    &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file (start)");
     print "";
     # option school
     my @schools=("");
@@ -457,10 +457,10 @@ sub AD_repdir_using_file {
         chomp($line);   
         if ($line eq ""){next;} # next on empty line
         if(/^\#/){next;} # next on comments
-
         $entry_num++;
         if (/\@\@SCHOOL\@\@/ and not defined $school) {
             @schools = @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+
         }
 
         if (/\@\@ADMINCLASS\@\@/) {
@@ -481,7 +481,10 @@ sub AD_repdir_using_file {
             $groupvar_seen++;
         }
 
-        my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl) = split(/::/,$line);
+        my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl,$ntaclonly) = split(/::/,$line);
+        if (not defined $ntaclonly){
+            $ntaclonly="";            
+        }
 
         # replacing $vars in path
         my @old_dirs=split(/\//,$path_with_var);
@@ -531,7 +534,11 @@ sub AD_repdir_using_file {
                 $path_smb=~s/\@\@SCHOOL\@\@\///; # for homdirs
             } else {
                 $path=~s/\@\@SCHOOL\@\@/$school/;
-                $path_smb=~s/\@\@SCHOOL\@\@\///;
+                if ($path_smb eq "\@\@SCHOOL\@\@"){
+                    $path_smb="/";
+                } else {
+                    $path_smb=~s/\@\@SCHOOL\@\@\///;
+                }
             }
             if($Conf::log_level>=3){
                 print "   Determining path for school $school:\n";
@@ -614,8 +621,12 @@ sub AD_repdir_using_file {
                         }
                         print "\nUser: $user_typeout in group $group in school $school\n";
                         print "---------------------------------------------------------------\n";
-                        print "* $smbclient_command\n";
-                        system($smbclient_command);
+                        if ($ntaclonly ne "ntaclonly"){
+                            print "* $smbclient_command\n";
+                            system($smbclient_command);
+		        } else {
+                            print "* NOT executed (ntaclonly): $smbclient_command\n";
+                        }
 
                         # smbcacls
                         &Sophomorix::SophomorixBase::NTACL_set_file({root_dns=>$root_dns,
@@ -640,6 +651,7 @@ sub AD_repdir_using_file {
         print "--- DONE with $entry_num) Line $line_num:  $line ---\n";
     }
     close(REPDIRFILE);
+    &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file (end)");
 }
 
 
@@ -2302,7 +2314,6 @@ sub AD_school_create {
         print "   * Adding OU's for default groups in OU=$school ...\n";
     }
     foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
-        print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
         my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
         my $description="LML Group, change if you like";
@@ -2369,7 +2380,6 @@ sub AD_school_create {
         print "   * Adding OU's for default groups in OU=$school ...\n";
     }
     foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
-        print "      * DN: $dn (GROUP_CN)\n";
         # create ou for group
         my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
         my $description="LML Group, change if you like";
