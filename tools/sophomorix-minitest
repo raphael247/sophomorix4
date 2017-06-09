@@ -43,6 +43,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_plain_password
                                  check_options
                                  config_sophomorix_read
+                                 result_sophomorix_init
                                  );
 use Sophomorix::SophomorixTest qw(
                                  file_test_lines
@@ -80,6 +81,8 @@ my $testopt=GetOptions(
            "help|h" => \$help
           );
 
+my %sophomorix_result=&result_sophomorix_init("sophomorix-school");
+
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
@@ -93,6 +96,9 @@ my @filelist=&filelist_fetch({filetype=>"users",
 ############################################################
 # BEGIN: Test code goes here
 ############################################################
+
+print STDOUT "Test STDOUT\n";
+print STDERR "Test STDERR\n";
 
 #my $cfg = Config::IniFiles->new( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
 #                                 -handle_trailing_comment => 1
@@ -114,34 +120,34 @@ my @filelist=&filelist_fetch({filetype=>"users",
 #print Dumper(\%ini);
 
 
-my %master=();
-&read_ini_file("/usr/share/sophomorix/devel/master/school.conf.master");
+# my %master=();
+# &read_ini_file("/usr/share/sophomorix/devel/master/school.conf.master");
 
-print Dumper(\%master);
+# print Dumper(\%master);
 
-print "We have >".$master{'managementgroup.wifi'}{'allow_group'}."<\n";
-# if ${managementgroup.wifi}{allow_group};
-
-
-# walk through all parameters
-foreach my $section ( keys %master ) {
-    print "Section: $section\n";
-    foreach my $parameter ( keys %{$master{$section}} ) {
-        print "    Parameter: $parameter -> >$master{$section}{$parameter}<\n";
-    }
-}
-
-foreach my $parameter ( keys %{$master{'managementgroup.wifi'}} ) {
-    print "Parameter: $parameter\n";
-}
+# print "We have >".$master{'managementgroup.wifi'}{'allow_group'}."<\n";
+# # if ${managementgroup.wifi}{allow_group};
 
 
-sub read_ini_file {
-    my ($filename)=@_;
-    tie %master, 'Config::IniFiles', ( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
-                                       -handle_trailing_comment => 1
-                                     );
-}
+# # walk through all parameters
+# foreach my $section ( keys %master ) {
+#     print "Section: $section\n";
+#     foreach my $parameter ( keys %{$master{$section}} ) {
+#         print "    Parameter: $parameter -> >$master{$section}{$parameter}<\n";
+#     }
+# }
+
+# foreach my $parameter ( keys %{$master{'managementgroup.wifi'}} ) {
+#     print "Parameter: $parameter\n";
+# }
+
+
+# sub read_ini_file {
+#     my ($filename)=@_;
+#     tie %master, 'Config::IniFiles', ( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
+#                                        -handle_trailing_comment => 1
+#                                      );
+# }
 
 #&file_test_lines("/etc/linuxmuster/sophomorix/sophomorix.conf",11,"ltg","bsz");
 
