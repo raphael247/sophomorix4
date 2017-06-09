@@ -263,6 +263,7 @@ if ($info==1) {
                 jsoninfo => "CONFIG",
                 jsoncomment => "The sophomorix configuration",
                 hash_ref=>\%sophomorix_config,
+                sophomorix_config=>\%sophomorix_config,
                });
     print "\n";
     &print_title("Reading the following user files:");
@@ -399,6 +400,7 @@ if ($dump_files==1){
                 jsoninfo => "USERS",
                 jsoncomment => "All users read from all user files",
                 hash_ref=>\%users_file,
+                sophomorix_config=>\%sophomorix_config,
                });
 }
 
@@ -445,6 +447,7 @@ if ($dump_AD==1){
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
                 hash_ref=>\%AD,
+                sophomorix_config=>\%sophomorix_config,
               });
 }
 
@@ -489,6 +492,7 @@ if ($dump_matches==1){
                 jsoninfo => "MATCH",
                 jsoncomment => "File user -> AD matches",
                 hash_ref=>\%Match,
+                sophomorix_config=>\%sophomorix_config,
               });
 }
 

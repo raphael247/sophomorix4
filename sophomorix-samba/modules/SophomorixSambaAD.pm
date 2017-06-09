@@ -2516,6 +2516,7 @@ sub AD_get_sessions {
                                                 jsoninfo => "SEARCH",
                                                 jsoncomment => "AD Content",
                                                 hash_ref=>$ref_AD,
+                                                sophomorix_config=>$ref_sophomorix_config,
                                                });
     }
 

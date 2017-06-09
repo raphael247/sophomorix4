@@ -95,6 +95,7 @@ sub json_dump {
       my $jsoncomment = $arg_ref->{jsoncomment};
       my $json = $arg_ref->{json};
       my $hash_ref = $arg_ref->{hash_ref};
+      my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
       # json 
       if ($json==0){
           # be quiet
@@ -104,17 +105,17 @@ sub json_dump {
           $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
-          print "$utf8_pretty_printed";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_pretty_printed";
       } elsif ($json==2){
           # compact output
           $hash_ref->{'JSONINFO'}=$jsoninfo;
           $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_json_line   = $json_obj->encode( $hash_ref  );
-          print "$utf8_json_line";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_json_line";
       } elsif ($json==3){
           &print_title("DUMP: $jsoncomment");
-          print Dumper( $hash_ref );
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} Dumper( $hash_ref );
       }
 }
 

@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use Getopt::Long;
 use Net::LDAP;
+use Sophomorix::SophomorixConfig;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -11,7 +12,19 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  check_options
                                  json_dump
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
                                  );
+
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                    );
+my @arguments = @ARGV;
+
 $Conf::log_level=1;
 my $json=0;
 my $help=0;
@@ -22,10 +35,13 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
           );
 
-
+my %sophomorix_result=&result_sophomorix_init("sophomorix-JSON-example");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
 
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 
 
 if ($help==1) {
@@ -90,21 +106,21 @@ my %data = ( RESULT => 0,
 push @{ $result{'SUMMARY'} }, {ERROR_COUNT => \%data};
 
 
-my %data = ( RESULT => 123,
+%data = ( RESULT => 123,
              RESULT_TYPE => "integer",
              DESCRIPTION_POST => "users can be added in sophomorix.add", 
              FORMAT_TYPE => 1 );
 push @{ $result{'SUMMARY'} }, {ADD => \%data};
 
 
-my %data = ( RESULT => 6, 
+%data = ( RESULT => 6, 
              RESULT_TYPE => "integer",
              DESCRIPTION_POST => "users can be updated in sophomorix.update", 
              FORMAT_TYPE => 1 );
 push @{ $result{'SUMMARY'} }, {UPDATE => \%data};
 
 
-my %data = ( RESULT => 98, 
+%data = ( RESULT => 98, 
              RESULT_TYPE => "integer",
              DESCRIPTION_POST => "users can be killed in sophomorix.kill", 
              FORMAT_TYPE => 1 );
@@ -169,11 +185,16 @@ print "   * MESSAGE_DE:  $result{'OUTPUT'}[0]{MESSAGE_DE}\n";
 # output JSON
 ############################################################
 print "\n";
-print "Here ist the JSON result object for schukonsole:\n";
+print "Here ist the JSON result object for schukonsole:($sophomorix_config{'INI'}{'VARS'}{'JSON_PRINTOUT'})\n";
 
     &json_dump({json => $json,
                 jsoninfo => "RESULT",
                 jsoncomment => "The result hash of a script",
                 hash_ref=>\%result,
+                sophomorix_config=>\%sophomorix_config,
                });
 print "\n";
+
+
+
+&AD_unbind_admin($ldap);
