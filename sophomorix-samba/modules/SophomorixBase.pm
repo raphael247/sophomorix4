@@ -534,7 +534,6 @@ sub config_sophomorix_read {
     foreach my $entry ( &Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'}) ){
         my ($membergroup,$group)=split(/\|/,$entry);
         $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
-        print "   ENTRY: $membergroup will be member in $group\n";
     }
 
     # GROUPMEMBEROF in section SCHOOLS
