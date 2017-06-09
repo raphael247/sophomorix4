@@ -126,6 +126,9 @@ foreach my $linux_path (@linux_paths){
             $smb_rel=~s/^$path//;
             $smb_rel=~s/^\///g;
             $smb_rel=~s/\/$//g;
+            if ($smb_rel eq ""){
+                $smb_rel="/"; # not allowed to be empty
+            }
             $command="smbcacls -U ".$user."%".$pass." ".$smb_unc." ".$smb_rel;
         }
     }
