@@ -5,11 +5,39 @@ Getopt::Long::Configure ("bundling");
 
 my $script="";
 my $option="";
+my $help=0;
 
 my $testopt=GetOptions(
            "script|s=s" => \$script,
            "option|o=s" => \$option,
+           "help|h" => \$help,
           );
+
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+regression-supertest.pl runs multiple tests
+Options:
+  -h  / --help
+
+  -s 1    reset samba and run sophomorix-test-1
+  -s 2    reset samba and run sophomorix-test-2
+  -s 3    reset samba and run sophomorix-test-3
+  -s 4    reset samba and run sophomorix-test-4
+  -s 5    reset samba and run sophomorix-test-5
+  -s w    reset samba and run sophomorix-test-workflow
+
+  -o j    run tests with option -j
+  -o jj   run tests with option -jj
+  -o vv   run tests with option -vv
+');
+   print "\n";
+   exit;
+}
+
 
 
 my @scriptlist=();
