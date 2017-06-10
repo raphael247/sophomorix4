@@ -1823,42 +1823,42 @@ if ($add==1 or $test_add==1){
     # Testing the filesystem
 
     &directory_tree_test("/srv/samba/schools",
-                         "/srv/samba/schools",
-                         "/srv/samba/schools/bsz",
+                         "/srv/samba/schools",                                           # acl
+                         "/srv/samba/schools/bsz",                                       # ntacl
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/projects",
-                         "/srv/samba/schools/bsz/students",
-                         "/srv/samba/schools/bsz/teachers",
-                         "/srv/samba/schools/bsz/teachers/homes",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42",
+                         "/srv/samba/schools/bsz/students",                              # ntacl
+                         "/srv/samba/schools/bsz/teachers",                              # ntacl
+                         "/srv/samba/schools/bsz/teachers/share",                        # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes",                        # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes/oe42",                   # ntacl
                          "/srv/samba/schools/bsz/teachers/homes/oe42/teacher1",
                          "/srv/samba/schools/bsz/teachers/homes/oe42/teacher2",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42",                   # ntacl
                          "/srv/samba/schools/bsz/teachers/homes/wu42/teacher1",
                          "/srv/samba/schools/bsz/teachers/homes/wu42/teacher2",
-                         "/srv/samba/schools/bsz/teachers/share",
-                         "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/homes",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",
+                         "/srv/samba/schools/bsz/students/m7ab",                         # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes",                   # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/share",                   # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",         # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir1",
                          "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir2",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",        # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir1",
                          "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir2",
-                         "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
-                         "/srv/samba/schools/bsz/students/m8cd/homes",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",
+                         "/srv/samba/schools/bsz/students/m8cd",                         # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/share",                   # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes",                   # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",        # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir1",
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir2",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",        # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir1",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir2",
-                         "/srv/samba/schools/uni",
+                         "/srv/samba/schools/uni",                                       # ntacl
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/projects",
-                         "/srv/samba/schools/uni/students",
+                         "/srv/samba/schools/uni/students",                              # ntacl
                          "/srv/samba/schools/uni/students/12abc",
                          "/srv/samba/schools/uni/students/12abc/share",
                          "/srv/samba/schools/uni/students/12abc/homes",
@@ -1868,7 +1868,7 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/schools/uni/students/12abc/homes/blackmri42",
                          "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir1",
                          "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir2",
-                         "/srv/samba/schools/uni/teachers",
+                         "/srv/samba/schools/uni/teachers",                              # ntacl
                          "/srv/samba/schools/uni/teachers/homes",
                          "/srv/samba/schools/uni/teachers/homes/kep42",
                          "/srv/samba/schools/uni/teachers/homes/kep42/teacher1",
@@ -1940,7 +1940,6 @@ if ($add==1 or $test_add==1){
                "group::r-x",    
                "other::r-x",    
               );
-
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -1952,6 +1951,252 @@ if ($add==1 or $test_add==1){
                  'GROUP:S-1-22-2-0',    
                  'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',    
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',    
+                );
+    # # /srv/samba/schools/bsz/students
+    # &ACL_test ("/srv/samba/schools/bsz/students","d",
+    #            "# owner: root", 
+    #            "# group: root", 
+    #            "user::rwx",     
+    #            "group::r-x",    
+    #            "other::r-x",    
+    #           );
+    # /srv/samba/schools/bsz/students
+    &NTACL_test ("bsz",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',    
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL',  
+                );
+    # /srv/samba/schools/bsz/teachers
+    &NTACL_test ("bsz",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL',  
+                );
+    # /srv/samba/schools/bsz/teachers/homes
+    &NTACL_test ("bsz",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/teachers/homes/oe42
+    &NTACL_test ("bsz",
+                 "/teachers/homes/oe42",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\oe42',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\oe42:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/teachers/homes/wu42
+    &NTACL_test ("bsz",
+                 "/teachers/homes/wu42",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\wu42',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\wu42:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/teachers/share
+    &NTACL_test ("bsz",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m7ab
+    &NTACL_test ("bsz",
+                 "/students/m7ab",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-m7ab:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m7ab/homes
+    &NTACL_test ("bsz",
+                 "/students/m7ab/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-m7ab:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m7ab/share
+    &NTACL_test ("bsz",
+                 "/students/m7ab/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-m7ab:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m7ab/homes/maiersa42
+    &NTACL_test ("bsz",
+                 "/students/m7ab/homes/maiersa42",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\maiersa42',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\maiersa42:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|I/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m7ab/homes/muellegr42
+    &NTACL_test ("bsz",
+                 "/students/m7ab/homes/muellegr42",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\muellegr42',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\muellegr42:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|I/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m8cd
+    &NTACL_test ("bsz",
+                 "/students/m8cd",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m8cd/homes
+    &NTACL_test ("bsz",
+                 "/students/m8cd/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m8cd/share
+    &NTACL_test ("bsz",
+                 "/students/m8cd/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m8cd/homes/jonsonad42
+    &NTACL_test ("bsz",
+                 "/students/m8cd/homes/jonsonad42",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\jonsonad42',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\jonsonad42:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|I/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/bsz/students/m8cd/homes/samardze42
+    &NTACL_test ("bsz",
+                 "/students/m8cd/homes/samardze42",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\samardze42',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\samardze42:ALLOWED/OI|CI/FULL',  
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|I/FULL',  
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',  
+                );
+    # /srv/samba/schools/uni
+    &NTACL_test ("uni",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\Administrator',     
+                 'GROUP:S-1-22-2-0',    
+                 'ACL:LINUXMUSTER\uni:ALLOWED/0x0/READ',    
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',    
+                );
+    # /srv/samba/schools/uni/students
+    &NTACL_test ("uni",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',    
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL',  
+                );
+    # /srv/samba/schools/uni/teachers
+    &NTACL_test ("uni",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:BUILTIN\Administrators',     
+                 'GROUP:LINUXMUSTER\Domain Users',    
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',  
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL',  
                 );
 
 
