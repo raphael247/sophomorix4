@@ -1486,7 +1486,6 @@ sub NTACL_set_file {
         }
         if ($school ne ""){
             my $prefix=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'};
-	    print "PREFIX: $school -> $prefix\n";
             $line=~s/\@\@SCHOOLNAME\@\@/$school/;
             $line=~s/\@\@SCHOOLPREFIX\@\@/$prefix/;
         }
