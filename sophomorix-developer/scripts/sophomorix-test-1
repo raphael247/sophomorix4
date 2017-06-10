@@ -18,6 +18,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_unbind_admin
                                  AD_dns_get
                                  AD_object_search
+                                 AD_get_passwd
                                     );
 use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
@@ -27,6 +28,7 @@ use Sophomorix::SophomorixTest qw(
                                  run_command
                                  AD_test_session_count
                                  ACL_test
+                                 NTACL_test
                                  );
 
 $Conf::log_level=1;
@@ -92,6 +94,8 @@ if ($json==0){
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 my $file_add=$DevelConf::path_result."/sophomorix.add";
 my $file_update=$DevelConf::path_result."/sophomorix.update";
@@ -1817,13 +1821,6 @@ if ($add==1 or $test_add==1){
 
     ############################################################
     # Testing the filesystem
-    &ACL_test ("/srv/samba/schools","d",
-               "# owner: root", 
-               "# group: root", 
-               "user::rwx",     
-               "group::r-x",    
-               "other::r-x",    
-              );
 
     &directory_tree_test("/srv/samba/schools",
                          "/srv/samba/schools",
@@ -1934,6 +1931,29 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
+
+
+    &ACL_test ("/srv/samba/schools","d",
+               "# owner: root", 
+               "# group: root", 
+               "user::rwx",     
+               "group::r-x",    
+               "other::r-x",    
+              );
+
+    # /srv/samba/schools/bsz
+    &NTACL_test ("bsz",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 "REVISION:1", 
+                 "CONTROL:SR|DP", 
+                 'OWNER:LINUXMUSTER\Administrator',     
+                 'GROUP:S-1-22-2-0',    
+                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',    
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',    
+                );
+
 
 }
 

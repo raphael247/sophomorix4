@@ -39,6 +39,7 @@ $Data::Dumper::Terse = 1;
             AD_rooms_any
             AD_user_timeupdate
             ACL_test
+            NTACL_test
             directory_tree_test
             run_command
             file_test_lines
@@ -884,7 +885,11 @@ sub directory_tree_test {
 # ACL
 ############################################################
 sub ACL_test {
+    # tests ACL, not NTACL
     my ($abs_path,$filetype,@test)=@_;
+    my $command="getfacl $abs_path 2> /dev/null";
+    print "****** Testing ACLS: $command\n";
+
     my $string=`getfacl $abs_path 2> /dev/null`;
     my @lines_raw=split(/\n/,$string);
     my @fs=();
@@ -901,18 +906,62 @@ sub ACL_test {
         if (-f $abs_path){
             $exists=1;
         }
-        is ($exists,1,"  * File exists: $abs_path");
+        is ($exists,1,"* File exists: $abs_path");
     } elsif ($filetype eq "d"){
         if (-d $abs_path){
             $exists=1;
         }
-        is ($exists,1,"  * Directory exists: $abs_path"); 
+        is ($exists,1,"* Directory exists: $abs_path"); 
     }
     # ACL lines
-    is ($#test,$#fs,"     * ACL contains correct number of entries(lines)");    
+    is ($#test,$#fs,"* ACL contains correct number of entries(lines)");    
     for (my $i=0;$i<=$#test;$i++){
         my $line_num=$i+1;
-        is ($test[$i],$fs[$i],"     * ACL entry $line_num is $test[$i]");
+        is ($test[$i],$fs[$i],"* ACL entry $line_num is $test[$i]");
+    }
+} 
+
+############################################################
+# NTACL
+############################################################
+sub NTACL_test {
+    # tests ACL, not NTACL
+    my ($share,$smb_rel,$root_dns,$smb_pass,@test)=@_;
+    my $unc_path="//".$root_dns."/".$share;
+    my $command="smbcacls -U administrator"."%".$smb_pass." ".$unc_path." ".$smb_rel;
+    print "****** Testing NTACL: $command\n";
+
+    my $string=`$command`;
+
+    # what is actually seen
+    my @lines=split(/\n/,$string);
+
+    my $count_test=$#test+1;
+    my $count_test_success=0; # should be $count_test if 100% match
+    my $count_lines=$#lines+1;
+ 
+    is ($count_lines,$count_test, "* NTACL contains: $count_test lines");   
+    foreach my $testline (@test){
+        my $ok=0;
+        foreach my $line (@lines){
+            if ($testline eq $line){
+                $ok=1; 
+                $count_test_success++; 
+                last;
+            }
+        }
+        is ($ok,1,"* NTACL contains: $testline");
+    }
+    # if not 100% ok print what is and what shoul be
+    if ($count_test==$count_test_success){
+        #ok
+    } else {
+        foreach my $line (@test){
+            print "   Expected:   -->$line<--\n";
+        }
+        foreach my $line (@lines){
+            print "   Got:        -->$line<--\n";
+        }
     }
 } 
 

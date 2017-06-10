@@ -1,5 +1,4 @@
 NTACL's
-Zeile CONTROL wird nicht sit smbcacls gesetzt
 Domain Users nicht variable
 
 OK in repdir.school
@@ -23,6 +22,7 @@ OK in repdir.student_home
 /srv/samba/schools/default-school/students/5a/homes/adamskke/
 
 
+
 Noch Todo:
 /srv/samba/schools/<bsz>/management
 /srv/samba/schools/<bsz>/projects
@@ -36,6 +36,31 @@ Noch Todo:
 /srv/samba/global/students
 /srv/samba/global/projects
 
+CONTROL-Zeile im output von smbcacls wird noch nicht verarbeitet:
+
+z.B, 
+teacher_home.ntacl.template:    CONTROL:SR|DP
+students.ntacl.template:        CONTROL:SR|PD|SI|DI|DP
+
+Woher der Unterschied?
+Wie wird das gestzt? Mit smbcacls?
+
+
+Bedeutung von:
+SR:  ?
+DP:  ?
+PD:  ?
+SI:  ?
+DI:  ?
+
+Weiter: ACL's in automatisierte tests einbauen
+example in test-1: NTACL_test
+
+
+sophomorix-repair für die 3 admintypen anpassen
+
+
+------------------------------------------------------------
 
 json output konfigurierbar auf stderr oder stdout
 -> checken auf server
