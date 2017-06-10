@@ -921,6 +921,8 @@ sub ACL_test {
     }
 } 
 
+
+
 ############################################################
 # NTACL
 ############################################################
@@ -932,6 +934,7 @@ sub NTACL_test {
     print "****** Testing NTACL: $command\n";
 
     my $string=`$command`;
+    my %result=();
 
     # what is actually seen
     my @lines=split(/\n/,$string);
@@ -947,6 +950,7 @@ sub NTACL_test {
             if ($testline eq $line){
                 $ok=1; 
                 $count_test_success++; 
+                $result{$line}="ok";
                 last;
             }
         }
@@ -957,10 +961,18 @@ sub NTACL_test {
         #ok
     } else {
         foreach my $line (@test){
-            print "   Expected:   -->$line<--\n";
+            if (exists $result{$line}){
+                print "   Expected:(ok) -->$line<--\n";
+            } else {
+                print "   Expected:(??) -->$line<--\n";
+            }
         }
         foreach my $line (@lines){
-            print "   Got:        -->$line<--\n";
+            if (exists $result{$line}){
+                print "   Got:(ok)      -->$line<--\n";
+            } else {
+                print "   Got:(??)      -->$line<--\n";
+            }
         }
     }
 } 
