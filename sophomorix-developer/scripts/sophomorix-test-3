@@ -34,6 +34,8 @@ use Sophomorix::SophomorixTest qw(
                                  AD_test_object
                                  run_command
                                  directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
                                  );
 
 $Conf::log_level=1;
@@ -50,6 +52,7 @@ my $test_kill_pro=0;
 
 my $all_options="";
 my $json=0;
+my %fs_test_result=();
 
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -1090,7 +1093,12 @@ if ($test_add_pro==1){
                    memberOf => "",
                   });
 
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
     &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
                          "/srv/samba/schools",
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
@@ -1166,13 +1174,21 @@ if ($test_add_pro==1){
                          "/srv/samba/schools/default-school/teachers/homes/sch23/teacher2",
                          "/srv/samba/schools/default-school/teachers/share",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
                          "/srv/samba/global",
                          "/srv/samba/global/management",
                          "/srv/samba/global/projects",
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
+    &end_fs_test(\%fs_test_result);
 }
 
 
@@ -2076,8 +2092,12 @@ if ($mod_pro==1){
                    member => "",
                    memberOf => "",
                   });
-
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
                          "/srv/samba/schools",
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
@@ -2153,15 +2173,21 @@ if ($mod_pro==1){
                          "/srv/samba/schools/default-school/teachers/homes/sch23/teacher2",
                          "/srv/samba/schools/default-school/teachers/share",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
                          "/srv/samba/global",
                          "/srv/samba/global/management",
                          "/srv/samba/global/projects",
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
-
-
+    &end_fs_test(\%fs_test_result);
 }
 
 ############################################################
@@ -2234,7 +2260,12 @@ if ($test_kill_pro==1){
     &AD_object_nonexist($ldap,$root_dse,"group","s6ade");
     &AD_object_nonexist($ldap,$root_dse,"group","uni-12abc");
 
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
                          "/srv/samba/schools",
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
@@ -2258,13 +2289,21 @@ if ($test_kill_pro==1){
                          "/srv/samba/schools/default-school/teachers/homes",
                          "/srv/samba/schools/default-school/teachers/share",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
                          "/srv/samba/global",
                          "/srv/samba/global/management",
                          "/srv/samba/global/projects",
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
+    &end_fs_test(\%fs_test_result);
 }
 
 

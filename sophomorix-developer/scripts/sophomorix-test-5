@@ -33,6 +33,8 @@ use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
                                  AD_test_object
                                  directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
                                  run_command
                                  );
 
@@ -53,6 +55,7 @@ my $test_kill_admin=0;
 
 my $all_options="";
 my $json=0;
+my %fs_test_result=();
 
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -512,7 +515,12 @@ if ($test_add_admin==1){
                    member => "global-admin-66|global-admin-666",
                   });
 
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
                          "/srv/samba/schools",
                          "/srv/samba/schools/abc",
                          "/srv/samba/schools/abc/management",
@@ -548,7 +556,14 @@ if ($test_add_admin==1){
                          "/srv/samba/schools/default-school/teachers/share",
                          "/srv/samba/schools/default-school/teachers/homes",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
                          "/srv/samba/global",
                          "/srv/samba/global/management",
                          "/srv/samba/global/management/all-admin-66",
@@ -567,6 +582,7 @@ if ($test_add_admin==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         );
+    &end_fs_test(\%fs_test_result);
 }
 
 
@@ -625,7 +641,12 @@ if ($test_kill_admin==1){
     &AD_object_nonexist($ldap,$root_dse,"user","all-admin-66");
     &AD_object_nonexist($ldap,$root_dse,"user","all-admin-666");
 
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
                          "/srv/samba/schools",
                          "/srv/samba/schools/abc",
                          "/srv/samba/schools/abc/management",
@@ -649,13 +670,21 @@ if ($test_kill_admin==1){
                          "/srv/samba/schools/default-school/teachers/share",
                          "/srv/samba/schools/default-school/teachers/homes",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
                          "/srv/samba/global",
                          "/srv/samba/global/management",
                          "/srv/samba/global/projects",
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
+    &end_fs_test(\%fs_test_result);
 }
 
 

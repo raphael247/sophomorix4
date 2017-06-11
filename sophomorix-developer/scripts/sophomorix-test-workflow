@@ -24,6 +24,8 @@ use Sophomorix::SophomorixTest qw(
                                  AD_dn_nonexist
                                  AD_test_object
                                  directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
                                  run_command
                                  AD_test_session_count
                                  ACL_test
@@ -64,6 +66,7 @@ my $full=0;
 my $help=0;
 my $all_options="";
 my $json=0;
+my %fs_test_result=();
 
 my $testopt=GetOptions(
            "help|h" => \$help,

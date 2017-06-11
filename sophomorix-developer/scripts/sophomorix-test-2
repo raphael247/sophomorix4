@@ -60,6 +60,9 @@ use Sophomorix::SophomorixTest qw(
                                  AD_dnszones_any
                                  AD_rooms_any
                                  run_command
+                                 directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
                                  );
 
 $Conf::log_level=1;
@@ -89,6 +92,7 @@ my $ws_count=0;
 my $birthdate="1970-01-01";
 my $all_options="";
 my $json=0;
+my %fs_test_result=();
 
 # dns
 my $res   = Net::DNS::Resolver->new;

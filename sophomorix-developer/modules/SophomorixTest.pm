@@ -853,13 +853,31 @@ sub test_multivalue {
 ############################################################
 sub start_fs_test {
     my ($ref_fs_test_result) = @_;
+    my $oldnum;
+    if (defined $ref_fs_test_result->{'testnumber'}){
+        $oldnum=$ref_fs_test_result->{'testnumber'};
+        # check if test was endet
+        if ($ref_fs_test_result->{'testnumber'} eq $ref_fs_test_result->{'closed'}){
+            # ok
+        } else {
+            print "\nERROR: $ref_fs_test_result->{'testnumber'} was not closed/ended\n\n";
+            exit;
+        }
+    } else {
+        $oldnum=0;
+    }
+    my $newnum=$oldnum+1;
     %{$ref_fs_test_result} = (); 
+    $ref_fs_test_result->{'testnumber'}=$newnum;
+    #print "fs_test_result_hash at beginning:\n";
+    #print Dumper ($ref_fs_test_result);
+    print "########## Ready for fs_test $ref_fs_test_result->{'testnumber'}  ##########\n";
 }
 
 sub end_fs_test {
     my ($ref_fs_test_result) = @_;
     my $count=1;
-    print "########## fs_test summary for $ref_fs_test_result->{'finddir'} ##########\n";
+    print "########## fs_test $ref_fs_test_result->{'testnumber'} summary for $ref_fs_test_result->{'finddir'} ##########\n";
     foreach my $dir (@{ $ref_fs_test_result->{'directory_tree_test'} }){
         if (exists $ref_fs_test_result->{'NTACL_lookup'}{$dir}){
             #print "  NTACL tested:  $dir\n";
@@ -868,6 +886,7 @@ sub end_fs_test {
             $count++;
         }
     }
+    $ref_fs_test_result->{'closed'}=$ref_fs_test_result->{'testnumber'};
     # show all
     #print Dumper ($ref_fs_test_result);
 }

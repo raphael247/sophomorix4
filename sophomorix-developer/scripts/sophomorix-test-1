@@ -1820,11 +1820,6 @@ if ($add==1 or $test_add==1){
                    member => "",
                   });
 
-
-
-    ############################################################
-    # Testing the filesystem
-
     ############################################################
     # fs test
     ############################################################
@@ -2630,7 +2625,6 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
-
     &end_fs_test(\%fs_test_result);
 }
 
@@ -3470,6 +3464,10 @@ if ($mod==1){
                    memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
                          "/srv/samba/schools",                                                     # acl
@@ -3543,14 +3541,7 @@ if ($mod==1){
                          "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
                          "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
                         ); 
-    &directory_tree_test("/srv/samba/global",
-                         \%fs_test_result,
-                         "/srv/samba/global",
-                         "/srv/samba/global/management",
-                         "/srv/samba/global/projects",
-                         "/srv/samba/global/students",
-                         "/srv/samba/global/teachers",
-                        ); 
+
 
     &ACL_test ("/srv/samba/schools",
                "d",
@@ -4095,6 +4086,21 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI/FULL', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
 }
 
 
@@ -5160,6 +5166,10 @@ if ($ses==1){
                    memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
 
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
                          "/srv/samba/schools",                                                     # acl
@@ -5232,14 +5242,6 @@ if ($ses==1){
                          "/srv/samba/schools/default-school/teachers/homes/sch42",                 # ntacl
                          "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
                          "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
-                        ); 
-    &directory_tree_test("/srv/samba/global",
-                         \%fs_test_result,
-                         "/srv/samba/global",
-                         "/srv/samba/global/management",
-                         "/srv/samba/global/projects",
-                         "/srv/samba/global/students",
-                         "/srv/samba/global/teachers",
                         ); 
 
     &ACL_test ("/srv/samba/schools",
@@ -5785,6 +5787,21 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI/FULL', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
 }
 
 
@@ -7147,6 +7164,11 @@ if ($update==1 or $test_update==1){
                    member => "bsz-teachers|uni-teachers|lin-teachers|ghs-teachers|teachers",
                   });
 
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
                          "/srv/samba/schools",                                                       # nacl
@@ -7306,14 +7328,6 @@ if ($update==1 or $test_update==1){
                          "/srv/samba/schools/default-school/students/alumni/homes/sch42/dir1",       #        moved to here
                          "/srv/samba/schools/default-school/students/alumni/homes/sch42/dir2",       #        moved to here
                         ); 
-    &directory_tree_test("/srv/samba/global",
-                         \%fs_test_result,
-                         "/srv/samba/global",
-                         "/srv/samba/global/management",
-                         "/srv/samba/global/projects",
-                         "/srv/samba/global/students",
-                         "/srv/samba/global/teachers",
-                        );
 
     &ACL_test ("/srv/samba/schools",
                "d",
@@ -7653,47 +7667,47 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/bsz/students/m9cd
-    &NTACL_test ("bsz",
-                 "/students/m9cd",
-                 $root_dns,
-                 $smb_admin_pass,
-                 \%fs_test_result,
-                 "REVISION:1",
-                 "CONTROL:SR|DP",
-                 'OWNER:BUILTIN\Administrators', 
-                 'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
-                );
+    # # /srv/samba/schools/bsz/students/m9cd
+    # &NTACL_test ("bsz",
+    #              "/students/m9cd",
+    #              $root_dns,
+    #              $smb_admin_pass,
+    #              \%fs_test_result,
+    #              "REVISION:1",
+    #              "CONTROL:SR|DP",
+    #              'OWNER:BUILTIN\Administrators', 
+    #              'GROUP:LINUXMUSTER\Domain Users',
+    #              'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
+    #              'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+    #             );
     # /srv/samba/schools/bsz/students/m9cd/share
-    &NTACL_test ("bsz",
-                 "/students/m9cd/share",
-                 $root_dns,
-                 $smb_admin_pass,
-                 \%fs_test_result,
-                 "REVISION:1",
-                 "CONTROL:SR|DP",
-                 'OWNER:BUILTIN\Administrators', 
-                 'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/OI|CI/FULL', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
-                );
+    # &NTACL_test ("bsz",
+    #              "/students/m9cd/share",
+    #              $root_dns,
+    #              $smb_admin_pass,
+    #              \%fs_test_result,
+    #              "REVISION:1",
+    #              "CONTROL:SR|DP",
+    #              'OWNER:BUILTIN\Administrators', 
+    #              'GROUP:LINUXMUSTER\Domain Users',
+    #              'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/OI|CI/FULL', 
+    #              'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+    #              'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+    #             );
     # /srv/samba/schools/bsz/students/m9cd/homes
-    &NTACL_test ("bsz",
-                 "/students/m9cd/homes",
-                 $root_dns,
-                 $smb_admin_pass,
-                 \%fs_test_result,
-                 "REVISION:1",
-                 "CONTROL:SR|DP",
-                 'OWNER:BUILTIN\Administrators', 
-                 'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
-                );
+    # &NTACL_test ("bsz",
+    #              "/students/m9cd/homes",
+    #              $root_dns,
+    #              $smb_admin_pass,
+    #              \%fs_test_result,
+    #              "REVISION:1",
+    #              "CONTROL:SR|DP",
+    #              'OWNER:BUILTIN\Administrators', 
+    #              'GROUP:LINUXMUSTER\Domain Users',
+    #              'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
+    #              'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+    #              'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+    #             );
     # /srv/samba/schools/bsz/students/m9cd/homes/jonsonad42
     &NTACL_test ("bsz",
                  "/students/m9cd/homes/jonsonad42",
@@ -8317,9 +8331,21 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    &end_fs_test(\%fs_test_result);
 
-
-
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        );
+    &end_fs_test(\%fs_test_result);
 }
 
 
@@ -8714,10 +8740,12 @@ if ($kill==1 or $test_kill==1){
                    member => "",
                   });
 
-
     &AD_object_nonexist($ldap,$root_dse,"group","uni-12abc");
 
-
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
                          "/srv/samba/schools",
@@ -8761,6 +8789,12 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/default-school/teachers/homes",
                          "/srv/samba/schools/default-school/teachers/share",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/global",
                          \%fs_test_result,
                          "/srv/samba/global",
@@ -8769,8 +8803,7 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
-
-
+    &end_fs_test(\%fs_test_result);
 
     # remove files to avoid deletion
     &run_command("rm -f /srv/samba/schools/uni/students/alumni/homes/fakeuser");
@@ -8860,7 +8893,10 @@ if ($kill==1 or $test_kill==1){
                    member => "lin|ghs|bsz|uni|default-school",
                   });
 
-    # check again the dirtree
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
                          "/srv/samba/schools",
@@ -8900,6 +8936,12 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/default-school/teachers/homes",
                          "/srv/samba/schools/default-school/teachers/share",
                         ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
     &directory_tree_test("/srv/samba/global",
                          \%fs_test_result,
                          "/srv/samba/global",
@@ -8908,9 +8950,7 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
-
-
-
+    &end_fs_test(\%fs_test_result);
 }
 
 
