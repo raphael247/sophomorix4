@@ -927,9 +927,20 @@ sub directory_tree_test {
 ############################################################
 sub ACL_test {
     # tests ACL, not NTACL
-    my ($abs_path,$filetype,@test)=@_;
+    my ($abs_path,$filetype,$ref_fs_test_result,@test)=@_;
     my $command="getfacl $abs_path 2> /dev/null";
     print "****** Testing ACLS: $command\n";
+    # remember in list
+    push @{ $ref_fs_test_result->{'ACL_test'} }, $abs_path;
+    # remember in hash
+    if (exists $ref_fs_test_result->{'ACL_lookup'}{$abs_path}){
+        print "\nERROR: $abs_path tested twice (Fix your set of NTACL tests)\n\n";
+        exit;
+    }else {
+        $ref_fs_test_result->{'ACL_lookup'}{$abs_path}=1;
+    }
+
+
 
     my $string=`getfacl $abs_path 2> /dev/null`;
     my @lines_raw=split(/\n/,$string);
@@ -984,14 +995,14 @@ sub NTACL_test {
     print "****** Testing NTACL: $command\n";
     # print "****** $share $smb_rel $abs_path_linux\n";
     # remember in list
-        push @{ $ref_fs_test_result->{'NTACL_test'} }, $abs_path_linux;
-        # remember in hash
-        if (exists $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}){
-            print "\nERROR: $abs_path_linux tested twice (Fix your set of NTACL tests)\n\n";
-            exit;
-        }else {
-            $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}=1;
-        }
+    push @{ $ref_fs_test_result->{'NTACL_test'} }, $abs_path_linux;
+    # remember in hash
+    if (exists $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}){
+        print "\nERROR: $abs_path_linux tested twice (Fix your set of NTACL tests)\n\n";
+        exit;
+    }else {
+        $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}=1;
+    }
 
     my $string=`$command`;
     my %result=();

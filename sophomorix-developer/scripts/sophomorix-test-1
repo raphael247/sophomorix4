@@ -1932,7 +1932,9 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
                          "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
                         ); 
-    &ACL_test ("/srv/samba/schools","d",
+    &ACL_test ("/srv/samba/schools",
+               "d",
+               \%fs_test_result,
                "# owner: root",
                "# group: root",
                "user::rwx",
@@ -1953,7 +1955,9 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                 );
     # # /srv/samba/schools/bsz/students
-    # &ACL_test ("/srv/samba/schools/bsz/students","d",
+    # &ACL_test ("/srv/samba/schools/bsz/students",
+    #            "d",
+    #            \%fs_test_result,
     #            "# owner: root",
     #            "# group: root",
     #            "user::rwx",
@@ -3548,7 +3552,9 @@ if ($mod==1){
                          "/srv/samba/global/teachers",
                         ); 
 
-    &ACL_test ("/srv/samba/schools","d",
+    &ACL_test ("/srv/samba/schools",
+               "d",
+               \%fs_test_result,
                "# owner: root",
                "# group: root",
                "user::rwx",
@@ -3569,7 +3575,9 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                 );
     # # /srv/samba/schools/bsz/students
-    # &ACL_test ("/srv/samba/schools/bsz/students","d",
+    # &ACL_test ("/srv/samba/schools/bsz/students",
+    #            "d",
+    #            \%fs_test_result,
     #            "# owner: root",
     #            "# group: root",
     #            "user::rwx", 
@@ -5234,7 +5242,9 @@ if ($ses==1){
                          "/srv/samba/global/teachers",
                         ); 
 
-    &ACL_test ("/srv/samba/schools","d",
+    &ACL_test ("/srv/samba/schools",
+               "d",
+               \%fs_test_result,
                "# owner: root",
                "# group: root",
                "user::rwx", 
@@ -5255,7 +5265,9 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                 );
     # # /srv/samba/schools/bsz/students
-    # &ACL_test ("/srv/samba/schools/bsz/students","d",
+    # &ACL_test ("/srv/samba/schools/bsz/students",
+    #            "d",
+    #            \%fs_test_result,
     #            "# owner: root",
     #            "# group: root",
     #            "user::rwx",
@@ -7303,7 +7315,9 @@ if ($update==1 or $test_update==1){
                          "/srv/samba/global/teachers",
                         );
 
-   &ACL_test ("/srv/samba/schools","d",
+    &ACL_test ("/srv/samba/schools",
+               "d",
+               \%fs_test_result,
                "# owner: root",
                "# group: root",
                "user::rwx", 
