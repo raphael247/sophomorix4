@@ -40,6 +40,8 @@ $Data::Dumper::Terse = 1;
             AD_user_timeupdate
             ACL_test
             NTACL_test
+            start_fs_test
+            end_fs_test
             directory_tree_test
             run_command
             file_test_lines
@@ -847,12 +849,40 @@ sub test_multivalue {
 
 
 ############################################################
+# fs
+############################################################
+sub start_fs_test {
+    my ($ref_fs_test_result) = @_;
+    %{$ref_fs_test_result} = (); 
+}
+
+sub end_fs_test {
+    my ($ref_fs_test_result) = @_;
+    my $count=1;
+    print "########## fs_test summary for $ref_fs_test_result->{'finddir'} ##########\n";
+    foreach my $dir (@{ $ref_fs_test_result->{'directory_tree_test'} }){
+        if (exists $ref_fs_test_result->{'NTACL_lookup'}{$dir}){
+            #print "  NTACL tested:  $dir\n";
+        } else {
+            print "  $count: No NTACL-test: $dir\n";
+            $count++;
+        }
+    }
+    # show all
+    #print Dumper ($ref_fs_test_result);
+}
+
+
+############################################################
 # directory_tree
 ############################################################
 sub directory_tree_test {
     # fist option: wher to search for the dirs
     # 2nd, ... the dirs to test
-    my ($finddir,@dirlist) = @_;
+    my ($finddir,$ref_fs_test_result,@dirlist) = @_;
+    # remember finddir
+    $ref_fs_test_result->{'finddir'}=$finddir;
+
     my %dir_hash=();
     my $string=`find $finddir`;
     my @dirs=split(/\n/,$string);
@@ -862,6 +892,17 @@ sub directory_tree_test {
     }
     print "****** Testing directory tree $finddir\n";
     foreach my $dir (@dirlist){
+        # remember in list
+        push @{ $ref_fs_test_result->{'directory_tree_test'} }, $dir;
+        # remember in hash
+        if (exists $ref_fs_test_result->{'directory_tree_test_lookup'}{$dir}){
+            print "\nERROR: $dir tested twice (Fix your &directory_tree_test)\n\n";
+            exit;
+        }else {
+            $ref_fs_test_result->{'directory_tree_test_lookup'}{$dir}=1;
+        }
+
+        # test
         is (exists $dir_hash{$dir} ,1, "* Existing: $dir");
         if (exists $dir_hash{$dir}){
             delete $dir_hash{$dir};
@@ -928,10 +969,29 @@ sub ACL_test {
 ############################################################
 sub NTACL_test {
     # tests ACL, not NTACL
-    my ($share,$smb_rel,$root_dns,$smb_pass,@test)=@_;
+    my ($share,$smb_rel,$root_dns,$smb_pass,$ref_fs_test_result,@test)=@_;
     my $unc_path="//".$root_dns."/".$share;
+
+    my $abs_path_linux;
+    if ($share eq "global" or $share eq "linuxmuster-global"){
+        $abs_path_linux="/srv/samba/global/".$smb_rel;
+        $abs_path_linux=~s/\/$//; # remove trailing /
+    } else {
+        $abs_path_linux="/srv/samba/schools/".$share.$smb_rel;
+        $abs_path_linux=~s/\/$//; # remove trailing /
+    }
     my $command="smbcacls -U administrator"."%".$smb_pass." ".$unc_path." ".$smb_rel;
     print "****** Testing NTACL: $command\n";
+    # print "****** $share $smb_rel $abs_path_linux\n";
+    # remember in list
+        push @{ $ref_fs_test_result->{'NTACL_test'} }, $abs_path_linux;
+        # remember in hash
+        if (exists $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}){
+            print "\nERROR: $abs_path_linux tested twice (Fix your set of NTACL tests)\n\n";
+            exit;
+        }else {
+            $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}=1;
+        }
 
     my $string=`$command`;
     my %result=();
