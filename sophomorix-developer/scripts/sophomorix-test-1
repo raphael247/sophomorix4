@@ -39,12 +39,16 @@ my $mod=0;
 my $ses=0;
 my $update=0;
 my $kill=0;
+my $groupkill_1=0;
+my $groupkill_2=0;
 my $cp_add=0;
 my $cp_update=0;
 my $cp_kill=0;
 my $test_add=0;
 my $test_update=0;
 my $test_kill=0;
+my $test_groupkill_1=0;
+my $test_groupkill_2=0;
 my $migration_kill=0;
 my $full=0;
 my $help=0;
@@ -63,12 +67,16 @@ my $testopt=GetOptions(
            "test-add" => \$test_add,
            "test-update" => \$test_update,
            "test-kill" => \$test_kill,
+           "test-groupkill-1" => \$test_groupkill_1,
+           "test-groupkill-2" => \$test_groupkill_2,
            "migration-kill" => \$migration_kill,
            "add|a" => \$add,
            "mod" => \$mod,
            "ses" => \$ses,
            "update|u" => \$update,
            "kill|k" => \$kill,
+           "groupkill-1" => \$groupkill_1,
+           "groupkill-2" => \$groupkill_2,
            "full|f" => \$full,
            "skip|s" => \$skip_warning,
           );
@@ -185,9 +193,13 @@ Step by step Test:
   Test killed users:
       sophomorix-test-1 --test-kill
 
-  --u user / --users user
-  --c class / --class class
-  --lock / --unlock
+  Killing the groups
+      sophomorix-test-1 --groupkill-1
+      sophomorix-test-1 --test-groupkill-1
+
+      sophomorix-test-1 --groupkill-2
+      sophomorix-test-1 --test-groupkill-2
+
 ');
    print "\n";
    exit;
@@ -211,6 +223,10 @@ if ($full==1){
     $ses=1;
     $update=1;
     $kill=1;
+    $groupkill_1=1;
+    $groupkill_2=1;
+    $test_groupkill_1=1;
+    $test_groupkill_2=1;
     $skip_warning=1;
 }
 
@@ -7513,9 +7529,6 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-
-
-
     # /srv/samba/schools/bsz/students/attic
     &NTACL_test ("bsz",
                  "/students/attic",
@@ -7626,6 +7639,47 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/bsz/students/m8cd
+    &NTACL_test ("bsz",
+                 "/students/m8cd",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m8cd/share
+    &NTACL_test ("bsz",
+                 "/students/m8cd/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m8cd/homes
+    &NTACL_test ("bsz",
+                 "/students/m8cd/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
     # /srv/samba/schools/bsz/students/m9cd
     &NTACL_test ("bsz",
                  "/students/m9cd",
@@ -7667,48 +7721,6 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # # /srv/samba/schools/bsz/students/m9cd
-    # &NTACL_test ("bsz",
-    #              "/students/m9cd",
-    #              $root_dns,
-    #              $smb_admin_pass,
-    #              \%fs_test_result,
-    #              "REVISION:1",
-    #              "CONTROL:SR|DP",
-    #              'OWNER:BUILTIN\Administrators', 
-    #              'GROUP:LINUXMUSTER\Domain Users',
-    #              'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
-    #              'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
-    #             );
-    # /srv/samba/schools/bsz/students/m9cd/share
-    # &NTACL_test ("bsz",
-    #              "/students/m9cd/share",
-    #              $root_dns,
-    #              $smb_admin_pass,
-    #              \%fs_test_result,
-    #              "REVISION:1",
-    #              "CONTROL:SR|DP",
-    #              'OWNER:BUILTIN\Administrators', 
-    #              'GROUP:LINUXMUSTER\Domain Users',
-    #              'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/OI|CI/FULL', 
-    #              'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
-    #              'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
-    #             );
-    # /srv/samba/schools/bsz/students/m9cd/homes
-    # &NTACL_test ("bsz",
-    #              "/students/m9cd/homes",
-    #              $root_dns,
-    #              $smb_admin_pass,
-    #              \%fs_test_result,
-    #              "REVISION:1",
-    #              "CONTROL:SR|DP",
-    #              'OWNER:BUILTIN\Administrators', 
-    #              'GROUP:LINUXMUSTER\Domain Users',
-    #              'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
-    #              'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
-    #              'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
-    #             );
-    # /srv/samba/schools/bsz/students/m9cd/homes/jonsonad42
     &NTACL_test ("bsz",
                  "/students/m9cd/homes/jonsonad42",
                  $root_dns,
@@ -8653,8 +8665,957 @@ if ($kill==1 or $test_kill==1){
                    member => "",
                   });
 
+    ##### Testing the users
+    &AD_object_nonexist($ldap,$root_dse,"user","maiersa42");
+    &AD_object_nonexist($ldap,$root_dse,"user","muellegr42");
+    &AD_object_nonexist($ldap,$root_dse,"user","jonsonad42");
+    &AD_object_nonexist($ldap,$root_dse,"user","samardze42");
+    &AD_object_nonexist($ldap,$root_dse,"user","oe42");
+    &AD_object_nonexist($ldap,$root_dse,"user","wu42");
+    &AD_object_nonexist($ldap,$root_dse,"user","lordjo42");
+    &AD_object_nonexist($ldap,$root_dse,"user","blackmri42");
+    &AD_object_nonexist($ldap,$root_dse,"user","kep42");
+    &AD_object_nonexist($ldap,$root_dse,"user","gal42");
+    &AD_object_nonexist($ldap,$root_dse,"user","schneima42");
+    &AD_object_nonexist($ldap,$root_dse,"user","sch42");
 
-    if ($kill==1){
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
+                         "/srv/samba/schools",                                                       # nacl
+                         "/srv/samba/schools/bsz",                                                   # ntacl
+                         "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/students",                                          # ntacl
+                         "/srv/samba/schools/bsz/teachers",                                          # ntacl
+                         "/srv/samba/schools/bsz/teachers/share",                                    # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes",                                    # ntacl
+                         "/srv/samba/schools/bsz/students/alumni",                                   # ntacl
+                         "/srv/samba/schools/bsz/students/alumni/share",                             # ntacl
+                         "/srv/samba/schools/bsz/students/alumni/homes",                             # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/share",                               # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes",                               # ntacl
+                         "/srv/samba/schools/bsz/students/attic",                                    # ntacl
+                         "/srv/samba/schools/bsz/students/attic/share",                              # ntacl
+                         "/srv/samba/schools/bsz/students/attic/homes",                              # ntacl
+                         "/srv/samba/schools/lin/students/attic",                                    # ntacl
+                         "/srv/samba/schools/lin/students/attic/share",                              # ntacl
+                         "/srv/samba/schools/lin/students/attic/homes",                              # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/share",                               # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes",                               # ntacl
+                         "/srv/samba/schools/bsz/students/m9cd",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m9cd/share",                               # ntacl
+                         "/srv/samba/schools/bsz/students/m9cd/homes",                               # ntacl
+                         "/srv/samba/schools/uni",                                                   # ntacl
+                         "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/students",                                          # ntacl
+                         "/srv/samba/schools/uni/students/12abc",                                    # ntacl
+                         "/srv/samba/schools/uni/students/12abc/share",                              # ntacl
+                         "/srv/samba/schools/uni/students/12abc/homes",                              # ntacl
+                         "/srv/samba/schools/lin",                                                   # ntacl
+                         "/srv/samba/schools/lin/management",                              
+                         "/srv/samba/schools/lin/projects",
+                         "/srv/samba/schools/lin/students",                                          # ntacl
+                         "/srv/samba/schools/lin/teachers",                                          # ntacl
+                         "/srv/samba/schools/lin/teachers/share",                                    # ntacl
+                         "/srv/samba/schools/lin/teachers/homes",                                    # ntacl
+                         "/srv/samba/schools/uni/teachers",                                          # ntacl
+                         "/srv/samba/schools/uni/teachers/share",                                    # ntacl
+                         "/srv/samba/schools/uni/teachers/homes",                                    # ntacl
+                         "/srv/samba/schools/uni/students/alumni",                                   # ntacl
+                         "/srv/samba/schools/uni/students/alumni/share",                             # ntacl
+                         "/srv/samba/schools/uni/students/alumni/homes",                             # ntacl
+                         "/srv/samba/schools/ghs",                                                   # ntacl
+                         "/srv/samba/schools/ghs/management",
+                         "/srv/samba/schools/ghs/projects",
+                         "/srv/samba/schools/ghs/students",                                          # ntacl
+                         "/srv/samba/schools/ghs/students/alumni",                                   # ntacl
+                         "/srv/samba/schools/ghs/students/alumni/share",                             # ntacl
+                         "/srv/samba/schools/ghs/students/alumni/homes",                             # ntacl
+                         "/srv/samba/schools/ghs/teachers",                                          # ntacl
+                         "/srv/samba/schools/ghs/teachers/share",                                    # ntacl
+                         "/srv/samba/schools/ghs/teachers/homes",                                    # ntacl
+                         "/srv/samba/schools/default-school",                                        # ntacl
+                         "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/students",                               # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade",                         # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/share",                   # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes",                   # ntacl
+                         "/srv/samba/schools/default-school/students/s7ade",                         # ntacl
+                         "/srv/samba/schools/default-school/students/s7ade/share",                   # ntacl
+                         "/srv/samba/schools/default-school/students/s7ade/homes",                   # ntacl
+                         "/srv/samba/schools/default-school/teachers",
+                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/teachers/homes",
+                         "/srv/samba/schools/default-school/students/alumni",                        # ntacl
+                         "/srv/samba/schools/default-school/students/alumni/share",                  # ntacl
+                         "/srv/samba/schools/default-school/students/alumni/homes",                  # ntacl
+                        ); 
+
+    &ACL_test ("/srv/samba/schools",
+               "d",
+               \%fs_test_result,
+               "# owner: root",
+               "# group: root",
+               "user::rwx", 
+               "group::r-x",
+               "other::r-x",
+              );
+    # /srv/samba/schools/bsz
+    &NTACL_test ("bsz",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+   # /srv/samba/schools/bsz/students
+    &NTACL_test ("bsz",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers
+    &NTACL_test ("bsz",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers/share
+    &NTACL_test ("bsz",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers/homes
+    &NTACL_test ("bsz",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/alumni
+    &NTACL_test ("bsz",
+                 "/students/alumni",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/alumni/share
+    &NTACL_test ("bsz",
+                 "/students/alumni/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-alumni:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/alumni/homes
+    &NTACL_test ("bsz",
+                 "/students/alumni/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m7ab
+    &NTACL_test ("bsz",
+                 "/students/m7ab",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m7ab:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m7ab/share
+    &NTACL_test ("bsz",
+                 "/students/m7ab/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m7ab:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m7ab/homes
+    &NTACL_test ("bsz",
+                 "/students/m7ab/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m7ab:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/attic
+    &NTACL_test ("bsz",
+                 "/students/attic",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-attic:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/attic/share
+    &NTACL_test ("bsz",
+                 "/students/attic/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-attic:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/attic/homes
+    &NTACL_test ("bsz",
+                 "/students/attic/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-attic:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/lin/students/attic
+    &NTACL_test ("lin",
+                 "/students/attic",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-attic:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/lin/students/attic/share
+    &NTACL_test ("lin",
+                 "/students/attic/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-attic:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/lin/students/attic/homes
+    &NTACL_test ("lin",
+                 "/students/attic/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-attic:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m8cd
+    &NTACL_test ("bsz",
+                 "/students/m8cd",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m8cd/share
+    &NTACL_test ("bsz",
+                 "/students/m8cd/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m8cd/homes
+    &NTACL_test ("bsz",
+                 "/students/m8cd/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m8cd:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m9cd
+    &NTACL_test ("bsz",
+                 "/students/m9cd",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m9cd/share
+    &NTACL_test ("bsz",
+                 "/students/m9cd/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m9cd/homes
+    &NTACL_test ("bsz",
+                 "/students/m9cd/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni
+    &NTACL_test ("uni",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+    # /srv/samba/schools/uni/students
+    &NTACL_test ("uni",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/uni/students/12abc
+    &NTACL_test ("uni",
+                 "/students/12abc",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-12abc:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/students/12abc/share
+    &NTACL_test ("uni",
+                 "/students/12abc/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-12abc:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/students/12abc/homes
+    &NTACL_test ("uni",
+                 "/students/12abc/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-12abc:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/lin
+    &NTACL_test ("lin",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\lin:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+    # /srv/samba/schools/lin/students
+    &NTACL_test ("lin",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/lin/teachers
+    &NTACL_test ("lin",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/lin/teachers/share
+    &NTACL_test ("lin",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/lin/teachers/homes
+    &NTACL_test ("lin",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/teachers
+    &NTACL_test ("uni",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/uni/teachers/share
+    &NTACL_test ("uni",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/teachers/homes
+    &NTACL_test ("uni",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/students/alumni
+    &NTACL_test ("uni",
+                 "/students/alumni",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/students/alumni/share
+    &NTACL_test ("uni",
+                 "/students/alumni/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-alumni:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/uni/students/alumni/homes
+    &NTACL_test ("uni",
+                 "/students/alumni/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\uni-alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/ghs
+    &NTACL_test ("ghs",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\ghs:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+
+    # /srv/samba/schools/ghs/students
+    &NTACL_test ("ghs",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/ghs/students/alumni
+    &NTACL_test ("ghs",
+                 "/students/alumni",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/ghs/students/alumni/share
+    &NTACL_test ("ghs",
+                 "/students/alumni/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-alumni:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/ghs/students/alumni/homes
+    &NTACL_test ("ghs",
+                 "/students/alumni/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/ghs/teachers
+    &NTACL_test ("ghs",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/ghs/teachers/share
+    &NTACL_test ("ghs",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/ghs/teachers/homes
+    &NTACL_test ("ghs",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school
+    &NTACL_test ("default-school",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
+                );
+    # /srv/samba/schools/default-school/students
+    &NTACL_test ("default-school",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/s6ade
+    &NTACL_test ("default-school",
+                 "/students/s6ade",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\s6ade:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/s6ade/share
+    &NTACL_test ("default-school",
+                 "/students/s6ade/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\s6ade:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/s6ade/homes
+    &NTACL_test ("default-school",
+                 "/students/s6ade/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\s6ade:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/s7ade
+    &NTACL_test ("default-school",
+                 "/students/s7ade",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\s7ade:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/s7ade/share
+    &NTACL_test ("default-school",
+                 "/students/s7ade/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\s7ade:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/s7ade/homes
+    &NTACL_test ("default-school",
+                 "/students/s7ade/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\s7ade:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    &NTACL_test ("default-school",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/default-school/teachers/share
+    &NTACL_test ("default-school",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/teachers/homes
+    &NTACL_test ("default-school",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/alumni
+    &NTACL_test ("default-school",
+                 "/students/alumni",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/alumni/share
+    &NTACL_test ("default-school",
+                 "/students/alumni/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\alumni:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/alumni/homes
+    &NTACL_test ("default-school",
+                 "/students/alumni/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\alumni:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        );
+    &end_fs_test(\%fs_test_result);
+}
+
+
+
+
+############################################################
+# Deleting unused groups --groupkill-1
+############################################################
+
+if ($groupkill_1==1 or $test_groupkill_1==1){
+    if ($groupkill_1==1){
         # kill the classes, one exception: alumni
         # creating files to avoid deletion
         &run_command("touch /srv/samba/schools/uni/students/alumni/homes/fakeuser");
@@ -8684,19 +9645,6 @@ if ($kill==1 or $test_kill==1){
 
     &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
 
-    ##### Testing the users
-    &AD_object_nonexist($ldap,$root_dse,"user","maiersa42");
-    &AD_object_nonexist($ldap,$root_dse,"user","muellegr42");
-    &AD_object_nonexist($ldap,$root_dse,"user","jonsonad42");
-    &AD_object_nonexist($ldap,$root_dse,"user","samardze42");
-    &AD_object_nonexist($ldap,$root_dse,"user","oe42");
-    &AD_object_nonexist($ldap,$root_dse,"user","wu42");
-    &AD_object_nonexist($ldap,$root_dse,"user","lordjo42");
-    &AD_object_nonexist($ldap,$root_dse,"user","blackmri42");
-    &AD_object_nonexist($ldap,$root_dse,"user","kep42");
-    &AD_object_nonexist($ldap,$root_dse,"user","gal42");
-    &AD_object_nonexist($ldap,$root_dse,"user","schneima42");
-    &AD_object_nonexist($ldap,$root_dse,"user","sch42");
 
     ##### Testing the groups
     &AD_object_nonexist($ldap,$root_dse,"group","m7ab");
@@ -8748,14 +9696,14 @@ if ($kill==1 or $test_kill==1){
     &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
-                         "/srv/samba/schools",
+                         "/srv/samba/schools",                                    # acl
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/projects",
-                         "/srv/samba/schools/bsz/students",
-                         "/srv/samba/schools/bsz/teachers",
-                         "/srv/samba/schools/bsz/teachers/homes",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/students",                       # ntacl
+                         "/srv/samba/schools/bsz/teachers",                       # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes",                 # ntacl
+                         "/srv/samba/schools/bsz/teachers/share",                 # ntacl
                          "/srv/samba/schools/lin",
                          "/srv/samba/schools/lin/management",
                          "/srv/samba/schools/lin/projects",
@@ -8788,7 +9736,88 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/default-school/teachers",
                          "/srv/samba/schools/default-school/teachers/homes",
                          "/srv/samba/schools/default-school/teachers/share",
-                        ); 
+                        );
+
+    &ACL_test ("/srv/samba/schools",
+               "d",
+               \%fs_test_result,
+               "# owner: root",
+               "# group: root",
+               "user::rwx", 
+               "group::r-x",
+               "other::r-x",
+              );
+
+    # /srv/samba/schools/bsz
+    &NTACL_test ("bsz",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+
+   # /srv/samba/schools/bsz/students
+    &NTACL_test ("bsz",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers
+    &NTACL_test ("bsz",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers/share
+    &NTACL_test ("bsz",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers/homes
+    &NTACL_test ("bsz",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+
+
+
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -8804,11 +9833,16 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/global/teachers",
                         ); 
     &end_fs_test(\%fs_test_result);
+}
 
-    # remove files to avoid deletion
-    &run_command("rm -f /srv/samba/schools/uni/students/alumni/homes/fakeuser");
-    # kill the class that could not be killed
-    &run_command("sophomorix-class --kill --class uni-alumni $all_options");
+
+if ($groupkill_2==1 or $test_groupkill_2==1){
+    if ($groupkill_2==1){
+        # remove files to allow deletion
+        &run_command("rm -f /srv/samba/schools/uni/students/alumni/homes/fakeuser");
+        # kill the class that could not be killed
+        &run_command("sophomorix-class --kill --class uni-alumni $all_options");
+    }
 
     &AD_object_nonexist($ldap,$root_dse,"group","uni-alumni");
 

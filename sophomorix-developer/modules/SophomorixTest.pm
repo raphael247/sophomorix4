@@ -870,8 +870,10 @@ sub start_fs_test {
     %{$ref_fs_test_result} = (); 
     $ref_fs_test_result->{'testnumber'}=$newnum;
     #print "fs_test_result_hash at beginning:\n";
-    #print Dumper ($ref_fs_test_result);
     print "########## Ready for fs_test $ref_fs_test_result->{'testnumber'}  ##########\n";
+    $ref_fs_test_result->{'ACL_count'}=0;
+    $ref_fs_test_result->{'NTACL_count'}=0;
+    print Dumper ($ref_fs_test_result);
 }
 
 sub end_fs_test {
@@ -947,8 +949,11 @@ sub directory_tree_test {
 sub ACL_test {
     # tests ACL, not NTACL
     my ($abs_path,$filetype,$ref_fs_test_result,@test)=@_;
+    my $testnum=$ref_fs_test_result->{'ACL_count'}+1;
+    $ref_fs_test_result->{'ACL_count'}=$testnum;
+
     my $command="getfacl $abs_path 2> /dev/null";
-    print "****** Testing ACLS: $command\n";
+    print "****** Run $ref_fs_test_result->{'testnumber'} ACL-test $testnum: $command\n";
     # remember in list
     push @{ $ref_fs_test_result->{'ACL_test'} }, $abs_path;
     # remember in hash
@@ -1000,6 +1005,9 @@ sub ACL_test {
 sub NTACL_test {
     # tests ACL, not NTACL
     my ($share,$smb_rel,$root_dns,$smb_pass,$ref_fs_test_result,@test)=@_;
+    my $testnum=$ref_fs_test_result->{'NTACL_count'}+1;
+    $ref_fs_test_result->{'NTACL_count'}=$testnum;
+
     my $unc_path="//".$root_dns."/".$share;
 
     my $abs_path_linux;
@@ -1011,7 +1019,7 @@ sub NTACL_test {
         $abs_path_linux=~s/\/$//; # remove trailing /
     }
     my $command="smbcacls -U administrator"."%".$smb_pass." ".$unc_path." ".$smb_rel;
-    print "****** Testing NTACL: $command\n";
+    print "****** Run $ref_fs_test_result->{'testnumber'} NTACL-test $testnum: $command\n";
     # print "****** $share $smb_rel $abs_path_linux\n";
     # remember in list
     push @{ $ref_fs_test_result->{'NTACL_test'} }, $abs_path_linux;
@@ -1019,7 +1027,7 @@ sub NTACL_test {
     if (exists $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}){
         print "\nERROR: $abs_path_linux tested twice (Fix your set of NTACL tests)\n\n";
         exit;
-    }else {
+    } else {
         $ref_fs_test_result->{'NTACL_lookup'}{$abs_path_linux}=1;
     }
 

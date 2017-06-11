@@ -997,7 +997,6 @@ sub test_user_update {
         # no update
         ${$new_unid_ref}="---";
     } else {
-	print "UNID: $Match{'action'}{$line_new}{'unid'}\n";
         # update only if user is identically matched
         if ($identifier_class_changes==0){
             if ($Match{'action'}{$line_new}{'unid'} eq "---"){
