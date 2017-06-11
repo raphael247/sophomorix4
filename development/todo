@@ -56,6 +56,20 @@ DI:  ?
 Weiter: ACL's in automatisierte tests einbauen
 example in test-1: NTACL_test
 
+my %fs_test_result
+sub start_fs_test (empties %fs_test_result)
+     -> &directory_tree_test saves the paths to %fs_test_result
+     -> &NTACL_test
+         -> checks if path is in  %fs_test_result
+            -> yes -> OK, count in %fs_test_result
+               No  -> error 
+                    A) missing test
+                    B) tested multiple times (count)
+sub end_fs_test
+ -> dumps %fs_test_result (for debugging)
+ -> shows which dirs were not tested for NTACLs/ACLs
+    (Just for information)
+
 
 sophomorix-repair für die 3 admintypen anpassen
 
