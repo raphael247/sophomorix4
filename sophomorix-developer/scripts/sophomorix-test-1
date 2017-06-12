@@ -51,6 +51,7 @@ my $test_groupkill_1=0;
 my $test_groupkill_2=0;
 my $migration_kill=0;
 my $full=0;
+my $test_until_update=0;
 my $help=0;
 my $skip_warning=0;
 my $all_options="";
@@ -78,6 +79,7 @@ my $testopt=GetOptions(
            "groupkill-1" => \$groupkill_1,
            "groupkill-2" => \$groupkill_2,
            "full|f" => \$full,
+           "test-until-update" => \$test_until_update,
            "skip|s" => \$skip_warning,
           );
 
@@ -152,9 +154,12 @@ Options
 
 Full automated test:
 
-  -f, --full 
-   full test (copying file|add,move,kill|test)
-   includes skip
+  sophomorix-test-1 --full 
+   (full test, includes skip)
+
+  sophomorix-test-1 --test-until-update 
+   (run until and including update)
+
   -s, --skip 
    force overwriting sophomorix.add,sophomorix.move, sophomorix.kill
 
@@ -227,6 +232,16 @@ if ($full==1){
     $groupkill_2=1;
     $test_groupkill_1=1;
     $test_groupkill_2=1;
+    $skip_warning=1;
+}
+
+# --test-until-update
+if ($test_until_update==1){
+    $add=1;
+    $migration_kill=1;
+    $mod=1;
+    $ses=1;
+    $update=1;
     $skip_warning=1;
 }
 

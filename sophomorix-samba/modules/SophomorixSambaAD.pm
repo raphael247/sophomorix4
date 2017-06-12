@@ -2323,30 +2323,33 @@ sub AD_school_create {
     if($Conf::log_level>=2){
         print "   * Adding OU's for default groups in OU=$school ...\n";
     }
-    foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
-        # create ou for group
-        my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
-        my $description="LML Group, change if you like";
-        my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
-        my $school=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL'};
-        # create
-        &AD_group_create({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          dn_wish=>$dn,
-                          school=>$school,
-                          group=>$group,
-                          group_basename=>$group,
-                          description=>$description,
-                          type=>$type,
-                          status=>"P",
-                          creationdate=>$creationdate,
-                          joinable=>"TRUE",
-                          hidden=>"FALSE",
-                          smb_admin_pass=>$smb_admin_pass,
-                          sophomorix_config=>$ref_sophomorix_config,
-                         });
-    }
+
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+                             $school,$ref_sophomorix_config);
+    # foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
+    #     # create ou for group
+    #     my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
+    #     my $description="LML Group, change if you like";
+    #     my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
+    #     my $school=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL'};
+    #     # create
+    #     &AD_group_create({ldap=>$ldap,
+    #                       root_dse=>$root_dse,
+    #                       root_dns=>$root_dns,
+    #                       dn_wish=>$dn,
+    #                       school=>$school,
+    #                       group=>$group,
+    #                       group_basename=>$group,
+    #                       description=>$description,
+    #                       type=>$type,
+    #                       status=>"P",
+    #                       creationdate=>$creationdate,
+    #                       joinable=>"TRUE",
+    #                       hidden=>"FALSE",
+    #                       smb_admin_pass=>$smb_admin_pass,
+    #                       sophomorix_config=>$ref_sophomorix_config,
+    #                      });
+    # }
     ############################################################
     # adding groups to <schoolname>-group
     foreach my $ref_membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
@@ -2389,30 +2392,33 @@ sub AD_school_create {
     if($Conf::log_level>=2){
         print "   * Adding OU's for default groups in OU=$school ...\n";
     }
-    foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
-        # create ou for group
-        my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
-        my $description="LML Group, change if you like";
-        my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
-        my $school=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'SCHOOL'};
-        # create
-        &AD_group_create({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          dn_wish=>$dn,
-                          school=>$school,
-                          group=>$group,
-                          group_basename=>$group,
-                          description=>$description,
-                          type=>$type,
-                          status=>"P",
-                          creationdate=>$creationdate,
-                          joinable=>"TRUE",
-                          hidden=>"FALSE",
-                          smb_admin_pass=>$smb_admin_pass,
-                          sophomorix_config=>$ref_sophomorix_config,
-                        });
-    }
+
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+                             $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
+    # foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
+    #     # create ou for group
+    #     my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
+    #     my $description="LML Group, change if you like";
+    #     my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
+    #     my $school=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'SCHOOL'};
+    #     # create
+    #     &AD_group_create({ldap=>$ldap,
+    #                       root_dse=>$root_dse,
+    #                       root_dns=>$root_dns,
+    #                       dn_wish=>$dn,
+    #                       school=>$school,
+    #                       group=>$group,
+    #                       group_basename=>$group,
+    #                       description=>$description,
+    #                       type=>$type,
+    #                       status=>"P",
+    #                       creationdate=>$creationdate,
+    #                       joinable=>"TRUE",
+    #                       hidden=>"FALSE",
+    #                       smb_admin_pass=>$smb_admin_pass,
+    #                       sophomorix_config=>$ref_sophomorix_config,
+    #                     });
+    # }
 
     # all groups created, add some memberships from GLOBAL
     foreach my $group (keys %{$ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBER'}}) {
@@ -2439,11 +2445,75 @@ sub AD_school_create {
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
                          });
+    # creating filesystem for groups
+    # SCHOOLS -> no filesystem
+    # <schoolname> -> no filsystem
+    # create schoolgroups again, now all NTACLs can be set because all groups already exist
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+                             $school,$ref_sophomorix_config);
+
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+                             $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
 
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (end) ...");
     print "\n";
 }
 
+
+sub AD_create_school_groups {
+    my ($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,$school,$ref_sophomorix_config) = @_;
+    if ($school eq $DevelConf::AD_global_ou){
+        foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
+            # create ou for group
+            my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
+            my $description="LML Group, change if you like";
+            my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
+            my $school=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'SCHOOL'};
+            # create
+            &AD_group_create({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              root_dns=>$root_dns,
+                              dn_wish=>$dn,
+                              school=>$school,
+                              group=>$group,
+                              group_basename=>$group,
+                              description=>$description,
+                              type=>$type,
+                              status=>"P",
+                              creationdate=>$creationdate,
+                              joinable=>"TRUE",
+                              hidden=>"FALSE",
+                              smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>$ref_sophomorix_config,
+                            });
+        }
+    } else {
+        foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
+            # create ou for group
+            my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
+            my $description="LML Group, change if you like";
+            my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
+            my $school=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL'};
+            # create
+            &AD_group_create({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              root_dns=>$root_dns,
+                              dn_wish=>$dn,
+                              school=>$school,
+                              group=>$group,
+                              group_basename=>$group,
+                              description=>$description,
+                              type=>$type,
+                              status=>"P",
+                              creationdate=>$creationdate,
+                              joinable=>"TRUE",
+                              hidden=>"FALSE",
+                              smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>$ref_sophomorix_config,
+                            });
+        }
+    }
+}
 
 
 sub AD_object_search {
