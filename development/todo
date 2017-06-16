@@ -13,29 +13,6 @@ in AD_school_create
 wird 2x aufgerufen
 -> besser: erstesmal ohne repdir
            zweitesmal mit repdir (noch besser nur repdir)
-
-beim add wird schule ghs NICHT erzeugt, erst beim update:
-gal42::unidb6789::---::Galilei::---::Galileo::---::23.10.1972::---::Galilei::---::Galileo::---::uni.teachers.csv::ghs.students.csv::U::---::teacher::student::teachers::alumni::uni::ghs::
-
-
-repdir.teacherclass
-* smbcacls -U administrator%'Muster!' //linuxmuster.local/ghs teachers/homes --set 
-  "REVISION:1,OWNER:BUILTIN\Administrators,GROUP:LINUXMUSTER\Domain Users,ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ,ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL"
-ACE 'LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL': failed to convert 'LINUXMUSTER\ghs-admins' to SID
-ERROR setting NTACLS (512)
-
-
-
-Run 7 NTACL-test 55: smbcacls -U administrator%Muster! //linuxmuster.local/ghs /teachers
-Run 7 NTACL-test 56: smbcacls -U administrator%Muster! //linuxmuster.local/ghs /teachers/share
-Run 7 NTACL-test 57: smbcacls -U administrator%Muster! //linuxmuster.local/ghs /teachers/homes
-
-Run 9 NTACL-test 45: smbcacls -U administrator%Muster! //linuxmuster.local/ghs /teacher
-Run 9 NTACL-test 46: smbcacls -U administrator%Muster! //linuxmuster.local/ghs /teachers/share
-Run 9 NTACL-test 47: smbcacls -U administrator%Muster! //linuxmuster.local/ghs /teachers/homes
-
-
-
 NTACL's
 Domain Users nicht variable
 

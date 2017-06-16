@@ -4422,8 +4422,10 @@ if ($ses==1){
                    sophomorixSessions => "666;Mondays Session;lordjo42,blackmri42;|777;No such  allowed;lordjo42;",
                   });
 
+#    # --set-exam-mode
+#    &run_command("sophomorix-session $all_options --session 666 --set-exam-mode lordjo42,blackmri42");
     # --set-exam-mode
-    &run_command("sophomorix-session $all_options --session 666 --set-exam-mode lordjo42,blackmri42");
+    &run_command("sophomorix-exam-mode $all_options --set-exam-mode --supervisor maiersa42 --participant lordjo42 --participant blackmri42");
 
     # lordjo42
     &AD_test_object({ldap=>$ldap,
@@ -4496,8 +4498,10 @@ if ($ses==1){
                   });
 
 
+#    # --unset-exam-mode
+#    &run_command("sophomorix-session $all_options --session 666 --unset-exam-mode lordjo42,blackmri42");
     # --unset-exam-mode
-    &run_command("sophomorix-session $all_options --session 666 --unset-exam-mode lordjo42,blackmri42");
+    &run_command("sophomorix-exam-mode $all_options --unset-exam-mode --participant lordjo42 --participant blackmri42");
 
     # lordjo42
     &AD_test_object({ldap=>$ldap,

@@ -54,8 +54,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_session_manage
-                                 AD_session_set_exam
-                                 AD_session_unset_exam
                                  AD_user_create
                                  AD_group_create
                                  AD_group_addmember
@@ -98,8 +96,6 @@ my $comment="";
 my $participants=""; # undef: do not change participants
 my $add_participants="";
 my $remove_participants="";
-my $set_exam_mode="";
-my $unset_exam_mode="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -117,8 +113,6 @@ my $testopt=GetOptions(
            "participants|m=s" => \$participants,
            "add-participants=s" => \$add_participants,
            "remove-participants=s" => \$remove_participants,
-           "set-exam-mode=s" => \$set_exam_mode,
-           "unset-exam-mode=s" => \$unset_exam_mode,
            "developer-session=s" => \$developer_session,
           );
 
@@ -156,8 +150,6 @@ Options:
   --participants <user1>,<user2>, ...
   --add-participants <user1>,<user2>, ...
   --remove-participants <user1>,<user2>, ...
-  --set-exam-mode <user1>,<user2>, ...
-  --unset-exam-mode <user1>,<user2>, ...
   --create (user current time as session-id)
   --kill -s <session-id>
   --kill-all-sessions
@@ -370,68 +362,6 @@ if ($session ne "" and $remove_participants ne ""){
                     });
     &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
-
-
-
-# --set-exam-mode
-if ($session ne "" and $set_exam_mode ne ""){
-    if (not exists $sessions{'id'}{$session}{'supervisor'}{'name'} ){
-        print "   * Doing nothing: session $session not found\n"; 
-    } else {
-        # get chief of session
-        my $supervisor=$sessions{'id'}{$session}{'supervisor'}{'name'};
-        my @participants=split(/,/,$set_exam_mode);
-        print "$supervisor is supervisor of $session\n";
-        my $user_count=0;
-        foreach my $participant (@participants){
-	    $user_count++;
-            if (exists $sessions{'id'}{$session}{'participants'}{$participant}){
-                &AD_session_set_exam({ldap=>$ldap,
-                                      root_dse=>$root_dse,
-                                      root_dns=>$root_dns,
-                                      supervisor=>$supervisor,
-                                      session=>$session,
-                                      participant=>$participant,
-                                      user_count=>$user_count,
-                                      sessions_ref=>\%sessions,
-                                      date_now=> $time_stamp_AD,
-                                   });
-            } else {
-                print "   * Doing nothing: $participant is not in the session\n";
-            }
-        }
-    }
-}
-
-
-
-# --unset-exam-mode
-if ($session ne "" and $unset_exam_mode ne ""){
-    # get chief of session
-    my $supervisor=$sessions{'id'}{$session}{'supervisor'}{'name'};
-    my @participants=split(/,/,$unset_exam_mode);
-    print "$supervisor is supervisor of $session\n";
-    my $user_count=0;
-    foreach my $participant (@participants){
-	$user_count++;
-        if (exists $sessions{'id'}{$session}{'participants'}{$participant}){
-            &AD_session_unset_exam({ldap=>$ldap,
-                                    root_dse=>$root_dse,
-                                    root_dns=>$root_dns,
-                                    supervisor=>$supervisor,
-                                    session=>$session,
-                                    participant=>$participant,
-                                    user_count=>$user_count,
-                                    sessions_ref=>\%sessions,
-                                    date_now=> $time_stamp_AD,
-                                  });
-        } else {
-            print "   * Doing nothing: $participant is not in the session\n";
-        }
-    }
-
-}
-
 
 
 &AD_unbind_admin($ldap);

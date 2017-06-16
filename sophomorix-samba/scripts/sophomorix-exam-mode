@@ -1,0 +1,221 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-exam-mode) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+use String::Approx 'amatch';
+use String::Approx 'adist';
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
+use File::Basename qw( basename
+                       dirname
+                     ); 
+use Text::Iconv;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_amku_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 filelist_fetch
+                                 remove_whitespace
+                                 json_dump
+                                 recode_utf8_to_ascii
+                                 remove_from_list
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_session_manage
+                                 AD_user_set_exam_mode
+                                 AD_user_unset_exam_mode
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_get_sessions
+                                 AD_get_AD
+                                 AD_dns_get
+                                 AD_object_search
+                                 get_forbidden_logins
+                                    );
+
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+
+
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $json=0;
+my $supervisor="";
+my @participants=();
+my $set_exam_mode=0;
+my $unset_exam_mode=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
+#           "create|c" => \$create,
+#           "dump-AD" => \$dump_AD,
+#           "kill" => \$kill,
+#           "kill-all-sessions" => \$kill_all_sessions,
+           "supervisor=s" => \$supervisor,
+#           "session|s=s" => \$session,
+#           "comment=s" => \$comment,
+           "participant|m=s" => \@participants,
+#           "add-participants=s" => \$add_participants,
+#           "remove-participants=s" => \$remove_participants,
+           "set-exam-mode|set" => \$set_exam_mode,
+           "unset-exam-mode|unset" => \$unset_exam_mode,
+#           "developer-session=s" => \$developer_session,
+          );
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-exam-mode");
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt,\%sophomorix_result,$json);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+my @filelist=&filelist_fetch({filetype=>"users",
+                              sophomorix_config=>\%sophomorix_config,
+                            });
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-exam-mode sets/unsets users in exam-mode
+
+Options:
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+  sophomorix-exam-mode --set --supervisor <supi>  --participant <user1> --participant <user2> ...
+  sophomorix-exam-mode --unset --participant <user1> --participant <user2> ...
+ 
+Please see the sophomorix-exam-mode(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+# --info
+if ($info==1) {
+
+
+}
+
+
+&result_sophomorix_check_exit(\%sophomorix_result,$json);
+################################################################################
+# Start
+################################################################################
+&log_script_start(\@arguments,\%sophomorix_result);
+
+
+
+# --set-exam-mode
+if ($set_exam_mode==1){
+    if ($#participants==-1){
+        print "\nERROR: you need to specify at least one participant\n\n";
+        exit;
+    }
+    if ($supervisor eq ""){
+        print "\nERROR: you need to specify the supervisor\n\n";
+        exit;
+    }
+
+    my $user_count=0;
+    foreach my $participant (@participants){
+       $user_count++;
+       &AD_user_set_exam_mode({ldap=>$ldap,
+                               root_dse=>$root_dse,
+                               root_dns=>$root_dns,
+                               supervisor=>$supervisor,
+                               participant=>$participant,
+                               user_count=>$user_count,
+                               date_now=> $time_stamp_AD,
+                           });
+    }
+    exit;
+}
+
+
+
+# --unset-exam-mode
+if ($unset_exam_mode==1){
+    if ($#participants==-1){
+        print "\nERROR: you need to specify at least one participant\n\n";
+        exit;
+    }
+    my $user_count=0;
+    foreach my $participant (@participants){
+       $user_count++;
+       &AD_user_unset_exam_mode({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 root_dns=>$root_dns,
+                                 participant=>$participant,
+                                 user_count=>$user_count,
+                                 date_now=> $time_stamp_AD,
+                               });
+    }
+    exit;
+}
+
+
+&AD_unbind_admin($ldap);
+&log_script_end(\@arguments,\%sophomorix_result,$json);
+
+################################################################################
+# Sub
+################################################################################

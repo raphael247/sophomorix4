@@ -38,8 +38,8 @@ $Data::Dumper::Terse = 1;
             AD_unbind_admin
             AD_get_sessions
             AD_session_manage
-            AD_session_set_exam
-            AD_session_unset_exam
+            AD_user_set_exam_mode
+            AD_user_unset_exam_mode
             AD_user_create
             AD_user_update
             AD_get_user
@@ -1115,7 +1115,8 @@ sub AD_session_manage {
 
 
 
-sub AD_session_set_exam {
+#sub AD_session_set_exam {
+sub AD_user_set_exam_mode {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -1143,17 +1144,17 @@ sub AD_session_set_exam {
 
 
 
-sub AD_session_unset_exam {
+#sub AD_session_unset_exam {
+sub AD_user_unset_exam_mode {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
-    my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
     my $date_now = $arg_ref->{date_now};
 
-    print "   * Unsetting exam mode for session participant $participant (Supervisor: $supervisor)\n";
+    print "   * Unsetting exam mode for session participant $participant\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
         print "ERROR: Could not unset exam mode for nonexisting user $participant\n";
