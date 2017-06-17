@@ -1,20 +1,15 @@
-test-1
-
-weiter fiesystem test in den letzten 2 schritten
 
 
-wenn ghs-teachers erzeugt wird
-wird auch gleich deren teachers/homes erzeugt, aber diegruppe ghs-admins fehlt noch
-
--> problem:
+Problem: zuerst Gruppen erzeugen, erst dann können NTACL's erzeugt werden:
 
 in AD_school_create
 &AD_create_school groups(SCHOOLS|$DevelConf::AD_global_ou)
 wird 2x aufgerufen
 -> besser: erstesmal ohne repdir
            zweitesmal mit repdir (noch besser nur repdir)
-NTACL's
-Domain Users nicht variable
+
+------------------------------------------------------------
+NTACL umgesetzt
 
 OK in repdir.school
 /srv/samba/schools/default-school
@@ -50,6 +45,7 @@ Noch Todo:
 /srv/samba/global/management/<all-admin>
 /srv/samba/global/students
 /srv/samba/global/projects
+------------------------------------------------------------
 
 CONTROL-Zeile im output von smbcacls wird noch nicht verarbeitet:
 
@@ -68,22 +64,7 @@ PD:  ?
 SI:  ?
 DI:  ?
 
-Weiter: ACL's in automatisierte tests einbauen
-example in test-1: NTACL_test
 
-my %fs_test_result
-sub start_fs_test (empties %fs_test_result)
-     -> &directory_tree_test saves the paths to %fs_test_result
-     -> &NTACL_test
-         -> checks if path is in  %fs_test_result
-            -> yes -> OK, count in %fs_test_result
-               No  -> error 
-                    A) missing test
-                    B) tested multiple times (count)
-sub end_fs_test
- -> dumps %fs_test_result (for debugging)
- -> shows which dirs were not tested for NTACLs/ACLs
-    (Just for information)
 
 
 sophomorix-repair für die 3 admintypen anpassen
@@ -94,15 +75,6 @@ sophomorix-repair für die 3 admintypen anpassen
 json output konfigurierbar auf stderr oder stdout
 -> checken auf server
 
-new: sophomorix-exam-mode
-(set/unset exammode)
-Example:
-sophomorix-exam-mode --set --supervisor <supi>  --participant <user1> --participant <user2> ...
-sophomorix-exam-mode --unset --participant <user1> --participant <user2> ...
-
--> NUR Eintrag sophomorixExamModein ldap aus dem user entfernen
-   -> später auch Klassenerbeitsdinge
-   -> unabhängig von einer session
 
 
 sernet-Anfrage
