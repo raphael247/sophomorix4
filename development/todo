@@ -1,3 +1,27 @@
+Exam modus:
+
+Prüfling zwangsausloggen(testen ob ausgeloggt
+Prüfling aus allen Gruppen austragen
+(wie ist das, wenn sein Klasse mitglied in einem Projekt ist?)
+--> konfigurierbar, welche das sind
+    --> Internetzugansg sperren
+
+--> AD-Eintrag, welcher Lehrer den user in exammode gesetzt hat (und Datum mit Uhrzeit?)
+
+--> Heimatverzeichnis wegschieben 
+    umbiegen nach .../KLASSE/USER-lock oder .../KLASSE/home/USER-lock ?
+    in Heimatverzeichnis abspeichern: 
+      - Gruppenzugehörigkeiten
+      - Password-hash der momentanen Avccounts
+
+--> neues, leeres Prüfungs-home anlegen (heißt wie altes, repdir.student_home benutzen)
+
+Nach dem exam:
+--> Examhome/einsammeln sichern zum lehrer, der exammodus *gestartet* hat
+--> Examhome löschen
+--> altes Heimatverzeichnis rück umbenennen
+--> Gruppenzugehörigkeiten aus Datei herstellen (Datei dann löschen)
+--> Password wiederherstellen (hashdatei löschen)
 
 
 Problem: zuerst Gruppen erzeugen, erst dann können NTACL's erzeugt werden:
