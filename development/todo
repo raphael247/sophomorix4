@@ -56,13 +56,36 @@ students.ntacl.template:        CONTROL:SR|PD|SI|DI|DP
 Woher der Unterschied?
 Wie wird das gestzt? Mit smbcacls?
 
+-I remove   -> PD erscheint
+-I allow|copy    -> PD verschwindet
 
-Bedeutung von:
-SR:  ?
-DP:  ?
-PD:  ?
-SI:  ?
-DI:  ?
+how to set:
+SI
+DI
+
+
+die Control-Bits sind in source3/lib/util_sd.c erklärt:
+
+ {SEC_DESC_OWNER_DEFAULTED,       "OD", "Owner Defaulted"},
+ {SEC_DESC_GROUP_DEFAULTED,       "GD", "Group Defaulted"},
+ {SEC_DESC_DACL_PRESENT,          "DP", "DACL Present"},
+ {SEC_DESC_DACL_DEFAULTED,        "DD", "DACL Defaulted"},
+ {SEC_DESC_SACL_PRESENT,          "SP", "SACL Present"},
+ {SEC_DESC_SACL_DEFAULTED,        "SD", "SACL Defaulted"},
+ {SEC_DESC_DACL_TRUSTED,          "DT", "DACL Trusted"},
+ {SEC_DESC_SERVER_SECURITY,       "SS", "Server Security"},
+ {SEC_DESC_DACL_AUTO_INHERIT_REQ, "DR", "DACL Inheritance Required"},
+ {SEC_DESC_SACL_AUTO_INHERIT_REQ, "SR", "SACL Inheritance Required"},
+
+ {SEC_DESC_DACL_AUTO_INHERITED,   "DI", "DACL Auto Inherited"},
+ {SEC_DESC_SACL_AUTO_INHERITED,   "SI", "SACL Auto Inherited"},
+
+ {SEC_DESC_DACL_PROTECTED,        "PD", "DACL Protected"},
+ {SEC_DESC_SACL_PROTECTED,        "PS", "SACL Protected"},
+ {SEC_DESC_RM_CONTROL_VALID,      "RM", "RM Control Valid"},
+ {SEC_DESC_SELF_RELATIVE ,        "SR", "Self Relative"},
+
+
 
 
 

@@ -1857,106 +1857,106 @@ if ($add==1 or $test_add==1){
     &start_fs_test(\%fs_test_result); 
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
-                         "/srv/samba/schools",                                                     # acl
-                         "/srv/samba/schools/bsz",                                                 # ntacl
+                         "/srv/samba/schools",                                                         # acl
+                         "/srv/samba/schools/bsz",                                                     # ntacl
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/projects",
-                         "/srv/samba/schools/bsz/students",                                        # ntacl
-                         "/srv/samba/schools/bsz/teachers",                                        # ntacl
-                         "/srv/samba/schools/bsz/teachers/share",                                  # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes",                                  # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/oe42",                             # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher2",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42",                             # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher2",
-                         "/srv/samba/schools/bsz/students/m7ab",                                   # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/share",                             # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes",                             # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                   # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir2",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir2",
-                         "/srv/samba/schools/bsz/students/m8cd",                                   # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/share",                             # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes",                             # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir2",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir2",
-                         "/srv/samba/schools/uni",                                                 # ntacl
+                         "/srv/samba/schools/bsz/students",                                            # ntacl
+                         "/srv/samba/schools/bsz/teachers",                                            # ntacl
+                         "/srv/samba/schools/bsz/teachers/share",                                      # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes",                                      # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes/oe42",                                 # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes/oe42/_austeilen",
+                         "/srv/samba/schools/bsz/teachers/homes/oe42/_einsammeln",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42",                                 # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes/wu42/_austeilen",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m7ab",                                       # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/share",                                 # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes",                                 # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                       # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                      # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m8cd",                                       # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/share",                                 # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes",                                 # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",                      # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",                      # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_einsammeln",
+                         "/srv/samba/schools/uni",                                                     # ntacl
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/projects",
-                         "/srv/samba/schools/uni/students",                                        # ntacl
-                         "/srv/samba/schools/uni/students/12abc",                                  # ntacl
-                         "/srv/samba/schools/uni/students/12abc/share",                            # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes",                            # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42",                   # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir2",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42",                 # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir2",
-                         "/srv/samba/schools/uni/teachers",                                        # ntacl
-                         "/srv/samba/schools/uni/teachers/share",                                  # ntacl
-                         "/srv/samba/schools/uni/teachers/homes",                                  # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/kep42",                            # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher2",
-                         "/srv/samba/schools/uni/teachers/homes/gal42",                            # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher2",
-                         "/srv/samba/schools/default-school",                                      # ntacl
+                         "/srv/samba/schools/uni/students",                                            # ntacl
+                         "/srv/samba/schools/uni/students/12abc",                                      # ntacl
+                         "/srv/samba/schools/uni/students/12abc/share",                                # ntacl
+                         "/srv/samba/schools/uni/students/12abc/homes",                                # ntacl
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42",                       # ntacl
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_austeilen",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_einsammeln",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42",                     # ntacl
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_austeilen",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_einsammeln",
+                         "/srv/samba/schools/uni/teachers",                                            # ntacl
+                         "/srv/samba/schools/uni/teachers/share",                                      # ntacl
+                         "/srv/samba/schools/uni/teachers/homes",                                      # ntacl
+                         "/srv/samba/schools/uni/teachers/homes/kep42",                                # ntacl
+                         "/srv/samba/schools/uni/teachers/homes/kep42/_austeilen",
+                         "/srv/samba/schools/uni/teachers/homes/kep42/_einsammeln",
+                         "/srv/samba/schools/uni/teachers/homes/gal42",                                # ntacl
+                         "/srv/samba/schools/uni/teachers/homes/gal42/_austeilen",
+                         "/srv/samba/schools/uni/teachers/homes/gal42/_einsammeln",
+                         "/srv/samba/schools/default-school",                                          # ntacl
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/projects",
-                         "/srv/samba/schools/default-school/students",                             # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade",                       # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/share",                 # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes",                 # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",      # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/fisch42",         # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/fisch42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/fisch42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42",         # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42/dir2",    
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42",          # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/katze42",         # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/katze42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/katze42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/maus42",          # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/maus42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/maus42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hahn42",          # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hahn42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hahn42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/gans42",          # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/gans42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/gans42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/frosch42",        # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/frosch42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/frosch42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hamster42",       # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hamster42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/hamster42/dir2",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schwein42",       # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schwein42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schwein42/dir2",
-                         "/srv/samba/schools/default-school/teachers",                             # ntacl
-                         "/srv/samba/schools/default-school/teachers/share",                       # ntacl
-                         "/srv/samba/schools/default-school/teachers/homes",                       # ntacl
-                         "/srv/samba/schools/default-school/teachers/homes/sch42",                 # ntacl
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
+                         "/srv/samba/schools/default-school/students",                                 # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade",                           # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/share",                     # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes",                     # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",          # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/fisch42",             # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/fisch42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/fisch42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42",             # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schaf42/_einsammeln",    
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42",              # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hund42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/katze42",             # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/katze42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/katze42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/maus42",              # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/maus42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/maus42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hahn42",              # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hahn42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hahn42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/gans42",              # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/gans42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/gans42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/frosch42",            # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/frosch42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/frosch42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hamster42",           # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hamster42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/hamster42/_einsammeln",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schwein42",           # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schwein42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schwein42/_einsammeln",
+                         "/srv/samba/schools/default-school/teachers",                                 # ntacl
+                         "/srv/samba/schools/default-school/teachers/share",                           # ntacl
+                         "/srv/samba/schools/default-school/teachers/homes",                           # ntacl
+                         "/srv/samba/schools/default-school/teachers/homes/sch42",                     # ntacl
+                         "/srv/samba/schools/default-school/teachers/homes/sch42/_austeilen",
+                         "/srv/samba/schools/default-school/teachers/homes/sch42/_einsammeln",
                         ); 
     &ACL_test ("/srv/samba/schools",
                "d",
@@ -3510,29 +3510,29 @@ if ($mod==1){
                          "/srv/samba/schools/bsz/teachers/share",                                  # ntacl
                          "/srv/samba/schools/bsz/teachers/homes",                                  # ntacl
                          "/srv/samba/schools/bsz/teachers/homes/oe42",                             # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher2",
+                         "/srv/samba/schools/bsz/teachers/homes/oe42/_austeilen",
+                         "/srv/samba/schools/bsz/teachers/homes/oe42/_einsammeln",
                          "/srv/samba/schools/bsz/teachers/homes/wu42",                             # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher2",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42/_austeilen",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m7ab",                                   # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/share",                             # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes",                             # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                   # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir2",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir2",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",                                   # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/share",                             # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/homes",                             # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_einsammeln",
                          "/srv/samba/schools/uni",                                                 # ntacl
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/projects",
@@ -3541,20 +3541,20 @@ if ($mod==1){
                          "/srv/samba/schools/uni/students/12abc/share",                            # ntacl
                          "/srv/samba/schools/uni/students/12abc/homes",                            # ntacl
                          "/srv/samba/schools/uni/students/12abc/homes/lordjo42",                   # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir2",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_austeilen",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_einsammeln",
                          "/srv/samba/schools/uni/students/12abc/homes/blackmri42",                 # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir2",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_austeilen",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_einsammeln",
                          "/srv/samba/schools/uni/teachers",                                        # ntacl
                          "/srv/samba/schools/uni/teachers/share",                                  # ntacl
                          "/srv/samba/schools/uni/teachers/homes",                                  # ntacl
                          "/srv/samba/schools/uni/teachers/homes/kep42",                            # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher2",
+                         "/srv/samba/schools/uni/teachers/homes/kep42/_austeilen",
+                         "/srv/samba/schools/uni/teachers/homes/kep42/_einsammeln",
                          "/srv/samba/schools/uni/teachers/homes/gal42",                            # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher2",
+                         "/srv/samba/schools/uni/teachers/homes/gal42/_austeilen",
+                         "/srv/samba/schools/uni/teachers/homes/gal42/_einsammeln",
                          "/srv/samba/schools/default-school",                                      # ntacl
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/projects",
@@ -3563,14 +3563,14 @@ if ($mod==1){
                          "/srv/samba/schools/default-school/students/s6ade/share",                 # ntacl
                          "/srv/samba/schools/default-school/students/s6ade/homes",                 # ntacl
                          "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",      # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir2",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_einsammeln",
                          "/srv/samba/schools/default-school/teachers",                             # ntacl
                          "/srv/samba/schools/default-school/teachers/share",                       # ntacl
                          "/srv/samba/schools/default-school/teachers/homes",                       # ntacl
                          "/srv/samba/schools/default-school/teachers/homes/sch42",                 # ntacl
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
+                         "/srv/samba/schools/default-school/teachers/homes/sch42/_austeilen",
+                         "/srv/samba/schools/default-school/teachers/homes/sch42/_einsammeln",
                         ); 
 
 
@@ -5217,29 +5217,29 @@ if ($ses==1){
                          "/srv/samba/schools/bsz/teachers/share",                                  # ntacl
                          "/srv/samba/schools/bsz/teachers/homes",                                  # ntacl
                          "/srv/samba/schools/bsz/teachers/homes/oe42",                             # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher2",
+                         "/srv/samba/schools/bsz/teachers/homes/oe42/_austeilen",
+                         "/srv/samba/schools/bsz/teachers/homes/oe42/_einsammeln",
                          "/srv/samba/schools/bsz/teachers/homes/wu42",                             # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher1",
-                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher2",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42/_austeilen",
+                         "/srv/samba/schools/bsz/teachers/homes/wu42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m7ab",                                   # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/share",                             # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes",                             # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                   # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir2",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir1",
-                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir2",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",                                   # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/share",                             # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/homes",                             # ntacl
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",                  # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir1",
-                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_austeilen",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_einsammeln",
                          "/srv/samba/schools/uni",                                                 # ntacl
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/projects",
@@ -5248,20 +5248,20 @@ if ($ses==1){
                          "/srv/samba/schools/uni/students/12abc/share",                            # ntacl
                          "/srv/samba/schools/uni/students/12abc/homes",                            # ntacl
                          "/srv/samba/schools/uni/students/12abc/homes/lordjo42",                   # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir2",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_austeilen",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_einsammeln",
                          "/srv/samba/schools/uni/students/12abc/homes/blackmri42",                 # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir1",
-                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir2",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_austeilen",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_einsammeln",
                          "/srv/samba/schools/uni/teachers",                                        # ntacl
                          "/srv/samba/schools/uni/teachers/share",                                  # ntacl
                          "/srv/samba/schools/uni/teachers/homes",                                  # ntacl
                          "/srv/samba/schools/uni/teachers/homes/kep42",                            # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/kep42/teacher2",
+                         "/srv/samba/schools/uni/teachers/homes/kep42/_austeilen",
+                         "/srv/samba/schools/uni/teachers/homes/kep42/_einsammeln",
                          "/srv/samba/schools/uni/teachers/homes/gal42",                            # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher1",
-                         "/srv/samba/schools/uni/teachers/homes/gal42/teacher2",
+                         "/srv/samba/schools/uni/teachers/homes/gal42/_austeilen",
+                         "/srv/samba/schools/uni/teachers/homes/gal42/_einsammeln",
                          "/srv/samba/schools/default-school",                                      # ntacl
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/projects",
@@ -5270,14 +5270,14 @@ if ($ses==1){
                          "/srv/samba/schools/default-school/students/s6ade/share",                 # ntacl
                          "/srv/samba/schools/default-school/students/s6ade/homes",                 # ntacl
                          "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",      # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir1",
-                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir2",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_austeilen",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_einsammeln",
                          "/srv/samba/schools/default-school/teachers",                             # ntacl
                          "/srv/samba/schools/default-school/teachers/share",                       # ntacl
                          "/srv/samba/schools/default-school/teachers/homes",                       # ntacl
                          "/srv/samba/schools/default-school/teachers/homes/sch42",                 # ntacl
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",
-                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",
+                         "/srv/samba/schools/default-school/teachers/homes/sch42/_austeilen",
+                         "/srv/samba/schools/default-school/teachers/homes/sch42/_einsammeln",
                         ); 
 
     &ACL_test ("/srv/samba/schools",
@@ -7208,162 +7208,150 @@ if ($update==1 or $test_update==1){
     &start_fs_test(\%fs_test_result);
     &directory_tree_test("/srv/samba/schools",
                          \%fs_test_result,
-                         "/srv/samba/schools",                                                       # nacl
-                         "/srv/samba/schools/bsz",                                                   # ntacl
+                         "/srv/samba/schools",                                                             # nacl
+                         "/srv/samba/schools/bsz",                                                         # ntacl
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/projects",
-                         "/srv/samba/schools/bsz/students",                                          # ntacl
-                         "/srv/samba/schools/bsz/teachers",                                          # ntacl
-                         "/srv/samba/schools/bsz/teachers/share",                                    # ntacl
-                         "/srv/samba/schools/bsz/teachers/homes",                                    # ntacl
-#                         "/srv/samba/schools/bsz/teachers/homes/oe42",                              # moved away
-#                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher1",                     # moved away
-#                         "/srv/samba/schools/bsz/teachers/homes/oe42/teacher2",                     # moved away
-                         "/srv/samba/schools/bsz/students/alumni",                                   # ntacl
-                         "/srv/samba/schools/bsz/students/alumni/share",                             # ntacl
-                         "/srv/samba/schools/bsz/students/alumni/homes",                             # ntacl
-                         "/srv/samba/schools/bsz/students/alumni/homes/oe42",                        # ntacl, moved to here
-                         "/srv/samba/schools/bsz/students/alumni/homes/oe42/teacher1",               #        moved to here
-                         "/srv/samba/schools/bsz/students/alumni/homes/oe42/teacher2",               #        moved to here
-                         "/srv/samba/schools/bsz/students/alumni/homes/oe42/dir1",                   #        moved to here
-                         "/srv/samba/schools/bsz/students/alumni/homes/oe42/dir2",                   #        moved to here
-#                         "/srv/samba/schools/bsz/teachers/homes/wu42",                              # moved away
-#                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher1",                     # moved away
-#                         "/srv/samba/schools/bsz/teachers/homes/wu42/teacher2",                     # moved away
-                         "/srv/samba/schools/uni/teachers/homes/wu42",                               # ntacl, moved to here
-                         "/srv/samba/schools/uni/teachers/homes/wu42/teacher1",                      #        moved to here
-                         "/srv/samba/schools/uni/teachers/homes/wu42/teacher2",                      #        moved to here
-                         "/srv/samba/schools/bsz/students/m7ab",                                     # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/share",                               # ntacl
-                         "/srv/samba/schools/bsz/students/m7ab/homes",                               # ntacl
-#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                    # moved away
-#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir1",               # moved away
-#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/dir2",               # moved away
-                         "/srv/samba/schools/bsz/students/attic",                                    # ntacl
-                         "/srv/samba/schools/bsz/students/attic/share",                              # ntacl
-                         "/srv/samba/schools/bsz/students/attic/homes",                              # ntacl
-                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42",                    # ntacl, moved to here
-                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/dir1",               #        moved to here
-                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/dir2",               #        moved to here
-#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                   # moved away
-#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir1",              # moved away
-#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/dir2",              # moved away
-                         "/srv/samba/schools/lin/students/attic",                                    # ntacl
-                         "/srv/samba/schools/lin/students/attic/share",                              # ntacl
-                         "/srv/samba/schools/lin/students/attic/homes",                              # ntacl
-                         "/srv/samba/schools/lin/students/attic/homes/muellegr42",                   # ntacl, moved to here
-                         "/srv/samba/schools/lin/students/attic/homes/muellegr42/dir1",              #        moved to here
-                         "/srv/samba/schools/lin/students/attic/homes/muellegr42/dir2",              #        moved to here
-                         "/srv/samba/schools/bsz/students/m8cd",                                     # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/share",                               # ntacl
-                         "/srv/samba/schools/bsz/students/m8cd/homes",                               # ntacl
-#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",                   # moved away
-#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir1",              # moved away
-#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/dir2",              # moved away
-#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",                   # moved away
-#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir1",              # moved away
-#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/dir2",              # moved away
-                         "/srv/samba/schools/bsz/students/m9cd",                                     # ntacl
-                         "/srv/samba/schools/bsz/students/m9cd/share",                               # ntacl
-                         "/srv/samba/schools/bsz/students/m9cd/homes",                               # ntacl
-                         "/srv/samba/schools/bsz/students/m9cd/homes/jonsonad42",                    # ntacl, moved to here
-                         "/srv/samba/schools/bsz/students/m9cd/homes/jonsonad42/dir1",               #        moved to here
-                         "/srv/samba/schools/bsz/students/m9cd/homes/jonsonad42/dir2",               #        moved to here
-                         "/srv/samba/schools/bsz/students/m9cd/homes/samardze42",                    # ntacl, moved to here
-                         "/srv/samba/schools/bsz/students/m9cd/homes/samardze42/dir1",               #        moved to here
-                         "/srv/samba/schools/bsz/students/m9cd/homes/samardze42/dir2",               #        moved to here
-                         "/srv/samba/schools/uni",                                                   # ntacl
+                         "/srv/samba/schools/bsz/students",                                                # ntacl
+                         "/srv/samba/schools/bsz/teachers",                                                # ntacl
+                         "/srv/samba/schools/bsz/teachers/share",                                          # ntacl
+                         "/srv/samba/schools/bsz/teachers/homes",                                          # ntacl
+#                         "/srv/samba/schools/bsz/teachers/homes/oe42",                                    # moved away
+#                         "/srv/samba/schools/bsz/teachers/homes/oe42/_austeilen",                         # moved away
+#                         "/srv/samba/schools/bsz/teachers/homes/oe42/_einsammeln",                        # moved away
+                         "/srv/samba/schools/bsz/students/alumni",                                         # ntacl
+                         "/srv/samba/schools/bsz/students/alumni/share",                                   # ntacl
+                         "/srv/samba/schools/bsz/students/alumni/homes",                                   # ntacl
+                         "/srv/samba/schools/bsz/students/alumni/homes/oe42",                              # ntacl, moved to here
+                         "/srv/samba/schools/bsz/students/alumni/homes/oe42/_austeilen",                   #        moved to here
+                         "/srv/samba/schools/bsz/students/alumni/homes/oe42/_einsammeln",                  #        moved to here
+#                         "/srv/samba/schools/bsz/teachers/homes/wu42",                                    # moved away
+#                         "/srv/samba/schools/bsz/teachers/homes/wu42/_austeilen",                         # moved away
+#                         "/srv/samba/schools/bsz/teachers/homes/wu42/_einsammeln",                        # moved away
+                         "/srv/samba/schools/uni/teachers/homes/wu42",                                     # ntacl, moved to here
+                         "/srv/samba/schools/uni/teachers/homes/wu42/_austeilen",                          #        moved to here
+                         "/srv/samba/schools/uni/teachers/homes/wu42/_einsammeln",                         #        moved to here
+                         "/srv/samba/schools/bsz/students/m7ab",                                           # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/share",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m7ab/homes",                                     # ntacl
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                          # moved away
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_austeilen",               # moved away
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln",              # moved away
+                         "/srv/samba/schools/bsz/students/attic",                                          # ntacl
+                         "/srv/samba/schools/bsz/students/attic/share",                                    # ntacl
+                         "/srv/samba/schools/bsz/students/attic/homes",                                    # ntacl
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42",                          # ntacl, moved to here
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/_austeilen",               #        moved to here
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/_einsammeln",              #        moved to here
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                         # moved away
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_austeilen",              # moved away
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_einsammeln",             # moved away
+                         "/srv/samba/schools/lin/students/attic",                                          # ntacl
+                         "/srv/samba/schools/lin/students/attic/share",                                    # ntacl
+                         "/srv/samba/schools/lin/students/attic/homes",                                    # ntacl
+                         "/srv/samba/schools/lin/students/attic/homes/muellegr42",                         # ntacl, moved to here
+                         "/srv/samba/schools/lin/students/attic/homes/muellegr42/_austeilen",              #        moved to here
+                         "/srv/samba/schools/lin/students/attic/homes/muellegr42/_einsammeln",             #        moved to here
+                         "/srv/samba/schools/bsz/students/m8cd",                                           # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/share",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m8cd/homes",                                     # ntacl
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42",                         # moved away
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_austeilen",              # moved away
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_einsammeln",             # moved away
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42",                         # moved away
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_austeilen",              # moved away
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_einsammeln",             # moved away
+                         "/srv/samba/schools/bsz/students/m9cd",                                           # ntacl
+                         "/srv/samba/schools/bsz/students/m9cd/share",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m9cd/homes",                                     # ntacl
+                         "/srv/samba/schools/bsz/students/m9cd/homes/jonsonad42",                          # ntacl, moved to here
+                         "/srv/samba/schools/bsz/students/m9cd/homes/jonsonad42/_austeilen",               #        moved to here
+                         "/srv/samba/schools/bsz/students/m9cd/homes/jonsonad42/_einsammeln",              #        moved to here
+                         "/srv/samba/schools/bsz/students/m9cd/homes/samardze42",                          # ntacl, moved to here
+                         "/srv/samba/schools/bsz/students/m9cd/homes/samardze42/_austeilen",               #        moved to here
+                         "/srv/samba/schools/bsz/students/m9cd/homes/samardze42/_einsammeln",              #        moved to here
+                         "/srv/samba/schools/uni",                                                         # ntacl
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/projects",
-                         "/srv/samba/schools/uni/students",                                          # ntacl
-                         "/srv/samba/schools/uni/students/12abc",                                    # ntacl
-                         "/srv/samba/schools/uni/students/12abc/share",                              # ntacl
-                         "/srv/samba/schools/uni/students/12abc/homes",                              # ntacl
-                         "/srv/samba/schools/uni/teachers/homes/lordjo42",                           # ntacl, moved to here
-                         "/srv/samba/schools/uni/teachers/homes/lordjo42/dir1",                      #        moved to here
-                         "/srv/samba/schools/uni/teachers/homes/lordjo42/dir2",                      #        moved to here
-                         "/srv/samba/schools/uni/teachers/homes/lordjo42/teacher1",                  #        moved to here
-                         "/srv/samba/schools/uni/teachers/homes/lordjo42/teacher2",                  #        moved to here
- #                        "/srv/samba/schools/uni/students/12abc/homes/lordjo42",                    # moved away
- #                        "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir1",               # moved away
- #                        "/srv/samba/schools/uni/students/12abc/homes/lordjo42/dir2",               # moved away
- #                        "/srv/samba/schools/uni/students/12abc/homes/blackmri42",                  # moved away
- #                        "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir1",             # moved away
- #                        "/srv/samba/schools/uni/students/12abc/homes/blackmri42/dir2",             # moved away
-                         "/srv/samba/schools/lin",                                                   # ntacl
+                         "/srv/samba/schools/uni/students",                                                # ntacl
+                         "/srv/samba/schools/uni/students/12abc",                                          # ntacl
+                         "/srv/samba/schools/uni/students/12abc/share",                                    # ntacl
+                         "/srv/samba/schools/uni/students/12abc/homes",                                    # ntacl
+                         "/srv/samba/schools/uni/teachers/homes/lordjo42",                                 # ntacl, moved to here
+                         "/srv/samba/schools/uni/teachers/homes/lordjo42/_austeilen",                      #        moved to here
+                         "/srv/samba/schools/uni/teachers/homes/lordjo42/_einsammeln",                     #        moved to here
+ #                        "/srv/samba/schools/uni/students/12abc/homes/lordjo42",                          # moved away
+ #                        "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_austeilen",               # moved away
+ #                        "/srv/samba/schools/uni/students/12abc/homes/lordjo42/_einsammeln",              # moved away
+ #                        "/srv/samba/schools/uni/students/12abc/homes/blackmri42",                        # moved away
+ #                        "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_austeilen",             # moved away
+ #                        "/srv/samba/schools/uni/students/12abc/homes/blackmri42/_einsammeln",            # moved away
+                         "/srv/samba/schools/lin",                                                         # ntacl
                          "/srv/samba/schools/lin/management",                              
                          "/srv/samba/schools/lin/projects",
-                         "/srv/samba/schools/lin/students",                                          # ntacl
-                         "/srv/samba/schools/lin/teachers",                                          # ntacl
-                         "/srv/samba/schools/lin/teachers/share",                                    # ntacl
-                         "/srv/samba/schools/lin/teachers/homes",                                    # ntacl
-                         "/srv/samba/schools/lin/teachers/homes/blackmri42",                         # ntacl, moved to here
-                         "/srv/samba/schools/lin/teachers/homes/blackmri42/teacher1",                #        moved to here
-                         "/srv/samba/schools/lin/teachers/homes/blackmri42/teacher2",                #        moved to here
-                         "/srv/samba/schools/lin/teachers/homes/blackmri42/dir1",                    #        moved to here
-                         "/srv/samba/schools/lin/teachers/homes/blackmri42/dir2",                    #        moved to here
-                         "/srv/samba/schools/uni/teachers",                                          # ntacl
-                         "/srv/samba/schools/uni/teachers/share",                                    # ntacl
-                         "/srv/samba/schools/uni/teachers/homes",                                    # ntacl
- #                        "/srv/samba/schools/uni/teachers/homes/kep42",                             # moved away
- #                        "/srv/samba/schools/uni/teachers/homes/kep42/teacher1",                    # moved away
- #                        "/srv/samba/schools/uni/teachers/homes/kep42/teacher2",                    # moved away
-                         "/srv/samba/schools/uni/students/alumni",                                   # ntacl
-                         "/srv/samba/schools/uni/students/alumni/share",                             # ntacl
-                         "/srv/samba/schools/uni/students/alumni/homes",                             # ntacl
-                         "/srv/samba/schools/uni/students/alumni/homes/kep42",                       # ntacl, moved to here
-                         "/srv/samba/schools/uni/students/alumni/homes/kep42/teacher1",              #        moved to here
-                         "/srv/samba/schools/uni/students/alumni/homes/kep42/teacher2",              #        moved to here
-                         "/srv/samba/schools/uni/students/alumni/homes/kep42/dir1",                  #        moved to here
-                         "/srv/samba/schools/uni/students/alumni/homes/kep42/dir2",                  #        moved to here
- #                        "/srv/samba/schools/uni/teachers/homes/gal42",                             # moved away
- #                        "/srv/samba/schools/uni/teachers/homes/gal42/teacher1",                    # moved away
- #                        "/srv/samba/schools/uni/teachers/homes/gal42/teacher2",                    # moved away
-                         "/srv/samba/schools/ghs",                                                   # ntacl
+                         "/srv/samba/schools/lin/students",                                                # ntacl
+                         "/srv/samba/schools/lin/teachers",                                                # ntacl
+                         "/srv/samba/schools/lin/teachers/share",                                          # ntacl
+                         "/srv/samba/schools/lin/teachers/homes",                                          # ntacl
+                         "/srv/samba/schools/lin/teachers/homes/blackmri42",                               # ntacl, moved to here
+                         "/srv/samba/schools/lin/teachers/homes/blackmri42/_austeilen",                    #        moved to here
+                         "/srv/samba/schools/lin/teachers/homes/blackmri42/_einsammeln",                   #        moved to here
+                         "/srv/samba/schools/uni/teachers",                                                # ntacl
+                         "/srv/samba/schools/uni/teachers/share",                                          # ntacl
+                         "/srv/samba/schools/uni/teachers/homes",                                          # ntacl
+ #                        "/srv/samba/schools/uni/teachers/homes/kep42",                                   # moved away
+ #                        "/srv/samba/schools/uni/teachers/homes/kep42/_austeilen",                        # moved away
+ #                        "/srv/samba/schools/uni/teachers/homes/kep42/_einsammeln",                       # moved away
+                         "/srv/samba/schools/uni/students/alumni",                                         # ntacl
+                         "/srv/samba/schools/uni/students/alumni/share",                                   # ntacl
+                         "/srv/samba/schools/uni/students/alumni/homes",                                   # ntacl
+                         "/srv/samba/schools/uni/students/alumni/homes/kep42",                             # ntacl, moved to here
+                         "/srv/samba/schools/uni/students/alumni/homes/kep42/_austeilen",                  #        moved to here
+                         "/srv/samba/schools/uni/students/alumni/homes/kep42/_einsammeln",                 #        moved to here
+ #                        "/srv/samba/schools/uni/teachers/homes/gal42",                                   # moved away
+ #                        "/srv/samba/schools/uni/teachers/homes/gal42/_austeilen",                        # moved away
+ #                        "/srv/samba/schools/uni/teachers/homes/gal42/_einsammeln",                       # moved away
+                         "/srv/samba/schools/ghs",                                                         # ntacl
                          "/srv/samba/schools/ghs/management",
                          "/srv/samba/schools/ghs/projects",
-                         "/srv/samba/schools/ghs/students",                                          # ntacl
-                         "/srv/samba/schools/ghs/students/alumni",                                   # ntacl
-                         "/srv/samba/schools/ghs/students/alumni/share",                             # ntacl
-                         "/srv/samba/schools/ghs/students/alumni/homes",                             # ntacl
-                         "/srv/samba/schools/ghs/students/alumni/homes/gal42",                       # ntacl, moved to here
-                         "/srv/samba/schools/ghs/students/alumni/homes/gal42/teacher1",              #        moved to here
-                         "/srv/samba/schools/ghs/students/alumni/homes/gal42/teacher2",              #        moved to here
-                         "/srv/samba/schools/ghs/students/alumni/homes/gal42/dir1",                  #        moved to here
-                         "/srv/samba/schools/ghs/students/alumni/homes/gal42/dir2",                  #        moved to here
-                         "/srv/samba/schools/ghs/teachers",                                          # ntacl
-                         "/srv/samba/schools/ghs/teachers/share",                                    # ntacl
-                         "/srv/samba/schools/ghs/teachers/homes",                                    # ntacl
-                         "/srv/samba/schools/default-school",                                        # ntacl
+                         "/srv/samba/schools/ghs/students",                                                # ntacl
+                         "/srv/samba/schools/ghs/students/alumni",                                         # ntacl
+                         "/srv/samba/schools/ghs/students/alumni/share",                                   # ntacl
+                         "/srv/samba/schools/ghs/students/alumni/homes",                                   # ntacl
+                         "/srv/samba/schools/ghs/students/alumni/homes/gal42",                             # ntacl, moved to here
+                         "/srv/samba/schools/ghs/students/alumni/homes/gal42/_austeilen",                  #        moved to here
+                         "/srv/samba/schools/ghs/students/alumni/homes/gal42/_einsammeln",                 #        moved to here
+                         "/srv/samba/schools/ghs/teachers",                                                # ntacl
+                         "/srv/samba/schools/ghs/teachers/share",                                          # ntacl
+                         "/srv/samba/schools/ghs/teachers/homes",                                          # ntacl
+                         "/srv/samba/schools/default-school",                                              # ntacl
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/projects",
-                         "/srv/samba/schools/default-school/students",                               # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade",                         # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/share",                   # ntacl
-                         "/srv/samba/schools/default-school/students/s6ade/homes",                   # ntacl
-#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",       # moved away
-#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir1",  # moved away
-#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/dir2",  # moved away
-                         "/srv/samba/schools/default-school/students/s7ade",                         # ntacl
-                         "/srv/samba/schools/default-school/students/s7ade/share",                   # ntacl
-                         "/srv/samba/schools/default-school/students/s7ade/homes",                   # ntacl
-                         "/srv/samba/schools/default-school/students/s7ade/homes/schneima42",        # ntacl, moved to here
-                         "/srv/samba/schools/default-school/students/s7ade/homes/schneima42/dir1",   #        moved to here
-                         "/srv/samba/schools/default-school/students/s7ade/homes/schneima42/dir2",   #        moved to here
+                         "/srv/samba/schools/default-school/students",                                     # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade",                               # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/share",                         # ntacl
+                         "/srv/samba/schools/default-school/students/s6ade/homes",                         # ntacl
+#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42",             # moved away
+#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_austeilen",  # moved away
+#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima42/_einsammeln",  # moved away
+                         "/srv/samba/schools/default-school/students/s7ade",                               # ntacl
+                         "/srv/samba/schools/default-school/students/s7ade/share",                         # ntacl
+                         "/srv/samba/schools/default-school/students/s7ade/homes",                         # ntacl
+                         "/srv/samba/schools/default-school/students/s7ade/homes/schneima42",              # ntacl, moved to here
+                         "/srv/samba/schools/default-school/students/s7ade/homes/schneima42/_austeilen",   #        moved to here
+                         "/srv/samba/schools/default-school/students/s7ade/homes/schneima42/_einsammeln",  #        moved to here
                          "/srv/samba/schools/default-school/teachers",
                          "/srv/samba/schools/default-school/teachers/share",
                          "/srv/samba/schools/default-school/teachers/homes",
-#                         "/srv/samba/schools/default-school/teachers/homes/sch42",                  # moved away
-#                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher1",         # moved away
-#                         "/srv/samba/schools/default-school/teachers/homes/sch42/teacher2",         # moved away
-                         "/srv/samba/schools/default-school/students/alumni",                        # ntacl
-                         "/srv/samba/schools/default-school/students/alumni/share",                  # ntacl
-                         "/srv/samba/schools/default-school/students/alumni/homes",                  # ntacl
-                         "/srv/samba/schools/default-school/students/alumni/homes/sch42",            # ntacl, moved to here
-                         "/srv/samba/schools/default-school/students/alumni/homes/sch42/teacher1",   #        moved to here
-                         "/srv/samba/schools/default-school/students/alumni/homes/sch42/teacher2",   #        moved to here
-                         "/srv/samba/schools/default-school/students/alumni/homes/sch42/dir1",       #        moved to here
-                         "/srv/samba/schools/default-school/students/alumni/homes/sch42/dir2",       #        moved to here
+#                         "/srv/samba/schools/default-school/teachers/homes/sch42",                        # moved away
+#                         "/srv/samba/schools/default-school/teachers/homes/sch42/_austeilen",             # moved away
+#                         "/srv/samba/schools/default-school/teachers/homes/sch42/_einsammeln",            # moved away
+                         "/srv/samba/schools/default-school/students/alumni",                              # ntacl
+                         "/srv/samba/schools/default-school/students/alumni/share",                        # ntacl
+                         "/srv/samba/schools/default-school/students/alumni/homes",                        # ntacl
+                         "/srv/samba/schools/default-school/students/alumni/homes/sch42",                  # ntacl, moved to here
+                         "/srv/samba/schools/default-school/students/alumni/homes/sch42/_austeilen",       #        moved to here
+                         "/srv/samba/schools/default-school/students/alumni/homes/sch42/_einsammeln",      #        moved to here
                         ); 
 
     &ACL_test ("/srv/samba/schools",
