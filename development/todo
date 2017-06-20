@@ -1,3 +1,21 @@
+sophomorix-check -ij bricht ab bei syntaxfehler in bsz.school.conf
+(userfile.students.csv)
+aber sophomorix.add nicht (sollte auch abbrechen)
+
+
+sophomorix-user -i
+
+-> admins zeigen allee 3 admintypen zusammen
+
+sophomorix-nochange soll sophomorix.nochange auflisten
+sophomorix.nochange nicht mit admins???
+
+
+sophomorix.ini:
+make global sharename configurable
+
+
+
 Exam modus:
 
 sophomorix-exam-mode -i:
@@ -49,7 +67,7 @@ OK in repdir.teacherclass
 /srv/samba/schools/default-school/teachers/share/
 
 OK in repdir.teacher_home
-sophomorix-cacls /srv/samba/schools/default-school/teachers/homes/cv/
+/srv/samba/schools/default-school/teachers/homes/cv/
 
 OK in repdir.adminclass
 /srv/samba/schools/default-school/students/5a
@@ -73,7 +91,16 @@ Noch Todo:
 /srv/samba/global/management/<all-admin>
 /srv/samba/global/students
 /srv/samba/global/projects
+
+Und evtl.?
+/srv/samba/schools/default-school/students/5a/homes/adamskke/_austeilen
+/srv/samba/schools/default-school/students/5a/homes/adamskke/_einsammeln
+/srv/samba/schools/default-school/teachers/homes/cv/_austeilen
+/srv/samba/schools/default-school/teachers/homes/cv/_einsammeln
+
+Und evtl. dito für exam-mode
 ------------------------------------------------------------
+
 
 CONTROL-Zeile im output von smbcacls wird noch nicht verarbeitet:
 
@@ -91,8 +118,7 @@ how to set:
 SI
 DI
 
-
-die Control-Bits sind in source3/lib/util_sd.c erklärt:
+Die Control-Bits sind in source3/lib/util_sd.c erklärt:
 
  {SEC_DESC_OWNER_DEFAULTED,       "OD", "Owner Defaulted"},
  {SEC_DESC_GROUP_DEFAULTED,       "GD", "Group Defaulted"},
@@ -120,6 +146,11 @@ die Control-Bits sind in source3/lib/util_sd.c erklärt:
 
 sophomorix-repair für die 3 admintypen anpassen
 
+------------------------------------------------------------
+sophomorix-check:
+  bei sophomorix.adds schon loginnamen erstellen (die es noch nicht gibt)
+  -> besser möglich einzelne user anzulegen mit loginnamen als parameter
+  -> sophomorix-add prüft nochmal ob loginname möglich, wenn nicht garnix machen
 
 ------------------------------------------------------------
 
@@ -128,7 +159,7 @@ json output konfigurierbar auf stderr oder stdout
 
 
 
-sernet-Anfrage
+sernet-Anfrage 1
 
 smbstatus -b zeigt, wer eingeloggt ist
 Wir bräuchten:
@@ -137,11 +168,13 @@ A) Test, ob ein bestimmter User eingeloggt ist.
 B) wir kann man einen user per script zwangsweise ausloggen
    (Klassenarbeit -> homeverzeichnis tauschen gegen leeres Klassenarbeitshome)
 
+sernet-Anfrage 2
+
 Daten von einem share zum anderen verschieben
 - recursiv
 - acls sollen erhalten bleiben
 idealerweise mit rsync via smb-protocol, scheint es nicht zu geben
-
+oder kann man beides smb-mounten und dann rsync incl. ntacls-syncen 
 
 ------------------------------------------------------------
 
@@ -158,6 +191,9 @@ $dns_zone_prefix_string="SophomorixdnsZone";
 [VARS]
 #	DNS_NODE_PREFIX = "SophomorixdnsNode"    # Prefix for all DNS Nodes created by sophomorix
 #	DNS_ZONE_PREFIX = "SophomorixdnsZone"    # Prefix for all DNS Zones created by sophomorix
+
+
+
 
 
 sophomorix.ini ?????:
