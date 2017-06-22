@@ -1,3 +1,68 @@
+Bugs nach AK:
+
+students.csv
+
+- Leerzeichen vor/nach namen entfernen
+- Leerzeichen IM namen (i.e. del Rio) 
+  -> in den Namen mitnehmen
+    -> funktionen die suchen dann noch sophomorix -user -s "del R"?
+  -> leerzeichen NICHT in Loginnamen nehmen
+- apostroph testen in Namen O'Reilly und O`Reilly (backtick)
+- Datum 2.2.99 wird nicht in 1999 umgewandelt
+  Algorithmus: 19 und 20 davor  sub calc_birth_century
+  -> lookup-table in sophomorix.ini?
+   [birth_century_lookup]
+        01=2001
+        02=2002
+        ...
+        99=1999
+  (was liegt nicht in der Zukuft und gibt geringeres Alter?)
+Handling doppelter Zeilen in students.csv
+
+
+
+Encoding erkennen: Hans-Jürgen wird nicht erkannt
+-> was ist mit Hans Jürgen?
+   -> wird gesplittet? Dann auch an - splitten
+
+Wenn von linuxmuster-import-devices sophomorix-device aufgerufen wird
+sollte irgendwann der Returnwert des json-Objekts verwendet werden
+
+sophomorix user -i -u <login> ()
+sophomorix-user -u (ohne weitere option -i sollte den user anzeigen)
+
+sophomorix-user -s <string> sollte in vorname, vorname ascii .... suchen
+
+
+
+setup:
+
+unattended hat Probleme
+
+creating linbofs dauerte bei manchen sehr lange
+-> Hinweis auf die dauer wäre be einigen ungeduldigen nicht schlecht (This can take a few minutes)
+   oder bei zwischenschritten eine Ausgabe
+
+nach ablauf der (unsichtbaren) Passwordeingabe wird das Password doch noch geechoed, wenn das script läuft.
+
+Tippfehler bei Passwordeingabe: unvisible -> invisible
+
+bei manchen Installationen (eigentlich identisch) wurde der global-admin nicht angelegt 
+(hinterher anlegen, anlegen bei erneutem Setup war möglich)
+Fehlermeldung von sophomorix-admin .... war No connection to AD
+-> Laufzeitproblem? wird der admin zu früh angelegt?
+
+
+import devices:
+
+wir hatten server ip 10.0.0.1 255.255.0.0
+
+Trotzdem wurden Rechner mit IP 10.170.10.241 angelegt
+-> macht das Sinn?
+-> sollte man nicht prüfen, ob die IP's der Rechner im Netz liegen
+
+
+
 sophomorix-check -ij bricht ab bei syntaxfehler in bsz.school.conf
 (userfile.students.csv)
 aber sophomorix.add nicht (sollte auch abbrechen)
