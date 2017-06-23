@@ -10,9 +10,9 @@ LINUX::$homedir_all_schools/::root::root::0755::noacl::
 LINUX::$homedir_all_schools/@@SCHOOL@@/::root::root::0755::noacl::
 # school
 SMB::@@SCHOOL@@::root::root::0755::school.ntacl::ntaclonly::
-# topdir for admins
-SMB::@@SCHOOL@@/$directory_management/::root::root::0755::noacl::
+# topdir management
+SMB::@@SCHOOL@@/$directory_management/::root::root::0755::management.ntacl::
 # topdir for projects
-SMB::@@SCHOOL@@/$directory_projects/::root::root::0755::noacl::
+SMB::@@SCHOOL@@/$directory_projects/::root::root::0755::projects.ntacl::
 # topdir for students
 SMB::@@SCHOOL@@/$directory_students/::root::root::0755::students.ntacl::
