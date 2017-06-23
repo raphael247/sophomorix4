@@ -4,7 +4,12 @@
 # GLOBAL
 ############################################################
 LINUX::$homedir_global/::root::root::0755::noacl::
-SMB::$homedir_global/$directory_students/::root::root::0755::noacl::
-SMB::$homedir_global/$directory_teachers/::root::root::0755::noacl::
-SMB::$homedir_global/$directory_projects/::root::root::0755::noacl::
-SMB::$homedir_global/$directory_management/::root::root::0755::noacl::
+SMB::$homedir_global/::root::root::0755::global.ntacl::ntaclonly::
+# topdir students
+SMB::$homedir_global/$directory_students/::root::root::0755::global-students.ntacl::
+# topdir teachers
+SMB::$homedir_global/$directory_teachers/::root::root::0755::global-teachers.ntacl::
+# topdir projects
+SMB::$homedir_global/$directory_projects/::root::root::0755::global-projects.ntacl::
+# topdir management
+SMB::$homedir_global/$directory_management/::root::root::0755::global-management.ntacl::
