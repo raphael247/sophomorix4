@@ -28,6 +28,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_object_search
                                  AD_debug_logdump
                                  AD_get_name_tokened
+                                 AD_get_passwd
                                     );
 use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
@@ -36,6 +37,8 @@ use Sophomorix::SophomorixTest qw(
                                  start_fs_test
                                  end_fs_test
                                  run_command
+                                 ACL_test
+                                 NTACL_test
                                  );
 
 $Conf::log_level=1;
@@ -94,6 +97,8 @@ if ($json==0){
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 my $testdata="/usr/share/sophomorix-developer/testdata";
 
@@ -556,6 +561,334 @@ if ($test_add_admin==1){
                          "/srv/samba/schools/default-school/teachers/share",
                          "/srv/samba/schools/default-school/teachers/homes",
                         ); 
+    # /srv/samba/schools/default-school
+    &NTACL_test ("default-school",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
+                );
+    # /srv/samba/schools/default-school/management
+    &NTACL_test ("default-school",
+                 "/management",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/0x0/FULL',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/default-school/projects
+    &NTACL_test ("default-school",
+                 "/projects",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students
+    &NTACL_test ("default-school",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/default-school/teachers
+    &NTACL_test ("default-school",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/default-school/teachers/share
+    &NTACL_test ("default-school",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/teachers/homes
+    &NTACL_test ("default-school",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/abc/management/admin-66
+    &NTACL_test ("default-school",
+                 "/management/admin-66",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admin-66:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/abc/management/admin-666
+    &NTACL_test ("default-school",
+                 "/management/admin-666",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admin-666:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz
+    &NTACL_test ("bsz",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+    # /srv/samba/schools/bsz/management
+    &NTACL_test ("bsz",
+                 "/management",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/0x0/FULL',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/projects
+    &NTACL_test ("bsz",
+                 "/projects",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+   # /srv/samba/schools/bsz/students
+    &NTACL_test ("bsz",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers
+    &NTACL_test ("bsz",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers/share
+    &NTACL_test ("bsz",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/teachers/homes
+    &NTACL_test ("bsz",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/management/admin-bsz-66
+    &NTACL_test ("bsz",
+                 "/management/admin-bsz-66",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admin-bsz-66:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/abc
+    &NTACL_test ("abc",
+                 "/",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\Administrator', 
+                 'GROUP:S-1-22-2-0',
+                 'ACL:LINUXMUSTER\abc:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|IO/FULL',
+                );
+    # /srv/samba/schools/abc/management
+    &NTACL_test ("abc",
+                 "/management",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/0x0/FULL',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/abc/projects
+    &NTACL_test ("abc",
+                 "/projects",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\abc:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+   # /srv/samba/schools/abc/students
+    &NTACL_test ("abc",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\abc-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/abc/teachers
+    &NTACL_test ("abc",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI/FULL', 
+                );
+    # /srv/samba/schools/abc/teachers/share
+    &NTACL_test ("abc",
+                 "/teachers/share",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\abc-teachers:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/abc/teachers/homes
+    &NTACL_test ("abc",
+                 "/teachers/homes",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/abc/management/admin-abc-666
+    &NTACL_test ("abc",
+                 "/management/admin-abc-666",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admin-abc-666:ALLOWED/OI|CI/FULL', 
+                );
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -582,6 +915,83 @@ if ($test_add_admin==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         );
+    # /srv/samba/global/management
+    &NTACL_test ("linuxmuster-global",
+                 "/management",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/0x0/FULL',
+                );
+    # /srv/samba/global/projects
+    &NTACL_test ("linuxmuster-global",
+                 "/projects",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
+                 'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
+                );
+    # /srv/samba/global/teachers
+    &NTACL_test ("linuxmuster-global",
+                 "/teachers",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
+                );
+    # /srv/samba/global/students
+    &NTACL_test ("linuxmuster-global",
+                 "/students",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
+                 'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
+                );
+    # /srv/samba/global/management/global-admin-66
+    &NTACL_test ("linuxmuster-global",
+                 "/management/global-admin-66",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admin-66:ALLOWED/OI|CI/FULL',
+                );
+    # /srv/samba/global/management/global-admin-666
+    &NTACL_test ("linuxmuster-global",
+                 "/management/global-admin-666",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\global-admin-666:ALLOWED/OI|CI/FULL',
+                );
     &end_fs_test(\%fs_test_result);
 }
 
