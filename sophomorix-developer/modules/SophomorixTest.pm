@@ -960,11 +960,9 @@ sub ACL_test {
     if (exists $ref_fs_test_result->{'ACL_lookup'}{$abs_path}){
         print "\nERROR: $abs_path tested twice (Fix your set of NTACL tests)\n\n";
         exit;
-    }else {
+    } else {
         $ref_fs_test_result->{'ACL_lookup'}{$abs_path}=1;
     }
-
-
 
     my $string=`getfacl $abs_path 2> /dev/null`;
     my @lines_raw=split(/\n/,$string);
@@ -1011,8 +1009,8 @@ sub NTACL_test {
     my $unc_path="//".$root_dns."/".$share;
 
     my $abs_path_linux;
-    if ($share eq "global" or $share eq "linuxmuster-global"){
-        $abs_path_linux="/srv/samba/global/".$smb_rel;
+    if ($share eq "global" or $share eq "linuxmuster-global" or $share eq "lml-global" ){
+        $abs_path_linux="/srv/samba/global".$smb_rel;
         $abs_path_linux=~s/\/$//; # remove trailing /
     } else {
         $abs_path_linux="/srv/samba/schools/".$share.$smb_rel;
