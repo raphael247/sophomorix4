@@ -2365,13 +2365,13 @@ sub AD_school_create {
                         }); 
     }
 
-    # creating filesystem for school
-    &AD_repdir_using_file({root_dns=>$root_dns,
-                           repdir_file=>"repdir.school",
-                           school=>$school,
-                           smb_admin_pass=>$smb_admin_pass,
-                           sophomorix_config=>$ref_sophomorix_config,
-                        });
+    # # creating filesystem for school
+    # &AD_repdir_using_file({root_dns=>$root_dns,
+    #                        repdir_file=>"repdir.school",
+    #                        school=>$school,
+    #                        smb_admin_pass=>$smb_admin_pass,
+    #                        sophomorix_config=>$ref_sophomorix_config,
+    #                     });
 
     ############################################################
     # providing OU=GLOBAL
@@ -2441,6 +2441,34 @@ sub AD_school_create {
                             }); 
     }
 
+    # # creating filesystem for global
+    # &AD_repdir_using_file({ldap=>$ldap,
+    #                        root_dns=>$root_dns,
+    #                        repdir_file=>"repdir.global",
+    #                        school=>$DevelConf::homedir_global_smb_share,
+    #                        smb_admin_pass=>$smb_admin_pass,
+    #                        sophomorix_config=>$ref_sophomorix_config,
+    #                      });
+    # creating filesystem for groups
+    # SCHOOLS -> no filesystem
+    # <schoolname> -> no filsystem
+    # create schoolgroups again, now all NTACLs can be set because all groups already exist
+
+    # school
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+                             $school,$ref_sophomorix_config);
+    # global
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+                             $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
+
+    # creating fileystem at last, because groups are needed beforehand for the ACL's 
+    # creating filesystem for school
+    &AD_repdir_using_file({root_dns=>$root_dns,
+                           repdir_file=>"repdir.school",
+                           school=>$school,
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>$ref_sophomorix_config,
+                        });
     # creating filesystem for global
     &AD_repdir_using_file({ldap=>$ldap,
                            root_dns=>$root_dns,
@@ -2449,16 +2477,6 @@ sub AD_school_create {
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
                          });
-    # creating filesystem for groups
-    # SCHOOLS -> no filesystem
-    # <schoolname> -> no filsystem
-    # create schoolgroups again, now all NTACLs can be set because all groups already exist
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
-                             $school,$ref_sophomorix_config);
-
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
-                             $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
-
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (end) ...");
     print "\n";
 }
