@@ -164,6 +164,7 @@ if ($info==1){
 # avoid double create
 my $create_count=0;
 
+
 # --create-school-admin
 if ($create_school_admin ne ""){
     $create_count++;
@@ -180,6 +181,7 @@ if ($create_school_admin ne ""){
     }
 }
 
+
 # --create-global-admin
 if ($create_global_admin ne ""){
     $create_count++;
@@ -195,6 +197,7 @@ if ($create_global_admin ne ""){
         exit;
     }
 }
+
 
 if ($create_count>1){
         print "\nERROR: You can only use one --create* option at a time\n\n";

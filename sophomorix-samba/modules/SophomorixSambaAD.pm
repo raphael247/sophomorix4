@@ -1396,27 +1396,6 @@ sub AD_user_create {
                                   addmember => $login,
                                 });
         }
-    # } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
-    #     #######################################################
-    #     # all administrator
-    #     #######################################################
-    #     my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MANMEMBEROF'});
-    #     foreach my $mangroup (@manmember){
-    #         &AD_group_addmember_management({ldap => $ldap,
-    #                                         root_dse => $root_dse, 
-    #                                         group => $mangroup,
-    #                                         addmember => $login,
-    #                                        }); 
-    #     }
-    #     my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'administrator.all'}{'MEMBEROF'});
-    #     foreach my $group (@member){
-    #         &AD_group_addmember({ldap => $ldap,
-    #                               root_dse => $root_dse, 
-    #                               group => $group,
-    #                               addmember => $login,
-    #                             });
-    #     }
-
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
         #######################################################
         # school administrator
@@ -1492,15 +1471,6 @@ sub AD_user_create {
     ############################################################
     # Create filesystem
     ############################################################
-    # if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.all'}{'USER_ROLE'}){
-    #     &AD_repdir_using_file({root_dns=>$root_dns,
-    #                            repdir_file=>"repdir.alladministrator_home",
-    #                            school=>$DevelConf::homedir_global_smb_share,
-    #                            administrator_home=>$login,
-    #                            smb_admin_pass=>$smb_admin_pass,
-    #                            sophomorix_config=>$ref_sophomorix_config,
-    #                          });
-    #} els
     if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
         &AD_repdir_using_file({root_dns=>$root_dns,
                                repdir_file=>"repdir.schooladministrator_home",
@@ -2331,30 +2301,6 @@ sub AD_school_create {
 
     &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
                              $school,$ref_sophomorix_config);
-    # foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
-    #     # create ou for group
-    #     my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
-    #     my $description="LML Group, change if you like";
-    #     my $type=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_TYPE'}{$group};
-    #     my $school=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL'};
-    #     # create
-    #     &AD_group_create({ldap=>$ldap,
-    #                       root_dse=>$root_dse,
-    #                       root_dns=>$root_dns,
-    #                       dn_wish=>$dn,
-    #                       school=>$school,
-    #                       group=>$group,
-    #                       group_basename=>$group,
-    #                       description=>$description,
-    #                       type=>$type,
-    #                       status=>"P",
-    #                       creationdate=>$creationdate,
-    #                       joinable=>"TRUE",
-    #                       hidden=>"FALSE",
-    #                       smb_admin_pass=>$smb_admin_pass,
-    #                       sophomorix_config=>$ref_sophomorix_config,
-    #                      });
-    # }
     ############################################################
     # adding groups to <schoolname>-group
     foreach my $ref_membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
@@ -2365,14 +2311,6 @@ sub AD_school_create {
                          addgroup => $membergroup,
                         }); 
     }
-
-    # # creating filesystem for school
-    # &AD_repdir_using_file({root_dns=>$root_dns,
-    #                        repdir_file=>"repdir.school",
-    #                        school=>$school,
-    #                        smb_admin_pass=>$smb_admin_pass,
-    #                        sophomorix_config=>$ref_sophomorix_config,
-    #                     });
 
     ############################################################
     # providing OU=GLOBAL
@@ -2400,30 +2338,6 @@ sub AD_school_create {
 
     &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
                              $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
-    # foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
-    #     # create ou for group
-    #     my $group=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}{$dn};
-    #     my $description="LML Group, change if you like";
-    #     my $type=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$group};
-    #     my $school=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'SCHOOL'};
-    #     # create
-    #     &AD_group_create({ldap=>$ldap,
-    #                       root_dse=>$root_dse,
-    #                       root_dns=>$root_dns,
-    #                       dn_wish=>$dn,
-    #                       school=>$school,
-    #                       group=>$group,
-    #                       group_basename=>$group,
-    #                       description=>$description,
-    #                       type=>$type,
-    #                       status=>"P",
-    #                       creationdate=>$creationdate,
-    #                       joinable=>"TRUE",
-    #                       hidden=>"FALSE",
-    #                       smb_admin_pass=>$smb_admin_pass,
-    #                       sophomorix_config=>$ref_sophomorix_config,
-    #                     });
-    # }
 
     # all groups created, add some memberships from GLOBAL
     foreach my $group (keys %{$ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBER'}}) {
@@ -2441,19 +2355,6 @@ sub AD_school_create {
                              addgroup => $group,
                             }); 
     }
-
-    # # creating filesystem for global
-    # &AD_repdir_using_file({ldap=>$ldap,
-    #                        root_dns=>$root_dns,
-    #                        repdir_file=>"repdir.global",
-    #                        school=>$DevelConf::homedir_global_smb_share,
-    #                        smb_admin_pass=>$smb_admin_pass,
-    #                        sophomorix_config=>$ref_sophomorix_config,
-    #                      });
-    # creating filesystem for groups
-    # SCHOOLS -> no filesystem
-    # <schoolname> -> no filsystem
-    # create schoolgroups again, now all NTACLs can be set because all groups already exist
 
     # school
     &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
@@ -3023,7 +2924,6 @@ sub AD_get_AD {
         my $filter="(&(objectClass=user)(|(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'ALLADMINISTRATOR'}.")(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
 	print "HERE: $filter";

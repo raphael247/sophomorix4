@@ -74,7 +74,6 @@ my $linux=0;
 my $global=0;
 my $school=0;
 my $project=0;
-my $alladministrator_home=0;
 my $globaladministrator_home=0;
 my $schooladministrator_home=0;
 my $teacherclass=0;
@@ -99,7 +98,6 @@ my $testopt=GetOptions(
            "global" => \$global,
            "school" => \$school,
            "project" => \$project,
-           "alladministrator-home" => \$alladministrator_home,
            "globaladministrator-home" => \$globaladministrator_home,
            "schooladministrator-home" => \$schooladministrator_home,
            "teacherclass" => \$teacherclass,
@@ -144,7 +142,6 @@ What to repair in the Filesystem:
   --global                   (use repdir.global, repairs the global part)
   --school                   (use repdir.school, repairs a school and subdirs)
   --project                  (use repdir.project, repairs projects)
-  --alladministrator-home    (use repdir.alladministrator_home, repairs homes of alladministrators)
   --globaladministrator-home (use repdir.globaladministrator_home, repairs homes of globaladministrators)
   --schooladministrator-home (use repdir.schooladministrator_home, repairs homes of schooladministrators)
   --teacherclass             (use repdir.teacherclass, repairs teacherclasses)
@@ -213,7 +210,6 @@ if ($all==1) {
     $global=1;
     $school=1;
     $project=1;
-    $alladministrator_home=1;
     $globaladministrator_home=1;
     $schooladministrator_home=1;
     $teacherclass=1;
@@ -269,19 +265,6 @@ if ($project==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.project",
-                         AD=>\%AD,
-                         smb_admin_pass=>$smb_admin_pass,
-                         sophomorix_config=>\%sophomorix_config,
-                        });
-}
-
-
-# --alladministrator-home
-if ($alladministrator_home==1) {
-   &AD_repdir_using_file({ldap=>$ldap,
-                         root_dse=>$root_dse,
-                         root_dns=>$root_dns,
-                         repdir_file=>"repdir.alladministrator_home",
                          AD=>\%AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
