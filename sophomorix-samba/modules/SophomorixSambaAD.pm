@@ -527,10 +527,7 @@ sub AD_repdir_using_file {
         foreach my $school (@schools){
             my $path=$path_with_var;
             my $path_smb=$path_with_var;
-            if ($school eq $DevelConf::homedir_global_smb_share){
-#                $path_smb=~s/\/home\/global\///; # for school
-#                $path_smb=~s/\/srv\/samba\/global\///; # for school
-#                $path_smb=~s/$DevelConf::homedir_global//; # for school
+            if ($school eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
                 if ($path_smb eq $DevelConf::homedir_global){
                     $path_smb="/";
                 } else {
@@ -822,7 +819,7 @@ sub AD_group_kill {
         $type=$type_opt; # override type
     }
     if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
-        $school_smbshare=$DevelConf::homedir_global_smb_share;
+        $school_smbshare=$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
     } elsif ($school eq "---"){
         $school=$DevelConf::name_default_school;
     }
@@ -1482,7 +1479,7 @@ sub AD_user_create {
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         &AD_repdir_using_file({root_dns=>$root_dns,
                                repdir_file=>"repdir.globaladministrator_home",
-                               school=>$DevelConf::homedir_global_smb_share,
+                               school=>$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                                administrator_home=>$login,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
@@ -1491,7 +1488,7 @@ sub AD_user_create {
         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.teacher_home",
-                                   school=>$DevelConf::homedir_global_smb_share,,
+                                   school=>$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                                    teacherclass=>$group,
                                    teacher_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
@@ -1511,7 +1508,7 @@ sub AD_user_create {
         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
             &AD_repdir_using_file({root_dns=>$root_dns,
                                    repdir_file=>"repdir.student_home",
-                                   school=>$DevelConf::homedir_global_smb_share,,
+                                   school=>$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                                    adminclass=>$group,
                                    student_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
@@ -2176,21 +2173,21 @@ sub AD_school_create {
     # providing smb shares
     ############################################################
     # global share
-    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$DevelConf::homedir_global_smb_share}){
-        print "   * Nothing to do: Global share $DevelConf::homedir_global_smb_share exists.\n";
+    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}){
+        print "   * Nothing to do: Global share $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'} exists.\n";
     } else {
-        &Sophomorix::SophomorixBase::print_title("Creating $DevelConf::homedir_global_smb_share");
+        &Sophomorix::SophomorixBase::print_title("Creating $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}");
         system("mkdir -p $DevelConf::homedir_global");
         my $command="net conf addshare ".
-                    $DevelConf::homedir_global_smb_share." ".
+                    $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." ".
                     $DevelConf::homedir_global.
                     " writeable=y guest_ok=y 'Share for school global'";
         print "   * $command\n";
         system($command);
-        my $command_mod1="net conf setparm ".$DevelConf::homedir_global_smb_share." 'msdfs root' 'yes'";
+        my $command_mod1="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'msdfs root' 'yes'";
         print "   * $command_mod1\n";
         system($command_mod1);
-        my $command_mod2="net conf setparm ".$DevelConf::homedir_global_smb_share." 'hide unreadable' 'yes'";
+        my $command_mod2="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'hide unreadable' 'yes'";
         print "   * $command_mod2\n";
         system($command_mod2);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
@@ -2375,7 +2372,7 @@ sub AD_school_create {
     &AD_repdir_using_file({ldap=>$ldap,
                            root_dns=>$root_dns,
                            repdir_file=>"repdir.global",
-                           school=>$DevelConf::homedir_global_smb_share,
+                           school=>$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
                          });

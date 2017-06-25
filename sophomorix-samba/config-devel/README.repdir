@@ -108,7 +108,7 @@ When creating/repairing ONE user-home, group-share, school then:
 # Examples  
 # creating the Global school 
    &AD_repdir_using_file({root_dns=>$root_dns,
-                         school=>$DevelConf::homedir_global_smb_share,
+                         school=>$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                          repdir_file=>"repdir.global",
                          AD=>\%AD,
                          smb_admin_pass=>$smb_admin_pass,

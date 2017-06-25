@@ -1672,7 +1672,7 @@ sub get_homedirectory {
     
     my $school_smbshare;
     if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
-        $school_smbshare=$DevelConf::homedir_global_smb_share;
+        $school_smbshare=$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
     } else {
         $school_smbshare=$school;
     }
@@ -1715,7 +1715,7 @@ sub get_sharedirectory {
         $school=$DevelConf::name_default_school;
         $school_smbshare=$DevelConf::name_default_school;
     } elsif ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
-        $school_smbshare=$DevelConf::homedir_global_smb_share;
+        $school_smbshare=$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
     } else {
         $school_smbshare=$school;
     }

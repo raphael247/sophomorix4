@@ -237,7 +237,7 @@ if ($global==1) {
    &AD_repdir_using_file({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
-                         school=>$DevelConf::homedir_global_smb_share,
+                         school=>$sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                          repdir_file=>"repdir.global",
                          AD=>\%AD,
                          smb_admin_pass=>$smb_admin_pass,
