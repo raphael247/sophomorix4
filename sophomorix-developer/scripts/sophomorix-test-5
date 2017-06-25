@@ -164,9 +164,6 @@ if ($add_admin==1){
     # schooladmin in OU=default-school
     &run_command("sophomorix-admin $all_options --create-school-admin admin-66 --school default-school --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-school-admin admin-666 --school default-school --password 'Muster!'");
-    # alladmin in OU=GLOBAL
-    &run_command("sophomorix-admin $all_options --create-all-admin all-admin-66 --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-all-admin all-admin-666 --password 'Muster!'");
     # globaladmin in OU=GLOBAL
     &run_command("sophomorix-admin $all_options --create-global-admin global-admin-66 --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-global-admin global-admin-666 --password 'Muster!'");
@@ -358,72 +355,6 @@ if ($test_add_admin==1){
 
 
 
-    # all-admin-66
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=all-admin-66,OU=Management,OU=GLOBAL,".$root_dse,
-                   #####
-                   displayName=>"All Admin",
-                   givenName=>"All",
-                   name=>"all-admin-66",
-                   sAMAccountname=>"all-admin-66",
-                   uidNumber=>"-1",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\linuxmuster-global\\management\\all-admin-66",
-                   unixHomeDirectory=>"/srv/samba/schools/global/management/all-admin-66",
-                   sn=>"Admin",
-                   userPrincipalName => "all-admin-66@".$root_dns,
-                   sophomorixAdminClass => "all-admins",
-                   sophomorixExitAdminClass => "unknown",
-                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "All",
-                   sophomorixSurnameASCII  => "Admin",
-                   sophomorixRole => "alladministrator",
-                   sophomorixSchoolPrefix => "global",
-                   sophomorixSchoolname => "global",
-                   sophomorixAdminFile => "none",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus=>"P",
-                   sophomorixUnid => "---",
-                   userAccountControl => "512",
-                   memberOf => "all-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
-                  });
-    # all-admin-666
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=all-admin-666,OU=Management,OU=GLOBAL,".$root_dse,
-                   #####
-                   displayName=>"All Admin",
-                   givenName=>"All",
-                   name=>"all-admin-666",
-                   sAMAccountname=>"all-admin-666",
-                   uidNumber=>"-1",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\linuxmuster-global\\management\\all-admin-666",
-                   unixHomeDirectory=>"/srv/samba/schools/global/management/all-admin-666",
-                   sn=>"Admin",
-                   userPrincipalName => "all-admin-666@".$root_dns,
-                   sophomorixAdminClass => "all-admins",
-                   sophomorixExitAdminClass => "unknown",
-                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "All",
-                   sophomorixSurnameASCII  => "Admin",
-                   sophomorixRole => "alladministrator",
-                   sophomorixSchoolPrefix => "global",
-                   sophomorixSchoolname => "global",
-                   sophomorixAdminFile => "none",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "default",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus=>"P",
-                   sophomorixUnid => "---",
-                   userAccountControl => "512",
-                   memberOf => "all-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
-                  });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=all-admins,OU=Management,OU=GLOBAL,".$root_dse,
@@ -435,7 +366,7 @@ if ($test_add_admin==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "global",
                    memberOf => "",
-                   member => "bsz-admins|abc-admins|admins|all-admin-66|all-admin-666",
+                   member => "bsz-admins|abc-admins|admins",
                   });
 
 
@@ -899,12 +830,6 @@ if ($test_add_admin==1){
                          \%fs_test_result,
                          "/srv/samba/global",
                          "/srv/samba/global/management",
-                         "/srv/samba/global/management/all-admin-66",
-                         "/srv/samba/global/management/all-admin-66/alladmindir1",
-                         "/srv/samba/global/management/all-admin-66/alladmindir2",
-                         "/srv/samba/global/management/all-admin-666",
-                         "/srv/samba/global/management/all-admin-666/alladmindir1",
-                         "/srv/samba/global/management/all-admin-666/alladmindir2",
                          "/srv/samba/global/management/global-admin-66",
                          "/srv/samba/global/management/global-admin-66/globaladmindir1",
                          "/srv/samba/global/management/global-admin-66/globaladmindir2",
@@ -1028,9 +953,6 @@ if ($kill_admin==1){
     # schooladmin in OU=default-school
     &run_command("sophomorix-admin $all_options --kill admin-66");
     &run_command("sophomorix-admin $all_options --kill admin-666");
-    # alladmin in OU=GLOBAL
-    &run_command("sophomorix-admin $all_options --kill all-admin-66");
-    &run_command("sophomorix-admin $all_options --kill all-admin-666");
     # globaladmin in OU=GLOBAL
     &run_command("sophomorix-admin $all_options --kill global-admin-66");
     &run_command("sophomorix-admin $all_options --kill global-admin-666");
@@ -1048,8 +970,6 @@ if ($test_kill_admin==1){
     &AD_object_nonexist($ldap,$root_dse,"user","admin-abc-666");
     &AD_object_nonexist($ldap,$root_dse,"user","admin-66");
     &AD_object_nonexist($ldap,$root_dse,"user","admin-666");
-    &AD_object_nonexist($ldap,$root_dse,"user","all-admin-66");
-    &AD_object_nonexist($ldap,$root_dse,"user","all-admin-666");
 
     ############################################################
     # fs test

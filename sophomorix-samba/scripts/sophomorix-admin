@@ -80,7 +80,6 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $create_school_admin="";
-my $create_all_admin="";
 my $create_global_admin="";
 my $school="";
 my $password="";
@@ -97,7 +96,6 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "create-school-admin=s" => \$create_school_admin,
-           "create-all-admin=s" => \$create_all_admin,
            "create-global-admin=s" => \$create_global_admin,
            "school|s=s" => \$school,
            "password=s" => \$password,
@@ -133,9 +131,6 @@ Options
 
 # create a powerful global-admin (for linuxmuster-base):
 sophomorix-admin --create-global-admin <name-of-admin> --password <fdrTfdtti>
-
-# create a hierarchical all-admin 
-sophomorix-admin --create-all-admin <name-of-admin> --password <fdrTfdtti>
 
 # create an school-admin
 sophomorix-admin --create-school-admin <name-of-admin> --school <schoolname> --password <fdrTfdtti>
@@ -185,22 +180,6 @@ if ($create_school_admin ne ""){
     }
 }
 
-# --create-all-admin
-if ($create_all_admin ne ""){
-    $create_count++;
-    my ($count,$dn,$rdn)=&AD_object_search($ldap,$root_dse,"all",$create_all_admin);
-    if ($count==0){
-        # ok
-    } else {
-        print "\nERROR: Object $create_all_admin exists already in AD\n\n";
-        exit;
-    }
-    if ($school ne ""){
-        print "\nERROR: Option --school is useless with option --create-all-admin\n\n";
-        exit;
-    }
-}
-
 # --create-global-admin
 if ($create_global_admin ne ""){
     $create_count++;
@@ -226,50 +205,6 @@ if ($create_count>1){
 ############################################################
 # Options do it
 ############################################################
-# --create-all-admin <user>
-if ($create_all_admin ne "" and $password ne ""){
-    my $group=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPPREFIX'}.
-       $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
-    &print_title("Creating admin $create_all_admin in group $group $sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'}");
-    &AD_school_create({ldap=>$ldap,
-                       root_dse=>$root_dse,
-                       root_dns=>$root_dns,
-                       school=>$DevelConf::name_default_school,
-                       creationdate=>$time_stamp_AD,
-                       smb_admin_pass=>$smb_admin_pass,
-                       sophomorix_config=>\%sophomorix_config,
-                     });
-    &AD_user_create({ldap=>$ldap,
-                    root_dse => $root_dse, 
-                    root_dns => $root_dns, 
-                    user_count => "1",
-                    login => $create_all_admin,
-                    group => $group,
-                    group_basename => $group,
-                    firstname_ascii => $sophomorix_config{'INI'}{'administrator.all'}{'DEFAULT_givenName_ASCII'},
-                    surname_ascii => $sophomorix_config{'INI'}{'administrator.all'}{'DEFAULT_sn_ASCII'},
-                    firstname_utf8 => $sophomorix_config{'INI'}{'administrator.all'}{'DEFAULT_givenName'},
-                    surname_utf8 => $sophomorix_config{'INI'}{'administrator.all'}{'DEFAULT_sn'},
-                    birthdate => "---",
-                    plain_password => $password,
-                    unid => "---",
-                    role => $sophomorix_config{'INI'}{'administrator.all'}{'USER_ROLE'},
-                    type => "sophomorixalladmin",
-                    school => $sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'},
-                    creationdate => $time_stamp_AD,
-                    tolerationdate => "---",
-                    deactivationdate => "---",
-                    status => "P",
-                    file => $sophomorix_config{'INI'}{'administrator.all'}{'ADMINFILE'},
-                    smb_admin_pass=>$smb_admin_pass,
-                    sophomorix_config=>\%sophomorix_config,
-                  });
-} elsif ($create_all_admin ne "" and  $password eq ""){
-    print "\nERROR: A password is needed to create the admin $create_all_admin\n\n";
-    exit;
-} 
-
-
 
 # --create-school-admin <user>
 if ($create_school_admin ne "" and $school ne "" and $password ne ""){
@@ -284,10 +219,10 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
 
     my $group_token;
     if ($school eq $DevelConf::name_default_school){
-        $group_token=$sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
+        $group_token=$sophomorix_config{'INI'}{'administrator.school'}{'GROUPBASENAME'};
     } else {
         $group_token=$school."-".
-	             $sophomorix_config{'INI'}{'administrator.all'}{'GROUPBASENAME'};
+	             $sophomorix_config{'INI'}{'administrator.school'}{'GROUPBASENAME'};
     }
 
     # make sure school exists
@@ -397,7 +332,6 @@ if ($kill ne ""){
         exit;
     }
     if ($role eq $sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'} or
-        $role eq $sophomorix_config{'INI'}{'administrator.all'}{'USER_ROLE'} or
         $role eq $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'}){
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,
