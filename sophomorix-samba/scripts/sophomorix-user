@@ -325,10 +325,9 @@ if ($user eq "" and $info==1){
     my @teachers_f=();
     my @students_p=();
     my @teachers_p=();
-
-    my @examaccounts_p=();
+    my @globaladmin_p=();
+    my @schooladmin_p=();
     my @computers_p=();
-
     my @others=();
 
     ##################################################
@@ -400,10 +399,10 @@ if ($user eq "" and $info==1){
             push @students_p, $dn;
 	} elsif ($role eq "teacher" and $status eq "P"){
             push @teachers_p, $dn;
-        # examaccounts
-	} elsif ($role eq "examaccount" and $status eq "P"){
-            push @examaccounts_p, $dn;
-        # computers
+	} elsif ($role eq "globaladministrator" and $status eq "P"){
+            push @globaladmin_p, $dn;
+	} elsif ($role eq "schooladministrator" and $status eq "P"){
+            push @schooladmin_p, $dn;
 	} elsif ($role eq "computer" and $status eq "P"){
             push @computers_p, $dn;
 	} else {
@@ -435,10 +434,9 @@ if ($user eq "" and $info==1){
     $results{'count'}{'teachers'}{'F'}=$#teachers_f+1;
     $results{'count'}{'students'}{'P'}=$#students_p+1;
     $results{'count'}{'teachers'}{'P'}=$#teachers_p+1;
-
-    $results{'count'}{'examaccounts'}{'P'}=$#examaccounts_p+1;
+    $results{'count'}{'globaladministrators'}{'P'}=$#globaladmin_p+1;
+    $results{'count'}{'schooladministrators'}{'P'}=$#schooladmin_p+1;
     $results{'count'}{'computers'}{'P'}=$#computers_p+1;
-
     $results{'count'}{'others'}=$#others+1;
 
     ##################################################
@@ -466,46 +464,51 @@ if ($user eq "" and $info==1){
                     $results{'count'}{'teachers'}{'K'}+
                     $results{'count'}{'teachers'}{'F'}+
                     $results{'count'}{'teachers'}{'P'};
+    my $sum_globaladministrators=$results{'count'}{'globaladministrators'}{'P'};
+    my $sum_schooladministrators=$results{'count'}{'schooladministrators'}{'P'};
 
     my $sum_examaccounts=$results{'count'}{'examaccounts'}{'P'};
     my $sum_computers=$results{'count'}{'computers'}{'P'};
 
     # # OUTPUT
     # ##################################################
-    print "----------+---+------+------+-----+-----+-----+-----+\n";
-    print "status    |   | stud | teach| exam| comp| adm | oth |\n";
-    print "----------+---+------+------+-----+-----+-----+-----+\n";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
+    print "----------+---+------+------+------+------+------+-----+\n";
+    print "status    |   | stud | teach| gadm | sadm | comp | oth |\n";
+    print "----------+---+------+------+------+------+------+-----+\n";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
            "permanent | P",
            $results{'count'}{'students'}{'P'},
            $results{'count'}{'teachers'}{'P'},
-           $results{'count'}{'examaccounts'}{'P'},
-           $results{'count'}{'computers'}{'P'},"","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "usable    | U",$results{'count'}{'students'}{'U'},$results{'count'}{'teachers'}{'U'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "activated | A",$results{'count'}{'students'}{'A'},$results{'count'}{'teachers'}{'A'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "enabled   | E",$results{'count'}{'students'}{'E'},$results{'count'}{'teachers'}{'E'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "selfactiv.| S",$results{'count'}{'students'}{'S'},$results{'count'}{'teachers'}{'S'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "tolerated | T",$results{'count'}{'students'}{'T'},$results{'count'}{'teachers'}{'T'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "disabled  | D",$results{'count'}{'students'}{'D'},$results{'count'}{'teachers'}{'D'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "locked    | L",$results{'count'}{'students'}{'L'},$results{'count'}{'teachers'}{'L'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "frozen    | F",$results{'count'}{'students'}{'F'},$results{'count'}{'teachers'}{'F'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "removeable| R",$results{'count'}{'students'}{'R'},$results{'count'}{'teachers'}{'R'},"-","-","","-";
-    printf "%-13s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "killable  | K",$results{'count'}{'students'}{'K'},$results{'count'}{'teachers'}{'K'},"-","-","","-";
-    print "----------+---+------+------+-----+-----+-----+-----+\n";
-    printf "%-10s|%2s |%5s |%5s |%4s |%4s |%4s |%4s |\n",
-           "sum: $max","",$sum_student,$sum_teacher,$sum_examaccounts,$sum_computers,"",$results{'count'}{'others'};
-    print "----------+---+------+------+-----+-----+-----+-----+\n";
-    print "(stud=students,teach=teachers,adm=admins,oth=other)\n";
+           $results{'count'}{'globaladministrators'}{'P'},
+           $results{'count'}{'schooladministrators'}{'P'},
+           $results{'count'}{'computers'}{'P'},
+           "";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "usable    | U",$results{'count'}{'students'}{'U'},$results{'count'}{'teachers'}{'U'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "activated | A",$results{'count'}{'students'}{'A'},$results{'count'}{'teachers'}{'A'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "enabled   | E",$results{'count'}{'students'}{'E'},$results{'count'}{'teachers'}{'E'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "selfactiv.| S",$results{'count'}{'students'}{'S'},$results{'count'}{'teachers'}{'S'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "tolerated | T",$results{'count'}{'students'}{'T'},$results{'count'}{'teachers'}{'T'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "disabled  | D",$results{'count'}{'students'}{'D'},$results{'count'}{'teachers'}{'D'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "locked    | L",$results{'count'}{'students'}{'L'},$results{'count'}{'teachers'}{'L'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "frozen    | F",$results{'count'}{'students'}{'F'},$results{'count'}{'teachers'}{'F'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "removeable| R",$results{'count'}{'students'}{'R'},$results{'count'}{'teachers'}{'R'},"","","","";
+    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "killable  | K",$results{'count'}{'students'}{'K'},$results{'count'}{'teachers'}{'K'},"","","","";
+    print "----------+---+------+------+------+------+------+-----+\n";
+    printf "%-10s|%2s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+           "sum: $max","",$sum_student,$sum_teacher,$sum_globaladministrators,$sum_schooladministrators,$sum_computers,$results{'count'}{'others'};
+    print "----------+---+------+------+------+------+------+-----+\n";
+    print "(stud=student,teach=teacher,gadm=globaladministrator,\n";
+    print " sadm=schooladministrator,comp=computer,oth=other)\n";
 
     print "\nOther (oth) user objects (objectclass=user):\n";
     foreach my $dn (@others){
