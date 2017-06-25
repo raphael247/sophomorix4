@@ -358,11 +358,19 @@ while(<SOPHOMORIXADD>){
     my $login_name_to_check;
     if ($login_wish eq "---"){
         # create login and check it
-        # remove - from login
         my $surname_login=$surname_ascii;
-        $surname_login=~s/-//g;
+        $surname_login=~s/-//g;  # remove minus
+        $surname_login=~s/\.//g; # remove dots
+        $surname_login=~s/ //g;  # remove whitespace
+        $surname_login=~tr/A-Z/a-z/; # small letters
+        $surname_login=~s/[^a-zA-Z0-9]//; # ignore non a-z
+
         my $firstname_login=$firstname_ascii;
-        $firstname_login=~s/-//g;
+        $firstname_login=~s/-//g; # remove minus
+        $firstname_login=~s/\.//g; # remove dots
+        $firstname_login=~s/ //g;  # remove whitespace
+        $firstname_login=~tr/A-Z/a-z/; # small letters
+        $firstname_login=~s/[^a-zA-Z0-9]//; # ignore non a-z
 
         if ($sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
             $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
@@ -378,7 +386,6 @@ while(<SOPHOMORIXADD>){
         }
         # proposed login
         $login_name_to_check="$login_teil_1"."$login_teil_2";
-        $login_name_to_check=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
     } else {
         # check wish login
         $login_name_to_check="$login_wish";

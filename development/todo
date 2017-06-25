@@ -3,12 +3,14 @@ Bugs nach AK:
 
 students.csv
 
-- Leerzeichen vor/nach namen entfernen
-- Leerzeichen IM namen (i.e. del Rio) 
-  -> in den Namen mitnehmen
-    -> funktionen die suchen dann noch sophomorix -user -s "del R"?
-  -> leerzeichen NICHT in Loginnamen nehmen
+sophomorix-user:
+-> funktionen die suchen dann noch sophomorix -user -s "del R"?
+
+
 - apostroph testen in Namen O'Reilly und O`Reilly (backtick)
+  -> in UTF8 drin, nicht im Loginnamen
+     nicht in ascii? ist das richtig?
+
 - Datum 2.2.99 wird nicht in 1999 umgewandelt
   Algorithmus: 19 und 20 davor  sub calc_birth_century
   -> lookup-table in sophomorix.ini?
@@ -20,11 +22,8 @@ students.csv
   (was liegt nicht in der Zukuft und gibt geringeres Alter?)
 Handling doppelter Zeilen in students.csv
 
+bei using UTF usw. : surnames: 126, firstnames 4 (Anzahl der hits)
 
-
-Encoding erkennen: Hans-Jürgen wird nicht erkannt
--> was ist mit Hans Jürgen?
-   -> wird gesplittet? Dann auch an - splitten
 
 Wenn von linuxmuster-import-devices sophomorix-device aufgerufen wird
 sollte irgendwann der Returnwert des json-Objekts verwendet werden
@@ -34,6 +33,7 @@ sophomorix-user -u (ohne weitere option -i sollte den user anzeigen)
 
 sophomorix-user -s <string> sollte in vorname, vorname ascii .... suchen
 
+doppelte Zeilen liefern Fehler
 
 
 setup:
