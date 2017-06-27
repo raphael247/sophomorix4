@@ -454,8 +454,7 @@ sub AD_repdir_using_file {
         my $line=$_;
         $line_num++;
         my $group_type="";
-        my $groupvar_seen=0; # a group variable was in this line or this is above management or administrators
-        my $groupvar_set=0; # a group variable was in this line
+        my $groupvar_seen=0; # a group variable was in this line
         chomp($line);   
         if ($line eq ""){next;} # next on empty line
         if(/^\#/){next;} # next on comments
@@ -468,22 +467,18 @@ sub AD_repdir_using_file {
         if (/\@\@ADMINCLASS\@\@/) {
             $group_type="adminclass";
             $groupvar_seen++;
-            $groupvar_set++;
         }
         if (/\@\@TEACHERCLASS\@\@/) {
             $group_type="teacherclass";
             $groupvar_seen++;
-            $groupvar_set++;
         }
         if (/\@\@PROJECT\@\@/) {
             $group_type="project";
             $groupvar_seen++;
-            $groupvar_set++;
         }
         if (/\$directory_management/) {
             $group_type="admins";
             # go through one group loop for admins
-            $groupvar_seen++;
         }
 
         my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl,$ntaclonly) = split(/::/,$line);
@@ -553,30 +548,22 @@ sub AD_repdir_using_file {
             }
             # determining groups to walk through
             my @groups;
-#            if ($groupvar_seen==0){
-#                # no vars found -> one single loop
-#                @groups=("");
-#            } else {
-                # vars found
-                if (defined $project){
-                    @groups=($project);
-                } elsif (defined $teacherclass){
-                    @groups=($teacherclass);
-                } elsif (defined $adminclass){
-                    @groups=($adminclass);
-                } elsif(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
-                    # there is a group list -> use it
-                    @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
-                } else {
-                    @groups=("");
-	        }
-#            }
+            if (defined $project){
+                @groups=($project);
+            } elsif (defined $teacherclass){
+                @groups=($teacherclass);
+            } elsif (defined $adminclass){
+                @groups=($adminclass);
+            } elsif(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
+                # there is a group list -> use it
+                @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
+            } else {
+                @groups=("");
+            }
             ########################################
             # group loop start
-#	    print "HERE: >@groups<\n";
             foreach my $group (@groups){
-                # test this
-                if ($group eq "" and $groupvar_set>0){
+                if ($group eq "" and $groupvar_seen>0){
                     # skip, if a groupvar should be replaced, but there is only an empty string a group
                     print "Skipping $line: group would be replaced by empty string\n";
                     next;
