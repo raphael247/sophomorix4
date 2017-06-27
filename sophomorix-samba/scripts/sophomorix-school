@@ -130,6 +130,7 @@ Options:
   --create --school <schoolname>
   --kill --school <schoolname>
 
+  --recreate-all-schools   (recreates all configured schools from sophomorix.conf)
 
 Dumping data:                     
   -ij / --info --json              (dump configuration)
@@ -210,7 +211,7 @@ if ($school ne "" and $create==1){
 # ============================================================
 # recreating all schools
 # ============================================================
-# --recreate-all-school
+# --recreate-all-schools
 if ($recreate_all_schools==1){
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         # create new ou
