@@ -534,7 +534,7 @@ sub config_sophomorix_read {
     # GROUPMEMBEROF in section GLOBAL
     foreach my $entry ( &Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'GLOBAL'}{'GROUPMEMBEROF'}) ){
         my ($membergroup,$group)=split(/\|/,$entry);
-        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBER'}{$membergroup}=$group;
+        $sophomorix_config{'GLOBAL'}{'GROUP_MEMBEROF'}{$membergroup}=$group;
     }
 
     # GROUPMEMBEROF in section SCHOOLS
@@ -543,7 +543,7 @@ sub config_sophomorix_read {
             my ($membergroup,$group)=split(/\|/,$entry);
             $membergroup=&replace_vars($membergroup,\%sophomorix_config,$school);
             $group=&replace_vars($group,\%sophomorix_config,$school);
-            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$membergroup}=$group;
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBEROF'}{$membergroup}=$group;
         }
     }
 

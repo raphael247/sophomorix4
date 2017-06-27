@@ -2337,18 +2337,18 @@ sub AD_school_create {
                              $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
 
     # all groups created, add some memberships from GLOBAL
-    foreach my $group (keys %{$ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBER'}}) {
+    foreach my $group (keys %{$ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBEROF'}}) {
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
-                             group => $ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBER'}{$group},
+                             group => $ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBEROF'}{$group},
                              addgroup => $group,
                             }); 
     }
     # all groups created, add some memberships from SCHOOLS
-    foreach my $group (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBER'}}) {
+    foreach my $group (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBEROF'}}) {
        &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
-                             group => $ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBER'}{$group},
+                             group => $ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_MEMBEROF'}{$group},
                              addgroup => $group,
                             }); 
     }
