@@ -480,6 +480,7 @@ while(<SOPHOMORIXADD>){
                            creationdate=>$time_stamp_AD,
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
                          });
         # remember ou
         $school_created{$school}="already created";
@@ -504,6 +505,7 @@ while(<SOPHOMORIXADD>){
                      file=>$file,
                      smb_admin_pass=>$smb_admin_pass,
                      sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 
     &AD_user_create({ldap=>$ldap,
@@ -533,6 +535,7 @@ while(<SOPHOMORIXADD>){
                      file=>$file,  
                      smb_admin_pass=>$smb_admin_pass,
                      sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 
    # 1. Entry in sophomorix database and auth system

@@ -234,6 +234,7 @@ if ($create==1 and $class ne ""){
                       creationdate=>$time_stamp_AD,
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
+                      sophomorix_result=>\%sophomorix_result,
                     });
    my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
    &AD_group_create({ldap=>$ldap,
@@ -252,6 +253,7 @@ if ($create==1 and $class ne ""){
                      gidnumber_wish=>$gidnumber_wish,
                      smb_admin_pass=>$smb_admin_pass,
                      sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                   });
 }
 

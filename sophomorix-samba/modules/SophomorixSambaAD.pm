@@ -425,6 +425,7 @@ sub AD_repdir_using_file {
     my $ref_AD = $arg_ref->{AD};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     # optional options
     my $school = $arg_ref->{school};
@@ -1204,6 +1205,7 @@ sub AD_user_create {
     my $file = $arg_ref->{file};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
@@ -1475,6 +1477,7 @@ sub AD_user_create {
                                administrator_home=>$login,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         &AD_repdir_using_file({root_dns=>$root_dns,
@@ -1483,6 +1486,7 @@ sub AD_user_create {
                                administrator_home=>$login,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     } elsif ($role eq "teacher"){
         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
@@ -1493,6 +1497,7 @@ sub AD_user_create {
                                    teacher_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
+                                   sophomorix_result=>$ref_sophomorix_result,
                                  });
         } else {
             &AD_repdir_using_file({root_dns=>$root_dns,
@@ -1502,6 +1507,7 @@ sub AD_user_create {
                                    teacher_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
+                                   sophomorix_result=>$ref_sophomorix_result,
                                  });
         }
     } elsif ($role eq "student"){
@@ -1513,6 +1519,7 @@ sub AD_user_create {
                                    student_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
+                                   sophomorix_result=>$ref_sophomorix_result,
                                  });
         } else {
             &AD_repdir_using_file({root_dns=>$root_dns,
@@ -1522,6 +1529,7 @@ sub AD_user_create {
                                    student_home=>$login,
                                    smb_admin_pass=>$smb_admin_pass,
                                    sophomorix_config=>$ref_sophomorix_config,
+                                   sophomorix_result=>$ref_sophomorix_result,
                                  });
         }
     }  
@@ -1858,6 +1866,7 @@ sub AD_user_move {
     my $creationdate = $arg_ref->{creationdate};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     # read from config
     my $group_type_new;
@@ -1948,6 +1957,7 @@ sub AD_user_move {
                             creationdate=>$creationdate,
                             smb_admin_pass=>$smb_admin_pass,
                             sophomorix_config=>$ref_sophomorix_config,
+                            sophomorix_result=>$ref_sophomorix_result,
                           });
          # remember new ou to add it only once
          $school_created{$school_new}="already created";
@@ -1970,6 +1980,7 @@ sub AD_user_move {
                       creationdate=>$creationdate,
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
+                      sophomorix_result=>$ref_sophomorix_result,
                     });
 
     # update user entry
@@ -2074,6 +2085,7 @@ sub AD_user_move {
                                student_home=>$user,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     } elsif ($role_new eq "teacher"){
         &AD_repdir_using_file({root_dns=>$root_dns,
@@ -2083,6 +2095,7 @@ sub AD_user_move {
                                teacher_home=>$user,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     }
     &Sophomorix::SophomorixBase::print_title("Moving user $user, (end)");
@@ -2163,6 +2176,7 @@ sub AD_school_create {
     my $creationdate = $arg_ref->{creationdate};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_result = $arg_ref->{sophomorix_result};
     my $gidnumber_wish;
 
     $school=&AD_get_schoolname($school);
@@ -2243,6 +2257,7 @@ sub AD_school_create {
                       hidden=>"FALSE",
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
+                      sophomorix_result=>$ref_sophomorix_result,
                      });
     ############################################################
     # providing the OU=<school>,OU=SCHOOLS for schools
@@ -2270,6 +2285,7 @@ sub AD_school_create {
                       hidden=>"FALSE",
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
+                      sophomorix_result=>$ref_sophomorix_result,
                      });
     # make group <schoolname> member in SCHOOLS
     &AD_group_addmember({ldap => $ldap,
@@ -2367,6 +2383,7 @@ sub AD_school_create {
                            school=>$school,
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
+                           sophomorix_result=>$ref_sophomorix_result,
                         });
     # creating filesystem for global
     &AD_repdir_using_file({ldap=>$ldap,
@@ -2375,10 +2392,12 @@ sub AD_school_create {
                            school=>$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
+                           sophomorix_result=>$ref_sophomorix_result,
                          });
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (end) ...");
     print "\n";
 }
+
 
 
 sub AD_create_school_groups {
@@ -2406,6 +2425,7 @@ sub AD_create_school_groups {
                               hidden=>"FALSE",
                               smb_admin_pass=>$smb_admin_pass,
                               sophomorix_config=>$ref_sophomorix_config,
+                              sophomorix_result=>$ref_sophomorix_result,
                             });
         }
     } else {
@@ -2431,6 +2451,7 @@ sub AD_create_school_groups {
                               hidden=>"FALSE",
                               smb_admin_pass=>$smb_admin_pass,
                               sophomorix_config=>$ref_sophomorix_config,
+                              sophomorix_result=>$ref_sophomorix_result,
                             });
         }
     }
@@ -4687,6 +4708,7 @@ sub AD_group_create {
                                adminclass=>$group,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     } elsif ($type eq "teacherclass"){
         # add <token>-teachers to all-teachers
@@ -4701,6 +4723,7 @@ sub AD_group_create {
                                teacherclass=>$group,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     } elsif ($type eq "room"){
         #my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
@@ -4723,6 +4746,7 @@ sub AD_group_create {
                                project=>$group,
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
                              });
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");

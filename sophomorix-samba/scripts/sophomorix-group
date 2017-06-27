@@ -174,6 +174,7 @@ if ($create==1 and $group ne ""){
                        creationdate=>$time_stamp_AD,
                        smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
+                       sophomorix_result=>\%sophomorix_result,
                      }); 
     my $group_token=&AD_get_name_tokened($group,$school,"sophomorix-group");
     &AD_group_create({ldap=>$ldap,
@@ -189,6 +190,7 @@ if ($create==1 and $group ne ""){
 		      sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
+                      sophomorix_result=>\%sophomorix_result,
                     });
 }
 
