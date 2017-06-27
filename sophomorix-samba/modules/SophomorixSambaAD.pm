@@ -454,7 +454,8 @@ sub AD_repdir_using_file {
         my $line=$_;
         $line_num++;
         my $group_type="";
-        my $groupvar_seen=0;
+        my $groupvar_seen=0; # a group variable was in this line or this is above management or administrators
+        my $groupvar_set=0; # a group variable was in this line
         chomp($line);   
         if ($line eq ""){next;} # next on empty line
         if(/^\#/){next;} # next on comments
@@ -467,14 +468,17 @@ sub AD_repdir_using_file {
         if (/\@\@ADMINCLASS\@\@/) {
             $group_type="adminclass";
             $groupvar_seen++;
+            $groupvar_set++;
         }
         if (/\@\@TEACHERCLASS\@\@/) {
             $group_type="teacherclass";
             $groupvar_seen++;
+            $groupvar_set++;
         }
         if (/\@\@PROJECT\@\@/) {
             $group_type="project";
             $groupvar_seen++;
+            $groupvar_set++;
         }
         if (/\$directory_management/) {
             $group_type="admins";
@@ -549,10 +553,10 @@ sub AD_repdir_using_file {
             }
             # determining groups to walk through
             my @groups;
-            if ($groupvar_seen==0){
-                # no vars found -> one single loop
-                @groups=("");
-            } else {
+#            if ($groupvar_seen==0){
+#                # no vars found -> one single loop
+#                @groups=("");
+#            } else {
                 # vars found
                 if (defined $project){
                     @groups=($project);
@@ -566,10 +570,18 @@ sub AD_repdir_using_file {
                 } else {
                     @groups=("");
 	        }
-            }
+#            }
             ########################################
             # group loop start
+#	    print "HERE: >@groups<\n";
             foreach my $group (@groups){
+                # test this
+                if ($group eq "" and $groupvar_set>0){
+                    # skip, if a groupvar should be replaced, but there is only an empty string a group
+                    print "Skipping $line: group would be replaced by empty string\n";
+                    next;
+                }
+
                 my $group_basename=$group;
                 $group_basename=&Sophomorix::SophomorixBase::get_group_basename($group,$school);
                 my $path_after_group=$path;
@@ -625,7 +637,12 @@ sub AD_repdir_using_file {
                         } else {
                             $user_typeout=$user;
                         }
-                        print "\nUser: $user_typeout in group $group in school $school\n";
+                        if ($group eq ""){
+                            $group_typeout="<none>";
+                        } else {
+                            $group_typeout=$group;
+                        }
+                        print "\nUser: $user_typeout in group $group_typeout in school $school\n";
                         print "---------------------------------------------------------------\n";
                         if ($ntaclonly ne "ntaclonly"){
                             print "* $smbclient_command\n";
@@ -643,6 +660,7 @@ sub AD_repdir_using_file {
                                                                      smbpath=>$path_after_user_smb,
                                                                      smb_admin_pass=>$smb_admin_pass,
                                                                      sophomorix_config=>$ref_sophomorix_config,
+                                                                     sophomorix_result=>$ref_sophomorix_result,
                                                                    });
                    } elsif ($entry_type eq "LINUX"){
                         mkdir $path_after_user;

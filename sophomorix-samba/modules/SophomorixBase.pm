@@ -1022,6 +1022,9 @@ sub result_sophomorix_add_summary {
     my $description_pre  = $arg_ref->{DESCRIPTION_PRE};
     my $description_post = $arg_ref->{DESCRIPTION_POST};
     my $format_type = $arg_ref->{FORMAT_TYPE};
+    my $file = $arg_ref->{FILE};
+    my $encoding = $arg_ref->{ENCODING};
+
     if ($name eq "HEADER"){
         my %header = (TITLE => $title);
         push @{ $ref_result->{'SUMMARY'} }, {$name => \%header};
@@ -1041,6 +1044,12 @@ sub result_sophomorix_add_summary {
         }
         if (defined $format_type){
             $hash{'FORMAT_TYPE'}=$format_type;
+        }
+        if (defined $file){
+            $hash{'FILE'}=$file;
+        }
+        if (defined $encoding){
+            $hash{'ENCODING'}=$encoding;
         }
         push @{ $ref_result->{'SUMMARY'} }, {$name => \%hash};
     }
@@ -1095,6 +1104,9 @@ sub result_sophomorix_print {
 		  #print "Name: $name\n";
                   if ($name eq "HEADER"){
                       print "##### ".$line->{$name}{'TITLE'}."\n";
+                  } elsif ($line->{$name}{'FORMAT_TYPE'}==0){ # just print RESULT
+                      #print "Format 0\n";
+                      print "RESULT    : ".$line->{$name}{'RESULT'}."\n";
                   } elsif ($line->{$name}{'FORMAT_TYPE'}==1){
                       #print "Format 1\n";
                       printf "%6s %-65s \n",$line->{$name}{'RESULT'},$line->{$name}{'DESCRIPTION_POST'};
@@ -1453,6 +1465,7 @@ sub NTACL_set_file {
     my $user = $arg_ref->{user};
     my $group = $arg_ref->{group};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     my $ntacl_abs=$DevelConf::path_conf_devel_ntacl."/".$ntacl.".template";
     if ($ntacl eq "noacl" or $ntacl eq "nontacl"){
@@ -1462,13 +1475,19 @@ sub NTACL_set_file {
         print "\nERROR: $ntacl_abs not found/readable\n\n";
         exit;
     } 
-    print "Setting the NTACL (user=$user, group=$group, school=$school):\n";
+    &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (start)");
+    #print "Setting the NTACL for $smbpath from $ntacl (user=$user, group=$group, school=$school):\n";
     my $smbcacls_option="";
     open(NTACL,"<$ntacl_abs");
     my $line_count=0;
     while (<NTACL>) {
         $_=~s/\s+$//g;# remove trailing whitespace
         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            next;
+        }
+        if (/^CONTROL:/){
+            # do something special for CONTROL line
+            print "*** skipping $_\n";
             next;
         }
         
@@ -1496,8 +1515,6 @@ sub NTACL_set_file {
         } else {
             $smbcacls_option=$smbcacls_option.",".$line;
         }
-
-
     }
     $smbcacls_option="\"".$smbcacls_option."\"";
     my $smbcacls_base_command="smbcacls -U ".$DevelConf::sophomorix_file_admin."%'".
@@ -1507,11 +1524,13 @@ sub NTACL_set_file {
     print "  $smbcacls_option\n";
     my $smbcacls_return=system("$smbcacls_command");
     if($smbcacls_return==0){
-	print "NTACLS set successfully ($smbcacls_return)\n";
+ 	print "NTACLS set successfully ($smbcacls_return)\n";
     } else {
+        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbcacls_return): $smbcacls_command");
 	print "ERROR setting NTACLS ($smbcacls_return)\n";
     }
     close(NTACL);
+    &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (end)");
 }
 
 # ?????? deprecated ???

@@ -117,7 +117,66 @@ my %convert_month = qw(
      12    12
 );
 
-
+# allowed numbers for years
+my %convert_year = qw(
+     1     2001          01    2001
+     2     2002          02    2002
+     3     2003          03    2003
+     4     2004          04    2004
+     5     2005          05    2005
+     6     2006          06    2006
+     7     2007          07    2007
+     8     2008          08    2008
+     9     2009          09    2009
+     10    2010          11    2011
+     12    2012          13    2013
+     14    2014          15    2015
+     16    2016          17    2017
+     18    2018          19    2019
+     20    2020          21    2021
+     22    2022          23    2023
+     24    2024          25    2025
+     26    2026          27    2027
+     28    2028          29    2029
+     30    1930          31    1931
+     32    1932          33    1933
+     34    1934          35    1935
+     36    1936          37    1937
+     38    1938          39    1939
+     40    1940          41    1941
+     42    1942          43    1943
+     44    1944          45    1945
+     46    1946          47    1947
+     48    1948          49    1949
+     50    1950          51    1951
+     52    1952          53    1953
+     54    1954          55    1955
+     56    1956          57    1957
+     58    1958          59    1959
+     60    1960          61    1961
+     62    1962          63    1963
+     64    1964          65    1965
+     66    1966          67    1967
+     68    1968          69    1969
+     70    1970          71    1971
+     72    1972          73    1973
+     74    1974          75    1975
+     76    1976          77    1977
+     78    1978          79    1979
+     80    1980          81    1981
+     82    1982          83    1983
+     84    1984          85    1985
+     86    1986          87    1987
+     88    1988          89    1989
+     90    1990          91    1991
+     92    1992          93    1993
+     94    1994          95    1995
+     96    1996          97    1997
+     98    1998          99    1999
+);
+for( my $year = 1930 ; $year < 2029 ; $year++) {
+    $convert_year{$year}=$year;
+}
 
 
 # encoding tests
@@ -316,7 +375,16 @@ if ($analyze_encoding ne ""){
         }
     }
     &print_analyzed_encoding($analyze_encoding);
-    &log_script_exit("",1,1,0,\@arguments,\%sophomorix_result,$json);
+    my $result="$analyze_encoding is $enc encoded";
+    &result_sophomorix_add_summary({
+                         NAME=>"ANALYZE-ENCODING", 
+                         RESULT=>$result, 
+                         FORMAT_TYPE => 0,
+                         FILE => $analyze_encoding,
+                         ENCODING => $enc,
+                         sophomorix_result=>\%sophomorix_result,
+			       });
+    &log_script_end(\@arguments,\%sophomorix_result,$json);
 }
 
 
@@ -356,6 +424,8 @@ foreach my $user_file (@filelist){
          die "ERROR: $user_file not found!";  
     open(USERSUTF8,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
          die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
+#    open(REPORT,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
+#         die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
     while(<USERS>){
         $count++;
         my $line=$_;
@@ -363,6 +433,7 @@ foreach my $user_file (@filelist){
     }
     close(USERS);
     close(USERSUTF8);
+#    close(REPORT);
 }
 
 
@@ -1329,7 +1400,10 @@ sub analyze_user_line {
         my $class=&check_class($class_raw);
         my $first=&check_first($first_raw);
         my $last=&check_last($last_raw);
-        my $birthdate=&check_birthdate($birthdate_raw);
+        my ($birthdate_valid,$birthdate)=&check_birthdate($birthdate_raw);
+        if ($birthdate_valid==0){
+        
+        }
         my $unid="";
         my $login="";
         my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_5};
@@ -1462,6 +1536,7 @@ sub check_last {
 
 
 sub check_birthdate {
+    my $birthdate_valid=1;# valid if not found out otherwise
     my ($birthdate)=@_;
     $birthdate=&remove_whitespace($birthdate);
     my $dot_count=$birthdate=~tr/\.//;
@@ -1489,6 +1564,7 @@ sub check_birthdate {
 
     $day=$convert_day{$day};
     $month=$convert_month{$month};
+    $year=$convert_year{$year};
 
     # Instead of undefined use empty string
     # this avoids errors
@@ -1503,7 +1579,7 @@ sub check_birthdate {
     }
 
     my $birthdate_ok = join(".",($day,$month,$year));
-    return $birthdate_ok;
+    return ($birthdate_valid,$birthdate_ok);
 }
 
 

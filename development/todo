@@ -1,5 +1,9 @@
 sophomorix-repair --school auf resettetem system mit vielen Fehlern
 
+
+
+
+
 Bugs nach AK:
 
 students.csv
@@ -13,6 +17,7 @@ sophomorix-user:
   -> in UTF8 drin, nicht im Loginnamen
      nicht in ascii? ist das richtig?
 
+
 - Datum 2.2.99 wird nicht in 1999 umgewandelt
   Algorithmus: 19 und 20 davor  sub calc_birth_century
   -> lookup-table in sophomorix.ini?
@@ -22,7 +27,19 @@ sophomorix-user:
         ...
         99=1999
   (was liegt nicht in der Zukuft und gibt geringeres Alter?)
+
+Besser:
+gültige Jahreszahlen werden je File berechnet:
+min_age=6
+max_age=40
+geht von heutigen Jahr 6 Jahre zurück ... -6 ... -40
+und erlaubt 2007,07,7 im hash
+
+
 Handling doppelter Zeilen in students.csv
+
+
+
 
 bei using UTF usw. : surnames: 126, firstnames 4 (Anzahl der hits)
 
@@ -231,12 +248,92 @@ Die Control-Bits sind in source3/lib/util_sd.c erklärt:
  {SEC_DESC_RM_CONTROL_VALID,      "RM", "RM Control Valid"},
  {SEC_DESC_SELF_RELATIVE ,        "SR", "Self Relative"},
 
+############################################################
+sernet Problembeschreibung:
+
+1) Auf dem Server sieht die Schule 'bsz' wie folgt aus:
+# find /srv/samba/schools/bsz/
+
+/srv/samba/schools/bsz/
+/srv/samba/schools/bsz/teachers
+/srv/samba/schools/bsz/teachers/share
+/srv/samba/schools/bsz/teachers/homes
+/srv/samba/schools/bsz/teachers/homes/oe42
+/srv/samba/schools/bsz/teachers/homes/oe42/_einsammeln
+/srv/samba/schools/bsz/teachers/homes/oe42/_austeilen
+/srv/samba/schools/bsz/teachers/homes/wu42
+/srv/samba/schools/bsz/teachers/homes/wu42/_einsammeln
+/srv/samba/schools/bsz/teachers/homes/wu42/_austeilen
+/srv/samba/schools/bsz/management
+/srv/samba/schools/bsz/students
+/srv/samba/schools/bsz/students/share
+/srv/samba/schools/bsz/students/homes
+/srv/samba/schools/bsz/students/m7ab
+/srv/samba/schools/bsz/students/m7ab/share
+/srv/samba/schools/bsz/students/m7ab/homes
+/srv/samba/schools/bsz/students/m7ab/homes/maiersa42
+/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln
+/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_austeilen
+/srv/samba/schools/bsz/students/m7ab/homes/muellegr42
+/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_einsammeln
+/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_austeilen
+/srv/samba/schools/bsz/students/m8cd
+/srv/samba/schools/bsz/students/m8cd/share
+/srv/samba/schools/bsz/students/m8cd/homes
+/srv/samba/schools/bsz/students/m8cd/homes/samardze42
+/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_einsammeln
+/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_austeilen
+/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42
+/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_einsammeln
+/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_austeilen
+/srv/samba/schools/bsz/projects
+
+(m7ab,m8cd sind Schulklassen)
+
+2) Jede Schule hat ihre eigen Freigabe, z.B. 'bsz'
+# net conf list
+[bsz]
+	path = /srv/samba/schools/bsz
+	comment = Share for school bsz
+	guest ok = yes
+	read only = no
+	msdfs root = yes
+	hide unreadable = yes
+
+Wir haben uns per Windows-client ACL's zusammengeklickt, die nun umgesetzt werden sollen.
+
+Die Verzeichnisse werden per script via SMB-Protokoll angelegt und mit smbcacls mit ACL's versehen
+
+z.B. /srv/samba/schools/bsz/teachers SOLL so aussehen.
+
+REVISION:1
+CONTROL:SR|PD|SI|DI|DP
+OWNER:BUILTIN\Administrators
+GROUP:LINUXMUSTER\Domain Users
+ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ
+ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL
+
+Gesetzt werden die ACL's so:
+
+smbcacls -U administrator%'Muster!' //linuxmuster.local/bsz teachers --set 
+  "REVISION:1,OWNER:BUILTIN\Administrators,GROUP:LINUXMUSTER\Domain Users,ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ,ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL"
+
+Leider scheint smbcacls die CONTROL-Zeile nicht setzen zu können.
+
+man smbcacls sagt unter anderem:
+
+    --query-security-info FLAGS
+           The security-info flags for queries.
+
+       --set-security-info FLAGS
+           The security-info flags for queries.
+
+Aber es wird nirgends erwähnt was als 'FLAGS' angegeben werden muss um SR|PD|SI|DI|DP zu setzen.
+############################################################
 
 
 
-
-
-sophomorix-repair für die 3 admintypen anpassen
+sophomorix-repair für die 2 admintypen anpassen
 
 ------------------------------------------------------------
 sophomorix-check:
