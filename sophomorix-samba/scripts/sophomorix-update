@@ -23,7 +23,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_exit
                                  lock_sophomorix
                                  unlock_sophomorix
-                                 backup_amku_file
+                                 backup_auk_file
                                  check_options
                                  config_sophomorix_read
                                  result_sophomorix_init
@@ -72,8 +72,6 @@ my $k;
 my $v;
 my $key;
 
-my $update_file=${DevelConf::path_result}."/sophomorix.update";
-my $update_file_new=${DevelConf::path_result}."/sophomorix.update.new";
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -107,6 +105,9 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
+my $update_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update";
+my $update_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update.new";
+
 
 # --help
 if ($help==1) {
@@ -255,7 +256,7 @@ if ($info==1) {
 
 
 # sophomorix.update mitloggen
-&backup_amku_file($time_stamp_file,"update","before");
+&backup_auk_file($time_stamp_file,"update","before",\%sophomorix_config);
 
 
 # Datei mit den Schülern, die nicht versetzt wurden
@@ -369,7 +370,7 @@ close(NOCHUPDATE);
 
 
 # sophomorix.update mitloggen
-&backup_amku_file($time_stamp_file,"update","after");
+&backup_auk_file($time_stamp_file,"update","after",\%sophomorix_config);
 
 
 

@@ -25,7 +25,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
-                                 backup_amku_file
+                                 backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
@@ -94,8 +94,6 @@ my %forbidden_login_hash=();
 my %school_created=();
 $school_created{$school}="created";
 
-my $add_file=${DevelConf::path_result}."/sophomorix.add";
-my $add_file_new=${DevelConf::path_result}."/sophomorix.add.new";
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -136,6 +134,10 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
+my $add_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
+my $add_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add.new";
+
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -312,7 +314,7 @@ if($Conf::log_level>=2){
 # ??????????????????????
 
 # sophomorix.add mitloggen
-&backup_amku_file($time_stamp_file,"add","before");
+&backup_auk_file($time_stamp_file,"add","before",\%sophomorix_config);
 
 my @passwort_zeichen=&get_passwd_charlist();
 
@@ -618,7 +620,7 @@ if ($user_count==0){
 }
 
 
-&backup_amku_file($time_stamp_file,"add","after");
+&backup_auk_file($time_stamp_file,"add","after",\%sophomorix_config);
 rename("$add_file_new","$add_file" );
 
 

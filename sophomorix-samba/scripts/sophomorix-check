@@ -35,7 +35,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
-                                 backup_amku_file
+                                 backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
@@ -395,8 +395,8 @@ if ($analyze_encoding ne ""){
 # cleaning up last check
 &print_title("Cleaning up last check");
 system("rm -f $DevelConf::path_conf_tmp/*.csv*");
-system("rm -f $DevelConf::path_result/sophomorix.*");
-
+system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.*");
+system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'REPORT_OFFICE'}/report.office.*");
 
 # ============================================================
 # analyzing encoding of all filtered user files in tmp
@@ -414,6 +414,7 @@ my $count=0;
 # reading and checking all filtered user files
 # ============================================================
 system("mkdir -p $DevelConf::path_conf_tmp");
+
 foreach my $user_file (@filelist){
     my $filename = basename($user_file);
     # fetching some config data
@@ -424,16 +425,20 @@ foreach my $user_file (@filelist){
          die "ERROR: $user_file not found!";  
     open(USERSUTF8,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
          die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
-#    open(REPORT,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
-#         die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
+    open(REPORT,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
+         die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!"; 
+    print REPORT "Office Report for: $user_file\n"; 
+    print REPORT "Date_Time:         $time_stamp_file\n";
+ 
     while(<USERS>){
         $count++;
         my $line=$_;
         &analyze_user_line($line,$user_file,$filename,$school,$count,$enc_used,"no");
     }
+
     close(USERS);
     close(USERSUTF8);
-#    close(REPORT);
+    close(REPORT);
 }
 
 
@@ -455,8 +460,11 @@ foreach my $inject (@injectlines){
         # opening the output file to APPEND entries
         open(USERSUTF8,">>$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
              die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
+        open(REPORT,">>$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
+         die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!";  
         &analyze_user_line($line,$file_abs,$filename,$school,$count,"utf8","yes");
         close(USERSUTF8);
+        close(REPORT);
     } else {
         print "        WARNING: $filename is not valid on this ",
               "server (skipping this line)\n";
@@ -573,13 +581,13 @@ if ($dump_matches==1){
 # Write results into files
 ###########################################################################
 
-my $add_file=$DevelConf::path_result."/sophomorix.add";
+my $add_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
 open (ADD, ">$add_file");
-my $update_file=$DevelConf::path_result."/sophomorix.update";
+my $update_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update";
 open (UPDATE, ">$update_file");
-my $kill_file=$DevelConf::path_result."/sophomorix.kill";
+my $kill_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.kill";
 open (KILL, ">$kill_file");
-my $nochange_file=$DevelConf::path_result."/sophomorix.nochange";
+my $nochange_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.nochange";
 open (NOCHANGE, ">$nochange_file");
 
 &print_title("Writing the files:");

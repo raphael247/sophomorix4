@@ -24,7 +24,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
-                                 backup_amku_file
+                                 backup_auk_file
                                  check_options
                                  config_sophomorix_read
                                  result_sophomorix_init
@@ -61,8 +61,6 @@ my $killuser="";
 my $k="";
 my $v="";
 
-my $kill_file=${DevelConf::path_result}."/sophomorix.kill";
-my $kill_file_new=${DevelConf::path_result}."/sophomorix.kill.new";
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -101,6 +99,9 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
+my $kill_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.kill";
+my $kill_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.kill.new";
+
 
 # --help
 if ($help==1) {
@@ -230,7 +231,7 @@ if ($info==1) {
 # sophomorix database sichern
 #&backup_user_database($time_stamp_file, "before-kill.sql");
 # sophomorix.kill mitloggen
-&backup_amku_file($time_stamp_file,"kill","before");
+&backup_auk_file($time_stamp_file,"kill","before",\%sophomorix_config);
 
 
 
@@ -245,7 +246,7 @@ if ($info==1) {
 # Datei mit den Schülern, die nicht gelöscht wurden
 # ===========================================================================
 if (not -e "$kill_file_new" ){
-    system("mkdir -p ${DevelConf::path_result}");
+    system("mkdir -p $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}");
     system("touch $kill_file_new");
 }
 open(YETTOKILL,">$kill_file_new") 
@@ -304,7 +305,7 @@ if ($killuser ne ""){
 # Datei-Zustand (NACHHER) mitloggen 
 # ===========================================================================
 # sophomorix.kill mitloggen
-&backup_amku_file($time_stamp_file,"kill","after");
+&backup_auk_file($time_stamp_file,"kill","after",\%sophomorix_config);
 
 # ===========================================================================
 # Falls nur getestet wird, darf die Datei nicht ersetzt werden

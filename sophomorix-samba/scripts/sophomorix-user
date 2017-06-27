@@ -28,7 +28,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
-                                 backup_amku_file
+                                 backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
@@ -520,71 +520,6 @@ if ($user eq "" and $info==1){
 
 &result_sophomorix_check_exit(\%sophomorix_result,$json);
 &log_script_start(\@arguments,\%sophomorix_result);
-
-
-# #--user user --new-class class
-# if ($user ne "" and $new_class ne ""){
-#     my ($home,
-#         $type,
-#         $gecos,
-#         $group,
-#         $uidnumber,
-#         $sambahomepath,
-#         $firstpassword,
-#         $sambaacctflags,
-#         $exitadminclass,
-#         $sambahomedrive,
-#         $sambakickofftime,
-#         $sambalmpassword,
-#         $sambalogofftime,
-#         $sambalogontime,
-#         $sambantpassword,
-#         $sambaprimarygroupsid,
-#         $sambapwdcanchange,
-#         $sambapwdlastset,
-#         $sambapwdmustchange,
-#         $sambasid,
-#         $surname,
-#         $firstname,
-#         $userpassword,
-#         $loginshell,
-#         $gidnumber,
-#         $sophomorixstatus) = &fetchdata_from_account($user);
-
-#     my $file=${DevelConf::path_result}."/sophomorix.move";
-#     print "   Old class:  $group \n";
-#     print "   New class:  $new_class \n";
-#     print "   Old Status: $sophomorixstatus \n";
-#     my $line=$user."::".$group."::".$new_class."::".$sophomorixstatus."\n";
-#     print "   New Line:   $line";
-
-#     my $seen=0;
-#     my $line_seen="";
-#     open (MOVE, "$file");
-#     while(<MOVE>) {
-#         #print $_;
-#         my ($uid,$rest) = split(/::/,$_);
-#         #print "<$uid>\n";
-#         if ($user eq $uid){
-#             $seen=1;
-#             $line_seen=$_;
-#         }
-#     }
-#     close (MOVE);
-#     if ($seen==0){
-#         print "Creating new entry in $file\n";
-#         # append line
-#         open (MOVE, ">>$file");
-#         print MOVE $line;
-#         close (MOVE);
-#     } else {
-#         print "\nWARNING: Cannot create entry in $file\n";
-#         print "$user has scheduled action: $line_seen\n";
-#     }
-
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
-# }
-
 
 
 # # --old-uid oldlogin --new-uid newlogin

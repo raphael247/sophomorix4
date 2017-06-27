@@ -20,7 +20,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
-                                 backup_amku_file
+                                 backup_auk_file
                                  check_options
                                  config_sophomorix_read
                                  );
@@ -255,7 +255,7 @@ if ($info==1) {
 #&backup_user_database($time_stamp_file, "before-move.sql");
 
 # sophomorix.move mitloggen
-&backup_amku_file($time_stamp_file,"move","before");
+&backup_auk_file($time_stamp_file,"move","before",\%sophomorix_config);
 
 
 # Datei mit den Schülern, die nicht versetzt wurden
@@ -400,7 +400,7 @@ close(NOCHVERSETZEN);
 
 
 # sophomorix.move mitloggen
-&backup_amku_file($time_stamp_file,"move","after");
+&backup_auk_file($time_stamp_file,"move","after",\%sophomorix_config);
 
 
 

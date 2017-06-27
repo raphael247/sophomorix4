@@ -110,10 +110,10 @@ my $root_dns=&AD_dns_get($root_dse);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
-my $file_add=$DevelConf::path_result."/sophomorix.add";
-my $file_update=$DevelConf::path_result."/sophomorix.update";
-my $file_move=$DevelConf::path_result."/sophomorix.move";
-my $file_kill=$DevelConf::path_result."/sophomorix.kill";
+my $file_add="/var/lib/sophomorix/check-result/sophomorix.add";
+my $file_update="/var/lib/sophomorix/check-result/sophomorix.update";
+my $file_move="/var/lib/sophomorix/check-result/sophomorix.move";
+my $file_kill="/var/lib/sophomorix/check-result/sophomorix.kill";
 
 my $testdata="/usr/share/sophomorix-developer/testdata";
 my $file_add_test=$testdata."/sophomorix.add-1";
@@ -217,7 +217,7 @@ Step by step Test:
 # Check preliminaries
 ############################################################
 
-&run_command("mkdir -p $DevelConf::path_result");
+&run_command("mkdir -p /var/lib/sophomorix/check-result");
 
 
 # --full

@@ -37,7 +37,7 @@ $Data::Dumper::Terse = 1;
             log_script_start
             log_script_end
             log_script_exit
-            backup_amku_file
+            backup_auk_file
             get_passwd_charlist
             get_plain_password
             check_options
@@ -769,6 +769,8 @@ sub load_school_ini {
                 # add some redundant stuff for convenience
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
                     $DevelConf::path_conf_tmp."/".$filename.".utf8";
+                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
+                    $ref_sophomorix_config->{'INI'}{'PATHS'}{'REPORT_OFFICE'}."/report.office.".$filename;
                 # save unchecked filter script for error messages
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
                     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
@@ -1437,10 +1439,10 @@ sub log_script_exit {
 # option 2: add, move, kill, update
 # option 3 before, after
 # optopn 4: cp should be correct
-#  what is this mv for: &backup_amku_file($zeit,"add","after","mv");
-sub backup_amku_file {
-    my ($time, $str, $str2) = @_;
-    my $input=${DevelConf::path_result}."/sophomorix.".$str;
+#  what is this mv for: &backup_auk_file($zeit,"add","after","mv");
+sub backup_auk_file {
+    my ($time, $str, $str2,$ref_sophomorix_config) = @_;
+    my $input=$ref_sophomorix_config->{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.".$str;
     my $output=${DevelConf::path_log_user}."/".$time.".sophomorix.".$str."-".$str2;
 
     # Verarbeitete Datei mit Zeitstempel versehen
