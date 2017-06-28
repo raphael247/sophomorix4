@@ -29,6 +29,7 @@ Options:
   -s 4    reset samba and run sophomorix-test-4
   -s 5    reset samba and run sophomorix-test-5
   -s w    reset samba and run sophomorix-test-workflow
+  -s e    reset samba and run sophomorix-test-errorfiles
 
   -o j    run tests with option -j
   -o jj   run tests with option -jj
@@ -56,7 +57,9 @@ if ($script eq "r"){
                  "sophomorix-test-3 $option ", 
                  "sophomorix-test-4 $option ", 
                  "sophomorix-test-5 $option ", 
-                 "sophomorix-test-workflow $option ");
+                 "sophomorix-test-workflow $option ",
+                 "sophomorix-test-errorfiles $option ",
+                 );
 } elsif ($script eq "1"){
     @scriptlist=("sophomorix-test-1 $option ");
 } elsif ($script eq "2"){
@@ -69,6 +72,8 @@ if ($script eq "r"){
     @scriptlist=("sophomorix-test-5 $option ");
 } elsif ($script eq "w"){
     @scriptlist=("sophomorix-test-workflow $option ");
+} elsif ($script eq "e"){
+    @scriptlist=("sophomorix-test-errorfiles $option ");
 }
 
 
