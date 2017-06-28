@@ -40,6 +40,9 @@ max_age=40
 geht von heutigen Jahr 6 Jahre zurück ... -6 ... -40
 und erlaubt 2007,07,7 im hash
 
+tests für students.csv.errors-*
+-> Anzahl Zeilen in sophomorix.error
+
 
 Handling doppelter Zeilen in students.csv
 
@@ -2059,6 +2062,9 @@ config_sophomorix_read auf hashs als parameter umstellen
 Wenn alte, kurze Passwörter als firstpasswords eingespielt werden (complexity and length abgemildert)
 Dann tut das zurücksetzen of das erstpasswort nicht mehr (wenn abmilderung wieder aufgehoben)
 
+https://www.ostechnix.com/check-password-complexity-linux/
+   # sudo apt-get install libcrack2
+   # echo "Welcome1" | cracklib-check
 
 Lösungen?
 
@@ -2081,6 +2087,13 @@ ansonsten: siehe neuer workflow
 
 ############################################################
 sophomorix-check
+
+doku: Erlaubte Zeichen Vorname/Nachname/Klasse/Geburtsjahr:
+siehe check_class
+      check_first
+      check_last
+      check_birthdate
+in sophomorix-check
 
 --injectline "Klasse;Nachname;Vorname;Gebdat" --school
   fügt die Zeile (Unicode) 

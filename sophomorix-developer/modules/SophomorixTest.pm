@@ -46,6 +46,7 @@ $Data::Dumper::Terse = 1;
             run_command
             file_test_lines
             AD_get_samaccountname
+            cat_wcl_test
             );
 
 sub AD_test_session_count {
@@ -1140,6 +1141,21 @@ sub run_command {
     print "######################################################################\n";
     system("$command");
     print "######################################################################\n";
+}
+
+sub cat_wcl_test {
+    # $abs: abs path to file
+    # $grep: what to grep for in that file
+    # $expected result (number of lines)
+    my ($abs,$grep,$expect) = @_;
+    my $command="cat ".$abs." | grep \"".$grep."\" | wc -l";
+    print "\n";
+    print "######################################################################\n";
+    print "$command\n";
+    print "######################################################################\n";
+    my $count=`$command`;
+    chomp($count);
+    is ($count,$expect,"  * $count results for \"$grep\" in $abs");
 }
 
 

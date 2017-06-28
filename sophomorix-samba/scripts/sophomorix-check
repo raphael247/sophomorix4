@@ -398,6 +398,19 @@ system("rm -f $DevelConf::path_conf_tmp/*.csv*");
 system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.*");
 system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'REPORT_OFFICE'}/report.office.*");
 
+# create result files
+my $add_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
+open (ADD, ">$add_file");
+my $update_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update";
+open (UPDATE, ">$update_file");
+my $kill_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.kill";
+open (KILL, ">$kill_file");
+my $nochange_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.nochange";
+open (NOCHANGE, ">$nochange_file");
+my $error_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.error";
+open (ERRORFILE, ">$error_file");
+
+
 # ============================================================
 # analyzing encoding of all filtered user files in tmp
 # ============================================================
@@ -578,19 +591,9 @@ if ($dump_matches==1){
 
 
 ###########################################################################
-# Write results into files
+# Begin writing into result files
 ###########################################################################
-
-my $add_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
-open (ADD, ">$add_file");
-my $update_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update";
-open (UPDATE, ">$update_file");
-my $kill_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.kill";
-open (KILL, ">$kill_file");
-my $nochange_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.nochange";
-open (NOCHANGE, ">$nochange_file");
-
-&print_title("Writing the files:");
+&print_title("Writing the result files:");
 
 
 # ADD users that could not be matched to AD users
@@ -716,6 +719,7 @@ close(ADD);
 close(UPDATE);
 close(KILL);
 close(NOCHANGE);
+#close(ERRORFILE);
 
 
 ############################################################
@@ -775,6 +779,19 @@ my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users are not to be changed in ".basename($nochange_file), 
                      DESCRIPTION_PRE => "users in ".basename($nochange_file), 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+
+my $linecount_error=`wc -l $error_file`;
+chomp($linecount_error);
+my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
+&result_sophomorix_add_summary({
+                     NAME=>"ERRORFILE", 
+                     RESULT=>$lc_error, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => "users with errors in ".basename($error_file), 
+                     DESCRIPTION_PRE => "users in ".basename($error_file), 
                      FORMAT_TYPE => 1,
                      sophomorix_result=>\%sophomorix_result,
 			       });
@@ -1392,6 +1409,7 @@ sub analyze_user_line {
         # or contains only whitespace
         return 0;
     } else {
+        my $line_raw=$line;
         chomp($line);
         $line=&remove_whitespace($line);
         # add trailing ; if not there
@@ -1405,24 +1423,42 @@ sub analyze_user_line {
             $field5,
            )=split(/;/,$line);
 
-        my ($class_valid,$class,$error_strg)=&check_class($class_raw);
+        my ($class_valid,$class,$error_strg_class)=&check_class($class_raw);
         if ($class_valid==0){
             print REPORT "\nERROR in $line\n";
-            print REPORT "   * Class $class_raw not valid ($error_strg)\n";
+            print REPORT "   * Class $class_raw not valid ($error_strg_class)\n";
             # ignore the line, as if it is not there
+            print ERRORFILE $filename.":".$line_raw;
             return;
         }
 
+        # givenname
+        my ($first_valid,$first,$error_strg_first)=&check_first($first_raw);
+        if ($first_valid==0){
+            print REPORT "\nERROR in $line\n";
+            print REPORT "   * Surname $first_raw not valid ($error_strg_first)\n";
+            # ignore the line, as if it is not there
+            print ERRORFILE $filename.":".$line_raw;
+            return;
+        }
 
-        my $first=&check_first($first_raw);
-        my $last=&check_last($last_raw);
+        # surname
+        my ($last_valid,$last,$error_strg_last)=&check_last($last_raw);
+        if ($last_valid==0){
+            print REPORT "\nERROR in $line\n";
+            print REPORT "   * Surname $last_raw not valid ($error_strg_last)\n";
+            # ignore the line, as if it is not there
+            print ERRORFILE $filename.":".$line_raw;
+            return;
+        }
 
         # Birthdate
-        my ($birthdate_valid,$birthdate,$error_strg)=&check_birthdate($birthdate_raw);
+        my ($birthdate_valid,$birthdate,$error_strg_birth)=&check_birthdate($birthdate_raw);
         if ($birthdate_valid==0){
             print REPORT "\nERROR in $line\n";
-            print REPORT "   * Birthdate $birthdate_raw not valid ($error_strg)\n";
+            print REPORT "   * Birthdate $birthdate_raw not valid ($error_strg_birth)\n";
             # ignore the line, as if it is not there
+            print ERRORFILE $filename.":".$line_raw;
             return;
         }
 
@@ -1531,7 +1567,10 @@ sub check_class {
     $class=~tr/A-Z/a-z/; 
     # sternchenklassen filtern ?????
     # klassen filtern ?????
+
+    # replacements in classnames
     $class=~s/\//$DevelConf::replace_slash_with/g;
+
     if ($class=~/[^a-z0-9-_]/) { 
         $error_strg="special char in class $class";
         $class_valid=0;
@@ -1552,17 +1591,31 @@ sub check_class {
 
 
 sub check_first {
+    my $first_valid=1;
+    my $error_strg="";
     my ($first)=@_;
     $first=&remove_whitespace($first);
-    return $first;
+    # allowed ASCII: ;'`-._  (; leads to errors anyway)
+    if ($first=~/[!\\"#\$%&()*+,\/:<>=@?\{\}|\^~]/) { 
+        $error_strg="special char in given name $first";
+        $first_valid=0;
+    }
+    return ($first_valid,$first,$error_strg);
 }
 
 
 
 sub check_last {
+    my $last_valid=1;
+    my $error_strg="";
     my ($last)=@_;
     $last=&remove_whitespace($last);
-    return $last;
+    # allowed ASCII: ;'`-._  (; leads to errors anyway)
+    if ($last=~/[!\\"#\$%&()*+,\/:<>=@?\{\}|\^~]/) { 
+        $error_strg="special char in surname $last";
+        $last_valid=0;
+    }
+    return ($last_valid,$last,$error_strg);
 }
 
 
@@ -1570,29 +1623,29 @@ sub check_last {
 sub check_birthdate {
     my $birthdate_valid=1;# valid if not found out otherwise
     my $error_strg="";
+    my $birthdate_ok="";
+
     my ($birthdate)=@_;
     $birthdate=&remove_whitespace($birthdate);
+
+    # Test 1
     my $dot_count=$birthdate=~tr/\.//;
     if ($dot_count==2){
+        # continue to Test 2
         if($Conf::log_level>=3){
             print " ... $dot_count dots in date found ... OK\n";
 	}
     } elsif ($birthdate eq ""){
-        if($Conf::log_level>=3){
-            print " ... Date is empty, Line not corrupted ...\n";
-	}
+        $birthdate_valid=0;
+        $error_strg="Birthdate is empty";
+        return ($birthdate_valid,$birthdate,$error_strg);
     } else {
-	#$datum_korrupt=1;
-        print " ... $dot_count dots in date found ... ERROR\n";
-	#$datum_korrupt_anzahl++;
-          
-        # Eintrag in report.admin
-        #push (@admin_list_corrupt, "Corrupted Line (" , $punkte_anzahl ,
-        #                  " dots in date):\n" , $_ , "\n\n");
-        # Set tag for Abbruch
-        #$tag = "0"  
+        $birthdate_valid=0;
+        $error_strg="Birthdate does not have 2 dots: $birthdate";
+        return ($birthdate_valid,$birthdate,$error_strg);
     }
 
+    # Test 2
     my ($day,$month,$year)=split(/\./,$birthdate);
 
     # Instead of undefined use empty string
@@ -1611,21 +1664,24 @@ sub check_birthdate {
         $day=$convert_day{$day};
     } else {
         $birthdate_valid=0;
+        $error_strg="Day is not valid: $day";
     }
 
     if (exists $convert_month{$month}){
         $month=$convert_month{$month};
     } else {
         $birthdate_valid=0;
+        $error_strg="Month is not valid: $month";
     }
 
     if (exists $convert_year{$year}){
         $year=$convert_year{$year};
     } else {
         $birthdate_valid=0;
+        $error_strg="Year is not valid: $year";
     }
 
-    my $birthdate_ok = join(".",($day,$month,$year));
+    $birthdate_ok = join(".",($day,$month,$year));
     return ($birthdate_valid,$birthdate_ok,$error_strg);
 }
 
@@ -1933,7 +1989,7 @@ sub print_analyzed_encoding {
     }
     print "+---------------------+--------+--------+--------+\n";
     printf  "| %-20s|%7s |%7s |%7s |\n",
-            "none",
+            "none of the above",
             $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'},
             "",
             "";
