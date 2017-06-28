@@ -291,6 +291,10 @@ install-developer:
 	@install -d $(DEVELOPERDIR)
 # installing  testdata
 	@install -d $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-errors-firstname $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-errors-lastname $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-errors-birthdate $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-errors-class $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-30 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-40 $(TESTDATA)
