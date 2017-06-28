@@ -1405,13 +1405,27 @@ sub analyze_user_line {
             $field5,
            )=split(/;/,$line);
 
-        my $class=&check_class($class_raw);
+        my ($class_valid,$class,$error_strg)=&check_class($class_raw);
+        if ($class_valid==0){
+            print REPORT "\nERROR in $line\n";
+            print REPORT "   * Class $class_raw not valid ($error_strg)\n";
+            # ignore the line, as if it is not there
+            return;
+        }
+
+
         my $first=&check_first($first_raw);
         my $last=&check_last($last_raw);
-        my ($birthdate_valid,$birthdate)=&check_birthdate($birthdate_raw);
+
+        # Birthdate
+        my ($birthdate_valid,$birthdate,$error_strg)=&check_birthdate($birthdate_raw);
         if ($birthdate_valid==0){
-        
+            print REPORT "\nERROR in $line\n";
+            print REPORT "   * Birthdate $birthdate_raw not valid ($error_strg)\n";
+            # ignore the line, as if it is not there
+            return;
         }
+
         my $unid="";
         my $login="";
         my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_5};
@@ -1509,6 +1523,8 @@ sub analyze_user_line {
 
 
 sub check_class {
+    my $class_valid=1;
+    my $error_strg="";
     my ($class)=@_;
     $class=&remove_whitespace($class);
     # convert to small letters
@@ -1516,13 +1532,21 @@ sub check_class {
     # sternchenklassen filtern ?????
     # klassen filtern ?????
     $class=~s/\//$DevelConf::replace_slash_with/g;
+    if ($class=~/[^a-z0-9-_]/) { 
+        $error_strg="special char in class $class";
+        $class_valid=0;
+    }
+    if ($class=~/^[^a-z0-9]/) { 
+        $error_strg="$class begins not with a-z or 0-9";
+        $class_valid=0;
+    }
 
     if ($class eq "lehrer" or 
         $class eq "Lehrer"
        ){
         $class=$DevelConf::teacher;
     }
-    return $class;
+    return ($class_valid,$class,$error_strg);
 }
 
 
@@ -1545,6 +1569,7 @@ sub check_last {
 
 sub check_birthdate {
     my $birthdate_valid=1;# valid if not found out otherwise
+    my $error_strg="";
     my ($birthdate)=@_;
     $birthdate=&remove_whitespace($birthdate);
     my $dot_count=$birthdate=~tr/\.//;
@@ -1570,10 +1595,6 @@ sub check_birthdate {
 
     my ($day,$month,$year)=split(/\./,$birthdate);
 
-    $day=$convert_day{$day};
-    $month=$convert_month{$month};
-    $year=$convert_year{$year};
-
     # Instead of undefined use empty string
     # this avoids errors
     if (not defined $day){
@@ -1586,8 +1607,26 @@ sub check_birthdate {
         $year="";
     }
 
+    if (exists $convert_day{$day}){
+        $day=$convert_day{$day};
+    } else {
+        $birthdate_valid=0;
+    }
+
+    if (exists $convert_month{$month}){
+        $month=$convert_month{$month};
+    } else {
+        $birthdate_valid=0;
+    }
+
+    if (exists $convert_year{$year}){
+        $year=$convert_year{$year};
+    } else {
+        $birthdate_valid=0;
+    }
+
     my $birthdate_ok = join(".",($day,$month,$year));
-    return ($birthdate_valid,$birthdate_ok);
+    return ($birthdate_valid,$birthdate_ok,$error_strg);
 }
 
 

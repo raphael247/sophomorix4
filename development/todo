@@ -1,5 +1,10 @@
 sophomorix-repair --school auf resettetem system mit vielen Fehlern
 
+Problem:
+sophomorix-repair erzeugt viele Fehler, wenn schulen konfiguriert, aber kein user angelegt ist
+Mögliche Reaktion:
+--sophomorix-repair erzeugt die Schulen (evtl. nicht gewollt)
+
 
 
 
@@ -18,17 +23,17 @@ sophomorix-user:
      nicht in ascii? ist das richtig?
 
 
-- Datum 2.2.99 wird nicht in 1999 umgewandelt
-  Algorithmus: 19 und 20 davor  sub calc_birth_century
-  -> lookup-table in sophomorix.ini?
-   [birth_century_lookup]
-        01=2001
-        02=2002
-        ...
-        99=1999
-  (was liegt nicht in der Zukuft und gibt geringeres Alter?)
+sophomorix-check
+error_strg weiter
+Klassencheck fertig
+Datumscheck fertig
+Vorname WARNING bei / ..... usw -> siehe ascii-Tabelle
+nachname
 
-Besser:
+login-creation: wenn nicht nur a-z rauskommt, warnung/error
+
+
+Jahreszahl-Algorithmuus Besser:
 gültige Jahreszahlen werden je File berechnet:
 min_age=6
 max_age=40
@@ -39,6 +44,7 @@ und erlaubt 2007,07,7 im hash
 Handling doppelter Zeilen in students.csv
 
 
+Wenn kein Sonderzeichen gefunden wurde, ASCII annehmen
 
 
 bei using UTF usw. : surnames: 126, firstnames 4 (Anzahl der hits)
@@ -290,7 +296,7 @@ sernet Problembeschreibung:
 
 (m7ab,m8cd sind Schulklassen)
 
-2) Jede Schule hat ihre eigen Freigabe, z.B. 'bsz'
+2) Jede Schule hat ihre eigene Freigabe, z.B. 'bsz'
 # net conf list
 [bsz]
 	path = /srv/samba/schools/bsz
@@ -300,11 +306,12 @@ sernet Problembeschreibung:
 	msdfs root = yes
 	hide unreadable = yes
 
-Wir haben uns per Windows-client ACL's zusammengeklickt, die nun umgesetzt werden sollen.
+3) Wir haben uns per Windows-client/Explorer ACL's zusammengeklickt, Haken bei Vererbung,
+   ... die nun per script umgesetzt werden sollen.
 
-Die Verzeichnisse werden per script via SMB-Protokoll angelegt und mit smbcacls mit ACL's versehen
+Die Verzeichnisse werden per script via SMB-Protokoll (smbclient) angelegt und mit smbcacls mit ACL's versehen
 
-z.B. /srv/samba/schools/bsz/teachers SOLL so aussehen.
+4) z.B. /srv/samba/schools/bsz/teachers SOLL so aussehen.
 
 REVISION:1
 CONTROL:SR|PD|SI|DI|DP
@@ -313,14 +320,14 @@ GROUP:LINUXMUSTER\Domain Users
 ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ
 ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL
 
-Gesetzt werden die ACL's so:
+5) Gesetzt werden die ACL's im script so:
 
 smbcacls -U administrator%'Muster!' //linuxmuster.local/bsz teachers --set 
   "REVISION:1,OWNER:BUILTIN\Administrators,GROUP:LINUXMUSTER\Domain Users,ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ,ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL"
 
-Leider scheint smbcacls die CONTROL-Zeile nicht setzen zu können.
+6) Leider scheint smbcacls die CONTROL-Zeile nicht setzen zu können.
 
-man smbcacls sagt unter anderem:
+man smbcacls zeigt unter anderem:
 
     --query-security-info FLAGS
            The security-info flags for queries.
