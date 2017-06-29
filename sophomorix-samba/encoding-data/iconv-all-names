@@ -115,7 +115,9 @@ sub convert {
     while (<IN>){
         chomp();
         my $inline=$_;
-        print "$inline\n";
+        if ($inline=~m/^#/){
+            next;
+	}
         my $conv = Text::Iconv->new("UTF8",$enc);
         my $outline = $conv->convert($inline);
         if (defined $outline){
