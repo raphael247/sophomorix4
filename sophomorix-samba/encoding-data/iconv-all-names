@@ -12,8 +12,8 @@ use Text::Iconv;
 ############################################################
 #
 # 1. Adding a name to the correct list:
-#     A) Open $file_in in emacs (replace):
-#         emacs <$file_in> 
+#     A) Open $file_in_first in emacs (replace):
+#         emacs <$file_in_first> 
 #     B) Find that name on an unicoded website 
 #        (i.e. wikipedia -> Edit -> Mark to copy  )
 #     C) Insert the name into emacs/file
@@ -48,9 +48,11 @@ use Text::Iconv;
 ############################################################
 
 
-# the utf8 master file
-my $file_in="./firstnames.UTF8.txt";
-my $file_error_in="./firstname_errors.UTF8.txt";
+# the utf8 master files
+my $file_in_first="./firstnames.UTF8.txt";
+my $file_error_in_first="./firstname_errors.UTF8.txt";
+my $file_in_last="./lastnames.UTF8.txt";
+my $file_error_in_last="./lastname_errors.UTF8.txt";
 
 # target encodings
 my @target_encodings=(
@@ -63,20 +65,36 @@ my @target_encodings=(
 # Program
 ############################################################
 
-# correct names
+# correct firstnames
 foreach my $encoding (@target_encodings){
     # converting the UTF8 file to targets
     my $target_name="./firstnames.".$encoding.".txt";
-    &convert($file_in,$target_name,$encoding);
+    &convert($file_in_first,$target_name,$encoding);
 }
 
-# error names
+# error firstnames
 foreach my $encoding (@target_encodings){
     # converting the UTF8 error file to targets
     my $target_name="./firstname_errors.".$encoding.".txt";
-    &convert($file_error_in,$target_name,$encoding);
+    &convert($file_error_in_first,$target_name,$encoding);
 }
 
+
+
+
+# correct lastnames
+foreach my $encoding (@target_encodings){
+    # converting the UTF8 file to targets
+    my $target_name="./lastnames.".$encoding.".txt";
+    &convert($file_in_last,$target_name,$encoding);
+}
+
+# error lastnames
+foreach my $encoding (@target_encodings){
+    # converting the UTF8 error file to targets
+    my $target_name="./lastname_errors.".$encoding.".txt";
+    &convert($file_error_in_last,$target_name,$encoding);
+}
 
 
 ############################################################
@@ -89,6 +107,9 @@ foreach my $encoding (@target_encodings){
 # target_encoding
 sub convert {
     my ($in,$out,$enc) = @_;
+    print "###################################################\n";
+    print "Convert: $in --> $out\n";
+	print "###################################################\n";
     open(IN, "$in") || die "Fehler: $! $in nicht gefunden!"; 
     open(OUT, ">$out") || die "Fehler: $! $in nicht gefunden!"; 
     while (<IN>){
