@@ -1890,7 +1890,7 @@ sub analyze_encoding {
     $encoding_check_results{$file}{'firstnames'}{'count_errors'}{'none'}=0;
     $encoding_check_results{$file}{'lastnames'}{'count_hits'}{'none'}=0;
     $encoding_check_results{$file}{'lastnames'}{'count_errors'}{'none'}=0;
-    $encoding_check_results{$file}{'firstnames'}{'result'}="unknown";
+    $encoding_check_results{$file}{'names'}{'result'}="unknown";
 
     # start to analyze file_tmp
     &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
@@ -2039,16 +2039,16 @@ sub analyze_encoding {
 	    $encoding_check_results{$file}{'lastnames'}{'count_errors'}{$enc};
         $encoding_check_results{$file}{'firstnames'}{'count_sum'}{$enc}=$sum;
         if($sum > $oldsum){
-            $encoding_check_results{$file}{'firstnames'}{'result'}=$enc;
+            $encoding_check_results{$file}{'names'}{'result'}=$enc;
         }
     }
     # save result in config hash
     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
-        $encoding_check_results{$file}{'firstnames'}{'result'};
+        $encoding_check_results{$file}{'names'}{'result'};
     if($Conf::log_level>=2){
-        print "$file_tmp --> $encoding_check_results{$file}{'firstnames'}{'result'}\n";
+        print "$file_tmp --> $encoding_check_results{$file}{'names'}{'result'}\n";
     }
-    return $encoding_check_results{$file}{'firstnames'}{'result'};
+    return $encoding_check_results{$file}{'names'}{'result'};
 }
 
 
@@ -2061,7 +2061,7 @@ sub print_analyzed_encoding {
     # print valid firstnames
     if($Conf::log_level>=2){
     print "\nValid firstnames: ",
-          "($encoding_check_results{$file}{'firstnames'}{'result'} ---> utf8)\n";
+          "($encoding_check_results{$file}{'names'}{'result'} ---> utf8)\n";
     print "==========================================================================\n";
     foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} } ){
         printf  "%-20s %-12s %-20s\n",
@@ -2089,7 +2089,7 @@ sub print_analyzed_encoding {
         printf  "| %-15s%-60s|\n",
                 $item->{first_utf8},
                 $item->{line};
-        my $enc_result=$encoding_check_results{$file}{'firstnames'}{'result'};
+        my $enc_result=$encoding_check_results{$file}{'names'}{'result'};
         printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
         print "+---------------------------------------------------------------------------+\n";
     }
@@ -2109,9 +2109,9 @@ sub print_analyzed_encoding {
     print "+---------------------------------------------------------------------------+\n";
     foreach my $item ( @{ $encoding_check_results{$file}{'lastnames'}{'data_errors'} } ){
         printf  "| %-15s%-60s|\n",
-                $item->{lst_utf8},
+                $item->{last_utf8},
                 $item->{line};
-        my $enc_result=$encoding_check_results{$file}{'lastnames'}{'result'};
+        my $enc_result=$encoding_check_results{$file}{'names'}{'result'};
         printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
         print "+---------------------------------------------------------------------------+\n";
     }
@@ -2154,7 +2154,7 @@ sub print_analyzed_encoding {
             "-";
     print "+---------------------+--------+--------+--------+--------+--------+\n";
     print "$file:\n",
-          "    File-Encoding is $encoding_check_results{$file}{'firstnames'}{'result'}\n"; 
+          "    File-Encoding is $encoding_check_results{$file}{'names'}{'result'}\n"; 
     print "\n";
     close(DATAFILE);
 }
