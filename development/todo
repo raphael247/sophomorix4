@@ -136,11 +136,53 @@ sophomorix.nochange nicht mit admins???
 
 Exam modus:
 
+
+------------------------------------------------------------
 sophomorix-exam-mode -i:
-sinnvolles ordnen, evtl. session berücksichtigen
+sinnvolles ordnen, evtl. session berücksich
+
+
+Exam: Jeder Schritt in sophomorix.ini konfigurierbar
+
+Abfolge Zusatzaccount anlegen:
+  * update <login>-Account
+     * Nur wenn noch nicht gelockt
+     * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login>
+     * <login> disablen
+  * neuer Account erstellen
+    * option <login>
+    * neue sub (performant)
+    * <login>-exam
+    * in OU=ExamAccount in Schule
+    * sophomorixRole: examuser
+    * keine Gruppenmitgliedschaft
+    * Account
+  * Home erstellen
+    * spezielle ACL drüber (ähnlich Schüler)
+    * kein Tausch
+  * managementgruppen-Mitgliedschaften setzen (zuerst alle leer?)
+  * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login> ersetzen
+    mit finalem Inhalt
+
+
+Einsammeln (innerhalb der Schule rename):
+   * von userlisten nach supervisor
+   * wie???
+
+Abfolge Zusatzaccount entfernen:
+   * Home löschen
+   * Account <login>-exam löschen (oder aufbewahren)
+   * Account <login> wieder enablen
+
+
+? sophomorix-examMode bei <login>-exam
+------------------------------------------------------------
+
+
 
 Abfolge:
-  * Prüfling zwangsausloggen(testen ob ausgeloggt
+  * Schuko Warnung, dass ausgeloggt wird, Anzeige wer eingeloggt
+  * Prüfling zwangsausloggen(testen ob ausgeloggt)
   * Prüfling aus allen Gruppen austragen
     (wie ist das, wenn sein Klasse mitglied in einem Projekt ist?)
     --> konfigurierbar, welche das sind?
