@@ -1388,7 +1388,49 @@ sub AD_user_create {
     ######################################################################
     # memberships of created user
     ######################################################################
-    if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+    if ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
+        #######################################################
+        # global binduser
+        #######################################################
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'binduser.global'}{'MANMEMBEROF'});
+        foreach my $mangroup (@manmember){
+            &AD_group_addmember_management({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $mangroup,
+                                            addmember => $login,
+                                           }); 
+        }
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'binduser.global'}{'MEMBEROF'});
+        foreach my $group (@member){
+            &AD_group_addmember({ldap => $ldap,
+                                  root_dse => $root_dse, 
+                                  group => $group,
+                                  addmember => $login,
+                                });
+        }
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
+        #######################################################
+        # school binduser
+        #######################################################
+        my @manmember=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'binduser.school'}{'MANMEMBEROF'});
+        foreach my $mangroup (@manmember){
+            $mangroup=&Sophomorix::SophomorixBase::replace_vars($mangroup,$ref_sophomorix_config,$school);
+            &AD_group_addmember_management({ldap => $ldap,
+                                            root_dse => $root_dse, 
+                                            group => $mangroup,
+                                            addmember => $login,
+                                           }); 
+        }
+        my @member=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'INI'}{'binduser.school'}{'MEMBEROF'});
+        foreach my $group (@member){
+            $group=&Sophomorix::SophomorixBase::replace_vars($group,$ref_sophomorix_config,$school);
+            &AD_group_addmember({ldap => $ldap,
+                                 root_dse => $root_dse, 
+                                 group => $group,
+                                 addmember => $login,
+                               });
+        }
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         #######################################################
         # global administrator
         #######################################################
