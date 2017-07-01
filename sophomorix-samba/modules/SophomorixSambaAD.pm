@@ -1256,6 +1256,14 @@ sub AD_user_create {
         $class_ou=$ref_sophomorix_config->{'INI'}{'administrator.school'}{'SUB_OU'};
         $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
 	$dn="cn=".$login.",".$dn_class;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
+        $class_ou=$ref_sophomorix_config->{'INI'}{'binduser.global'}{'SUB_OU'};
+        $dn_class=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{ADMINS}{OU};
+        $dn="cn=".$login.",".$dn_class;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
+        $class_ou=$ref_sophomorix_config->{'INI'}{'binduser.school'}{'SUB_OU'};
+        $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
+	$dn="cn=".$login.",".$dn_class;
     } else {
         # from file
         $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};

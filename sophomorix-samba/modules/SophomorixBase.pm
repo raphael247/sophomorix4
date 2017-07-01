@@ -1715,6 +1715,14 @@ sub get_homedirectory {
         $smb_rel_path="management/".$user;
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
+        $smb_rel_path="management/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
+        $smb_rel_path="management/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
     } else {
         $smb_rel_path="unknown/".$group_basename."/homes/".$user;
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\unknown\\".$group_basename."\\homes\\".$user;
