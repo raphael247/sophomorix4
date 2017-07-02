@@ -1180,7 +1180,7 @@ sub AD_user_unset_exam_mode {
                    });
 }
 
-
+ 
 
 sub AD_user_create {
     my ($arg_ref) = @_;
@@ -1212,6 +1212,8 @@ sub AD_user_create {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
+    print "HERE: $group $group_basename\n";
+
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
           "Creating user $user_count : $login (start)");
@@ -1231,6 +1233,9 @@ sub AD_user_create {
         $deactivationdate=$DevelConf::default_date;
     }
     $school=&AD_get_schoolname($school);
+
+    $group=&Sophomorix::SophomorixBase::replace_vars($group,$ref_sophomorix_config,$school);
+    $group_basename=&Sophomorix::SophomorixBase::replace_vars($group_basename,$ref_sophomorix_config,$school);
 
     # calculate
     my $shell="/bin/false";

@@ -392,7 +392,10 @@ if ($create_school_binduser ne "" and $school ne "" and $password ne ""){
     }
 
     my $group_token;
-    if ($school eq $DevelConf::name_default_school){
+    if (exists $sophomorix_config{'INI'}{'binduser.school'}{'GROUPNAME'}){
+        # if a group ist given
+        $group_token=$sophomorix_config{'INI'}{'binduser.school'}{'GROUPNAME'};
+    } elsif ($school eq $DevelConf::name_default_school){
         $group_token=$sophomorix_config{'INI'}{'binduser.school'}{'GROUPBASENAME'};
     } else {
         $group_token=$school."-".

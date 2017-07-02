@@ -558,6 +558,7 @@ sub replace_vars {
     my ($string,$ref_sophomorix_config,$school)=@_;
     my $replacement=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'};
     $string=~s/\@\@SCHOOLPREFIX\@\@/$replacement/g; 
+    $string=~s/\@\@SCHOOLNAME\@\@/$school/g; 
     return $string;
 }
 

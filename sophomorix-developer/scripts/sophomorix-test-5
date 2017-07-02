@@ -483,7 +483,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/bsz/management/binduser-bsz-66",
                    sn=>"Binduser",
                    userPrincipalName => "binduser-bsz-66@".$root_dns,
-                   sophomorixAdminClass => "bsz-AD_RO_auth",
+#                   sophomorixAdminClass => "bsz-AD_RO_auth",
+                   sophomorixAdminClass => "bsz",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "bsz",
@@ -500,20 +501,35 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "bsz-AD_RO_auth",
+#                   memberOf => "bsz-AD_RO_auth",
+                   memberOf => "bsz",
                   });
     ##### Testing the users group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=bsz-AD_RO_auth,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+    #                sAMAccountname=>"bsz-AD_RO_auth",
+    #                gidNumber=>"-1",
+    #                sophomorixCreationDate => "exists",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"roauth",
+    #                sophomorixHidden=>"FALSE",
+    #                sophomorixSchoolname => "bsz",
+    #                memberOf => "",
+    #                member => "binduser-bsz-66",
+    #               });
+    # group <schoolname>
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz-AD_RO_auth,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"bsz-AD_RO_auth",
+                   dn=>"CN=bsz,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"roauth",
+                   sophomorixType=>"school",
                    sophomorixHidden=>"FALSE",
+                   sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "",
-                   member => "binduser-bsz-66",
+                   memberOf => "SCHOOLS",
+                   member => "binduser-bsz-66|bsz-teachers|bsz-students|bsz-admins",
                   });
 
 
@@ -531,7 +547,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/abc/management/binduser-abc-666",
                    sn=>"Binduser",
                    userPrincipalName => "binduser-abc-666@".$root_dns,
-                   sophomorixAdminClass => "abc-AD_RO_auth",
+#                   sophomorixAdminClass => "abc-AD_RO_auth",
+                   sophomorixAdminClass => "abc",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "abc",
@@ -548,20 +565,35 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "abc-AD_RO_auth",
+#                   memberOf => "abc-AD_RO_auth",
+                   memberOf => "abc",
                   });
     ##### Testing the users group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=abc-AD_RO_auth,OU=Management,OU=abc,OU=SCHOOLS,".$root_dse,
+    #                sAMAccountname=>"abc-AD_RO_auth",
+    #                gidNumber=>"-1",
+    #                sophomorixCreationDate => "exists",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"roauth",
+    #                sophomorixHidden=>"FALSE",
+    #                sophomorixSchoolname => "abc",
+    #                memberOf => "",
+    #                member => "binduser-abc-666",
+    #               });
+    # group <schoolname>
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=abc-AD_RO_auth,OU=Management,OU=abc,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"abc-AD_RO_auth",
+                   dn=>"CN=abc,OU=abc,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"abc",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"roauth",
+                   sophomorixType=>"school",
                    sophomorixHidden=>"FALSE",
+                   sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "abc",
-                   memberOf => "",
-                   member => "binduser-abc-666",
+                   memberOf => "SCHOOLS",
+                   member => "binduser-abc-666|abc-teachers|abc-students|abc-admins",
                   });
 
 
@@ -579,7 +611,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/default-school/management/binduser-66",
                    sn=>"Binduser",
                    userPrincipalName => "binduser-66@".$root_dns,
-                   sophomorixAdminClass => "AD_RO_auth",
+#                   sophomorixAdminClass => "AD_RO_auth",
+                   sophomorixAdminClass => "default-school",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "default-school",
@@ -596,7 +629,8 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "AD_RO_auth",
+#                   memberOf => "AD_RO_auth",
+                   memberOf => "default-school",
                   });
     # binduser-666
     &AD_test_object({ldap=>$ldap,
@@ -612,7 +646,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/default-school/management/binduser-666",
                    sn=>"Binduser",
                    userPrincipalName => "binduser-666@".$root_dns,
-                   sophomorixAdminClass => "AD_RO_auth",
+#                   sophomorixAdminClass => "AD_RO_auth",
+                   sophomorixAdminClass => "default-school",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "default-school",
@@ -629,21 +664,38 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "AD_RO_auth",
+#                   memberOf => "AD_RO_auth",
+                   memberOf => "default-school",
                   });
-    ##### Testing the users group
+    # ##### Testing the users group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=AD_RO_auth,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+    #                sAMAccountname=>"AD_RO_auth",
+    #                gidNumber=>"-1",
+    #                sophomorixCreationDate => "exists",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"roauth",
+    #                sophomorixHidden=>"FALSE",
+    #                sophomorixSchoolname => "default-school",
+    #                memberOf => "",
+    #                member => "binduser-66|binduser-666",
+    #               });
+    # group <schoolname>
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=AD_RO_auth,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"AD_RO_auth",
+                   dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"default-school",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"roauth",
+                   sophomorixType=>"school",
                    sophomorixHidden=>"FALSE",
+                   sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "",
-                   member => "binduser-66|binduser-666",
+                   memberOf => "SCHOOLS",
+                   member => "binduser-66|binduser-666|teachers|students|admins",
                   });
+
+
 
     # ##### Testing the users group
     # &AD_test_object({ldap=>$ldap,
@@ -673,7 +725,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/global/management/global-binduser-66",
                    sn=>"Binduser",
                    userPrincipalName => "global-binduser-66@".$root_dns,
-                   sophomorixAdminClass => "global-AD_RO_auth",
+#                   sophomorixAdminClass => "global-AD_RO_auth",
+                   sophomorixAdminClass => "SCHOOLS",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Global",
@@ -690,7 +743,8 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "global-AD_RO_auth",
+#                   memberOf => "global-AD_RO_auth",
+                   memberOf => "SCHOOLS",
                   });
     # global-binduser-666
     &AD_test_object({ldap=>$ldap,
@@ -706,7 +760,8 @@ if ($test_add_admin==1){
                    unixHomeDirectory=>"/srv/samba/schools/global/management/global-binduser-666",
                    sn=>"Binduser",
                    userPrincipalName => "global-binduser-666@".$root_dns,
-                   sophomorixAdminClass => "global-AD_RO_auth",
+ #                  sophomorixAdminClass => "global-AD_RO_auth",
+                   sophomorixAdminClass => "SCHOOLS",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Global",
@@ -723,21 +778,39 @@ if ($test_add_admin==1){
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
-                   memberOf => "global-AD_RO_auth",
+#                   memberOf => "global-AD_RO_auth",
+                   memberOf => "SCHOOLS",
                   });
     ##### Testing the users group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=global-AD_RO_auth,OU=Management,OU=GLOBAL,".$root_dse,
+    #                sAMAccountname=>"global-AD_RO_auth",
+    #                gidNumber=>"-1",
+    #                sophomorixCreationDate => "exists",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"globalroauth",
+    #                sophomorixHidden=>"FALSE",
+    #                sophomorixSchoolname => "global",
+    #                memberOf => "",
+    #                member => "global-binduser-66|global-binduser-666",
+    #               });
+
+    # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=global-AD_RO_auth,OU=Management,OU=GLOBAL,".$root_dse,
-                   sAMAccountname=>"global-AD_RO_auth",
+                   dn=>"CN=SCHOOLS,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"SCHOOLS",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
-                   sophomorixType=>"globalroauth",
+                   sophomorixType=>"allschool",
                    sophomorixHidden=>"FALSE",
-                   sophomorixSchoolname => "global",
+                   sophomorixJoinable=>"FALSE",
+                   sophomorixSchoolname => "SCHOOLS",
                    memberOf => "",
-                   member => "global-binduser-66|global-binduser-666",
+                   member => "global-binduser-66|global-binduser-666|bsz|abc|default-school",
                   });
+
+
 
     ############################################################
     # fs test
