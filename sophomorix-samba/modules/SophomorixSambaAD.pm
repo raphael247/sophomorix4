@@ -1543,6 +1543,12 @@ sub AD_user_create {
                                sophomorix_config=>$ref_sophomorix_config,
                                sophomorix_result=>$ref_sophomorix_result,
                              });
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
+        # no home
+        &Sophomorix::SophomorixBase::print_title("NOT creating HOME: $login (sophomorixRole $role)");
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
+        # no home
+        &Sophomorix::SophomorixBase::print_title("NOT creating HOME: $login (sophomorixRole $role)");
     } elsif ($role eq "teacher"){
         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
             &AD_repdir_using_file({root_dns=>$root_dns,
@@ -4422,18 +4428,18 @@ sub AD_admin_list {
                                ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user sophomorix administrators found in AD");
-    print "+--------------------+-------------------------+---------------------+----------------+\n";
-    printf "| %-18s | %-23s | %-19s | %-14s |\n","administrator","displayName","sophomorixRole","School";
-    print "+--------------------+-------------------------+---------------------+----------------+\n";
+    print "+---------------------+-------------------------+---------------------+----------------+\n";
+    printf "| %-19s | %-23s | %-19s | %-14s |\n","administrator","displayName","sophomorixRole","School";
+    print "+---------------------+-------------------------+---------------------+----------------+\n";
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $school=$entry->get_value('sophomorixSchoolname');
         my $role=$entry->get_value('sophomorixRole');
         my $displayname=$entry->get_value('displayname');
-        printf "| %-18s | %-23s | %-19s | %-14s |\n",$sam,$displayname,$role,$school;
+        printf "| %-19s | %-23s | %-19s | %-14s |\n",$sam,$displayname,$role,$school;
     }
-    print "+--------------------+-------------------------+---------------------+----------------+\n";
+    print "+---------------------+-------------------------+---------------------+----------------+\n";
 }
 
 
