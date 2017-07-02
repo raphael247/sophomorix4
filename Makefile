@@ -309,9 +309,6 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.teachers.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/uni.students.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/uni.teachers.csv-1 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/school.conf-1 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.school.conf-1 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/uni.school.conf-1 $(TESTDATA)
 
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/devices.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/classrooms-1 $(TESTDATA)
