@@ -33,15 +33,17 @@ Bindusers:
 Gruppen, die den ldap-Baum lesen (schreiben) können werden mit der Schule angelegt:
    GROUP = @@SCHOOLPREFIX@@AD_RO_auth|roauth|OU=Management
    GROUP = global-AD_RO_auth|globalroauth|OU=Management
+ODER
+   Es sind die schulgruppen <schulname> bzw. SCHOOLS
 
 sophomorix-admin legt dann user an, die in diesen Gruppen sind 
 
 Option für zufallspasswort (Wieviele zeichen?- > sophomorix.ini)
 admin und binduser getrennt
-
+--randompasswd-display
+--randompasswd-save  (in .secret)
 --comment hinzu (für binduser wichtig, bind for Moodle)
    
---> firstpassword leer? prüfen
 sophomorix-admin --binduser <user> 
 bind user anlegen:
   - beliebiger loginname

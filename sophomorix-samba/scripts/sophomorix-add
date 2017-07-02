@@ -80,7 +80,7 @@ my $login_teil_2="";
 my $login_name_to_check="";
 my $login_name_to_check_mod="";
 my $login_check_ok="";
-my $plain_password="";
+my $sophomorix_first_password="";
 my $file="";
 my $class_group="";
 my $school="";
@@ -426,14 +426,14 @@ while(<SOPHOMORIXADD>){
 
     # Klartext-Passwort
     if ($password_wish eq "---") {
-        $plain_password=&get_plain_password(
+        $sophomorix_first_password=&get_plain_password(
                         $role,
                         $file,
                         $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
                         $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGHT'}, # length of random pwd
                         @passwort_zeichen);
     } else {
-        $plain_password=$password_wish;
+        $sophomorix_first_password=$password_wish;
     }
 
     # Abbruch, wenn nicht der richtige loginname angelegt wird
@@ -523,7 +523,7 @@ while(<SOPHOMORIXADD>){
                      firstname_utf8=>$firstname_utf8,
                      surname_utf8=>$surname_utf8,
                      birthdate=>$birthdate,
-                     plain_password=>$plain_password,
+                     sophomorix_first_password=>$sophomorix_first_password,
                      unid=>$unid,
                      uidnumber_wish=>$uidnumber_wish,
                      gidnumber_wish=>$gidnumber_wish,
@@ -546,7 +546,7 @@ while(<SOPHOMORIXADD>){
    #                      $birthdate,
    #                      $class_group,
    #                      $login_check_ok,
-   #                      $plain_password,
+   #                      $sophomorix_first_password,
    #                      $shell,
    #                      "",
    #                      $unid,
@@ -565,7 +565,7 @@ while(<SOPHOMORIXADD>){
 
 
   # 3. set a password
-  #&set_sophomorix_passwd($login_check_ok,$plain_password);
+  #&set_sophomorix_passwd($login_check_ok,$sophomorix_first_password);
 
   # 4. Creating dirs, links for the user
   #&provide_user_files($login_check_ok,$class_group);

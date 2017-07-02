@@ -979,7 +979,7 @@ sub AD_computer_create {
 #                   sophomorixUnid => $unid,
                    sophomorixStatus => "P",
                    sophomorixAdminClass => $room,    
-#                   sophomorixFirstPassword => $plain_password, 
+#                   sophomorixFirstPassword => $sophomorix_first_password, 
 #                   sophomorixFirstnameASCII => $firstname_ascii,
 #                   sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixRole => "computer",
@@ -1197,7 +1197,7 @@ sub AD_user_create {
     my $firstname_utf8 = $arg_ref->{firstname_utf8};
     my $surname_utf8 = $arg_ref->{surname_utf8};
     my $birthdate = $arg_ref->{birthdate};
-    my $plain_password = $arg_ref->{plain_password};
+    my $sophomorix_first_password = $arg_ref->{sophomorix_first_password};
     my $unid = $arg_ref->{unid};
     my $uidnumber_wish = $arg_ref->{uidnumber_wish};
     my $school = $arg_ref->{school};
@@ -1278,12 +1278,12 @@ sub AD_user_create {
     }
 
     # password generation
-    my $uni_password=&_unipwd_from_plainpwd($plain_password);
+    my $uni_password=&_unipwd_from_plainpwd($sophomorix_first_password);
 
     ## build the conversion map from your local character set to Unicode    
     #my $charmap = Unicode::Map8->new('latin1')  or  die;
     ## surround the PW with double quotes and convert it to UTF-16
-    #my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
+    #my $uni_password = $charmap->tou('"'.$sophomorix_first_password.'"')->byteswap()->utf16();
 
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
@@ -1304,6 +1304,19 @@ sub AD_user_create {
         $tolerationdate=$DevelConf::default_date;
     }
 
+    if ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
+        $sophomorix_first_password="---";
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
+        $sophomorix_first_password="---";
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+        $sophomorix_first_password="---";
+    } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+        $sophomorix_first_password="---";
+    } else {
+        # user from a file
+        # keep $sophomorix_first_password
+    }
+
     if($Conf::log_level>=1){
         print "   DN:                 $dn\n";
         print "   DN(Parent):         $dn_class\n";
@@ -1321,7 +1334,7 @@ sub AD_user_create {
         #print "   GECOS:              $gecos\n";
         #print "   Login (to check):   $login_name_to_check\n";
         print "   Login (check OK):   $login\n";
-        print "   Password:           $plain_password\n";
+        print "   Password:           $sophomorix_first_password\n";
         # sophomorix stuff
         print "   Creationdate:       $creationdate\n";
         print "   Tolerationdate:     $tolerationdate\n";
@@ -1367,7 +1380,7 @@ sub AD_user_create {
                    sophomorixStatus => $status,
                    sophomorixAdminClass => $group,    
                    sophomorixAdminFile => $file,    
-                   sophomorixFirstPassword => $plain_password, 
+                   sophomorixFirstPassword => $sophomorix_first_password, 
                    sophomorixFirstnameASCII => $firstname_ascii,
                    sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixBirthdate  => $birthdate,
@@ -1621,7 +1634,7 @@ sub AD_user_update {
     my $user_count = $arg_ref->{user_count};
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword};
-    my $plain_password = $arg_ref->{plain_password};
+    my $sophomorix_first_password = $arg_ref->{sophomorix_first_password};
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
@@ -1707,8 +1720,8 @@ sub AD_user_update {
         $replace{'sophomorixFirstpassword'}=$firstpassword;
         print "   Firstpassword:              $firstpassword\n";
     }
-    if (defined $plain_password){
-        my $uni_password=&_unipwd_from_plainpwd($plain_password);
+    if (defined $sophomorix_first_password){
+        my $uni_password=&_unipwd_from_plainpwd($sophomorix_first_password);
         $replace{'unicodePwd'}=$uni_password;
         print "   unicodePwd:                 **********\n";
     }
@@ -5091,6 +5104,9 @@ sub AD_login_test {
                             );
     my $entry = $mesg->entry(0);
     my $firstpassword = $entry->get_value('sophomorixFirstPassword');
+    if ($firstpassword eq "---"){
+        $firstpassword="Muster!"; # if no password given, try default password (i.e. in tests)
+    }
     my $samaccount = $entry->get_value('sAMAccountName');
     if (not defined $firstpassword){
         return -1;
@@ -5275,12 +5291,12 @@ sub _project_info_prefix {
 
 
 sub _unipwd_from_plainpwd{
-    # create string for unicodePwd in AD from $plain_password 
-    my ($plain_password) = @_;
+    # create string for unicodePwd in AD from $sophomorix_first_password 
+    my ($sophomorix_first_password) = @_;
     # build the conversion map from your local character set to Unicode 
     my $charmap = Unicode::Map8->new('latin1')  or  die;
     # surround the PW with double quotes and convert it to UTF-16
-    my $uni_password = $charmap->tou('"'.$plain_password.'"')->byteswap()->utf16();
+    my $uni_password = $charmap->tou('"'.$sophomorix_first_password.'"')->byteswap()->utf16();
     return $uni_password;
 }
 
