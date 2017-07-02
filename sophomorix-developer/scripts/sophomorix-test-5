@@ -158,6 +158,8 @@ if ($full==1){
 ############################################################
 # --add-admin  
 if ($add_admin==1){
+
+    # admin
     # schooladmin in OU=bsz and OU=abc
     &run_command("sophomorix-admin $all_options --create-school-admin admin-bsz-66 --school bsz --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-school-admin admin-abc-666 --school abc --password 'Muster!'");
@@ -168,6 +170,17 @@ if ($add_admin==1){
     &run_command("sophomorix-admin $all_options --create-global-admin global-admin-66 --password 'Muster!'");
     &run_command("sophomorix-admin $all_options --create-global-admin global-admin-666 --password 'Muster!'");
 
+    # binduser
+    # schoolbinduser in OU=bsz and OU=abc
+    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-bsz-66 --school bsz --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-abc-666 --school abc --password 'Muster!'");
+    # schoolbinduser in OU=default-school
+    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-66 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-666 --school default-school --password 'Muster!'");
+    # globalbinduser in OU=GLOBAL
+    &run_command("sophomorix-admin $all_options --create-global-binduser global-binduser-66 --password 'Muster!'");
+    &run_command("sophomorix-admin $all_options --create-global-binduser global-binduser-666 --password 'Muster!'");
+
 }
 
 ############################################################
@@ -175,7 +188,9 @@ if ($add_admin==1){
 ############################################################
 # --test-add-admin  
 if ($test_add_admin==1){
-    ##### Testing the users
+    ######################################################################
+    # test admins
+    ######################################################################
     # admin-bsz-66
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=admin-bsz-66,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -270,6 +285,7 @@ if ($test_add_admin==1){
                    memberOf => "abc|all-admins",
                    member => "admin-abc-666|global-admins",
                   });
+
 
     # admin-66
     &AD_test_object({ldap=>$ldap,
@@ -370,7 +386,6 @@ if ($test_add_admin==1){
                   });
 
 
-
     # global-admin-66
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-admin-66,OU=Management,OU=GLOBAL,".$root_dse,
@@ -449,6 +464,279 @@ if ($test_add_admin==1){
                    sophomorixSchoolname => "global",
                    memberOf => "admins|bsz-admins|bsz-admins|Domain Admins",
                    member => "global-admin-66|global-admin-666",
+                  });
+
+    ######################################################################
+    # test binduser
+    ######################################################################
+    # binduser-bsz-66
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=binduser-bsz-66,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"bsz Binduser",
+                   givenName=>"bsz",
+                   name=>"binduser-bsz-66",
+                   sAMAccountname=>"binduser-bsz-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\management\\binduser-bsz-66",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/management/binduser-bsz-66",
+                   sn=>"Binduser",
+                   userPrincipalName => "binduser-bsz-66@".$root_dns,
+                   sophomorixAdminClass => "bsz-AD_RO_auth",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "bsz",
+                   sophomorixSurnameASCII  => "Binduser",
+                   sophomorixRole => "schoolbinduser",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "bsz-AD_RO_auth",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-AD_RO_auth,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-AD_RO_auth",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"roauth",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "",
+                   member => "binduser-bsz-66",
+                  });
+
+
+    # binduser-abc-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=binduser-abc-666,OU=Management,OU=abc,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"abc Binduser",
+                   givenName=>"abc",
+                   name=>"binduser-abc-666",
+                   sAMAccountname=>"binduser-abc-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\abc\\management\\binduser-abc-666",
+                   unixHomeDirectory=>"/srv/samba/schools/abc/management/binduser-abc-666",
+                   sn=>"Binduser",
+                   userPrincipalName => "binduser-abc-666@".$root_dns,
+                   sophomorixAdminClass => "abc-AD_RO_auth",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "abc",
+                   sophomorixSurnameASCII  => "Binduser",
+                   sophomorixRole => "schoolbinduser",
+                   sophomorixSchoolPrefix => "abc",
+                   sophomorixSchoolname => "abc",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "abc-AD_RO_auth",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=abc-AD_RO_auth,OU=Management,OU=abc,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"abc-AD_RO_auth",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"roauth",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "abc",
+                   memberOf => "",
+                   member => "binduser-abc-666",
+                  });
+
+
+    # binduser-66
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=binduser-66,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"default-school Binduser",
+                   givenName=>"default-school",
+                   name=>"binduser-66",
+                   sAMAccountname=>"binduser-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\management\\binduser-66",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/management/binduser-66",
+                   sn=>"Binduser",
+                   userPrincipalName => "binduser-66@".$root_dns,
+                   sophomorixAdminClass => "AD_RO_auth",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "default-school",
+                   sophomorixSurnameASCII  => "Binduser",
+                   sophomorixRole => "schoolbinduser",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "AD_RO_auth",
+                  });
+    # binduser-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=binduser-666,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"default-school Binduser",
+                   givenName=>"default-school",
+                   name=>"binduser-666",
+                   sAMAccountname=>"binduser-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\default-school\\management\\binduser-666",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/management/binduser-666",
+                   sn=>"Binduser",
+                   userPrincipalName => "binduser-666@".$root_dns,
+                   sophomorixAdminClass => "AD_RO_auth",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "default-school",
+                   sophomorixSurnameASCII  => "Binduser",
+                   sophomorixRole => "schoolbinduser",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "AD_RO_auth",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=AD_RO_auth,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"AD_RO_auth",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"roauth",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "",
+                   member => "binduser-66|binduser-666",
+                  });
+
+    # ##### Testing the users group
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=all-admins,OU=Management,OU=GLOBAL,".$root_dse,
+    #                sAMAccountname=>"all-admins",
+    #                gidNumber=>"-1",
+    #                sophomorixCreationDate => "exists",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"alladmins",
+    #                sophomorixHidden=>"FALSE",
+    #                sophomorixSchoolname => "global",
+    #                memberOf => "",
+    #                member => "bsz-admins|abc-admins|admins",
+    #               });
+
+    # global-binduser-66
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-binduser-66,OU=Management,OU=GLOBAL,".$root_dse,
+                   #####
+                   displayName=>"Global Binduser",
+                   givenName=>"Global",
+                   name=>"global-binduser-66",
+                   sAMAccountname=>"global-binduser-66",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\linuxmuster-global\\management\\global-binduser-66",
+                   unixHomeDirectory=>"/srv/samba/schools/global/management/global-binduser-66",
+                   sn=>"Binduser",
+                   userPrincipalName => "global-binduser-66@".$root_dns,
+                   sophomorixAdminClass => "global-AD_RO_auth",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Global",
+                   sophomorixSurnameASCII  => "Binduser",
+                   sophomorixRole => "globalbinduser",
+                   sophomorixSchoolPrefix => "global",
+                   sophomorixSchoolname => "global",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "global-AD_RO_auth",
+                  });
+    # global-binduser-666
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-binduser-666,OU=Management,OU=GLOBAL,".$root_dse,
+                   #####
+                   displayName=>"Global Binduser",
+                   givenName=>"Global",
+                   name=>"global-binduser-666",
+                   sAMAccountname=>"global-binduser-666",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\linuxmuster-global\\management\\global-binduser-666",
+                   unixHomeDirectory=>"/srv/samba/schools/global/management/global-binduser-666",
+                   sn=>"Binduser",
+                   userPrincipalName => "global-binduser-666@".$root_dns,
+                   sophomorixAdminClass => "global-AD_RO_auth",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Global",
+                   sophomorixSurnameASCII  => "Binduser",
+                   sophomorixRole => "globalbinduser",
+                   sophomorixSchoolPrefix => "global",
+                   sophomorixSchoolname => "global",
+                   sophomorixAdminFile => "none",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"P",
+                   sophomorixUnid => "---",
+                   userAccountControl => "512",
+                   memberOf => "global-AD_RO_auth",
+                  });
+    ##### Testing the users group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=global-AD_RO_auth,OU=Management,OU=GLOBAL,".$root_dse,
+                   sAMAccountname=>"global-AD_RO_auth",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"globalroauth",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "global",
+                   memberOf => "",
+                   member => "global-binduser-66|global-binduser-666",
                   });
 
     ############################################################
@@ -947,6 +1235,8 @@ if ($test_mod_admin==1){
 ############################################################
 # --kill-admin  
 if ($kill_admin==1){
+
+    # admin
     # schooladmin in OU=bsz und OU=abc
     &run_command("sophomorix-admin $all_options --kill admin-bsz-66");
     &run_command("sophomorix-admin $all_options --kill admin-abc-666");
@@ -956,6 +1246,18 @@ if ($kill_admin==1){
     # globaladmin in OU=GLOBAL
     &run_command("sophomorix-admin $all_options --kill global-admin-66");
     &run_command("sophomorix-admin $all_options --kill global-admin-666");
+
+    # binduser
+    # schoolbinduser in OU=bsz und OU=abc
+    &run_command("sophomorix-admin $all_options --kill binduser-bsz-66");
+    &run_command("sophomorix-admin $all_options --kill binduser-abc-666");
+    # schoolbinduser in OU=default-school
+    &run_command("sophomorix-admin $all_options --kill binduser-66");
+    &run_command("sophomorix-admin $all_options --kill binduser-666");
+    # globalbinduser in OU=GLOBAL
+    &run_command("sophomorix-admin $all_options --kill global-binduser-66");
+    &run_command("sophomorix-admin $all_options --kill global-binduser-666");
+
 }
 
 
@@ -965,11 +1267,22 @@ if ($kill_admin==1){
 ############################################################
 # --test-kill-admin  
 if ($test_kill_admin==1){
-    # users
+
+    # admin
     &AD_object_nonexist($ldap,$root_dse,"user","admin-bsz-66");
     &AD_object_nonexist($ldap,$root_dse,"user","admin-abc-666");
     &AD_object_nonexist($ldap,$root_dse,"user","admin-66");
     &AD_object_nonexist($ldap,$root_dse,"user","admin-666");
+    &AD_object_nonexist($ldap,$root_dse,"user","global-admin-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","global-admin-666");
+
+    # binduser
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-bsz-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-abc-666");
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","admin-666");
+    &AD_object_nonexist($ldap,$root_dse,"user","global-admin-66");
+    &AD_object_nonexist($ldap,$root_dse,"user","global-admin-666");
 
     ############################################################
     # fs test
