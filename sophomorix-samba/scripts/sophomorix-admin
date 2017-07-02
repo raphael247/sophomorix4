@@ -509,7 +509,10 @@ if ($kill ne ""){
         exit;
     }
     if ($role eq $sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'} or
-        $role eq $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'}){
+        $role eq $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'} or
+        $role eq $sophomorix_config{'INI'}{'binduser.global'}{'USER_ROLE'} or
+        $role eq $sophomorix_config{'INI'}{'binduser.school'}{'USER_ROLE'}
+       ){
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
