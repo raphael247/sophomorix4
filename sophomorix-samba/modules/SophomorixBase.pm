@@ -40,6 +40,7 @@ $Data::Dumper::Terse = 1;
             backup_auk_file
             get_passwd_charlist
             get_plain_password
+            create_plain_password
             check_options
             config_sophomorix_read
             result_sophomorix_init
@@ -1639,7 +1640,6 @@ sub get_plain_password {
     my $i;
     if ($role eq "teacher") {
         # Teacher
-#        if ($Conf::teacher_password_random eq "yes") {
         if ( $random eq "yes") {
 	    $password=&create_plain_password($length,@password_chars);
         } else {
@@ -1647,17 +1647,12 @@ sub get_plain_password {
 	}
     } elsif ($role eq "student") {
         # Student
-#        if ($Conf::student_password_random eq "yes") {
         if ($random  eq "yes") {
 	    $password=&create_plain_password($length,@password_chars);
         } else {
             $password=$DevelConf::teacher_password_default;
         }
     }
-#    } elsif ($role eq "examaccount") {
-#        # Exam Account 12 chars to avoid login 
-#        $password=&create_plain_password(12,@password_chars);
-#    }
     return $password;
 }
 

@@ -156,7 +156,7 @@ my $list_files=0;
 my $no_sync=0;
 my $birthdate="1970-01-01";
 my $time_stamp_AD=&time_stamp_AD();
-my @passwort_zeichen=&get_passwd_charlist();
+my @password_chars=&get_passwd_charlist();
 my $sophomorix_first_password="";
 
 # schools that have been created in this script
@@ -1033,7 +1033,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #     my $role="examaccount";
     #     my $school=$devices_file{'device'}{$exam_account}{'SCHOOL'};
     #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
-    #     $sophomorix_first_password=&get_plain_password($role,$file,$random,$length,@passwort_zeichen);
+    #     $sophomorix_first_password=&get_plain_password($role,$file,$random,$length,@password_chars);
     #     if (not exists $school_created{$school}){
     #         # create ou
     #         &AD_school_create({ldap=>$ldap,

@@ -1212,8 +1212,6 @@ sub AD_user_create {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    print "HERE: $group $group_basename\n";
-
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
           "Creating user $user_count : $login (start)");

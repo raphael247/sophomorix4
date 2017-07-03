@@ -38,6 +38,7 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  result_sophomorix_init
                                  result_sophomorix_add
+                                 result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  remove_from_list
@@ -84,7 +85,11 @@ my $create_global_admin="";
 my $create_school_binduser="";
 my $create_global_binduser="";
 my $school="";
+
 my $password="";
+my $random_password_save=0;
+my $random_password_show=0;
+
 my $kill="";
 my $reset_class="";
 $Conf::log_level=1;
@@ -102,7 +107,9 @@ my $testopt=GetOptions(
            "create-school-binduser=s" => \$create_school_binduser,
            "create-global-binduser=s" => \$create_global_binduser,
            "school|s=s" => \$school,
-           "password=s" => \$password,
+           "password|passwd=s" => \$password,
+           "random-passwd-save|random-password-save" => \$random_password_save,
+           "random-passwd-show|random-password-show" => \$random_password_show,
            "kill=s" => \$kill,
           );
 
@@ -133,23 +140,32 @@ Options
   -vv / --verbose --verbose
   -i  / --info
 
+
+
 Administrators:
 
 # create a powerful global-admin:
 sophomorix-admin --create-global-admin <name-of-admin> --password <fdrTfdtti>
+sophomorix-admin --create-global-admin <name-of-admin> --random-passwd-show
+sophomorix-admin --create-global-admin <name-of-admin> --random-passwd-save
 
 # create an school-admin
 sophomorix-admin --create-school-admin <name-of-admin> --school <schoolname> --password <fdrTfdtti>
-
+sophomorix-admin --create-school-admin <name-of-admin> --school <schoolname> --random-passwd-show
+sophomorix-admin --create-school-admin <name-of-admin> --school <schoolname> --random-passwd-save
 
 
 Bind Users to access the samba AD-DIT:
 
 # create a global-binduser:
 sophomorix-admin --create-global-binduser <name-of-binduser> --password <fdrTfdtti>
+sophomorix-admin --create-global-binduser <name-of-binduser> --random-passwd-show
+sophomorix-admin --create-global-binduser <name-of-binduser> --random-passwd-save
 
 # create an school-binduser:
 sophomorix-admin --create-school-binduser <name-of-binduser> --school <schoolname> --password <fdrTfdtti>
+sophomorix-admin --create-school-binduser <name-of-binduser> --school <schoolname> --random-passwd-show
+sophomorix-admin --create-school-binduser <name-of-binduser> --school <schoolname> --random-passwd-save
 
 
 
@@ -167,6 +183,7 @@ Please see the sophomorix--admin(8) man pages for full documentation
 # --info
 if ($info==1){
     &AD_admin_list($ldap,$root_dse,\%sophomorix_config);
+    exit;
 }
 
 
@@ -179,6 +196,29 @@ if ($info==1){
 ############################################################
 # Test if options are mixed correctly
 ############################################################
+
+# passwd option
+my $pwd_option_count=0;
+if ($password ne ""){
+    $pwd_option_count++;
+}
+if ($random_password_save==1){
+    $pwd_option_count++;
+}
+if ($random_password_show==1){
+    $pwd_option_count++;
+}
+
+if ($kill ne ""){
+    # ok without password
+} elsif ($pwd_option_count>1){
+    print "\nERROR: Only one password option is allowed\n\n";
+    exit;
+} elsif ($pwd_option_count==0){
+    print "\nERROR: A password option is needed\n\n";
+    exit;
+} 
+
 # avoid double create
 my $create_count=0;
 
@@ -266,7 +306,7 @@ if ($create_count>1){
 
 # admins
 # --create-school-admin <user>
-if ($create_school_admin ne "" and $school ne "" and $password ne ""){
+if ($create_school_admin ne "" and $school ne ""){
     # test if school exists
     if (exists $sophomorix_config{'SCHOOLS'}{$school}){
         # is ok
@@ -296,6 +336,8 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
                        sophomorix_result=>\%sophomorix_result,
                      });
 
+    $password=&choose_password($password,$random_password_save,$random_password_show);
+  
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
                     root_dns => $root_dns, 
@@ -322,8 +364,8 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
-} elsif ($create_school_admin ne "" and ($school eq "" or $password eq "")){
-    print "\nERROR: A password is needed to create the admin $create_school_admin\n\n";
+} elsif ($create_school_admin ne "" and $school eq ""){
+    print "\nERROR: Option --school <school> is needed to create the admin $create_school_admin\n\n";
     exit;
 } 
 
@@ -331,7 +373,7 @@ if ($create_school_admin ne "" and $school ne "" and $password ne ""){
 
 
 # --create-global-admin <user>
-if ($create_global_admin ne "" and $password ne ""){
+if ($create_global_admin){
     $school=$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
     my $group_token=$sophomorix_config{'INI'}{'administrator.global'}{'GROUPPREFIX'}.
 	             $sophomorix_config{'INI'}{'administrator.global'}{'GROUPBASENAME'};
@@ -345,6 +387,8 @@ if ($create_global_admin ne "" and $password ne ""){
                        sophomorix_config=>\%sophomorix_config,
                        sophomorix_result=>\%sophomorix_result,
                      });
+
+    $password=&choose_password($password,$random_password_save,$random_password_show);
 
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -372,16 +416,13 @@ if ($create_global_admin ne "" and $password ne ""){
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
-} elsif ($create_global_admin ne "" and $password eq ""){
-    print "\nERROR: A password is needed to create the admin $create_global_admin\n\n";
-    exit;
-} 
+}
 
 
 
 # bindusers
 # --create-school-binduser <user>
-if ($create_school_binduser ne "" and $school ne "" and $password ne ""){
+if ($create_school_binduser ne "" and $school ne ""){
     # test if school exists
     if (exists $sophomorix_config{'SCHOOLS'}{$school}){
         # is ok
@@ -414,6 +455,8 @@ if ($create_school_binduser ne "" and $school ne "" and $password ne ""){
                        sophomorix_result=>\%sophomorix_result,
                      });
 
+    $password=&choose_password($password,$random_password_save,$random_password_show);
+
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
                     root_dns => $root_dns, 
@@ -440,8 +483,8 @@ if ($create_school_binduser ne "" and $school ne "" and $password ne ""){
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
-} elsif ($create_school_binduser ne "" and ($school eq "" or $password eq "")){
-    print "\nERROR: A password is needed to create the binduser $create_school_binduser\n\n";
+} elsif ($create_school_binduser ne "" and $school eq ""){
+    print "\nERROR: Option --school <school> is needed to create the binduser $create_school_binduser\n\n";
     exit;
 } 
 
@@ -449,7 +492,7 @@ if ($create_school_binduser ne "" and $school ne "" and $password ne ""){
 
 
 # --create-global-binduser <user>
-if ($create_global_binduser ne "" and $password ne ""){
+if ($create_global_binduser ne ""){
     $school=$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
     my $group_token=$sophomorix_config{'INI'}{'binduser.global'}{'GROUPPREFIX'}.
 	             $sophomorix_config{'INI'}{'binduser.global'}{'GROUPBASENAME'};
@@ -463,6 +506,8 @@ if ($create_global_binduser ne "" and $password ne ""){
                        sophomorix_config=>\%sophomorix_config,
                        sophomorix_result=>\%sophomorix_result,
                      });
+
+    $password=&choose_password($password,$random_password_save,$random_password_show);
 
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -490,9 +535,6 @@ if ($create_global_binduser ne "" and $password ne ""){
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
-} elsif ($create_global_binduser ne "" and $password eq ""){
-    print "\nERROR: A password is needed to create the binduser $create_global_binduser\n\n";
-    exit;
 } 
 
 
@@ -553,4 +595,35 @@ sub print_valid_schools{
     foreach my $file (@list){
         print "      * $file\n";
     }
+}
+
+sub choose_password {
+    my ($password,$random_password_save,$random_password_show) = @_;
+    if ($random_password_save==1){
+        my @password_chars=&get_passwd_charlist();
+        $password=&Sophomorix::SophomorixBase::create_plain_password(
+            $sophomorix_config{'INI'}{'administrator.school'}{'RANDOM_PWD_LENGTH'},
+            @password_chars);
+        my $mkdir=$sophomorix_config{'INI'}{'PATHS'}{'SECRET_PWD'};
+        system("mkdir -p $mkdir");
+        my $pwd_file=$sophomorix_config{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$create_school_admin;
+        open(SECRET, ">$pwd_file") || die "ERROR: $!";
+        print SECRET $password;
+        close(SECRET);
+    } elsif ($random_password_show==1){
+        my @password_chars=&get_passwd_charlist();
+        $password=&Sophomorix::SophomorixBase::create_plain_password(
+            $sophomorix_config{'INI'}{'administrator.school'}{'RANDOM_PWD_LENGTH'},
+            @password_chars);
+        &result_sophomorix_add_summary({
+                     NAME=>"ADD", 
+                     RESULT=>$password, 
+                     RESULT_TYPE => "string",
+                     DESCRIPTION_POST => " is the password of the user ".$create_school_admin, 
+                     DESCRIPTION_PRE => "Password of user ".$create_school_admin." is:", 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+    }
+    return $password;
 }

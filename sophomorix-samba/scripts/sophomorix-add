@@ -316,7 +316,7 @@ if($Conf::log_level>=2){
 # sophomorix.add mitloggen
 &backup_auk_file($time_stamp_file,"add","before",\%sophomorix_config);
 
-my @passwort_zeichen=&get_passwd_charlist();
+my @password_chars=&get_passwd_charlist();
 
 # ?????????????? more to forbid
 %forbidden_login_hash=&get_forbidden_logins($ldap,$root_dse);
@@ -431,7 +431,7 @@ while(<SOPHOMORIXADD>){
                         $file,
                         $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
                         $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
-                        @passwort_zeichen);
+                        @password_chars);
     } else {
         $sophomorix_first_password=$password_wish;
     }
