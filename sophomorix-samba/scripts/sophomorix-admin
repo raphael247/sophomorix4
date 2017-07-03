@@ -336,7 +336,7 @@ if ($create_school_admin ne "" and $school ne ""){
                        sophomorix_result=>\%sophomorix_result,
                      });
 
-    $password=&choose_password($password,$random_password_save,$random_password_show);
+    $password=&choose_password("administrator.school",$password,$random_password_save,$random_password_show);
   
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -388,7 +388,7 @@ if ($create_global_admin){
                        sophomorix_result=>\%sophomorix_result,
                      });
 
-    $password=&choose_password($password,$random_password_save,$random_password_show);
+    $password=&choose_password("administrator.global",$password,$random_password_save,$random_password_show);
 
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -455,7 +455,7 @@ if ($create_school_binduser ne "" and $school ne ""){
                        sophomorix_result=>\%sophomorix_result,
                      });
 
-    $password=&choose_password($password,$random_password_save,$random_password_show);
+    $password=&choose_password("binduser.school",$password,$random_password_save,$random_password_show);
 
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -507,7 +507,7 @@ if ($create_global_binduser ne ""){
                        sophomorix_result=>\%sophomorix_result,
                      });
 
-    $password=&choose_password($password,$random_password_save,$random_password_show);
+    $password=&choose_password("binduser.global",$password,$random_password_save,$random_password_show);
 
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
@@ -597,12 +597,13 @@ sub print_valid_schools{
     }
 }
 
+
 sub choose_password {
-    my ($password,$random_password_save,$random_password_show) = @_;
+    my ($user,$password,$random_password_save,$random_password_show) = @_;
     if ($random_password_save==1){
         my @password_chars=&get_passwd_charlist();
         $password=&Sophomorix::SophomorixBase::create_plain_password(
-            $sophomorix_config{'INI'}{'administrator.school'}{'RANDOM_PWD_LENGTH'},
+            $sophomorix_config{'INI'}{$user}{'RANDOM_PWD_LENGTH'},
             @password_chars);
         my $mkdir=$sophomorix_config{'INI'}{'PATHS'}{'SECRET_PWD'};
         system("mkdir -p $mkdir");
@@ -613,7 +614,7 @@ sub choose_password {
     } elsif ($random_password_show==1){
         my @password_chars=&get_passwd_charlist();
         $password=&Sophomorix::SophomorixBase::create_plain_password(
-            $sophomorix_config{'INI'}{'administrator.school'}{'RANDOM_PWD_LENGTH'},
+            $sophomorix_config{'INI'}{$user}{'RANDOM_PWD_LENGTH'},
             @password_chars);
         &result_sophomorix_add_summary({
                      NAME=>"ADD", 

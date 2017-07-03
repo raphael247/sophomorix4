@@ -15,6 +15,20 @@ script starten mit parameterkombination, die zum abbruch führen soll
                            "ERROR: A password option is needed");
   -> eigentlich sollte das run_command machen
 
+Weitere tests:
+
+start_user_test
+end_user_test
+(dito mit group, oder zusammen als start_object_test)
+-> mitloggen, welche user/gruppengetestet wurden
+--> user/group exists, but not tested
+
+
+testen: random Password length aus sophomorix.ini
+--> wird die umgesetzt
+--> neue sub in test: wc --chars /abs/path/.secret
+
+
 Problem:
 sophomorix-repair erzeugt viele Fehler, wenn schulen konfiguriert,
   aber die Schule noch nicht angelegt ist
