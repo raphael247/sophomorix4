@@ -10,10 +10,10 @@ SophomorixTest.pm:
 script starten mit parameterkombination, die zum abbruch führen soll
   BSP: sophomorix-admin --create-* ohne password option
   RESULT JSON anschauen und nach der passenden Fehlermeldung suchen
+
   &run_command_verify_exit("sophomorix-admin --create-global-binduser global-binduser-666 --password",
                            "ERROR: A password option is needed");
-
-
+  -> eigentlich sollte das run_command machen
 
 Problem:
 sophomorix-repair erzeugt viele Fehler, wenn schulen konfiguriert,
