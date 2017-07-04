@@ -187,8 +187,21 @@ sinnvolles ordnen, evtl. session berücksich
 
 Exam: Jeder Schritt in sophomorix.ini konfigurierbar
 
+[exammode]
+	TESTLOCK=TRUE
+	TESTOTHEREXAM=TRUE
+	DISABLE_FIRST=TRUE
+	LOGINAME=postfix
+	CREATE_DISABLED=TRUE
+	PASSWORD=random
+	managementgroup = ......
+	REMOVELOCK=TRUE
+	DISABLE_LOGIN=TRUE
+	ENABLE_LOGIN_EXAM=TRUE
+
 Abfolge Zusatzaccount anlegen:
   * update <login>-Account
+     * Nur wenn kein anderer schon exam mode nutzt
      * Nur wenn noch nicht gelockt (von anderem)
      * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login>
      * <login> disablen
@@ -201,6 +214,7 @@ Abfolge Zusatzaccount anlegen:
         - <login>-session-id
         - <login>-short-session-id + ka vorbereitbar
         - <rechnername>
+     * disabled anlegen
      * Passwort:
         * am besten wie <login> -> testen ob das geht
         * ansonsten: Passwort setzen (muss komplex genug sein)
@@ -214,6 +228,10 @@ Abfolge Zusatzaccount anlegen:
         * je nach Haken (zuerst alle leer?)
      * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login> ersetzen
        mit finalem Inhalt
+     * final step
+       * disable <login>
+       * enable <login>-exam
+
 
 * Material teilen:
 
@@ -235,6 +253,10 @@ Abfolge Zusatzaccount entfernen:
 
 sophomorix-examMode bei <login>-exam
 ------------------------------------------------------------
+option --waitstep n seconds: um bei Tests schrittweise verfolgen zu können was passiert.
+
+nach jedem Schritt n Sekunden warten
+
 
 
 
