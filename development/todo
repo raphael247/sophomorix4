@@ -183,7 +183,7 @@ Exam modus:
 sophomorix-exam-mode -i:
 sinnvolles ordnen, evtl. session berücksich
 
---> sophomorix-exam-mod mit einem Aufruf mehrere benutzer in exam-mode setzbar
+--> sophomorix-exam-mode mit einem Aufruf mehrere benutzer in exam-mode setzbar
 
 Exam: Jeder Schritt in sophomorix.ini konfigurierbar
 
@@ -199,15 +199,23 @@ Exam: Jeder Schritt in sophomorix.ini konfigurierbar
 	DISABLE_LOGIN=TRUE
 	ENABLE_LOGIN_EXAM=TRUE
 
+
+KA-Modus in er Session starten
+   -> Abruch:
+      * einer der user ist schon im exam-mode
+      * einer der zu erzeugenden accounts gibts schon
+   (später-> session kopieren, neue benutzer definieren,
+    sodass KA-session Wochen vorher vorbereitet werden kann)
 Abfolge Zusatzaccount anlegen:
   * update <login>-Account
      * Nur wenn kein anderer schon exam mode nutzt
-     * Nur wenn noch nicht gelockt (von anderem)
-     * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login>
-     * <login> disablen
-     * login ist somit nicht mehr benutzbar
+       # nicht mehr: Nur wenn noch nicht gelockt (von anderem)
+       # nicht mehr: LOCK-supervisor-Date-Time in sophomorixExamMode bei <login>
+     * (nicht mehr <login> disablen, doppelanmeldungen verhindern)
+     * Zwangsabmeldung von <login>
 
-* neuer Account erstellen
+  * neuer Account erstellen
+    * Abbruch, wenn es nicht jeder user nicht im 
     * neue sub mit option (<login>) (performant ohne schulcheck/klassencheck usw.)
      * Loginname des Zusatzaccounts:
         * <login>-exam (unsere Wahl)
@@ -217,11 +225,13 @@ Abfolge Zusatzaccount anlegen:
      * disabled anlegen
      * Passwort:
         * am besten wie <login> -> testen ob das geht
-        * ansonsten: Passwort setzen (muss komplex genug sein)
+        * ansonsten: Passwort setzen (muss komplex genug sein),
+	      --password "Muster!"
      * AD-Ort: OU=Examuser(s) -> Anpassen
      * keine Gruppenmitgliedschaft
      * Home erstellen
-        * srv/samba/schools/<school>/examuser
+        * srv/samba/schools/<school>/examuser(session-ide)
+	* ohne Unterordner
         * spezielle ACL drüber (ähnlich Schüler)
         * kein Tausch
      * managementgruppen-Mitgliedschaften setzen
@@ -242,6 +252,11 @@ Während KA:
      -> ansonsten nachmeldbar
 
 Material holen (innerhalb der Schule rename):
+
+   * srv/samba/schools/<school>/examuser(session-ide)
+     worunter alle homes liegen ins home des Lehrers moven
+     (owner erhalten oder ändern)
+
    * von userlisten nach supervisor
    * wie???
 
