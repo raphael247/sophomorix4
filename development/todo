@@ -183,31 +183,47 @@ Exam modus:
 sophomorix-exam-mode -i:
 sinnvolles ordnen, evtl. session berücksich
 
+--> sophomorix-exam-mod mit einem Aufruf mehrere benutzer in exam-mode setzbar
 
 Exam: Jeder Schritt in sophomorix.ini konfigurierbar
 
 Abfolge Zusatzaccount anlegen:
   * update <login>-Account
-     * Nur wenn noch nicht gelockt
+     * Nur wenn noch nicht gelockt (von anderem)
      * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login>
      * <login> disablen
-  * neuer Account erstellen
-    * option <login>
-    * neue sub (performant)
-    * <login>-exam
-    * in OU=ExamAccount in Schule
-    * sophomorixRole: examuser
-    * keine Gruppenmitgliedschaft
-    * Account
-  * Home erstellen
-    * spezielle ACL drüber (ähnlich Schüler)
-    * kein Tausch
-  * managementgruppen-Mitgliedschaften setzen (zuerst alle leer?)
-  * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login> ersetzen
-    mit finalem Inhalt
+     * login ist somit nicht mehr benutzbar
+
+* neuer Account erstellen
+    * neue sub mit option (<login>) (performant ohne schulcheck/klassencheck usw.)
+     * Loginname des Zusatzaccounts:
+        * <login>-exam (unsere Wahl)
+        - <login>-session-id
+        - <login>-short-session-id + ka vorbereitbar
+        - <rechnername>
+     * Passwort:
+        * am besten wie <login> -> testen ob das geht
+        * ansonsten: Passwort setzen (muss komplex genug sein)
+     * AD-Ort: OU=Examuser(s) -> Anpassen
+     * keine Gruppenmitgliedschaft
+     * Home erstellen
+        * srv/samba/schools/<school>/examuser
+        * spezielle ACL drüber (ähnlich Schüler)
+        * kein Tausch
+     * managementgruppen-Mitgliedschaften setzen
+        * je nach Haken (zuerst alle leer?)
+     * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login> ersetzen
+       mit finalem Inhalt
+
+* Material teilen:
 
 
-Einsammeln (innerhalb der Schule rename):
+Während KA:
+   * wer ist an welchem PC angemeldet
+   * hinzukommende user haben schon einen Account, wenn sie in der session sind
+     -> ansonsten nachmeldbar
+
+Material holen (innerhalb der Schule rename):
    * von userlisten nach supervisor
    * wie???
 
@@ -217,7 +233,7 @@ Abfolge Zusatzaccount entfernen:
    * Account <login> wieder enablen
 
 
-? sophomorix-examMode bei <login>-exam
+sophomorix-examMode bei <login>-exam
 ------------------------------------------------------------
 
 
