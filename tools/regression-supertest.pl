@@ -23,13 +23,14 @@ regression-supertest.pl runs multiple tests
 Options:
   -h  / --help
 
-  -s 1    reset samba and run sophomorix-test-1
-  -s 2    reset samba and run sophomorix-test-2
-  -s 3    reset samba and run sophomorix-test-3
-  -s 4    reset samba and run sophomorix-test-4
-  -s 5    reset samba and run sophomorix-test-5
-  -s w    reset samba and run sophomorix-test-workflow
-  -s e    reset samba and run sophomorix-test-errorfiles
+  -s 1     reset samba and run sophomorix-test-1
+  -s 2     reset samba and run sophomorix-test-2
+  -s 3     reset samba and run sophomorix-test-3
+  -s 4     reset samba and run sophomorix-test-4
+  -s 5     reset samba and run sophomorix-test-5
+  -s w     reset samba and run sophomorix-test-workflow
+  -s er    reset samba and run sophomorix-test-errorfiles
+  -s ex    reset samba and run sophomorix-test-exammode
 
   -o j    run tests with option -j
   -o jj   run tests with option -jj
@@ -59,6 +60,7 @@ if ($script eq "r"){
                  "sophomorix-test-5 $option ", 
                  "sophomorix-test-workflow $option ",
                  "sophomorix-test-errorfiles $option ",
+                 "sophomorix-test-exammode $option ",
                  );
 } elsif ($script eq "1"){
     @scriptlist=("sophomorix-test-1 $option ");
@@ -72,8 +74,10 @@ if ($script eq "r"){
     @scriptlist=("sophomorix-test-5 $option ");
 } elsif ($script eq "w"){
     @scriptlist=("sophomorix-test-workflow $option ");
-} elsif ($script eq "e"){
+} elsif ($script eq "er"){
     @scriptlist=("sophomorix-test-errorfiles $option ");
+} elsif ($script eq "ex"){
+    @scriptlist=("sophomorix-test-exammode $option ");
 }
 
 
