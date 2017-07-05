@@ -87,7 +87,7 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $supervisor="";
-my @participants=();
+my $participants="";
 my $set_exam_mode=0;
 my $unset_exam_mode=0;
 
@@ -104,7 +104,7 @@ my $testopt=GetOptions(
            "supervisor=s" => \$supervisor,
 #           "session|s=s" => \$session,
 #           "comment=s" => \$comment,
-           "participant|m=s" => \@participants,
+           "participants|m=s" => \$participants,
 #           "add-participants=s" => \$add_participants,
 #           "remove-participants=s" => \$remove_participants,
            "set-exam-mode|set" => \$set_exam_mode,
@@ -140,8 +140,8 @@ Options:
   -vv / --verbose --verbose
   -i  / --info
 
-  sophomorix-exam-mode --set --supervisor <supi>  --participant <user1> --participant <user2> ...
-  sophomorix-exam-mode --unset --participant <user1> --participant <user2> ...
+  sophomorix-exam-mode --set --supervisor <supi>  --participants <user1>,<user2>,...
+  sophomorix-exam-mode --unset --participants <user1>,<user2>,...
  
 Please see the sophomorix-exam-mode(8) man pages for full documentation
 ');
@@ -185,7 +185,7 @@ if ($info==1) {
 
 # --set-exam-mode
 if ($set_exam_mode==1){
-    if ($#participants==-1){
+    if ($participants eq ""){
         print "\nERROR: you need to specify at least one participant\n\n";
         exit;
     }
@@ -195,6 +195,7 @@ if ($set_exam_mode==1){
     }
 
     my $user_count=0;
+    my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
        $user_count++;
        &AD_user_set_exam_mode({ldap=>$ldap,
@@ -213,11 +214,12 @@ if ($set_exam_mode==1){
 
 # --unset-exam-mode
 if ($unset_exam_mode==1){
-    if ($#participants==-1){
+    if ($participants eq ""){
         print "\nERROR: you need to specify at least one participant\n\n";
         exit;
     }
     my $user_count=0;
+    my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
        $user_count++;
        &AD_user_unset_exam_mode({ldap=>$ldap,
