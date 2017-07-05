@@ -1,0 +1,242 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-test-exammode) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# Bibliotheken
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 check_options
+                                 time_stamp_AD 
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_user_kill
+                                 AD_dns_get
+                                 AD_object_search
+                                 AD_debug_logdump
+                                 AD_get_name_tokened
+                                    );
+use Sophomorix::SophomorixTest qw(
+                                 AD_object_nonexist
+                                 AD_test_object
+                                 run_command
+                                 directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
+                                 );
+
+$Conf::log_level=1;
+my $help=0;
+my $full=0;
+
+my $add_users=0;
+my $test_add_users=0;
+my $kill_users=0;
+my $test_kill_users=0;
+
+
+
+my $all_options="";
+my $json=0;
+my %fs_test_result=();
+
+
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "full|f" => \$full,
+           "add-users" => \$add_users,
+           "test-add-users" => \$test_add_users,
+           "kill-users" => \$kill_users,
+           "test-kill-users" => \$test_kill_users,
+           "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
+  );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+if ($Conf::log_level==1){
+    $all_options="";
+} elsif ($Conf::log_level==2){
+    $all_options="-v";
+} elsif ($Conf::log_level==3){
+    $all_options="-vv";
+}
+
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+
+my $testdata="/usr/share/sophomorix-developer/testdata";
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-test-exammode tests exams
+
+Options
+  -h  / --help
+
+   Add some users:
+    sophomorix-test-exammode --add-users  
+    sophomorix-test-exammode --test-add-users  
+
+   Kill all users:
+    sophomorix-test-exammode --kill-users  
+    sophomorix-test-exammode --test-kill-users  
+
+');
+   print "\n";
+   exit;
+}
+
+
+
+
+
+############################################################
+# Check preliminaries
+############################################################
+
+# --full
+if ($full==1){
+    $add_users=1;
+    $test_add_users=1;
+    $kill_users=1;
+    $test_kill_users=1;
+}
+
+my $file_add_users=$testdata."/sophomorix.add-exammode";
+my $file_kill_users=$testdata."/sophomorix.kill-exammode";
+my $file_add="/var/lib/sophomorix/check-result/sophomorix.add";
+my $file_kill="/var/lib/sophomorix/check-result/sophomorix.kill";
+
+
+############################################################
+# Add projects
+############################################################
+# --add-users  
+if ($add_users==1){
+    # adding users
+    &run_command("cp -v $file_add_users $file_add");
+    &run_command("sophomorix-add $all_options");
+}
+
+
+
+
+############################################################
+# Kill projects
+############################################################
+# --kill-users  
+if ($kill_users==1){
+    &run_command("cp -v $file_kill_users $file_kill");
+    &run_command("sophomorix-kill -i $all_options");
+    &run_command("sophomorix-kill $all_options");
+
+    # classes
+    &run_command("sophomorix-class --kill --class bsz-m7ab $all_options");
+    &run_command("sophomorix-class --kill --class bsz-m8cd $all_options");
+    &run_command("sophomorix-class --kill --class s6ade $all_options");
+    &run_command("sophomorix-class --kill --class uni-12abc $all_options");
+
+
+}
+
+
+
+
+############################################################
+#  Test killed  users, groups, projects
+############################################################
+# --test-kill-users  
+if ($test_kill_users==1){
+    # users
+    &AD_object_nonexist($ldap,$root_dse,"user","maiersa72");
+    &AD_object_nonexist($ldap,$root_dse,"user","muellegr72");
+    &AD_object_nonexist($ldap,$root_dse,"user","jonsonad72");
+    &AD_object_nonexist($ldap,$root_dse,"user","samardze72");
+    &AD_object_nonexist($ldap,$root_dse,"user","oe72");
+    &AD_object_nonexist($ldap,$root_dse,"user","wu72");
+    &AD_object_nonexist($ldap,$root_dse,"user","lordjo72");
+    &AD_object_nonexist($ldap,$root_dse,"user","blackmri72");
+    &AD_object_nonexist($ldap,$root_dse,"user","kep72");
+    &AD_object_nonexist($ldap,$root_dse,"user","gal72");
+    &AD_object_nonexist($ldap,$root_dse,"user","schneima72");
+    &AD_object_nonexist($ldap,$root_dse,"user","sch72");
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
+                         "/srv/samba/schools",
+                         "/srv/samba/schools/bsz",
+                         "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/students",
+                         "/srv/samba/schools/bsz/teachers",
+                         "/srv/samba/schools/bsz/teachers/homes",
+                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/uni",
+                         "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/students",
+                         "/srv/samba/schools/uni/teachers",
+                         "/srv/samba/schools/uni/teachers/homes",
+                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/default-school",
+                         "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/students",
+                         "/srv/samba/schools/default-school/teachers",
+                         "/srv/samba/schools/default-school/teachers/homes",
+                         "/srv/samba/schools/default-school/teachers/share",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+}
+
+
+&AD_unbind_admin($ldap);

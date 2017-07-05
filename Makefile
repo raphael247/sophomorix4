@@ -284,6 +284,7 @@ install-developer:
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-*[0-9] $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-workflow $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-errorfiles $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-exammode $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-JSON-example $(DESTDIR)/usr/sbin
 # copying perl developer modules
 	@install -d -m755 -oroot -groot $(PERLMOD)
@@ -299,10 +300,12 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-30 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-40 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.add-exammode $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.update-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.kill-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.kill-30 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.kill-40 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/sophomorix.kill-exammode $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/teachers.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-1 $(TESTDATA)
