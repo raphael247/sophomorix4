@@ -140,7 +140,7 @@ my $file_kill="/var/lib/sophomorix/check-result/sophomorix.kill";
 
 
 ############################################################
-# Add projects
+# Add users
 ############################################################
 # --add-users  
 if ($add_users==1){
@@ -148,6 +148,255 @@ if ($add_users==1){
     &run_command("cp -v $file_add_users $file_add");
     &run_command("sophomorix-add $all_options");
 }
+
+
+
+
+
+
+
+if ($test_add_users==1){
+    ##### Testing the users
+    # maiersa72
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa72,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa72",
+                   sAMAccountname=>"maiersa72",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa72",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/maiersa72",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa72@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid1234",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m7ab,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m7ab",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                  });
+    ##### Testing the users ou-students group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-students",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz|all-students",
+                  });
+
+
+    # muellegr72
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=muellegr72,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Gregor Müller",
+                   givenName=>"Gregor",
+                   name=>"muellegr72",
+                   sAMAccountname=>"muellegr72",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\muellegr72",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/muellegr72",
+                   sn=>"Müller",
+                   userPrincipalName => "muellegr72@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster72!",
+                   sophomorixFirstnameASCII => "Gregor",
+                   sophomorixSurnameASCII  => "Mueller",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid2345",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m7ab|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m7ab,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m7ab",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                  });
+    ##### Testing the users ou-students group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-students",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz|all-students",
+                  });
+
+
+    # jonsonad72
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=jonsonad72,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Aðalráður Jónsson",
+                   givenName=>"Aðalráður",
+                   name=>"jonsonad72",
+                   sAMAccountname=>"jonsonad72",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\jonsonad72",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72",
+                   sn=>"Jónsson",
+                   userPrincipalName => "jonsonad72@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster72!",
+                   sophomorixFirstnameASCII => "Adalradur",
+                   sophomorixSurnameASCII  => "Jonsson",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid3456",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m8cd,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m8cd",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                  });
+    ##### Testing the users ou-students group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-students",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz|all-students",
+                  });
+
+
+    # samardze72
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=samardze72,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Željko Samardžić",
+                   givenName=>"Željko",
+                   name=>"samardze72",
+                   sAMAccountname=>"samardze72",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze72",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze72",
+                   sn=>"Samardžić",
+                   userPrincipalName => "samardze72@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Zeljko",
+                   sophomorixSurnameASCII  => "Samardzic",
+                   sophomorixRole => "student",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid4567",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    ##### Testing the users class
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-m8cd,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-m8cd",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"adminclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                  });
+    ##### Testing the users ou-students group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-students",
+                   gidNumber=>"-1",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz|all-students",
+                  });
+
+}
+
+
+
+
 
 
 
@@ -166,15 +415,11 @@ if ($kill_users==1){
     &run_command("sophomorix-class --kill --class bsz-m8cd $all_options");
     &run_command("sophomorix-class --kill --class s6ade $all_options");
     &run_command("sophomorix-class --kill --class uni-12abc $all_options");
-
-
 }
 
 
-
-
 ############################################################
-#  Test killed  users, groups, projects
+#  Test killed  users, groups
 ############################################################
 # --test-kill-users  
 if ($test_kill_users==1){
