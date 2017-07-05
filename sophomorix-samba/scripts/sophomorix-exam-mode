@@ -68,6 +68,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_object_search
                                  get_forbidden_logins
+                                 AD_create_examuser
+                                 AD_kill_examuser
                                     );
 
 my @arguments = @ARGV;
@@ -91,6 +93,8 @@ my $participants="";
 my $set_exam_mode=0;
 my $unset_exam_mode=0;
 
+my $subdir="none";
+
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -105,6 +109,7 @@ my $testopt=GetOptions(
 #           "session|s=s" => \$session,
 #           "comment=s" => \$comment,
            "participants|m=s" => \$participants,
+           "subdir=s" => \$subdir,
 #           "add-participants=s" => \$add_participants,
 #           "remove-participants=s" => \$remove_participants,
            "set-exam-mode|set" => \$set_exam_mode,
@@ -205,7 +210,19 @@ if ($set_exam_mode==1){
                                participant=>$participant,
                                user_count=>$user_count,
                                date_now=> $time_stamp_AD,
+                               sophomorix_config=>\%sophomorix_config,
+                               sophomorix_result=>\%sophomorix_result,
                            });
+      &AD_create_examuser({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           participant=>$participant,
+                           subdir=>$subdir,
+                           user_count=>$user_count,
+                           date_now=> $time_stamp_AD,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
     }
     exit;
 }
@@ -228,7 +245,18 @@ if ($unset_exam_mode==1){
                                  participant=>$participant,
                                  user_count=>$user_count,
                                  date_now=> $time_stamp_AD,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
                                });
+      &AD_kill_examuser({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         root_dns=>$root_dns,
+                         participant=>$participant,
+                         user_count=>$user_count,
+                         date_now=> $time_stamp_AD,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                       });
     }
     exit;
 }

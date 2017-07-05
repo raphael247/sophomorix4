@@ -77,6 +77,8 @@ $Data::Dumper::Terse = 1;
             AD_dns_kill
             AD_dns_zonekill
             AD_repdir_using_file
+            AD_create_examuser
+            AD_kill_examuser
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -681,7 +683,8 @@ sub AD_user_kill {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
+    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
+        $user_account_control,$toleration_date,$deactivation_date,$school)=
         &AD_get_user({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
@@ -1238,7 +1241,7 @@ sub AD_user_create {
     # calculate
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
-    my $user_principal_name = $login."\@"."linuxmuster.local";
+    my $user_principal_name = $login."\@".$root_dns;
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
@@ -1652,6 +1655,7 @@ sub AD_user_update {
         $user_account_control_AD,
         $toleration_date_AD,
         $deactivation_date_AD,
+        $school_unused,
        )=&AD_get_user({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
@@ -1856,6 +1860,7 @@ sub AD_get_user {
                               'userAccountControl',
                               'sophomorixTolerationDate',
                               'sophomorixDeactivationDate',
+                              'sophomorixSchoolname',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -1874,10 +1879,11 @@ sub AD_get_user {
         my $user_account_control = $entry->get_value('userAccountControl');
         my $toleration_date = $entry->get_value('sophomorixTolerationDate');
         my $deactivation_date = $entry->get_value('sophomorixDeactivationDate');
+        my $school = $entry->get_value('sophomorixSchoolname');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,
                 $home_directory,$user_account_control,$toleration_date,
-                $deactivation_date);
+                $deactivation_date,$school);
     }
 }
 
@@ -2557,7 +2563,6 @@ sub AD_object_search {
         $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
     }
 
-
     my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
@@ -2692,7 +2697,8 @@ sub AD_get_sessions {
                 }
                 foreach $participant (@participants){
                     # get userinfo
-                    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
+                    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
+                        $user_account_control,$toleration_date,$deactivation_date,$school)=
                         &AD_get_user({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
@@ -5127,6 +5133,141 @@ sub AD_login_test {
 
 
     return $result;
+}
+
+
+
+sub AD_create_examuser {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $participant = $arg_ref->{participant};
+    my $subdir = $arg_ref->{subdir};
+    my $user_count = $arg_ref->{user_count};
+    my $date_now = $arg_ref->{date_now};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant");
+    # get data from (non-exam-)user
+    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
+        $user_account_control,$toleration_date,$deactivation_date,$school)=
+        &AD_get_user({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$participant,
+                    });
+    my $display_name = "Examuser of ".$firstname." ".$lastname;
+    my $examuser=$participant."-exam";
+    my $uni_password=&_unipwd_from_plainpwd("Muster!");# ???
+    my $prefix=$school;
+    if ($school eq $DevelConf::name_default_school){
+        # empty token creates error on AD add 
+        $prefix="---";
+    }
+    if (not defined $uidnumber_wish or $uidnumber_wish eq "---"){
+        $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
+    }
+    my $user_principal_name = $examuser."\@".$root_dns;
+
+    # create OU for session
+    $dn_session="OU=".$subdir.",OU=Examusers,OU=".$school.",OU=SCHOOLS,".$root_dse;
+    $ldap->add($dn_session,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+    my $dn="CN=".$examuser.",".$dn_session;
+    my $result = $ldap->add( $dn,
+                   attr => [
+                   sAMAccountName => $examuser,
+                   givenName => $firstname,
+                   sn => $lastname,
+                   displayName => [$display_name],
+                   userPrincipalName => $user_principal_name,
+                   unicodePwd => $uni_password,
+                   homeDrive => "H:",
+                   homeDirectory => "\\\\linuxmuster.local\\bsz\\examusers"."\\".$subdir."\\".$examuser,
+                   unixHomeDirectory => "/srv/samba/schools/bsz/examusers/".$subdir."/".$examuser,
+                   sophomorixExitAdminClass => "unknown", 
+                   sophomorixUnid => "---",
+                   sophomorixStatus => "X",
+                   sophomorixAdminClass => "---",    
+                   sophomorixAdminFile => "---",    
+                   sophomorixFirstPassword => "---", 
+                   sophomorixFirstnameASCII => "---",
+                   sophomorixSurnameASCII  => "---",
+                   sophomorixBirthdate  => "01.01.1970",
+                   sophomorixRole => "examuser",
+                   sophomorixSchoolPrefix => $prefix,
+                   sophomorixSchoolname => $school,
+                   sophomorixCreationDate => $date_now, 
+                   sophomorixTolerationDate => $DevelConf::default_date, 
+                   sophomorixDeactivationDate => $DevelConf::default_date, 
+                   sophomorixComment => "created by sophomorix", 
+                   sophomorixExamMode => "---", 
+                   userAccountControl => $user_account_control=$DevelConf::default_user_account_control,
+                   uidNumber => $uidnumber_wish,
+
+                   objectclass => ['top', 'person',
+                                     'organizationalPerson',
+                                     'user' ],
+                           ]
+                           );
+#print Dumper(\$result);
+    &AD_debug_logdump($result,2,(caller(0))[3]);
+}
+
+
+
+sub AD_kill_examuser {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $participant = $arg_ref->{participant};
+    my $user_count = $arg_ref->{user_count};
+    my $date_now = $arg_ref->{date_now};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+    &Sophomorix::SophomorixBase::print_title("Killing examuser of user: $participant");
+    my $examuser=$participant."-exam";
+    my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$examuser);
+
+    print "$count,$dn_exist,$cn_exist\n";
+    if ($count > 0){
+        my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
+            $user_account_control,$toleration_date,$deactivation_date,$school)=
+            &AD_get_user({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          user=>$examuser,
+                        });
+
+        if ($role ne "examuser"){
+            print "Not deleting $examuser beause its role is not examuser";
+            return;
+	}
+        my $command="samba-tool user delete ". $examuser;
+        print "   # $command\n";
+        system($command);
+
+        # # deleting home
+        # if ($role eq "examuser"){
+        #       my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+        #                                        password  => $smb_admin_pass,
+        #                                        debug     => 1);
+        #       #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+        #       my $return=$smb->rmdir_recurse($smb_home);
+        #       if($return==1){
+        #           print "OK: Deleted with succes $smb_home\n";
+        #       } else {
+        #           print "ERROR: rmdir_recurse $smb_home $!\n";
+        #       }
+        # }
+        return;
+    } else {
+        print "   * User $examuser nonexisting ($count results)\n";
+        return;
+    }
 }
 
 

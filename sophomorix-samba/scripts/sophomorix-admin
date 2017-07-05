@@ -542,7 +542,8 @@ if ($create_global_binduser ne ""){
 # --kill <user>
 if ($kill ne ""){
     # make sure it exists and is an administrator created by sophomorix
-    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory)=
+    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
+        $user_account_control,$toleration_date,$deactivation_date,$school)=
     &AD_get_user({ldap=>$ldap,
                   root_dse=>$root_dse,
                   root_dns=>$root_dns,
