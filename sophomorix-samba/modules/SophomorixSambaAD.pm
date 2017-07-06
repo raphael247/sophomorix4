@@ -5149,7 +5149,7 @@ sub AD_examuser_create {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant");
+    &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant (start)");
     # get data from (non-exam-)user
     my ($firstname_utf8,$lastname_utf8,$adminclass,$existing,$exammode,$role,$home_directory,
         $user_account_control,$toleration_date,$deactivation_date,$school)=
@@ -5180,7 +5180,7 @@ sub AD_examuser_create {
 
     my $file="---";
     my $unid="---";
-    my $status="X";
+    my $status=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_STATUS'};
     my $creationdate=$date_now;
     my $tolerationdate=$DevelConf::default_date;
     my $deactivationdate=$DevelConf::default_date;
@@ -5249,6 +5249,7 @@ sub AD_examuser_create {
                            ]
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
+    &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant (end)");
 }
 
 
