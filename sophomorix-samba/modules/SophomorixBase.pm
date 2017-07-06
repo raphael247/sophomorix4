@@ -1706,9 +1706,9 @@ sub get_homedirectory {
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_ROLE'}){
         $smb_rel_path=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$user;
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\".
-            $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."\\".$user;
+            $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."\\".$group_basename."\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/".
-            $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$user;
+            $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$group_basename."/".$user;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         $smb_rel_path="management/".$user;
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
