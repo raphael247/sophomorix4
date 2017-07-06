@@ -68,8 +68,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_object_search
                                  get_forbidden_logins
-                                 AD_create_examuser
-                                 AD_kill_examuser
+                                 AD_examuser_create
+                                 AD_examuser_kill
                                     );
 
 my @arguments = @ARGV;
@@ -213,7 +213,7 @@ if ($set_exam_mode==1){
                                sophomorix_config=>\%sophomorix_config,
                                sophomorix_result=>\%sophomorix_result,
                            });
-      &AD_create_examuser({ldap=>$ldap,
+      &AD_examuser_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            participant=>$participant,
@@ -248,7 +248,7 @@ if ($unset_exam_mode==1){
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
                                });
-      &AD_kill_examuser({ldap=>$ldap,
+      &AD_examuser_kill({ldap=>$ldap,
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          participant=>$participant,

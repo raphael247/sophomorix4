@@ -77,8 +77,8 @@ $Data::Dumper::Terse = 1;
             AD_dns_kill
             AD_dns_zonekill
             AD_repdir_using_file
-            AD_create_examuser
-            AD_kill_examuser
+            AD_examuser_create
+            AD_examuser_kill
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -5137,7 +5137,7 @@ sub AD_login_test {
 
 
 
-sub AD_create_examuser {
+sub AD_examuser_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -5151,15 +5151,16 @@ sub AD_create_examuser {
 
     &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant");
     # get data from (non-exam-)user
-    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
+    my ($firstname_utf8,$lastname_utf8,$adminclass,$existing,$exammode,$role,$home_directory,
         $user_account_control,$toleration_date,$deactivation_date,$school)=
         &AD_get_user({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
                       user=>$participant,
                     });
-    my $display_name = "Examuser of ".$firstname." ".$lastname;
-    my $examuser=$participant."-exam";
+    my $display_name = "Examuser of ".$firstname_utf8." ".$lastname_utf8;
+#    my $examuser=$participant."-exam";
+    my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
     my $uni_password=&_unipwd_from_plainpwd("Muster!");# ???
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
@@ -5174,13 +5175,45 @@ sub AD_create_examuser {
     # create OU for session
     $dn_session="OU=".$subdir.",OU=Examusers,OU=".$school.",OU=SCHOOLS,".$root_dse;
     $ldap->add($dn_session,attr => ['objectclass' => ['top', 'organizationalUnit']]);
-
     my $dn="CN=".$examuser.",".$dn_session;
+
+    my $file="---";
+    my $unid="---";
+    my $status="X";
+    my $creationdate=$date_now;
+    my $tolerationdate=$DevelConf::default_date;
+    my $deactivationdate=$DevelConf::default_date;
+    my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
+        &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                       $school,
+                                                       $subdir, # groupname is the subdir
+                                                       $examuser,
+                                                       $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_ROLE'},
+                                                       $ref_sophomorix_config);
+
+
+        print "   DN:                 $dn\n";
+        print "   DN(Parent):         $dn_session\n";
+        print "   Surname(UTF8):      $lastname_utf8\n";
+        print "   Firstname(UTF8):    $firstname_utf8\n";
+        print "   School:             $school\n"; # Organisatinal Unit
+        print "   Role(User):         $role\n";
+        print "   Status:             $status\n";
+        print "   Login (check OK):   $examuser\n";
+        # sophomorix stuff
+        print "   Creationdate:       $creationdate\n";
+        print "   Tolerationdate:     $tolerationdate\n";
+        print "   Deactivationdate:   $deactivationdate\n";
+        print "   Unid:               $unid\n";
+        print "   File:               $file\n";
+        print "   homeDirectory:      $homedirectory\n";
+        print "   unixHomeDirectory:  $unix_home\n";
+
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $examuser,
-                   givenName => $firstname,
-                   sn => $lastname,
+                   givenName => $firstname_utf8,
+                   sn => $lastname_utf8,
                    displayName => [$display_name],
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
@@ -5188,10 +5221,10 @@ sub AD_create_examuser {
                    homeDirectory => "\\\\linuxmuster.local\\bsz\\examusers"."\\".$subdir."\\".$examuser,
                    unixHomeDirectory => "/srv/samba/schools/bsz/examusers/".$subdir."/".$examuser,
                    sophomorixExitAdminClass => "unknown", 
-                   sophomorixUnid => "---",
-                   sophomorixStatus => "X",
+                   sophomorixUnid => $unid,
+                   sophomorixStatus => $status,
                    sophomorixAdminClass => "---",    
-                   sophomorixAdminFile => "---",    
+                   sophomorixAdminFile => $file,    
                    sophomorixFirstPassword => "---", 
                    sophomorixFirstnameASCII => "---",
                    sophomorixSurnameASCII  => "---",
@@ -5199,9 +5232,9 @@ sub AD_create_examuser {
                    sophomorixRole => "examuser",
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
-                   sophomorixCreationDate => $date_now, 
-                   sophomorixTolerationDate => $DevelConf::default_date, 
-                   sophomorixDeactivationDate => $DevelConf::default_date, 
+                   sophomorixCreationDate => $creationdate, 
+                   sophomorixTolerationDate => $tolerationdate, 
+                   sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
                    sophomorixExamMode => "---", 
                    userAccountControl => $user_account_control=$DevelConf::default_user_account_control,
@@ -5218,7 +5251,7 @@ sub AD_create_examuser {
 
 
 
-sub AD_kill_examuser {
+sub AD_examuser_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -5229,7 +5262,8 @@ sub AD_kill_examuser {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
     &Sophomorix::SophomorixBase::print_title("Killing examuser of user: $participant");
-    my $examuser=$participant."-exam";
+#    my $examuser=$participant."-exam";
+    my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$examuser);
 
     print "$count,$dn_exist,$cn_exist\n";
