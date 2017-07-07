@@ -37,6 +37,7 @@ use Sophomorix::SophomorixTest qw(
                                  start_fs_test
                                  end_fs_test
                                  run_command
+                                 file_test_chars
                                  ACL_test
                                  NTACL_test
                                  );
@@ -161,25 +162,25 @@ if ($add_admin==1){
 
     # admin
     # schooladmin in OU=bsz and OU=abc
-    &run_command("sophomorix-admin $all_options --create-school-admin admin-bsz-66 --school bsz --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-school-admin admin-abc-666 --school abc --password 'Muster!'");
+    &run_command("sophomorix-admin --create-school-admin admin-bsz-66 --school bsz --password 'Muster!' $all_options");
+    &run_command("sophomorix-admin --create-school-admin admin-abc-666 --school abc --password 'Muster!' $all_options");
     # schooladmin in OU=default-school
-    &run_command("sophomorix-admin $all_options --create-school-admin admin-66 --school default-school --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-school-admin admin-666 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin --create-school-admin admin-66 --school default-school --password 'Muster!' $all_options");
+    &run_command("sophomorix-admin --create-school-admin admin-666 --school default-school --password 'Muster!' $all_options");
     # globaladmin in OU=GLOBAL
-    &run_command("sophomorix-admin $all_options --create-global-admin global-admin-66 --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-global-admin global-admin-666 --password 'Muster!'");
+    &run_command("sophomorix-admin --create-global-admin global-admin-66 --password 'Muster!' $all_options");
+    &run_command("sophomorix-admin --create-global-admin global-admin-666 --password 'Muster!' $all_options");
 
     # binduser
     # schoolbinduser in OU=bsz and OU=abc
-    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-bsz-66 --school bsz --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-abc-666 --school abc --password 'Muster!'");
+    &run_command("sophomorix-admin --create-school-binduser binduser-bsz-66 --school bsz --random-passwd-save $all_options");
+    &run_command("sophomorix-admin --create-school-binduser binduser-abc-666 --school abc --password 'Muster!' $all_options");
     # schoolbinduser in OU=default-school
-    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-66 --school default-school --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-school-binduser binduser-666 --school default-school --password 'Muster!'");
+    &run_command("sophomorix-admin --create-school-binduser binduser-66 --school default-school --random-passwd-save $all_options");
+    &run_command("sophomorix-admin --create-school-binduser binduser-666 --school default-school --password 'Muster!' $all_options");
     # globalbinduser in OU=GLOBAL
-    &run_command("sophomorix-admin $all_options --create-global-binduser global-binduser-66 --password 'Muster!'");
-    &run_command("sophomorix-admin $all_options --create-global-binduser global-binduser-666 --password 'Muster!'");
+    &run_command("sophomorix-admin --create-global-binduser global-binduser-66 --random-passwd-save $all_options");
+    &run_command("sophomorix-admin --create-global-binduser global-binduser-666 --password 'Muster!' $all_options");
 
 }
 
@@ -531,6 +532,8 @@ if ($test_add_admin==1){
                    memberOf => "SCHOOLS",
                    member => "binduser-bsz-66|bsz-teachers|bsz-students|bsz-admins",
                   });
+    &file_test_chars("/etc/linuxmuster/.secret/binduser-bsz-66",19);
+
 
 
     # binduser-abc-666
@@ -632,6 +635,9 @@ if ($test_add_admin==1){
 #                   memberOf => "AD_RO_auth",
                    memberOf => "default-school",
                   });
+    &file_test_chars("/etc/linuxmuster/.secret/binduser-66",19);
+
+
     # binduser-666
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=binduser-666,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -746,6 +752,9 @@ if ($test_add_admin==1){
 #                   memberOf => "global-AD_RO_auth",
                    memberOf => "SCHOOLS",
                   });
+    &file_test_chars("/etc/linuxmuster/.secret/global-binduser-66",21);
+
+
     # global-binduser-666
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=global-binduser-666,OU=Management,OU=GLOBAL,".$root_dse,

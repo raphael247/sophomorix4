@@ -45,8 +45,9 @@ $Data::Dumper::Terse = 1;
             directory_tree_test
             run_command
             file_test_lines
+            file_test_chars
             AD_get_samaccountname
-            cat_wcl_test
+            cat_wcc_test
             );
 
 sub AD_test_session_count {
@@ -1132,6 +1133,28 @@ sub file_test_lines {
     }
 }
 
+sub file_test_chars {
+    # abs path to file
+    # char number
+    my ($abs,$is_char_num)=@_;
+
+    if (-e $abs){
+        $exists=1;
+    }
+    is ($exists,1,"* $abs exists");
+    if ($exists==0){
+        return;
+    }
+    my $command="cat $abs | wc -c";
+    print "\n";
+    print "######################################################################\n";
+    print "$command\n";
+    print "######################################################################\n";
+    my $count=`$command`;
+    chomp($count);
+    is ($count,$is_char_num,"  * $count chars in file $abs")
+}
+
 
 sub run_command {
     my ($command) = @_;
@@ -1157,6 +1180,7 @@ sub cat_wcl_test {
     chomp($count);
     is ($count,$expect,"  * $count results for \"$grep\" in $abs");
 }
+
 
 
 # END OF FILE
