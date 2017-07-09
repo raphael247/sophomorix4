@@ -753,7 +753,14 @@ sub AD_test_object {
            ){
             my $res=&Sophomorix::SophomorixSambaAD::AD_login_test($ldap,$root_dse,$dn);
             my $firstpass=$entry->get_value ('sophomorixFirstPassword');
-            is ($res,0,"  * Login OK (pwd=$firstpass): $dn");
+            if ($firstpass eq "---" and -e "/etc/linuxmuster/.secret/$sam_account"){
+                $firstpass = `cat /etc/linuxmuster/.secret/$sam_account`;
+            }
+            if ($res==2){
+                #skip test
+            } else {
+                is ($res,0,"  * Login OK (pwd: $firstpass): $dn");
+            }
 	}
 
         # ##################################################

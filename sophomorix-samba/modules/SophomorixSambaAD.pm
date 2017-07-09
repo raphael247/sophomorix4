@@ -5114,31 +5114,37 @@ sub AD_login_test {
                             );
     my $entry = $mesg->entry(0);
     my $firstpassword = $entry->get_value('sophomorixFirstPassword');
-    if ($firstpassword eq "---"){
-        $firstpassword="Muster!"; # if no password given, try default password (i.e. in tests)
+    my $sam_account = $entry->get_value('sAMAccountName');
+
+    if ($firstpassword eq "---" and -e "/etc/linuxmuster/.secret/$sam_account"){
+        print "   * Trying to fetch password from .secret/$sam_account\n";
+        $firstpassword = `cat /etc/linuxmuster/.secret/$sam_account`;
     }
-    my $samaccount = $entry->get_value('sAMAccountName');
     if (not defined $firstpassword){
         return -1;
     }
 
     # smbclient test
-    #my $command="smbclient -L localhost --user=$samaccount%'$firstpassword' > /dev/null 2>&1 ";
-    #print "   # $command\n";
-    #my $result=system($command);
-
-    # pam login
-    my $command="wbinfo --pam-logon=$samaccount%'$firstpassword' > /dev/null 2>&1 ";
-    print "   # $command\n";
-    my $result=system($command);
-
-    # kerberos login
-    #my $command="wbinfo --krb5auth=$samaccount%'$firstpassword'' > /dev/null 2>&1 ";
+    #my $command="smbclient -L localhost --user=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
     #print "   # $command\n";
     #my $result=system($command);
 
 
-    return $result;
+    if ($firstpassword eq "---"){
+        print "   * No password test possible\n";
+        return 2;
+    } else {
+        # pam login
+        my $command="wbinfo --pam-logon=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
+        print "   # $command\n";
+        my $result=system($command);
+        return $result;
+
+        # kerberos login
+        # my $command="wbinfo --krb5auth=$sam_account%'$firstpassword'' > /dev/null 2>&1 ";
+        # print "   # $command\n";
+        # my $result=system($command);
+    }
 }
 
 
