@@ -4450,18 +4450,24 @@ sub AD_admin_list {
                                ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user sophomorix administrators found in AD");
-    print "+---------------------+-------------------------+---------------------+----------------+\n";
-    printf "| %-19s | %-23s | %-19s | %-14s |\n","administrator","displayName","sophomorixRole","School";
-    print "+---------------------+-------------------------+---------------------+----------------+\n";
+    print "+---------------------+-+-------------------------+---------------------+----------------+\n";
+    printf "| %-19s |%1s| %-23s | %-19s | %-14s |\n","administrator","P","displayName","sophomorixRole","School";
+    print "+---------------------+-+-------------------------+---------------------+----------------+\n";
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $school=$entry->get_value('sophomorixSchoolname');
         my $role=$entry->get_value('sophomorixRole');
         my $displayname=$entry->get_value('displayname');
-        printf "| %-19s | %-23s | %-19s | %-14s |\n",$sam,$displayname,$role,$school;
+        my $pw=0;
+        my $pwd_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$sam;
+        if (-e $pwd_file){
+            $pw=1;
+        }
+        printf "| %-19s |%1s| %-23s | %-19s | %-14s |\n",$sam,$pw,$displayname,$role,$school;
     }
-    print "+---------------------+-------------------------+---------------------+----------------+\n";
+    print "+---------------------+-+-------------------------+---------------------+----------------+\n";
+    print "P: Password file exists(1)/does not exist(0)\n";
 }
 
 

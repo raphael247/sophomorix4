@@ -567,6 +567,11 @@ if ($kill ne ""){
                        smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
                      });
+        my $pwd_file=$sophomorix_config{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$kill;
+        if (-e $pwd_file){
+            &Sophomorix::SophomorixBase::print_title("Removing $pwd_file");
+            system ("rm -f $pwd_file");
+        }
     } else {
         print "\nERROR: User $kill is not an administrator created by sophomorix\n\n";
         exit;
