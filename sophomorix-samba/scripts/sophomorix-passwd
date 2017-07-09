@@ -343,9 +343,9 @@ if ($test_firstpassword==1){
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $dn=$entry->dn();
-        my $samaccount=$entry->get_value ('sAMAccountName');
+        my $sam_account=$entry->get_value ('sAMAccountName');
         $count_tested++;
-        print "* $count_tested) $samaccount: $dn\n";
+        print "* $count_tested) $sam_account: $dn\n";
         my $res=&AD_login_test($ldap,$root_dse,$dn);
         if ($res==0){
             print "   * Login with firstpassword OK!\n";
@@ -397,13 +397,13 @@ if ($set_firstpassword==1){
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $dn=$entry->dn();
-        my $samaccount=$entry->get_value ('sAMAccountName');
+        my $sam_account=$entry->get_value ('sAMAccountName');
         my $firstpassword=$entry->get_value ('sophomorixFirstPassword');
         my $user_count=$index+1;
         &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
-                     user=>$samaccount,
+                     user=>$sam_account,
                      user_count=>$user_count,
                      firstpassword=>$firstpassword,
                      plain_password=>$firstpassword,

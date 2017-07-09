@@ -621,11 +621,11 @@ if ($import_user_password_hashes==1){
         $lines++;
         chomp();
         my (@add)=split(/::/);
-        my $samaccount=$add[3];
+        my $sam_account=$add[3];
         my $pass=$add[16];
-        my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$samaccount);
+        my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$sam_account);
         print "\n";
-        print "$lines) $samaccount: importing password hash $pass\n";
+        print "$lines) $sam_account: importing password hash $pass\n";
         print "   DN: $dn\n";
 
         # creating ldif file
@@ -642,7 +642,7 @@ if ($import_user_password_hashes==1){
         if (not $res==0){
             $errors++;
             print "ERROR: $res returned\n";
-            push @loglines, "Not updated Hash (Return: $res): $samaccount\n";
+            push @loglines, "Not updated Hash (Return: $res): $sam_account\n";
         }
     }
     print "\n$errors ERRORS:\n";
