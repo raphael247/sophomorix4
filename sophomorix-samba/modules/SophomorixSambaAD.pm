@@ -4446,28 +4446,50 @@ sub AD_admin_list {
                                 'sophomorixSchoolname',
                                 'sophomorixSchoolPrefix',
                                 'sophomorixRole',
+                                'sophomorixComment',
                                 'userAccountControl',
                                ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user sophomorix administrators found in AD");
-    print "+---------------------+-+-------------------------+---------------------+----------------+\n";
-    printf "| %-19s |%1s| %-23s | %-19s | %-14s |\n","administrator","P","displayName","sophomorixRole","School";
-    print "+---------------------+-+-------------------------+---------------------+----------------+\n";
+    print "+---------------------+-+-------------------------+------+--------+------------------------+\n";
+    printf "| %-19s |%1s| %-23s | %-4s | %-6s | %-22s |\n","administrator","P","displayName","Role","School","Comment";
+    print "+---------------------+-+-------------------------+------+--------+------------------------+\n";
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $school=$entry->get_value('sophomorixSchoolname');
+        my $comment=$entry->get_value('sophomorixComment');
+        my $displayschool="";
+        if ($school eq $DevelConf::name_default_school){
+            $displayschool="*";
+        } else {
+            $displayschool=$school;
+        }
         my $role=$entry->get_value('sophomorixRole');
+        my $displayrole="";
+        if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
+            $displayrole="sadm";
+        } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
+            $displayrole="gadm";
+        } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
+            $displayrole="sbin";
+        } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
+            $displayrole="gbin";
+        } else {
+            $displayrole=$role;
+        }
         my $displayname=$entry->get_value('displayname');
         my $pw=0;
         my $pwd_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$sam;
         if (-e $pwd_file){
             $pw=1;
         }
-        printf "| %-19s |%1s| %-23s | %-19s | %-14s |\n",$sam,$pw,$displayname,$role,$school;
+        printf "| %-19s |%1s| %-23s | %-4s | %-6s | %-22s |\n",$sam,$pw,$displayname,$displayrole,$displayschool,$comment;
     }
-    print "+---------------------+-+-------------------------+---------------------+----------------+\n";
+    print "+---------------------+-+-------------------------+------+--------+------------------------+\n";
     print "P: Password file exists(1)/does not exist(0)\n";
+    print "sbin:  schoolbinduser        gbin:  globalbinduser\n";
+    print "sadm:  schooladministrator   gadm:  globaladministrator\n";
 }
 
 
