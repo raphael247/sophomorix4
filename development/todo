@@ -5,6 +5,7 @@ git clone https://github.com/linuxmuster/sophomorix4.git
 
 sophomorix-repair --school auf resettetem system mit vielen Fehlern
 
+------------------------------------------------------------
 SophomorixTest.pm:
 
 script starten mit parameterkombination, die zum abbruch führen soll
@@ -22,12 +23,7 @@ end_user_test
 (dito mit group, oder zusammen als start_object_test)
 -> mitloggen, welche user/gruppengetestet wurden
 --> user/group exists, but not tested
-
-
-testen: random Password length aus sophomorix.ini
---> wird die umgesetzt
---> neue sub in test: wc --chars /abs/path/.secret
-
+------------------------------------------------------------
 
 Problem:
 sophomorix-repair erzeugt viele Fehler, wenn schulen konfiguriert,
@@ -45,8 +41,7 @@ WARNING: User seen in multiple classes
 use lastname for Encoding detection
 
 school.conf -> file
-    CLASS_MAP 12|oberstufe12
-    CLASS_MAP 13|oberstufe13
+    CLASS_MAP=12=oberstufe12,13=oberstufe13
 
 
 ------------------------------------------------------------
@@ -62,8 +57,8 @@ ODER
 
 sophomorix-admin legt dann user an, die in diesen Gruppen sind 
 
-Option für zufallspasswort (Wieviele zeichen?- > sophomorix.ini -> RANDOM_PWD_LENGTH=10)
-admin und binduser getrennt
+
+Option für zufallspasswort Anzeigen:
 --randompasswd-display -> JSON (Objekt noch testen)
 
 
@@ -186,7 +181,7 @@ Exam: Jeder Schritt in sophomorix.ini konfigurierbar
 WEITER:
 smb_home bei den kill_funktionen in sub
 
-AD_get user liegfert UTF8 zurück - variablen umbennnen 
+AD_get user liegert UTF8 zurück - variablen umbennnen 
 
 user aus anderen Schule in exammode
 andere examuser testen
@@ -377,13 +372,11 @@ OK in
 
 Noch Todo:
 
-?? fehlt noch?    /srv/samba/global
+/srv/samba/global
+-> vorbereitet in global.ntacl.template
 
-    /srv/samba/global/management/<all-admin>
-    --> user wirds nicht geben wird
-    --> keine acl bereitlegen
-    --> sophomorix-admin kann keinen mehr anlegen
-
+/srv/samba/global/projects/<p_name>
+-> kommt nach projects.share.ntacl.template
 
 Und evtl.?
 /srv/samba/schools/default-school/students/5a/homes/adamskke/_austeilen
@@ -392,7 +385,7 @@ Und evtl.?
 /srv/samba/schools/default-school/teachers/homes/cv/_austeilen
 /srv/samba/schools/default-school/teachers/homes/cv/_einsammeln
 
-Und evtl. dito für exam-mode
+Und evtl. dito für exam-user
 ------------------------------------------------------------
 
 
