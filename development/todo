@@ -6,6 +6,84 @@ git clone https://github.com/linuxmuster/sophomorix4.git
 sophomorix-repair --school auf resettetem system mit vielen Fehlern
 
 ------------------------------------------------------------
+1. NTACL: vollständige Klärung, ob wir die Controlbits weglassen können
+   Control bits ergeben sich durch setzen der ACL's
+   Propagation der inheritance (muss propagiert werden)
+   Windows-GUI macht das rekursiv, smbcacls kann das (noch) nicht
+
+2. Die NTACLs unseres Schulservers durchgehen
+   bisheriges home (schüler darf nur lesen und durch):
+   work  -> Hier darf Schüler schreiben
+   _einsammeln -> hier nicht
+   _austeilen -> hier nicht
+
+   --> wird noch recherchiert
+
+   dfs
+   Freigabe der schule mit msdfs proxy = \fileserver-bsz\abc
+   (EINZIGE OPTION)
+   (ohne msdfs root und andere)   
+
+   Im school-share:
+      statt
+        guest ok = yes
+   Kommt valid users = @LINUXMUSTER\acb  @LINUXMUSTER\global-admins  (acb=schulgruppe)
+                      oder acb@linuxmuster.lan
+        -> workgroup= kurzer domänenname (kurze Domänename bzw. netbiosname)
+	-> realm    = langer domänenname.lan  lange Domänename = dns-Zonen-name
+
+valid users
+
+
+2b sync von homes
+   wie kommen migrierte Daten ins home
+  (alt: undefinierter Zustand)
+   1) migration:
+     HOMES:
+     1) irgendwie syncen ( z.B. rsync via ssh)
+     2) ACL drüberbügeln
+        - files und directories getrennt
+     TAUSCH:
+     - READ-Only in unterordner (Altes-Tauchverzeichnis-gelösch_ab_10_12_2017)
+       - getrennt nach
+          --sync-teachershare
+          --sync-classshare
+	  --sync-projectshare
+   2) versetzen von einer zur anderen schule
+      statt move via samba-shares
+     
+
+
+3. Zugriffe auf AD-Objekte Attribute regeln (Teilbaum, Attribute ausblenden,
+...)
+
+   geht
+   von konsole aus nicht simple, aber scriptbar
+
+   Lesezugriff auf Unterbaum
+   --> liefert nach
+   adsi editor
+
+   samba version 4.3.11
+   --> besser sernet-Version
+   --> Distributionspakete updatebar
+       ---> sernet repo eintragen, update, fertig
+       ---> todoliste, wie zusammengeklicktes mit adsi abernten
+   
+   schema-Erweiterungen schützen
+   Erstpasswörter:
+   Geburtstag:
+      nicht lesbar
+
+
+4. Passwort Hash-Frage, Ob wir da richtig vorgehen (ungesaltete Passwörter)
+   - testen, ob kopiertes passwort bei anderem Passwort
+
+   - password history aktivieren (alte Passörter führen nicht zum sperren des Accounts)
+
+
+
+------------------------------------------------------------
 SophomorixTest.pm:
 
 script starten mit parameterkombination, die zum abbruch führen soll
