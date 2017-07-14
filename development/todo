@@ -5,6 +5,18 @@ git clone https://github.com/linuxmuster/sophomorix4.git
 
 sophomorix-repair --school auf resettetem system mit vielen Fehlern
 
+todo:
+0) testen ob hash bei demselben password gleich ist
+   -> password übertragbar?
+1) school share: statt guest ok -> valid users = @LINUXMUSTER\acb  @LINUXMUSTER\global-admins
+2) mv von homes
+3) migration:
+    * tausch syncen
+      wie macht man ein Verzichnis read only auf einem share nur für die Gruppe?
+    * migration_repair eines home
+      - acl für dir?
+      - acl für file?
+
 ------------------------------------------------------------
 1. NTACL: vollständige Klärung, ob wir die Controlbits weglassen können
    Control bits ergeben sich durch setzen der ACL's
@@ -19,23 +31,22 @@ sophomorix-repair --school auf resettetem system mit vielen Fehlern
 
    --> wird noch recherchiert
 
-   dfs
-   Freigabe der schule mit msdfs proxy = \fileserver-bsz\abc
-   (EINZIGE OPTION)
-   (ohne msdfs root und andere)   
-
-   Im school-share:
+   school-share:
       statt
         guest ok = yes
-   Kommt valid users = @LINUXMUSTER\acb  @LINUXMUSTER\global-admins  (acb=schulgruppe)
+      Kommt
+        valid users = @LINUXMUSTER\acb  @LINUXMUSTER\global-admins  (acb=schulgruppe)
                       oder acb@linuxmuster.lan
         -> workgroup= kurzer domänenname (kurze Domänename bzw. netbiosname)
 	-> realm    = langer domänenname.lan  lange Domänename = dns-Zonen-name
 
-valid users
+   dfs
+   Freigabe der schule mit msdfs proxy = \fileserver-bsz\abc
+     -> msdfs proxy: EINZIGE OPTION die erfordelich ist (ohne msdfs root und andere)  
+     -> alle anderen optionen werden ungültig (trotzdem drin lassen?)
+     -> Optionen wie Comment usw. müssen auf Fileserver liegen, auf den msdfs proxy zeigt
 
-
-2b sync von homes
+3. sync von homes
    wie kommen migrierte Daten ins home
   (alt: undefinierter Zustand)
    1) migration:
@@ -54,8 +65,8 @@ valid users
      
 
 
-3. Zugriffe auf AD-Objekte Attribute regeln (Teilbaum, Attribute ausblenden,
-...)
+4. Zugriffe auf AD-Objekte Attribute regeln
+   (Teilbaum, Attribute ausblenden, ...)
 
    geht
    von konsole aus nicht simple, aber scriptbar
@@ -68,20 +79,24 @@ valid users
    --> besser sernet-Version
    --> Distributionspakete updatebar
        ---> sernet repo eintragen, update, fertig
-       ---> todoliste, wie zusammengeklicktes mit adsi abernten
-   
+       
+   ---> wird nachgeliefert:
+        - wie zusammengeklicktes mit adsi abernten
+        - kann sein, dass man aktuelleres samba braucht
+
    schema-Erweiterungen schützen
    Erstpasswörter:
    Geburtstag:
       nicht lesbar
+   ---> wird nachgeliefert
 
 
-4. Passwort Hash-Frage, Ob wir da richtig vorgehen (ungesaltete Passwörter)
+5. Passwort Hash-Frage, Ob wir da richtig vorgehen (ungesaltete Passwörter)
    - testen, ob kopiertes passwort bei anderem Passwort
 
    - password history aktivieren (alte Passörter führen nicht zum sperren des Accounts)
 
-
+   --> Info zu salt in den Passwort hashes wird nachgeliefert
 
 ------------------------------------------------------------
 SophomorixTest.pm:
