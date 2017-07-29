@@ -1061,7 +1061,7 @@ sub result_sophomorix_add_summary {
 
 
 sub result_sophomorix_check_exit {
-    my ($ref_result,$json)=@_;
+    my ($ref_result,$ref_sophomorix_config,$json)=@_;
     my $log=0;
     my $warn=0;
     my $err=0;
@@ -1081,7 +1081,7 @@ sub result_sophomorix_check_exit {
     # check if i need to exit
     if ($err>0 or $warn>0){
         $ref_result->{'JSONCOMMENT'}="Configuration check failed";
-        &result_sophomorix_print($ref_result,$json);
+        &result_sophomorix_print($ref_result,$ref_sophomorix_config,$json);
         exit;
     } else {
         &print_title("$err ERRORS, $warn WARNINGS -> let's go");
@@ -1090,7 +1090,7 @@ sub result_sophomorix_check_exit {
 
 
 sub result_sophomorix_print {
-    my ($ref_result,$json)=@_;
+    my ($ref_result,$ref_sophomorix_config,$json)=@_;
       if ($json==0){
           # be quiet
           print "Calling console printout\n";
@@ -1126,15 +1126,15 @@ sub result_sophomorix_print {
           # pretty output
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_result );
-          print "$utf8_pretty_printed";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "$utf8_pretty_printed";
       } elsif ($json==2){
           # compact output
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_json_line   = $json_obj->encode( $ref_result  );
-          print "$utf8_json_line";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "$utf8_json_line";
       } elsif ($json==3){
           &print_title("DUMP: ".$ref_result->{'JSONCOMMENT'});
-          print Dumper( $ref_result );
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} Dumper( $ref_result );
       }
 }
 
@@ -1326,7 +1326,7 @@ sub log_script_start {
 
 
 sub log_script_end {
-    my ($ref_arguments,$ref_result,$json) = @_;
+    my ($ref_arguments,$ref_result,$ref_sophomorix_config,$json) = @_;
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::end  ::  $0";
@@ -1358,7 +1358,7 @@ sub log_script_end {
     &print_title("$0 terminated regularly");
     &result_sophomorix_add_log($ref_result,"$0 terminated regularly");
     # output the result object
-    &result_sophomorix_print($ref_result,$json);
+    &result_sophomorix_print($ref_result,$ref_sophomorix_config,$json);
     exit;
 }
 
@@ -1386,6 +1386,8 @@ sub log_script_exit {
     my $json=shift;
     # 8) replacement parameter list for error scripts
     my $ref_parameter=shift;
+    # 9) config
+    my $ref_sophomorix_config=shift;
 
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
@@ -1430,7 +1432,7 @@ sub log_script_exit {
 
     #&nscd_start();
     # output the result object
-    &result_sophomorix_print($ref_result,$json);
+    &result_sophomorix_print($ref_result,$ref_sophomorix_config,$json);
     exit $return;
 }
 

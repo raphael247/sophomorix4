@@ -310,7 +310,7 @@ if ($info==1) {
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 ################################################################################
 # Start
 ################################################################################
@@ -594,7 +594,7 @@ if ($set_firstpassword==1){
 # }
 
 
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 

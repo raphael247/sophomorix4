@@ -139,7 +139,7 @@ Please see the sophomorix-managementgroup(8) man pages for full documentation
 #} 
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 &log_script_start(\@arguments,\%sophomorix_result);
 
 
@@ -228,7 +228,7 @@ if ($noadmins ne ""){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 
@@ -251,7 +251,7 @@ sub manage_groupmemberships {
 
         my $count = $mesg->count;
         if ($count==0){
-            &log_script_exit("ERROR: Could not find user $user",1,1,0,\@arguments,\%sophomorix_result,$json);
+            &log_script_exit("ERROR: Could not find user $user",1,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
         my $entry = $mesg->entry(0);
         my $school = $entry->get_value('sophomorixSchoolname');

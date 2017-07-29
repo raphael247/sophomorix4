@@ -217,7 +217,7 @@ if ($class ne "" and $info==1){
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
@@ -270,7 +270,7 @@ if ($kill==1 and $class ne ""){
                     type=>"adminclass",
                     sophomorix_config=>\%sophomorix_config,
                   });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -281,10 +281,10 @@ my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
 if ($count>1){
     print "\n$count classes found.\n";
     print "Specify the school-token to choose a project\n\n";
-    &log_script_exit("Specify the school-token to choose a class",$count,1,0,\@arguments,\%sophomorix_result,$json);
+    &log_script_exit("Specify the school-token to choose a class",$count,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } elsif ($count==0){
     print "\nERROR retrieving class $class: $count class found.\n\n";
-    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,\@arguments,\%sophomorix_result,$json);
+    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 ##################################################
@@ -594,7 +594,7 @@ if (defined $removeadmins){
 # Ende des Scripts
 # ===========================================================================
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 

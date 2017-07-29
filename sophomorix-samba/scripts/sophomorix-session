@@ -234,7 +234,7 @@ if ($info==1) {
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 ################################################################################
 # Start
 ################################################################################
@@ -252,7 +252,7 @@ if ($kill_all_sessions==1){
                             sessions_ref=>\%sessions,
                         });
     }
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -266,7 +266,7 @@ if ($session ne "" and $kill==1){
                         create=>"FALSE",
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -284,7 +284,7 @@ if ($create==1 and $supervisor ne ""){
                         developer_session=>$developer_session,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -301,7 +301,7 @@ if ($session ne "" and $participants ne ""){
                         participants=>$participants,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -318,7 +318,7 @@ if ($session ne "" and $comment ne ""){
                         comment=>$comment,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -339,7 +339,7 @@ if ($session ne "" and $add_participants ne ""){
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -359,12 +359,12 @@ if ($session ne "" and $remove_participants ne ""){
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
                     });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 ################################################################################
 # Sub

@@ -997,7 +997,7 @@ if($no_sync==1){
 
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 # ===========================================================================
 # Modifying System
 # ===========================================================================
@@ -1275,7 +1275,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         $dns_node_count++;
     }
 
-    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
+    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -1309,7 +1309,7 @@ if ($set_computer_passwords==1){
         system("/usr/sbin/sophomorix-passwd --force -u $comp --pass $pw");
         $count++;
     }
-    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
+    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 

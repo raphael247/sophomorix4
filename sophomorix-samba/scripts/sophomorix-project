@@ -413,7 +413,7 @@ if ($user_info==1){
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 &log_script_start(\@arguments,\%sophomorix_result);
 
 # --current-member
@@ -629,7 +629,7 @@ if ($kill==1 and $project ne ""){
                     type=>"project",
                     sophomorix_config=>\%sophomorix_config,
                   });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -640,10 +640,12 @@ my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
 if ($count>1){
     print "\n$count Projects found.\n";
     print "Specify the school-token to choose a project\n\n";
-    &log_script_exit("Specify the school-token to choose a project",$count,1,0,\@arguments,\%sophomorix_result,$json);
+    &log_script_exit("Specify the school-token to choose a project",$count,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } elsif ($count==0){
     print "\nERROR retrieving project $project: $count project found.\n\n";
-    &log_script_exit("ERROR retrieving project $project: $count project found.",$count,1,0,\@arguments,\%sophomorix_result,$json);
+    &log_script_exit("ERROR retrieving project $project: $count project found.",$count,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -1030,4 +1032,4 @@ if (defined $removeadmingroups){
 # }
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);

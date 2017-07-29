@@ -197,7 +197,7 @@ print "dumcp $dump_AD \n";
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 # ============================================================
 # changing the filesystem
 # ============================================================
@@ -362,7 +362,7 @@ if ($student_home==1) {
 
 
 
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 ############################################################

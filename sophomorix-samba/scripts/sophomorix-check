@@ -346,7 +346,7 @@ if ($list_files==1) {
    }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 &log_script_start(\@arguments,\%sophomorix_result);
 
 # --analyze-encoding
@@ -388,7 +388,7 @@ if ($analyze_encoding ne ""){
                          ENCODING => $enc,
                          sophomorix_result=>\%sophomorix_result,
 			       });
-    &log_script_end(\@arguments,\%sophomorix_result,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -806,7 +806,7 @@ my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
 
 
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 ################################################################################

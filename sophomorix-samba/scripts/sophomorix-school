@@ -161,7 +161,7 @@ if ($lock==1) {
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 ################################################################################
 # Start
 ################################################################################
@@ -249,7 +249,7 @@ if ($school ne "" and $kill==1){
 
 &AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments,\%sophomorix_result,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 
