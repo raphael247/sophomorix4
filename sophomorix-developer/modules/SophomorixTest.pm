@@ -47,7 +47,7 @@ $Data::Dumper::Terse = 1;
             file_test_lines
             file_test_chars
             AD_get_samaccountname
-            cat_wcc_test
+            cat_wcl_test
             );
 
 sub AD_test_session_count {
