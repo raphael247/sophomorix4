@@ -2324,15 +2324,23 @@ sub AD_school_create {
         my $command="net conf addshare ".
                     $school." ".
                     $unix_path.
-                    " writeable=y guest_ok=y 'Share for school $school'";
+                    " writeable=y guest_ok=N 'Share for school $school'";
         print "   * $command\n";
         system($command);
         my $command_mod1="net conf setparm ".$school." 'msdfs root' 'yes'";
         print "   * $command_mod1\n";
         system($command_mod1);
+
         my $command_mod2="net conf setparm ".$school." 'hide unreadable' 'yes'";
         print "   * $command_mod2\n";
         system($command_mod2);
+
+        my $groupstring=$DevelConf::sophomorix_file_admin."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
+                        ", ".$school."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
+                        ", global-admins\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'};
+        my $command_mod3="net conf setparm ".$school." 'valid users' '$groupstring'";
+        print "   * $command_mod3\n";
+        system($command_mod3);
 
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
