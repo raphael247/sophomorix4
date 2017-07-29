@@ -695,7 +695,7 @@ if ($user ne "" and $info==1){
                       base   => $root_dse,
                       scope => 'sub',
                       filter => $filter,
-                      attr => ['cn']
+                      attr => ['cn','unicodePwd']
 	);
     my $number = $mesg->count;
     if ($number==0){
@@ -708,6 +708,10 @@ if ($user ne "" and $info==1){
             my $sam = $entry->get_value ('sAMAccountName');
             print "\n";
             &print_title("User $count: $sam");
+
+            my $pwd = $entry->get_value ('unicodePwd');
+
+	    print "PWD: $pwd\n";
             $entry->dump; 
         }
     }

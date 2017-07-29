@@ -34,6 +34,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT_OK = qw( );
 @EXPORT = qw(
             AD_get_passwd
+            AD_get_passwd_hashes
             AD_bind_admin
             AD_unbind_admin
             AD_get_sessions
@@ -84,6 +85,19 @@ $Data::Dumper::Terse = 1;
             next_free_gidnumber_set
             next_free_gidnumber_get
             );
+
+sub AD_get_passwd_hashes {
+    my ($sam,$ref_sophomorix_config)=@_;
+    my $string=`ldbsearch --url $ref_sophomorix_config->{'INI'}{'PATHS'}{'SAM_LDB'} "sAMAccountName=$sam" unicodePwd`;
+    my @lines=split("\n",$string);
+    foreach my $line (@lines){
+        if ($line=~m/unicodePwd/){
+            my ($attr,$pass)=split("::",$line);
+            $pass=&Sophomorix::SophomorixBase::remove_whitespace($pass);
+            print "   $sam: $pass (unicodePwd)\n"
+        }
+    }
+}
 
 sub AD_get_passwd {
     my ($user,$pwd_file)=@_;

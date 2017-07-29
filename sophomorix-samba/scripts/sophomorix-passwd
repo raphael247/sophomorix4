@@ -53,6 +53,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_print
                                  );
 use Sophomorix::SophomorixSambaAD qw(
+                                 AD_get_passwd_hashes
                                  AD_school_create
                                  AD_bind_admin
                                  AD_unbind_admin
@@ -302,12 +303,19 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 # }
 
 
-# --info, show only the users
-if ($info==1) {
-   &print_list_column(6,"Passwörter setzen für user ",@users);
-   print "INFO: $info_line  \n";
-   exit;
+# --info --user <>
+if ($info==1 and $user ne "") {
+    my @users=split(",",$user);
+    foreach my $user (@users){
+        print "$user\n";
+        &AD_get_passwd_hashes($user,\%sophomorix_config);
+       
+
+    }
+    exit;
 }
+
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
