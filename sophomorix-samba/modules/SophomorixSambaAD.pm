@@ -1191,6 +1191,7 @@ sub AD_user_create {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $identifier = $arg_ref->{identifier};
     my $login = $arg_ref->{login};
     my $group = $arg_ref->{group};
@@ -1212,12 +1213,13 @@ sub AD_user_create {
     my $status = $arg_ref->{status};
     my $file = $arg_ref->{file};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
-          "Creating user $user_count : $login (start)");
+          "Creating user $user_count/$max_user_count : $login (start)");
 
     # set defaults if not defined
     if (not defined $identifier){
@@ -1345,6 +1347,28 @@ sub AD_user_create {
         print "   File:               $file\n";
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
+    }
+
+    if ($json>=1){
+        # prepare json object
+        my %json_progress=();
+        $json_progress{'JSONINFO'}="PROGRESS";
+        $json_progress{'COMMENT_EN'}="Adding user $login ($firstname_utf8 $surname_utf8)";
+        $json_progress{'COMMENT_DE'}="Lege Benutzer $login an ($firstname_utf8 $surname_utf8)";
+        $json_progress{'STEP'}=$user_count;
+        $json_progress{'FINAL_STEP'}=$max_user_count;
+        # print JSON Object
+        if ($json==1){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+        } elsif ($json==2){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_json_line   = $json_obj->encode( \%json_progress );
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+        } elsif ($json==3){
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+        }
     }
 
     # make sure $dn_class exists

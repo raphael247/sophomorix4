@@ -322,6 +322,10 @@ my @password_chars=&get_passwd_charlist();
 %forbidden_login_hash=&get_forbidden_logins($ldap,$root_dse);
 
 
+# calulate users to add
+my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.add | wc -l`;
+chomp($max_user_count);
+
 
 # Datei mit den Schülern, die nicht angelegt wurden
 open(STILLTOADD,">$add_file_new") 
@@ -514,6 +518,7 @@ while(<SOPHOMORIXADD>){
                      root_dse=>$root_dse, 
                      root_dns=>$root_dns, 
                      user_count=>$user_count,
+                     max_user_count=>$max_user_count,
                      identifier=>$identifier,
                      login=>$login_token,
                      group=>$group_token,
@@ -536,6 +541,7 @@ while(<SOPHOMORIXADD>){
                      status=>$status,
                      file=>$file,  
                      smb_admin_pass=>$smb_admin_pass,
+                     json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
                    });
