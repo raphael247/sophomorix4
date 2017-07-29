@@ -53,7 +53,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_print
                                  );
 use Sophomorix::SophomorixSambaAD qw(
-                                 AD_get_passwd_hashes
+                                 AD_get_unicodepwd
                                  AD_school_create
                                  AD_bind_admin
                                  AD_unbind_admin
@@ -308,7 +308,7 @@ if ($info==1 and $user ne "") {
     my @users=split(",",$user);
     foreach my $user (@users){
         print "$user\n";
-        &AD_get_passwd_hashes($user,\%sophomorix_config);
+        &AD_get_unicodepwd($user,\%sophomorix_config);
        
 
     }
