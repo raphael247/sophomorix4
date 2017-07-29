@@ -23,6 +23,9 @@ regression-supertest.pl runs multiple tests
 Options:
   -h  / --help
 
+  -s r     reset samba
+  -s all   reset an run all tests
+
   -s 1     reset samba and run sophomorix-test-1
   -s 2     reset samba and run sophomorix-test-2
   -s 3     reset samba and run sophomorix-test-3
