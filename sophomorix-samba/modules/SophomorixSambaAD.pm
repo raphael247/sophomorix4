@@ -1200,6 +1200,7 @@ sub AD_user_set_exam_mode {
                      user=>$participant,
                      user_count=>$user_count,
                      exammode=>$supervisor,
+                     uac_force=>"disable",
                      date_now=> $time_stamp_AD,
                    });
 }
@@ -1228,6 +1229,7 @@ sub AD_user_unset_exam_mode {
                      user=>$participant,
                      user_count=>$user_count,
                      exammode=>"---",
+                     uac_force=>"enable",
                      date_now=> $time_stamp_AD,
                    });
 }
@@ -1717,6 +1719,7 @@ sub AD_user_update {
     my $date_now = $arg_ref->{date_now};
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
+    my $uac_force = $arg_ref->{uac_force};
 
     my ($firstname_AD,
         $lastname_AD,
@@ -1850,6 +1853,21 @@ sub AD_user_update {
         print "   sophomorixDeactivationDate: $deactivation_date\n";
         print "   userAccountControl:         $user_account_control",
               " (was: $user_account_control_AD)\n";
+    }
+    # update userAccountControl for exam users
+    if (defined $uac_force and not defined $status){
+        my $user_account_control;
+        if ($uac_force eq "enable"){
+            $user_account_control=&_uac_enable_user($user_account_control_AD);
+            $replace{'userAccountControl'}=$user_account_control;
+            print "   userAccountControl:         $user_account_control",
+                  " (was: $user_account_control_AD)\n";
+        } elsif ($uac_force eq "disable"){
+            $user_account_control=&_uac_disable_user($user_account_control_AD);
+            $replace{'userAccountControl'}=$user_account_control;
+            print "   userAccountControl:         $user_account_control",
+                  " (was: $user_account_control_AD)\n";
+	}
     }
     if (defined $school and $school ne "---"){
         # update sophomorixSchoolname AND sophomorixSchoolPrefix
@@ -5213,10 +5231,16 @@ sub AD_login_test {
                       base   => $dn,
                       scope => 'base',
                       filter => $filter,
-                      attr => ['sophomorixFirstPassword']
+                      attr => ['sophomorixFirstPassword',
+                               'sophomorixExamMode',
+                               'sophomorixStatus',
+                               'userAccountControl']
                             );
     my $entry = $mesg->entry(0);
     my $firstpassword = $entry->get_value('sophomorixFirstPassword');
+    my $exammode = $entry->get_value('sophomorixExamMode');
+    my $status = $entry->get_value('sophomorixStatus');
+    my $user_account_control = $entry->get_value('userAccountControl');
     my $sam_account = $entry->get_value('sAMAccountName');
 
     if ($firstpassword eq "---" and -e "/etc/linuxmuster/.secret/$sam_account"){
@@ -5234,12 +5258,17 @@ sub AD_login_test {
 
 
     if ($firstpassword eq "---"){
-        print "   * No password test possible\n";
+        print "   * $sam_account($status,$user_account_control,$exammode):".
+              " No password test possible (sophomorixFirstpassword: $firstpassword)\n";
+        return 2;
+    } elsif ( $exammode ne "---"){
+        print "   * $sam_account($status,$user_account_control,$exammode):".
+              " No password test possible (user should be in ExamMode/disabled)\n";
         return 2;
     } else {
         # pam login
         my $command="wbinfo --pam-logon=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
-        print "   # $command\n";
+        print "   # $sam_account: $command\n";
         my $result=system($command);
         return $result;
 

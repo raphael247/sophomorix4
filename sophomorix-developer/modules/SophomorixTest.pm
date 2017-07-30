@@ -50,6 +50,7 @@ $Data::Dumper::Terse = 1;
             cat_wcl_test
             );
 
+
 sub AD_test_session_count {
     my ($ldap,$root_dse,$root_dns,$should) = @_;
     my %sessions=&Sophomorix::SophomorixSambaAD::AD_get_sessions($ldap,$root_dse,$root_dns,0,0,"all");
@@ -150,6 +151,7 @@ sub AD_rooms_any {
 }
 
 
+
 sub AD_user_timeupdate {
     my ($ldap,$root_dse,$dn,$toleration_date,$deactivation_date)=@_;
     print "Updating: $dn\n";
@@ -168,6 +170,7 @@ sub AD_user_timeupdate {
                );
     #&AD_debug_logdump($mesg,2,(caller(0))[3]);
 }
+
 
 
 sub AD_dnsnodes_any {
@@ -258,6 +261,7 @@ sub AD_dn_nonexist {
 }
 
 
+
 sub AD_get_samaccountname {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -289,6 +293,7 @@ sub AD_get_samaccountname {
         return ($sam,$dn);
     }
 }
+
 
 
 sub AD_test_object {
@@ -540,6 +545,8 @@ sub AD_test_object {
         if (defined $s_exammode){
             is ($entry->get_value ('sophomorixExamMode'),$s_exammode,
 		"  * sophomorixExamMode is $s_exammode");
+        } else {
+            $s_exammode="---";
         }
         if (defined $s_type){
             is ($entry->get_value ('sophomorixType'),$s_type,
@@ -741,15 +748,17 @@ sub AD_test_object {
             &test_multivalue($member_of,"memberOf",$entry,$sam_account);
         }
         ##################################################
-        # test login only if status is U,E,A,S,P,T
+        # test login only if status is U,E,A,S,P,T,X
+        # and exammode is off (sophomorixExamMode="---")
         if ($objectclass eq "user" and 
             ($s_status eq "U" or
              $s_status eq "E" or
              $s_status eq "A" or
              $s_status eq "S" or
              $s_status eq "P" or
-             $s_status eq "T"
-            )
+             $s_status eq "T" or
+             $s_status eq "X"
+            ) 
            ){
             my $res=&Sophomorix::SophomorixSambaAD::AD_login_test($ldap,$root_dse,$dn);
             my $firstpass=$entry->get_value ('sophomorixFirstPassword');
@@ -761,7 +770,9 @@ sub AD_test_object {
             } else {
                 is ($res,0,"  * Login OK (pwd: $firstpass): $dn");
             }
-	}
+	} else {
+            "  * Login test skipped (Status: $s_status): $dn"
+        }
 
         # ##################################################
         # # membeOf
@@ -857,6 +868,7 @@ sub test_multivalue {
 }
 
 
+
 ############################################################
 # fs
 ############################################################
@@ -885,6 +897,8 @@ sub start_fs_test {
     print Dumper ($ref_fs_test_result);
 }
 
+
+
 sub end_fs_test {
     my ($ref_fs_test_result) = @_;
     my $count=1;
@@ -901,6 +915,7 @@ sub end_fs_test {
     # show all
     #print Dumper ($ref_fs_test_result);
 }
+
 
 
 ############################################################
@@ -950,6 +965,7 @@ sub directory_tree_test {
         #print "$dir\n";
     } 
 }
+
 
 
 ############################################################
@@ -1140,6 +1156,8 @@ sub file_test_lines {
     }
 }
 
+
+
 sub file_test_chars {
     # abs path to file
     # char number
@@ -1163,6 +1181,7 @@ sub file_test_chars {
 }
 
 
+
 sub run_command {
     my ($command) = @_;
     print "\n";
@@ -1172,6 +1191,8 @@ sub run_command {
     system("$command");
     print "######################################################################\n";
 }
+
+
 
 sub cat_wcl_test {
     # $abs: abs path to file
