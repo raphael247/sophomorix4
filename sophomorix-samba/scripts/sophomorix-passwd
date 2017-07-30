@@ -54,6 +54,7 @@ use Sophomorix::SophomorixBase qw(
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_unicodepwd
+                                 AD_set_unicodepwd
                                  AD_school_create
                                  AD_bind_admin
                                  AD_unbind_admin
@@ -97,6 +98,8 @@ my $test_firstpassword=0;
 my $set_firstpassword=0;
 
 my $user="";
+my $clone_from_user="";
+my $clone_to_user="";
 my $classes="";
 my $projects="";
 my $student=0;
@@ -139,6 +142,8 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "users|user|u=s" => \$user,
+           "clone-from-user=s" => \$clone_from_user,
+           "clone-to-user=s" => \$clone_to_user,
            "class|classes|c=s" => \$classes,
            "project|projects=s" => \$projects,
            "student|students|s" => \$student,
@@ -189,13 +194,27 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-passwd modifies users in the sophomorix database and the authentification system (see also sophomorix-usermod)
+sophomorix-passwd modifies passwords in the AD
 
 Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
+
+Cloning a password-hash from one user to another:
+  --clone-from-user <user1> --clone-to-user <user2>
+
+Testing stuff:
+  --set-firstpassword 
+  --set-firstpassword -u user
+
+  --test-firstpassword 
+  --test-firstpassword -u user
+
+
+
+Todo:
 
 Create a password:
   --config  (use sophomorix.conf)
@@ -225,13 +244,6 @@ Create userlist:
   --project project1,project2,... 
   -r room1,room2,...   /  --rooms room1,room2,...
 
-
-Testing stuff:
-  --set-firstpassword 
-  --set-firstpassword -u user
-
-  --test-firstpassword 
-  --test-firstpassword -u user
 
 Please see the sophomorix-passwd(8) man pages for full documentation
 ');
@@ -308,9 +320,8 @@ if ($info==1 and $user ne "") {
     my @users=split(",",$user);
     foreach my $user (@users){
         print "$user\n";
-        &AD_get_unicodepwd($user,\%sophomorix_config);
-       
-
+        my ($unicodepwd) = &AD_get_unicodepwd($user,\%sophomorix_config);
+        print "   $user: $unicodepwd (unicodePwd)\n"
     }
     exit;
 }
@@ -324,7 +335,23 @@ if ($info==1 and $user ne "") {
 ################################################################################
 &log_script_start(\@arguments,\%sophomorix_result);
 
+############################################################
+# --clone-from-user <user1> --clone-to-user <user2>
+if ( ($clone_from_user ne "" and $clone_to_user eq "") or
+     ($clone_to_user ne "" and $clone_from_user eq "") ){
+    print "\nWARNING: --clone-from-user <user1> --clone-to-user <user2>\n\n";
+    exit;
+} elsif ($clone_from_user ne "" and $clone_to_user ne ""){
+    &print_title("Cloning password-hash of $clone_from_user to $clone_to_user");
+    my $unicodepwd= &AD_get_unicodepwd($clone_from_user,\%sophomorix_config);
+    &AD_set_unicodepwd($clone_to_user,$unicodepwd,\%sophomorix_config);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
 
+
+
+
+############################################################
 # --test-firstpassword
 if ($test_firstpassword==1){
     my $count_tested=0;
@@ -382,6 +409,7 @@ if ($test_firstpassword==1){
     print "$count_tested tested:  $count_success OK,",
           "  $count_fail Failed Logins,",
           " $count_nofirstpass Without Firstpassword Attribute\n";
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -418,6 +446,7 @@ if ($set_firstpassword==1){
                      date_now=> $time_stamp_AD,
                    });
     }
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 

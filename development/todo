@@ -2,6 +2,12 @@ https cloning:
 
 git clone https://github.com/linuxmuster/sophomorix4.git
 
+------------------------------------------------------------
+sophomorix needs to run on the domain controller:
+  - next uid/gid files
+  - access to /var/lib/samba/private/sam.ldb (update unicodePwd)
+------------------------------------------------------------
+
 
 sophomorix-session:
   - userdirectory: transfer
@@ -29,6 +35,9 @@ binduser: anzeigen von
 - CN=global....... .lan  AD-pfad ausgeben
 
 
+password hash cloning cloning
+optional $ldap,root_dse
+wenn undef, dann selber bindm,unbind
 
 
 sernet-Pakete:

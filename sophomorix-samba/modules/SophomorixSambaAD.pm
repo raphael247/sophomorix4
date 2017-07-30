@@ -35,6 +35,7 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             AD_get_passwd
             AD_get_unicodepwd
+            AD_set_unicodepwd
             AD_bind_admin
             AD_unbind_admin
             AD_get_sessions
@@ -88,16 +89,46 @@ $Data::Dumper::Terse = 1;
 
 
 sub AD_get_unicodepwd {
-    my ($sam,$ref_sophomorix_config)=@_;
+    my ($sam,$ref_sophomorix_config) = @_;
     my $string=`ldbsearch --url $ref_sophomorix_config->{'INI'}{'PATHS'}{'SAM_LDB'} "sAMAccountName=$sam" unicodePwd`;
     my @lines=split("\n",$string);
+    my $unicodepwd;
     foreach my $line (@lines){
         if ($line=~m/unicodePwd/){
             my ($attr,$pass)=split("::",$line);
-            $pass=&Sophomorix::SophomorixBase::remove_whitespace($pass);
-            print "   $sam: $pass (unicodePwd)\n"
+            $unicodepwd=&Sophomorix::SophomorixBase::remove_whitespace($pass);
+            last; # dont look further
         }
     }
+    return $unicodepwd;
+}
+
+
+
+sub AD_set_unicodepwd {
+    my ($user,$unicodepwd,$ref_sophomorix_config) = @_;
+
+    # ???
+    my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+
+    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+    system("mkdir -p $ref_sophomorix_config->{'INI'}{'PATHS'}{'TMP_PWDUPDATE'}");
+    my $ldif=$ref_sophomorix_config->{'INI'}{'PATHS'}{'TMP_PWDUPDATE'}."/".$user.".ldif";
+    open(LDIF,">$ldif")|| die "ERROR: $!";
+    print LDIF "dn: $dn\n";
+    print LDIF "changetype: modify\n";
+    print LDIF "replace: unicodePwd\n";
+    print LDIF "unicodePwd:: $unicodepwd\n";
+    close(LDIF);
+    # load ldif file
+    my $com="ldbmodify -H /var/lib/samba/private/sam.ldb --controls=local_oid:1.3.6.1.4.1.7165.4.3.12:0 $ldif";
+    my $res=system($com);
+    if (not $res==0){
+        print "ERROR: password update failed, $res returned\n";
+    }
+    system("rm $ldif");
+    # ???
+    &AD_unbind_admin($ldap);
 }
 
 
