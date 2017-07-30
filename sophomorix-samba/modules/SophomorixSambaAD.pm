@@ -1952,6 +1952,8 @@ sub AD_get_user {
                               'sophomorixTolerationDate',
                               'sophomorixDeactivationDate',
                               'sophomorixSchoolname',
+                              'sophomorixStatus',
+                              'sophomorixFirstPassword',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -1971,10 +1973,12 @@ sub AD_get_user {
         my $toleration_date = $entry->get_value('sophomorixTolerationDate');
         my $deactivation_date = $entry->get_value('sophomorixDeactivationDate');
         my $school = $entry->get_value('sophomorixSchoolname');
+        my $status = $entry->get_value('sophomorixStatus');
+        my $firstpassword = $entry->get_value('sophomorixFirstPassword');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,
                 $home_directory,$user_account_control,$toleration_date,
-                $deactivation_date,$school);
+                $deactivation_date,$school,$status,$firstpassword);
     }
 }
 
@@ -5287,6 +5291,7 @@ sub AD_examuser_create {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
+    my $firstpassword = $arg_ref->{firstpassword};
     my $subdir = $arg_ref->{subdir};
     my $user_count = $arg_ref->{user_count};
     my $date_now = $arg_ref->{date_now};
@@ -5372,7 +5377,7 @@ sub AD_examuser_create {
                    sophomorixStatus => $status,
                    sophomorixAdminClass => "---",    
                    sophomorixAdminFile => $file,    
-                   sophomorixFirstPassword => "---", 
+                   sophomorixFirstPassword => $firstpassword, 
                    sophomorixFirstnameASCII => "---",
                    sophomorixSurnameASCII  => "---",
                    sophomorixBirthdate  => "01.01.1970",
