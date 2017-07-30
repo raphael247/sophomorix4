@@ -661,6 +661,7 @@ sub AD_repdir_using_file {
 
                     $path_after_user_smb=~s/\@\@COLLECT_DIR_HOME\@\@/$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'COLLECT_DIR_HOME_'.$ref_sophomorix_config->{'GLOBAL'}{'LANG'}}/;
                     $path_after_user_smb=~s/\@\@SHARE_DIR_HOME\@\@/$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'SHARE_DIR_HOME_'.$ref_sophomorix_config->{'GLOBAL'}{'LANG'}}/;
+                    $path_after_user_smb=~s/\@\@TRANSFER_DIR_HOME\@\@/$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.$ref_sophomorix_config->{'GLOBAL'}{'LANG'}}/;
                     if($Conf::log_level>=3){      
                         print "      * Path after user:   $path_after_user (smb: $path_after_user_smb)\n";
 	            }
