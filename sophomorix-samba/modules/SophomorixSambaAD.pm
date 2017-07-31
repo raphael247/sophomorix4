@@ -732,15 +732,16 @@ sub AD_user_kill {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
-        $user_account_control,$toleration_date,$deactivation_date,$school)=
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD)=
         &AD_get_user({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
                       user=>$user,
                     });
-    $home_directory=~s/\\/\//g;
-    my $smb_home="smb:".$home_directory;
+    $home_directory_AD=~s/\\/\//g;
+    my $smb_home="smb:".$home_directory_AD;
 
     &Sophomorix::SophomorixBase::print_title("Killing User $user ($user_count):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
@@ -752,10 +753,10 @@ sub AD_user_kill {
         system($command);
 
         # deleting home
-        if ($role eq "student" or 
-            $role eq "teacher" or 
-            $role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
-            $role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
+        if ($role_AD eq "student" or 
+            $role_AD eq "teacher" or 
+            $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
+            $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
            ){
               my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                password  => $smb_admin_pass,
@@ -1720,8 +1721,8 @@ sub AD_user_update {
     my $examteacher = $arg_ref->{exammode};
     my $uac_force = $arg_ref->{uac_force};
 
-    my ($firstname_AD,
-        $lastname_AD,
+    my ($firstname_utf8_AD,
+        $lastname_utf8_AD,
         $adminclass_AD,
         $existing_AD,
         $exammode_AD,
@@ -1730,7 +1731,9 @@ sub AD_user_update {
         $user_account_control_AD,
         $toleration_date_AD,
         $deactivation_date_AD,
-        $school_unused,
+        $school_AD,
+        $status_AD,
+        $firstpassword_AD
        )=&AD_get_user({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
@@ -1762,9 +1765,9 @@ sub AD_user_update {
         if ($firstname_utf8 ne "---" and $surname_utf8 ne "---"  ){
            $display_name = $firstname_utf8." ".$surname_utf8;
         } elsif ($firstname_utf8 eq "---"){
-           $display_name = $firstname_AD." ".$surname_utf8;
+           $display_name = $firstname_utf8_AD." ".$surname_utf8;
         } elsif ($surname_utf8 eq "---"){
-           $display_name = $firstname_utf8." ".$lastname_AD;
+           $display_name = $firstname_utf8." ".$lastname_utf8_AD;
         }
         $replace{'displayName'}=$display_name;
         print "   displayName:                $display_name\n";
@@ -2799,33 +2802,34 @@ sub AD_get_sessions {
                 }
                 foreach $participant (@participants){
                     # get userinfo
-                    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
-                        $user_account_control,$toleration_date,$deactivation_date,$school)=
+                    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
                         &AD_get_user({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       user=>$participant,
                            });
 
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_existing'}=$existing;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'sophomorixRole'}=$role;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname_utf8_AD;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname_utf8_AD;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass_AD;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_existing'}=$existing_AD;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'sophomorixRole'}=$role_AD;
+                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode_AD;
 
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_firstname'}=$firstname;
+                             {$participant}{'user_firstname'}=$firstname_utf8_AD;
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_lastname'}=$lastname;
+                             {$participant}{'user_lastname'}=$lastname_utf8_AD;
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_adminclass'}=$adminclass;
+                             {$participant}{'user_adminclass'}=$adminclass_AD;
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_existing'}=$existing;
+                             {$participant}{'user_existing'}=$existing_AD;
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_exammode'}=$exammode;
+                             {$participant}{'user_exammode'}=$exammode_AD;
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'sophomorixRole'}=$role;
+                             {$participant}{'sophomorixRole'}=$role_AD;
 
                     # test participantship in managementgroups
                     my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
@@ -5299,14 +5303,15 @@ sub AD_examuser_create {
 
     &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant (start)");
     # get data from (non-exam-)user
-    my ($firstname_utf8,$lastname_utf8,$adminclass,$existing,$exammode,$role,$home_directory,
-        $user_account_control,$toleration_date,$deactivation_date,$school)=
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD)=
         &AD_get_user({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
                       user=>$participant,
                     });
-    my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".$firstname_utf8." ".$lastname_utf8;
+    my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".$firstname_utf8_AD." ".$lastname_utf8_AD;
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
  
     my $uni_password;
@@ -5316,8 +5321,8 @@ sub AD_examuser_create {
         $uni_password=&_unipwd_from_plainpwd($DevelConf::student_password_default);
     }
 
-    my $prefix=$school;
-    if ($school eq $DevelConf::name_default_school){
+    my $prefix=$school_AD;
+    if ($school_AD eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
         $prefix="---";
     }
@@ -5328,7 +5333,7 @@ sub AD_examuser_create {
 
     # create OU for session
     $dn_session="OU=".$subdir.",".$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_OU'}.
-                ",OU=".$school.",OU=SCHOOLS,".$root_dse;
+                ",OU=".$school_AD.",OU=SCHOOLS,".$root_dse;
     $ldap->add($dn_session,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $dn="CN=".$examuser.",".$dn_session;
 
@@ -5340,7 +5345,7 @@ sub AD_examuser_create {
     my $deactivationdate=$DevelConf::default_date;
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
-                                                       $school,
+                                                       $school_AD,
                                                        $subdir, # groupname is the subdir
                                                        $examuser,
                                                        $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_ROLE'},
@@ -5349,10 +5354,10 @@ sub AD_examuser_create {
 
         print "   DN:                 $dn\n";
         print "   DN(Parent):         $dn_session\n";
-        print "   Surname(UTF8):      $lastname_utf8\n";
-        print "   Firstname(UTF8):    $firstname_utf8\n";
-        print "   School:             $school\n"; # Organisatinal Unit
-        print "   Role(User):         $role\n";
+        print "   Surname(UTF8):      $lastname_utf8_AD\n";
+        print "   Firstname(UTF8):    $firstname_utf8_AD\n";
+        print "   School:             $school_AD\n"; # Organisatinal Unit
+        print "   Role(User):         $role_AD\n";
         print "   Status:             $status\n";
         print "   Login (check OK):   $examuser\n";
         # sophomorix stuff
@@ -5368,8 +5373,8 @@ sub AD_examuser_create {
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $examuser,
-                   givenName => $firstname_utf8,
-                   sn => $lastname_utf8,
+                   givenName => $firstname_utf8_AD,
+                   sn => $lastname_utf8_AD,
                    displayName => [$display_name],
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
@@ -5387,13 +5392,13 @@ sub AD_examuser_create {
                    sophomorixBirthdate  => "01.01.1970",
                    sophomorixRole => "examuser",
                    sophomorixSchoolPrefix => $prefix,
-                   sophomorixSchoolname => $school,
+                   sophomorixSchoolname => $school_AD,
                    sophomorixCreationDate => $creationdate, 
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
                    sophomorixExamMode => "---", 
-                   userAccountControl => $user_account_control=$DevelConf::default_user_account_control,
+                   userAccountControl => $DevelConf::default_user_account_control,
                    uidNumber => $uidnumber_wish,
 
                    objectclass => ['top', 'person',
@@ -5423,15 +5428,16 @@ sub AD_examuser_kill {
 
     print "$count,$dn_exist,$cn_exist\n";
     if ($count > 0){
-        my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
-            $user_account_control,$toleration_date,$deactivation_date,$school)=
+        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+            $school_AD,$status_AD,$firstpassword_AD)=
             &AD_get_user({ldap=>$ldap,
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
                           user=>$examuser,
                         });
 
-        if ($role ne "examuser"){
+        if ($role_AD ne "examuser"){
             print "Not deleting $examuser beause its role is not examuser";
             return;
 	}
@@ -5440,7 +5446,7 @@ sub AD_examuser_kill {
         system($command);
 
         # # deleting home
-        # if ($role eq "examuser"){
+        # if ($role_AD eq "examuser"){
         #       my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
         #                                        password  => $smb_admin_pass,
         #                                        debug     => 1);

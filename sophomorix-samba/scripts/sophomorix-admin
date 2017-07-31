@@ -553,22 +553,23 @@ if ($create_global_binduser ne ""){
 # --kill <user>
 if ($kill ne ""){
     # make sure it exists and is an administrator created by sophomorix
-    my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,
-        $user_account_control,$toleration_date,$deactivation_date,$school)=
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD)=
     &AD_get_user({ldap=>$ldap,
                   root_dse=>$root_dse,
                   root_dns=>$root_dns,
                   user=>$kill,
                 });
 
-    if ($existing eq "FALSE"){
+    if ($existing_AD eq "FALSE"){
         print "\nERROR: User $kill does not exist\n\n";
         exit;
     }
-    if ($role eq $sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'} or
-        $role eq $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'} or
-        $role eq $sophomorix_config{'INI'}{'binduser.global'}{'USER_ROLE'} or
-        $role eq $sophomorix_config{'INI'}{'binduser.school'}{'USER_ROLE'}
+    if ($role_AD eq $sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'} or
+        $role_AD eq $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'} or
+        $role_AD eq $sophomorix_config{'INI'}{'binduser.global'}{'USER_ROLE'} or
+        $role_AD eq $sophomorix_config{'INI'}{'binduser.school'}{'USER_ROLE'}
        ){
         &AD_user_kill({ldap=>$ldap,
                        root_dse=>$root_dse,

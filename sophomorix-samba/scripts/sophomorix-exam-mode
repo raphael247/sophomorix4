@@ -208,14 +208,15 @@ if ($set_exam_mode==1){
         $user_count++;
         my $firstpassword=$DevelConf::student_password_default;
         if ($sophomorix_config{'INI'}{'EXAMMODE'}{'FIRSTPASSWORD_COPY'} eq "TRUE"){
-            my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,$user_account_control,
-                $toleration_date,$deactivation_date,$school,$status,$firstpassword_get)=
+            my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,
+                $role_AD,$home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+                $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
                 &AD_get_user({ldap=>$ldap,
                               root_dse=>$root_dse,
                               root_dns=>$root_dns,
                               user=>$participant,
                             });
-	    $firstpassword=$firstpassword_get;
+	    $firstpassword=$firstpassword_AD;
         }
 
         &AD_user_set_exam_mode({ldap=>$ldap,
