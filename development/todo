@@ -7,13 +7,15 @@ sophomorix needs to run on the domain controller:
   - next uid/gid files
   - access to /var/lib/samba/private/sam.ldb (update unicodePwd)
 ------------------------------------------------------------
-
+next:
 
 sophomorix-session:
+  - OK: userdirectory: transfer anlegen
   - userdirectory: transfer
-  - anzeigen des transfer ordners des supervisors?
+    - anzeigen des transfer ordners des supervisors?
   -i :
      entweder user anzeigen, ODER user-exam
+     im JSON beides drin
 
 sophomorix-exam-mode
   user enablen/disablen
@@ -21,12 +23,44 @@ sophomorix-exam-mode
 password des >user< übernehmen für >exam-user<, kein firstpassword eintrag
 sophomorix-passwd: password für >exam-user< setzen, muss tun
 
+smbclient usw: abs_path in sophomorix.ini, and use it
+
+info:
+unicodePwd: kann nicht direkt gesetzt werden
+ der Wert unicodePwd wird mit Net::LDAP dem samba4-server im
+ Klartext übergeben (firstpassword), der samba4 server speichert es gehasht ab
+ 
+
+
+sophomorix-passwd: password ändern mit option
+
+test-exam:
+   user anlegen, passwort ändern auf bestimmten Wert <newMuster!>
+   exam-user anlegen, testen ob examaccount <newMuster!> tut
+
+
 
 austeilen/einsammeln-Befehle
+------------------------------------------------------------
+von unix auf smbshare mit: mput, recurse
 
+optionen: sharename,unix-from-path
 
-http://manpages.ubuntu.com/manpages/trusty/man1/gvfs-copy.1.html
+/usr/local/bin/smbclient //servername/share  -c "cd remote_path_of share; lcd /var/schuko/dir; prompt; recurse; mput *; exit;"
 
+prompt: Nachfrage für jedes file an/aus
+exit: beendet connection
+
+exit evtl. vermeiden und mehrfach kopieren, spart Zeit?
+
+von smbshare zu smbshare
+
+  * server site copy nutzen:
+    https://wiki.samba.org/index.php/Server-Side_Copy
+  * gvfs
+    http://manpages.ubuntu.com/manpages/trusty/man1/gvfs-copy.1.html
+  * mount als smb share, use find usw, rsync
+  sudo mount -t cifs //192.168.2.73/BACKUPS /mnt -o username=luis,file_mode=0777,dir_mode=0777
 
 
 binduser: anzeigen von
@@ -51,7 +85,8 @@ sernet-Pakete:
    - selbst bezahlten features (smbcacls rekursiv)
 
 
-Rückgabe:
+------------------------------------------------------------
+PROGRESS (Rückgabe bei langlaufenden Scripten)
 
 --> STDERR
 comment_en
@@ -66,6 +101,37 @@ OK: sophomorix-add
 sophomorix-update
 sophomorix-kill
 sophomorix-device
+sophomorix-exam-mode mit progress JSON output
+    setting user ... in exam mode, unset
+-> Textstrings in sophomorix.ini
+
+[LANG.PROGRESS]
+  ADDUSER_PREFIX_EN = Adding user
+  ADDUSER_POSTFIX_EN = .
+  ADDUSER_PREFIX_DE = Lege Benutzer
+  ADDUSER_POSTFIX_DE = an.
+  UPDATEUSER_PREFIX_EN = Updating user
+  UPDATEUSER_POSTFIX_EN = .
+  UPDATEUSER_PREFIX_DE = Aktualisiere Benutzer
+  UPDATEUSER_POSTFIX_DE = .
+  KILLUSER_PREFIX_EN = Deleting user
+  KILLUSER_POSTFIX_EN = .
+  KILLUSER_PREFIX_DE = Lösche Benutzer
+  KILLUSER_POSTFIX_DE = .
+  ADDCOMPUTER_PREFIX_EN = Adding computer
+  ADDCOMPUTER_POSTFIX_EN = .
+  ADDCOMPUTER_PREFIX_DE = Lege Comuter
+  ADDCOMPUTER_POSTFIX_DE = an.
+  SETEXAMMODE_PREFIX_EN = Starting exammode for
+  SETEXAMMODE_POSTFIX_EN = .
+  SETEXAMMODE_PREFIX_DE = Beginne Klassenarbeitsmodus für
+  SETEXAMMODE_POSTFIX_DE = .
+  UNSETEXAMMODE_PREFIX_EN = Terminating exammode for
+  UNSETEXAMMODE_POSTFIX_EN = .
+  UNSETEXAMMODE_PREFIX_DE = Beende Klassenarbeitsmodus für
+  UNSETEXAMMODE_POSTFIX_DE = .
+
+
 
 
 
@@ -755,7 +821,7 @@ $dns_zone_prefix_string="SophomorixdnsZone";
 
 
 sophomorix.ini ?????:
-definitions in [OU] shoulb be moved to other sections
+definitions in [OU] should be moved to other sections
 i.e. AD_project_ou
 should be moved to upcoming? section [type.project]->[SUB_OU]
 
