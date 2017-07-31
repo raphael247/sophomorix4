@@ -5292,6 +5292,7 @@ sub AD_examuser_create {
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
     my $firstpassword = $arg_ref->{firstpassword};
+    my $unicodepwd_force = $arg_ref->{unicodepwd_force};
     my $subdir = $arg_ref->{subdir};
     my $user_count = $arg_ref->{user_count};
     my $date_now = $arg_ref->{date_now};
@@ -5309,7 +5310,16 @@ sub AD_examuser_create {
                     });
     my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".$firstname_utf8." ".$lastname_utf8;
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
-    my $uni_password=&_unipwd_from_plainpwd("Muster!");# ???
+ 
+    my $uni_password;
+    if (defined $unicodepwd_force){
+        $uni_password=$unicodepwd_force;
+    } elsif (defined $firstpassword) {
+        $uni_password=&_unipwd_from_plainpwd($firstpassword);
+    } else {
+        $uni_password=&_unipwd_from_plainpwd("Muster!");
+    }
+
     my $prefix=$school;
     if ($school eq $DevelConf::name_default_school){
         # empty token creates error on AD add 
@@ -5321,7 +5331,6 @@ sub AD_examuser_create {
     my $user_principal_name = $examuser."\@".$root_dns;
 
     # create OU for session
-#    $dn_session="OU=".$subdir.",OU=Examusers,OU=".$school.",OU=SCHOOLS,".$root_dse;
     $dn_session="OU=".$subdir.",".$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_OU'}.
                 ",OU=".$school.",OU=SCHOOLS,".$root_dse;
     $ldap->add($dn_session,attr => ['objectclass' => ['top', 'organizationalUnit']]);
@@ -5356,6 +5365,7 @@ sub AD_examuser_create {
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
         print "   File:               $file\n";
+        print "   Firstpassword:      $firstpassword\n";
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
 
