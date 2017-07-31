@@ -159,8 +159,8 @@ sub AD_bind_admin {
         print "\nERROR: Connection to AD failed: No password found!\n\n";
         print "sophomorix connects to AD with the user $DevelConf::sophomorix_AD_admin:\n";
         print "  A) Make sure $DevelConf::sophomorix_AD_admin exists:\n";
-        print "     samba-tool user create $DevelConf::sophomorix_AD_admin %Muster!% \n";
-        print "     (Replace Muster! according to: samba-tool domain passwordsettings show)\n";
+        print "     samba-tool user create $DevelConf::sophomorix_AD_admin %<password>% \n";
+        print "     (Replace <password> according to: samba-tool domain passwordsettings show)\n";
         print "  B) Store the Password of $DevelConf::sophomorix_AD_admin (without newline character) in:\n";
         print "     $DevelConf::secret_file_sophomorix_AD_admin\n";
         print "\n";
@@ -208,7 +208,7 @@ sub AD_bind_admin {
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
     # Testing if sophomorix schema is present
-    # ldbsearch -H ldap://localhost -UAdministrator%Muster! -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User
+    # ldbsearch -H ldap://localhost -UAdministrator%<password> -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User
     if($Conf::log_level>=2){
         print "Testing if the Sophomorix Schema exists (Sophomorix-User)...\n";
     }
@@ -1462,7 +1462,6 @@ sub AD_user_create {
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
                    sophomorixSchoolPrefix => $prefix,
-#                   sophomorixCustom => "Tst",
                    sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate, 
                    sophomorixTolerationDate => $tolerationdate, 
@@ -2239,7 +2238,7 @@ sub AD_user_move {
     if ($school_old eq $school_new){
         # this is on the same share
         # smbclient ... rename (=move)
-#        my $smbclient_command="smbclient -U Administrator%'Muster!'".
+#        my $smbclient_command="smbclient -U Administrator%'<password>'".
 #                              " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
         my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
                               " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
@@ -5292,7 +5291,6 @@ sub AD_examuser_create {
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
     my $firstpassword = $arg_ref->{firstpassword};
-    my $unicodepwd_force = $arg_ref->{unicodepwd_force};
     my $subdir = $arg_ref->{subdir};
     my $user_count = $arg_ref->{user_count};
     my $date_now = $arg_ref->{date_now};
@@ -5312,12 +5310,10 @@ sub AD_examuser_create {
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
  
     my $uni_password;
-    if (defined $unicodepwd_force){
-        $uni_password=$unicodepwd_force;
-    } elsif (defined $firstpassword) {
+    if (defined $firstpassword) {
         $uni_password=&_unipwd_from_plainpwd($firstpassword);
     } else {
-        $uni_password=&_unipwd_from_plainpwd("Muster!");
+        $uni_password=&_unipwd_from_plainpwd($DevelConf::student_password_default);
     }
 
     my $prefix=$school;
@@ -5378,8 +5374,6 @@ sub AD_examuser_create {
                    userPrincipalName => $user_principal_name,
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
-#                   homeDirectory => "\\\\linuxmuster.local\\bsz\\examusers"."\\".$subdir."\\".$examuser,
-#                   unixHomeDirectory => "/srv/samba/schools/bsz/examusers/".$subdir."/".$examuser,
                    homeDirectory => $homedirectory,
                    unixHomeDirectory => $unix_home,
                    sophomorixExitAdminClass => "unknown", 

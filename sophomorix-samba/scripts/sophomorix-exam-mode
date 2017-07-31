@@ -50,6 +50,8 @@ use Sophomorix::SophomorixBase qw(
                                  remove_from_list
                                  );
 use Sophomorix::SophomorixSambaAD qw(
+                                 AD_get_unicodepwd
+                                 AD_set_unicodepwd
                                  AD_school_create
                                  AD_bind_admin
                                  AD_unbind_admin
@@ -204,7 +206,7 @@ if ($set_exam_mode==1){
     my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
         $user_count++;
-        my $firstpassword="---";
+        my $firstpassword=$DevelConf::student_password_default;
         if ($sophomorix_config{'INI'}{'EXAMMODE'}{'FIRSTPASSWORD_COPY'} eq "TRUE"){
             my ($firstname,$lastname,$adminclass,$existing,$exammode,$role,$home_directory,$user_account_control,
                 $toleration_date,$deactivation_date,$school,$status,$firstpassword_get)=
@@ -237,8 +239,14 @@ if ($set_exam_mode==1){
                              date_now=> $time_stamp_AD,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,
-                            });
-    # add unicodepwd to examuser
+                           });
+
+        if ($sophomorix_config{'INI'}{'EXAMMODE'}{'PASSWORDHASH_COPY'} eq "TRUE"){
+            my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
+            my $unicodepwd= &AD_get_unicodepwd($participant,\%sophomorix_config);
+            &AD_set_unicodepwd($examuser,$unicodepwd,\%sophomorix_config);
+        }
+
     # create dir/subdir
 
     }
