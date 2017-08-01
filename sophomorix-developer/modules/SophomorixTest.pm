@@ -771,9 +771,9 @@ sub AD_test_object {
                 is ($res,0,"  * Login OK (pwd: $firstpass): $dn");
             }
 	} elsif ($objectclass eq "user") {
-            "  * Login test skipped (Status: $s_status): $dn"
+            print "  * Login test skipped (Status: $s_status): $dn"
         } else {
-            "  * Login test skipped (Objectclass: $objectclass): $dn"
+            print "  * Login test skipped (Objectclass: $objectclass): $dn"
         }
 
         # ##################################################
