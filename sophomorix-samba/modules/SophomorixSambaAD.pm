@@ -1193,7 +1193,7 @@ sub AD_user_set_exam_mode {
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
         print "ERROR: Could not set exam mode for nonexisting user $participant\n";
-        return;
+        return 1;
     }
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
@@ -1204,6 +1204,7 @@ sub AD_user_set_exam_mode {
                      uac_force=>"disable",
                      date_now=> $time_stamp_AD,
                    });
+    return 0;
 }
 
 
