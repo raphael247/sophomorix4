@@ -756,7 +756,6 @@ sub AD_user_kill {
         # deleting home
         if ($role_AD eq "student" or 
             $role_AD eq "teacher" or 
-            $role_AD eq "examuser" or 
             $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
             $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
            ){
@@ -5434,6 +5433,7 @@ sub AD_examuser_kill {
     my $participant = $arg_ref->{participant};
     my $user_count = $arg_ref->{user_count};
     my $date_now = $arg_ref->{date_now};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
     &Sophomorix::SophomorixBase::print_title("Killing examuser of user: $participant");
@@ -5450,6 +5450,8 @@ sub AD_examuser_kill {
                           root_dns=>$root_dns,
                           user=>$examuser,
                         });
+        $home_directory_AD=~s/\\/\//g;
+        my $smb_home="smb:".$home_directory_AD;
 
         if ($role_AD ne "examuser"){
             print "Not deleting $examuser beause its role is not examuser";
@@ -5459,19 +5461,19 @@ sub AD_examuser_kill {
         print "   # $command\n";
         system($command);
 
-        # # deleting home
-        # if ($role_AD eq "examuser"){
-        #       my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
-        #                                        password  => $smb_admin_pass,
-        #                                        debug     => 1);
-        #       #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-        #       my $return=$smb->rmdir_recurse($smb_home);
-        #       if($return==1){
-        #           print "OK: Deleted with succes $smb_home\n";
-        #       } else {
-        #           print "ERROR: rmdir_recurse $smb_home $!\n";
-        #       }
-        # }
+        # deleting home
+        if ($role_AD eq "examuser"){
+              my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+                                               password  => $smb_admin_pass,
+                                               debug     => 1);
+              #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+              my $return=$smb->rmdir_recurse($smb_home);
+              if($return==1){
+                  print "OK: Deleted with succes $smb_home\n";
+              } else {
+                  print "ERROR: rmdir_recurse $smb_home $!\n";
+              }
+        }
         return;
     } else {
         print "   * User $examuser nonexisting ($count results)\n";

@@ -7,6 +7,26 @@ sophomorix needs to run on the domain controller:
   - next uid/gid files
   - access to /var/lib/samba/private/sam.ldb (update unicodePwd)
 ------------------------------------------------------------
+
+next developer meeting
+
+sophomorix-exam-mode --unset --participants <user1>,<user2>,..
+soll da noch der participant hinzu?
+- um das wegnehmen des users aus einer ka zu erschweren?
+------------------------------------------------------------
+
+
+sophomorix-session -i -s session:
+muss bei den usern anzeigen werd die session gestartet hat
+
+
+AD_user_kill
+   identifier unused in sub -> remove?
+
+Verzeichnis none bei examusers
+-> wird noch nicht gelöscht, wer macht das ?
+
+
 next:
 
 sophomorix-session:
@@ -609,18 +629,25 @@ OK in
 
 Noch Todo:
 
+/srv/samba/schools/default-school/examusers
+/srv/samba/schools/default-school/?exam?
+repdir.examuser_home 
+   @@ADMINCLASS@@ -> @@EXAM@@
+       student_home.ntacl  ersetzen
+       student_home.ntacl  ersetzen
+
 /srv/samba/global
 -> vorbereitet in global.ntacl.template
 
 /srv/samba/global/projects/<p_name>
 -> kommt nach projects.share.ntacl.template
 
-Und evtl.?
-/srv/samba/schools/default-school/students/5a/homes/adamskke/_austeilen
-/srv/samba/schools/default-school/students/5a/homes/adamskke/_einsammeln
+Und unloeschbar:
+/srv/samba/schools/default-school/students/5a/homes/adamskke/transfer
 --> Unterschiedlich dazu
-/srv/samba/schools/default-school/teachers/homes/cv/_austeilen
-/srv/samba/schools/default-school/teachers/homes/cv/_einsammeln
+/srv/samba/schools/default-school/teachers/homes/cv/transfer
+--> Unterschiedlich dazu
+/srv/samba/schools/default-school/examusers/?exam?/transfer
 
 Und evtl. dito für exam-user
 ------------------------------------------------------------

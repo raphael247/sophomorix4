@@ -527,6 +527,7 @@ if ($test_add_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/examusers",
+                         "/srv/samba/schools/bsz/examusers/none",  # ????????????????????????????
                          "/srv/samba/schools/bsz/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
@@ -1596,7 +1597,6 @@ if ($test_nonexammode_users==1){
                    memberOf => "bsz|all-teachers",
                   });
 
-
     # check if examuser are deleted
     &AD_object_nonexist($ldap,$root_dse,"user","maiersa72-exam");
     &AD_object_nonexist($ldap,$root_dse,"user","muellegr72-exam");
@@ -1611,7 +1611,103 @@ if ($test_nonexammode_users==1){
     &AD_object_nonexist($ldap,$root_dse,"user","schneima72-exam");
     &AD_object_nonexist($ldap,$root_dse,"user","sch72-exam");
    
+    ############################################################
     # check if homes of examusers are deleted
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
+    &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
+                         "/srv/samba/schools",
+                         "/srv/samba/schools/bsz",
+                         "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/examusers",
+                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/students",
+                         "/srv/samba/schools/bsz/teachers",
+                         "/srv/samba/schools/bsz/teachers/homes",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72/transfer",
+#                         "/srv/samba/schools/bsz/teachers/homes/oe72/_einsammeln",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72/transfer",
+#                         "/srv/samba/schools/bsz/teachers/homes/wu72/_einsammeln",
+                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/students/m7ab",
+                         "/srv/samba/schools/bsz/students/m7ab/homes",
+                         "/srv/samba/schools/bsz/students/m7ab/share",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer",
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr72",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr72/transfer",
+#                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr72/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m8cd",
+                         "/srv/samba/schools/bsz/students/m8cd/share",
+                         "/srv/samba/schools/bsz/students/m8cd/homes",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/transfer",
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/_einsammeln",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze72",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/transfer",
+#                         "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/_einsammeln",
+                         "/srv/samba/schools/uni",
+                         "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/examusers",
+                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/students",
+                         "/srv/samba/schools/uni/students/12abc",
+                         "/srv/samba/schools/uni/students/12abc/share",
+                         "/srv/samba/schools/uni/students/12abc/homes",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo72",
+                         "/srv/samba/schools/uni/students/12abc/homes/lordjo72/transfer",
+#                         "/srv/samba/schools/uni/students/12abc/homes/lordjo72/_einsammeln",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri72",
+                         "/srv/samba/schools/uni/students/12abc/homes/blackmri72/transfer",
+#                         "/srv/samba/schools/uni/students/12abc/homes/blackmri72/_einsammeln",
+                         "/srv/samba/schools/uni/teachers",
+                         "/srv/samba/schools/uni/teachers/homes",
+                         "/srv/samba/schools/uni/teachers/homes/kep72",
+                         "/srv/samba/schools/uni/teachers/homes/kep72/transfer",
+#                         "/srv/samba/schools/uni/teachers/homes/kep72/_einsammeln",
+                         "/srv/samba/schools/uni/teachers/homes/gal72",
+                         "/srv/samba/schools/uni/teachers/homes/gal72/transfer",
+#                         "/srv/samba/schools/uni/teachers/homes/gal72/_einsammeln",
+                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/default-school",
+                         "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/examusers",
+                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/students",
+                         "/srv/samba/schools/default-school/students/s6ade",
+                         "/srv/samba/schools/default-school/students/s6ade/share",
+                         "/srv/samba/schools/default-school/students/s6ade/homes",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima72",
+                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima72/transfer",
+#                         "/srv/samba/schools/default-school/students/s6ade/homes/schneima72/_einsammeln",
+                         "/srv/samba/schools/default-school/teachers",
+                         "/srv/samba/schools/default-school/teachers/homes",
+                         "/srv/samba/schools/default-school/teachers/homes/sch72",
+                         "/srv/samba/schools/default-school/teachers/homes/sch72/transfer",
+#                         "/srv/samba/schools/default-school/teachers/homes/sch72/_einsammeln",
+                         "/srv/samba/schools/default-school/teachers/share",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+
 
 
 }
@@ -1681,6 +1777,8 @@ if ($test_kill_users==1){
                          "/srv/samba/schools",
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/examusers",
+                         "/srv/samba/schools/bsz/examusers/none", # ?????????????????????
                          "/srv/samba/schools/bsz/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
@@ -1688,6 +1786,7 @@ if ($test_kill_users==1){
                          "/srv/samba/schools/bsz/teachers/share",
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/examusers",
                          "/srv/samba/schools/uni/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/teachers",
@@ -1695,6 +1794,7 @@ if ($test_kill_users==1){
                          "/srv/samba/schools/uni/teachers/share",
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/examusers",
                          "/srv/samba/schools/default-school/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/teachers",
