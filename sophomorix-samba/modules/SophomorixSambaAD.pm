@@ -552,6 +552,7 @@ sub AD_repdir_using_file {
             $dir=~s/>\$directory_teachers</${DevelConf::directory_teachers}/;
             $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
             $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
+            $dir=~s/>\$directory_examusers</${DevelConf::directory_examusers}/;
             # remove <,>
             $dir=~s/^>//g;
             $dir=~s/<$//g;
@@ -5295,7 +5296,7 @@ sub AD_examuser_create {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
-    my $firstpassword = $arg_ref->{firstpassword};
+#    my $firstpassword = $arg_ref->{firstpassword};
     my $subdir = $arg_ref->{subdir};
     my $user_count = $arg_ref->{user_count};
     my $date_now = $arg_ref->{date_now};
@@ -5312,12 +5313,14 @@ sub AD_examuser_create {
                       root_dns=>$root_dns,
                       user=>$participant,
                     });
-    my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".$firstname_utf8_AD." ".$lastname_utf8_AD;
+    my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".
+                       $firstname_utf8_AD." ".$lastname_utf8_AD;
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
  
     my $uni_password;
-    if (defined $firstpassword) {
-        $uni_password=&_unipwd_from_plainpwd($firstpassword);
+    if ($ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'FIRSTPASSWORD_COPY'} eq "TRUE"){
+#    if (defined $firstpassword) {
+        $uni_password=&_unipwd_from_plainpwd($firstpassword_AD);
     } else {
         $uni_password=&_unipwd_from_plainpwd($DevelConf::student_password_default);
     }
@@ -5367,7 +5370,7 @@ sub AD_examuser_create {
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
         print "   File:               $file\n";
-        print "   Firstpassword:      $firstpassword\n";
+        print "   Firstpassword:      $firstpassword_AD\n";
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
 
@@ -5387,7 +5390,7 @@ sub AD_examuser_create {
                    sophomorixStatus => $status,
                    sophomorixAdminClass => "---",    
                    sophomorixAdminFile => $file,    
-                   sophomorixFirstPassword => $firstpassword, 
+                   sophomorixFirstPassword => $firstpassword_AD, 
                    sophomorixFirstnameASCII => "---",
                    sophomorixSurnameASCII  => "---",
                    sophomorixBirthdate  => "01.01.1970",

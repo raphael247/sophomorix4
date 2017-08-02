@@ -206,19 +206,6 @@ if ($set_exam_mode==1){
     my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
         $user_count++;
-        my $firstpassword=$DevelConf::student_password_default;
-        if ($sophomorix_config{'INI'}{'EXAMMODE'}{'FIRSTPASSWORD_COPY'} eq "TRUE"){
-            my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,
-                $role_AD,$home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-                $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
-                &AD_get_user({ldap=>$ldap,
-                              root_dse=>$root_dse,
-                              root_dns=>$root_dns,
-                              user=>$participant,
-                            });
-	    $firstpassword=$firstpassword_AD;
-        }
-
         my $ret=&AD_user_set_exam_mode({ldap=>$ldap,
                                 root_dse=>$root_dse,
                                 root_dns=>$root_dns,
@@ -231,13 +218,13 @@ if ($set_exam_mode==1){
                             });
 
         if ($ret==0){
+            # if <user> found and set in exammode, create <user>-exam
             &AD_examuser_create({ldap=>$ldap,
                                  root_dse=>$root_dse,
                                  root_dns=>$root_dns,
                                  participant=>$participant,
                                  subdir=>$subdir,
                                  user_count=>$user_count,
-                                 firstpassword=>$firstpassword,
                                  date_now=> $time_stamp_AD,
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
@@ -248,9 +235,16 @@ if ($set_exam_mode==1){
                 my $unicodepwd= &AD_get_unicodepwd($participant,\%sophomorix_config);
                 &AD_set_unicodepwd($examuser,$unicodepwd,\%sophomorix_config);
             }
+#            &AD_repdir_using_file({root_dns=>$root_dns,
+#                                   repdir_file=>"repdir.examuser_home",
+#                                   school=>$school,
+#                                   adminclass=>$group,
+#                                   student_home=>$login,
+#                                   smb_admin_pass=>$smb_admin_pass,
+#                                   sophomorix_config=>$ref_sophomorix_config,
+#                                   sophomorix_result=>$ref_sophomorix_result,
+#                                 });
         }
-    # create dir/subdir
-
     }
     exit;
 }
