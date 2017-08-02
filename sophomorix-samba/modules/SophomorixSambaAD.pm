@@ -756,6 +756,7 @@ sub AD_user_kill {
         # deleting home
         if ($role_AD eq "student" or 
             $role_AD eq "teacher" or 
+            $role_AD eq "examuser" or 
             $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
             $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
            ){
@@ -5414,7 +5415,7 @@ sub AD_examuser_create {
     &AD_repdir_using_file({root_dns=>$root_dns,
                            repdir_file=>"repdir.examuser_home",
                            school=>$school_AD,
-                           adminclass=>"---",
+                           adminclass=>$subdir,
                            student_home=>$examuser,
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,
