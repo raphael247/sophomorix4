@@ -73,6 +73,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  get_forbidden_logins
                                  AD_examuser_create
                                  AD_examuser_kill
+                                 AD_get_passwd
                                     );
 
 my @arguments = @ARGV;
@@ -128,9 +129,11 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-exam-mode");
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
-my @filelist=&filelist_fetch({filetype=>"users",
-                              sophomorix_config=>\%sophomorix_config,
-                            });
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
+#my @filelist=&filelist_fetch({filetype=>"users",
+#                              sophomorix_config=>\%sophomorix_config,
+#                            });
 
 
 # --help
@@ -226,6 +229,8 @@ if ($set_exam_mode==1){
                                  subdir=>$subdir,
                                  user_count=>$user_count,
                                  date_now=> $time_stamp_AD,
+                                 smb_admin_pass=>$smb_admin_pass,
+                                 json=>$json,
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
                                });
@@ -235,15 +240,6 @@ if ($set_exam_mode==1){
                 my $unicodepwd= &AD_get_unicodepwd($participant,\%sophomorix_config);
                 &AD_set_unicodepwd($examuser,$unicodepwd,\%sophomorix_config);
             }
-#            &AD_repdir_using_file({root_dns=>$root_dns,
-#                                   repdir_file=>"repdir.examuser_home",
-#                                   school=>$school,
-#                                   adminclass=>$group,
-#                                   student_home=>$login,
-#                                   smb_admin_pass=>$smb_admin_pass,
-#                                   sophomorix_config=>$ref_sophomorix_config,
-#                                   sophomorix_result=>$ref_sophomorix_result,
-#                                 });
         }
     }
     exit;
