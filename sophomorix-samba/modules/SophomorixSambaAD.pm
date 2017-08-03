@@ -484,6 +484,7 @@ sub AD_repdir_using_file {
     my $teacherclass = $arg_ref->{teacherclass};
     my $teacher_home = $arg_ref->{teacher_home};
     my $adminclass = $arg_ref->{adminclass};
+    my $subdir = $arg_ref->{subdir};
     my $student_home = $arg_ref->{student_home};
 
     # abs path
@@ -525,6 +526,17 @@ sub AD_repdir_using_file {
         if (/\@\@PROJECT\@\@/) {
             $group_type="project";
             $groupvar_seen++;
+        }
+        if (/\@\@SUBDIR\@\@/) {
+            #$group_type="project";
+            #$groupvar_seen++;
+            if (defined $subdir and $subdir eq ""){
+                # replace SUBDIR and / with ""
+                $line=~s/\/\@\@SUBDIR\@\@//;
+            } else {
+                # replace SUBDIR with $subdir
+                $line=~s/\@\@SUBDIR\@\@/$subdir/;
+            }
         }
         if (/\$directory_management/) {
             $group_type="admins";
@@ -5336,8 +5348,17 @@ sub AD_examuser_create {
     my $user_principal_name = $examuser."\@".$root_dns;
 
     # create OU for session
-    $dn_session="OU=".$subdir.",".$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_OU'}.
-                ",OU=".$school_AD.",OU=SCHOOLS,".$root_dse;
+    my $dn_session;
+    if ($subdir eq ""){
+        # no sub_ou
+        $dn_session=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_OU'}.
+                    ",OU=".$school_AD.",OU=SCHOOLS,".$root_dse;
+    } else {
+        # use subdir as sub_ou 
+        $dn_session="OU=".$subdir.",".$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_OU'}.
+                    ",OU=".$school_AD.",OU=SCHOOLS,".$root_dse;
+    }
+
     $ldap->add($dn_session,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $dn="CN=".$examuser.",".$dn_session;
 
@@ -5414,7 +5435,7 @@ sub AD_examuser_create {
     &AD_repdir_using_file({root_dns=>$root_dns,
                            repdir_file=>"repdir.examuser_home",
                            school=>$school_AD,
-                           adminclass=>$subdir,
+                           subdir=>$subdir,
                            student_home=>$examuser,
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>$ref_sophomorix_config,

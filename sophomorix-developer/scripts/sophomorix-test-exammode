@@ -634,7 +634,7 @@ if ($exammode_users==1){
 
     # put the session members in exammode
     # 666
-    &run_command("sophomorix-exam-mode --set --supervisor oe72  --participants maiersa72,muellegr72 $all_options");
+    &run_command("sophomorix-exam-mode --set --subdir subdir72 --supervisor oe72  --participants maiersa72,muellegr72 $all_options");
     # 777
     &run_command("sophomorix-exam-mode --set --supervisor wu72  --participants jonsonad72,samardze72 $all_options");
 
@@ -685,7 +685,7 @@ if ($test_exammode_users==1){
                   });
     # maiersa72-exam
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=maiersa72-exam,OU=none,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=maiersa72-exam,OU=subdir72,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Examuser of Sarina Maier",
                    givenName=>"Sarina",
@@ -693,8 +693,8 @@ if ($test_exammode_users==1){
                    sAMAccountname=>"maiersa72-exam",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\none\\maiersa72-exam",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/none/maiersa72-exam",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\subdir72\\maiersa72-exam",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
                    sn=>"Maier",
                    userPrincipalName => "maiersa72-exam@".$root_dns,
                    sophomorixAdminClass => "---",
@@ -779,7 +779,7 @@ if ($test_exammode_users==1){
                   });
     # muellegr72-exam
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=muellegr72-exam,OU=none,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=muellegr72-exam,OU=subdir72,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Examuser of Gregor Müller",
                    givenName=>"Gregor",
@@ -787,8 +787,8 @@ if ($test_exammode_users==1){
                    sAMAccountname=>"muellegr72-exam",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\none\\muellegr72-exam",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/none/muellegr72-exam",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\subdir72\\muellegr72-exam",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
                    sn=>"Müller",
                    userPrincipalName => "muellegr72-exam@".$root_dns,
                    sophomorixAdminClass => "---",
@@ -873,7 +873,7 @@ if ($test_exammode_users==1){
                   });
     # jonsonad72-exam
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=jonsonad72-exam,OU=none,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=jonsonad72-exam,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Examuser of Aðalráður Jónsson",
                    givenName=>"Aðalráður",
@@ -881,8 +881,8 @@ if ($test_exammode_users==1){
                    sAMAccountname=>"jonsonad72-exam",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\none\\jonsonad72-exam",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/none/jonsonad72-exam",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\jonsonad72-exam",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/jonsonad72-exam",
                    sn=>"Jónsson",
                    userPrincipalName => "jonsonad72-exam@".$root_dns,
                    sophomorixAdminClass => "---",
@@ -967,7 +967,7 @@ if ($test_exammode_users==1){
                   });
     # samardze72-exam
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=samardze72-exam,OU=none,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   dn=>"CN=samardze72-exam,OU=Examusers,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
                    displayName=>"Examuser of Željko Samardžić",
                    givenName=>"Željko",
@@ -975,8 +975,8 @@ if ($test_exammode_users==1){
                    sAMAccountname=>"samardze72-exam",
                    uidNumber=>"-1",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\none\\samardze72-exam",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/none/samardze72-exam",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\examusers\\samardze72-exam",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/examusers/samardze72-exam",
                    sn=>"Samardžić",
                    userPrincipalName => "samardze72-exam@".$root_dns,
                    sophomorixAdminClass => "---",
@@ -1132,19 +1132,19 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/examusers",
-                         "/srv/samba/schools/bsz/examusers/none",
-                         "/srv/samba/schools/bsz/examusers/none/maiersa72-exam",
-                         "/srv/samba/schools/bsz/examusers/none/maiersa72-exam/transfer",
-#                         "/srv/samba/schools/bsz/examusers/none/maiersa72-exam/_einsammeln",
-                         "/srv/samba/schools/bsz/examusers/none/muellegr72-exam",
-                         "/srv/samba/schools/bsz/examusers/none/muellegr72-exam/transfer",
-#                         "/srv/samba/schools/bsz/examusers/none/muellegr72-exam/_einsammeln",
-                         "/srv/samba/schools/bsz/examusers/none/jonsonad72-exam",
-                         "/srv/samba/schools/bsz/examusers/none/jonsonad72-exam/transfer",
-#                         "/srv/samba/schools/bsz/examusers/none/jonsonad72-exam/_einsammeln",
-                         "/srv/samba/schools/bsz/examusers/none/samardze72-exam",
-                         "/srv/samba/schools/bsz/examusers/none/samardze72-exam/transfer",
-#                         "/srv/samba/schools/bsz/examusers/none/samardze72-exam/_einsammeln",
+                         "/srv/samba/schools/bsz/examusers/subdir72",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
+#                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/_einsammeln",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
+#                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/_einsammeln",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
+#                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/_einsammeln",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+#                         "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
                          "/srv/samba/schools/bsz/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
@@ -1777,7 +1777,7 @@ if ($test_kill_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/examusers",
-                         "/srv/samba/schools/bsz/examusers/none", # ?????????????????????
+                         "/srv/samba/schools/bsz/examusers/subdir72", # ?????????????????????
                          "/srv/samba/schools/bsz/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
