@@ -1226,7 +1226,7 @@ sub dir_listing_session_supervisor {
             $type="strange";
         }
         $ref_sessions->{'SUPERVISOR'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
-        $ref_sessions->{'id'}{$session}{'SUPERVISOR'}{'files'}{$name}{$file}{'type'}=$type;
+        $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'files'}{$name}{$file}{'type'}=$type;
     }
     closedir DIR;
 }

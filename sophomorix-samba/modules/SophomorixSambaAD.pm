@@ -2874,9 +2874,10 @@ sub AD_get_sessions {
                     }  
                     # List contents of share and collect directory 
                     # of the supervisor
-                    my $supervisor=$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'name'};
+                    my $supervisor=$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'};
                     &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix",
-                                                                                "collect_dir","supervisor",
+                                                                                "collect_dir",
+                                                                                "supervisor",
                                                                                 $supervisor,
                                                                                 $show_session,
                                                                                 \%sessions);
