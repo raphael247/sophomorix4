@@ -27,16 +27,6 @@ Verzeichnis none bei examusers
 -> wird noch nicht gelöscht, wer macht das ?
 
 
-konfigurierbares subdir $subdir="none" in sophomorix-exam-mode
---> in sophomorix.ini raus. wenn no= leer, dann ohne subdir
--> alle tests sollet tun
-
--> subdir-option in tests nutzen und prüfen
-
--> wenn letzter user in subdir gelöscht ist, dass subdir entfernen
-
-ALLE tests 'none' gleich regeln
-
 
 next:
 
@@ -49,14 +39,15 @@ sophomorix-session:
      im JSON beides drin
 
 sophomorix-exam-mode
-  user enablen/disablen
-  --uset: user-exam löschen
-password des >user< übernehmen für >exam-user<, kein firstpassword eintrag
-sophomorix-passwd: password für >exam-user< setzen, muss tun
+OK:  user enablen/disablen
+OK:  --uset: user-exam löschen
+OK: password des >user< übernehmen für >exam-user<, kein firstpassword eintrag
+    sophomorix-passwd: password für >exam-user< setzen, muss tun
 
 smbclient usw: abs_path in sophomorix.ini, and use it
 
-info:
+
+Info:
 unicodePwd: kann nicht direkt gesetzt werden
  der Wert unicodePwd wird mit Net::LDAP dem samba4-server im
  Klartext übergeben (firstpassword), der samba4 server speichert es gehasht ab
@@ -636,16 +627,22 @@ OK in
     /srv/samba/schools/default-school/management/<school-admin>
 
 
-
-
 Noch Todo:
 
 /srv/samba/schools/default-school/examusers
-/srv/samba/schools/default-school/?exam?
-repdir.examuser_home 
-   @@ADMINCLASS@@ -> @@EXAM@@
-       student_home.ntacl  ersetzen
-       student_home.ntacl  ersetzen
+    TODO: examusers.ntacl  noch ersetzen
+
+/srv/samba/schools/default-school/examusers/?exam?
+    repdir.exam
+    -> nutzt examusers.ntacl  
+       ersetzen mit examusers.subdir.ntacl??? entsprechend adminclass.ntacl???
+    
+
+/srv/samba/schools/default-school/examusers/?exam?/<examuser>
+   repdir.examuser_home 
+   OK: @@ADMINCLASS@@ -> @@SUBDIR@@
+       TODO: examuser_home.ntacl  ersetzen
+
 
 /srv/samba/global
 -> vorbereitet in global.ntacl.template
