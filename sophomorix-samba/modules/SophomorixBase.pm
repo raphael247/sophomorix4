@@ -77,10 +77,10 @@ sub print_title {
    my ($a) = @_;
    if($Conf::log_level>=2){
    print  "\n#########################################", 
-                            "#######################################\n";
+             #######################################\n";
    printf " # %-70s # ",$a;
    print  "\n########################################",
-                            "########################################\n";
+            "########################################\n";
    } else {
          printf "#### %-69s####\n",$a;
    }
@@ -91,34 +91,51 @@ sub print_title {
 ######################################################################
 
 sub json_dump {
-      my ($arg_ref) = @_;
-      my $jsoninfo = $arg_ref->{jsoninfo};
-      my $jsoncomment = $arg_ref->{jsoncomment};
-      my $json = $arg_ref->{json};
-      my $hash_ref = $arg_ref->{hash_ref};
-      my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-      # json 
-      if ($json==0){
-          # be quiet
-      } elsif ($json==1){
-          # pretty output
-          $hash_ref->{'JSONINFO'}=$jsoninfo;
-          $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
-          my $json_obj = JSON->new->allow_nonref;
-          my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
-          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_pretty_printed";
-      } elsif ($json==2){
-          # compact output
-          $hash_ref->{'JSONINFO'}=$jsoninfo;
-          $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
-          my $json_obj = JSON->new->allow_nonref;
-          my $utf8_json_line   = $json_obj->encode( $hash_ref  );
-          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_json_line";
-      } elsif ($json==3){
-          &print_title("DUMP: $jsoncomment");
-          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} Dumper( $hash_ref );
-      }
+    my ($arg_ref) = @_;
+    my $jsoninfo = $arg_ref->{jsoninfo};
+    my $jsoncomment = $arg_ref->{jsoncomment};
+    my $json = $arg_ref->{json};
+    my $log_level = $arg_ref->{log_level};
+    my $hash_ref = $arg_ref->{hash_ref};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    # json 
+    if ($json==0){
+        if ($jsoninfo eq "SESSIONS"){
+            &_console_print_sessions($hash_ref,$log_level)
+        }
+        # be quiet
+    } elsif ($json==1){
+        # pretty output
+        $hash_ref->{'JSONINFO'}=$jsoninfo;
+        $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_pretty_printed";
+    } elsif ($json==2){
+        # compact output
+        $hash_ref->{'JSONINFO'}=$jsoninfo;
+        $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_json_line   = $json_obj->encode( $hash_ref  );
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_json_line";
+    } elsif ($json==3){
+        &print_title("DUMP: $jsoncomment");
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} Dumper( $hash_ref );
+    }
 }
+
+
+
+sub _console_print_sessions {
+    my ($ref_sessions,$log_level)=@_;
+    print "LogLevel: $log_level\n";
+    print "$ref_sessions->{'SESSIONCOUNT'} sessions by Session-Name:\n";
+        foreach my $session (@{ $ref_sessions->{'id_list'} }){
+            print "$session  $ref_sessions->{'ID'}{$session}{'supervisor'}{'name'}  ",
+                  "$ref_sessions->{'ID'}{$session}{'sophomorixSessions'}\n";
+        }
+}
+
 
 
 # helper stuff

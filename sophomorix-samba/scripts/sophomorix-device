@@ -409,6 +409,7 @@ if ($dns_test==1){
         &json_dump({json => $json,
                     jsoninfo => "DEVICES_FILE",
                     jsoncomment => "All devices read from all user files",
+                    log_level => $Conf::log_level,
                     hash_ref=>\%devices_file,
                     sophomorix_config=>\%sophomorix_config,
                   });

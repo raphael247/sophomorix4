@@ -54,7 +54,7 @@ $Data::Dumper::Terse = 1;
 sub AD_test_session_count {
     my ($ldap,$root_dse,$root_dns,$should) = @_;
     my %sessions=&Sophomorix::SophomorixSambaAD::AD_get_sessions($ldap,$root_dse,$root_dns,0,0,"all");
-    my $count=$sessions{'sessioncount'};
+    my $count=$sessions{'SESSIONCOUNT'};
     is ($count,$should,"  * There exist $should sessions");
     return $count;
 }

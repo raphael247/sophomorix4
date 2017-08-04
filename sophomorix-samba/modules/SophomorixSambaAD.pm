@@ -1118,11 +1118,11 @@ sub AD_session_manage {
         }
     } elsif (defined $session and defined $new_participants and defined $new_comment){
         # modifying the session
-        if (defined $ref_sessions->{'id'}{$session}{'supervisor'}{'name'}){
+        if (defined $ref_sessions->{'ID'}{$session}{'supervisor'}{'name'}){
             # get data from session hash
             $session_new=$session;
-            $supervisor=$ref_sessions->{'id'}{$session}{'supervisor'}{'name'};
-            $session_string_old=$ref_sessions->{'id'}{$session}{'sophomorixSessions'};
+            $supervisor=$ref_sessions->{'ID'}{$session}{'supervisor'}{'name'};
+            $session_string_old=$ref_sessions->{'ID'}{$session}{'sophomorixSessions'};
             my ($unused,$old_comment,$old_participants)=split(/;/,$session_string_old);
 	    if ($new_comment eq "---"){
                 $new_comment=$old_comment;
@@ -2734,14 +2734,15 @@ sub AD_get_sessions {
                                dnsnodes=>"FALSE",
                                sophomorix_config=>$ref_sophomorix_config,
                   });
-    if ($dump_AD==1){
-        &Sophomorix::SophomorixBase::json_dump({json => $json,
-                                                jsoninfo => "SEARCH",
-                                                jsoncomment => "AD Content",
-                                                hash_ref=>$ref_AD,
-                                                sophomorix_config=>$ref_sophomorix_config,
-                                               });
-    }
+    # if ($dump_AD==1){
+    #     &Sophomorix::SophomorixBase::json_dump({json => $json,
+    #                                             jsoninfo => "SEARCH",
+    #                                             jsoncomment => "AD Content",
+    #                                             #log_level => $ref_log_level,
+    #                                             hash_ref=>$ref_AD,
+    #                                             sophomorix_config=>$ref_sophomorix_config,
+    #                                            });
+    # }
 
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -2797,15 +2798,16 @@ sub AD_get_sessions {
                 $sessions{'supervisor'}{$sam}{'sophomorixRole'}=$supervisor_role;
                 $sessions{'supervisor'}{$sam}{'firstname'}=$firstname;
                 $sessions{'supervisor'}{$sam}{'lastname'}=$lastname;
+                push @{ $sessions{'supervisor_list'} }, $sam; 
                 # save by id
-                $sessions{'id'}{$id}{'supervisor'}{'name'}=$sam;
-                $sessions{'id'}{$id}{'supervisor'}{'sophomorixRole'}=$supervisor_role;
-                $sessions{'id'}{$id}{'supervisor'}{'firstname'}=$firstname;
-                $sessions{'id'}{$id}{'supervisor'}{'lastname'}=$lastname;
-                $sessions{'id'}{$id}{'sophomorixSessions'}=$session;
-                $sessions{'id'}{$id}{'comment'}=$comment;
-                $sessions{'id'}{$id}{'participantstring'}=$participants;
-
+                $sessions{'ID'}{$id}{'supervisor'}{'name'}=$sam;
+                $sessions{'ID'}{$id}{'supervisor'}{'sophomorixRole'}=$supervisor_role;
+                $sessions{'ID'}{$id}{'supervisor'}{'firstname'}=$firstname;
+                $sessions{'ID'}{$id}{'supervisor'}{'lastname'}=$lastname;
+                $sessions{'ID'}{$id}{'sophomorixSessions'}=$session;
+                $sessions{'ID'}{$id}{'comment'}=$comment;
+                $sessions{'ID'}{$id}{'participantstring'}=$participants;
+                push @{ $sessions{'id_list'} }, $id; 
 
                 # save participant information
                 #--------------------------------------------------
@@ -2825,12 +2827,12 @@ sub AD_get_sessions {
                                       user=>$participant,
                            });
 
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname_utf8_AD;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname_utf8_AD;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass_AD;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_existing'}=$existing_AD;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'sophomorixRole'}=$role_AD;
-                    $sessions{'id'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode_AD;
+                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname_utf8_AD;
+                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname_utf8_AD;
+                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass_AD;
+                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_existing'}=$existing_AD;
+                    $sessions{'ID'}{$id}{'participants'}{$participant}{'sophomorixRole'}=$role_AD;
+                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode_AD;
 
                     $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
                              {$participant}{'user_firstname'}=$firstname_utf8_AD;
@@ -2849,13 +2851,13 @@ sub AD_get_sessions {
                     my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
                     foreach my $grouptype (@grouptypes){
                         # befor testing set FALSE as default
-                        $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
+                        $sessions{'ID'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
                         $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}
                                  {'participants'}{$participant}{"group_".$grouptype}="FALSE";
                         foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                             if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
                                 # if in the groups, set TRUE
-                                $sessions{'id'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
+                                $sessions{'ID'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
                                 $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}
                                          {'participants'}{$participant}{"group_".$grouptype}="TRUE";
                             }
@@ -2872,7 +2874,7 @@ sub AD_get_sessions {
                     }  
                     # List contents of share and collect directory 
                     # of the supervisor
-                    my $supervisor=$sessions{'id'}{$show_session}{'supervisor'}{'name'};
+                    my $supervisor=$sessions{'ID'}{$show_session}{'supervisor'}{'name'};
                     &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix",
                                                                                 "collect_dir","supervisor",
                                                                                 $supervisor,
@@ -2886,7 +2888,7 @@ sub AD_get_sessions {
                                                                                 \%sessions);
                     # List quota 
                     # of all participants
-                    foreach my $participant (keys %{$sessions{'id'}{$show_session}{'participants'}}) {
+                    foreach my $participant (keys %{$sessions{'ID'}{$show_session}{'participants'}}) {
                         &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,
                                                                                        $show_session,
                                                                                        $supervisor,
@@ -2902,7 +2904,7 @@ sub AD_get_sessions {
             }
         }
     }
-    $sessions{'sessioncount'}=$session_count;
+    $sessions{'SESSIONCOUNT'}=$session_count;
 
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 

@@ -191,6 +191,7 @@ print "dumcp $dump_AD \n";
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
+                log_level => $Conf::log_level,
                 hash_ref=>\%AD,
                 sophomorix_config=>\%sophomorix_config,
               });

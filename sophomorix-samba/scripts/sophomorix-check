@@ -323,6 +323,7 @@ if ($info==1) {
     &json_dump({json => $json,
                 jsoninfo => "CONFIG",
                 jsoncomment => "The sophomorix configuration",
+                log_level => $Conf::log_level,
                 hash_ref=>\%sophomorix_config,
                 sophomorix_config=>\%sophomorix_config,
                });
@@ -497,6 +498,7 @@ if ($dump_files==1){
     &json_dump({json => $json,
                 jsoninfo => "USERS",
                 jsoncomment => "All users read from all user files",
+                log_level => $Conf::log_level,
                 hash_ref=>\%users_file,
                 sophomorix_config=>\%sophomorix_config,
                });
@@ -544,6 +546,7 @@ if ($dump_AD==1){
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
+                log_level => $Conf::log_level,
                 hash_ref=>\%AD,
                 sophomorix_config=>\%sophomorix_config,
               });
@@ -589,6 +592,7 @@ if ($dump_matches==1){
     &json_dump({json => $json,
                 jsoninfo => "MATCH",
                 jsoncomment => "File user -> AD matches",
+                log_level => $Conf::log_level,
                 hash_ref=>\%Match,
                 sophomorix_config=>\%sophomorix_config,
               });
