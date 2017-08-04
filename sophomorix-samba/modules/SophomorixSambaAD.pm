@@ -773,7 +773,7 @@ sub AD_user_kill {
            ){
               my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                password  => $smb_admin_pass,
-                                               debug     => 1);
+                                               debug     => 0);
               #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
               my $return=$smb->rmdir_recurse($smb_home);
               if($return==1){
@@ -912,7 +912,7 @@ sub AD_group_kill {
             if ($smb_share ne  "unknown"){
                 my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                  password  => $smb_admin_pass,
-                                                 debug     => 1);
+                                                 debug     => 0);
                 # trying to delete homes (success only if it is empty)
                 my $smb_share_homes=$smb_share."/homes";
                 my $return1=$smb->rmdir($smb_share_homes);
@@ -939,7 +939,7 @@ sub AD_group_kill {
             if ($smb_share ne  "unknown"){
                 my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                  password  => $smb_admin_pass,
-                                                 debug     => 1);
+                                                 debug     => 0);
                 # trying to delete homes (success only if it is empty)
                 my $return1=$smb->rmdir_recurse($smb_share);
                 if($return1==1){
@@ -5478,23 +5478,41 @@ sub AD_examuser_kill {
             print "Not deleting $examuser beause its role is not examuser";
             return;
 	}
+
+        # deleting user
         my $command="samba-tool user delete ". $examuser;
         print "   # $command\n";
         system($command);
 
         # deleting home
-        if ($role_AD eq "examuser"){
-              my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
-                                               password  => $smb_admin_pass,
-                                               debug     => 1);
-              #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-              my $return=$smb->rmdir_recurse($smb_home);
-              if($return==1){
-                  print "OK: Deleted with succes $smb_home\n";
-              } else {
-                  print "ERROR: rmdir_recurse $smb_home $!\n";
-              }
+        my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+                                         password  => $smb_admin_pass,
+                                         debug     => 0);
+        #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+        my $return=$smb->rmdir_recurse($smb_home);
+        if($return==1){
+            print "OK: Deleted with succes $smb_home\n";
+        } else {
+            print "ERROR: rmdir_recurse $smb_home $!\n";
         }
+
+        # deleting subdir if empty and not examusers
+        my $subdir=$smb_home;
+        $subdir=~s/\/$//; # make sure trailing / are gone 
+        $subdir=~s/\/$examuser$//; # remove <user>-exam
+        if ($subdir=~m/$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{USER_SUB_DIR}$/){
+            # examusers still needed
+            print "Not deleting $subdir (still needed)\n";
+        } else {
+            # deleting subdir
+            my $return=$smb->rmdir($subdir);
+            if($return==1){
+                print "OK: Deleted empty dir: $subdir\n";
+            } else {
+                print "Not deleted: $subdir ($!)\n";
+            }
+        }
+
         return;
     } else {
         print "   * User $examuser nonexisting ($count results)\n";
