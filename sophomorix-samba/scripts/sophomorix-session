@@ -211,11 +211,11 @@ if ($info==1) {
                 sophomorix_config => \%sophomorix_config,
                });
 
-    if ($session ne "" and exists $sessions{'ID'}{$session}{'supervisor'}{'name'}){
+    if ($session ne "" and exists $sessions{'ID'}{$session}{'SUPERVISOR'}{'name'}){
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Session $session:");
-        print "     *         supervisor:  $sessions{'ID'}{$session}{'supervisor'}{'name'}  (supervisor of the session)\n";
-        print "     *       participants:  $sessions{'ID'}{$session}{'participantstring'}  (participants of the session)\n";
+        print "     *         supervisor:  $sessions{'ID'}{$session}{'SUPERVISOR'}{'name'}  (supervisor of the session)\n";
+        print "     *       participants:  $sessions{'ID'}{$session}{'PARTICIPANTSTRING'}  (participants of the session)\n";
         print "     * sophomorixSessions:  $sessions{'ID'}{$session}{'sophomorixSessions'}\n";
     } 
 
@@ -223,7 +223,7 @@ if ($info==1) {
     # supervisor listing
     if ($supervisor ne ""){
         my @ordered_list=();
-        foreach my $session ( keys %{ $sessions{'supervisor'}->{$supervisor}{'sophomorixSessions'} }){
+        foreach my $session ( keys %{ $sessions{'SUPERVISOR'}->{$supervisor}{'sophomorixSessions'} }){
             push @ordered_list, $session;
         }
         @ordered_list = sort @ordered_list;
@@ -233,8 +233,8 @@ if ($info==1) {
         foreach my $session (@ordered_list ){
             $count++;
             print "  $count) Supervisor $supervisor session: $session\n";
-            print "     *         supervisor:  $sessions{'ID'}{$session}{'supervisor'}{'name'}  (supervisor of the session)\n";
-            print "     *       participants:  $sessions{'ID'}{$session}{'participantstring'}  (participants of the session)\n";
+            print "     *         supervisor:  $sessions{'ID'}{$session}{'SUPERVISOR'}{'name'}  (supervisor of the session)\n";
+            print "     *       participants:  $sessions{'ID'}{$session}{'PARTICIPANTSTRING'}  (participants of the session)\n";
             print "     * sophomorixSessions:  $sessions{'ID'}{$session}{'sophomorixSessions'}\n";
         }
     }
@@ -334,7 +334,7 @@ if ($session ne "" and $comment ne ""){
 # --add-participants
 if ($session ne "" and $add_participants ne ""){
     my @add_participants=split(/,/,$add_participants);
-    my @old_participants=split(/,/,$sessions{'ID'}{$session}{'participantstring'});
+    my @old_participants=split(/,/,$sessions{'ID'}{$session}{'PARTICIPANTSTRING'});
     my @participants = uniq(@old_participants,@add_participants);
     my $participants_new=join(",",@participants);
     # update the requested session
@@ -354,7 +354,7 @@ if ($session ne "" and $add_participants ne ""){
 
 # --remove-participants
 if ($session ne "" and $remove_participants ne ""){
-    my @old_participants=split(/,/,$sessions{'ID'}{$session}{'participantstring'});
+    my @old_participants=split(/,/,$sessions{'ID'}{$session}{'PARTICIPANTSTRING'});
     my @participants = &remove_from_list($remove_participants,@old_participants);
     my $participants_new=join(",",@participants);
     # update the requested session

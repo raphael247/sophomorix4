@@ -1118,10 +1118,10 @@ sub AD_session_manage {
         }
     } elsif (defined $session and defined $new_participants and defined $new_comment){
         # modifying the session
-        if (defined $ref_sessions->{'ID'}{$session}{'supervisor'}{'name'}){
+        if (defined $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}){
             # get data from session hash
             $session_new=$session;
-            $supervisor=$ref_sessions->{'ID'}{$session}{'supervisor'}{'name'};
+            $supervisor=$ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'};
             $session_string_old=$ref_sessions->{'ID'}{$session}{'sophomorixSessions'};
             my ($unused,$old_comment,$old_participants)=split(/;/,$session_string_old);
 	    if ($new_comment eq "---"){
@@ -2792,22 +2792,22 @@ sub AD_get_sessions {
                 # save supervisor information
                 #--------------------------------------------------
                 # save by user
-                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'string'}=$session;
-                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'comment'}=$comment;
-                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participantstring'}=$participants;
-                $sessions{'supervisor'}{$sam}{'sophomorixRole'}=$supervisor_role;
-                $sessions{'supervisor'}{$sam}{'firstname'}=$firstname;
-                $sessions{'supervisor'}{$sam}{'lastname'}=$lastname;
-                push @{ $sessions{'supervisor_list'} }, $sam; 
+                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'sophomorixSessions'}=$session;
+                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'COMMENT'}=$comment;
+                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTSTRING'}=$participants;
+                $sessions{'SUPERVISOR'}{$sam}{'sophomorixRole'}=$supervisor_role;
+                $sessions{'SUPERVISOR'}{$sam}{'givenName'}=$firstname;
+                $sessions{'SUPERVISOR'}{$sam}{'sn'}=$lastname;
+                push @{ $sessions{'SUPERVISOR_LIST'} }, $sam; 
                 # save by id
-                $sessions{'ID'}{$id}{'supervisor'}{'name'}=$sam;
-                $sessions{'ID'}{$id}{'supervisor'}{'sophomorixRole'}=$supervisor_role;
-                $sessions{'ID'}{$id}{'supervisor'}{'firstname'}=$firstname;
-                $sessions{'ID'}{$id}{'supervisor'}{'lastname'}=$lastname;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sAMAccountName'}=$sam;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixRole'}=$supervisor_role;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'givenName'}=$firstname;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sn'}=$lastname;
                 $sessions{'ID'}{$id}{'sophomorixSessions'}=$session;
-                $sessions{'ID'}{$id}{'comment'}=$comment;
-                $sessions{'ID'}{$id}{'participantstring'}=$participants;
-                push @{ $sessions{'id_list'} }, $id; 
+                $sessions{'ID'}{$id}{'COMMENT'}=$comment;
+                $sessions{'ID'}{$id}{'PARTICIPANTSTRING'}=$participants;
+                push @{ $sessions{'ID_LIST'} }, $id; 
 
                 # save participant information
                 #--------------------------------------------------
@@ -2827,39 +2827,39 @@ sub AD_get_sessions {
                                       user=>$participant,
                            });
 
-                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_firstname'}=$firstname_utf8_AD;
-                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_lastname'}=$lastname_utf8_AD;
-                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_adminclass'}=$adminclass_AD;
-                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_existing'}=$existing_AD;
-                    $sessions{'ID'}{$id}{'participants'}{$participant}{'sophomorixRole'}=$role_AD;
-                    $sessions{'ID'}{$id}{'participants'}{$participant}{'user_exammode'}=$exammode_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'givenName'}=$firstname_utf8_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sn'}=$lastname_utf8_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixAdminClass'}=$adminclass_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixRole'}=$role_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixExamMode'}=$exammode_AD;
 
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_firstname'}=$firstname_utf8_AD;
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_lastname'}=$lastname_utf8_AD;
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_adminclass'}=$adminclass_AD;
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
+                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                             {$participant}{'givenName'}=$firstname_utf8_AD;
+                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                             {$participant}{'sn'}=$lastname_utf8_AD;
+                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                             {$participant}{'sophomorixAdminClass'}=$adminclass_AD;
+                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'user_existing'}=$existing_AD;
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
-                             {$participant}{'user_exammode'}=$exammode_AD;
-                    $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}{'participants'}
+                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                             {$participant}{'sophomorixExamMode'}=$exammode_AD;
+                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixRole'}=$role_AD;
 
                     # test participantship in managementgroups
                     my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
                     foreach my $grouptype (@grouptypes){
                         # befor testing set FALSE as default
-                        $sessions{'ID'}{$id}{'participants'}{$participant}{"group_".$grouptype}="FALSE";
-                        $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}
-                                 {'participants'}{$participant}{"group_".$grouptype}="FALSE";
+                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
+                        $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}
+                                 {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                             if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
                                 # if in the groups, set TRUE
-                                $sessions{'ID'}{$id}{'participants'}{$participant}{"group_".$grouptype}="TRUE";
-                                $sessions{'supervisor'}{$sam}{'sophomorixSessions'}{$id}
-                                         {'participants'}{$participant}{"group_".$grouptype}="TRUE";
+                                $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
+                                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}
+                                         {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
                             }
                         }
                     }
@@ -2874,7 +2874,7 @@ sub AD_get_sessions {
                     }  
                     # List contents of share and collect directory 
                     # of the supervisor
-                    my $supervisor=$sessions{'ID'}{$show_session}{'supervisor'}{'name'};
+                    my $supervisor=$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'name'};
                     &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix",
                                                                                 "collect_dir","supervisor",
                                                                                 $supervisor,
@@ -2888,7 +2888,7 @@ sub AD_get_sessions {
                                                                                 \%sessions);
                     # List quota 
                     # of all participants
-                    foreach my $participant (keys %{$sessions{'ID'}{$show_session}{'participants'}}) {
+                    foreach my $participant (keys %{$sessions{'ID'}{$show_session}{'PARTICIPANTS'}}) {
                         &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,
                                                                                        $show_session,
                                                                                        $supervisor,

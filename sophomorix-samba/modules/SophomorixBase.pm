@@ -130,8 +130,8 @@ sub _console_print_sessions {
     my ($ref_sessions,$log_level)=@_;
     print "LogLevel: $log_level\n";
     print "$ref_sessions->{'SESSIONCOUNT'} sessions by Session-Name:\n";
-        foreach my $session (@{ $ref_sessions->{'id_list'} }){
-            print "$session  $ref_sessions->{'ID'}{$session}{'supervisor'}{'name'}  ",
+        foreach my $session (@{ $ref_sessions->{'ID_LIST'} }){
+            print "$session  $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'name'}  ",
                   "$ref_sessions->{'ID'}{$session}{'sophomorixSessions'}\n";
         }
 }
@@ -1225,8 +1225,8 @@ sub dir_listing_session_supervisor {
         } else {
             $type="strange";
         }
-        $ref_sessions->{'supervisor'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
-        $ref_sessions->{'id'}{$session}{'supervisor'}{'files'}{$name}{$file}{'type'}=$type;
+        $ref_sessions->{'SUPERVISOR'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
+        $ref_sessions->{'id'}{$session}{'SUPERVISOR'}{'files'}{$name}{$file}{'type'}=$type;
     }
     closedir DIR;
 }
@@ -1238,14 +1238,14 @@ sub quota_listing_session_participant {
     print "      * fetching quota of participant $participant  --> todo\n";
 
     # session ids
-    $ref_sessions->{'id'}{$session}{'participants'}{$participant}{'quota'}{'/dev/sda1'}{'comment'}="Home";
-    $ref_sessions->{'id'}{$session}{'participants'}{$participant}{'quota'}{'/dev/sda1'}{'hardlimit'}="xxx MB";
+    $ref_sessions->{'id'}{$session}{'PARTICIPANTS'}{$participant}{'quota'}{'/dev/sda1'}{'COMMENT'}="Home";
+    $ref_sessions->{'id'}{$session}{'PARTICIPANTS'}{$participant}{'quota'}{'/dev/sda1'}{'hardlimit'}="xxx MB";
 
 
     # supervisors
-    $ref_sessions->{'supervisor'}{$supervisor}{'sophomorixSessions'}{$session}{'participants'}
+    $ref_sessions->{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$session}{'PARTICIPANTS'}
                    {$participant}{'quota'}{'/dev/sda1'}{'hardlimit'}="xxx MB";
-    $ref_sessions->{'supervisor'}{$supervisor}{'sophomorixSessions'}{$session}{'participants'}
+    $ref_sessions->{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$session}{'PARTICIPANTS'}
                    {$participant}{'quota'}{'/dev/sda1'}{'comment'}="Home";
 }
 
