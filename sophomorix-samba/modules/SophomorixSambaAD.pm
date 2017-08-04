@@ -2754,6 +2754,8 @@ sub AD_get_sessions {
                              'sophomorixRole',
                              'givenName',
                              'sn',
+                             'sophomorixSchoolname',
+                             'homeDirectory',
                             ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max_user = $mesg->count; 
@@ -2766,9 +2768,6 @@ sub AD_get_sessions {
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        my $supervisor_role=$entry->get_value('sophomorixRole');
-        my $firstname = $entry->get_value('givenName');
-        my $lastname = $entry->get_value('sn');
         my @session_list = sort $entry->get_value('sophomorixSessions');
         if($Conf::log_level>=2){
             my $user_session_count=$#session_list+1;
@@ -2795,18 +2794,23 @@ sub AD_get_sessions {
                 $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'sophomorixSessions'}=$session;
                 $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'COMMENT'}=$comment;
                 $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTSTRING'}=$participants;
-                $sessions{'SUPERVISOR'}{$sam}{'sophomorixRole'}=$supervisor_role;
-                $sessions{'SUPERVISOR'}{$sam}{'givenName'}=$firstname;
-                $sessions{'SUPERVISOR'}{$sam}{'sn'}=$lastname;
+                $sessions{'SUPERVISOR'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+                $sessions{'SUPERVISOR'}{$sam}{'givenName'}=$entry->get_value('givenName');
+                $sessions{'SUPERVISOR'}{$sam}{'sn'}=$entry->get_value('sn');
+                $sessions{'SUPERVISOR'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
+                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
                 push @{ $sessions{'SUPERVISOR_LIST'} }, $sam; 
                 # save by id
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sAMAccountName'}=$sam;
-                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixRole'}=$supervisor_role;
-                $sessions{'ID'}{$id}{'SUPERVISOR'}{'givenName'}=$firstname;
-                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sn'}=$lastname;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'givenName'}=$entry->get_value('givenName');
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sn'}=$entry->get_value('sn');
                 $sessions{'ID'}{$id}{'sophomorixSessions'}=$session;
                 $sessions{'ID'}{$id}{'COMMENT'}=$comment;
                 $sessions{'ID'}{$id}{'PARTICIPANTSTRING'}=$participants;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'homeDirectory'}=$entry->get_value('homeDirectory');
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+
                 push @{ $sessions{'ID_LIST'} }, $id; 
 
                 # save participant information
@@ -2833,6 +2837,8 @@ sub AD_get_sessions {
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixRole'}=$role_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixExamMode'}=$exammode_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'}=$home_directory_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'}=$school_AD;
 
                     $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'givenName'}=$firstname_utf8_AD;
@@ -2875,18 +2881,13 @@ sub AD_get_sessions {
                     # List contents of share and collect directory 
                     # of the supervisor
                     my $supervisor=$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'};
-                    &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix",
-                                                                                "collect_dir",
-                                                                                "supervisor",
-                                                                                $supervisor,
-                                                                                $show_session,
-                                                                                \%sessions);
-                    &Sophomorix::SophomorixBase::dir_listing_session_supervisor("/etc/linuxmuster/sophomorix/bsz",
-                                                                                "share_dir",
-                                                                                "supervisor",
-                                                                                $supervisor,
-                                                                                $show_session,
-                                                                                \%sessions);
+                    &Sophomorix::SophomorixBase::dir_listing_user("/etc/linuxmuster/sophomorix",
+                                                                  "collect_dir",
+                                                                  "supervisor",
+                                                                  $supervisor,
+                                                                  $show_session,
+                                                                  \%sessions,
+                                                                 );
                     # List quota 
                     # of all participants
                     foreach my $participant (keys %{$sessions{'ID'}{$show_session}{'PARTICIPANTS'}}) {

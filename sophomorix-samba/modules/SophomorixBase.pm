@@ -1206,29 +1206,40 @@ sub filelist_fetch {
 }
 
 
-sub dir_listing_session_supervisor {
+sub dir_listing_user {
     # directory listing for supervisor of session only
+    ($user)=@_;
+
 
     # fix the path to homedir of supervisors ???????????????????ß
-
-    my ($dir,$name,$role,$supervisor,$session,$ref_sessions)=@_;
-    opendir DIR, $dir or return;
-    foreach my $file (readdir DIR){
-        my $abs_path=$dir."/".$file;
-        my $Type;
-        if ($file eq "."){next};
-        if ($file eq ".."){next};
-        if (-d $abs_path){
-            $type="d";
-        } elsif (-f $abs_path){
-            $type="f";
-        } else {
-            $type="strange";
-        }
-        $ref_sessions->{'SUPERVISOR'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
-        $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'files'}{$name}{$file}{'type'}=$type;
+    my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+                                     password  => $smb_admin_pass,
+                                     debug     => 0);
+#    my $fd = $smb->opendir("smb://jupiter/doc");
+    my $fd = $smb->opendir("smb://jupiter/doc");
+    foreach my $n ($smb->readdir($fd)) {
+        print $n,"\n";
     }
-    closedir DIR;
+    close($fd);
+
+    # my ($dir,$name,$role,$supervisor,$session,$ref_sessions)=@_;
+    # opendir DIR, $dir or return;
+    # foreach my $file (readdir DIR){
+    #     my $abs_path=$dir."/".$file;
+    #     my $Type;
+    #     if ($file eq "."){next};
+    #     if ($file eq ".."){next};
+    #     if (-d $abs_path){
+    #         $type="d";
+    #     } elsif (-f $abs_path){
+    #         $type="f";
+    #     } else {
+    #         $type="strange";
+    #     }
+    #     $ref_sessions->{'SUPERVISOR'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
+    #     $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'files'}{$name}{$file}{'type'}=$type;
+    # }
+    # closedir DIR;
 }
 
 
