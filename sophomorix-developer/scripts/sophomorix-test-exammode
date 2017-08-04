@@ -620,7 +620,7 @@ if ($test_add_users==1){
 ############################################################
 if ($exammode_users==1){
     
-    # add a session
+    # add a 3 sessions
     # 666
     &run_command("sophomorix-session $all_options --create --supervisor oe72 --developer-session 666");
     &run_command("sophomorix-session $all_options --session 666 --participants muellegr72,maiersa72");
@@ -628,8 +628,9 @@ if ($exammode_users==1){
     &run_command("sophomorix-session $all_options --create --supervisor wu72 --developer-session 777");
     &run_command("sophomorix-session $all_options --session 777 --participants jonsonad72,samardze72");
     sleep 1;
-    # 888
-    &run_command("sophomorix-session $all_options --create --supervisor wu72 --developer-session 888");
+
+    # 888 with a comment
+    &run_command("sophomorix-session $all_options --create --supervisor wu72 --developer-session 888 --comment \"Monday session\"");
     &run_command("sophomorix-session $all_options --session 888 --participants muellegr72,samardze72");
 
     # put the session members in exammode
@@ -1105,7 +1106,7 @@ if ($test_exammode_users==1){
                    sophomorixUnid => "unid6789",
                    userAccountControl => "512",
                    memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                   sophomorixSessions => "777;---;jonsonad72,samardze72;|888;---;muellegr72,samardze72;",
+                   sophomorixSessions => "777;---;jonsonad72,samardze72;|888;Monday session;muellegr72,samardze72;",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
