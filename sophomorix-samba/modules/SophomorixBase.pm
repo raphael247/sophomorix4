@@ -152,6 +152,7 @@ sub _console_print_onesession {
     foreach my $item (@{ $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER_LIST'} }){
         print "      $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER'}{$item}{'TYPE'}  $item\n";
     }
+    print "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANT_COUNT'} participants:\n";
     &print_line();
     foreach my $participant (@{ $ref_sessions->{'ID'}{$object_name}{'PARTICIPANT_LIST'} }){
         print "Participant: $participant",

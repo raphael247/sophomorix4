@@ -2878,10 +2878,13 @@ sub AD_get_sessions {
                     }
                 }
 
-                # sort some lists
+                # sort some lists and count
                 @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} } = sort @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} };
+                $sessions{'ID'}{$id}{'PARTICIPANT_COUNT'}=$#{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} }+1;
 		@{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} } = 
                     sort @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} };
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_COUNT'}=
+                    $#{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }+1;
 
                 # save extended information
                 #--------------------------------------------------
