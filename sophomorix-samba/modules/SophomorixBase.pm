@@ -141,21 +141,32 @@ sub _console_print_sessions {
 
 sub _console_print_onesession {
     my ($ref_sessions,$object_name,$log_level)=@_;
-    print "LogLevel: $log_level\n";
     &print_line();
     print "$ref_sessions->{'ID'}{$object_name}{'COMMENT'}  (Session-ID $object_name):\n";
     &print_line();
-    print "Supervisor:  $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sAMAccountName'}",
+    my $supervisor=$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sAMAccountName'};
+    print "Supervisor: $supervisor ",
           " ($ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'givenName'} ",
           "$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sn'})\n";
-    print "             $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'SMBhomeDirectory'}\n";
+    print "  $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'SMBhomeDirectory'}\n";
+    foreach my $item (@{ $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER_LIST'} }){
+        print "      $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER'}{$item}{'TYPE'}  $item\n";
+    }
     &print_line();
     foreach my $participant (@{ $ref_sessions->{'ID'}{$object_name}{'PARTICIPANT_LIST'} }){
         print "Participant: $participant",
               " ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'givenName'} ",
               "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})\n";
-        #print "";
-        print "             $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'}\n";
+        print "      internetaccess: $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_internetaccess'}\n";
+        print "      webfilter:      $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_webfilter'}\n";
+        print "      wifiaccess:     $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_wifiaccess'}\n";
+        print "      intranetaccess: $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_intranetaccess'}\n";
+        print "      printing:       $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_printing'}\n";
+        print "  $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'}\n";
+        foreach my $item (@{ $ref_sessions->{'TRANSFER_DIRS'}{$participant}{'TRANSFER_LIST'} }){
+            print "      $ref_sessions->{'TRANSFER_DIRS'}{$participant}{'TRANSFER'}{$item}{'TYPE'}  $item\n";
+        }
+        print "------------------------------------------------------------\n"
     }
     &print_line();
 }
@@ -1230,6 +1241,7 @@ sub filelist_fetch {
 }
 
 
+
 sub dir_listing_user {
     # directory listing for supervisor of session only
     my ($sam,$smb_dir,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
@@ -1238,20 +1250,28 @@ sub dir_listing_user {
                                      password  => $smb_admin_pass,
                                      debug     => 0);
     # empty for a start
-    $ref_sessions->{'TRANSFER_DIRS'}{$sam}=();
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}=();
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'}=();
     my $fd = $smb->opendir($smb_dir);
     while (my $file = $smb->readdir_struct($fd)) {
         if ($file->[1] eq "."){next};
         if ($file->[1] eq ".."){next};
         if ($file->[0] == 7) {
         #print "Directory ",$file->[1],"\n";
-        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{$transfer}{$file->[1]}{'type'}="d";
+        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$file->[1]}{'TYPE'}="d";
+        push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $file->[1]; 
     } elsif ($file->[0] == 8) {
         #print "File ",$file->[1],"\n";
-        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{$transfer}{$file->[1]}{'type'}="f";
+        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$file->[1]}{'TYPE'}="f";
+        push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $file->[1]; 
     } else {
 
     }
+  }
+  # sort
+  if ($#{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }>0 ){
+      @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} } = 
+        sort @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} };
   }
   #close($fd);
 }

@@ -2910,7 +2910,6 @@ sub AD_get_sessions {
 
                         &Sophomorix::SophomorixBase::dir_listing_user(
                                        $participant,
-#                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'},
                                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'},
                                        $smb_admin_pass,
                                        \%sessions,
