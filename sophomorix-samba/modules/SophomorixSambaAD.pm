@@ -2778,6 +2778,13 @@ sub AD_get_sessions {
                     print "   * Loading partial data of session $id.\n";
                 }            
 
+                my $smb_dir=$entry->get_value('homeDirectory');
+                $smb_dir=~s/\\/\//g;
+                my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
+                             $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
+                $smb_dir="smb:".$smb_dir."/".$transfer;
+		#print "SMB: $smb_dir\n";
+
                 # save supervisor information
                 #--------------------------------------------------
                 # save by user
@@ -2788,6 +2795,7 @@ sub AD_get_sessions {
                 $sessions{'SUPERVISOR'}{$supervisor}{'givenName'}=$entry->get_value('givenName');
                 $sessions{'SUPERVISOR'}{$supervisor}{'sn'}=$entry->get_value('sn');
                 $sessions{'SUPERVISOR'}{$supervisor}{'homeDirectory'}=$entry->get_value('homeDirectory');
+                $sessions{'SUPERVISOR'}{$supervisor}{'SMBhomeDirectory'}=$smb_dir;
                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
                 push @{ $sessions{'SUPERVISOR_LIST'} }, $supervisor; 
                 # save by id
@@ -2799,8 +2807,8 @@ sub AD_get_sessions {
                 $sessions{'ID'}{$id}{'COMMENT'}=$comment;
                 $sessions{'ID'}{$id}{'PARTICIPANTSTRING'}=$participants;
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'homeDirectory'}=$entry->get_value('homeDirectory');
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'SMBhomeDirectory'}=$smb_dir;
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
-
                 push @{ $sessions{'ID_LIST'} }, $id; 
 
                 # save participant information
@@ -2820,6 +2828,12 @@ sub AD_get_sessions {
                                       root_dns=>$root_dns,
                                       user=>$participant,
                            });
+                    my $smb_dir=$home_directory_AD;
+                    $smb_dir=~s/\\/\//g;
+                    my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
+                                 $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
+                    $smb_dir="smb:".$smb_dir."/".$transfer;
+		    #print "SMB: $smb_dir\n";
 
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'givenName'}=$firstname_utf8_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sn'}=$lastname_utf8_AD;
@@ -2828,7 +2842,9 @@ sub AD_get_sessions {
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixRole'}=$role_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixExamMode'}=$exammode_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'}=$home_directory_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'}=$smb_dir;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'}=$school_AD;
+                    push @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
 
                     $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'givenName'}=$firstname_utf8_AD;
@@ -2842,6 +2858,7 @@ sub AD_get_sessions {
                              {$participant}{'sophomorixExamMode'}=$exammode_AD;
                     $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixRole'}=$role_AD;
+                    push @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
 
                     # test participantship in managementgroups
                     my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
@@ -2861,6 +2878,11 @@ sub AD_get_sessions {
                     }
                 }
 
+                # sort some lists
+                @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} } = sort @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} };
+		@{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} } = 
+                    sort @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} };
+
                 # save extended information
                 #--------------------------------------------------
                 if ($id eq $show_session){
@@ -2876,8 +2898,8 @@ sub AD_get_sessions {
                                   root_dns=>$root_dns,
                                   user=>$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
                                 });
-                    &Sophomorix::SophomorixBase::dir_listing_user($supervisor,
-                                                                  $home_directory_AD,
+                    &Sophomorix::SophomorixBase::dir_listing_user($sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
+                                                                  $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'SMBhomeDirectory'},
                                                                   $smb_admin_pass,
                                                                   \%sessions,
                                                                   $ref_sophomorix_config
@@ -2888,7 +2910,8 @@ sub AD_get_sessions {
 
                         &Sophomorix::SophomorixBase::dir_listing_user(
                                        $participant,
-                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'},
+#                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'},
+                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'},
                                        $smb_admin_pass,
                                        \%sessions,
                                        $ref_sophomorix_config

@@ -197,17 +197,21 @@ if ($session ne ""){
 # --info
 if ($info==1) {
     my $jsoncomment;
+    my $jsoninfo;
     if ($session ne ""){
         # show only one session
+        $jsoninfo="ONESESSION";
         $jsoncomment="The sophomorix session $session";
     } else {
         # show all sessions
+        $jsoninfo="SESSIONS";      
         $jsoncomment="All sophomorix sessions";
     }
 
     &json_dump({json => $json,
-                jsoninfo => "SESSIONS",
+                jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
+                object_name => $session,
                 log_level => $Conf::log_level,
                 hash_ref => \%sessions,
                 sophomorix_config => \%sophomorix_config,

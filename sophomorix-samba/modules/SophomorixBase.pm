@@ -97,13 +97,15 @@ sub json_dump {
     my $json = $arg_ref->{json};
     my $log_level = $arg_ref->{log_level};
     my $hash_ref = $arg_ref->{hash_ref};
+    my $object_name = $arg_ref->{object_name};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     # json 
     if ($json==0){
         if ($jsoninfo eq "SESSIONS"){
             &_console_print_sessions($hash_ref,$log_level)
+        } elsif ($jsoninfo eq "ONESESSION"){
+            &_console_print_onesession($hash_ref,$object_name,$log_level)
         }
-        # be quiet
     } elsif ($json==1){
         # pretty output
         $hash_ref->{'JSONINFO'}=$jsoninfo;
@@ -134,6 +136,28 @@ sub _console_print_sessions {
             print "  $session   $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}   ",
                   "$ref_sessions->{'ID'}{$session}{'sophomorixSessions'}\n";
         }
+}
+
+
+sub _console_print_onesession {
+    my ($ref_sessions,$object_name,$log_level)=@_;
+    print "LogLevel: $log_level\n";
+    &print_line();
+    print "$ref_sessions->{'ID'}{$object_name}{'COMMENT'}  (Session-ID $object_name):\n";
+    &print_line();
+    print "Supervisor:  $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sAMAccountName'}",
+          " ($ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'givenName'} ",
+          "$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sn'})\n";
+    print "             $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'SMBhomeDirectory'}\n";
+    &print_line();
+    foreach my $participant (@{ $ref_sessions->{'ID'}{$object_name}{'PARTICIPANT_LIST'} }){
+        print "Participant: $participant",
+              " ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'givenName'} ",
+              "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})\n";
+        #print "";
+        print "             $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'}\n";
+    }
+    &print_line();
 }
 
 
@@ -1208,19 +1232,13 @@ sub filelist_fetch {
 
 sub dir_listing_user {
     # directory listing for supervisor of session only
-    ($sam,$home_directory,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
-    my $smb_dir=$home_directory;
-    $smb_dir=~s/\\/\//g;
-    my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.$ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
-    $smb_dir="smb:".$smb_dir."/".$transfer;
+    my ($sam,$smb_dir,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
     print "      * fetching filelist of user $sam  ($smb_dir)\n";
-
-    #print "SMB: $smb_dir $ref_sophomorix_config->{'GLOBAL'}{'LANG'}\n";
     my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                      password  => $smb_admin_pass,
                                      debug     => 0);
     # empty for a start
-    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{$transfer}=();
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}=();
     my $fd = $smb->opendir($smb_dir);
     while (my $file = $smb->readdir_struct($fd)) {
         if ($file->[1] eq "."){next};
