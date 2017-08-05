@@ -145,9 +145,16 @@ sub _console_print_onesession {
     print "$ref_sessions->{'ID'}{$object_name}{'COMMENT'}  (Session-ID $object_name):\n";
     &print_line();
     my $supervisor=$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sAMAccountName'};
+    my $exammode_string;
+    if ($ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sophomorixExamMode'} eq "---"){
+        $exammode_string="OFF";
+    } else {
+        $exammode_string="ON by ".$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sophomorixExamMode'};
+    }
     print "Supervisor: $supervisor ",
           " ($ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'givenName'} ",
-          "$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sn'})\n";
+          "$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sn'})",
+          " ExamMode: $exammode_string\n";
     print "  $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'SMBhomeDirectory'}\n";
     foreach my $item (@{ $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER_LIST'} }){
         print "      $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER'}{$item}{'TYPE'}  $item\n";
@@ -155,9 +162,16 @@ sub _console_print_onesession {
     print "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANT_COUNT'} participants:\n";
     &print_line();
     foreach my $participant (@{ $ref_sessions->{'ID'}{$object_name}{'PARTICIPANT_LIST'} }){
+        my $exammode_string;
+        if ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sophomorixExamMode'} eq "---"){
+            $exammode_string="OFF";
+        } else {
+            $exammode_string="ON by ".$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sophomorixExamMode'};
+        }
         print "Participant: $participant",
               " ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'givenName'} ",
-              "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})\n";
+              "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})",
+              " ExamMode: $exammode_string\n";
         print "      internetaccess: $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_internetaccess'}\n";
         print "      webfilter:      $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_webfilter'}\n";
         print "      wifiaccess:     $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_wifiaccess'}\n";

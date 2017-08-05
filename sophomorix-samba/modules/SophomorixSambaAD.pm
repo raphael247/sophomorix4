@@ -2746,6 +2746,7 @@ sub AD_get_sessions {
                              'givenName',
                              'sn',
                              'sophomorixSchoolname',
+                             'sophomorixExamMode',
                              'homeDirectory',
                             ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -2797,6 +2798,7 @@ sub AD_get_sessions {
                 $sessions{'SUPERVISOR'}{$supervisor}{'homeDirectory'}=$entry->get_value('homeDirectory');
                 $sessions{'SUPERVISOR'}{$supervisor}{'SMBhomeDirectory'}=$smb_dir;
                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
                 push @{ $sessions{'SUPERVISOR_LIST'} }, $supervisor; 
                 # save by id
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sAMAccountName'}=$supervisor;
@@ -2809,6 +2811,7 @@ sub AD_get_sessions {
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'homeDirectory'}=$entry->get_value('homeDirectory');
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'SMBhomeDirectory'}=$smb_dir;
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
                 push @{ $sessions{'ID_LIST'} }, $id; 
 
                 # save participant information
