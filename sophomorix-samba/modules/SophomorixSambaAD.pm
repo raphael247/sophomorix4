@@ -1236,7 +1236,7 @@ sub AD_user_unset_exam_mode {
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
     if (not $count==1){
         print "ERROR: Could not unset exam mode for nonexisting user $participant\n";
-        return;
+        return 1;
     }
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
@@ -1247,6 +1247,7 @@ sub AD_user_unset_exam_mode {
                      uac_force=>"enable",
                      date_now=> $time_stamp_AD,
                    });
+    return 0;
 }
 
  
@@ -2831,7 +2832,23 @@ sub AD_get_sessions {
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       user=>$participant,
-                           });
+                                    });
+                    if ($exammode_AD ne "---"){
+                        # display exam-account
+                        $participant=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
+                        
+                        # get data again
+                        ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+                        &AD_get_user({ldap=>$ldap,
+                                      root_dse=>$root_dse,
+                                      root_dns=>$root_dns,
+                                      user=>$participant,
+                                    });
+                    }
+
+
                     # calculate smb_dir
                     my $smb_dir=$home_directory_AD;
                     $smb_dir=~s/\\/\//g;
@@ -2864,6 +2881,9 @@ sub AD_get_sessions {
                     $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixRole'}=$role_AD;
                     push @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
+
+                    # id exammode 
+
 
                     # test membership in managementgroups
                     foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
@@ -5430,6 +5450,7 @@ sub AD_examuser_create {
         print "   Unid:               $unid\n";
         print "   File:               $file\n";
         print "   Firstpassword:      $firstpassword_AD\n";
+        print "   Examuser:           $exammode_AD\n";
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
 
@@ -5460,7 +5481,7 @@ sub AD_examuser_create {
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
-                   sophomorixExamMode => "---", 
+                   sophomorixExamMode => $exammode_AD, 
                    userAccountControl => $DevelConf::default_user_account_control,
                    uidNumber => $uidnumber_wish,
 
@@ -5499,8 +5520,14 @@ sub AD_examuser_kill {
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$examuser);
 
-    print "$count,$dn_exist,$cn_exist\n";
-    if ($count > 0){
+    if ($participant=~/$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'}$/){
+        print "WARNING: you must use the account name for --participant",
+              " (without $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'})\n";
+        return;
+    } elsif ($count==0){
+        print "ERROR: Cannot kill nonexisting examuser $examuser\n";
+        return;
+    } elsif ($count > 0){
         my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
             $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
             $school_AD,$status_AD,$firstpassword_AD)=

@@ -148,14 +148,14 @@ sub _console_print_onesession {
     my $supervisor=$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sAMAccountName'};
     my $exammode_string;
     if ($ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sophomorixExamMode'} eq "---"){
-        $exammode_string="OFF";
+        $exammode_string="ExamMode: OFF";
     } else {
-        $exammode_string="ON by ".$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sophomorixExamMode'};
+        $exammode_string="ExamMode of $supervisor ON by ".$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sophomorixExamMode'};
     }
     print "Supervisor: $supervisor ",
           " ($ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'givenName'} ",
           "$ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'sn'})",
-          " ExamMode: $exammode_string\n";
+          "  $exammode_string\n";
     print "  $ref_sessions->{'ID'}{$object_name}{'SUPERVISOR'}{'SMBhomeDirectory'}\n";
     foreach my $item (@{ $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER_LIST'} }){
         print "      $ref_sessions->{'TRANSFER_DIRS'}{$supervisor}{'TRANSFER'}{$item}{'TYPE'}  $item\n";

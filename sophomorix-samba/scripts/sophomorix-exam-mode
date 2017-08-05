@@ -253,39 +253,28 @@ if ($unset_exam_mode==1){
     my $user_count=0;
     my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
-       $user_count++;
-       &AD_user_unset_exam_mode({ldap=>$ldap,
-                                 root_dse=>$root_dse,
-                                 root_dns=>$root_dns,
-                                 participant=>$participant,
-                                 user_count=>$user_count,
-                                 date_now=> $time_stamp_AD,
-                                 sophomorix_config=>\%sophomorix_config,
-                                 sophomorix_result=>\%sophomorix_result,
-                               });
-      &AD_examuser_kill({ldap=>$ldap,
-                         root_dse=>$root_dse,
-                         root_dns=>$root_dns,
-                         participant=>$participant,
-                         user_count=>$user_count,
-                         date_now=> $time_stamp_AD,
-                         smb_admin_pass=>$smb_admin_pass,
-                         sophomorix_config=>\%sophomorix_config,
-                         sophomorix_result=>\%sophomorix_result,
-                       });
-
-#      &AD_user_kill({ldap=>$ldap,
-#                     root_dse=>$root_dse,
-#                     root_dns=>$root_dns,
-#                     login=>$participant,
-#                     identifier=>"",
-#                     user_count=>$user_count,
-#                     smb_admin_pass=>$smb_admin_pass,
-#                     sophomorix_config=>\%sophomorix_config,
-#                   });
-
-
-
+        $user_count++;
+        my $ret=&AD_user_unset_exam_mode({ldap=>$ldap,
+                                          root_dse=>$root_dse,
+                                          root_dns=>$root_dns,
+                                          participant=>$participant,
+                                          user_count=>$user_count,
+                                          date_now=> $time_stamp_AD,
+                                          sophomorix_config=>\%sophomorix_config,
+                                          sophomorix_result=>\%sophomorix_result,
+                                        });
+        if ($ret==0){
+            &AD_examuser_kill({ldap=>$ldap,
+                               root_dse=>$root_dse,
+                               root_dns=>$root_dns,
+                               participant=>$participant,
+                               user_count=>$user_count,
+                               date_now=> $time_stamp_AD,
+                               smb_admin_pass=>$smb_admin_pass,
+                               sophomorix_config=>\%sophomorix_config,
+                               sophomorix_result=>\%sophomorix_result,
+                             });
+        }
     }
     exit;
 }
