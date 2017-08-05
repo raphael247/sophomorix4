@@ -139,6 +139,7 @@ sub _console_print_sessions {
 }
 
 
+
 sub _console_print_onesession {
     my ($ref_sessions,$object_name,$log_level)=@_;
     &print_line();

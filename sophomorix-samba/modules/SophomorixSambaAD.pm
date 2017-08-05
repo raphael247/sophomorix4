@@ -2777,8 +2777,9 @@ sub AD_get_sessions {
                 # just go on
                 if($Conf::log_level>=2){
                     print "   * Loading partial data of session $id.\n";
-                }            
-
+                }
+            
+                # calculate smb_dir
                 my $smb_dir=$entry->get_value('homeDirectory');
                 $smb_dir=~s/\\/\//g;
                 my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
@@ -2831,6 +2832,7 @@ sub AD_get_sessions {
                                       root_dns=>$root_dns,
                                       user=>$participant,
                            });
+                    # calculate smb_dir
                     my $smb_dir=$home_directory_AD;
                     $smb_dir=~s/\\/\//g;
                     my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
@@ -2863,16 +2865,16 @@ sub AD_get_sessions {
                              {$participant}{'sophomorixRole'}=$role_AD;
                     push @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
 
-                    # test participantship in managementgroups
-                    my @grouptypes=("wifiaccess","internetaccess","admins","webfilter","intranetaccess","printing");
-                    foreach my $grouptype (@grouptypes){
+                    # test membership in managementgroups
+                    foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUP'} }){
                         # befor testing set FALSE as default
                         $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                  {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
-                            if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
+                           if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}){
                                 # if in the groups, set TRUE
+			       print "Res: $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}\n";
                                 $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
                                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                          {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
@@ -2895,7 +2897,7 @@ sub AD_get_sessions {
                     if($Conf::log_level>=2){
                         print "   * Loading extended data of selected session $id.\n";
                     }
-                    # transfer of supervisor
+                    # transfer directory of supervisor
                     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
                         $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
@@ -2912,8 +2914,10 @@ sub AD_get_sessions {
                                                                  );
                     # participants
                     foreach my $participant (keys %{$sessions{'ID'}{$id}{'PARTICIPANTS'}}) {
-                        # transfer of participants 
+                        # managementgroups
 
+
+                        # transfer directory of participants 
                         &Sophomorix::SophomorixBase::dir_listing_user(
                                        $participant,
                                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'},
