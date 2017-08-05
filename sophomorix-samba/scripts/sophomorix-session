@@ -65,6 +65,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_AD
                                  AD_dns_get
                                  AD_object_search
+                                 AD_get_passwd
                                  get_forbidden_logins
                                     );
 
@@ -124,10 +125,11 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-session");
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-#my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,\%sophomorix_config);
 my %sessions=();
 
 
@@ -185,10 +187,10 @@ Please see the sophomorix-session(8) man pages for full documentation
 
 if ($session ne ""){
     # get the session $session
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,$session,\%sophomorix_config);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$session,$smb_admin_pass,\%sophomorix_config);
 } else {
     # get all sessions
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$dump_AD,"all",\%sophomorix_config);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all",$smb_admin_pass,\%sophomorix_config);
 }
 
 

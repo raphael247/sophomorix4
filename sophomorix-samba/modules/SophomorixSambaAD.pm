@@ -2720,7 +2720,7 @@ sub AD_object_search {
 
 
 sub AD_get_sessions {
-    my ($ldap,$root_dse,$root_dns,$json,$dump_AD,$show_session,$ref_sophomorix_config)=@_;
+    my ($ldap,$root_dse,$root_dns,$json,$show_session,$smb_admin_pass,$ref_sophomorix_config)=@_;
     my %sessions=();
     my $session_count=0;
     my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
@@ -2734,21 +2734,12 @@ sub AD_get_sessions {
                                dnsnodes=>"FALSE",
                                sophomorix_config=>$ref_sophomorix_config,
                   });
-    # if ($dump_AD==1){
-    #     &Sophomorix::SophomorixBase::json_dump({json => $json,
-    #                                             jsoninfo => "SEARCH",
-    #                                             jsoncomment => "AD Content",
-    #                                             #log_level => $ref_log_level,
-    #                                             hash_ref=>$ref_AD,
-    #                                             sophomorix_config=>$ref_sophomorix_config,
-    #                                            });
-    # }
-
+#    my $filter="(&(objectClass=user)(sophomorixRole=*))";
+    my $filter="(&(objectClass=user)(sophomorixSessions=*)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
-                   filter => '(&(objectClass=user)(sophomorixRole=*))',
-                  #filter => '(&(objectClass=user) (sophomorixRole=student))',
+                   filter => $filter,
                    attrs => ['sAMAccountName',
                              'sophomorixSessions',
                              'sophomorixRole',
@@ -2760,25 +2751,40 @@ sub AD_get_sessions {
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max_user = $mesg->count; 
     if($Conf::log_level>=2){
-        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found to test for sessions");
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users have sessions");
     }
     $AD{'result'}{'supervisor'}{'student'}{'COUNT'}=$max_user;
 
-    # walk through all users
+    # walk through all supervisors
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
+        my $supervisor=$entry->get_value('sAMAccountName');
         my @session_list = sort $entry->get_value('sophomorixSessions');
         if($Conf::log_level>=2){
             my $user_session_count=$#session_list+1;
-            print "   * User $sam has $user_session_count sessions\n";
+            print "   * User $supervisor has $user_session_count sessions\n";
 	}
+        # get supervisor info
+        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+            $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+            &AD_get_user({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          user=>$supervisor,
+                        });
+        &Sophomorix::SophomorixBase::dir_listing_user($supervisor,
+                                                      $home_directory_AD,
+                                                      $smb_admin_pass,
+                                                      \%sessions,
+                                                      $ref_sophomorix_config
+                                                     );
         
         # walk through all sessions of the user
         foreach my $session (@session_list){
             $session_count++;
             if($Conf::log_level>=2){
-                &Sophomorix::SophomorixBase::print_title("$session_count: User $sam has session $session");
+                &Sophomorix::SophomorixBase::print_title("$session_count: User $supervisor has session $session");
             }
             my ($id,$comment,$participants,$string)=split(/;/,$session);
 
@@ -2791,17 +2797,17 @@ sub AD_get_sessions {
                 # save supervisor information
                 #--------------------------------------------------
                 # save by user
-                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'sophomorixSessions'}=$session;
-                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'COMMENT'}=$comment;
-                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTSTRING'}=$participants;
-                $sessions{'SUPERVISOR'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
-                $sessions{'SUPERVISOR'}{$sam}{'givenName'}=$entry->get_value('givenName');
-                $sessions{'SUPERVISOR'}{$sam}{'sn'}=$entry->get_value('sn');
-                $sessions{'SUPERVISOR'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
-                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
-                push @{ $sessions{'SUPERVISOR_LIST'} }, $sam; 
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'sophomorixSessions'}=$session;
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'COMMENT'}=$comment;
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTSTRING'}=$participants;
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+                $sessions{'SUPERVISOR'}{$supervisor}{'givenName'}=$entry->get_value('givenName');
+                $sessions{'SUPERVISOR'}{$supervisor}{'sn'}=$entry->get_value('sn');
+                $sessions{'SUPERVISOR'}{$supervisor}{'homeDirectory'}=$entry->get_value('homeDirectory');
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+                push @{ $sessions{'SUPERVISOR_LIST'} }, $supervisor; 
                 # save by id
-                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sAMAccountName'}=$sam;
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sAMAccountName'}=$supervisor;
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'givenName'}=$entry->get_value('givenName');
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sn'}=$entry->get_value('sn');
@@ -2840,17 +2846,17 @@ sub AD_get_sessions {
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'}=$home_directory_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'}=$school_AD;
 
-                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'givenName'}=$firstname_utf8_AD;
-                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sn'}=$lastname_utf8_AD;
-                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixAdminClass'}=$adminclass_AD;
-                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'user_existing'}=$existing_AD;
-                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixExamMode'}=$exammode_AD;
-                    $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixRole'}=$role_AD;
 
                     # test participantship in managementgroups
@@ -2858,17 +2864,23 @@ sub AD_get_sessions {
                     foreach my $grouptype (@grouptypes){
                         # befor testing set FALSE as default
                         $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
-                        $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}
+                        $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                  {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                             if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'participants'}{$participant}){
                                 # if in the groups, set TRUE
                                 $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
-                                $sessions{'SUPERVISOR'}{$sam}{'sophomorixSessions'}{$id}
+                                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                          {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
                             }
                         }
                     }
+                    &Sophomorix::SophomorixBase::dir_listing_user($participant,
+                                                                  $home_directory_AD,
+                                                                  $smb_admin_pass,
+                                                                  \%sessions,
+                                                                  $ref_sophomorix_config
+                                                                 );
                     # do more with the session participants
                 }
 
@@ -2878,16 +2890,6 @@ sub AD_get_sessions {
                     if($Conf::log_level>=2){
                         print "   * Loading extended data of selected session $id.\n";
                     }  
-                    # List contents of share and collect directory 
-                    # of the supervisor
-                    my $supervisor=$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'};
-                    &Sophomorix::SophomorixBase::dir_listing_user("/etc/linuxmuster/sophomorix",
-                                                                  "collect_dir",
-                                                                  "supervisor",
-                                                                  $supervisor,
-                                                                  $show_session,
-                                                                  \%sessions,
-                                                                 );
                     # List quota 
                     # of all participants
                     foreach my $participant (keys %{$sessions{'ID'}{$show_session}{'PARTICIPANTS'}}) {

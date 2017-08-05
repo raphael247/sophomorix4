@@ -4414,7 +4414,7 @@ if ($ses==1){
     print "Session tests\n";
     &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 666");
     &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 777");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
     # maiersa42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -4453,7 +4453,7 @@ if ($ses==1){
 
     &run_command("sophomorix-session $all_options --session 666 --participants lordjo42");
     &run_command("sophomorix-session $all_options --session 777 --participants lordjo42,blackmri42");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4493,7 +4493,7 @@ if ($ses==1){
 
     # --remove-participants
     &run_command("sophomorix-session $all_options --session 777 --remove-participants blackmri42");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4533,7 +4533,7 @@ if ($ses==1){
 
     # --remove-participants (removing nonexisting participant)
     &run_command("sophomorix-session $all_options --session 777 --remove-participants blackmri42");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4574,7 +4574,7 @@ if ($ses==1){
 
     # --add-participants (adding already existing participant)
     &run_command("sophomorix-session $all_options --session 777 --add-participants lordjo42");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4615,7 +4615,7 @@ if ($ses==1){
 
     # --add-participants
     &run_command("sophomorix-session $all_options --session 666 --add-participants blackmri42");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4656,7 +4656,7 @@ if ($ses==1){
     # --comment
     &run_command("sophomorix-session $all_options --session 666 --comment \"Mondays Session\"");
     &run_command("sophomorix-session $all_options --session 777 --comment \"No such ;;; allowed\"");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,2);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4849,7 +4849,7 @@ if ($ses==1){
 
     &run_command("sophomorix-session $all_options --kill --session 666");
     &run_command("sophomorix-session $all_options --kill --session 777");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,0);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,0);
 
 
     # create a full session in one blow
@@ -4965,7 +4965,7 @@ if ($ses==1){
 
 
     &run_command("sophomorix-session $all_options --kill-all-sessions");
-    &AD_test_session_count($ldap,$root_dse,$root_dns,0);
+    &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,0);
 
     #################### internet
     # --nointernet, 1 user

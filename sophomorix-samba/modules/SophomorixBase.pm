@@ -1208,39 +1208,36 @@ sub filelist_fetch {
 
 sub dir_listing_user {
     # directory listing for supervisor of session only
-    ($user)=@_;
+    ($sam,$home_directory,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
+    my $smb_dir=$home_directory;
+    $smb_dir=~s/\\/\//g;
 
+    my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.$ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
+    $smb_dir="smb:".$smb_dir."/".$transfer;
 
-    # fix the path to homedir of supervisors ???????????????????ß
+    #print "SMB: $smb_dir $ref_sophomorix_config->{'GLOBAL'}{'LANG'}\n";
     my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                      password  => $smb_admin_pass,
                                      debug     => 0);
-#    my $fd = $smb->opendir("smb://jupiter/doc");
-    my $fd = $smb->opendir("smb://jupiter/doc");
-    foreach my $n ($smb->readdir($fd)) {
-        print $n,"\n";
-    }
-    close($fd);
+    # empty for a start
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}=();
+    my $fd = $smb->opendir($smb_dir);
+    while (my $file = $smb->readdir_struct($fd)) {
+        if ($file->[1] eq "."){next};
+        if ($file->[1] eq ".."){next};
+        if ($file->[0] == 7) {
+        #print "Directory ",$file->[1],"\n";
+        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{$transfer}{$file->[1]}{'type'}="d";
+    } elsif ($file->[0] == 8) {
+        #print "File ",$file->[1],"\n";
+        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{$transfer}{$file->[1]}{'type'}="f";
+    } else {
 
-    # my ($dir,$name,$role,$supervisor,$session,$ref_sessions)=@_;
-    # opendir DIR, $dir or return;
-    # foreach my $file (readdir DIR){
-    #     my $abs_path=$dir."/".$file;
-    #     my $Type;
-    #     if ($file eq "."){next};
-    #     if ($file eq ".."){next};
-    #     if (-d $abs_path){
-    #         $type="d";
-    #     } elsif (-f $abs_path){
-    #         $type="f";
-    #     } else {
-    #         $type="strange";
-    #     }
-    #     $ref_sessions->{'SUPERVISOR'}{$supervisor}{'files'}{$name}{$file}{'type'}=$type;
-    #     $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'files'}{$name}{$file}{'type'}=$type;
-    # }
-    # closedir DIR;
+    }
+  }
+  #close($fd);
 }
+
 
 
 sub quota_listing_session_participant {
