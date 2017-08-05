@@ -2866,7 +2866,7 @@ sub AD_get_sessions {
                     push @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
 
                     # test membership in managementgroups
-                    foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUP'} }){
+                    foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
                         # befor testing set FALSE as default
                         $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
@@ -2874,7 +2874,6 @@ sub AD_get_sessions {
                         foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
                            if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}){
                                 # if in the groups, set TRUE
-			       print "Res: $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}\n";
                                 $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
                                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                          {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";

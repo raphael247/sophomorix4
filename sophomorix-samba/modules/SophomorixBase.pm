@@ -102,9 +102,9 @@ sub json_dump {
     # json 
     if ($json==0){
         if ($jsoninfo eq "SESSIONS"){
-            &_console_print_sessions($hash_ref,$log_level)
+            &_console_print_sessions($hash_ref,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "ONESESSION"){
-            &_console_print_onesession($hash_ref,$object_name,$log_level)
+            &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -129,7 +129,7 @@ sub json_dump {
 
 
 sub _console_print_sessions {
-    my ($ref_sessions,$log_level)=@_;
+    my ($ref_sessions,$log_level,$ref_sophomorix_config)=@_;
     print "LogLevel: $log_level\n";
     print "$ref_sessions->{'SESSIONCOUNT'} sessions by Session-Name:\n";
         foreach my $session (@{ $ref_sessions->{'ID_LIST'} }){
@@ -141,7 +141,7 @@ sub _console_print_sessions {
 
 
 sub _console_print_onesession {
-    my ($ref_sessions,$object_name,$log_level)=@_;
+    my ($ref_sessions,$object_name,$log_level,$ref_sophomorix_config)=@_;
     &print_line();
     print "$ref_sessions->{'ID'}{$object_name}{'COMMENT'}  (Session-ID $object_name):\n";
     &print_line();
@@ -173,11 +173,11 @@ sub _console_print_onesession {
               " ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'givenName'} ",
               "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})",
               " ExamMode: $exammode_string\n";
-        print "      internetaccess: $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_internetaccess'}\n";
-        print "      webfilter:      $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_webfilter'}\n";
-        print "      wifiaccess:     $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_wifiaccess'}\n";
-        print "      intranetaccess: $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_intranetaccess'}\n";
-        print "      printing:       $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_printing'}\n";
+        foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
+            printf "      %-16s%-20s\n",
+                $grouptype.":",
+                $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_'.$grouptype};
+        }
         print "  $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'}\n";
         foreach my $item (@{ $ref_sessions->{'TRANSFER_DIRS'}{$participant}{'TRANSFER_LIST'} }){
             print "      $ref_sessions->{'TRANSFER_DIRS'}{$participant}{'TRANSFER'}{$item}{'TYPE'}  $item\n";
@@ -615,6 +615,10 @@ sub config_sophomorix_read {
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_MEMBEROF'}{$membergroup}=$group;
         }
     }
+
+    # create MANAGEMENTGROUPLIST from MANAGEMENTGROUP 
+    my @managementgrouplist=&Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUP'});
+    $sophomorix_config{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'}=[ \@managementgrouplist ];
 
     # sorting some lists
     @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
