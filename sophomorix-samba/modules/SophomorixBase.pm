@@ -131,7 +131,7 @@ sub _console_print_sessions {
     print "LogLevel: $log_level\n";
     print "$ref_sessions->{'SESSIONCOUNT'} sessions by Session-Name:\n";
         foreach my $session (@{ $ref_sessions->{'ID_LIST'} }){
-            print "$session  $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'name'}  ",
+            print "  $session   $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}   ",
                   "$ref_sessions->{'ID'}{$session}{'sophomorixSessions'}\n";
         }
 }
@@ -1211,16 +1211,16 @@ sub dir_listing_user {
     ($sam,$home_directory,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
     my $smb_dir=$home_directory;
     $smb_dir=~s/\\/\//g;
-
     my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.$ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
     $smb_dir="smb:".$smb_dir."/".$transfer;
+    print "      * fetching filelist of user $sam  ($smb_dir)\n";
 
     #print "SMB: $smb_dir $ref_sophomorix_config->{'GLOBAL'}{'LANG'}\n";
     my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                      password  => $smb_admin_pass,
                                      debug     => 0);
     # empty for a start
-    $ref_sessions->{'TRANSFER_DIRS'}{$sam}=();
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{$transfer}=();
     my $fd = $smb->opendir($smb_dir);
     while (my $file = $smb->readdir_struct($fd)) {
         if ($file->[1] eq "."){next};

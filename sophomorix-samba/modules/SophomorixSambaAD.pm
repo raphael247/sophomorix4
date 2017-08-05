@@ -2764,22 +2764,6 @@ sub AD_get_sessions {
             my $user_session_count=$#session_list+1;
             print "   * User $supervisor has $user_session_count sessions\n";
 	}
-        # get supervisor info
-        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-            $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
-            &AD_get_user({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          user=>$supervisor,
-                        });
-        &Sophomorix::SophomorixBase::dir_listing_user($supervisor,
-                                                      $home_directory_AD,
-                                                      $smb_admin_pass,
-                                                      \%sessions,
-                                                      $ref_sophomorix_config
-                                                     );
-        
         # walk through all sessions of the user
         foreach my $session (@session_list){
             $session_count++;
@@ -2875,13 +2859,6 @@ sub AD_get_sessions {
                             }
                         }
                     }
-                    &Sophomorix::SophomorixBase::dir_listing_user($participant,
-                                                                  $home_directory_AD,
-                                                                  $smb_admin_pass,
-                                                                  \%sessions,
-                                                                  $ref_sophomorix_config
-                                                                 );
-                    # do more with the session participants
                 }
 
                 # save extended information
@@ -2889,10 +2866,34 @@ sub AD_get_sessions {
                 if ($id eq $show_session){
                     if($Conf::log_level>=2){
                         print "   * Loading extended data of selected session $id.\n";
-                    }  
-                    # List quota 
-                    # of all participants
-                    foreach my $participant (keys %{$sessions{'ID'}{$show_session}{'PARTICIPANTS'}}) {
+                    }
+                    # transfer of supervisor
+                    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+                    &AD_get_user({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  user=>$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
+                                });
+                    &Sophomorix::SophomorixBase::dir_listing_user($supervisor,
+                                                                  $home_directory_AD,
+                                                                  $smb_admin_pass,
+                                                                  \%sessions,
+                                                                  $ref_sophomorix_config
+                                                                 );
+                    # participants
+                    foreach my $participant (keys %{$sessions{'ID'}{$id}{'PARTICIPANTS'}}) {
+                        # transfer of participants 
+
+                        &Sophomorix::SophomorixBase::dir_listing_user(
+                                       $participant,
+                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'},
+                                       $smb_admin_pass,
+                                       \%sessions,
+                                       $ref_sophomorix_config
+                                       );
+                        # quota
                         &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,
                                                                                        $show_session,
                                                                                        $supervisor,
