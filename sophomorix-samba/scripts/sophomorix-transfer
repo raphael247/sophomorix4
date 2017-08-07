@@ -98,6 +98,8 @@ my $from_unix_path="";
 my $to_user="";
 my $subdir="";
 
+my $clean_transfer_dir="";
+
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -106,6 +108,7 @@ my $testopt=GetOptions(
            "from-unix-path=s" => \$from_unix_path,
            "to-user=s" => \$to_user,
            "subdir=s" => \$subdir,
+           "clean-transfer-dir=s" => \$clean_transfer_dir,
            "verbose|v+" => \$Conf::log_level,
           );
 
@@ -136,6 +139,8 @@ Options:
   -i  / --info
 
 sophomorix-transfer --from-unix-path /srv/upload/... --to-user <user1>,<user2>-exam, ... --subdir dir
+
+sophomorix-transfer --clean-transfer-dir <user1>,<user2>-exam, ...
  
 Please see the sophomorix-transfer(8) man pages for full documentation
 ');
@@ -165,8 +170,15 @@ if ($from_unix_path ne "" and $to_user ne ""){
     print "Copying from $from_unix_path to the users $to_user\n";
     # create mput commands
     &smbclient_mput_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,$from_unix_path,$subdir,$to_user,\%sophomorix_config);
+    exit;
 }
 
+# --clean-transfer-dir
+if ($clean_transfer_dir){
+    print "Cleaning transfer dir of $clean_transfer_dir\n";
+    &clean_transfer_dir($ldap,$root_dse,$root_dns,$smb_admin_pass,$clean_transfer_dir,\%sophomorix_config);
+    exit;
+}
 
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -218,4 +230,54 @@ sub smbclient_mput_recurse {
         system($smbclient_command);
     }
 
+}
+
+
+
+sub clean_transfer_dir {
+    my ($ldap,$root_dse,$root_dns,$smb_admin_pass,$userstring,$ref_sophomorix_config)=@_;
+    my @users=split(/,/,$userstring);
+    foreach my $user (@users){
+        # exit if user does not exist
+        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+                        &AD_get_user({ldap=>$ldap,
+                                      root_dse=>$root_dse,
+                                      root_dns=>$root_dns,
+                                      user=>$user,
+                                    });
+        my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
+                             $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
+        my $smb_dir=$home_directory_AD;
+        $smb_dir=~s/\\/\//g;
+        $smb_dir="smb:".$smb_dir."/".$transfer;
+	print "  * $user: $smb_dir\n";
+
+        my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+                                         password  => $smb_admin_pass,
+                                         debug     => 0);
+        
+        my $fd = $smb->opendir($smb_dir);
+        while (my $file = $smb->readdir_struct($fd)) {
+            if ($file->[1] eq "."){next};
+            if ($file->[1] eq ".."){next};
+            my $path=$smb_dir."/".$file->[1];
+
+            my $return;
+            if ($file->[0] == 7) {
+                # its a dir
+                $return=$smb->rmdir_recurse($path);
+            } elsif ($file->[0] == 8) {
+                # its a file
+                $return=$smb->unlink($path);
+            }
+
+            if ($return==1){
+                print "OK: Deleted with succes $path\n";
+            } else {
+                print "ERROR: rmdir_recurse $path $!\n";
+            }
+        }
+    }
 }

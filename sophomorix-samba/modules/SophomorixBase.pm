@@ -50,7 +50,7 @@ $Data::Dumper::Terse = 1;
             result_sophomorix_check_exit
             result_sophomorix_print
             filelist_fetch
-            dir_listing
+            dir_listing_user
             dns_query_ip
             remove_whitespace
             json_dump
@@ -1293,7 +1293,7 @@ sub dir_listing_user {
       @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} } = 
         sort @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} };
   }
-  #close($fd);
+  #close($fd); # ?????????????? gives error
 }
 
 

@@ -48,8 +48,14 @@ my $test_add_users=0;
 my $exammode_users=0;
 my $test_exammode_users=0;
 
-my $file_transfer=0;
-my $test_file_transfer=0;
+my $file_transfer_share=0;
+my $test_file_transfer_share=0;
+
+my $file_transfer_collect=0;
+my $test_file_transfer_collect=0;
+
+my $file_transfer_clean=0;
+my $test_file_transfer_clean=0;
 
 my $nonexammode_users=0;
 my $test_nonexammode_users=0;
@@ -71,8 +77,12 @@ my $testopt=GetOptions(
            "test-add-users" => \$test_add_users,
            "exammode-users" => \$exammode_users,
            "test-exammode-users" => \$test_exammode_users,
-           "file-transfer" => \$file_transfer,
-           "test-file-transfer" => \$test_file_transfer,
+           "file-transfer-share" => \$file_transfer_share,
+           "test-file-transfer-share" => \$test_file_transfer_share,
+           "file-transfer-collect" => \$file_transfer_collect,
+           "test-file-transfer-collect" => \$test_file_transfer_collect,
+           "file-transfer-clean" => \$file_transfer_clean,
+           "test-file-transfer-clean" => \$test_file_transfer_clean,
            "nonexammode-users" => \$nonexammode_users,
            "test-nonexammode-users" => \$test_nonexammode_users,
            "kill-users" => \$kill_users,
@@ -129,8 +139,14 @@ Options
     sophomorix-test-exammode --test-exammode-users  
 
    File transfer:
-    sophomorix-test-exammode --file-transfer 
-    sophomorix-test-exammode --test-file-transfer 
+    sophomorix-test-exammode --file-transfer-share 
+    sophomorix-test-exammode --test-file-transfer-share 
+
+    sophomorix-test-exammode --file-transfer-collect 
+    sophomorix-test-exammode --test-file-transfer-collect 
+
+    sophomorix-test-exammode --file-transfer-clean 
+    sophomorix-test-exammode --test-file-transfer-clean 
 
    Remove some users from exammode:
     sophomorix-test-exammode --nonexammode-users  
@@ -159,8 +175,12 @@ if ($full==1){
     $test_add_users=1;
     $exammode_users=1;
     $test_exammode_users=1;
-    $file_transfer=1;
-    $test_file_transfer=1;
+    $file_transfer_share=1;
+    $test_file_transfer_share=1;
+    $file_transfer_collect=1;
+    $test_file_transfer_collect=1;
+    $file_transfer_clean=1;
+    $test_file_transfer_clean=1;
     $nonexammode_users=1;
     $test_nonexammode_users=1;
     $kill_users=1;
@@ -1242,10 +1262,10 @@ if ($test_exammode_users==1){
 
 
 ############################################################
-# do the file transfer
+# do the file transfer, share
 ############################################################
-if ($file_transfer==1){
-    # distribute files
+if ($file_transfer_share==1){
+    # share files
     &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user maiersa72,muellegr72-exam");
 
 }
@@ -1255,7 +1275,7 @@ if ($file_transfer==1){
 ############################################################
 # Test the file transfer
 ############################################################
-if ($test_file_transfer==1){
+if ($test_file_transfer_share==1){
     ############################################################
     # fs test
     ############################################################
@@ -1272,7 +1292,6 @@ if ($test_file_transfer==1){
 #                    "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/_einsammeln",
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
-
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/file1-level1",
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/file2-level1",
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir1-level1",
@@ -1289,9 +1308,6 @@ if ($test_file_transfer==1){
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/subdir1-level3",
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir2-level2",
                     "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir3-level2",
-
-
-
 #                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/_einsammeln",
                     "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
                     "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
@@ -1403,6 +1419,28 @@ if ($test_file_transfer==1){
 
 
 }
+
+
+
+############################################################
+# do the file transfer, collect
+############################################################
+if ($file_transfer_collect==1){
+    # collect files
+#    &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user maiersa72,muellegr72-exam");
+
+}
+
+############################################################
+# do the file transfer, clean
+############################################################
+if ($file_transfer_clean==1){
+    # clean up  files
+    &run_command("sophomorix-transfer $all_options --clean-transfer-dir maiersa72,muellegr72-exam");
+
+}
+
+
 
 
 
