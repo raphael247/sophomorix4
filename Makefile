@@ -346,8 +346,6 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir1-level1/file* $(TESTDATA)/transfer-testdata/subdir1-level1
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir2-level1/file* $(TESTDATA)/transfer-testdata/subdir2-level1
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir2-level1/subdir1-level2/file* $(TESTDATA)/transfer-testdata/subdir2-level1/subdir1-level2
-#	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir2-level1/subdir2-level2/file* $(TESTDATA)/transfer-testdata/subdir2-level1/subdir2-level2
-#	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir2-level1/subdir3-level2/file* $(TESTDATA)/transfer-testdata/subdir2-level1/subdir3-level2
 
 # installing sources.list examples
 #	@install -d $(TOOLS)/apt/s-lists

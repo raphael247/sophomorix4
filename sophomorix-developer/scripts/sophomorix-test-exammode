@@ -48,6 +48,9 @@ my $test_add_users=0;
 my $exammode_users=0;
 my $test_exammode_users=0;
 
+my $file_transfer=0;
+my $test_file_transfer=0;
+
 my $nonexammode_users=0;
 my $test_nonexammode_users=0;
 
@@ -68,6 +71,8 @@ my $testopt=GetOptions(
            "test-add-users" => \$test_add_users,
            "exammode-users" => \$exammode_users,
            "test-exammode-users" => \$test_exammode_users,
+           "file-transfer" => \$file_transfer,
+           "test-file-transfer" => \$test_file_transfer,
            "nonexammode-users" => \$nonexammode_users,
            "test-nonexammode-users" => \$test_nonexammode_users,
            "kill-users" => \$kill_users,
@@ -123,6 +128,10 @@ Options
     sophomorix-test-exammode --exammode-users  
     sophomorix-test-exammode --test-exammode-users  
 
+   File transfer:
+    sophomorix-test-exammode --file-transfer 
+    sophomorix-test-exammode --test-file-transfer 
+
    Remove some users from exammode:
     sophomorix-test-exammode --nonexammode-users  
     sophomorix-test-exammode --test-nonexammode-users  
@@ -150,6 +159,8 @@ if ($full==1){
     $test_add_users=1;
     $exammode_users=1;
     $test_exammode_users=1;
+    $file_transfer=1;
+    $test_file_transfer=1;
     $nonexammode_users=1;
     $test_nonexammode_users=1;
     $kill_users=1;
@@ -616,7 +627,7 @@ if ($test_add_users==1){
 
 
 ############################################################
-# Test users in exammode
+# Set users in exammode
 ############################################################
 if ($exammode_users==1){
     
@@ -638,8 +649,6 @@ if ($exammode_users==1){
     &run_command("sophomorix-exam-mode --set --subdir subdir72 --supervisor oe72  --participants maiersa72,muellegr72 $all_options");
     # 777
     &run_command("sophomorix-exam-mode --set --supervisor wu72  --participants jonsonad72,samardze72 $all_options");
-
-
 }
 
 
@@ -711,7 +720,7 @@ if ($test_exammode_users==1){
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
+                   sophomorixExamMode => "oe72",
                    sophomorixStatus=>"X",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
@@ -805,7 +814,7 @@ if ($test_exammode_users==1){
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
+                   sophomorixExamMode => "oe72",
                    sophomorixStatus=>"X",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
@@ -899,7 +908,7 @@ if ($test_exammode_users==1){
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
+                   sophomorixExamMode => "wu72",
                    sophomorixStatus=>"X",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
@@ -993,7 +1002,7 @@ if ($test_exammode_users==1){
                    sophomorixTolerationDate => "default",
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "created by sophomorix",
-                   sophomorixExamMode => "---",
+                   sophomorixExamMode => "wu72",
                    sophomorixStatus=>"X",
                    sophomorixUnid => "---",
                    userAccountControl => "512",
@@ -1121,8 +1130,6 @@ if ($test_exammode_users==1){
                    memberOf => "bsz|all-teachers",
                   });
 
-
-
     ############################################################
     # fs test
     ############################################################
@@ -1231,12 +1238,171 @@ if ($test_exammode_users==1){
                          "/srv/samba/global/teachers",
                         ); 
     &end_fs_test(\%fs_test_result);
+}
 
 
+############################################################
+# do the file transfer
+############################################################
+if ($file_transfer==1){
+    # distribute files
+    &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user maiersa72,muellegr72-exam");
 
 }
 
 
+
+############################################################
+# Test the file transfer
+############################################################
+if ($test_file_transfer==1){
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
+    &directory_tree_test("/srv/samba/schools",
+                    \%fs_test_result,
+                    "/srv/samba/schools",
+                    "/srv/samba/schools/bsz",
+                    "/srv/samba/schools/bsz/management",
+                    "/srv/samba/schools/bsz/examusers",
+                    "/srv/samba/schools/bsz/examusers/subdir72",
+                    "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                    "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
+#                    "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/_einsammeln",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
+
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/file1-level1",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/file2-level1",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir1-level1",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir1-level1/file1-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir1-level1/file2-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir1-level1/file3-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/file1-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/file2-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/file3-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir1-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/file1-level3",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/file2-level3",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/subdir1-level3",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir2-level2",
+                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/subdir2-level1/subdir3-level2",
+
+
+
+#                    "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/_einsammeln",
+                    "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
+                    "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
+#                    "/srv/samba/schools/bsz/examusers/jonsonad72-exam/_einsammeln",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+#                    "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
+                    "/srv/samba/schools/bsz/projects",
+                    "/srv/samba/schools/bsz/students",
+                    "/srv/samba/schools/bsz/teachers",
+                    "/srv/samba/schools/bsz/teachers/homes",
+                    "/srv/samba/schools/bsz/teachers/homes/oe72",
+                    "/srv/samba/schools/bsz/teachers/homes/oe72/transfer",
+#                    "/srv/samba/schools/bsz/teachers/homes/oe72/_einsammeln",
+                    "/srv/samba/schools/bsz/teachers/homes/wu72",
+                    "/srv/samba/schools/bsz/teachers/homes/wu72/transfer",
+#                    "/srv/samba/schools/bsz/teachers/homes/wu72/_einsammeln",
+                    "/srv/samba/schools/bsz/teachers/share",
+                    "/srv/samba/schools/bsz/students/m7ab",
+                    "/srv/samba/schools/bsz/students/m7ab/homes",
+                    "/srv/samba/schools/bsz/students/m7ab/share",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/file1-level1",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/file2-level1",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir1-level1",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir1-level1/file1-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir1-level1/file2-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir1-level1/file3-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/file1-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/file2-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/file3-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/subdir1-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/subdir1-level2/file1-level3",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/subdir1-level2/file2-level3",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/subdir1-level2/subdir1-level3",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/subdir2-level2",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/transfer/subdir2-level1/subdir3-level2",
+#                    "/srv/samba/schools/bsz/students/m7ab/homes/maiersa72/_einsammeln",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/muellegr72",
+                    "/srv/samba/schools/bsz/students/m7ab/homes/muellegr72/transfer",
+#                    "/srv/samba/schools/bsz/students/m7ab/homes/muellegr72/_einsammeln",
+                    "/srv/samba/schools/bsz/students/m8cd",
+                    "/srv/samba/schools/bsz/students/m8cd/share",
+                    "/srv/samba/schools/bsz/students/m8cd/homes",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/transfer",
+#                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/_einsammeln",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/samardze72",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/transfer",
+#                    "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/_einsammeln",
+                    "/srv/samba/schools/uni",
+                    "/srv/samba/schools/uni/management",
+                    "/srv/samba/schools/uni/examusers",
+                    "/srv/samba/schools/uni/projects",
+                    "/srv/samba/schools/uni/students",
+                    "/srv/samba/schools/uni/students/12abc",
+                    "/srv/samba/schools/uni/students/12abc/share",
+                    "/srv/samba/schools/uni/students/12abc/homes",
+                    "/srv/samba/schools/uni/students/12abc/homes/lordjo72",
+                    "/srv/samba/schools/uni/students/12abc/homes/lordjo72/transfer",
+#                    "/srv/samba/schools/uni/students/12abc/homes/lordjo72/_einsammeln",
+                    "/srv/samba/schools/uni/students/12abc/homes/blackmri72",
+                    "/srv/samba/schools/uni/students/12abc/homes/blackmri72/transfer",
+#                    "/srv/samba/schools/uni/students/12abc/homes/blackmri72/_einsammeln",
+                    "/srv/samba/schools/uni/teachers",
+                    "/srv/samba/schools/uni/teachers/homes",
+                    "/srv/samba/schools/uni/teachers/homes/kep72",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer",
+#                    "/srv/samba/schools/uni/teachers/homes/kep72/_einsammeln",
+                    "/srv/samba/schools/uni/teachers/homes/gal72",
+                    "/srv/samba/schools/uni/teachers/homes/gal72/transfer",
+#                    "/srv/samba/schools/uni/teachers/homes/gal72/_einsammeln",
+                    "/srv/samba/schools/uni/teachers/share",
+                    "/srv/samba/schools/default-school",
+                    "/srv/samba/schools/default-school/management",
+                    "/srv/samba/schools/default-school/examusers",
+                    "/srv/samba/schools/default-school/projects",
+                    "/srv/samba/schools/default-school/students",
+                    "/srv/samba/schools/default-school/students/s6ade",
+                    "/srv/samba/schools/default-school/students/s6ade/share",
+                    "/srv/samba/schools/default-school/students/s6ade/homes",
+                    "/srv/samba/schools/default-school/students/s6ade/homes/schneima72",
+                    "/srv/samba/schools/default-school/students/s6ade/homes/schneima72/transfer",
+#                    "/srv/samba/schools/default-school/students/s6ade/homes/schneima72/_einsammeln",
+                    "/srv/samba/schools/default-school/teachers",
+                    "/srv/samba/schools/default-school/teachers/homes",
+                    "/srv/samba/schools/default-school/teachers/homes/sch72",
+                    "/srv/samba/schools/default-school/teachers/homes/sch72/transfer",
+#                    "/srv/samba/schools/default-school/teachers/homes/sch72/_einsammeln",
+                    "/srv/samba/schools/default-school/teachers/share",
+                   ); 
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/projects",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+
+
+}
 
 
 
@@ -1253,7 +1419,6 @@ if ($nonexammode_users==1){
     # 777
     &run_command("sophomorix-exam-mode --unset --participants jonsonad72,samardze72 $all_options");
 }
-
 
 
 

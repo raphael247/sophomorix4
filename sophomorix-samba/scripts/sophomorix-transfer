@@ -203,19 +203,17 @@ sub smbclient_mput_recurse {
                                       root_dns=>$root_dns,
                                       user=>$user,
                                     });
-        my $smb_dir=$home_directory_AD;
-        $smb_dir=~s/\\/\//g;
+
         my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
                              $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
+        my $smb_dir=$home_directory_AD;
+        $smb_dir=~s/\\/\//g;
         $smb_dir=$smb_dir."/".$transfer;
-        print "* from $localdir\n";
-        print "   * to $smb_dir\n";
-        # smbdir splitten sodass man im subdir landet
+        my ($string,$rel_path_user)=split(/$school_AD/,$smb_dir);
+
 
         my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
-                              " //$root_dns/$school_AD "." -c 'exit;'";
-# $smb_dir ".
-#                                              "-c 'lcd $localdir; prompt; recurse; mput *; exit;'";
+                              " //$root_dns/$school_AD "." -c 'cd $rel_path_user; lcd $localdir; prompt; recurse; mput *; exit;'";
         print "$smbclient_command\n";
         system($smbclient_command);
     }
