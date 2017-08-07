@@ -1452,22 +1452,23 @@ if ($test_file_transfer_share==1){
 if ($file_transfer_collect==1){
     # collect files
 #    &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user maiersa72,muellegr72-exam");
-
 }
 
+
+
 ############################################################
-# do the file transfer, clean
+# do clean up after file transfer
 ############################################################
 if ($file_transfer_clean==1){
     # clean up  files
     &run_command("sophomorix-transfer $all_options --clean-transfer-dir maiersa72,muellegr72-exam");
-
 }
 
 
 
-
-
+############################################################
+# test clean up after file transfer
+############################################################
 if ($test_file_transfer_clean==1){
     ############################################################
     # fs test
@@ -1581,33 +1582,18 @@ if ($test_file_transfer_clean==1){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ############################################################
-# do the file transfer, home
+# do the file transfer into home
 ############################################################
 if ($file_transfer_home==1){
     # share files
     &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user maiersa72,muellegr72-exam --subdir \"\"");
-
 }
 
 
 
 ############################################################
-# Test the file transfer
+# Test the file transfer into home
 ############################################################
 if ($test_file_transfer_home==1){
     ############################################################
@@ -1756,16 +1742,19 @@ if ($test_file_transfer_home==1){
 
 
 
-
-
 ############################################################
-# do the file transfer, clean
+#  do clean up after file transfer into home
 ############################################################
 if ($file_transfer_home_clean==1){
     # clean up  files
     &run_command("sophomorix-transfer $all_options --clean-home-dir maiersa72,muellegr72-exam");
 }
 
+
+
+############################################################
+# test clean up after file transfer into home
+############################################################
 if ($test_file_transfer_home_clean==1){
     ############################################################
     # fs test
@@ -1875,15 +1864,12 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/global/teachers",
                         ); 
     &end_fs_test(\%fs_test_result);
-
 }
 
 
 ############################################################
 # users NOT in exammode anymore
 ############################################################
-
-#??? hier weiter, inset
 if ($nonexammode_users==1){
     
     # put the session members in exammode
