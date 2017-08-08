@@ -1451,7 +1451,7 @@ if ($file_transfer_collect==1){
     # collect dirs and files from default location 'transfer'
     &run_command("sophomorix-transfer $all_options --collect-copy --from-user maiersa72 --to-user oe72 --file transfer/file1-level1,transfer/file2-level1,transfer/subdir2-level1");
     # collect the whole directory 'transfer'
-    #&run_command("sophomorix-transfer $all_options --collect-copy --from-user muellegr72-exam --to-user oe72 --file transfer");
+    &run_command("sophomorix-transfer $all_options --collect-copy --from-user muellegr72-exam --to-user kep72 --file transfer");
 }
 
 ############################################################
@@ -1577,6 +1577,24 @@ if ($test_file_transfer_collect==1){
                     "/srv/samba/schools/uni/teachers/homes",
                     "/srv/samba/schools/uni/teachers/homes/kep72",
                     "/srv/samba/schools/uni/teachers/homes/kep72/transfer",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/file1-level1",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/file2-level1",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir1-level1",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir1-level1/file1-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir1-level1/file2-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir1-level1/file3-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/file1-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/file2-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/file3-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/subdir1-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/file1-level3",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/file2-level3",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/subdir1-level2/subdir1-level3",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/subdir2-level2",
+                    "/srv/samba/schools/uni/teachers/homes/kep72/transfer/muellegr72-exam/transfer/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/uni/teachers/homes/kep72/_einsammeln",
                     "/srv/samba/schools/uni/teachers/homes/gal72",
                     "/srv/samba/schools/uni/teachers/homes/gal72/transfer",
@@ -1624,7 +1642,7 @@ if ($test_file_transfer_collect==1){
 ############################################################
 if ($file_transfer_clean==1){
     # clean up  files
-    &run_command("sophomorix-transfer $all_options --clean-home-dir oe72,muellegr72");
+    &run_command("sophomorix-transfer $all_options --clean-home-dir oe72,muellegr72,kep72");
     &run_command("sophomorix-transfer $all_options --clean-transfer-dir maiersa72,muellegr72-exam");
 }
 
