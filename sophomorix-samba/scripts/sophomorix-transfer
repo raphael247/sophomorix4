@@ -104,6 +104,7 @@ my $subdir;
 
 # collect
 my $collect_copy=0;
+my $collect_move=0;
 my $from_user="";
 my $file_list="";
 
@@ -121,9 +122,10 @@ my $testopt=GetOptions(
            "subdir=s" => \$subdir,
            "file-list=s" => \$file_list,
            "collect-copy" => \$collect_copy,
+           "collect-move" => \$collect_move,
            "clean-transfer-dir=s" => \$clean_transfer_dir,
            "clean-home-dir=s" => \$clean_home_dir,
-           "debug-level" => $debug_level\,
+           "debug-level" => \$debug_level,
            "verbose|v+" => \$Conf::log_level,
           );
 
@@ -226,12 +228,20 @@ if ($clean_home_dir ne ""){
 
 
 # --collect-copy --from-user <user1> --to-user <user2> --file <file1>,<dir1>, ...
-if ($collect_copy==1 and $from_user ne "" and $to_user ne "" and $file_list ne ""){
+if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne "" and $file_list ne ""){
     &print_title("Collecting to unix dir ...");
     print "   * From user: $from_user\n";
     print "   * To user:   $to_user\n";
     print "   * Files:     $file_list\n";
-    my $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"copy",$from_user,$file_list,\%sophomorix_config);
+    my $target_dir;
+    if ($collect_copy==1){
+        $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"copy",
+                                            $from_user,$file_list,\%sophomorix_config);
+    } elsif ($collect_move==1){
+        $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"move",
+                                            $from_user,$file_list,\%sophomorix_config);
+    }
+
     my $from_unix_path=$target_dir;
 
     my $subdir_mput;
@@ -282,21 +292,14 @@ sub smbclient_mget_recurse {
         my $filename  = basename($file_path);        
 
         # lcd path
-        my $lcd_path=$tmp."/".$from_user."/".$dirname; #/var/lib/sophomorix/tmp_collect/zGdyDqYqQ5/maiersa72/transfer
+        my $lcd_path=$tmp."/".$from_user."/".$dirname;
+        system("mkdir -p $lcd_path");
 
         # cd path
         my $smb_dir_sub=$smb_dir_home."/".$dirname;
-        my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home);
-        my ($string2,$rel_path_sub)=split(/$school_AD/,$smb_dir_sub);
-        my $cd_path=$rel_path_sub;   # /students/m7ab/homes/maiersa72/transfer
-
-#        # collect from a smb-share to a unixdir
-#        print "Copying $file_path:\n";
-#        print "   * lcd:    $lcd_path\n";
-#        print "   * cd:     $cd_path\n";
-#        print "   * Type:  $type\n";
-#        print "   * Last:  $filename\n";
-        system("mkdir -p $lcd_path");
+        my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home); # to home
+        my ($string2,$rel_path_sub)=split(/$school_AD/,$smb_dir_sub); # to subdir in home
+        my $cd_path=$rel_path_sub;
 
         # file or dir
         my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
@@ -316,6 +319,15 @@ sub smbclient_mget_recurse {
                                        " prompt; recurse; get $filename; exit;'";
                 print "$smbclient_command\n";
                 system($smbclient_command);
+                if ($type eq "move"){
+                    # remove file that was collected
+                    my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                          $smb_admin_pass."'".
+                                          " //$root_dns/$school_AD "." -c 'cd $rel_path_sub;".
+                                          " prompt; rm $filename; exit;'";
+                    print "$smbclient_command\n";
+                    system($smbclient_command);
+                }
                 last;
             } elsif ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
                 # dir
@@ -329,6 +341,22 @@ sub smbclient_mget_recurse {
                                        " prompt; recurse; mget *; exit;'";
                 print "$smbclient_command\n";
                 system($smbclient_command);
+
+                if ($type eq "move"){
+                    # remove dir that was collected
+		    print "smb://linuxmuster.local/<school>/subdir1/subdir2\n";
+                    my $smb_share="smb://".$root_dns."/".$school_AD.$rel_path_sub;
+                    my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+                                                     password  => $smb_admin_pass,
+                                                     debug     => 0);
+                    # trying to delete homes (success only if it is empty)
+                    my $return1=$smb->rmdir_recurse($smb_share);
+                    if($return1==1){
+                        print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    } else {
+                        print "ERROR: rmdir_recurse $smb_share $!\n";
+                    }
+                }
                 last;
             } 
         }
