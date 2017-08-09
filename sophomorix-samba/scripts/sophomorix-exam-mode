@@ -93,6 +93,7 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
+
 my $supervisor="";
 my $participants="";
 my $set_exam_mode=0;
@@ -149,7 +150,7 @@ Options:
   -i  / --info
 
   sophomorix-exam-mode --set --supervisor <supi>  --participants <user1>,<user2>,...
-  sophomorix-exam-mode --unset --participants <user1>,<user2>,...
+  sophomorix-exam-mode --unset --subdir <session> --participants <user1>,<user2>,...
  
 Please see the sophomorix-exam-mode(8) man pages for full documentation
 ');
@@ -254,6 +255,11 @@ if ($unset_exam_mode==1){
     my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
         $user_count++;
+        # collect data
+        if ($sophomorix_config{'INI'}{'EXAMMODE'}{'COLLECT_BEFORE_KILL'} eq "TRUE"){
+            my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
+            system("sophomorix-transfer --collect-copy-exam $examuser");
+        }
         my $ret=&AD_user_unset_exam_mode({ldap=>$ldap,
                                           root_dse=>$root_dse,
                                           root_dns=>$root_dns,
