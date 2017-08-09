@@ -174,9 +174,8 @@ Options:
 
   # collect from exam-account regularly
   sophomorix-transfer --collect-copy-exam <user-exam> --subdir <transfer/session-name>
-
-  # collect from exam-account to a foreign user
-  sophomorix-transfer --collect-copy-exam <user-exam> --subdir <transfer/date-collected_by<user>>
+  (--subdir is the relative path in the homedirectory of sophomorixExam user)
+  (--subdir is optional, if omitted <date>-nosession is used)
 
 # clean data
   sophomorix-transfer --clean-home-dir <user1>,<user2>-exam, ...
@@ -281,7 +280,7 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
 
 
 # --collect-copy-exam <user1>-exam 
-if ( $collect_copy_exam ne "" and defined $subdir){
+if ($collect_copy_exam){
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
         $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
@@ -310,20 +309,31 @@ if ( $collect_copy_exam ne "" and defined $subdir){
     my $target_user=$exammode_AD;
     print "   * Collect to:       $target_user\n";
 
-    my $subdir_mput=$subdir."/".$collect_copy_exam; # the session
-    print "   * Subdir (Session): $subdir_mput\n";
-
     my $transfer=$sophomorix_config{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
                      $sophomorix_config{'GLOBAL'}{'LANG'}};
+
+    my $subdir_mput;
+    if (not defined $subdir){
+        # use current date
+        my $time_stamp_file=&time_stamp_file();
+        $subdir_mput=$transfer."/".$time_stamp_file."-nosession/".$collect_copy_exam;
+        print "   * Subdir (no Session): $subdir_mput\n";
+    } else {
+        # use subdir
+        $subdir_mput=$subdir."/".$collect_copy_exam; # the session
+        print "   * Subdir (Session): $subdir_mput\n";
+    }
+
+
     my $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"copy",
                                            $collect_copy_exam,$transfer,\%sophomorix_config);
     my $from_unix_path=$target_dir;
 
     &smbclient_mput_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,$from_unix_path,$subdir_mput,$target_user,\%sophomorix_config);
 
-} elsif ($collect_copy_exam ne ""){
-    print "\nWARNING: You need a subdir (--subdir <dir>) with option --collect-copy-exam\n\n";
 }
+
+
 
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
