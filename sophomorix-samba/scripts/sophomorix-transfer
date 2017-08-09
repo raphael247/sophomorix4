@@ -108,6 +108,8 @@ my $collect_move=0;
 my $from_user="";
 my $file_list="";
 
+my $collect_copy_exam="";
+
 my $clean_transfer_dir="";
 my $clean_home_dir="";
 
@@ -123,6 +125,7 @@ my $testopt=GetOptions(
            "file-list=s" => \$file_list,
            "collect-copy" => \$collect_copy,
            "collect-move" => \$collect_move,
+           "collect-copy-exam=s" => \$collect_copy_exam,
            "clean-transfer-dir=s" => \$clean_transfer_dir,
            "clean-home-dir=s" => \$clean_home_dir,
            "debug-level" => \$debug_level,
@@ -156,11 +159,28 @@ Options:
   -i  / --info
   --debug-level  (debug level for smbclient)
 
+# share data
+  sophomorix-transfer --from-unix-path /srv/upload/... --to-user <user1>,<user2>-exam, ... --subdir dir
 
-sophomorix-transfer --from-unix-path /srv/upload/... --to-user <user1>,<user2>-exam, ... --subdir dir
+# collect data
 
-sophomorix-transfer --clean-home-dir <user1>,<user2>-exam, ...
-sophomorix-transfer --clean-transfer-dir <user1>,<user2>-exam, ...
+  # collect some files
+  sophomorix-transfer --collect-copy --from-user <user1> --to-user <user2> --file transfer/<file1>,transfer/<dir1>
+  sophomorix-transfer --collect-move --from-user <user1> --to-user <user2> --file transfer/<file1>,transfer/<dir1>
+
+  # collect transfer directory
+  sophomorix-transfer --collect-copy --from-user <user1> --to-user <user2> --file transfer
+  sophomorix-transfer --collect-move --from-user <user1> --to-user <user2> --file transfer
+
+  # collect from exam-account regularly
+  sophomorix-transfer --collect-copy-exam <user-exam> --subdir <transfer/session-name>
+
+  # collect from exam-account to a foreign user
+  sophomorix-transfer --collect-copy-exam <user-exam> --subdir <transfer/date-collected_by<user>>
+
+# clean data
+  sophomorix-transfer --clean-home-dir <user1>,<user2>-exam, ...
+  sophomorix-transfer --clean-transfer-dir <user1>,<user2>-exam, ...
  
 Please see the sophomorix-transfer(8) man pages for full documentation
 ');
@@ -260,6 +280,51 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
 }
 
 
+# --collect-copy-exam <user1>-exam 
+if ( $collect_copy_exam ne "" and defined $subdir){
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+            &AD_get_user({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          user=>$collect_copy_exam,
+                        });
+    if ($existing_AD ne "TRUE"){
+        print "\nERROR: $collect_copy_exam does not exist\n\n";
+        exit 1;
+    }
+
+    if ( $role_AD ne $sophomorix_config{'INI'}{'EXAMMODE'}{'USER_ROLE'} ){
+        print "\nERROR: $collect_copy_exam is not am examuser (sohomorixRole: $role_AD)\n\n";
+        exit 1;
+    }
+
+    if ( $exammode_AD eq "---" ){
+        print "\nERROR: Cannot determine supervisror (sophomorixExamMode: $exammode_AD)\n\n";
+        exit 1;
+    }
+
+    print "   * Examuser:         $collect_copy_exam\n";
+
+    my $target_user=$exammode_AD;
+    print "   * Collect to:       $target_user\n";
+
+    my $subdir_mput=$subdir."/".$collect_copy_exam; # the session
+    print "   * Subdir (Session): $subdir_mput\n";
+
+    my $transfer=$sophomorix_config{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
+                     $sophomorix_config{'GLOBAL'}{'LANG'}};
+    my $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"copy",
+                                           $collect_copy_exam,$transfer,\%sophomorix_config);
+    my $from_unix_path=$target_dir;
+
+    &smbclient_mput_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,$from_unix_path,$subdir_mput,$target_user,\%sophomorix_config);
+
+} elsif ($collect_copy_exam ne ""){
+    print "\nWARNING: You need a subdir (--subdir <dir>) with option --collect-copy-exam\n\n";
+}
+
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
@@ -276,7 +341,7 @@ sub smbclient_mget_recurse {
                  $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
     my $to_dir=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'TMP_COLLECT_DIR'};
     system("mkdir -p $to_dir");
-    my $tmp = tempdir( DIR => $to_dir, CLEANUP =>  1 );
+    my $tmp = tempdir( DIR => $to_dir, CLEANUP =>  0 );
     my $target_dir = $tmp."/".$from_user;
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
