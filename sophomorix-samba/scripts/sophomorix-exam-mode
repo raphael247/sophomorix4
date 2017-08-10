@@ -99,7 +99,8 @@ my $participants="";
 my $set_exam_mode=0;
 my $unset_exam_mode=0;
 
-my $subdir="";
+my $subdir; # for collecting into
+my $subdir_examuser=""; # for creating examusers and OU
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -115,7 +116,7 @@ my $testopt=GetOptions(
 #           "session|s=s" => \$session,
 #           "comment=s" => \$comment,
            "participants|m=s" => \$participants,
-           "subdir=s" => \$subdir,
+           "subdir-examuser=s" => \$subdir_examuser,
 #           "add-participants=s" => \$add_participants,
 #           "remove-participants=s" => \$remove_participants,
            "set-exam-mode|set" => \$set_exam_mode,
@@ -224,7 +225,7 @@ if ($set_exam_mode==1){
                                  root_dse=>$root_dse,
                                  root_dns=>$root_dns,
                                  participant=>$participant,
-                                 subdir=>$subdir,
+                                 subdir=>$subdir_examuser,
                                  user_count=>$user_count,
                                  date_now=> $time_stamp_AD,
                                  smb_admin_pass=>$smb_admin_pass,
@@ -258,7 +259,15 @@ if ($unset_exam_mode==1){
         # collect data
         if ($sophomorix_config{'INI'}{'EXAMMODE'}{'COLLECT_BEFORE_KILL'} eq "TRUE"){
             my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
-            system("sophomorix-transfer --collect-copy-exam $examuser");
+            my $command;
+            if (not defined $subdir){
+                $command="sophomorix-transfer --collect-copy-exam ".$examuser." --subdir ".$subdir;
+            } else {
+                $command="sophomorix-transfer --collect-copy-exam ".$examuser;
+            }
+
+            print "$command\n";
+            system($command);
         }
         my $ret=&AD_user_unset_exam_mode({ldap=>$ldap,
                                           root_dse=>$root_dse,

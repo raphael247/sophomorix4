@@ -703,7 +703,7 @@ if ($exammode_users==1){
 
     # put the session members in exammode
     # 666
-    &run_command("sophomorix-exam-mode --set --subdir subdir72 --supervisor oe72  --participants maiersa72,muellegr72 $all_options");
+    &run_command("sophomorix-exam-mode --set --subdir-examuser subdir72 --supervisor oe72  --participants maiersa72,muellegr72 $all_options");
     # 777
     &run_command("sophomorix-exam-mode --set --supervisor wu72  --participants jonsonad72,samardze72 $all_options");
 }
@@ -1879,30 +1879,6 @@ if ($test_file_transfer_collect_move==1){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ############################################################
 # do clean up after file transfer
 ############################################################
@@ -2036,6 +2012,7 @@ if ($test_file_transfer_clean==1){
 if ($file_transfer_home==1){
     # share files
     &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user maiersa72,muellegr72-exam --subdir \"\"");
+    &run_command("sophomorix-transfer $all_options --from-unix-path /usr/share/sophomorix-developer/testdata/transfer-testdata --to-user jonsonad72,samardze72-exam --subdir \"\"");
 }
 
 
@@ -2082,6 +2059,22 @@ if ($test_file_transfer_home==1){
 #                    "/srv/samba/schools/bsz/examusers/jonsonad72-exam/_einsammeln",
                     "/srv/samba/schools/bsz/examusers/samardze72-exam",
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/file1-level1",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/file2-level1",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1/file1-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1/file2-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1/file3-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/file1-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/file2-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/file3-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2/file1-level3",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2/file2-level3",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2/subdir1-level3",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir2-level2",
+                    "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
                     "/srv/samba/schools/bsz/projects",
                     "/srv/samba/schools/bsz/students",
@@ -2124,6 +2117,22 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/bsz/students/m8cd/homes",
                     "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72",
                     "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/transfer",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/file1-level1",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/file2-level1",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file1-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file2-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file3-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file1-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file2-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file3-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/file1-level3",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/file2-level3",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/subdir1-level3",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir2-level2",
+                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/_einsammeln",
                     "/srv/samba/schools/bsz/students/m8cd/homes/samardze72",
                     "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/transfer",
@@ -2226,6 +2235,22 @@ if ($test_file_transfer_home_clean==1){
 #                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/_einsammeln",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/file1-level1",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/file2-level1",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1/file1-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1/file2-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir1-level1/file3-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/file1-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/file2-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/file3-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2/file1-level3",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2/file2-level3",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir1-level2/subdir1-level3",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir2-level2",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/subdir2-level1/subdir3-level2",
 #                         "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
                          "/srv/samba/schools/bsz/projects",
                          "/srv/samba/schools/bsz/students",
@@ -2252,6 +2277,22 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/bsz/students/m8cd/homes",
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/file1-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/file2-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file1-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file2-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file3-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file1-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file2-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file3-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/file1-level3",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/file2-level3",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/subdir1-level3",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir2-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir3-level2",
 #                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze72",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/transfer",
@@ -2320,11 +2361,11 @@ if ($test_file_transfer_home_clean==1){
 ############################################################
 if ($nonexammode_users==1){
     
-    # put the session members in exammode
+    # remove the session members in exammode
     # 666
-    &run_command("sophomorix-exam-mode --unset --participants maiersa72,muellegr72 $all_options");
+    &run_command("sophomorix-exam-mode --unset --participants maiersa72,muellegr72 --subdir 666 $all_options");
     # 777
-    &run_command("sophomorix-exam-mode --unset --participants jonsonad72,samardze72 $all_options");
+    &run_command("sophomorix-exam-mode --unset --participants jonsonad72,samardze72 --subdir 777 $all_options");
 }
 
 
@@ -2719,6 +2760,22 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/bsz/students/m8cd/homes",
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/file1-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/file2-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file1-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file2-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir1-level1/file3-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file1-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file2-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/file3-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/file1-level3",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/file2-level3",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir1-level2/subdir1-level3",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir2-level2",
+                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/subdir2-level1/subdir3-level2",
 #                         "/srv/samba/schools/bsz/students/m8cd/homes/jonsonad72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze72",
                          "/srv/samba/schools/bsz/students/m8cd/homes/samardze72/transfer",
