@@ -116,6 +116,7 @@ my $testopt=GetOptions(
 #           "session|s=s" => \$session,
 #           "comment=s" => \$comment,
            "participants|m=s" => \$participants,
+           "subdir=s" => \$subdir,
            "subdir-examuser=s" => \$subdir_examuser,
 #           "add-participants=s" => \$add_participants,
 #           "remove-participants=s" => \$remove_participants,
@@ -260,7 +261,7 @@ if ($unset_exam_mode==1){
         if ($sophomorix_config{'INI'}{'EXAMMODE'}{'COLLECT_BEFORE_KILL'} eq "TRUE"){
             my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
             my $command;
-            if (not defined $subdir){
+            if (defined $subdir){
                 $command="sophomorix-transfer --collect-copy-exam ".$examuser." --subdir ".$subdir;
             } else {
                 $command="sophomorix-transfer --collect-copy-exam ".$examuser;

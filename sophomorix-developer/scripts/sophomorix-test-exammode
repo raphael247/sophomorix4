@@ -2363,9 +2363,9 @@ if ($nonexammode_users==1){
     
     # remove the session members in exammode
     # 666
-    &run_command("sophomorix-exam-mode --unset --participants maiersa72,muellegr72 --subdir 666 $all_options");
+    &run_command("sophomorix-exam-mode --unset --participants maiersa72,muellegr72 --subdir transfer/666 $all_options");
     # 777
-    &run_command("sophomorix-exam-mode --unset --participants jonsonad72,samardze72 --subdir 777 $all_options");
+    &run_command("sophomorix-exam-mode --unset --participants jonsonad72,samardze72 --subdir transfer/777 $all_options");
 }
 
 
@@ -2741,9 +2741,20 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/bsz/teachers/homes",
                          "/srv/samba/schools/bsz/teachers/homes/oe72",
                          "/srv/samba/schools/bsz/teachers/homes/oe72/transfer",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72/transfer/666",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72/transfer/666/maiersa72-exam",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72/transfer/666/maiersa72-exam/transfer",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72/transfer/666/muellegr72-exam",
+                         "/srv/samba/schools/bsz/teachers/homes/oe72/transfer/666/muellegr72-exam/transfer",
 #                         "/srv/samba/schools/bsz/teachers/homes/oe72/_einsammeln",
                          "/srv/samba/schools/bsz/teachers/homes/wu72",
                          "/srv/samba/schools/bsz/teachers/homes/wu72/transfer",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72/transfer/777",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72/transfer/777/jonsonad72-exam",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72/transfer/777/jonsonad72-exam/transfer",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72/transfer/777/samardze72-exam",
+                         "/srv/samba/schools/bsz/teachers/homes/wu72/transfer/777/samardze72-exam/transfer",
+
 #                         "/srv/samba/schools/bsz/teachers/homes/wu72/_einsammeln",
                          "/srv/samba/schools/bsz/teachers/share",
                          "/srv/samba/schools/bsz/students/m7ab",
@@ -2836,9 +2847,6 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/global/teachers",
                         ); 
     &end_fs_test(\%fs_test_result);
-
-
-
 }
 
 
