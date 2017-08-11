@@ -4773,7 +4773,7 @@ if ($ses==1){
 #    # --unset-exam-mode
 #    &run_command("sophomorix-session $all_options --session 666 --unset-exam-mode lordjo42,blackmri42");
     # --unset-exam-mode
-    &run_command("sophomorix-exam-mode $all_options --unset-exam-mode --participants lordjo42,blackmri42");
+    &run_command("sophomorix-exam-mode $all_options --unset-exam-mode --participants lordjo42,blackmri42 --subdir transfer/666");
 
     # lordjo42
     &AD_test_object({ldap=>$ldap,
@@ -5499,6 +5499,11 @@ if ($ses==1){
                          "/srv/samba/schools/bsz/students/m7ab/homes",                             # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42",                   # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/transfer",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/transfer/666",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/transfer/666/lordjo42-exam",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/transfer/666/lordjo42-exam/transfer",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/transfer/666/blackmri42-exam",
+                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/transfer/666/blackmri42-exam/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln",
                          "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                  # ntacl
                          "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/transfer",
@@ -7648,6 +7653,11 @@ if ($update==1 or $test_update==1){
                          "/srv/samba/schools/bsz/students/attic/homes",                                    # ntacl
                          "/srv/samba/schools/bsz/students/attic/homes/maiersa42",                          # ntacl, moved to here
                          "/srv/samba/schools/bsz/students/attic/homes/maiersa42/transfer",               #        moved to here
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/transfer/666",
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/transfer/666/lordjo42-exam",
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/transfer/666/lordjo42-exam/transfer",
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/transfer/666/blackmri42-exam",
+                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/transfer/666/blackmri42-exam/transfer",
 #                         "/srv/samba/schools/bsz/students/attic/homes/maiersa42/_einsammeln",              #        moved to here
 #                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42",                         # moved away
 #                         "/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/transfer",              # moved away
