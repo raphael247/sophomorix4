@@ -441,9 +441,13 @@ if ($set_firstpassword==1){
                      dn=>$dn,
                      user=>$sam_account,
                      user_count=>$user_count,
+                     max_user_count=>"-",
                      firstpassword=>$firstpassword,
                      plain_password=>$firstpassword,
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
     }
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);

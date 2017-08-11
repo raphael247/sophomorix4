@@ -258,6 +258,10 @@ if ($info==1) {
 # sophomorix.update mitloggen
 &backup_auk_file($time_stamp_file,"update","before",\%sophomorix_config);
 
+# calulate users to update
+my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.update | wc -l`;
+chomp($max_user_count);
+
 
 # Datei mit den Schülern, die nicht versetzt wurden
 open(NOCHUPDATE,">$update_file_new") 
@@ -321,7 +325,11 @@ while(<USERUPDATE>){
                          status=>$status_new,
                          unid=>$unid_new,
                          user_count=>$user_count,
+                         max_user_count=>$max_user_count,
                          date_now=> $time_stamp_AD,
+                         json=>$json,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
                        });
     }
 

@@ -749,7 +749,11 @@ if ($user ne "" and defined $comment){
                      user=>$user,
                      comment=>$comment,
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -762,7 +766,11 @@ if ($user ne "" and defined $webui_dashboard){
                      user=>$user,
                      webui_dashboard=>$webui_dashboard,
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -773,12 +781,16 @@ if ($user ne "" and defined $webui_dashboard){
 # --user-permissions permission1,permission2,permission3, ... 
 if (defined $user_permissions and $user ne ""){
     &AD_user_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn,
-                      user=>$user,
-                      user_permissions=>$user_permissions,
-                      user_count=>"",
-                      date_now=> $time_stamp_AD,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     user_permissions=>$user_permissions,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                     });
 }
 
@@ -790,12 +802,16 @@ if (defined $add_user_permissions and $user ne ""){
     my @user_permissions = uniq(@old_user_permissions,@add_user_permissions); 
     my $user_permissions=join(",",@user_permissions);
     &AD_user_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn,
-                      user=>$user,
-                      user_permissions=>$user_permissions,
-                      user_count=>"",
-                      date_now=> $time_stamp_AD,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     user_permissions=>$user_permissions,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                     });
 }
 
@@ -806,12 +822,16 @@ if (defined $remove_user_permissions){
     my @user_permissions = &remove_from_list($remove_user_permissions,@old_user_permissions);
     my $user_permissions=join(",",@user_permissions);
     &AD_user_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn,
-                      user=>$user,
-                      user_permissions=>$user_permissions,
-                      user_count=>"",
-                      date_now=> $time_stamp_AD,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     user_permissions=>$user_permissions,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                     });
 }
 
@@ -831,7 +851,11 @@ if ($deactivate==1){
                      user=>$user,
                      status=>"D",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -846,7 +870,11 @@ if ($lock==1){
                      user=>$user,
                      status=>"L",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -861,7 +889,11 @@ if ($freeze==1){
                      user=>$user,
                      status=>"F",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -896,7 +928,11 @@ if ($permanent==1){
                      user=>$user,
                      status=>"P",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -910,7 +946,11 @@ if ($tolerate==1){
                      user=>$user,
                      status=>"T",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -946,7 +986,11 @@ if ($removable==1){
 #                     tolerationdate=> $tolerationdate=$DevelConf::default_date,
 #                     deactivationdate=> $deactivationdate=$DevelConf::default_date,
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -981,7 +1025,11 @@ if ($killable==1){
                      user=>$user,
                      status=>"K",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -1015,7 +1063,11 @@ if ($activate==1){
                      user=>$user,
                      status=>"A",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -1028,7 +1080,11 @@ if ($selfactivate==1){
                      user=>$user,
                      status=>"S",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -1062,7 +1118,11 @@ if ($usable==1){
                      user=>$user,
                      status=>"U",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 
@@ -1076,7 +1136,11 @@ if ($enable==1){
                      user=>$user,
                      status=>"E",
                      user_count=>"",
+                     max_user_count=>"-",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
                    });
 }
 

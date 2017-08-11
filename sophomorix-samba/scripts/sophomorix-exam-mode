@@ -206,6 +206,7 @@ if ($set_exam_mode==1){
     }
 
     my $user_count=0;
+    my $max_user_count=$#participants;
     my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
         $user_count++;
@@ -215,7 +216,9 @@ if ($set_exam_mode==1){
                                 supervisor=>$supervisor,
                                 participant=>$participant,
                                 user_count=>$user_count,
+                                max_user_count=>$max_user_count,
                                 date_now=> $time_stamp_AD,
+                                json=>$json,
                                 sophomorix_config=>\%sophomorix_config,
                                 sophomorix_result=>\%sophomorix_result,
                             });
@@ -253,7 +256,9 @@ if ($unset_exam_mode==1){
         print "\nERROR: you need to specify at least one participant\n\n";
         exit;
     }
+
     my $user_count=0;
+    my $max_user_count=$#participants;
     my @participants=split(/,/,$participants);
     foreach my $participant (@participants){
         $user_count++;
@@ -275,7 +280,9 @@ if ($unset_exam_mode==1){
                                           root_dns=>$root_dns,
                                           participant=>$participant,
                                           user_count=>$user_count,
+                                          max_user_count=>$max_user_count,
                                           date_now=> $time_stamp_AD,
+                                          json=>$json,
                                           sophomorix_config=>\%sophomorix_config,
                                           sophomorix_result=>\%sophomorix_result,
                                         });

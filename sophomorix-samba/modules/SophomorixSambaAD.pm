@@ -1200,7 +1200,11 @@ sub AD_user_set_exam_mode {
     my $participant = $arg_ref->{participant};
     my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $date_now = $arg_ref->{date_now};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     print "   * Setting exam mode for session participant $participant (Supervisor: $supervisor)\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
@@ -1213,9 +1217,13 @@ sub AD_user_set_exam_mode {
                      dn=>$dn,
                      user=>$participant,
                      user_count=>$user_count,
+                     max_user_count=>$max_user_count,
                      exammode=>$supervisor,
                      uac_force=>"disable",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>$ref_sophomorix_config,
+                     sophomorix_result=>$ref_sophomorix_result,
                    });
     return 0;
 }
@@ -1230,7 +1238,11 @@ sub AD_user_unset_exam_mode {
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $date_now = $arg_ref->{date_now};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     print "   * Unsetting exam mode for session participant $participant\n";
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$participant);
@@ -1243,9 +1255,13 @@ sub AD_user_unset_exam_mode {
                      dn=>$dn,
                      user=>$participant,
                      user_count=>$user_count,
+                     max_user_count=>$max_user_count,
                      exammode=>"---",
                      uac_force=>"enable",
                      date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>$ref_sophomorix_config,
+                     sophomorix_result=>$ref_sophomorix_result,
                    });
     return 0;
 }
@@ -1420,8 +1436,12 @@ sub AD_user_create {
         # prepare json object
         my %json_progress=();
         $json_progress{'JSONINFO'}="PROGRESS";
-        $json_progress{'COMMENT_EN'}="Adding user $login ($firstname_utf8 $surname_utf8)";
-        $json_progress{'COMMENT_DE'}="Lege Benutzer $login an ($firstname_utf8 $surname_utf8)";
+        $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_PREFIX_EN'}.
+                                     " $login ($firstname_utf8 $surname_utf8)".
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_EN'};
+        $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_PREFIX_DE'}.
+                                     " $login an ($firstname_utf8 $surname_utf8)".
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_EN'};
         $json_progress{'STEP'}=$user_count;
         $json_progress{'FINAL_STEP'}=$max_user_count;
         # print JSON Object
@@ -1723,6 +1743,7 @@ sub AD_user_update {
     my $birthdate = $arg_ref->{birthdate};
     my $unid = $arg_ref->{unid};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword};
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password};
@@ -1735,6 +1756,13 @@ sub AD_user_update {
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
     my $uac_force = $arg_ref->{uac_force};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+  
+    if (not defined $max_user_count){
+	$max_user_count="-";
+    }
 
     my ($firstname_utf8_AD,
         $lastname_utf8_AD,
@@ -1932,6 +1960,34 @@ sub AD_user_update {
         my $mesg = $ldap->modify($dn,replace => {'sophomorixUserPermissions' => \@user_permissions }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+
+    if ($json>=1){
+        # prepare json object
+        my %json_progress=();
+        $json_progress{'JSONINFO'}="PROGRESS";
+        $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'UPDATEUSER_PREFIX_EN'}.
+                                     " $user".
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'UPDATEUSER_POSTFIX_EN'};
+        $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'UPDATEUSER_PREFIX_DE'}.
+                                     " $user".
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'UPDATEUSER_POSTFIX_DE'};
+        $json_progress{'STEP'}=$user_count;
+        $json_progress{'FINAL_STEP'}=$max_user_count;
+        # print JSON Object
+        if ($json==1){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+        } elsif ($json==2){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_json_line   = $json_obj->encode( \%json_progress );
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+        } elsif ($json==3){
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+        }
+    }
+
+
 
     #print Dumper(\$replace);
     if (%replace){
