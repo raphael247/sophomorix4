@@ -219,6 +219,17 @@ if ($from_unix_path ne "" and $to_user ne ""){
         $subdir_mput=$transfer;
     }
     &smbclient_mput_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,$from_unix_path,$subdir_mput,$to_user,\%sophomorix_config);
+    # &smbclient_mput_recurse({ldap=>$ldap,
+    #                          root_dse=>$root_dse,
+    #                          root_dns=>$root_dns,
+    #                          smb_admin_pass=>$smb_admin_pass,
+    #                          localdir=>$from_unix_path,
+    #                          target_subdir=>$subdir_mput,
+    #                          userstring=>$to_user,
+    #                          json=>$json,
+    #                          sophomorix_config=>\%sophomorix_config,
+    #                          sophomorix_result=>\%sophomorix_result,
+    #                        });
     exit;
 } 
 
@@ -241,6 +252,16 @@ if ($clean_home_dir ne ""){
         &print_title("Cleaning homedir of $clean_home_dir");
     }
     &clean_home_without_transfer($ldap,$root_dse,$root_dns,$smb_admin_pass,$clean_home_dir,$subdir,\%sophomorix_config);
+    # &clean_home_without_transfer({ldap=>$ldap,
+    #                               root_dse=>$root_dse,
+    #                               root_dns=>$root_dns,
+    #                               smb_admin_pass=>$smb_admin_pass,
+    #                               userstring=>$clean_home_dir,
+    #                               subdir=>$subdir,
+    #                               json=>$json,
+    #                               sophomorix_config=>\%sophomorix_config,
+    #                               sophomorix_result=>\%sophomorix_result,
+    #                             });
     &clean_transfer_dir($ldap,$root_dse,$root_dns,$smb_admin_pass,$clean_home_dir,\%sophomorix_config);
     exit;
 }
@@ -256,9 +277,31 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
     if ($collect_copy==1){
         $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"copy",
                                             $from_user,$file_list,\%sophomorix_config);
+        # $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
+        #                                      root_dse=>$root_dse,
+        #                                      root_dns=>$root_dns,
+        #                                      smb_admin_pass=>$smb_admin_pass,
+        #                                      type=>"copy",
+        #                                      from_user=>$from_user,
+        #                                      file_list=>$file_list,
+        #                                      json=>$json,
+        #                                      sophomorix_config=>\%sophomorix_config,
+        #                                      sophomorix_result=>\%sophomorix_result,
+        #                                    });
     } elsif ($collect_move==1){
         $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"move",
                                             $from_user,$file_list,\%sophomorix_config);
+        # $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
+        #                                      root_dse=>$root_dse,
+        #                                      root_dns=>$root_dns,
+        #                                      smb_admin_pass=>$smb_admin_pass,
+        #                                      type=>"move",
+        #                                      from_user=>$from_user,
+        #                                      file_list=>$file_list,
+        #                                      json=>$json,
+        #                                      sophomorix_config=>\%sophomorix_config,
+        #                                      sophomorix_result=>\%sophomorix_result,
+        #                                    });
     }
 
     my $from_unix_path=$target_dir;
@@ -276,6 +319,17 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
     print "   * To user: $to_user\n";
 
     &smbclient_mput_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,$from_unix_path,$subdir_mput,$to_user,\%sophomorix_config);
+    # &smbclient_mput_recurse({ldap=>$ldap,
+    #                          root_dse=>$root_dse,
+    #                          root_dns=>$root_dns,
+    #                          smb_admin_pass=>$smb_admin_pass,
+    #                          localdir=>$from_unix_path,
+    #                          target_subdir=>$subdir_mput,
+    #                          userstring=>$to_user,
+    #                          json=>$json,
+    #                          sophomorix_config=>\%sophomorix_config,
+    #                          sophomorix_result=>\%sophomorix_result,
+    #                        });
 }
 
 
@@ -327,9 +381,31 @@ if ($collect_copy_exam){
 
     my $target_dir=&smbclient_mget_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,"copy",
                                            $collect_copy_exam,$transfer,\%sophomorix_config);
+    # my $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
+    #                                         root_dse=>$root_dse,
+    #                                         root_dns=>$root_dns,
+    #                                         smb_admin_pass=>$smb_admin_pass,
+    #                                         type=>"copy",
+    #                                         from_user=>$collect_copy_exam,
+    #                                         file_list=>$transfer,
+    #                                         json=>$json,
+    #                                         sophomorix_config=>\%sophomorix_config,
+    #                                         sophomorix_result=>\%sophomorix_result,
+    #                                       });
     my $from_unix_path=$target_dir;
 
     &smbclient_mput_recurse($ldap,$root_dse,$root_dns,$smb_admin_pass,$from_unix_path,$subdir_mput,$target_user,\%sophomorix_config);
+    # &smbclient_mput_recurse({ldap=>$ldap,
+    #                          root_dse=>$root_dse,
+    #                          root_dns=>$root_dns,
+    #                          smb_admin_pass=>$smb_admin_pass,
+    #                          localdir=>$from_unix_path,
+    #                          target_subdir=>$subdir_mput,
+    #                          userstring=>$target_user,
+    #                          json=>$json,
+    #                          sophomorix_config=>\%sophomorix_config,
+    #                          sophomorix_result=>\%sophomorix_result,
+    #                        });
 
 }
 
@@ -346,7 +422,20 @@ if ($collect_copy_exam){
 sub smbclient_mget_recurse {
     # save the data from smb share to a local unix dir with tmp filename
     # return abs-path
+    # my ($arg_ref) = @_;
+    # my $ldap = $arg_ref->{ldap};
+    # my $root_dse = $arg_ref->{root_dse};
+    # my $root_dns = $arg_ref->{root_dns};
+    # my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    # my $type = $arg_ref->{type};
+    # my $from_user = $arg_ref->{from_user};
+    # my $file_list = $arg_ref->{file_list};
+    # my $json = $arg_ref->{json};
+    # my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    # my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
     my ($ldap,$root_dse,$root_dns,$smb_admin_pass,$type,$from_user,$file_list,$ref_sophomorix_config)=@_;
+
     my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
                  $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
     my $to_dir=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'TMP_COLLECT_DIR'};
@@ -370,6 +459,8 @@ sub smbclient_mget_recurse {
 
         # lcd path
         my $lcd_path=$tmp."/".$from_user."/".$dirname;
+        $lcd_path=~s/\/\.$//; # remove /. in the end
+	print "HERE $lcd_path\n";
         system("mkdir -p $lcd_path");
 
         # cd path
@@ -377,11 +468,11 @@ sub smbclient_mget_recurse {
         my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home); # to home
         my ($string2,$rel_path_sub)=split(/$school_AD/,$smb_dir_sub); # to subdir in home
         my $cd_path=$rel_path_sub;
-
+        $cd_path=~s/\/\.$//; # remove /. in the end
         # file or dir
         my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                               $smb_admin_pass."'".
-                              " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; stat $filename; exit;'";
+                              " //$root_dns/$school_AD "." -c 'cd $cd_path; stat $filename; exit;'";
         print "$smbclient_command\n";
         my $stat_string=`$smbclient_command`;
         my @stat_lines=split("\n",$stat_string);
@@ -392,7 +483,7 @@ sub smbclient_mget_recurse {
                 print "   * $filename is a file ($file_path)\n";
                 my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                        $smb_admin_pass."'".
-                                       " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; lcd $lcd_path;".
+                                       " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
                                        " prompt; recurse; get $filename; exit;'";
                 print "$smbclient_command\n";
                 system($smbclient_command);
@@ -400,7 +491,7 @@ sub smbclient_mget_recurse {
                     # remove file that was collected
                     my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                           $smb_admin_pass."'".
-                                          " //$root_dns/$school_AD "." -c 'cd $rel_path_sub;".
+                                          " //$root_dns/$school_AD "." -c 'cd $cd_path;".
                                           " prompt; rm $filename; exit;'";
                     print "$smbclient_command\n";
                     system($smbclient_command);
@@ -409,14 +500,14 @@ sub smbclient_mget_recurse {
             } elsif ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
                 # dir
                 print "   * $filename is a directory ($file_path)\n";
-		$rel_path_sub=$rel_path_sub."/".$filename;
+		$cd_path=$cd_path."/".$filename;
 
                 # prepare local unix path
                 $lcd_path=$lcd_path."/".$filename;
                 system("mkdir $lcd_path");
                 my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                        $smb_admin_pass."'".
-                                       " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; lcd $lcd_path;".
+                                       " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
                                        " prompt; recurse; mget *; exit;'";
                 print "$smbclient_command\n";
                 system($smbclient_command);
@@ -429,7 +520,7 @@ sub smbclient_mget_recurse {
                     } else {
                         # other dirs, romove them completely
 		        # example: smb://linuxmuster.local/<school>/subdir1/subdir2
-                        my $smb_share="smb://".$root_dns."/".$school_AD.$rel_path_sub;
+                        my $smb_share="smb://".$root_dns."/".$school_AD.$cd_path;
                         my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                          password  => $smb_admin_pass,
                                                          debug     => 0);
@@ -452,6 +543,18 @@ sub smbclient_mget_recurse {
 
 
 sub smbclient_mput_recurse {
+    # my ($arg_ref) = @_;
+    # my $ldap = $arg_ref->{ldap};
+    # my $root_dse = $arg_ref->{root_dse};
+    # my $root_dns = $arg_ref->{root_dns};
+    # my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    # my $localdir = $arg_ref->{localdir};
+    # my $target_subdir = $arg_ref->{target_subdir};
+    # my $userstring = $arg_ref->{userstring};
+    # my $json = $arg_ref->{json};
+    # my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    # my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
     my ($ldap,$root_dse,$root_dns,$smb_admin_pass,$localdir,$target_subdir,$userstring,$ref_sophomorix_config)=@_;
     # $localdir: sourcedir (unix-Pfad)
     # $userstring: list of users to put to
@@ -504,11 +607,32 @@ sub clean_transfer_dir {
     my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
                  $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
     &clean_home_without_transfer($ldap,$root_dse,$root_dns,$smb_admin_pass,$userstring,$transfer,\%sophomorix_config);
+    # &clean_home_without_transfer({ldap=>$ldap,
+    #                               root_dse=>$root_dse,
+    #                               root_dns=>$root_dns,
+    #                               smb_admin_pass=>$smb_admin_pass,
+    #                               userstring=>$to_user,
+    #                               subdir=>$transfer,
+    #                               json=>$json,
+    #                               sophomorix_config=>\%sophomorix_config,
+    #                               sophomorix_result=>\%sophomorix_result,
+    #                             });
 }
 
 
 
 sub clean_home_without_transfer {
+    # my ($arg_ref) = @_;
+    # my $ldap = $arg_ref->{ldap};
+    # my $root_dse = $arg_ref->{root_dse};
+    # my $root_dns = $arg_ref->{root_dns};
+    # my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    # my $userstring = $arg_ref->{userstring};
+    # my $subdir = $arg_ref->{subdir};
+    # my $json = $arg_ref->{json};
+    # my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    # my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
     my ($ldap,$root_dse,$root_dns,$smb_admin_pass,$userstring,$subdir,$ref_sophomorix_config)=@_;
     my @users=split(/,/,$userstring);
     my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
