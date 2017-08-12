@@ -790,6 +790,7 @@ sub AD_user_kill {
             }
         }
 
+        # deleting user
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
         system($command);
@@ -5453,6 +5454,7 @@ sub AD_examuser_create {
     my $participant = $arg_ref->{participant};
     my $subdir = $arg_ref->{subdir};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $date_now = $arg_ref->{date_now};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
@@ -5539,6 +5541,32 @@ sub AD_examuser_create {
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
 
+        if ($json>=1){
+            # prepare json object
+            my %json_progress=();
+            $json_progress{'JSONINFO'}="PROGRESS";
+            $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_PREFIX_EN'}.
+                                         " $participant ($firstname_utf8_AD $lastname_utf8_AD)".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_EN'};
+            $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_PREFIX_DE'}.
+                                         " $participant an ($firstname_utf8_AD $lastname_utf8_AD)".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_EN'};
+            $json_progress{'STEP'}=$user_count;
+            $json_progress{'FINAL_STEP'}=$max_user_count;
+            # print JSON Object
+            if ($json==1){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+            } elsif ($json==2){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_json_line   = $json_obj->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+            } elsif ($json==3){
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+            }
+        }
+
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $examuser,
@@ -5597,10 +5625,13 @@ sub AD_examuser_kill {
     my $root_dns = $arg_ref->{root_dns};
     my $participant = $arg_ref->{participant};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $date_now = $arg_ref->{date_now};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
     &Sophomorix::SophomorixBase::print_title("Killing examuser of user: $participant");
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$examuser);
@@ -5628,6 +5659,32 @@ sub AD_examuser_kill {
             print "Not deleting $examuser beause its role is not examuser";
             return;
 	}
+        if ($json>=1){
+            # prepare json object
+            my %json_progress=();
+            $json_progress{'JSONINFO'}="PROGRESS";
+            $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_PREFIX_EN'}.
+                                         " $participant".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_POSTFIX_EN'};
+            $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_PREFIX_DE'}.
+                                         " $participant".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_POSTFIX_EN'};
+            $json_progress{'STEP'}=$user_count;
+            $json_progress{'FINAL_STEP'}=$max_user_count;
+            # print JSON Object
+            if ($json==1){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+            } elsif ($json==2){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_json_line   = $json_obj->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+            } elsif ($json==3){
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+            }
+        }
+
 
         # deleting user
         my $command="samba-tool user delete ". $examuser;
