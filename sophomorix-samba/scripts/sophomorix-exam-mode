@@ -207,7 +207,7 @@ if ($set_exam_mode==1){
 
     my @participants=split(/,/,$participants);
     my $user_count=0;
-    my $max_user_count=$#participants;
+    my $max_user_count=$#participants+1;
     foreach my $participant (@participants){
         $user_count++;
         my $ret=&AD_user_set_exam_mode({ldap=>$ldap,
@@ -260,7 +260,7 @@ if ($unset_exam_mode==1){
 
     my @participants=split(/,/,$participants);
     my $user_count=0;
-    my $max_user_count=$#participants;
+    my $max_user_count=$#participants+1;
     foreach my $participant (@participants){
         $user_count++;
         # collect data

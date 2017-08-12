@@ -866,11 +866,16 @@ sub AD_computer_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
-    my $ws = $arg_ref->{workstation};
-    my $count = $arg_ref->{count};
-    &Sophomorix::SophomorixBase::print_title("Killing computer $ws ($count):");
+    my $computer = $arg_ref->{computer};
+    my $computer_count = $arg_ref->{computer_count};
+    my $max_computer_count = $arg_ref->{max_computer_count};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    &Sophomorix::SophomorixBase::print_title("Killing computer $computer ($computer_count):");
     my $dn="";
-    my $filter="(&(objectClass=computer)(sophomorixRole=computer)(sAMAccountName=".$ws."))";
+    my $filter="(&(objectClass=computer)(sophomorixRole=computer)(sAMAccountName=".$computer."))";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -880,12 +885,37 @@ sub AD_computer_kill {
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $count_result = $mesg->count;
     if ($count_result==1){
+        if ($json>=1){
+            # prepare json object
+            my %json_progress=();
+            $json_progress{'JSONINFO'}="PROGRESS";
+            $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLCOMPUTER_PREFIX_EN'}.
+                                         " $computer".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLCOMPUTER_POSTFIX_EN'};
+            $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLCOMPUTER_PREFIX_DE'}.
+                                         " $computer".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLCOMPUTER_POSTFIX_DE'};
+            $json_progress{'STEP'}=$computer_count;
+            $json_progress{'FINAL_STEP'}=$max_computer_count;
+            # print JSON Object
+            if ($json==1){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+            } elsif ($json==2){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_json_line   = $json_obj->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+            } elsif ($json==3){
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+            }
+        }
         my ($entry,@entries) = $mesg->entries;
         $dn = $entry->dn();
         print "   * DN: $dn\n";
         my $mesg = $ldap->delete( $dn );
     } else {
-        print "   * WARNING: $ws not found/to many items ($count_result results)\n";     
+        print "   * WARNING: $computer not found/to many items ($count_result results)\n";     
     }
 }
 
@@ -1012,11 +1042,14 @@ sub AD_computer_create {
     my $room = $arg_ref->{room};
     my $room_basename = $arg_ref->{room_basename};
     my $role = $arg_ref->{role};
-    my $ws_count = $arg_ref->{ws_count};
+    my $computer_count = $arg_ref->{computer_count};
+    my $max_computer_count = $arg_ref->{max_computer_count};
     my $school = $arg_ref->{school};
     my $filename = $arg_ref->{filename};
     my $creationdate = $arg_ref->{creationdate};
+    my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     # calculation
     my $display_name=$name;
@@ -1043,7 +1076,7 @@ sub AD_computer_create {
 
     if($Conf::log_level>=1){
         &Sophomorix::SophomorixBase::print_title(
-              "Creating workstation $ws_count: $name");
+              "Creating workstation $computer_count: $name");
         print "   DN:                    $dn\n";
         print "   DN(Parent):            $dn_room\n";
         print "   Name:                  $name\n";
@@ -1058,7 +1091,35 @@ sub AD_computer_create {
         }
         print "\n";
     }
-   $ldap->add($dn_room,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+
+    if ($json>=1){
+        # prepare json object
+        my %json_progress=();
+        $json_progress{'JSONINFO'}="PROGRESS";
+        $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDCOMPUTER_PREFIX_EN'}.
+                                     " $name".
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDCOMPUTER_POSTFIX_EN'};
+        $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDCOMPUTER_PREFIX_DE'}.
+                                     " $name ".
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDCOMPUTER_POSTFIX_DE'};
+        $json_progress{'STEP'}=$computer_count;
+        $json_progress{'FINAL_STEP'}=$max_computer_count;
+        # print JSON Object
+        if ($json==1){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+        } elsif ($json==2){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_json_line   = $json_obj->encode( \%json_progress );
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+        } elsif ($json==3){
+            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+        }
+    }
+
+
+    $ldap->add($dn_room,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $smb_name,
@@ -1470,7 +1531,7 @@ sub AD_user_create {
                                      " $login ($firstname_utf8 $surname_utf8)".
                                      $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_EN'};
         $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_PREFIX_DE'}.
-                                     " $login an ($firstname_utf8 $surname_utf8)".
+                                     " $login ($firstname_utf8 $surname_utf8) ".
                                      $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_EN'};
         $json_progress{'STEP'}=$user_count;
         $json_progress{'FINAL_STEP'}=$max_user_count;

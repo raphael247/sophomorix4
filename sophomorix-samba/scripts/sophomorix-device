@@ -1127,22 +1127,29 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill computers
     print "\n";
-    &print_title("Computers to be killed:");
-    my $count=1;
+    my $max_computer_count_kill=$#killing_computers+1;
+
+    &print_title("Killing $max_computer_count_kill computers");
+    my $computer_count_kill=1;
     foreach my $computer (@killing_computers){
         &AD_computer_kill({ldap=>$ldap,
                            root_dse=>$root_dse,
-                           workstation=>$computer,
-                           count=>$count,
+                           computer=>$computer,
+                           computer_count=>$computer_count_kill,
+                           max_computer_count=>$max_computer_count_kill,
+                           json=>$json,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
                          });
-        $count++;
+        $computer_count_kill++;
     }
 
     ############################################################
     # Add computers
     print "\n";
-    &print_title("Computers to be added:");
-    my $ws_count=1;
+    my $max_computer_count_create=$#adding_computers+1;
+    &print_title("Adding $max_computer_count_create computers:");
+    my $computer_count_create=1;
     foreach my $computer (@adding_computers){
         my $school=$devices_file{'computer'}{$computer}{'SCHOOL'};
         my $room_saved=$devices_file{'computer'}{$computer}{'ROOM'};
@@ -1167,7 +1174,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         }
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
-                             ws_count=>$ws_count,
+                             computer_count=>$computer_count_create,
+                             max_computer_count=>$max_computer_count_create,
                              name=>$ws_saved,
                              room=>$room_saved,
                              room_basename=>$room_basename,
@@ -1176,9 +1184,11 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              school=>$school,
                              filename=>$filename,
                              creationdate=>$time_stamp_AD,
+                             json=>$json,
                              sophomorix_config=>\%sophomorix_config,
+                             sophomorix_result=>\%sophomorix_result,
                            });
-        $ws_count++;
+        $computer_count_create++;
         # make sure that the room exists
         my $room_description=$room_basename." in ".$school;
         &AD_group_create({ldap=>$ldap,

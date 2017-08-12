@@ -262,7 +262,7 @@ if ($killuser ne ""){
     # killing users given by option --killuser
     #print "Killing the following List of users: $killuser\n";
     my @userlist=split /,/,$killuser;
-    my $max_user_count=$#userlist;
+    my $max_user_count=$#userlist+1;
     foreach my $user_to_kill (@userlist){
         $user_count++;
         &AD_user_kill({ldap=>$ldap,
