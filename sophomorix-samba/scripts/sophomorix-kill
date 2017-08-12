@@ -262,6 +262,7 @@ if ($killuser ne ""){
     # killing users given by option --killuser
     #print "Killing the following List of users: $killuser\n";
     my @userlist=split /,/,$killuser;
+    my $max_user_count=$#userlist;
     foreach my $user_to_kill (@userlist){
         $user_count++;
         &AD_user_kill({ldap=>$ldap,
@@ -270,11 +271,17 @@ if ($killuser ne ""){
                        login=>$user_to_kill,
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
+                       max_user_count=>$max_user_count,
                        smb_admin_pass=>$smb_admin_pass,
+                       json=>$json,
                        sophomorix_config=>\%sophomorix_config,
-                     });
+                       sophomorix_result=>\%sophomorix_result,
+                        });
     }
 } else {
+    # calulate users to kill from file
+    my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.kill | wc -l`;
+    chomp($max_user_count);
     # killing users from file
     open(KILL,"$kill_file") || die "ERROR: $!";
     while(<KILL>){
@@ -291,8 +298,11 @@ if ($killuser ne ""){
                        login=>$login_name_to_kill,
                        identifier=>$identifier_to_kill,
                        user_count=>$user_count,
+                       max_user_count=>$max_user_count,
                        smb_admin_pass=>$smb_admin_pass,
+                       json=>$json,
                        sophomorix_config=>\%sophomorix_config,
+                       sophomorix_result=>\%sophomorix_result,
                      });
     }
     close(KILL);

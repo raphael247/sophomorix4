@@ -742,8 +742,11 @@ sub AD_user_kill {
     my $user = $arg_ref->{login};
     my $identifier = $arg_ref->{identifier};
     my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
@@ -761,6 +764,32 @@ sub AD_user_kill {
     &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$user);
 
     if ($count > 0){
+        if ($json>=1){
+            # prepare json object
+            my %json_progress=();
+            $json_progress{'JSONINFO'}="PROGRESS";
+            $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_PREFIX_EN'}.
+                                         " $user".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_POSTFIX_EN'};
+            $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_PREFIX_DE'}.
+                                         " $user".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_POSTFIX_EN'};
+            $json_progress{'STEP'}=$user_count;
+            $json_progress{'FINAL_STEP'}=$max_user_count;
+            # print JSON Object
+            if ($json==1){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+            } elsif ($json==2){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_json_line   = $json_obj->encode( \%json_progress );
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+            } elsif ($json==3){
+                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+            }
+        }
+
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
         system($command);
