@@ -773,7 +773,7 @@ sub AD_user_kill {
                                          $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_POSTFIX_EN'};
             $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_PREFIX_DE'}.
                                          " $user".
-                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_POSTFIX_EN'};
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLUSER_POSTFIX_DE'};
             $json_progress{'STEP'}=$user_count;
             $json_progress{'FINAL_STEP'}=$max_user_count;
             # print JSON Object
@@ -1532,7 +1532,7 @@ sub AD_user_create {
                                      $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_EN'};
         $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_PREFIX_DE'}.
                                      " $login ($firstname_utf8 $surname_utf8) ".
-                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_EN'};
+                                     $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDUSER_POSTFIX_DE'};
         $json_progress{'STEP'}=$user_count;
         $json_progress{'FINAL_STEP'}=$max_user_count;
         # print JSON Object
@@ -5610,8 +5610,8 @@ sub AD_examuser_create {
                                          " $participant ($firstname_utf8_AD $lastname_utf8_AD)".
                                          $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_EN'};
             $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_PREFIX_DE'}.
-                                         " $participant an ($firstname_utf8_AD $lastname_utf8_AD)".
-                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_EN'};
+                                         " $participant ($firstname_utf8_AD $lastname_utf8_AD) ".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_DE'};
             $json_progress{'STEP'}=$user_count;
             $json_progress{'FINAL_STEP'}=$max_user_count;
             # print JSON Object
@@ -5729,7 +5729,7 @@ sub AD_examuser_kill {
                                          $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_POSTFIX_EN'};
             $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_PREFIX_DE'}.
                                          " $participant".
-                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_POSTFIX_EN'};
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'KILLEXAMUSER_POSTFIX_DE'};
             $json_progress{'STEP'}=$user_count;
             $json_progress{'FINAL_STEP'}=$max_user_count;
             # print JSON Object
