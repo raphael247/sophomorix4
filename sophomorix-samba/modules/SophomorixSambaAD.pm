@@ -777,17 +777,10 @@ sub AD_user_kill {
             $json_progress{'STEP'}=$user_count;
             $json_progress{'FINAL_STEP'}=$max_user_count;
             # print JSON Object
-            if ($json==1){
-                my $json_obj = JSON->new->allow_nonref;
-                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
-            } elsif ($json==2){
-                my $json_obj = JSON->new->allow_nonref;
-                my $utf8_json_line   = $json_obj->encode( \%json_progress );
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-            } elsif ($json==3){
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
-            }
+            &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                              json=>$json,
+                                                              sophomorix_config=>$ref_sophomorix_config,
+                                                            });
         }
 
         # deleting user
@@ -898,17 +891,10 @@ sub AD_computer_kill {
             $json_progress{'STEP'}=$computer_count;
             $json_progress{'FINAL_STEP'}=$max_computer_count;
             # print JSON Object
-            if ($json==1){
-                my $json_obj = JSON->new->allow_nonref;
-                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
-            } elsif ($json==2){
-                my $json_obj = JSON->new->allow_nonref;
-                my $utf8_json_line   = $json_obj->encode( \%json_progress );
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-            } elsif ($json==3){
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
-            }
+            &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                              json=>$json,
+                                                              sophomorix_config=>$ref_sophomorix_config,
+                                                            });
         }
         my ($entry,@entries) = $mesg->entries;
         $dn = $entry->dn();
@@ -1105,19 +1091,11 @@ sub AD_computer_create {
         $json_progress{'STEP'}=$computer_count;
         $json_progress{'FINAL_STEP'}=$max_computer_count;
         # print JSON Object
-        if ($json==1){
-            my $json_obj = JSON->new->allow_nonref;
-            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
-        } elsif ($json==2){
-            my $json_obj = JSON->new->allow_nonref;
-            my $utf8_json_line   = $json_obj->encode( \%json_progress );
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-        } elsif ($json==3){
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
-        }
+        &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                          json=>$json,
+                                                          sophomorix_config=>$ref_sophomorix_config,
+                                                        });
     }
-
 
     $ldap->add($dn_room,attr => ['objectclass' => ['top', 'organizationalUnit']]);
     my $result = $ldap->add( $dn,
@@ -1536,17 +1514,10 @@ sub AD_user_create {
         $json_progress{'STEP'}=$user_count;
         $json_progress{'FINAL_STEP'}=$max_user_count;
         # print JSON Object
-        if ($json==1){
-            my $json_obj = JSON->new->allow_nonref;
-            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
-        } elsif ($json==2){
-            my $json_obj = JSON->new->allow_nonref;
-            my $utf8_json_line   = $json_obj->encode( \%json_progress );
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-        } elsif ($json==3){
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
-        }
+        &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                          json=>$json,
+                                                          sophomorix_config=>$ref_sophomorix_config,
+                                                        });
     }
 
     # make sure $dn_class exists
@@ -2065,20 +2036,11 @@ sub AD_user_update {
         $json_progress{'STEP'}=$user_count;
         $json_progress{'FINAL_STEP'}=$max_user_count;
         # print JSON Object
-        if ($json==1){
-            my $json_obj = JSON->new->allow_nonref;
-            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
-        } elsif ($json==2){
-            my $json_obj = JSON->new->allow_nonref;
-            my $utf8_json_line   = $json_obj->encode( \%json_progress );
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-        } elsif ($json==3){
-            print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
-        }
+        &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                          json=>$json,
+                                                          sophomorix_config=>$ref_sophomorix_config,
+                                                        });
     }
-
-
 
     #print Dumper(\$replace);
     if (%replace){
@@ -5726,19 +5688,11 @@ sub AD_examuser_kill {
             $json_progress{'STEP'}=$user_count;
             $json_progress{'FINAL_STEP'}=$max_user_count;
             # print JSON Object
-            if ($json==1){
-                my $json_obj = JSON->new->allow_nonref;
-                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
-            } elsif ($json==2){
-                my $json_obj = JSON->new->allow_nonref;
-                my $utf8_json_line   = $json_obj->encode( \%json_progress );
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-            } elsif ($json==3){
-                print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
-            }
+            &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                              json=>$json,
+                                                              sophomorix_config=>$ref_sophomorix_config,
+                                                            });
         }
-
 
         # deleting user
         my $command="samba-tool user delete ". $examuser;
