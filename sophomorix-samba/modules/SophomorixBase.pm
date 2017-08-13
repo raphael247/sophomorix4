@@ -53,6 +53,7 @@ $Data::Dumper::Terse = 1;
             dir_listing_user
             dns_query_ip
             remove_whitespace
+            json_progress_print
             json_dump
             get_homedirectory
             get_sharedirectory
@@ -89,6 +90,39 @@ sub print_title {
 
 # json stuff
 ######################################################################
+
+sub json_progress_print {
+    my ($arg_ref) = @_;
+    my $ref_progress = $arg_ref->{ref_progress};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    print "JSON Progress start\n";
+    if ($json==1){
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_progress );
+        if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+            print STDERR  "$utf8_pretty_printed";
+        } else {
+            print STDOUT  "$utf8_pretty_printed";
+        }
+    } elsif ($json==2){
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_json_line   = $json_obj->encode( $ref_progress );
+        if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+            print STDERR  "$utf8_json_line\n";
+        } else {
+            print STDOUT  "$utf8_json_line\n";
+        }
+           #print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+        } elsif ($json==3){
+            if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                print STDERR Dumper( $ref_progress );
+            } else {
+                print STDOUT Dumper( $ref_progress );
+            }
+       }
+    print "JSON Progress end\n";
+}
 
 sub json_dump {
     my ($arg_ref) = @_;
