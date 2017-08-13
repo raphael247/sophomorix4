@@ -5607,10 +5607,10 @@ sub AD_examuser_create {
             my %json_progress=();
             $json_progress{'JSONINFO'}="PROGRESS";
             $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_PREFIX_EN'}.
-                                         " $participant ($firstname_utf8_AD $lastname_utf8_AD)".
+                                         " $examuser ($firstname_utf8_AD $lastname_utf8_AD)".
                                          $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_EN'};
             $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_PREFIX_DE'}.
-                                         " $participant ($firstname_utf8_AD $lastname_utf8_AD) ".
+                                         " $examuser ($firstname_utf8_AD $lastname_utf8_AD) ".
                                          $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'ADDEXAMUSER_POSTFIX_DE'};
             $json_progress{'STEP'}=$user_count;
             $json_progress{'FINAL_STEP'}=$max_user_count;

@@ -218,6 +218,7 @@ if ($from_unix_path ne "" and $to_user ne ""){
     } else {
         $subdir_mput=$transfer;
     }
+
     &smbclient_mput_recurse({ldap=>$ldap,
                              root_dse=>$root_dse,
                              root_dns=>$root_dns,
@@ -281,6 +282,7 @@ if ($clean_home_dir ne ""){
 }
 
 
+
 # --collect-copy --from-user <user1> --to-user <user2> --file <file1>,<dir1>, ...
 if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne "" and $file_list ne ""){
     &print_title("Collecting to unix dir ...");
@@ -288,6 +290,45 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
     print "   * To user:   $to_user\n";
     print "   * Files:     $file_list\n";
     my $target_dir;
+
+    if ($json>=1){
+        # prepare json object
+        my %json_progress=();
+        $json_progress{'JSONINFO'}="PROGRESS";
+        $json_progress{'COMMENT_EN'}=$sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_PREFIX_EN'}.
+                                     " $from_user --> $to_user ($file_list)".
+                                     $sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_POSTFIX_EN'};
+        $json_progress{'COMMENT_DE'}=$sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_PREFIX_DE'}.
+                                     " $from_user --> $to_user ($file_list)".
+                                     $sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_POSTFIX_DE'};
+        $json_progress{'STEP'}="1";
+        $json_progress{'FINAL_STEP'}="1";
+        # print JSON Object
+        if ($json==1){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+            if ($sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                print STDERR  "$utf8_pretty_printed";
+            } else {
+                print STDOUT  "$utf8_pretty_printed";
+            }
+        } elsif ($json==2){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_json_line   = $json_obj->encode( \%json_progress );
+            if ($sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                print STDERR  "$utf8_json_line\n";
+            } else {
+                print STDOUT  "$utf8_json_line\n";
+            }
+        } elsif ($json==3){
+            if ($sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                print STDERR Dumper( \%json_progress );
+            } else {
+                print STDOUT Dumper( \%json_progress );
+            }
+        }
+    }
+
     if ($collect_copy==1){
         $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
                                              root_dse=>$root_dse,
@@ -342,6 +383,7 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
 }
 
 
+
 # --collect-copy-exam <user1>-exam 
 if ($collect_copy_exam){
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
@@ -386,6 +428,33 @@ if ($collect_copy_exam){
         $subdir_mput=$subdir."/".$collect_copy_exam; # the session
         print "   * Subdir (session): $subdir_mput\n";
     }
+
+    if ($json>=1){
+        # prepare json object
+        my %json_progress=();
+        $json_progress{'JSONINFO'}="PROGRESS";
+        $json_progress{'COMMENT_EN'}=$sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_PREFIX_EN'}.
+                                     " $collect_copy_exam".
+                                     $sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_POSTFIX_EN'};
+        $json_progress{'COMMENT_DE'}=$sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_PREFIX_DE'}.
+                                     " $collect_copy_exam".
+                                     $sophomorix_config{'INI'}{'LANG.PROGRESS'}{'COLLECTCOPY_POSTFIX_DE'};
+        $json_progress{'STEP'}="1";
+        $json_progress{'FINAL_STEP'}="1";
+        # print JSON Object
+        if ($json==1){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+            print {$sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed";
+        } elsif ($json==2){
+            my $json_obj = JSON->new->allow_nonref;
+            my $utf8_json_line   = $json_obj->encode( \%json_progress );
+            print {$sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+        } elsif ($json==3){
+            print {$sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( \%json_progress );
+        }
+    }
+
     my $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
                                             root_dse=>$root_dse,
                                             root_dns=>$root_dns,
@@ -566,9 +635,51 @@ sub smbclient_mput_recurse {
     # $localdir: sourcedir (unix-Pfad)
     # $userstring: list of users to put to
     # $target_subdir: subdir under userhome/transfer
+    my $user_count=0;
     my @users=split(/,/,$userstring);
+    my $max_user_count=$#users;
     foreach my $user (@users){
+        $user_count++;
         print "   * Copying to user $user\n";
+        if ($json>=1){
+            # prepare json object
+            my %json_progress=();
+            $json_progress{'JSONINFO'}="PROGRESS";
+            $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'MPUTFILES_PREFIX_EN'}.
+                                         " $user".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'MPUTFILES_POSTFIX_EN'};
+            $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'MPUTFILES_PREFIX_DE'}.
+                                         " $user".
+                                         $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'MPUTFILES_POSTFIX_DE'};
+            $json_progress{'STEP'}=$user_count;
+            $json_progress{'FINAL_STEP'}=$max_user_count;
+            # print JSON Object
+            if ($json==1){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_pretty_printed = $json_obj->pretty->encode( \%json_progress );
+                if ($sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                    print STDERR  "$utf8_pretty_printed";
+                } else {
+                    print STDOUT  "$utf8_pretty_printed";
+                }
+            } elsif ($json==2){
+                my $json_obj = JSON->new->allow_nonref;
+                my $utf8_json_line   = $json_obj->encode( \%json_progress );
+                if ($sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                    print STDERR  "$utf8_json_line\n";
+                } else {
+                    print STDOUT  "$utf8_json_line\n";
+                }
+                #print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
+            } elsif ($json==3){
+                if ($sophomorix_config{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+                    print STDERR Dumper( \%json_progress );
+                } else {
+                    print STDOUT Dumper( \%json_progress );
+                }
+            }
+        }
+
         my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
                         $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
