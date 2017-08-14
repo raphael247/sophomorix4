@@ -1044,7 +1044,7 @@ sub NTACL_test {
         $abs_path_linux="/srv/samba/schools/".$share.$smb_rel;
         $abs_path_linux=~s/\/$//; # remove trailing /
     }
-    my $command="smbcacls -U administrator"."%".$smb_pass." ".$unc_path." ".$smb_rel;
+    my $command="/usr/bin/smbcacls -U administrator"."%".$smb_pass." ".$unc_path." ".$smb_rel;
     print "****** Run $ref_fs_test_result->{'testnumber'} NTACL-test $testnum: $command\n";
     # print "****** $share $smb_rel $abs_path_linux\n";
     # remember in list

@@ -129,7 +129,7 @@ foreach my $linux_path (@linux_paths){
             if ($smb_rel eq ""){
                 $smb_rel="/"; # not allowed to be empty
             }
-            $command="smbcacls -U ".$user."%".$pass." ".$smb_unc." '".$smb_rel."'";
+            $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCACLS'}." -U ".$user."%".$pass." ".$smb_unc." '".$smb_rel."'";
         }
     }
 

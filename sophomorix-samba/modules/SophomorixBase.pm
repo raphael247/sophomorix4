@@ -1670,7 +1670,8 @@ sub NTACL_set_file {
         }
     }
     $smbcacls_option="\"".$smbcacls_option."\"";
-    my $smbcacls_base_command="smbcacls -U ".$DevelConf::sophomorix_file_admin."%'".
+    my $smbcacls_base_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCACLS'}.
+                              " -U ".$DevelConf::sophomorix_file_admin."%'".
                               $smb_admin_pass."' //$root_dns/$school $smbpath --set ";
     my $smbcacls_command=$smbcacls_base_command.$smbcacls_option;
     print "* $smbcacls_base_command\n";
