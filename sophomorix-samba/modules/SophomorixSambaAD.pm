@@ -2857,6 +2857,7 @@ sub AD_get_sessions {
                              'sn',
                              'sophomorixSchoolname',
                              'sophomorixExamMode',
+                             'sophomorixStatus',
                              'homeDirectory',
                             ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -2910,6 +2911,7 @@ sub AD_get_sessions {
                 $sessions{'SUPERVISOR'}{$supervisor}{'SMBhomeDirectory'}=$smb_dir;
                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
+                $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
                 push @{ $sessions{'SUPERVISOR_LIST'} }, $supervisor; 
                 # save by id
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sAMAccountName'}=$supervisor;
@@ -2923,6 +2925,7 @@ sub AD_get_sessions {
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'SMBhomeDirectory'}=$smb_dir;
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
                 $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
+                $sessions{'ID'}{$id}{'SUPERVISOR'}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
                 push @{ $sessions{'ID_LIST'} }, $id; 
 
                 # save participant information
@@ -2972,6 +2975,7 @@ sub AD_get_sessions {
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixRole'}=$role_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixExamMode'}=$exammode_AD;
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixStatus'}=$status_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'homeDirectory'}=$home_directory_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'}=$smb_dir;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'}=$school_AD;
@@ -2987,6 +2991,8 @@ sub AD_get_sessions {
                              {$participant}{'user_existing'}=$existing_AD;
                     $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixExamMode'}=$exammode_AD;
+                    $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                             {$participant}{'sophomorixStatus'}=$status_AD;
                     $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixRole'}=$role_AD;
                     push @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
