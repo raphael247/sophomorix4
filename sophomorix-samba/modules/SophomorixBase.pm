@@ -60,6 +60,7 @@ $Data::Dumper::Terse = 1;
             get_group_basename
             recode_utf8_to_ascii
             read_smb_conf
+            call_sophomorix_command
             );
 
 
@@ -67,7 +68,6 @@ $Data::Dumper::Terse = 1;
 
 # formatted printout
 ######################################################################
-
 sub print_line {
    print "========================================",
          "========================================\n";
@@ -88,15 +88,14 @@ sub print_title {
 }
 
 
+
 # json stuff
 ######################################################################
-
 sub json_progress_print {
     my ($arg_ref) = @_;
     my $ref_progress = $arg_ref->{ref_progress};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-    print "JSON Progress start\n";
     if ($json==1){
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_progress );
@@ -121,8 +120,9 @@ sub json_progress_print {
                 print STDOUT Dumper( $ref_progress );
             }
        }
-    print "JSON Progress end\n";
 }
+
+
 
 sub json_dump {
     my ($arg_ref) = @_;
@@ -250,9 +250,10 @@ sub remove_whitespace {
     return $string;    
 }
 
+
+
 # time stamps
 ######################################################################
-
 # use this timestamp for the sophomorix-schema in AD
 sub time_stamp_AD {
   # 2016-04-04 21:51:44
@@ -327,6 +328,7 @@ sub unlock_sophomorix{
 }
 
 
+
 sub lock_sophomorix {
     #my ($type,$pid,@arguments) = @_;
     my ($type,$pid,$ref_arguments) = @_;
@@ -399,6 +401,31 @@ sub read_lockfile {
     my $locking_script=$lock[3];
     my $locking_pid=$lock[4];
     return ($locking_script,$locking_pid);
+}
+
+# command execution 
+######################################################################
+sub call_sophomorix_command {
+    my ($log_level,$json,$command)=@_;
+    my $all_opt="";
+    if ($log_level==2){
+	$all_opt=$all_opt."v";
+    } elsif ($log_level==3){
+        $all_opt=$all_opt."vv";
+    }
+    if ($json==1){
+        $all_opt=$all_opt."j";
+    } elsif ($json==2){
+        $all_opt=$all_opt."jj";
+    } elsif ($json==3){
+        $all_opt=$all_opt."jjj";
+    }
+    if ($all_opt ne ""){
+        $all_opt="-".$all_opt;
+    }
+    my $full_command=$command." ".$all_opt;
+    print "$full_command\n";
+    system($full_command);
 }
 
 
@@ -660,6 +687,7 @@ sub config_sophomorix_read {
     return %sophomorix_config; 
 }
 
+
  
 sub replace_vars {
     my ($string,$ref_sophomorix_config,$school)=@_;
@@ -668,6 +696,7 @@ sub replace_vars {
     $string=~s/\@\@SCHOOLNAME\@\@/$school/g; 
     return $string;
 }
+
 
 
 sub read_smb_conf {
@@ -707,6 +736,7 @@ sub read_sophomorix_ini {
           -handle_trailing_comment => 1,
         );
 }
+
 
 
 sub ini_list {
@@ -1079,6 +1109,7 @@ sub result_sophomorix_init {
 }
 
 
+
 sub result_sophomorix_add {
     # $type: ERROR|WARNUNG
     # $num: -1, no number, else look in ERROR|WARNING db
@@ -1107,6 +1138,7 @@ sub result_sophomorix_add {
         print "Unknown result type $type";
     }
 }
+
 
 
 sub result_sophomorix_add_log {
@@ -1166,6 +1198,7 @@ sub result_sophomorix_add_summary {
 }
 
 
+
 sub result_sophomorix_check_exit {
     my ($ref_result,$ref_sophomorix_config,$json)=@_;
     my $log=0;
@@ -1193,6 +1226,7 @@ sub result_sophomorix_check_exit {
         &print_title("$err ERRORS, $warn WARNINGS -> let's go");
     }
 }
+
 
 
 sub result_sophomorix_print {
@@ -1243,6 +1277,7 @@ sub result_sophomorix_print {
           print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} Dumper( $ref_result );
       }
 }
+
 
 
 # other
@@ -1348,7 +1383,6 @@ sub quota_listing_session_participant {
     $ref_sessions->{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$session}{'PARTICIPANTS'}
                    {$participant}{'quota'}{'/dev/sda1'}{'comment'}="Home";
 }
-
 
 
 
@@ -1518,8 +1552,6 @@ sub log_script_exit {
             $message = &Sophomorix::SophomorixAPI::fetch_error_string($return);
         }
     } 
-
-#    foreach my $arg (@arguments){
     foreach my $arg ( @{ $ref_arguments}  ){  
         # count numbers arguments beginning with 1
         # @arguments numbers arguments beginning with 0
@@ -1545,9 +1577,7 @@ sub log_script_exit {
     }
     # put message in json object
     &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$message);
-#    &result_sophomorix_add($ref_result,"ERROR",-1,\@{["one","two","three"]},"Error not in db: $message");
 
-    #&nscd_start();
     # output the result object
     &result_sophomorix_print($ref_result,$ref_sophomorix_config,$json);
     exit $return;
@@ -1656,6 +1686,8 @@ sub NTACL_set_file {
     &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (end)");
 }
 
+
+
 # ?????? deprecated ???
 sub old_ACL_set_file_obsolete {
     # $path and $aclname are mandatory
@@ -1681,12 +1713,6 @@ sub old_ACL_set_file_obsolete {
     if (defined $aclname){
         $source=$DevelConf::path_conf_devel_acl."/".$aclname.".acl.template";
         $tmp=$DevelConf::path_conf_tmp."/".$aclname.".acl";
-#    } elsif (defined $role){
-#        $source=$DevelConf::path_conf_devel_acl."/".$role.".acl.template";
-#        $tmp=$DevelConf::path_conf_tmp."/".$role.".acl";
-#    } elsif (defined $type){
-#        $source=$DevelConf::path_conf_devel_acl."/".$type.".acl.template";
-#        $tmp=$DevelConf::path_conf_tmp."/".$type.".acl";
     } else {
         print "";
         &Sophomorix::SophomorixBase::log_script_exit(
@@ -1716,11 +1742,11 @@ sub old_ACL_set_file_obsolete {
     print "$sed_command\n";
     system($sed_command);
 
-#    if($Conf::log_level>=2){
+    if($Conf::log_level>=2){
         print "\nPatched ACL:\n\n";
         system("cat $tmp");
         print "\n";
-#    }
+    }
 
     # apply acl from tmp to path
     $setfacl="setfacl --set-file=".$tmp." ".$path;
@@ -1747,6 +1773,7 @@ sub get_passwd_charlist {
                 );
    return @zeichen;
 }
+
 
 
 sub get_plain_password {
@@ -1932,7 +1959,6 @@ sub check_options{
 
 # dns queries
 ######################################################################
-
 sub dns_query_ip {
     my ($res,$host)=@_;
 
@@ -1949,6 +1975,7 @@ sub dns_query_ip {
     }
     #return $ip;
 }
+
 
 
 # encoding, recoding stuff
@@ -2220,8 +2247,7 @@ sub recode_utf8_to_ascii {
 }
 
 
-
-
+######################################################################
 # END OF FILE
 # Return true=1
 1;

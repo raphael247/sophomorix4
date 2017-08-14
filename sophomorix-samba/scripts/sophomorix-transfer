@@ -409,7 +409,6 @@ if ($collect_copy_exam){
         $subdir_mput=$subdir."/".$collect_copy_exam; # the session
         print "   * Subdir (session): $subdir_mput\n";
     }
-    print "HERE1\n";
     if ($json>=1){
         # prepare json object
         my %json_progress=();
@@ -428,7 +427,6 @@ if ($collect_copy_exam){
                                                           sophomorix_config=>\%sophomorix_config,
                                                         });
     }
-    print "HERE2\n";
 
     my $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
                                             root_dse=>$root_dse,

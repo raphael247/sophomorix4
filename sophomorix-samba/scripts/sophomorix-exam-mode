@@ -48,6 +48,7 @@ use Sophomorix::SophomorixBase qw(
                                  json_dump
                                  recode_utf8_to_ascii
                                  remove_from_list
+                                 call_sophomorix_command
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_unicodepwd
@@ -268,13 +269,14 @@ if ($unset_exam_mode==1){
             my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
             my $command;
             if (defined $subdir){
-                $command="sophomorix-transfer --collect-copy-exam ".$examuser." --subdir ".$subdir;
+                $command="/usr/sbin/sophomorix-transfer --collect-copy-exam ".$examuser." --subdir ".$subdir;
             } else {
-                $command="sophomorix-transfer --collect-copy-exam ".$examuser;
-            }
+                $command="/usr/sbin/sophomorix-transfer --collect-copy-exam ".$examuser;
 
-            print "$command\n";
-            system($command);
+            }
+            &call_sophomorix_command($Conf::log_level,$json,$command);
+#            print "$command\n";
+#            system($command);
         }
         my $ret=&AD_user_unset_exam_mode({ldap=>$ldap,
                                           root_dse=>$root_dse,
