@@ -1062,6 +1062,10 @@ sub AD_computer_create {
     my $display_name=$name;
     my $smb_name=$name."\$";
 
+    # sophomorixDnsNodename
+    my $s_dns_nodename=$name;
+    $s_dns_nodename=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
+
     # dns
     my $root_dns=&AD_dns_get($root_dse);
 
@@ -1093,6 +1097,7 @@ sub AD_computer_create {
         print "   Prefix:                $prefix\n";
         print "   sAMAccountName:        $smb_name\n";
         print "   dNSHostName:           $dns_name\n";
+        print "   sophomorixDnsNodename: $s_dns_nodename\n";
         foreach my $entry (@service_principal_name){
             print "   servicePrincipalName:  $entry\n";
         }
@@ -1143,6 +1148,7 @@ sub AD_computer_create {
                    sophomorixSchoolname => $school,
                    sophomorixAdminFile => $filename,
                    sophomorixCreationDate => $creationdate, 
+                   sophomorixDnsNodename => $s_dns_nodename, 
                    userAccountControl => '4096',
                    instanceType => '4',
                    objectclass => ['top', 'person',

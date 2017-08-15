@@ -325,6 +325,9 @@ sub AD_test_object {
     # group
     my $gidnumber =$arg_ref->{gidNumber};
 
+    # sophomorix computer
+    my $s_dns_nodename = $arg_ref->{sophomorixDnsNodename};
+
     # sophomorix user
     my $s_admin_class = $arg_ref->{sophomorixAdminClass};
     my $s_exit_admin_class = $arg_ref->{sophomorixExitAdminClass};
@@ -502,6 +505,10 @@ sub AD_test_object {
         if (defined $s_admin_class){
             is ($entry->get_value ('sophomorixAdminClass'),$s_admin_class,
 		"  * sophomorixAdminClass is $s_admin_class");
+        }
+        if (defined $s_dns_nodename){
+            is ($entry->get_value ('sophomorixDnsNodename'),$s_dns_nodename,
+		"  * sophomorixDnsNodename is $s_dns_nodename");
         }
         if (defined $s_exit_admin_class){
             is ($entry->get_value ('sophomorixExitAdminClass'),$s_exit_admin_class,
