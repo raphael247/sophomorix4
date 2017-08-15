@@ -680,7 +680,8 @@ sub AD_repdir_using_file {
 	            }
                     if ($entry_type eq "SMB"){
                         # smbclient
-                        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_file_admin."%'".
+                        my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                              " -U ".$DevelConf::sophomorix_file_admin."%'".
                                               $smb_admin_pass."'"." //$root_dns/$school -c 'mkdir $path_after_user_smb'";
                         my $user_typeout;
                         if ($user eq ""){
@@ -2365,9 +2366,11 @@ sub AD_user_move {
     if ($school_old eq $school_new){
         # this is on the same share
         # smbclient ... rename (=move)
-#        my $smbclient_command="smbclient -U Administrator%'<password>'".
+#        my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+#                               " -U Administrator%'<password>'".
 #                              " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
-        my $smbclient_command="smbclient -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
+        my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                              " -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
                               " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
         print "$smbclient_command\n";
         system($smbclient_command);
@@ -5446,7 +5449,8 @@ sub AD_login_test {
     }
 
     # smbclient test
-    #my $command="smbclient -L localhost --user=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
+    #my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+    #            " -L localhost --user=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
     #print "   # $command\n";
     #my $result=system($command);
 

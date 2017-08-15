@@ -512,7 +512,8 @@ sub smbclient_mget_recurse {
         my $cd_path=$rel_path_sub;
         $cd_path=~s/\/\.$//; # remove /. in the end
         # file or dir
-        my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+        my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                              " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                               $smb_admin_pass."'".
                               " //$root_dns/$school_AD "." -c 'cd $cd_path; stat $filename; exit;'";
         print "$smbclient_command\n";
@@ -523,15 +524,17 @@ sub smbclient_mget_recurse {
             if ($stat=~m/regular file/ and $stat=~m/Blocks/ and $stat=~m/Size/){
                 # file
                 print "   * $filename is a file ($file_path)\n";
-                my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                       $smb_admin_pass."'".
-                                       " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
-                                       " prompt; recurse; get $filename; exit;'";
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                      $smb_admin_pass."'".
+                                      " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
+                                      " prompt; recurse; get $filename; exit;'";
                 print "$smbclient_command\n";
                 system($smbclient_command);
                 if ($type eq "move"){
                     # remove file that was collected
-                    my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                    my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                          " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                           $smb_admin_pass."'".
                                           " //$root_dns/$school_AD "." -c 'cd $cd_path;".
                                           " prompt; rm $filename; exit;'";
@@ -547,10 +550,11 @@ sub smbclient_mget_recurse {
                 # prepare local unix path
                 $lcd_path=$lcd_path."/".$filename;
                 system("mkdir $lcd_path");
-                my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                       $smb_admin_pass."'".
-                                       " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
-                                       " prompt; recurse; mget *; exit;'";
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                      $smb_admin_pass."'".
+                                      " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
+                                      " prompt; recurse; mget *; exit;'";
                 print "$smbclient_command\n";
                 system($smbclient_command);
 
@@ -658,7 +662,8 @@ sub smbclient_mput_recurse {
             }
             #print "\n$md_commands\n\n";
   
-            my $smbclient_command="smbclient --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                  " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                   $smb_admin_pass."'".
                                   " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
                                   " prompt; recurse; mput *; exit;'";
