@@ -83,7 +83,7 @@ use Net::DNS;
 use Net::MAC;
 use Date::Calc qw(check_date);
 use Data::Dumper;
-$Data::Dumper::Indent = 6;
+$Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
@@ -120,6 +120,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
+                                 AD_get_devices
                                  AD_computer_create
                                  AD_group_create
                                  AD_group_kill
@@ -697,7 +698,24 @@ if ($print==1){
 
 
 if ($info==1){
-    print "--info Not implemented\n";
+    my $ref_devices=&AD_get_devices({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 root_dns=>$root_dns,
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                               });
+#$ldap,$root_dse,$root_dns,$json,\%sophomorix_config);
+    my $jsoninfo="DEVICES";
+    my $jsoncomment="The sophomorix devices";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => "",
+                log_level => $Conf::log_level,
+                hash_ref => $ref_devices,
+                sophomorix_config => \%sophomorix_config,
+               });
+
     exit;
 }
 # # ===========================================================================

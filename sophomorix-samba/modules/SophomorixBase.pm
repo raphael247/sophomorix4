@@ -139,6 +139,8 @@ sub json_dump {
             &_console_print_sessions($hash_ref,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "ONESESSION"){
             &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "DEVICES"){
+            &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -219,6 +221,28 @@ sub _console_print_onesession {
         print "------------------------------------------------------------\n"
     }
     &print_line();
+}
+
+
+
+sub _console_print_devices {
+my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
+if($log_level==1 and $object_name eq ""){
+        # one device per line
+        &print_line();
+        print "DNS Node           | IPv4 |\n";
+        &print_line();
+        foreach my $dns_node ( @{ $ref_devices->{'lists'}{'by_school'}{'global'}{'dnsNode'} } ){
+
+        printf "|%-18s|%-18s|%-14s|%-8s|%-8s|\n",
+               $dns_node,
+               #$ref_devices->{'objectclass'}{'dnsNode'}{'sophomorixdnsNode'}{$dns_node}{'IPv4'},
+               $ref_devices->{'objectclass'}{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
+               " --- "," --- ","";
+            #print "$dns_node\n";
+        }
+    }
+
 }
 
 

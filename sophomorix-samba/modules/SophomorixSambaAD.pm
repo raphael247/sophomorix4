@@ -46,11 +46,12 @@ $Data::Dumper::Terse = 1;
             AD_user_update
             AD_get_user
             AD_get_group
+            AD_get_devices
             AD_computer_create
+            AD_computer_kill
             AD_user_move
             AD_user_kill
             AD_remove_sam_from_sophomorix_attributes
-            AD_computer_kill
             AD_group_create
             AD_group_kill
             AD_group_addmember
@@ -1019,6 +1020,25 @@ sub AD_group_kill {
     }
 }
 
+
+
+sub AD_get_devices {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+                               root_dse=>$root_dse,
+                               root_dns=>$root_dns,
+                               computers=>"TRUE",
+                               rooms=>"TRUE",
+                               dnszones=>"TRUE",
+                               dnsnodes=>"TRUE",
+                               sophomorix_config=>$ref_sophomorix_config,
+             });
+    return $ref_AD
+}
 
 
 sub AD_computer_create {
@@ -3957,7 +3977,11 @@ sub AD_get_AD {
                 my $entry = $mesg->entry($index);
                 my $dc=$entry->get_value('dc');
                 # get ip from dns, because in AD its binary (last 4 Bytes)
+
                 my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+                if ($ip eq "NXDOMAIN"){
+                    next;
+                }
                 my $record=$entry->get_value('dnsRecord');
                 my $desc=$entry->get_value('adminDescription');
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
