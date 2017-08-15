@@ -3551,6 +3551,7 @@ sub AD_get_AD {
                                     'sophomorixAdminFile',
                                     'sophomorixAdminClass',
                                     'sophomorixRole',
+                                    'sophomorixDnsNodename',
                                   ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
@@ -3566,12 +3567,19 @@ sub AD_get_AD {
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixRole'}=$role;
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+            $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixDnsNodename'}=
+                $entry->get_value('sophomorixDnsNodename');
+            $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminClass'}=
+                $entry->get_value('sophomorixAdminClass');
             # lists
             push @{ $AD{'lists'}{'by_school'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
             push @{ $AD{'lists'}{'by_school'}{$sn}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
+
+            $AD{'lookup'}{'sophomorixDnsNodename_by_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
+            $AD{'lookup'}{'sAMAccountName_by_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
 
             my $type=$AD{'lookup'}{'type_by_adminclass'}{$entry->get_value('sophomorixAdminClass')};
             push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}

@@ -226,22 +226,37 @@ sub _console_print_onesession {
 
 
 sub _console_print_devices {
-my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
-if($log_level==1 and $object_name eq ""){
+    my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
+    #if($log_level==1 and $object_name eq ""){
         # one device per line
         &print_line();
-        print "DNS Node         | IPv4          |\n";
+        print "DNS Node        | IPv4          | Computer       | Room      | MAC             |\n";
         &print_line();
         foreach my $dns_node ( @{ $ref_devices->{'lists'}{'by_school'}{'global'}{'dnsNode'} } ){
+            my $computer;
+            my $hwc;
+            my $adminclass;
+            if (exists $ref_devices->{'lookup'}{'sAMAccountName_by_sophomorixDnsNodename'}{$dns_node}){
+                $computer=$ref_devices->{'lookup'}{'sAMAccountName_by_sophomorixDnsNodename'}{$dns_node};
+                $hwc="";
+                $adminclass=$ref_devices->{'objectclass'}{'computer'}{'computer'}{$computer}{'sophomorixAdminClass'};
+            } else {
+                $computer="---";
+                $hwc="---";
+                $adminclass="---";
+            }
+            
 
-        printf "|%-16s|%-15s|%-14s|%-8s|%-8s|\n",
-               $dns_node,
-               #$ref_devices->{'objectclass'}{'dnsNode'}{'sophomorixdnsNode'}{$dns_node}{'IPv4'},
-               $ref_devices->{'objectclass'}{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
-               " --- "," --- ","";
+            printf "|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
+                   $dns_node,
+                   $ref_devices->{'objectclass'}{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
+                   $computer,
+                   $adminclass,
+                   "not in AD";
             #print "$dns_node\n";
         }
-    }
+        &print_line();
+    #}
 
 }
 
