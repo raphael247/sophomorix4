@@ -230,11 +230,11 @@ my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
 if($log_level==1 and $object_name eq ""){
         # one device per line
         &print_line();
-        print "DNS Node           | IPv4 |\n";
+        print "DNS Node         | IPv4          |\n";
         &print_line();
         foreach my $dns_node ( @{ $ref_devices->{'lists'}{'by_school'}{'global'}{'dnsNode'} } ){
 
-        printf "|%-18s|%-18s|%-14s|%-8s|%-8s|\n",
+        printf "|%-16s|%-15s|%-14s|%-8s|%-8s|\n",
                $dns_node,
                #$ref_devices->{'objectclass'}{'dnsNode'}{'sophomorixdnsNode'}{$dns_node}{'IPv4'},
                $ref_devices->{'objectclass'}{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
@@ -426,6 +426,8 @@ sub read_lockfile {
     my $locking_pid=$lock[4];
     return ($locking_script,$locking_pid);
 }
+
+
 
 # command execution 
 ######################################################################
