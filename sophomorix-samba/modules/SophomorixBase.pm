@@ -236,8 +236,8 @@ sub _console_print_devices {
             my $computer;
             my $hwc;
             my $adminclass;
-            if (exists $ref_devices->{'lookup'}{'sAMAccountName_by_sophomorixDnsNodename'}{$dns_node}){
-                $computer=$ref_devices->{'lookup'}{'sAMAccountName_by_sophomorixDnsNodename'}{$dns_node};
+            if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
+                $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
                 $hwc="";
                 $adminclass=$ref_devices->{'objectclass'}{'computer'}{'computer'}{$computer}{'sophomorixAdminClass'};
             } else {
