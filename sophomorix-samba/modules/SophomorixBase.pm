@@ -232,7 +232,7 @@ sub _console_print_devices {
         &print_line();
         print "DNS Node        | IPv4          | Computer       | Room      | MAC             |\n";
         &print_line();
-        foreach my $dns_node ( @{ $ref_devices->{'lists'}{'by_school'}{'global'}{'dnsNode'} } ){
+        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
             my $computer;
             my $hwc;
             my $adminclass;

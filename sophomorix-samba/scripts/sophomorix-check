@@ -1885,16 +1885,16 @@ sub analyze_encoding {
     my $filename_tmp = basename($file_tmp);
     # set all result counters to 0
     foreach my $enc (@encodings_to_check){
-        $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc}=0;
-        $encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc}=0;
-        $encoding_check_results{$file}{'lastnames'}{'count_hits'}{$enc}=0;
-        $encoding_check_results{$file}{'lastnames'}{'count_errors'}{$enc}=0;
+        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=0;
+        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=0;
+        $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}=0;
+        $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc}=0;
     }
-    $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'}=0;
-    $encoding_check_results{$file}{'firstnames'}{'count_errors'}{'none'}=0;
-    $encoding_check_results{$file}{'lastnames'}{'count_hits'}{'none'}=0;
-    $encoding_check_results{$file}{'lastnames'}{'count_errors'}{'none'}=0;
-    $encoding_check_results{$file}{'names'}{'result'}="unknown";
+    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=0;
+    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{'none'}=0;
+    $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=0;
+    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{'none'}=0;
+    $encoding_check_results{$file}{'NAMES'}{'RESULT'}="unknown";
 
     # start to analyze file_tmp
     &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
@@ -1938,40 +1938,40 @@ sub analyze_encoding {
                     # check for positive hits (known, valid firstnames)
                     if (exists $firstnames_data{$enc}{$first}){
                         # remember hits
-	                push @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} }, 
+	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} }, 
                                 { first => "$first", 
                                   first_utf8 => "$first_utf8",
                                   line => "$_"};
                         # count hits
-                        my $old=$encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc};
+                        my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc}=$new;
+                        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=$new;
                         $hit_count++;
                     }
                     # check for errors
                     if (exists $firstnames_errors{$enc}{$first}){
                         # remember errors
-	                push @{ $encoding_check_results{$file}{'firstnames'}{'data_errors'} }, 
+	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_errors'} }, 
                                 { first => "$first", 
                                   first_utf8 => "$first_utf8",
                                   line => "$_"};
                         # count errors
-                        my $old=$encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc};
+                        my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc}=$new;
+                        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=$new;
                         $hit_count++;
                     }
                 }
                 # non-hits and non-errors (unknown firstnames) 
                 if ($hit_count==0 and $error_count==0){
                     # remember unknown names
-                    push @{ $encoding_check_results{$file}{'firstnames'}{'data_unknown'} }, 
+                    push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_unknown'} }, 
                            { first => "$first", 
                              line => "$_"};
                     # count unknown names
-                    my $old=$encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'};
+                    my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'};
                     my $new=$old+1;
-                    $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'}=$new;
+                    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=$new;
                 }
             }
         }
@@ -1994,40 +1994,40 @@ sub analyze_encoding {
                     # check for positive hits (known, valid firstnames)
                     if (exists $lastnames_data{$enc}{$last}){
                         # remember hits
-	                push @{ $encoding_check_results{$file}{'lastnames'}{'data_hits'} }, 
+	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_hits'} }, 
                                 { last => "$last", 
                                   last_utf8 => "$last_utf8",
                                   line => "$_"};
                         # count hits
-                        my $old=$encoding_check_results{$file}{'lastnames'}{'count_hits'}{$enc};
+                        my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'lastnames'}{'count_hits'}{$enc}=$new;
+                        $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}=$new;
                         $hit_count++;
                     }
                     # check for errors
                     if (exists $lastnames_errors{$enc}{$last}){
                         # remember errors
-	                push @{ $encoding_check_results{$file}{'lastnames'}{'data_errors'} }, 
+	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_errors'} }, 
                                 { last => "$last", 
                                   last_utf8 => "$last_utf8",
                                   line => "$_"};
                         # count errors
-                        my $old=$encoding_check_results{$file}{'lastnames'}{'count_errors'}{$enc};
+                        my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'lastnames'}{'count_errors'}{$enc}=$new;
+                        $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc}=$new;
                         $hit_count++;
                     }
                 }
                 # non-hits and non-errors (unknown lastnames) 
                 if ($hit_count==0 and $error_count==0){
                     # remember unknown names
-                    push @{ $encoding_check_results{$file}{'lastnames'}{'data_unknown'} }, 
+                    push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_unknown'} }, 
                            { last => "$last", 
                              line => "$_"};
                     # count unknown names
-                    my $old=$encoding_check_results{$file}{'lastnames'}{'count_hits'}{'none'};
+                    my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'};
                     my $new=$old+1;
-                    $encoding_check_results{$file}{'lastnames'}{'count_hits'}{'none'}=$new;
+                    $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=$new;
                 }
             }
         }
@@ -2037,22 +2037,22 @@ sub analyze_encoding {
     my $oldsum=0;
     foreach my $enc (@encodings_to_check){
         my $sum=
-            $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc}+
-	    $encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc}+
-            $encoding_check_results{$file}{'lastnames'}{'count_hits'}{$enc}+
-	    $encoding_check_results{$file}{'lastnames'}{'count_errors'}{$enc};
-        $encoding_check_results{$file}{'firstnames'}{'count_sum'}{$enc}=$sum;
+            $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}+
+	    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}+
+            $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}+
+	    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
+        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_sum'}{$enc}=$sum;
         if($sum > $oldsum){
-            $encoding_check_results{$file}{'names'}{'result'}=$enc;
+            $encoding_check_results{$file}{'NAMES'}{'RESULT'}=$enc;
         }
     }
     # save result in config hash
     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
-        $encoding_check_results{$file}{'names'}{'result'};
+        $encoding_check_results{$file}{'NAMES'}{'RESULT'};
     if($Conf::log_level>=2){
-        print "$file_tmp --> $encoding_check_results{$file}{'names'}{'result'}\n";
+        print "$file_tmp --> $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n";
     }
-    return $encoding_check_results{$file}{'names'}{'result'};
+    return $encoding_check_results{$file}{'NAMES'}{'RESULT'};
 }
 
 
@@ -2065,9 +2065,9 @@ sub print_analyzed_encoding {
     # print valid firstnames
     if($Conf::log_level>=2){
     print "\nValid firstnames: ",
-          "($encoding_check_results{$file}{'names'}{'result'} ---> utf8)\n";
+          "($encoding_check_results{$file}{'NAMES'}{'RESULT'} ---> utf8)\n";
     print "==========================================================================\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_hits'} } ){
+    foreach my $item ( @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} } ){
         printf  "%-20s %-12s %-20s\n",
                 $item->{first},
                 "--->",
@@ -2080,7 +2080,7 @@ sub print_analyzed_encoding {
     print "\n";
     print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
     print "+------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_unknown'} } ){
+    foreach my $item ( @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_unknown'} } ){
         printf  "| %-40s |\n",
                 $item->{first},
     }
@@ -2089,11 +2089,11 @@ sub print_analyzed_encoding {
     #  print firstnames with errors
     print "\nFirstnames that should be an error (Please report the the School Office):\n";
     print "+---------------------------------------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'firstnames'}{'data_errors'} } ){
+    foreach my $item ( @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_errors'} } ){
         printf  "| %-15s%-60s|\n",
                 $item->{first_utf8},
                 $item->{line};
-        my $enc_result=$encoding_check_results{$file}{'names'}{'result'};
+        my $enc_result=$encoding_check_results{$file}{'NAMES'}{'RESULT'};
         printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
         print "+---------------------------------------------------------------------------+\n";
     }
@@ -2102,7 +2102,7 @@ sub print_analyzed_encoding {
     print "\n";
     print "Unknown lastnames (Please report to info\@linuxmuster.net):\n";
     print "+------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'lastnames'}{'data_unknown'} } ){
+    foreach my $item ( @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_unknown'} } ){
         printf  "| %-40s |\n",
                 $item->{last},
     }
@@ -2111,11 +2111,11 @@ sub print_analyzed_encoding {
     #  print lastnames with errors
     print "\nLastnames that should be an error (Please report the the School Office):\n";
     print "+---------------------------------------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'lastnames'}{'data_errors'} } ){
+    foreach my $item ( @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_errors'} } ){
         printf  "| %-15s%-60s|\n",
                 $item->{last_utf8},
                 $item->{line};
-        my $enc_result=$encoding_check_results{$file}{'names'}{'result'};
+        my $enc_result=$encoding_check_results{$file}{'NAMES'}{'RESULT'};
         printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
         print "+---------------------------------------------------------------------------+\n";
     }
@@ -2142,23 +2142,23 @@ sub print_analyzed_encoding {
     foreach my $enc (@encodings_to_check){
         printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
                 $enc,
-                $encoding_check_results{$file}{'firstnames'}{'count_hits'}{$enc},
-                $encoding_check_results{$file}{'firstnames'}{'count_errors'}{$enc},
-                $encoding_check_results{$file}{'lastnames'}{'count_hits'}{$enc},
-                $encoding_check_results{$file}{'lastnames'}{'count_errors'}{$enc},
-   	        $encoding_check_results{$file}{'firstnames'}{'count_sum'}{$enc};# ?????????
+                $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc},
+                $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc},
+                $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc},
+                $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc},
+   	        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_sum'}{$enc};# ?????????
     }
     print "+---------------------+--------+--------+--------+--------+--------+\n";
     printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
             "none of the above",
-            $encoding_check_results{$file}{'firstnames'}{'count_hits'}{'none'},
+            $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'},
             "-",
-            $encoding_check_results{$file}{'lastnames'}{'count_hits'}{'none'},
+            $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'},
             "-",
             "-";
     print "+---------------------+--------+--------+--------+--------+--------+\n";
     print "$file:\n",
-          "    File-Encoding is $encoding_check_results{$file}{'names'}{'result'}\n"; 
+          "    File-Encoding is $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n"; 
     print "\n";
     close(DATAFILE);
 }

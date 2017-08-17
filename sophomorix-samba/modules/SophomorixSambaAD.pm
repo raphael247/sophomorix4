@@ -618,9 +618,9 @@ sub AD_repdir_using_file {
                 @groups=($teacherclass);
             } elsif (defined $adminclass){
                 @groups=($adminclass);
-            } elsif(defined $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type}){
+            } elsif(defined $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'groups_by_type'}{$group_type}){
                 # there is a group list -> use it
-                @groups=@{ $ref_AD->{'lists'}{'by_school'}{$school}{'groups_by_type'}{$group_type} };
+                @groups=@{ $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'groups_by_type'}{$group_type} };
             } else {
                 @groups=("");
             }
@@ -658,8 +658,8 @@ sub AD_repdir_using_file {
                         @users=($teacher_home);
                     } elsif (defined $student_home){
                         @users=($student_home);
-                    } elsif (defined $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group}){
-                        @users = @{ $ref_AD->{'lists'}{'by_school'}{$school}{'users_by_group'}{$group} };
+                    } elsif (defined $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'users_by_group'}{$group}){
+                        @users = @{ $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'users_by_group'}{$group} };
                     } else {
                         print "\n";
                         print "##### No users in $group (school $school) #####\n";
@@ -2894,7 +2894,7 @@ sub AD_get_sessions {
     if($Conf::log_level>=2){
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users have sessions");
     }
-    $AD{'result'}{'supervisor'}{'student'}{'COUNT'}=$max_user;
+    $AD{'RESULT'}{'supervisor'}{'student'}{'COUNT'}=$max_user;
 
     # walk through all supervisors
     for( my $index = 0 ; $index < $max_user ; $index++) {
@@ -3187,7 +3187,7 @@ sub AD_get_AD {
         my $max_adminclass = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_adminclass sophomorix adminclasses found in AD");
-        $AD{'result'}{'group'}{'adminclass'}{'COUNT'}=$max_adminclass;
+        $AD{'RESULT'}{'group'}{'adminclass'}{'COUNT'}=$max_adminclass;
         for( my $index = 0 ; $index < $max_adminclass ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3199,17 +3199,17 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
-#            push @{ $AD{'lists'}{'by_school'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
             $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'adminclass'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'adminclass'} } = sort @{ $AD{'lists'}{'adminclass'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{'adminclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'LISTS'}{'adminclass'} } = sort @{ $AD{'LISTS'}{'adminclass'} }; 
     }
 
 
@@ -3230,7 +3230,7 @@ sub AD_get_AD {
         my $max_teacherclass = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_teacherclass sophomorix teacherclasses found in AD");
-        $AD{'result'}{'group'}{'teacherclass'}{'COUNT'}=$max_teacherclass;
+        $AD{'RESULT'}{'group'}{'teacherclass'}{'COUNT'}=$max_teacherclass;
         for( my $index = 0 ; $index < $max_teacherclass ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3242,17 +3242,17 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
-#            push @{ $AD{'lists'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'LISTS'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
             $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{'teacherclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'LISTS'}{'teacherclass'} } = sort @{ $AD{'LISTS'}{'teacherclass'} }; 
     }
 
     ##################################################
@@ -3273,7 +3273,7 @@ sub AD_get_AD {
         my $max_teacherclass = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_teacherclass sophomorix admins found in AD");
-        $AD{'result'}{'group'}{'teacherclass'}{'COUNT'}=$max_teacherclass;
+        $AD{'RESULT'}{'group'}{'teacherclass'}{'COUNT'}=$max_teacherclass;
         for( my $index = 0 ; $index < $max_teacherclass ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3285,17 +3285,17 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'teacherclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
-#            push @{ $AD{'lists'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'LISTS'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
             $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{'teacherclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'LISTS'}{'teacherclass'} } = sort @{ $AD{'LISTS'}{'teacherclass'} }; 
     }
 
     ##################################################
@@ -3315,7 +3315,7 @@ sub AD_get_AD {
         my $max_project = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_project sophomorix projects found in AD");
-        $AD{'result'}{'group'}{'project'}{'COUNT'}=$max_project;
+        $AD{'RESULT'}{'group'}{'project'}{'COUNT'}=$max_project;
         for( my $index = 0 ; $index < $max_project ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3327,17 +3327,17 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'project'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'project'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
-#            push @{ $AD{'lists'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+#            push @{ $AD{'LISTS'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
             $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'teacherclass'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'teacherclass'} } = sort @{ $AD{'lists'}{'teacherclass'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{'teacherclass'} }; # make list computer empty to allow sort  
+#        @{ $AD{'LISTS'}{'teacherclass'} } = sort @{ $AD{'LISTS'}{'teacherclass'} }; 
     }
 
 
@@ -3372,7 +3372,7 @@ sub AD_get_AD {
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
-        $AD{'result'}{'user'}{'student'}{'COUNT'}=$max_user;
+        $AD{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3474,21 +3474,21 @@ sub AD_get_AD {
             $AD{'lookup'}{'role_by_user'}{$sam}=$entry->get_value('sophomorixRole');
 
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam;
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam;
 
             my $type=$AD{'lookup'}{'type_by_adminclass'}{$entry->get_value('sophomorixAdminClass')};
-            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_by_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
-            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_by_type'}{$type} }, $sam;  
 
         }
         # sorting some lists
-#        my $unneeded1=$#{ $AD{'lists'}{'student'} }; # make list computer nonempty        
-#        @{ $AD{'lists'}{'student'} } = sort @{ $AD{'lists'}{'student'} }; 
-#        my $unneeded2=$#{ $AD{'lists'}{'teacher'} }; # make list computer nonempty        
-#        @{ $AD{'lists'}{'teacher'} } = sort @{ $AD{'lists'}{'teacher'} }; 
+#        my $unneeded1=$#{ $AD{'LISTS'}{'student'} }; # make list computer nonempty        
+#        @{ $AD{'LISTS'}{'student'} } = sort @{ $AD{'LISTS'}{'student'} }; 
+#        my $unneeded2=$#{ $AD{'LISTS'}{'teacher'} }; # make list computer nonempty        
+#        @{ $AD{'LISTS'}{'teacher'} } = sort @{ $AD{'LISTS'}{'teacher'} }; 
     }
 
 
@@ -3510,7 +3510,7 @@ sub AD_get_AD {
         my $max_room = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_room sophomorix Rooms found in AD");
-        $AD{'result'}{'group'}{'room'}{'COUNT'}=$max_room;
+        $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=$max_room;
         for( my $index = 0 ; $index < $max_room ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3522,16 +3522,16 @@ sub AD_get_AD {
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
             $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'groups_by_type'}{$type} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_by_type'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_by_type'}{$type} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
             $AD{'lookup'}{'type_by_adminclass'}{$sam}=$type;
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'room'} }; # make list computer empty to allow sort  
-#        @{ $AD{'lists'}{'room'} } = sort @{ $AD{'lists'}{'room'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{'room'} }; # make list computer empty to allow sort  
+#        @{ $AD{'LISTS'}{'room'} } = sort @{ $AD{'LISTS'}{'room'} }; 
     }
 
 
@@ -3555,7 +3555,7 @@ sub AD_get_AD {
                                   ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
-        $AD{'result'}{'computer'}{'computer'}{'COUNT'}=$max_user;
+        $AD{'RESULT'}{'computer'}{'computer'}{'COUNT'}=$max_user;
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
@@ -3572,8 +3572,8 @@ sub AD_get_AD {
             $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminClass'}=
                 $entry->get_value('sophomorixAdminClass');
             # lists
-            push @{ $AD{'lists'}{'by_school'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
-            push @{ $AD{'lists'}{'by_school'}{$sn}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_by_role'}{$entry->get_value('sophomorixRole')} }, $sam; 
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
@@ -3582,16 +3582,16 @@ sub AD_get_AD {
             $AD{'lookup'}{'sAMAccountName_by_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
 
             my $type=$AD{'lookup'}{'type_by_adminclass'}{$entry->get_value('sophomorixAdminClass')};
-            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_by_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
-            push @{ $AD{'lists'}{'by_school'}{$entry->get_value('sophomorixSchoolname')}{'users_by_type'}{$type} }, $sam;  
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_by_type'}{$type} }, $sam;  
 
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'computer'} }; # make list computer empty to allow sort  
-        # print "COUNT: $#{ $AD{'lists'}{'computer'} }\n";  # -1  
-#        @{ $AD{'lists'}{'computer'} } = sort @{ $AD{'lists'}{'computer'} }; 
-        # print "COUNT: $#{ $AD{'lists'}{'computer'} }\n";  # -1   
+#        my $unneeded=$#{ $AD{'LISTS'}{'computer'} }; # make list computer empty to allow sort  
+        # print "COUNT: $#{ $AD{'LISTS'}{'computer'} }\n";  # -1  
+#        @{ $AD{'LISTS'}{'computer'} } = sort @{ $AD{'LISTS'}{'computer'} }; 
+        # print "COUNT: $#{ $AD{'LISTS'}{'computer'} }\n";  # -1   
     }
 
 
@@ -3611,7 +3611,7 @@ sub AD_get_AD {
         my $max_internetaccess = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_internetaccess sophomorix internetaccess groups found in AD");
-        $AD{'result'}{'group'}{'internetaccess'}{'COUNT'}=$max_internetaccess;
+        $AD{'RESULT'}{'group'}{'internetaccess'}{'COUNT'}=$max_internetaccess;
         for( my $index = 0 ; $index < $max_internetaccess ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -3634,13 +3634,13 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'internetaccess'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'internetaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'internetaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'internetaccess'} }, $member;
             }
         }
         # sorting some lists
-#        my $unneeded1=$#{ $AD{'lists'}{'internetaccess'} }; 
-#        @{ $AD{'lists'}{'internetaccess'} } = sort @{ $AD{'lists'}{'internetaccess'} }; 
+#        my $unneeded1=$#{ $AD{'LISTS'}{'internetaccess'} }; 
+#        @{ $AD{'LISTS'}{'internetaccess'} } = sort @{ $AD{'LISTS'}{'internetaccess'} }; 
         # ----------------------------------------
         # sophomorixType wifiaccess from ldap
         $mesg = $ldap->search( # perform a search
@@ -3655,7 +3655,7 @@ sub AD_get_AD {
         my $max_wifiaccess = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_wifiaccess sophomorix wifiaccess groups found in AD");
-        $AD{'result'}{'group'}{'wifiaccess'}{'COUNT'}=$max_wifiaccess;
+        $AD{'RESULT'}{'group'}{'wifiaccess'}{'COUNT'}=$max_wifiaccess;
         for( my $index = 0 ; $index < $max_wifiaccess ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -3678,13 +3678,13 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'wifiaccess'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'wifiaccess'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'wifiaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'wifiaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'wifiaccess'} }, $member;
             }
         }
         # sorting some lists
-#        my $unneeded2=$#{ $AD{'lists'}{'wifiaccess'} }; 
-#        @{ $AD{'lists'}{'wifiaccess'} } = sort @{ $AD{'lists'}{'wifiaccess'} }; 
+#        my $unneeded2=$#{ $AD{'LISTS'}{'wifiaccess'} }; 
+#        @{ $AD{'LISTS'}{'wifiaccess'} } = sort @{ $AD{'LISTS'}{'wifiaccess'} }; 
 
         # ----------------------------------------
         # sophomorixType admins from ldap
@@ -3700,7 +3700,7 @@ sub AD_get_AD {
         my $max_admins = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_admins sophomorix admins groups found in AD");
-        $AD{'result'}{'group'}{'admins'}{'COUNT'}=$max_admins;
+        $AD{'RESULT'}{'group'}{'admins'}{'COUNT'}=$max_admins;
         for( my $index = 0 ; $index < $max_admins ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -3723,13 +3723,13 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'admins'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'admins'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'admins'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'admins'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'admins'} }, $member;
             }
         }
         # sorting some lists
-#        my $unneeded3=$#{ $AD{'lists'}{'admins'} }; 
-#        @{ $AD{'lists'}{'admins'} } = sort @{ $AD{'lists'}{'admins'} }; 
+#        my $unneeded3=$#{ $AD{'LISTS'}{'admins'} }; 
+#        @{ $AD{'LISTS'}{'admins'} } = sort @{ $AD{'LISTS'}{'admins'} }; 
 
 
 
@@ -3748,7 +3748,7 @@ sub AD_get_AD {
         my $max_webfilter = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_webfilter sophomorix webfilter groups found in AD");
-        $AD{'result'}{'group'}{'webfilter'}{'COUNT'}=$max_webfilter;
+        $AD{'RESULT'}{'group'}{'webfilter'}{'COUNT'}=$max_webfilter;
         for( my $index = 0 ; $index < $max_webfilter ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -3771,8 +3771,8 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'webfilter'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'webfilter'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'webfilter'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'webfilter'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'webfilter'} }, $member;
             }
         }
 
@@ -3793,7 +3793,7 @@ sub AD_get_AD {
         my $max_intranetaccess = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_intranetaccess sophomorix intranetaccess groups found in AD");
-        $AD{'result'}{'group'}{'intranetaccess'}{'COUNT'}=$max_intranetaccess;
+        $AD{'RESULT'}{'group'}{'intranetaccess'}{'COUNT'}=$max_intranetaccess;
         for( my $index = 0 ; $index < $max_intranetaccess ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -3816,8 +3816,8 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'intranetaccess'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'intranetaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'intranetaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'intranetaccess'} }, $member;
             }
         }
 
@@ -3839,7 +3839,7 @@ sub AD_get_AD {
         my $max_printing = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_printing sophomorix printing groups found in AD");
-        $AD{'result'}{'group'}{'printing'}{'COUNT'}=$max_printing;
+        $AD{'RESULT'}{'group'}{'printing'}{'COUNT'}=$max_printing;
         for( my $index = 0 ; $index < $max_printing ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -3862,8 +3862,8 @@ sub AD_get_AD {
                 $user=~s/^CN=//;
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'printing'}{$sam}{'members'}{$user}=$member;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'printing'} }, $member;
-                push @{ $AD{'lists'}{'by_school'}{$schoolname}{'printing'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'printing'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'printing'} }, $member;
             }
         }
 
@@ -3887,7 +3887,7 @@ sub AD_get_AD {
     #                             ]);
     #     my $max_user = $mesg->count; 
     #     &Sophomorix::SophomorixBase::print_title("$max_user ExamAccounts found in AD");
-    #     $AD{'result'}{'user'}{'examaccount'}{'COUNT'}=$max_user;
+    #     $AD{'RESULT'}{'user'}{'examaccount'}{'COUNT'}=$max_user;
     #     for( my $index = 0 ; $index < $max_user ; $index++) {
     #         my $entry = $mesg->entry($index);
     #         my $sam=$entry->get_value('sAMAccountName');
@@ -3944,23 +3944,23 @@ sub AD_get_AD {
                 # shophomorix dnsZone or default dnsZone
                 $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
                 $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'sophomorixdnsZone'} }, $zone;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'sophomorixdnsZone'} }, $zone;
             } else {
                 # other dnsZone
 		$sopho_max_zone=$sopho_max_zone-1;
                 $other_max_zone=$other_max_zone+1;
                 $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
                 $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'otherdnsZone'} }, $zone;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'otherdnsZone'} }, $zone;
             }
         }
-        $AD{'result'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
-        $AD{'result'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
+        $AD{'RESULT'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
+        $AD{'RESULT'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
         # sorting some lists
-#        my $unneeded1=$#{ $AD{'lists'}{'sophomorixdnsZone'} }; 
-#        @{ $AD{'lists'}{'sophomorixdnsZone'} } = sort @{ $AD{'lists'}{'sophomorixdnsZone'} }; 
-#        my $unneeded2=$#{ $AD{'lists'}{'otherdnsZone'} }; 
-#        @{ $AD{'lists'}{'otherdnsZone'} } = sort @{ $AD{'lists'}{'otherdnsZone'} }; 
+#        my $unneeded1=$#{ $AD{'LISTS'}{'sophomorixdnsZone'} }; 
+#        @{ $AD{'LISTS'}{'sophomorixdnsZone'} } = sort @{ $AD{'LISTS'}{'sophomorixdnsZone'} }; 
+#        my $unneeded2=$#{ $AD{'LISTS'}{'otherdnsZone'} }; 
+#        @{ $AD{'LISTS'}{'otherdnsZone'} } = sort @{ $AD{'LISTS'}{'otherdnsZone'} }; 
     }
 
 
@@ -4002,18 +4002,18 @@ sub AD_get_AD {
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
                 $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=$desc;
-                push @{ $AD{'lists'}{'by_school'}{'global'}{'dnsNode'} }, $dc;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
                 if($Conf::log_level>=2){
                     print "   * $dc\n";
                 }
             }
             if (defined $dc){ 
-                $AD{'result'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
+                $AD{'RESULT'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
 	    }
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'lists'}{'dnsNode'} }; 
-#        @{ $AD{'lists'}{'dnsNode'} } = sort @{ $AD{'lists'}{'dnsNode'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{'dnsNode'} }; 
+#        @{ $AD{'LISTS'}{'dnsNode'} } = sort @{ $AD{'LISTS'}{'dnsNode'} }; 
     }
 
     return(\%AD);
