@@ -2,6 +2,19 @@ https cloning:
 
 git clone https://github.com/linuxmuster/sophomorix4.git
 
+
+############################################################
+Entwicklertreffen
+- Hardwareclasses
+Info:
+unicodePwd: kann nicht direkt gesetzt werden
+ der Wert unicodePwd wird mit Net::LDAP dem samba4-server im
+ Klartext übergeben (firstpassword), der samba4 server speichert es gehasht ab
+
+
+
+############################################################
+
 ------------------------------------------------------------
 sophomorix needs to run on the domain controller:
   - next uid/gid files
@@ -16,7 +29,7 @@ soll da noch der participant hinzu?
 ------------------------------------------------------------
 
 ??? 
-exam-mode nur bei bestimmten Staus erlauben? aktive user
+exam-mode nur bei bestimmten Status erlauben? Aktive user
 ???
 
 sophomorix-session -i -s session:
@@ -25,30 +38,7 @@ sophomorix-session -i -s session:
 
 AD_user_kill
    identifier unused in sub -> remove?
-
-
-next:
-
-sophomorix-session:
-  - OK: userdirectory: transfer anlegen
-  - OK: userdirectory: transfer
-        - anzeigen des transfer ordners des supervisors?
-  -i :
-    OK: entweder user anzeigen, ODER user-exam
-
-sophomorix-exam-mode
-OK:  user enablen/disablen
-OK:  --uset: user-exam löschen
-OK: password des >user< übernehmen für >exam-user<, kein firstpassword eintrag
-    sophomorix-passwd: password für >exam-user< setzen, muss tun
-
-
-Info:
-unicodePwd: kann nicht direkt gesetzt werden
- der Wert unicodePwd wird mit Net::LDAP dem samba4-server im
- Klartext übergeben (firstpassword), der samba4 server speichert es gehasht ab
- 
-
+   mitloggen der genutzten samaccount namen?
 
 sophomorix-passwd: password ändern mit option
 
@@ -61,7 +51,7 @@ optionen: sharename,unix-from-path
 
 /usr/local/bin/smbclient //servername/share  -c "cd remote_path_of share; lcd /var/schuko/dir; prompt; recurse; mput *; exit;"
 
-prompt: Nachfrage für jedes file an/aus
+prompt: Nachfrage für jedes file an/aus (prompt=aus)
 exit: beendet connection
 
 exit evtl. vermeiden und mehrfach kopieren, spart Zeit?
@@ -79,8 +69,9 @@ debuglevel von samba an smbclient, usw. durchreichen
 default=0
 
 
+sophomorix-admin -i
 binduser: anzeigen von
-- passwoiord
+- password
 - loginname
 - CN=global....... .lan  AD-pfad ausgeben
 
@@ -1784,7 +1775,9 @@ Dann die DNS Nodes für reverse lookup zur passenden Zone hinzunehmen
 
 ------------------------------------------------------------
 Hardwareclasses (hwk, hardwareklasse)
-- wird von sophomorix-device als Gruppenmitgliedschaft des Computeraccounts
+- in anzulegendes attribut sophomorixHardwareClass speichern, bei computer 
+  (dnsnodes (ohne computzeraccount ) werden nicht gespeichert)
+- UND: wird von sophomorix-device als Gruppenmitgliedschaft des Computeraccounts
   gespeichert
 Umsetzung:
 sophomorix-device
