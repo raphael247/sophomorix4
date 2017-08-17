@@ -3425,38 +3425,38 @@ sub AD_get_AD {
             $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
             # new: by sam
-            $AD{'sam'}{$sam}{'sophomorixAdminClass'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=
                 $entry->get_value('sophomorixAdminClass');
-            $AD{'sam'}{$sam}{'sophomorixFirstnameASCII'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=
                 $entry->get_value('sophomorixFirstnameASCII');
-            $AD{'sam'}{$sam}{'sophomorixSurnameASCII'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=
                 $entry->get_value('sophomorixSurnameASCII');
-            $AD{'sam'}{$sam}{'givenName'}=
+            $AD{'sAMAccountName'}{$sam}{'givenName'}=
                 $entry->get_value('givenName');
-            $AD{'sam'}{$sam}{'sn'}=
+            $AD{'sAMAccountName'}{$sam}{'sn'}=
                 $entry->get_value('sn');
-            $AD{'sam'}{$sam}{'sophomorixBirthdate'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=
                 $entry->get_value('sophomorixBirthdate');
-            $AD{'sam'}{$sam}{'sophomorixStatus'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=
                 $entry->get_value('sophomorixStatus');
-            $AD{'sam'}{$sam}{'sophomorixSchoolname'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=
                 $entry->get_value('sophomorixSchoolname');
-            $AD{'sam'}{$sam}{'sophomorixPrefix'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixPrefix'}=
                 $entry->get_value('sophomorixPrefix');
-            $AD{'sam'}{$sam}{'sophomorixAdminFile'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=
                 $entry->get_value('sophomorixAdminFile');
-            $AD{'sam'}{$sam}{'sophomorixTolerationDate'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=
                 $entry->get_value('sophomorixTolerationDate');
-            $AD{'sam'}{$sam}{'sophomorixDeactivationDate'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=
                 $entry->get_value('sophomorixDeactivationDate');
-            $AD{'sam'}{$sam}{'sophomorixUnid'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=
                 $entry->get_value('sophomorixUnid');
-            $AD{'sam'}{$sam}{'sophomorixRole'}=
+            $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
-            $AD{'sam'}{$sam}{'userAccountControl'}=
+            $AD{'sAMAccountName'}{$sam}{'userAccountControl'}=
                 $entry->get_value('userAccountControl');
-            $AD{'sam'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
-            $AD{'sam'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+            $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+            $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
             # lookup
             if ($entry->get_value('sophomorixUnid') ne "---"){
@@ -3471,7 +3471,7 @@ sub AD_get_AD {
             $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
             $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
             $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_utf8'}{$identifier_utf8}=$entry->get_value('sophomorixStatus');
-            $AD{'LOOKUP'}{'sophomorixRole_BY_user'}{$sam}=$entry->get_value('sophomorixRole');
+            $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
 
             # lists
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
@@ -3481,7 +3481,7 @@ sub AD_get_AD {
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
-                       {'users_BY_type'}{$type} }, $sam;  
+                       {'users_BY_sophomorixType'}{$type} }, $sam;  
 
         }
         # sorting some lists
@@ -3584,7 +3584,7 @@ sub AD_get_AD {
             my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
-            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_type'}{$type} }, $sam;  
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, $sam;  
 
         }
         # sorting some lists
