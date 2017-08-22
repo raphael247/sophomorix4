@@ -1,0 +1,88 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SOPHOMORIX-EXAM-MODE 8 "August 22, 2017"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sophomorix-exam-mode \- Klassenarbeitsmodus
+.SH SYNOPSIS
+.B sophomorix-exam-mode
+.RI [ options ]
+.br
+.SH DESCRIPTION
+.B sophomorix-exam-mode  
+schaltet den Klassenarbeitsmodus für einen user-Account ein/aus.
+.br
+Der normale user-Account existiert dauerhaft, wird aber deaktiviert, sobald der Klassenarbeitsmodus eingeschaltet wird und ein Klassenarbeitsaccount angelegt wird.
+.br
+Beim Ausschalten des Klassenarbeitsmodus werden Daten des Klassenarbeits-Account eingesammelt (zum user im Attribut sophomorixExamMode) und der Klassenarbeitsaccount gelöscht. Der normale Account wird wieder aktiviert.
+.PP
+.SH OPTIONS
+.B sophomorix-exam-mode
+benützt die GNU command line syntax, mit langen Optionen, die mit zwei
+Bindestrichen (`-') beginnen:
+.TP
+.B \-h, \-\-help
+Kurzübersicht über Optionen, sowie eine Liste der eingelesenen Dateien.
+.TP
+.B \-v, \-\-verbose
+Sagt, was das Programm gerade macht (verbose)
+.TP
+.B \-vv, \-\-verbose \-\-verbose
+Sagt ungeheuer genau, was das Programm gerade macht (very verbose)
+.TP
+.B -i, --info
+listet user, die im Klassenarbeitmodus sind
+.TP
+.PP
+.SH EXAMPLES
+
+.br
+Als Schnittstelle zu Schulkonsole und andere Software, sind folgende
+Aufrufe von sophomorix-exam-mode typisch:
+.TP
+.B sophomorix-exam-mode --set --supervisor <supervisor>  --participants <user1>,<user2>,...
+Der user <supervisor> setzt die participants <user1>,<user2>,... in den Klassenarbeitsmodus.
+.br
+Beim Participant wir der Supervisor im Attribut sophomorixExamMode
+gespeichert. Damit ist festgelegt, zu welchem user die Daten des
+Klassenarbeitsaccount einesammelt werden, wenn der Klassenarbeitsmodus
+beendet wird.
+.TP
+.B sophomorix-exam-mode --unset --subdir <subdir> <session> --participants <user1>,<user2>,...
+Irgendein user (üblicherweise der Supevisor) beendet den
+Klassenarbeitsmodus für die user <user1>,<user2>,...
+.br
+Die Daten der Klassenarbeitsaccounts werden in den Transferordner des
+im Attribut sophomorixExamMode gespeicherten users eingesammelt. Sie
+landen dort im Unterverzeichnis <subdir>, welches beim beenden aus
+einer Session heraus, die eindeutige session ID (evtl. mit angehängtem
+Session-Kommentar) sein sollte.
+.br
+Wird nicht aus einer Session heraus eingesammelt
+(Klassenarbeitsaccount wird fremdbeendet), so wird das aktuelle Datum
+mit angehäntem String <-no-session> als subdir verwendet.
+.TP
+.PP
+.SH SEE ALSO
+.BR sophomorix-managementgroup (8), sophomorix-session (8)
+
+.\".BR baz (1).
+.\".br
+.\"You can see the full options of the Programs by calling for example 
+.\".IR "sophomrix-exam-mode -h" ,
+.
+.SH AUTHOR
+Written by <jeffbeck@web.de>.
