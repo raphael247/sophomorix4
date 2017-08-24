@@ -1,0 +1,96 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SOPHOMORIX-MANAGEMENTGROUP 8 "August 24, 2017"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sophomorix-managementgroup \- Verwaltung von Mitgliedschaften in
+Managementgruppen
+.SH SYNOPSIS
+.B sophomorix-managementgroup
+.RI [ options ]
+.br
+.SH DESCRIPTION
+.B sophomorix-managementgroup  
+entfernt user aus bzw. fügt user zu Managementgruppen hinzu. User
+werden in Managementgruppen EINZELN hinzugefügt um dem user
+zusätzliche Dinge zu ermöglichen, wie z.B. Internetzugriff.
+.PP
+.SH OPTIONS
+.B sophomorix-managementgroup
+benützt die GNU command line syntax, mit langen Optionen, die mit zwei
+Bindestrichen (`-') beginnen:
+.TP
+.B \-h, \-\-help
+Kurzübersicht über Optionen, sowie eine Liste der eingelesenen Dateien.
+.TP
+.B \-v, \-\-verbose
+Sagt, was das Programm gerade macht (verbose)
+.TP
+.B \-vv, \-\-verbose \-\-verbose
+Sagt ungeheuer genau, was das Programm gerade macht (very verbose)
+.TP
+.B -i, --info
+???
+.TP
+.PP
+.SH EXAMPLES
+.TP
+.B sophomorix-managementgroup --internet <user1,user2,...>
+schaltet für einen user Internetzugriffe ein.
+.TP
+.B sophomorix-managementgroup --nointernet <user1,user2,...>
+schaltet für einen user Internetzugriffe aus.
+.TP
+.B sophomorix-managementgroup --intranet <user1,user2,...>
+schaltet für einen user Intranetzugriffe ein.
+.TP
+.B sophomorix-managementgroup --nointranet <user1,user2,...>
+schaltet für einen user Intranetzugriffe aus.
+.TP
+.B sophomorix-managementgroup --wifi <user1,user2,...>
+schaltet für einen user Wifi-Benutzung ein.
+.TP
+.B sophomorix-managementgroup --nowifi <user1,user2,...>
+schaltet für einen user Wifi-Benutzung aus.
+.TP
+.B sophomorix-managementgroup --webfilter <user1,user2,...>
+schaltet für einen user den Webfilter ein.
+.TP
+.B sophomorix-managementgroup --nowebfilter <user1,user2,...>
+schaltet für einen user den Webfilter aus.
+.TP
+.B sophomorix-managementgroup --printing <user1,user2,...>
+schaltet für einen user den Zugriff auf Netzwerkdrucker ein.
+.TP
+.B sophomorix-managementgroup --noprinting <user1,user2,...>
+schaltet für einen user den Zugriff auf Netzwerkdrucker aus.
+.TP
+.B sophomorix-managementgroup --admins <user1,user2,...>
+fügt den user in die admingruppe der Schule hinzu (<schoolname>-admins).
+.TP
+.B sophomorix-managementgroup --noadmins <user1,user2,...>
+entfernt den user aus der admingruppe seiner Schule (<schoolname>-admins).
+.TP
+.SH SEE ALSO
+.BR sophomorix-session (8), sophomorix-exam-mode (8)
+
+.\".BR baz (1).
+.\".br
+.\"You can see the full options of the Programs by calling for example 
+.\".IR "sophomrix-managementgroup -h" ,
+.
+.SH AUTHOR
+Written by <jeffbeck@web.de>.
