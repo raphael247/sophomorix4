@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH SOPHOMORIX-SESSION 8 "January 03, 2017"
+.TH SOPHOMORIX-SESSION 8 "August 22, 2017"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -23,21 +23,19 @@ sophomorix-session \- Verwaltung von Unterrichten
 .br
 .SH DESCRIPTION
 .B sophomorix-session  
-erzeugt und ändert Unterrichte (sessions) im AD bei dem durchfühenden
-Supervisor im mehrfach-Attribut sophomorixSession. Ein Supervisor kann
+erstellt und ändert Unterrichte (sessions) im AD bei dem durchfühenden
+Supervisor im Multi-Value-Attribut sophomorixSession. Ein Supervisor kann
 mehrere Sessions verwalten.
 .br
 In sophomorixSessions steht folgender String: 
 .TP
 2017-01-03_02-44-35;This is the Monday Session;lordjo42,blackmri42;
 .br
-* 2017-01-03_02-44-35 ist die Erstellzeit der session und wird als ID benutzt.
+* 2017-01-03_02-44-35 ist die Erstellzeit der session und wird als eindeutige ID benutzt.
 .br
 * This is the Monday Session: Kommentar zu dieser Session.
 .br
 * lordjo42,blackmri42 sind die Participants (Teilnehmer) in dieser Session.
-.br
-* Beim Supervisor der Session ist die Session im AD gespeichert ist.
 .PP
 .SH OPTIONS
 .B sophomorix-session
@@ -54,7 +52,10 @@ Sagt, was das Programm gerade macht (verbose)
 Sagt ungeheuer genau, was das Programm gerade macht (very verbose)
 .TP
 .B -i, --info
-gibt informationen zu den sessions
+listet alle sessions die es in allen Schulen gibt.
+.TP
+.B -is <session-ID>, --info --session <session-ID>
+listet alle Informationen die es zu dieser Session UND deren Supervisor und Participants gibt.
 .TP
 .PP
 .SH EXAMPLES
@@ -63,13 +64,14 @@ gibt informationen zu den sessions
 Als Schnittstelle zu Schulkonsole und andere Software, sind folgende
 Aufrufe von sophomorix-session typisch:
 .TP
-.B sophomorix-session --create --supervisor <user>
-Erzeugt einen neuen Unterricht (session). Der Supervisor <user>
+.B sophomorix-session --create --supervisor <user> --comment <Kommentar>
+Erstellt einen neuen Unterricht (session). Der Supervisor <user>
 verwaltet diese session. Üblicherweise ist das eine Lehrerin, kann
-aber auch ein anderer User sein. Die Session wird bei dieser Lehrerin
-im Attribut sophomorixSessions (Multivalue) abgespeichert.
+aber auch ein anderer User sein.
 .br
 Als ID wird die sekundengenaue Erstellzeit  verwendet.
+.br
+Der Kommentar ist optional und sollte als Anzeigename verwendet werden, falls vorhanden.
 .TP
 .B sophomorix-session --create --supervisor <user> --participants <user1>,<user2>, ... --comment ''My Comment''
 Hier wird die Session gleich mit Participants (Teilnehmer) anglegt.
@@ -83,18 +85,15 @@ Erweitert die bisherigen user um die user <user1>,<user2>, ...
 .B sophomorix-session --session <session-id> --remove-participants <user1>,<user2>, ...
 Entfernt aus den bisherigen usern die user <user1>,<user2>, ...
 .TP
-.B sophomorix-session --session <session-id> --set-exam-mode <user1>,<user2>, ...
-Setzt <user1>,<user2>, ... in den Klassenarbeitsmodus.
-.TP
-.B sophomorix-session --session <session-id> --unset-exam-mode <user1>,<user2>, ...
-Beendet für <user1>,<user2>, ... den Klassenarbeitsmodus.
-.TP
 .B sophomorix-session -info --json (--json) [--session <session-id>]
-Liefert Informationen zu ALLEN[einer] laufenden Session[s] als JSON-Objekt
-zurück. Die zweite Option --json liefert ein kompaktes JSON-Obkekt
-zurück.
+Liefert Informationen zu ALLEN/[einer] laufenden Session[s] als
+JSON-Objekt zurück. Die zweite Option --json liefert ein kompakteres,
+einzeiliges JSON-Obkekt zurück.
 .br
-Wird nur eine Session angegeben sind mehr Informationen im JSON-Object
+Das kompakte JSON Objekt hat nur etwa
+70% der Datengröße und sollte deshalb von Programmen benutzt werden, die sophomorix-session aufrufen.
+.br
+Wird nur eine Session angegeben sind mehr Informationen im JSON-Objekt
 vorhanden.
 .br
 Eine session wird im JSON-Objekt über ihre session-id(JSON-Objekt->id)
@@ -113,7 +112,8 @@ Entfernt alle Sessions. Dies kann z.B. nachts per cronjob erfolgen.
 .TP
 .PP
 .SH RELATED
-
+.TP
+.B  sophomorix-managementgroup
 .br
 .B sophomorix-managementgroup --internet <user1,user2,...>
 .br
@@ -134,10 +134,15 @@ Entfernt alle Sessions. Dies kann z.B. nachts per cronjob erfolgen.
 .B sophomorix-managementgroup --printing <user1,user2,...>
 .br
 .B sophomorix-managementgroup --noprinting <user1,user2,...>
-
+.TP
+.B sophomorix-exam-mode
+.br
+.B sophomorix-exam-mode --set --supervisor <supervisor>  --participants <user1>,<user2>,...
+.br
+.B sophomorix-exam-mode --unset --subdir <session> --participants <user1>,<user2>,...
 .TP
 .SH SEE ALSO
-.BR sophomorix-managementgroup (8),
+.BR sophomorix-managementgroup (8), sophomorix-exam-mode (8)
 
 .\".BR baz (1).
 .\".br
