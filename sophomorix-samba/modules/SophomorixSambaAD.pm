@@ -66,6 +66,7 @@ $Data::Dumper::Terse = 1;
             AD_school_create
             AD_object_search
             AD_get_AD
+            AD_get_print_data
             AD_class_fetch
             AD_project_fetch
             AD_dn_fetch_multivalue
@@ -4017,6 +4018,82 @@ sub AD_get_AD {
     }
 
     return(\%AD);
+}
+
+
+
+sub AD_get_print_data {
+    my %AD_print_data=();
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my $users = $arg_ref->{users};
+    if (not defined $users){$users="FALSE"};
+
+    if ($users eq "TRUE"){
+        # sophomorix students,teachers from ldap
+        my $filter="(&(objectClass=user)(|(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => $filter,
+                       attrs => ['sAMAccountName',
+                                 'sophomorixAdminClass',
+                                 'givenName',
+                                 'sn',
+                                 'sophomorixFirstnameASCII',
+                                 'sophomorixSurnameASCII',
+                                 'sophomorixSchoolname',
+                                 'sophomorixRole',
+                                 'sophomorixCreationDate',
+                                 'sophomorixFirstPassword',
+                                ]);
+        my $max_user = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+        $AD_print_data{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $line=$entry->get_value('sn').";".
+                     $entry->get_value('givenName').";".
+                     $entry->get_value('sAMAccountName').";".
+                     $entry->get_value('sophomorixFirstPassword').";".
+                     $entry->get_value('sophomorixSchoolname').";".
+                     $entry->get_value('sophomorixAdminClass').";".
+                     $entry->get_value('sophomorixFirstnameASCII').";".
+                     $entry->get_value('sophomorixSurnameASCII').";".
+                     $entry->get_value('sophomorixRole').";".
+                     $entry->get_value('sophomorixCreationDate').";";
+            # list creation
+            push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
+                                  {$entry->get_value('sophomorixSchoolname')}
+                                  {$entry->get_value('sophomorixAdminClass')} }, 
+                                  $line; 
+            push @{ $AD_print_data{'LIST_BY_sophomorixAdminClass'}
+                                  {$entry->get_value('sophomorixAdminClass')} }, 
+                                  $line; 
+            push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname'}
+                                  {$entry->get_value('sophomorixSchoolname')} }, 
+                                  $line; 
+            push @{ $AD_print_data{'LIST_BY_sophomorixCreationDate'}{$entry->get_value('sophomorixCreationDate')} }, $line;
+
+        }
+        # sorting some lists
+#        my $unneeded1=$#{ $AD_print_data{'LISTS'}{'student'} }; # make list computer nonempty        
+#        @{ $AD_print_data{'LISTS'}{'student'} } = sort @{ $AD_print_data{'LISTS'}{'student'} }; 
+#        my $unneeded2=$#{ $AD_print_data{'LISTS'}{'teacher'} }; # make list computer nonempty        
+#        @{ $AD_print_data{'LISTS'}{'teacher'} } = sort @{ $AD_print_data{'LISTS'}{'teacher'} }; 
+    }
+
+
+
+    return(\%AD_print_data);
 }
 
 
