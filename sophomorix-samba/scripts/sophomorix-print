@@ -344,17 +344,16 @@ print Dumper($ref_AD_print_data);
 my $ref_printlist;
 if ($gruppe ne ""){
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$gruppe};
-    &print_class($output_file_basename,$ref_printlist);
+    &print_class($gruppe,$output_file_basename,$ref_printlist);
 }
 
 
 
-#foreach my $item (@{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname'}{'bsz'} }){
 
 # Walk through printlist
-foreach my $item ( @{ $ref_printlist } ){
-    print "$item\n";
-}
+#foreach my $item ( @{ $ref_printlist } ){
+#    print "$item\n";
+#}
 
 
 
@@ -1584,20 +1583,47 @@ sub latexen {
 }
 
 
+
 sub print_class {
-    my ($output_file_basename,$ref_printlist)=@_;
+    my ($class,$output_file_basename,$ref_printlist)=@_;
     &open_output_files($output_file_basename);
     &create_latex_from_template({latex_template=>"classlist-template.tex",
                                  ref_printlist=>$ref_printlist,
-                                 ADMINCLASS=>"---",
+                                 ADMINCLASS=>$class,
                                  SCHOOLNAME=>"---",
                                  TEACHERMEMBERS=>"---",
-                                 FILENAME=>"---",
+                                 FILENAME=>$output_file_basename,
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
                     });
     &close_output_files($output_file_basename);
     
+}
+
+
+
+sub datablock_from_list {
+    my @list = @_;
+    @list = sort @list;
+    my $datablock="";
+    my $dataline_count=0;
+    foreach my $item (@list){
+        print "Add to datablock: $item\n";
+        $dataline_count++;
+        my @data=split(/;/,$item);
+        $datablock=$datablock."\\databox{".$data[0].", ".
+                                           $data[1]."}".
+                                           "{"."}".
+                                           "{Klasse: ".$data[5]."}".
+                                           "{Login: \\texttt{".$data[2]."}}".
+                                           "{Erst-Passwort: \\texttt{".$data[3]."}}\n";
+    }
+    until ($dataline_count==36){
+        $dataline_count++;
+        $datablock=$datablock."\\databox{\\rule[2mm]{30mm}{0.5mm}}{}{}{}{}\n";
+    }
+    #print $datablock;
+    return $datablock;
 }
 
 
@@ -1615,16 +1641,36 @@ sub create_latex_from_template {
 
     my $template_abs=$ref_sophomorix_config->{'INI'}{'LATEX'}{'TEMPLATES'}."/".$latex_template;
     &print_title("Using Template $template_abs");
+
+    my $datablock=&datablock_from_list( @{ $ref_printlist } );
+
     open(TEMPLATE,"<$template_abs") || die "Fehler: $!";
+    my $datablockmode="FALSE";
     while (<TEMPLATE>){
-	print LATEX $_;
+        my $line=$_;
+
+        # replacements
+        $line=~s/\\textcolor\{red\}\{ADMINCLASS\}/$adminclass/;
+
+        if ($line=~m/DATABLOCK START/){
+            $datablockmode="TRUE";
+            print LATEX $line; # print the line to make debugging easier
+            print LATEX $datablock;
+        } elsif ($line=~m/DATABLOCK END/){
+            $datablockmode="FALSE";
+        }
+
+        if ($datablockmode eq "FALSE"){
+            print LATEX $line;
+        }
     }
     close(TEMPLATE);
 }
 
+
+
 sub open_output_files {
-    open(LATEX,
-         ">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Fehler: $!";
+    open(LATEX,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Fehler: $!";
 }
 
 

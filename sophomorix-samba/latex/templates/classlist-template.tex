@@ -1,22 +1,14 @@
-%%% Classlist template
-%%% Replacements:
-%%%   \textcolor{red}{ADMINCLASS}
-%%%   \textcolor{red}{SCHOOLNAME}
-%%%   \textcolor{red}{TEACHERMEMBERS}
-%%%   \textcolor{red}{FILENAME}
-%%%   DATABLOCK START
-%%%    36 \databox commands
-%%%   DATABLOCK ENE
-%%% 
+% Classlist template
+% Replacements: Look for \textcolor{red}{} and DATABLOCK
 \documentclass[11pt,fleqn,oneside,a4paper]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{ngerman}
 \usepackage{color}
-\usepackage{fancyheadings}
+\usepackage{fancyhdr}
 \pagestyle{fancy}
 
-%%% page layout
+% page layout
 \setlength{\paperwidth}{210mm}                                                                                      
 \setlength{\paperheight}{297mm}
 \setlength{\voffset}{0mm}
@@ -38,12 +30,12 @@
 \setlength{\textheight}{261.5mm}
 \renewcommand{\baselinestretch}{1}
 
-%% rulewidth 
+% rulewidth 
 \renewcommand{\headrulewidth}{0.25mm}
 \renewcommand{\footrulewidth}{0.25mm}
 \setlength{\fboxrule}{0.1mm}
 
-%% command to create entry
+% command to create entry
 \newcommand{\databox}[5]{
 \fbox{
 \begin{minipage}[b][26mm][c]{41mm}
@@ -53,7 +45,7 @@
 \end{minipage}
 }}
 
-%%% headers
+% headers
 \lhead{\bf \large \today}
 \chead{\LARGE \bf \textcolor{red}{ADMINCLASS}}
 \rhead{}
@@ -62,11 +54,10 @@
 \cfoot{\bf \textcolor{red}{TEACHERMEMBERS}}
 \rfoot{\textcolor{red}{FILENAME}}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
-%%% DATABLOCK START
+% DATABLOCK START
 \databox{Maier, Sarina}{here}{Klasse: m2kk3t}{Login: \texttt{maiersa42}}{Erst-Passwort: \texttt{EkqLjsjd6p}}
 \databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
 \databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
@@ -103,7 +94,6 @@
 \databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
 \databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
 \databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-%%% DATABLOCK END
-
+% DATABLOCK END
 
 \end{document}
