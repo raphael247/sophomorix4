@@ -59,6 +59,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
                                  AD_get_AD
+                                 AD_get_user
                                  AD_get_print_data
                                  AD_dns_get
                                  AD_object_search
@@ -94,12 +95,6 @@ my $info_lehrer_quota="";
 my $info_lehrer_mail_sender="";
 my $info_lehrer_mail_alias="";
 
-
-# Hashes, die aus Lehrerinfo-Datei erzeugt werden
-# Benannt nach dem Value, der gesucht wird
-
-# Nicht mehr gebraucht
-#my %nachname_edv_lehrer=();
 
 # Auslesen von user_db
 my $klasse_protokoll="";
@@ -154,22 +149,11 @@ my $k="";
 my $v="";
 
 my $dev_null="1>/dev/null 2>/dev/null";
-
-
-# ===========================================================================
-# Ende der Variablendeklaration
-# ===========================================================================
-
-
-# ===========================================================================
-# Programmbeginn
-# ===========================================================================
-
 my $json=0;
 
 $Conf::log_level=1;
 if($Conf::log_level>=3){
-   # Alle systembefehle nicht mehr nach /dev/null
+   # avoid logging STDOUT,STDERR to /dev/null
    $dev_null="";
 }
 my $help=0;
@@ -183,7 +167,7 @@ my $back_in_time=0;
 
 my $command="latex";
 my $user="";
-my $gruppe="";
+my $class="";
 my $project="";
 my $classlist="";
 my $one_per_page=0;
@@ -196,13 +180,13 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "school|s" => \$school,
            "all|a" => \$alle,
-           "class|c=s" => \$gruppe,
+           "class|c=s" => \$class,
            "project|p=s" => \$project,
            "user|u=s" => \$user,
            "classlist=s" => \$classlist,
            "help|h" => \$help,
            "teacher|t" => \$lehrer,
-           "caller|postfix=s" => \$caller,
+           "caller=s" => \$caller,
            "caller-copy|callercopy=s" => \$caller_copy,
            "command=s" => \$command,
            "back-in-time|backintime=i" => \$back_in_time,
@@ -215,16 +199,9 @@ if ($school eq ""){
     $school=$DevelConf::name_default_school;
 }
 
-
-
-## Prüfen, ob Optionen erkannt wurden
-#&check_options($testopt);
-#&check_connections();
-
 my %sophomorix_result=&result_sophomorix_init("sophomorix-check");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
-
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
@@ -237,10 +214,9 @@ my @filelist=&filelist_fetch({filetype=>"users",
 
 # --help
 if ($help==1) {
-   # Scriptname ermitteln
+   # calculate scriptname
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
-   # Befehlsbeschreibung
    print('
 sophomorix-print prints user account data of recently added users to 
   /var/lib/sophomorix/print-data
@@ -255,7 +231,7 @@ Examples:
 
 
 
-
+Untested in sophomorix4:
   -s / --school
 
   -a  / --all
@@ -289,68 +265,87 @@ system("mkdir -p $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}");
 
 
 # ===========================================================================
-# Output-Dateinamen ermitteln
+# Calculate output file basename
 # ===========================================================================
-# wichtig
 my $output_file_basename="";
 
-my $klasse_filename_part="";
+my $class_filename_part="";
 if ($alle==1){
-   $klasse_filename_part="all";
+   $class_filename_part="all";
 } elsif ($lehrer==1){
-   $klasse_filename_part=${DevelConf::teacher};
-}elsif ($gruppe ne ""){
-   $klasse_filename_part="$gruppe";
+   $class_filename_part=${DevelConf::teacher};
+}elsif ($class ne ""){
+   $class_filename_part="$class";
 }elsif ($project ne ""){
-   $klasse_filename_part="$project";
+   $class_filename_part="$project";
 }elsif ($classlist ne ""){
-   $klasse_filename_part="$classlist-classlist";
+   $class_filename_part="$classlist-classlist";
 }elsif ($user ne ""){
-   $klasse_filename_part="user";
+   $class_filename_part="user";
 } else {
-   $klasse_filename_part="add";
+   $class_filename_part="add";
 }
-
 
 my $caller_filename_part="-unknown";
+# --caller
 if ($caller ne ""){
-   $caller_filename_part="-"."$caller";
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD)=
+        &AD_get_user({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$caller,
+                    });
+    if ($existing_AD eq "FALSE"){
+        print "\nERROR: User $caller does not exist\n\n";
+        exit;
+    }
+    $caller_filename_part="-"."$caller";
 }
+
+# --caller-copy
 if ($caller_copy ne ""){
-   $caller_filename_part="-"."$caller_copy";
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD)=
+        &AD_get_user({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$caller_copy,
+                    });
+    if ($existing_AD eq "FALSE"){
+        print "\nERROR: User $caller_copy does not exist\n\n";
+        exit;
+    }
+    $caller_filename_part="-"."$caller_copy";
 }
 
 
-$output_file_basename="$klasse_filename_part"."$caller_filename_part";
+$output_file_basename="$class_filename_part"."$caller_filename_part";
 
 if($Conf::log_level>=3){
-   print "Basisname der Druckdateien ist: $output_file_basename \n";
+   print "Basename of output files: $output_file_basename \n";
 }
 
 
 # ===========================================================================
-# user_db in Hash einlesen
-# KEY = identifier wie im ersten Teil von sophomorix.add
-# VALUE = Zeile in user_db
+# Read data from AD
 # ===========================================================================
-
-# new ##################################
-
-
-
 my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       users=>"TRUE",
                                       sophomorix_config=>\%sophomorix_config,
              });
-print Dumper($ref_AD_print_data);
+#print Dumper($ref_AD_print_data);
+
 
 # decide which list to print
 my $ref_printlist;
-if ($gruppe ne ""){
-    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$gruppe};
-    &print_class($gruppe,$output_file_basename,$ref_printlist);
+if ($class ne ""){
+    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
+    &print_class($class,$output_file_basename,$ref_printlist);
 }
 
 
@@ -453,7 +448,7 @@ if($Conf::log_level>=3){
 
 if ($user eq "" and 
     $classlist eq "" and 
-    $gruppe eq "" and 
+    $class eq "" and 
     $project eq "" && 
     $alle==0 && 
     $lehrer==0) {
@@ -593,14 +588,14 @@ if ($user eq "" and
        }
     }    
 
-} elsif ($gruppe ne "") {
+} elsif ($class ne "") {
    # Argument muss "klasse" sein -> filtern
    my $argument;
-   if ($gruppe eq ${DevelConf::teacher}){
+   if ($class eq ${DevelConf::teacher}){
         print "Mit der Option --class können keine Lehrer angezeigt werden!\n\n";
         exit;
       } else {
-        $argument="$gruppe";
+        $argument="$class";
       }
 
    my $klasse="";
@@ -733,13 +728,13 @@ print LATEX ('%% This preamble was created from sophomorix-print
 
 print LATEX ('\rhead{\bf \large Seite \thepage}');
 
-if ($gruppe ne "") {
+if ($class ne "") {
    # Klassenangabe gemacht  
   if ($classlist ne ""){
-      print MEDIAWIKI "===$gruppe===\n"; 
+      print MEDIAWIKI "===$class===\n"; 
   }
   print LATEX ('
-      \chead{\LARGE \bf ',"$gruppe",'}
+      \chead{\LARGE \bf ',"$class",'}
    ');
 } elsif ($project ne "") {
    # Projektangabe gemacht  
@@ -1437,7 +1432,7 @@ while ($anzahl_karten_pro_seite < $entries_per_page){
 
 # ===========================================================================
 # Dokument beenden und Inhaltsverzeichnis schreiben
-if ($gruppe ne "" or $project ne "") {
+if ($class ne "" or $project ne "") {
    # Klassen-/Projektangabe gemacht  
    print LATEX ('
       \end{document}
@@ -1491,7 +1486,7 @@ close(WEBCSV);
 close(WEBUNIXCSV);
 
 # ===========================================================================
-# LATEXEN des Dokuments
+# LATEX des Dokuments
 # ===========================================================================
 
 
@@ -1501,15 +1496,15 @@ if ($info==1){
 }
 
 
-# einfacher
-if ($command eq "pdflatex"){
-    &pdflatexen;
-} elsif ($command eq "latex"){
-    # hoehere Qualitaet
-    &latexen;
-} else {
-    print "\nI do not know how to process the file ($command ?)\n\n";
-}
+# # einfacher
+# if ($command eq "pdflatex"){
+#     &pdflatex;
+# } elsif ($command eq "latex"){
+#     # hoehere Qualitaet
+#     &latex;
+# } else {
+#     print "\nI do not know how to process the file ($command ?)\n\n";
+# }
 
 
 # Dateien ins home kopieren
@@ -1554,7 +1549,7 @@ if ($caller_copy ne ""){
 
 
 
-sub pdflatexen {
+sub pdflatex {
     &print_title("pdflatex is creating $output_file_basename.pdf");
     my $pdflatex_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
 	                 "$sophomorix_config{'INI'}{'LATEX'}{'BIN_PDFLATEX'} ".$output_file_basename.".tex ".$dev_null;
@@ -1574,7 +1569,7 @@ sub pdflatexen {
 
 
 
-sub latexen {
+sub latex {
     &print_title("latex is creating $output_file_basename.dvi");
     # PS aus $output_file_basename.tex erzeugen
     my $latex_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
@@ -1626,10 +1621,10 @@ sub print_class {
 
 sub build_results {
     if ($command eq "pdflatex"){
-        &pdflatexen;
+        &pdflatex;
     } elsif ($command eq "latex"){
         # hoehere Qualitaet
-        &latexen;
+        &latex;
     } else {
         print "\nI do not know how to process the file ($command ?)\n\n";
     }
@@ -1675,7 +1670,7 @@ sub create_latex_from_template {
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     my $template_abs=$ref_sophomorix_config->{'INI'}{'LATEX'}{'TEMPLATES'}."/".$latex_template;
-    &print_title("Using Template $template_abs");
+    &print_title("Using template $template_abs");
 
     my $datablock=&datablock_from_list( @{ $ref_printlist } );
 
