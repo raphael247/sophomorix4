@@ -57,6 +57,9 @@ ENCODING=$(DESTDIR)/usr/share/sophomorix/encoding-data
 # Language
 LANGUAGE=$(DESTDIR)/usr/share/sophomorix/lang
 
+# Latex
+LATEX=$(DESTDIR)/usr/share/sophomorix/latex
+
 # Filter
 FILTER=$(DESTDIR)/usr/share/sophomorix/filter
 
@@ -223,6 +226,10 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/lang/errors.*[a-z] $(LANGUAGE)
 #	@install -d -m755 -oroot -groot $(LANGUAGE)/latex-templates
 #	@install -oroot -groot --mode=0644 sophomorix-base/latex-templates/*.tex $(LANGUAGE)/latex-templates
+# latex stuff
+	@install -d -m755 -oroot -groot $(LATEX)
+	@install -d -m755 -oroot -groot $(LATEX)/templates
+	@install -oroot -groot --mode=0644 sophomorix-samba/latex/templates/*[a-z]-template.tex $(LATEX)/templates
 # Encoding-data
 	@install -d -m755 -oroot -groot $(ENCODING)
 	@install -oroot -groot --mode=0644 sophomorix-samba/encoding-data/*.txt $(ENCODING)
