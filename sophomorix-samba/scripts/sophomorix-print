@@ -1556,12 +1556,20 @@ if ($caller_copy ne ""){
 
 sub pdflatexen {
     &print_title("pdflatex is creating $output_file_basename.pdf");
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; pdflatex $output_file_basename.tex $dev_null");
+    my $pdflatex_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
+	                 "$sophomorix_config{'INI'}{'LATEX'}{'BIN_PDFLATEX'} ".$output_file_basename.".tex ".$dev_null;
+    print "  * $pdflatex_command\n";
+    system($pdflatex_command);
+    system($pdflatex_command); # 2x, to create table of contents correctly
 
+    # clean up
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
+    # make files ro for root
+    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
+
 }
 
 
@@ -1569,23 +1577,31 @@ sub pdflatexen {
 sub latexen {
     &print_title("latex is creating $output_file_basename.dvi");
     # PS aus $output_file_basename.tex erzeugen
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_LATEX'} $output_file_basename.tex $dev_null");
-    # 2x, wegen Inhaltsverzeichnis
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_LATEX'} $output_file_basename.tex $dev_null");
-    &print_title("dvips is creating $output_file_basename.ps");
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_DVIPS'} $output_file_basename.dvi $dev_null");
-    &print_title("ps2pdf is creating $output_file_basename.pdf");
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_PS2PDF'} $output_file_basename.ps $dev_null");
+    my $latex_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
+	              "$sophomorix_config{'INI'}{'LATEX'}{'BIN_LATEX'} ".$output_file_basename.".tex ".$dev_null;
+    print "  * $latex_command\n";
+    system($latex_command);
+    system($latex_command); # 2x, to create table of contents correctly
 
+    &print_title("dvips is creating $output_file_basename.ps");
+    my $dvips_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
+	              "$sophomorix_config{'INI'}{'LATEX'}{'BIN_DVIPS'} ".$output_file_basename.".dvi ".$dev_null;
+    print "  * $dvips_command\n";
+    system($dvips_command);
+
+    &print_title("ps2pdf is creating $output_file_basename.pdf");
+    my $ps2pdf_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
+	              "$sophomorix_config{'INI'}{'LATEX'}{'BIN_PS2PDF'} ".$output_file_basename.".ps ".$dev_null;
+    print "  * $ps2pdf_command\n";
+    system($ps2pdf_command);
+
+    # clean up
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
-
-    # Dateien für user unlesbar machen
+    # make files ro for root
     system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
-    # Zugriff von admin von windows aus erlauben
-    system("chown admin.admin $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
 }
 
 
@@ -1635,7 +1651,7 @@ sub datablock_from_list {
                                            "{"."}".
                                            "{Klasse: ".$data[5]."}".
                                            "{Login: \\texttt{".$data[2]."}}".
-                                           "{Erst-Passwort: \\texttt{".$data[3]."}}\n";
+                                           "{Passwort: \\texttt{".$data[3]."}}\n";
     }
     until ($dataline_count==36){
         $dataline_count++;
