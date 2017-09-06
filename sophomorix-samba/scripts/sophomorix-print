@@ -347,6 +347,24 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
 #print Dumper($ref_AD_print_data);
 
 
+
+# --info
+if ($info==1){
+    my @datelist=();
+    foreach my $date (keys %{$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}}) {
+        print "$date\n";
+        push @datelist, $date;
+    }
+    # sort the dates in reverse order
+    @datelist=sort{$b cmp $a} @datelist; # for strings
+    my $back_in_time_count=0;
+    foreach my $date (@datelist){
+        print "  --back-in-time $back_in_time_count --> $date\n";
+        $back_in_time_count++;
+    }
+}
+
+
 # decide which list to print
 my $ref_printlist;
 if ($class ne ""){
@@ -1673,7 +1691,7 @@ sub datablock_from_list {
     my $datablock="";
     my $dataline_count=0;
     foreach my $item (@list){
-        print "Add to datablock: $item\n";
+        #print "Add to datablock: $item\n";
         $dataline_count++;
         my @data=split(/;/,$item);
         $datablock=$datablock."\\databox{".$data[0].", ".
