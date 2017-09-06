@@ -250,6 +250,12 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
 
+Examples:
+  sophomorix-print --class <prefix>-<class> --caller bz
+
+
+
+
   -s / --school
 
   -a  / --all
@@ -1563,13 +1569,13 @@ sub pdflatexen {
 sub latexen {
     &print_title("latex is creating $output_file_basename.dvi");
     # PS aus $output_file_basename.tex erzeugen
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; latex $output_file_basename.tex $dev_null");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_LATEX'} $output_file_basename.tex $dev_null");
     # 2x, wegen Inhaltsverzeichnis
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; latex $output_file_basename.tex $dev_null");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_LATEX'} $output_file_basename.tex $dev_null");
     &print_title("dvips is creating $output_file_basename.ps");
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; dvips $output_file_basename.dvi $dev_null");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_DVIPS'} $output_file_basename.dvi $dev_null");
     &print_title("ps2pdf is creating $output_file_basename.pdf");
-    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ps2pdf $output_file_basename.ps $dev_null");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; $sophomorix_config{'INI'}{'LATEX'}{'BIN_PS2PDF'} $output_file_basename.ps $dev_null");
 
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
@@ -1597,7 +1603,20 @@ sub print_class {
                                  sophomorix_result=>\%sophomorix_result,
                     });
     &close_output_files($output_file_basename);
-    
+    &build_results; 
+}
+
+
+
+sub build_results {
+    if ($command eq "pdflatex"){
+        &pdflatexen;
+    } elsif ($command eq "latex"){
+        # hoehere Qualitaet
+        &latexen;
+    } else {
+        print "\nI do not know how to process the file ($command ?)\n\n";
+    }
 }
 
 
