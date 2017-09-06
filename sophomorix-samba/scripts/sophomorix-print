@@ -285,7 +285,7 @@ system("mkdir -p $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}");
 # ===========================================================================
 # Output-Dateinamen ermitteln
 # ===========================================================================
-
+# wichtig
 my $output_file_basename="";
 
 my $klasse_filename_part="";
@@ -306,7 +306,7 @@ if ($alle==1){
 }
 
 
-my $caller_filename_part="";
+my $caller_filename_part="-unknown";
 if ($caller ne ""){
    $caller_filename_part="-"."$caller";
 }
@@ -329,6 +329,9 @@ if($Conf::log_level>=3){
 # ===========================================================================
 
 # new ##################################
+
+
+
 my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
@@ -338,8 +341,12 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
 print Dumper($ref_AD_print_data);
 
 # decide which list to print
+my $ref_printlist;
+if ($gruppe ne ""){
+    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$gruppe};
+    &print_class($output_file_basename,$ref_printlist);
+}
 
-my $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixSchoolname'}{'bsz'};
 
 
 #foreach my $item (@{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname'}{'bsz'} }){
@@ -350,7 +357,13 @@ foreach my $item ( @{ $ref_printlist } ){
 }
 
 
+
+
+
 exit;
+############################################################
+############################################################
+############################################################
 
 ################################## old #######################################
 # @print_data containes the lines of the database
@@ -1538,36 +1551,84 @@ if ($caller_copy ne ""){
 
 sub pdflatexen {
     &print_title("pdflatex is creating $output_file_basename.pdf");
-   system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; pdflatex $output_file_basename.tex $dev_null");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; pdflatex $output_file_basename.tex $dev_null");
 
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
-
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
 }
+
+
 
 sub latexen {
-   &print_title("latex is creating $output_file_basename.dvi");
-   # PS aus $output_file_basename.tex erzeugen
-   system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; latex $output_file_basename.tex $dev_null");
-   # 2x, wegen Inhaltsverzeichnis
-   system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; latex $output_file_basename.tex $dev_null");
-   &print_title("dvips is creating $output_file_basename.ps");
-   system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; dvips $output_file_basename.dvi $dev_null");
-   &print_title("ps2pdf is creating $output_file_basename.pdf");
-   system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ps2pdf $output_file_basename.ps $dev_null");
+    &print_title("latex is creating $output_file_basename.dvi");
+    # PS aus $output_file_basename.tex erzeugen
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; latex $output_file_basename.tex $dev_null");
+    # 2x, wegen Inhaltsverzeichnis
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; latex $output_file_basename.tex $dev_null");
+    &print_title("dvips is creating $output_file_basename.ps");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; dvips $output_file_basename.dvi $dev_null");
+    &print_title("ps2pdf is creating $output_file_basename.pdf");
+    system("cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ps2pdf $output_file_basename.ps $dev_null");
 
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
-   system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
 
-   # Dateien für user unlesbar machen
-   system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
-   # Zugriff von admin von windows aus erlauben
-   system("chown admin.admin $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
+    # Dateien für user unlesbar machen
+    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
+    # Zugriff von admin von windows aus erlauben
+    system("chown admin.admin $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
+}
+
+
+sub print_class {
+    my ($output_file_basename,$ref_printlist)=@_;
+    &open_output_files($output_file_basename);
+    &create_latex_from_template({latex_template=>"classlist-template.tex",
+                                 ref_printlist=>$ref_printlist,
+                                 ADMINCLASS=>"---",
+                                 SCHOOLNAME=>"---",
+                                 TEACHERMEMBERS=>"---",
+                                 FILENAME=>"---",
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                    });
+    &close_output_files($output_file_basename);
+    
 }
 
 
 
+sub create_latex_from_template {
+    my ($arg_ref) = @_;
+    my $latex_template = $arg_ref->{latex_template};
+    my $ref_printlist = $arg_ref->{ref_printlist};
+    my $adminclass = $arg_ref->{ADMINCLASS};
+    my $schoolname = $arg_ref->{SCHOOLNAME};
+    my $teachermembers = $arg_ref->{TEACHERMEMBERS};
+    my $filename = $arg_ref->{FILENAME};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    my $template_abs=$ref_sophomorix_config->{'INI'}{'LATEX'}{'TEMPLATES'}."/".$latex_template;
+    &print_title("Using Template $template_abs");
+    open(TEMPLATE,"<$template_abs") || die "Fehler: $!";
+    while (<TEMPLATE>){
+	print LATEX $_;
+    }
+    close(TEMPLATE);
+}
+
+sub open_output_files {
+    open(LATEX,
+         ">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Fehler: $!";
+}
+
+
+
+sub close_output_files {
+    close(LATEX);
+}
