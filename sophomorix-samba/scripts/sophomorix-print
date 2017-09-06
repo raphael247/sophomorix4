@@ -374,10 +374,11 @@ if ($caller_copy ne ""){
                           $smb_admin_pass."'".
                           " //$root_dns/$school_AD ".
                           " -c 'md $rel_path_home; cd $rel_path_home; lcd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'};".
-                          " prompt; mput $output_file_basename.*; exit;'";
+                          " prompt; mput $output_file_basename*; exit;'";
     print "$smbclient_command\n";
     system($smbclient_command);
 }
+
 
 
 &AD_unbind_admin($ldap);
@@ -1514,10 +1515,10 @@ close(WEBUNIXCSV);
 # ===========================================================================
 
 
-if ($info==1){
-    &log_script_end(@arguments);
-    #exit;
-}
+#if ($info==1){
+#    &log_script_end(@arguments);
+#    #exit;
+#}
 
 
 # # einfacher
@@ -1530,40 +1531,40 @@ if ($info==1){
 #     print "\nI do not know how to process the file ($command ?)\n\n";
 # }
 
+# # Dateien ins home kopieren
+# if ($caller_copy ne ""){
+#     print "#### Copying $output_file_basename into home of user $caller_copy:\n";
 
-# Dateien ins home kopieren
-if ($caller_copy ne ""){
-    print "#### Copying $output_file_basename into home of user $caller_copy:\n";
+#     # which files should be copied to $HOME of --caller-copy user
+#     my @extensions=(".ps",".pdf");
 
-    # which files should be copied to $HOME of --caller-copy user
-    my @extensions=(".ps",".pdf");
+#     foreach my $extension (@extensions){
+#         my  $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".$output_file_basename.$extension;
+#         if (-f $file){
+#             print "  ## $file\n";
+#             # check if user is teacher
+#             my ($homedir,$type,$gecos)=&fetchdata_from_account($caller_copy);
+#             if ($type ne "teacher"){
+#             &log_script_exit("ERROR: $caller_copy must be a teacher (--caller-copy)",
+#                              1,1,0,@arguments);
+#             }
 
-    foreach my $extension (@extensions){
-        my  $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".$output_file_basename.$extension;
-        if (-f $file){
-            print "  ## $file\n";
-            # check if user is teacher
-            my ($homedir,$type,$gecos)=&fetchdata_from_account($caller_copy);
-            if ($type ne "teacher"){
-            &log_script_exit("ERROR: $caller_copy must be a teacher (--caller-copy)",
-                             1,1,0,@arguments);
-            }
+#             # copy it
+#             my $target_dir=$homedir."/sophomorix-print-data";
+#             if (not -d $target_dir){
+#                 system("mkdir $target_dir");
+#             }
+#             system("cp $file $target_dir");
+#                 system("chown -R ${caller_copy}: $target_dir");
+#                 system("chmod 0700 $target_dir");
+#                 system("chmod 0600 $target_dir/*");
+#         }
+#     }
+# }
+#
+#
+#&log_script_end(@arguments);
 
-            # copy it
-            my $target_dir=$homedir."/sophomorix-print-data";
-            if (not -d $target_dir){
-                system("mkdir $target_dir");
-            }
-            system("cp $file $target_dir");
-                system("chown -R ${caller_copy}: $target_dir");
-                system("chmod 0700 $target_dir");
-                system("chmod 0600 $target_dir/*");
-        }
-    }
-}
-
-
-&log_script_end(@arguments);
 ######################################### old end ############################################################
 
 
@@ -1621,8 +1622,6 @@ sub latex {
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
-    # make files ro for root
-    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
 }
 
 
@@ -1639,8 +1638,10 @@ sub print_class {
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
                     });
+    &create_csv_files($ref_printlist);
     &close_output_files($output_file_basename);
     &build_results; 
+    &make_output_files_ro;
 }
 
 
@@ -1654,6 +1655,14 @@ sub build_results {
     } else {
         print "\nI do not know how to process the file ($command ?)\n\n";
     }
+}
+
+
+
+sub make_output_files_ro {
+    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.* $dev_null");
+    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-* $dev_null");
+    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_* $dev_null");
 }
 
 
@@ -1680,6 +1689,21 @@ sub datablock_from_list {
     }
     #print $datablock;
     return $datablock;
+}
+
+
+
+sub create_csv_files {
+    @{ $ref_printlist } = sort @{ $ref_printlist };
+    foreach my $item ( @{ $ref_printlist } ){
+        my @data=split(/;/,$item);
+        my $csv=$data[1]." ".$data[0].";".$data[5].";".$data[2].";".$data[3].";";
+        print CSV $csv."\l\r";
+        print UNIXCSV $csv."\n";
+        my $webuntis=$data[5].";".$data[0].";".$data[1].";".$data[2].";".$data[10].";";
+        print WEBUNIXCSV $webuntis."\n";
+        print WEBCSV $webuntis."\l\r";
+    }
 }
 
 
@@ -1727,10 +1751,22 @@ sub create_latex_from_template {
 
 sub open_output_files {
     open(LATEX,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Fehler: $!";
+    # CSV Windows
+    open(CSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.csv") || die "Fehler: $!";
+    # CSV Linux
+    open(UNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-unix.csv") || die "Fehler: $!";
+    # Webuntis CSV Windows
+    open(WEBCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis.csv") || die "Fehler: $!";
+    # Webuntis CSV Linux
+    open(WEBUNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis-unix.csv") || die "Fehler: $!";
 }
 
 
 
 sub close_output_files {
     close(LATEX);
+    close(CSV);
+    close(UNIXCSV);
+    close(WEBCSV);
+    close(WEBUNIXCSV);
 }

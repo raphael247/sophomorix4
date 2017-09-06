@@ -4054,6 +4054,7 @@ sub AD_get_print_data {
                                  'sophomorixRole',
                                  'sophomorixCreationDate',
                                  'sophomorixFirstPassword',
+                                 'uidNumber',
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
@@ -4069,7 +4070,8 @@ sub AD_get_print_data {
                      $entry->get_value('sophomorixFirstnameASCII').";".
                      $entry->get_value('sophomorixSurnameASCII').";".
                      $entry->get_value('sophomorixRole').";".
-                     $entry->get_value('sophomorixCreationDate').";";
+                     $entry->get_value('sophomorixCreationDate').";".
+                     $entry->get_value('uidNumber').";";
             # list creation
             push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
                                   {$entry->get_value('sophomorixSchoolname')}
