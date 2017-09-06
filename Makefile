@@ -58,7 +58,7 @@ ENCODING=$(DESTDIR)/usr/share/sophomorix/encoding-data
 LANGUAGE=$(DESTDIR)/usr/share/sophomorix/lang
 
 # Latex
-LATEX=$(DESTDIR)/usr/share/sophomorix/latex
+LATEX=$(DESTDIR)/usr/share/sophomorix/lang/latex
 
 # Filter
 FILTER=$(DESTDIR)/usr/share/sophomorix/filter
