@@ -62,6 +62,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_user
                                  AD_get_print_data
                                  AD_dns_get
+                                 AD_get_passwd
                                  AD_object_search
                                  get_forbidden_logins
                                     );
@@ -207,9 +208,8 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-check");
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
-my @filelist=&filelist_fetch({filetype=>"users",
-                              sophomorix_config=>\%sophomorix_config,
-                            });
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 
 # --help
@@ -287,16 +287,22 @@ if ($alle==1){
 }
 
 my $caller_filename_part="-unknown";
+# vars filled by --caller or --callercopy
+my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+    $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+    $school_AD,$status_AD,$firstpassword_AD);
+
+
 # --caller
 if ($caller ne ""){
-    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-        $school_AD,$status_AD,$firstpassword_AD)=
-        &AD_get_user({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      user=>$caller,
-                    });
+    ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+     $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+     $school_AD,$status_AD,$firstpassword_AD)=
+     &AD_get_user({ldap=>$ldap,
+                   root_dse=>$root_dse,
+                   root_dns=>$root_dns,
+                   user=>$caller,
+                 });
     if ($existing_AD eq "FALSE"){
         print "\nERROR: User $caller does not exist\n\n";
         exit;
@@ -306,14 +312,14 @@ if ($caller ne ""){
 
 # --caller-copy
 if ($caller_copy ne ""){
-    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-        $school_AD,$status_AD,$firstpassword_AD)=
-        &AD_get_user({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      user=>$caller_copy,
-                    });
+    ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+     $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+     $school_AD,$status_AD,$firstpassword_AD)=
+     &AD_get_user({ldap=>$ldap,
+                   root_dse=>$root_dse,
+                   root_dns=>$root_dns,
+                   user=>$caller_copy,
+                 });
     if ($existing_AD eq "FALSE"){
         print "\nERROR: User $caller_copy does not exist\n\n";
         exit;
@@ -349,7 +355,7 @@ if ($class ne ""){
 }
 
 
-
+ 
 
 # Walk through printlist
 #foreach my $item ( @{ $ref_printlist } ){
@@ -357,7 +363,25 @@ if ($class ne ""){
 #}
 
 
+if ($caller_copy ne ""){
+    &print_title("Copying files to user $caller_copy");
+    my $smb_dir_home=$home_directory_AD;
+    $smb_dir_home=~s/\\/\//g;
+    my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home); # to home
+    $rel_path_home=$rel_path_home."/".$sophomorix_config{'INI'}{'LATEX'}{'PRINT_HOME_SUBDIR'};
+    my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                          " -U ".$DevelConf::sophomorix_file_admin."%'".
+                          $smb_admin_pass."'".
+                          " //$root_dns/$school_AD ".
+                          " -c 'md $rel_path_home; cd $rel_path_home; lcd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'};".
+                          " prompt; mput $output_file_basename.*; exit;'";
+    print "$smbclient_command\n";
+    system($smbclient_command);
+}
 
+
+&AD_unbind_admin($ldap);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
 exit;
@@ -1539,8 +1563,9 @@ if ($caller_copy ne ""){
 }
 
 
-
 &log_script_end(@arguments);
+######################################### old end ############################################################
+
 
 
 # ===========================================================================
@@ -1595,6 +1620,7 @@ sub latex {
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
+    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
     # make files ro for root
     system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
 }
