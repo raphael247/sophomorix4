@@ -37,19 +37,33 @@ soll da noch der participant hinzu?
 ------------------------------------------------------------
 
 sophomorix-print:
-Klasse: usw im printout mit Variablen ersetzen
 können Daten, die mit --caller-copy kopiert wurden vom user gelesen werden?
 
-back in time aktivieren
---> zusatzoption Schule
-nur von einer Schule anzeigen lassen
---> schon in der Suche auf Schule einschränken
-
-OK: postscript in Back in time 
 
 richtig testbar nach Migration
 
 one-per-page template (verschiedene Sprachen)
+datalist-DE-1-template.tex
+
+optionen 
+--one-per-page/--1-per-page/--1pp
+--36-per-page/--36pp 
+---> weitere später
+--32-per-page/--36pp 
+ohne die optionen einen automatismus (Konsole):
+--> --user user1,user2   -> 1
+--class                  -> 32 falls möglich sonst 36
+
+Konfigurierbar pro Schule, welche vorlagen dann genommen werden in xxx.school.conf
+PFAD vorgeben: /etc/linuxmster/sophomorix/school/hhg/latex/template
+[LATEX]
+	TEMPLATE36=hhg-DE-36-template.tex
+	TEMPLATE01=hhg-DE-1-template.tex
+ansonsten werden die mitgelieferten benutzt
+
+Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen
+
+code cleanup
 
 
 
