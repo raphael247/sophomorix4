@@ -31,6 +31,7 @@ $Data::Dumper::Terse = 1;
             remove_from_list
             time_stamp_AD
             time_stamp_file
+            ymdhms_to_date
             ymdhms_to_epoch
             unlock_sophomorix
             lock_sophomorix
@@ -310,6 +311,16 @@ sub time_stamp_AD {
 
 
 
+sub ymdhms_to_date {
+    my ($string)=@_;
+    my ($ymdhms,$timezone)=split(/\./,$string);
+    my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$ymdhms;
+    my $date=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
+    return $date;
+}
+
+
+
 # use this timestamp for filenames
 sub time_stamp_file {
    my $zeit = `date +%Y-%m-%d_%H-%M-%S`;
@@ -323,7 +334,7 @@ sub ymdhms_to_epoch {
     my ($string)=@_;
     my ($ymdhms,$timezone)=split(/\./,$string);
     #print "YMDHMS: $ymdhms\n";
-    my($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$ymdhms;
+    my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$ymdhms;
     #print "$year $month $day $hour $minute $second\n";
     my $epoch=timelocal($second, $minute, $hour, $day , ($month-1), $year);
     #print "epoch of $string is $epoch\n";

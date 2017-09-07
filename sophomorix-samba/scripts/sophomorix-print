@@ -27,6 +27,7 @@ use Sophomorix::SophomorixBase qw(
                                  time_stamp_AD
                                  time_stamp_file
                                  ymdhms_to_epoch
+                                 ymdhms_to_date
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -344,7 +345,7 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       users=>"TRUE",
                                       sophomorix_config=>\%sophomorix_config,
              });
-#print Dumper($ref_AD_print_data);
+print Dumper($ref_AD_print_data);
 
 
 
@@ -352,14 +353,18 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
 if ($info==1){
     my @datelist=();
     foreach my $date (keys %{$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}}) {
-        print "$date\n";
         push @datelist, $date;
     }
     # sort the dates in reverse order
     @datelist=sort{$b cmp $a} @datelist; # for strings
     my $back_in_time_count=0;
-    foreach my $date (@datelist){
-        print "  --back-in-time $back_in_time_count --> $date\n";
+    print "+---------------------+---------------------+-------+-------------------+\n";
+    print "| Option to use       | Date                | users | AD-Date           |\n";
+    print "+---------------------+---------------------+-------+-------------------+\n";
+    foreach my $ymdhms (@datelist){
+        my $date=&ymdhms_to_date($ymdhms);
+        my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}-1;
+        printf "  --back-in-time %-6s $date %7s   $ymdhms\n",$back_in_time_count, $count;
         $back_in_time_count++;
     }
 }
