@@ -378,6 +378,21 @@ my $ref_printlist;
 if ($class ne ""){
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
     &print_class($class,$output_file_basename,$ref_printlist);
+} elsif ($user ne ""){
+    # create the print data structure from useroption
+    my %printdata=();
+    my @users=split(/,/,$user);
+    foreach my $username (@users){
+        if (exists $ref_AD_print_data->{'LOOKUP_BY_sAMAccountName'}{$username}){
+            print "   * $username selected\n";
+            push @{ $printdata{'LIST'} }, $ref_AD_print_data->{'LOOKUP_BY_sAMAccountName'}{$username};
+        } else {
+            print "\nERROR: User $username has no printout data in school $school\n\n";
+            exit;
+        }
+    }
+    $ref_printlist=$printdata{'LIST'};
+    &print_class("Users",$output_file_basename,$ref_printlist);
 } else {
     # go for back in time stuff, if nothing else ist given
     my @datelist=&sorted_datelist();
@@ -1689,8 +1704,6 @@ sub print_class {
     &build_results; 
     &make_output_files_ro;
 }
-
-
 
 sub build_results {
     if ($command eq "pdflatex"){

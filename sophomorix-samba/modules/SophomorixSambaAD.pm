@@ -4035,11 +4035,6 @@ sub AD_get_print_data {
 
     if ($users eq "TRUE"){
         # sophomorix students,teachers from ldap
-#        my $filter="(&(objectClass=user)(|(sophomorixRole=".
-#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
-#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
-#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
-#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
         my $filter="(&(objectClass=user)(sophomorixSchoolname=".
            $school.")(|(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
@@ -4087,7 +4082,10 @@ sub AD_get_print_data {
             push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname'}
                                   {$entry->get_value('sophomorixSchoolname')} }, 
                                   $line; 
-            push @{ $AD_print_data{'LIST_BY_sophomorixCreationDate'}{$entry->get_value('sophomorixCreationDate')} }, $line;
+            push @{ $AD_print_data{'LIST_BY_sophomorixCreationDate'}{$entry->get_value('sophomorixCreationDate')} }, 
+                                  $line;
+            # lookup creation
+            $AD_print_data{'LOOKUP_BY_sAMAccountName'}{$entry->get_value('sAMAccountName')}=$line;
 
         }
         # sorting some lists
