@@ -4057,7 +4057,7 @@ sub AD_get_print_data {
                                  'uidNumber',
                                 ]);
         my $max_user = $mesg->count; 
-        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found for password printout");
         $AD_print_data{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);

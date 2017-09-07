@@ -345,28 +345,24 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       users=>"TRUE",
                                       sophomorix_config=>\%sophomorix_config,
              });
-print Dumper($ref_AD_print_data);
+#print Dumper($ref_AD_print_data);
 
 
 
 # --info
 if ($info==1){
-    my @datelist=();
-    foreach my $date (keys %{$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}}) {
-        push @datelist, $date;
-    }
-    # sort the dates in reverse order
-    @datelist=sort{$b cmp $a} @datelist; # for strings
+    my @datelist=&sorted_datelist();
     my $back_in_time_count=0;
     print "+---------------------+---------------------+-------+-------------------+\n";
     print "| Option to use       | Date                | users | AD-Date           |\n";
     print "+---------------------+---------------------+-------+-------------------+\n";
     foreach my $ymdhms (@datelist){
         my $date=&ymdhms_to_date($ymdhms);
-        my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}-1;
+        my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}+1;
         printf "  --back-in-time %-6s $date %7s   $ymdhms\n",$back_in_time_count, $count;
         $back_in_time_count++;
     }
+    exit;
 }
 
 
@@ -375,6 +371,13 @@ my $ref_printlist;
 if ($class ne ""){
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
     &print_class($class,$output_file_basename,$ref_printlist);
+} else {
+    # go for back in time stuff, if nothing else ist given
+    my @datelist=&sorted_datelist();
+    my $date=&ymdhms_to_date($datelist[$back_in_time]);
+    print " Going Back in time $back_in_time steps to $date ($datelist[$back_in_time])\n";
+    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$datelist[$back_in_time]};
+    &print_class($date,$output_file_basename,$ref_printlist);
 }
 
 
@@ -1645,6 +1648,19 @@ sub latex {
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
     system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
+}
+
+
+
+sub sorted_datelist {
+    my @datelist=();
+    foreach my $date (keys %{$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}}) {
+	#print "$date\n";
+        push @datelist, $date;
+    }
+    # sort the dates in reverse order
+    @datelist=sort{$b cmp $a} @datelist; # for strings
+    return @datelist;  
 }
 
 
