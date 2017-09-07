@@ -4028,18 +4028,22 @@ sub AD_get_print_data {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
+    my $school = $arg_ref->{school};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-
     my $users = $arg_ref->{users};
     if (not defined $users){$users="FALSE"};
 
     if ($users eq "TRUE"){
         # sophomorix students,teachers from ldap
-        my $filter="(&(objectClass=user)(|(sophomorixRole=".
+#        my $filter="(&(objectClass=user)(|(sophomorixRole=".
+#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
+#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
+#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
+#           $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
+        my $filter="(&(objectClass=user)(sophomorixSchoolname=".
+           $school.")(|(sophomorixRole=".
            $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',

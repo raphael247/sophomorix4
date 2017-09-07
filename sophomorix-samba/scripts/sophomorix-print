@@ -180,7 +180,7 @@ my $school="";
 # Parsen der Optionen
 my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
-           "school|s" => \$school,
+           "school|s=s" => \$school,
            "all|a" => \$alle,
            "class|c=s" => \$class,
            "project|p=s" => \$project,
@@ -219,7 +219,7 @@ if ($help==1) {
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
    print('
-sophomorix-print prints user account data of recently added users to 
+sophomorix-print prints user account data of ONE school to 
   /var/lib/sophomorix/print-data
 
 Options:
@@ -227,27 +227,33 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
 
-Examples:
-  sophomorix-print --class <prefix>-<class> --caller bz
+sophomorix-print looks only on one school for users (without option the default-school)
+For other schools use the following option:
+  -s <schoolname> / --school <schoolname>
+
+The user given by option --caller/--caller-copy must exist!
+
+Choose the way of pdf generation (Default: latex->dvips->ps2pdf)
+  --command latex  (This is the default: latex->dvips->ps2pdf)
+  --command pdflatex
+
+Examples to print a class:
+  sophomorix-print --class <prefix>-<class> --caller bz [--school <schoolname>]
+  sophomorix-print --class <prefix>-<class> --caller-copy bz [--school <schoolname>]
+
+Examples to print timely additions:
+  sophomorix-print -i  (shows values and dates for <num>)
+  sophomorix-print --back-in-time <num> --caller bz [--school <schoolname>]
+  sophomorix-print --back-in-time <num> --caller-copy bz [--school <schoolname>]
 
 
-
-Untested in sophomorix4:
-  -s / --school
-
+Deprecated in sophomorix4:
   -a  / --all
   -u username / --user username
   -t / --teacher
   -c class / --class class
   -p project / --project project
-  --back-in-time <num> (default is --back-in-time 0)
-  --classlist class
   --one-per-page
-  --caller / --postfix  name
-  --caller-copy loginname
-  --command pdflatex  (standard is latex)
-  -i / --info         (print to standard out)
-  --skiplock
 
 Please see the sophomorix-print(8) man pages for full documentation
 ');
@@ -343,6 +349,7 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       users=>"TRUE",
+                                      school=>$school,
                                       sophomorix_config=>\%sophomorix_config,
              });
 #print Dumper($ref_AD_print_data);
