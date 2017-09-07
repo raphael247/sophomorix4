@@ -1678,7 +1678,7 @@ sub print_class {
     &create_latex_from_template({latex_template=>"classlist-template.tex",
                                  ref_printlist=>$ref_printlist,
                                  ADMINCLASS=>$class,
-                                 SCHOOLNAME=>"---",
+                                 SCHOOL=>$school,
                                  TEACHERMEMBERS=>"---",
                                  FILENAME=>$output_file_basename,
                                  sophomorix_config=>\%sophomorix_config,
@@ -1759,7 +1759,7 @@ sub create_latex_from_template {
     my $latex_template = $arg_ref->{latex_template};
     my $ref_printlist = $arg_ref->{ref_printlist};
     my $adminclass = $arg_ref->{ADMINCLASS};
-    my $schoolname = $arg_ref->{SCHOOLNAME};
+    my $school = $arg_ref->{SCHOOL};
     my $teachermembers = $arg_ref->{TEACHERMEMBERS};
     my $filename = $arg_ref->{FILENAME};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -1777,6 +1777,9 @@ sub create_latex_from_template {
 
         # replacements
         $line=~s/\\textcolor\{red\}\{ADMINCLASS\}/$adminclass/;
+        
+        my $schoolstring=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
+        $line=~s/\\textcolor\{red\}\{SCHOOL\}/$schoolstring/;
 
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
