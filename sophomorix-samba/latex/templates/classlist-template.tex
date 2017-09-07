@@ -5,6 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{ngerman}
 \usepackage{color}
+\usepackage{ifthen}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 
@@ -36,14 +37,28 @@
 \setlength{\fboxrule}{0.1mm}
 
 % command to create entry
-\newcommand{\databox}[5]{
-\fbox{
-\begin{minipage}[b][26mm][c]{41mm}
+\newcommand{\sophomorixdatabox}[9]{%
+\ifthenelse{\equal{#3}{}}{% if empty sAMAccountName
+\fbox{ % fbox start
+\begin{minipage}[b][26mm][c]{43mm}
 \begin{center}
-#1 #2 \par #3 \par #4 \par #5
+\rule[2mm]{25mm}{0.4mm}
 \end{center}
-\end{minipage}
+\end{minipage}%
+}   % fbox end
+}{% else sAMAccountName given
+\fbox{ % fbox start
+\begin{minipage}[b][26mm][c]{43mm}
+\begin{center}
+#1, #2 \par Klasse: #6 \par Passwort: #4 \par Login: #3
+\end{center}
+\end{minipage}%
+}   % fbox end
 }}
+
+% command for a pagebreak
+\newcommand{\sophomorixnewpage}[2]{\newpage\lfoot{#1}\chead{\LARGE \bf #2}
+}
 
 % headers
 \lhead{\bf \large \today}
@@ -58,42 +73,82 @@
 \begin{document}
 
 % DATABLOCK START
-\databox{Maier, Sarina}{here}{Klasse: m2kk3t}{Login: \texttt{maiersa42}}{Erst-Passwort: \texttt{EkqLjsjd6p}}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
-\databox{\rule[2mm]{30mm}{0.5mm}}{}{}{}{}
+\sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixnewpage{Uni}{7a}
+\sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+\sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+
+
+
 % DATABLOCK END
 
 \end{document}

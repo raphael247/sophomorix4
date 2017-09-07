@@ -1,0 +1,78 @@
+Create Latex templates
+
+
+
+1) The following Latex-Datastructures will be replaced by sophomorix:
+
+\textcolor{red}{ADMINCLASS}      ........  The adminclass of a user/users
+\textcolor{red}{TEACHERMEMBERS}  ........  The members of the adminclass
+\textcolor{red}{SCHOOL}          ........  The SCHOOL_LONGNAME oof a user/users with the SCHHOLNAME in brackets()
+\textcolor{red}{FILENAME}        ........  The filename (without extension) of the file created
+
+You should use these Latex-Datastructures in headers and footers, since they describe more then one user
+
+
+
+2) The datablock
+   Between the lines
+   % DATABLOCK START
+   and
+   % DATABLOCK END
+   sophomorix will enter the data from Active Directory
+   One dataset will be written like (\newcommand takes argument #1 to #9):
+   \sophomorixdatabox{<sn>}{<givenName>}{<sAMAccountName>}{<sophomorixFirstPassword>}%
+                     {<school(short)>}{<adminclass>}{<sophomorixRole>}{<sophomorixCreationDate>}{<uidNumber>}
+
+
+   \sophomorixnewpage{<school(short)>}{<adminclass>} 
+   more arguments might follow???
+
+
+
+3. To create a template, 
+
+   A) create a latexfile that is named like:  
+   <yourname>-<LANG>-<num>.tex
+
+   <yourname>:  is an ascii-string that describes the template
+   <LAND>:      describes the language used in the Template: DE, EN, ...
+   <num>:       is the number of data entries you want in ONE page
+
+
+   B) Contents of the latex file
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   \documentclass[...]{...}    % whatever you want
+   \usepackage[T1]{fontenc}    % I guess you need this
+   \usepackage[utf8]{inputenc} % this is mandatory, the data will come as utf8
+   \usepackage{color}          % this is mandatory for the textcolor command
+   \usepackage{fancyhdr}       % add whatever you need
+  
+   % page layout
+   \setlength{\paperwidth}{210mm}
+   ...
+
+
+
+   % command to create new entry
+   \newcommand{\sophomorixdatabox}[9]{
+      ... do what you need with the 9 parameters, take care of empty commands \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+   }
+
+   % command for a newpage
+   \newcommand{\sophomorixnewpage}[2]{
+      ... do what has to be done on a new page, update your headers and footers here
+   }
+
+   \begin{document}
+
+   % DATABLOCK START
+   % put your testdata here, it will be replaced with actual data
+   \sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
+   \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+   \sophomorixnewpage{Uni}{7a}
+   \sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
+   \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+   % DATABLOCK END
+
+   \end{document}

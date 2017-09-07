@@ -376,10 +376,11 @@ if ($info==1){
 # decide which list to print
 my $ref_printlist;
 if ($class ne ""){
+    # a class is given
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
-    &print_class($class,$output_file_basename,$ref_printlist);
+    &print_data($class,$output_file_basename,$ref_printlist);
 } elsif ($user ne ""){
-    # create the print data structure from useroption
+    # --user <user1><user2>,... are given
     my %printdata=();
     my @users=split(/,/,$user);
     foreach my $username (@users){
@@ -392,14 +393,14 @@ if ($class ne ""){
         }
     }
     $ref_printlist=$printdata{'LIST'};
-    &print_class("Users",$output_file_basename,$ref_printlist);
+    &print_data("Users",$output_file_basename,$ref_printlist);
 } else {
     # go for back in time stuff, if nothing else ist given
     my @datelist=&sorted_datelist();
     my $date=&ymdhms_to_date($datelist[$back_in_time]);
     print " Going Back in time $back_in_time steps to $date ($datelist[$back_in_time])\n";
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$datelist[$back_in_time]};
-    &print_class($date,$output_file_basename,$ref_printlist);
+    &print_data($date,$output_file_basename,$ref_printlist);
 }
 
 
@@ -1687,7 +1688,7 @@ sub sorted_datelist {
 
 
 
-sub print_class {
+sub print_data {
     my ($class,$output_file_basename,$ref_printlist)=@_;
     &open_output_files($output_file_basename);
     &create_latex_from_template({latex_template=>"classlist-template.tex",
@@ -1704,6 +1705,8 @@ sub print_class {
     &build_results; 
     &make_output_files_ro;
 }
+
+
 
 sub build_results {
     if ($command eq "pdflatex"){
@@ -1735,16 +1738,19 @@ sub datablock_from_list {
         #print "Add to datablock: $item\n";
         $dataline_count++;
         my @data=split(/;/,$item);
-        $datablock=$datablock."\\databox{".$data[0].", ".
-                                           $data[1]."}".
-                                           "{"."}".
-                                           "{Klasse: ".$data[5]."}".
-                                           "{Login: \\texttt{".$data[2]."}}".
-                                           "{Passwort: \\texttt{".$data[3]."}}\n";
+        $datablock=$datablock."\\sophomorixdatabox{".$data[0]."}".
+                                                 "{".$data[1]."}".
+                                                 "{".$data[2]."}".
+                                                 "{".$data[3]."}".
+                                                 "{".$data[4]."}".
+                                                 "{".$data[5]."}".
+                                                 "{".$data[8]."}".
+                                                 "{".$data[9]."}".
+                                                 "{".$data[10]."}%\n";
     }
     until ($dataline_count==36){
         $dataline_count++;
-        $datablock=$datablock."\\databox{\\rule[2mm]{30mm}{0.5mm}}{}{}{}{}\n";
+        $datablock=$datablock."\\sophomorixdatabox{}{}{}{}{}{}{}{}{}%\n";
     }
     #print $datablock;
     return $datablock;

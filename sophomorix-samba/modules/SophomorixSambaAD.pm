@@ -4066,8 +4066,8 @@ sub AD_get_print_data {
                      $entry->get_value('sophomorixFirstPassword').";".
                      $entry->get_value('sophomorixSchoolname').";".
                      $entry->get_value('sophomorixAdminClass').";".
-                     $entry->get_value('sophomorixFirstnameASCII').";".
                      $entry->get_value('sophomorixSurnameASCII').";".
+                     $entry->get_value('sophomorixFirstnameASCII').";".
                      $entry->get_value('sophomorixRole').";".
                      $entry->get_value('sophomorixCreationDate').";".
                      $entry->get_value('uidNumber').";";
