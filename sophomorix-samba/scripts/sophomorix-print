@@ -1777,9 +1777,9 @@ sub create_latex_from_template {
 
         # replacements
         $line=~s/\\textcolor\{red\}\{ADMINCLASS\}/$adminclass/;
-        
         my $schoolstring=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
         $line=~s/\\textcolor\{red\}\{SCHOOL\}/$schoolstring/;
+        $line=~s/\\textcolor\{red\}\{FILENAME\}/$filename/;
 
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
