@@ -229,7 +229,7 @@ install-sophomorix-samba:
 # latex stuff
 	@install -d -m755 -oroot -groot $(LATEX)
 	@install -d -m755 -oroot -groot $(LATEX)/templates
-	@install -oroot -groot --mode=0644 sophomorix-samba/latex/templates/*[a-z]-template.tex $(LATEX)/templates
+	@install -oroot -groot --mode=0644 sophomorix-samba/lang/latex/templates/*[a-z0-9-]-template.tex $(LATEX)/templates
 # Encoding-data
 	@install -d -m755 -oroot -groot $(ENCODING)
 	@install -oroot -groot --mode=0644 sophomorix-samba/encoding-data/*.txt $(ENCODING)
