@@ -1730,10 +1730,12 @@ sub make_output_files_ro {
 
 
 sub datablock_from_list {
-    my @list = @_;
+    my ($chead,$ref_printlist) = @_;   
+    my @list = @{ $ref_printlist };
     @list = sort @list;
-    my $datablock="";
     my $dataline_count=0;
+    # header
+    my $datablock="\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
     foreach my $item (@list){
         #print "Add to datablock: $item\n";
         $dataline_count++;
@@ -1787,7 +1789,7 @@ sub create_latex_from_template {
     my $template_abs=$ref_sophomorix_config->{'INI'}{'LATEX'}{'TEMPLATES'}."/".$latex_template;
     &print_title("Using template $template_abs");
 
-    my $datablock=&datablock_from_list( @{ $ref_printlist } );
+    my $datablock=&datablock_from_list($adminclass,$ref_printlist);
 
     open(TEMPLATE,"<$template_abs") || die "Fehler: $!";
     my $datablockmode="FALSE";
