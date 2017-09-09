@@ -45,14 +45,28 @@ richtig testbar nach Migration
 one-per-page template (verschiedene Sprachen)
 datalist-DE-1-template.tex
 
-optionen 
---one-per-page/--1-per-page/--1pp
+optionen um das template zu wählen 
+--one-per-page/--1-per-page/--1pp  
+    --> nimmt das zur LANG passende 1er template 
 --36-per-page/--36pp 
+    --> nimmt das zur LANG passende 36er template 
 ---> weitere später
 --32-per-page/--36pp 
+    --> nimmt das zur LANG passende 32er template 
+
+ODER:
+-- template /abs/path/to/template
+um templates zu testen
+
+am template-dateinamen wird erkannt, wieviele sophomorixdatabox einem sophomorixnewpage folgen sollen
+
+
+
 ohne die optionen einen automatismus (Konsole):
 --> --user user1,user2   -> 1
 --class                  -> 32 falls möglich sonst 36
+
+
 
 Konfigurierbar pro Schule, welche vorlagen dann genommen werden in xxx.school.conf
 PFAD vorgeben: /etc/linuxmster/sophomorix/school/hhg/latex/template
@@ -61,9 +75,10 @@ PFAD vorgeben: /etc/linuxmster/sophomorix/school/hhg/latex/template
 	TEMPLATE01=hhg-DE-1-template.tex
 ansonsten werden die mitgelieferten benutzt
 
-Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen
+Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen?
+oder Fehler
 
-code cleanup
+code cleanup sophomorix-print
 
 
 
