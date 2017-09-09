@@ -36,36 +36,20 @@
 \renewcommand{\footrulewidth}{0.25mm}
 \setlength{\fboxrule}{0.1mm}
 
-% command to create entry
-\newcommand{\sophomorixdatabox}[9]{
-\begin{center}
-\fbox{
-\begin{minipage}[b][54mm][c]{85mm}
-\begin{center}
-\Large #1, #2 \par Klasse: #6 \par Login: #3 \par Erst-Passwort: #4 \par Schule: #5
-\end{center}
-\end{minipage}
-}
-\end{center}
-}
-
-% command for a pagebreak
-\newcommand{\sophomorixnewpage}[2]{\newpage\lfoot{#1}\chead{\LARGE \bf #2}
-}
-
-% headers
+% command for a newpage
+\newcommand{\sophomorixnewpage}[9]{
+\newpage
 \lhead{\bf \large \today}
-\chead{\LARGE \bf \textcolor{red}{LOGIN}}
+\chead{\LARGE \bf #1}
 \rhead{}
-
 \lfoot{\textcolor{red}{SCHOOL}}
 \cfoot{}
 \rfoot{\textcolor{red}{FILENAME}}
+}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{document}
-
-Guten Tag \textcolor{red}{GIVENNAME} \textcolor{red}{SN},
+% command to create entry
+\newcommand{\sophomorixdatabox}[9]{
+Guten Tag #2 #1,
 
 \vspace{2mm}
 
@@ -73,7 +57,7 @@ Der/Die Netzwerkbetreuer/in
 
 \textcolor{red}{ADMINLIST}
 
-heißen Sie an der Schule (\textcolor{red}{SCHOOL}) willkommen.
+heißen Sie an der Schule (#5) willkommen.
 
 \vspace{2mm}
 
@@ -81,48 +65,69 @@ Hier sind Ihre Zugangsdaten zum pädagogischen Netz.
 
 Bitte ändern Sie Ihr Passwort möglichst bald in der Schulkonsole (siehe unten).
 
-% DATABLOCK START
-\sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
-%\sophomorixnewpage{}{}
-% DATABLOCK END
+\begin{center}
+\fbox{
+\begin{minipage}[b][53,98mm][c]{85,6mm} % scheckkarte
+\begin{center}
+\Large #1, #2 \par Klasse: #6 \par Login: #3 \par Erst-Passwort: #4 \par Schule: #5
+\end{center}
+\end{minipage}
+}
+\end{center}
 
-
-Anmeldung an einem Windowsrechner:
+Anmeldung an einem Windowsrechner:\\[-7mm]
 
 \begin{tabbing}
-\qquad Benutzername:\qquad \= \texttt{\textcolor{red}{LOGIN}} \\
-\qquad Kennwort:     \> \texttt{\textcolor{red}{PASSWORD}} \\
+\qquad Benutzername:\qquad \= \texttt{#3} \\
+\qquad Kennwort:     \> \texttt{#4} \\
 \qquad Domäne:       \> \texttt{????} \\
 \end{tabbing}
-
-\vspace{-6mm}
-
+\vspace{-9mm}
 \rule{\linewidth}{0.25mm}
 
-Anmeldung an einem Linuxrechner:
+Anmeldung an einem Linuxrechner:\\[-7mm]
 \begin{tabbing}
-\qquad Login:\qquad\qquad \= \texttt{\textcolor{red}{LOGIN}} \\
-\qquad Passwort: \> \texttt{\textcolor{red}{PASSWORD}} \\
+\qquad Login:\qquad\qquad \= \texttt{#3} \\
+\qquad Passwort: \> \texttt{#4} \\
 \end{tabbing}
-\vspace{-6mm}
-
+\vspace{-9mm}
 \rule{\linewidth}{0.25mm}
 
-Pädagogische Funktionen mit der Schulkonsole im Intranet:
-
- URL:  \texttt{\textcolor{red}{URLSCHUKO}} 
-
+Pädagogische Funktionen mit der Schulkonsole im Intranet:  \texttt{\textcolor{red}{URLSCHUKO}}\\[-7mm] 
+\begin{tabbing}
+\qquad Login:\qquad\qquad \= \texttt{#3} \\
+\qquad Passwort: \> \texttt{#4} \\
+\end{tabbing}
+\vspace{-9mm}
 \rule{\linewidth}{0.25mm}
 
-Mailzugriff:
-
- URL: \texttt{\textcolor{red}{URLMAIL}} 
-
+Mailzugriff: \texttt{\textcolor{red}{URLMAIL}}\\[-7mm] 
+\begin{tabbing}
+\qquad Login:\qquad\qquad \= \texttt{#3} \\
+\qquad Passwort: \> \texttt{#4} \\
+\end{tabbing}
+\vspace{-9mm}
 \rule{\linewidth}{0.25mm}
 
- Lernplattform mit Moodle:
+Lernplattform mit Moodle: \texttt{\textcolor{red}{URLMOODLE}}\\[-7mm]
+\begin{tabbing}
+\qquad Login:\qquad\qquad \= \texttt{#3} \\
+\qquad Passwort: \> \texttt{#4} \\
+\end{tabbing}
+\vspace{-9mm}
+\rule{\linewidth}{0.25mm}
+}
 
- URL: \texttt{\textcolor{red}{URLMOODLE}}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% DATABLOCK START
+\sophomorixnewpage{maiersa42}{}{}{}{}{}{}{}{}
+\sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{7a}{student}{20170905165452.0Z}{10999}%
+\sophomorixnewpage{muellegr42}{}{}{}{}{}{}{}{}
+\sophomorixdatabox{Müller}{Sarina}{muellegr42}{AkqLjsjd6p}{bsz}{8a}{teacher}{20170906165452.0Z}{11000}%
+% DATABLOCK END
 
 \end{document}

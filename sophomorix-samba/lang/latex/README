@@ -20,12 +20,12 @@ You should use these Latex-Datastructures in headers and footers, since they des
    % DATABLOCK END
    sophomorix will enter the data from Active Directory
    One dataset will be written like (\newcommand takes argument #1 to #9):
+   \sophomorixnewpage{centralheader}{}{}{}{}{}{}{}{} 
    \sophomorixdatabox{<sn>}{<givenName>}{<sAMAccountName>}{<sophomorixFirstPassword>}%
                      {<school(short)>}{<adminclass>}{<sophomorixRole>}{<sophomorixCreationDate>}{<uidNumber>}
 
 
-   \sophomorixnewpage{<school(short)>}{<adminclass>} 
-   more arguments might follow???
+
 
 
 
@@ -53,24 +53,25 @@ You should use these Latex-Datastructures in headers and footers, since they des
    ...
 
 
+   % command for a newpage
+   \newcommand{\sophomorixnewpage}[2]{
+      ... do what has to be done on a new page, update your headers and footers here
+   }
 
    % command to create new entry
    \newcommand{\sophomorixdatabox}[9]{
       ... do what you need with the 9 parameters, take care of empty commands \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
    }
 
-   % command for a newpage
-   \newcommand{\sophomorixnewpage}[2]{
-      ... do what has to be done on a new page, update your headers and footers here
-   }
 
    \begin{document}
 
    % DATABLOCK START
    % put your testdata here, it will be replaced with actual data
+   \sophomorixnewpage{}{}
    \sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
    \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
-   \sophomorixnewpage{Uni}{7a}
+   \sophomorixnewpage{}{}
    \sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
    \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
    % DATABLOCK END

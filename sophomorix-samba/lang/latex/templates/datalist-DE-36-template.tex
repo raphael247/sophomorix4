@@ -36,6 +36,17 @@
 \renewcommand{\footrulewidth}{0.25mm}
 \setlength{\fboxrule}{0.1mm}
 
+% command for a newpage
+\newcommand{\sophomorixnewpage}[9]{
+\newpage
+\lhead{\bf \large \today}
+\chead{\LARGE \bf #1}
+\rhead{}
+\lfoot{\textcolor{red}{SCHOOL}}
+\cfoot{}
+\rfoot{\textcolor{red}{FILENAME}}
+}
+
 % command to create entry
 \newcommand{\sophomorixdatabox}[9]{%
 \ifthenelse{\equal{#3}{}}{% if empty sAMAccountName
@@ -56,23 +67,13 @@
 }   % fbox end
 }}
 
-% command for a pagebreak
-\newcommand{\sophomorixnewpage}[2]{\newpage\lfoot{#1}\chead{\LARGE \bf #2}
-}
 
-% headers
-\lhead{\bf \large \today}
-\chead{\LARGE \bf \textcolor{red}{ADMINCLASS}}
-\rhead{}
-
-\lfoot{\textcolor{red}{SCHOOL}}
-\cfoot{\bf \textcolor{red}{TEACHERMEMBERS}}
-\rfoot{\textcolor{red}{FILENAME}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
 % DATABLOCK START
+\sophomorixnewpage{m2kk3t}{}{}{}{}{}{}{}{}
 \sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
@@ -109,8 +110,8 @@
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
-\sophomorixnewpage{Uni}{7a}
-\sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{m2kk3t}{student}{20170905165452.0Z}{10999}%
+\sophomorixnewpage{7a}{}{}{}{}{}{}{}{}
+\sophomorixdatabox{Maier}{Sarina}{maiersa42}{EkqLjsjd6p}{bsz}{7a}{student}{20170905165452.0Z}{10999}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
@@ -146,7 +147,6 @@
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
 \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
-\sophomorixnewpage{}{}
 % DATABLOCK END
 
 \end{document}
