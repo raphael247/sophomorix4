@@ -61,7 +61,7 @@ if ($filter_only==0){
 
 sub read_lines {
     my ($source)=@_;
-    open(SOURCE, "<$source") || die "Fehler: $! $source not found!";
+    open(SOURCE, "<$source") || die "Error: $! $source not found!";
     while (<SOURCE>){
         chomp();
         push @lines, $_;
@@ -72,7 +72,7 @@ sub read_lines {
 sub save_lines {
     my ($target)=@_;
     if ($target ne "---"){
-        open(TARGET, ">$target") || die "Fehler: $! Could not open $target!";
+        open(TARGET, ">$target") || die "Error: $! Could not open $target!";
     }
     my $count=0;
     foreach my $line (@lines){

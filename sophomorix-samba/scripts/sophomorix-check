@@ -4,7 +4,7 @@
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
-# Bibliotheken
+# modules
 use strict;
 #use Quota;
 use Getopt::Long;
@@ -1722,7 +1722,7 @@ sub reading_firstnames {
         my $filename = pop @list;
         my ($string1,$enc,$string2)=split(/\./,$filename); 
         open(DATAFILE, "$file_abs") || 
-             die "Fehler: $! $file_abs nicht gefunden!"; 
+             die "Error: $! $file_abs not found!"; 
         while (<DATAFILE>){
             chomp();
             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
@@ -1751,7 +1751,7 @@ sub reading_firstname_errors {
         my $filename = pop @list;
         my ($string1,$enc,$string2)=split(/\./,$filename); 
         open(DATAFILE, "$file_abs") || 
-             die "Fehler: $! $file_abs nicht gefunden!"; 
+             die "Error: $! $file_abs not found!"; 
         while (<DATAFILE>){
             chomp();
             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
@@ -1780,7 +1780,7 @@ sub reading_lastnames {
         my $filename = pop @list;
         my ($string1,$enc,$string2)=split(/\./,$filename); 
         open(DATAFILE, "$file_abs") || 
-             die "Fehler: $! $file_abs nicht gefunden!"; 
+             die "Error: $! $file_abs not found!"; 
         while (<DATAFILE>){
             chomp();
             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
@@ -1809,7 +1809,7 @@ sub reading_lastname_errors {
         my $filename = pop @list;
         my ($string1,$enc,$string2)=split(/\./,$filename); 
         open(DATAFILE, "$file_abs") || 
-             die "Fehler: $! $file_abs nicht gefunden!"; 
+             die "Error: $! $file_abs not found!"; 
         while (<DATAFILE>){
             chomp();
             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
@@ -1899,7 +1899,7 @@ sub analyze_encoding {
     # start to analyze file_tmp
     &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
     open(DATAFILE, "$file_tmp") || 
-         die "Fehler: $! $file_tmp not found!"; 
+         die "Error: $! $file_tmp not found!"; 
     my $count=0;
     while (<DATAFILE>){
         $count++;

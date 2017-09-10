@@ -1,11 +1,10 @@
 #!/usr/bin/perl -w
-# $Id$
-# Dieses Script (sophomorix-print) wurde von Rüdiger Beck erstellt
-# Es ist freie Software
-# Bei Fehlern wenden Sie sich bitte an mich.
-# jeffbeck@web.de  oder  jeffbeck@linuxmuster.net
+# This script (sophomorix-print) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
-# Libraries
+# modules
 use strict;
 use Getopt::Long;
 use Sophomorix::SophomorixConfig;
@@ -151,9 +150,9 @@ For other schools use the following option:
 
 The user given by option --caller/--caller-copy must exist!
 
-Choose the way of pdf generation (Default: latex->dvips->ps2pdf)
-  --command latex  (This is the default: latex->dvips->ps2pdf)
-  --command pdflatex
+Choose the way of pdf generation:
+  --command latex      (This is the default: *.tex ->latex->dvips->ps2pdf->*.pdf)
+  --command pdflatex   (*.tex->pdflatex->*.pdf)
 
 Examples to print a class:
   sophomorix-print --class <prefix>-<class> --caller bz [--school <schoolname>]
@@ -181,13 +180,7 @@ Please see the sophomorix-print(8) man pages for full documentation
 
 &log_script_start(@arguments);
 
-# --info
-if ($info==0){
-    &print_title("sophomorix-print is creating output ...");
-}
-
 system("mkdir -p $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}");
-
 
 # ===========================================================================
 # Calculate output_file_basename and template file
@@ -321,8 +314,9 @@ if ($info==1){
 }
 
 
-
+# ===========================================================================
 # decide which list to print
+# ===========================================================================
 my $ref_printlist;
 if ($class ne ""){
     # a class is given
@@ -363,6 +357,9 @@ if ($class ne ""){
 #    print "$item\n";
 #}
 
+# ===========================================================================
+# copy result, if necessary
+# ===========================================================================
 # --caller-copy (do the copy stuff)
 if ($caller_copy ne ""){
     &print_title("Copying files to user $caller_copy");
@@ -389,7 +386,7 @@ if ($caller_copy ne ""){
 
 
 # ===========================================================================
-# Subroutinen
+# Subroutines
 # ===========================================================================
 
 sub pdflatex {
@@ -574,7 +571,7 @@ sub create_latex_from_template {
 
     my $datablock=&datablock_from_list($adminclass,$ref_printlist);
 
-    open(TEMPLATE,"<$template_path_abs") || die "Fehler: $!";
+    open(TEMPLATE,"<$template_path_abs") || die "Error: $!";
     my $datablockmode="FALSE";
     while (<TEMPLATE>){
         my $line=$_;
@@ -603,15 +600,15 @@ sub create_latex_from_template {
 
 
 sub open_output_files {
-    open(LATEX,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Fehler: $!";
+    open(LATEX,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Error: $!";
     # CSV Windows
-    open(CSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.csv") || die "Fehler: $!";
+    open(CSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.csv") || die "Error: $!";
     # CSV Linux
-    open(UNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-unix.csv") || die "Fehler: $!";
+    open(UNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-unix.csv") || die "Error: $!";
     # Webuntis CSV Windows
-    open(WEBCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis.csv") || die "Fehler: $!";
+    open(WEBCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis.csv") || die "Error: $!";
     # Webuntis CSV Linux
-    open(WEBUNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis-unix.csv") || die "Fehler: $!";
+    open(WEBUNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis-unix.csv") || die "Error: $!";
 }
 
 

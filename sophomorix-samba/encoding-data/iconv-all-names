@@ -2,7 +2,7 @@
 # This script is maintained by Rüdiger Beck
 # It is Free Software (License GPLv3)
 # If you find errors, contact the author
-# jeffbeck@web.de  or  jeffbeck@gmx.de
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
 use strict;
 use Text::Iconv;
@@ -110,8 +110,8 @@ sub convert {
     print "###################################################\n";
     print "Convert: $in --> $out\n";
 	print "###################################################\n";
-    open(IN, "$in") || die "Fehler: $! $in nicht gefunden!"; 
-    open(OUT, ">$out") || die "Fehler: $! $in nicht gefunden!"; 
+    open(IN, "$in") || die "Error: $! $in not found!"; 
+    open(OUT, ">$out") || die "Error: $! $in not found!"; 
     while (<IN>){
         chomp();
         my $inline=$_;
