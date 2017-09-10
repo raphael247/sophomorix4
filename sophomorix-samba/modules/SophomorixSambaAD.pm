@@ -4086,7 +4086,7 @@ sub AD_get_print_data {
                                   $line;
             # lookup creation
             $AD_print_data{'LOOKUP_BY_sAMAccountName'}{$entry->get_value('sAMAccountName')}=$line;
-
+            $AD_print_data{'LOOKUP_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')}="exists";
         }
         # sorting some lists
 #        my $unneeded1=$#{ $AD_print_data{'LISTS'}{'student'} }; # make list computer nonempty        

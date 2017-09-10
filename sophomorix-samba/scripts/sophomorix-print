@@ -307,6 +307,10 @@ my $ref_printlist;
 if ($class ne ""){
     # a class is given
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
+    if (not exists $ref_AD_print_data->{'LOOKUP_BY_sophomorixAdminClass'}{$class}){
+        print "\nERROR: Class $class has no printout data in school $school\n\n";
+        exit;
+    }
     &print_data($class,$output_file_basename,$ref_printlist);
 } elsif ($user ne ""){
     # --user <user1><user2>,... are given
