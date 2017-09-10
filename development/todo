@@ -40,45 +40,38 @@ sophomorix-print:
 können Daten, die mit --caller-copy kopiert wurden vom user gelesen werden?
 
 
-richtig testbar nach Migration
-
-one-per-page template (verschiedene Sprachen)
-datalist-DE-1-template.tex
+richtig testbar erst nach Migration
 
 optionen um das template zu wählen 
---one-per-page/--1-per-page/--1pp  
-    --> nimmt das zur LANG passende 1er template 
---36-per-page/--36pp 
-    --> nimmt das zur LANG passende 36er template 
----> weitere später
---32-per-page/--36pp 
-    --> nimmt das zur LANG passende 32er template 
+--pp / --per-page
 
-ODER:
---template /abs/path/to/template
-um templates zu testen
+OK: --template /abs/path/to/template
+    um templates zu testen
+
+
 
 List templates with help option
 
-am template-dateinamen wird erkannt, wieviele sophomorixdatabox einem sophomorixnewpage folgen sollen
-
-vom template namen auf die anzahl der datenboxen und newpages schließen 
- (nicht option benutzen, da sonst eigene templates nicht gehen)
-
-
+OK: am template-dateinamen wird erkannt, wieviele sophomorixdatabox einem sophomorixnewpage folgen sollen
+    (nicht option benutzen, da sonst eigene templates nicht gehen)
 
 ohne die optionen einen automatismus (Konsole):
 --> --user user1,user2   -> 1
 --class                  -> 32 falls möglich sonst 36
 
+Ersetzungen:
+   ADMINLIST
+   URLSCHUKO
+   URLMOODLE
+   URLMAIL
 
-
+BESSER überlegen:
 Konfigurierbar pro Schule, welche vorlagen dann genommen werden in xxx.school.conf
 PFAD vorgeben: /etc/linuxmster/sophomorix/school/hhg/latex/template
 [LATEX]
 	TEMPLATE36=hhg-DE-36-template.tex
 	TEMPLATE01=hhg-DE-1-template.tex
-ansonsten werden die mitgelieferten benutzt
+ansonsten werden die mitgelieferten templates benutzt
 
 Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen?
 oder Fehler

@@ -58,9 +58,12 @@ use Sophomorix::SophomorixSambaAD qw(
 
 Getopt::Long::Configure ("bundling");
 use Net::LDAP;
-use Sys::Hostname;
+#use Sys::Hostname;
 use JSON;
 use Data::Dumper;
+use File::Basename qw( basename
+                       dirname
+                     ); 
 
 my @arguments = @ARGV;
 
@@ -74,24 +77,22 @@ if($Conf::log_level>=3){
 }
 my $help=0;
 my $info=0;
+
 my $caller="";
 my $caller_copy="";
-
-my $back_in_time=0;
-
 my $command="latex";
+
+# entries selections
 my $user="";
 my $class="";
-
-
 my $project="";
 my $classlist="";
+my $back_in_time=0;
 
-
-my $one_per_page=0;
-my $skiplock=0;
-
+# template options
 my $template="";
+my $one_per_page=0;
+my $pp=0;
 
 my $school="";
 
@@ -102,6 +103,7 @@ my $testopt=GetOptions(
            "class|c=s" => \$class,
            "project|p=s" => \$project,
            "template=s" => \$template,
+           "per-page|pp=i" => \$pp,
            "user|u=s" => \$user,
            "classlist=s" => \$classlist,
            "help|h" => \$help,
@@ -110,7 +112,6 @@ my $testopt=GetOptions(
            "command=s" => \$command,
            "back-in-time|backintime=i" => \$back_in_time,
            "one-per-page" => \$one_per_page,
-           "skiplock" => \$skiplock,
            "info|i" => \$info
           );
 
@@ -163,10 +164,14 @@ Examples to print timely additions:
   sophomorix-print --back-in-time <num> --caller bz [--school <schoolname>]
   sophomorix-print --back-in-time <num> --caller-copy bz [--school <schoolname>]
 
+Changing the LaTeX-template:
+  --per-page <num> / --pp <num> (change to the template with the given number)
+  Test your template:
+  --template  /abs/path/override  (use specified template, entries per page is calculated from filename)
 
-Deprecated in sophomorix4:
+Deprecated in sophomorix4 (at the moment):
   -p project / --project project
-  --one-per-page
+  --all printing of a school
 
 Please see the sophomorix-print(8) man pages for full documentation
 ');
@@ -255,6 +260,19 @@ if ($caller_copy ne ""){
 # assemble file basename
 $output_file_basename="$class_filename_part"."$caller_filename_part";
 
+# template num options
+# --one-per-page
+if ($one_per_page==1){
+    # equal to --pp 1 
+    $pp=1;
+}
+# --per-page <num> / --pp <num>
+if ($pp!=0){
+   $template_num=$pp;
+   &print_title("Number of entries per page: $template_num");
+}
+
+
 # --template  /abs/path/override
 if ($template ne ""){
     $template_path_abs=$template;
@@ -262,6 +280,7 @@ if ($template ne ""){
     # assemble template path
     $template_path_abs=$template_path_abs.$template_num."-template.tex";
 }
+
 # test existance of template file
 if (not -f $template_path_abs){
     print "\nERROR: Template does not exist: $template_path_abs\n\n";
@@ -302,6 +321,7 @@ if ($info==1){
 }
 
 
+
 # decide which list to print
 my $ref_printlist;
 if ($class ne ""){
@@ -335,7 +355,6 @@ if ($class ne ""){
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$datelist[$back_in_time]};
     &print_data($date,$output_file_basename,$ref_printlist);
 }
-
 
  
 
@@ -478,15 +497,19 @@ sub make_output_files_ro {
 
 
 sub datablock_from_list {
-    my ($chead,$ref_printlist) = @_;   
+    my ($chead,$ref_printlist) = @_;
     my @list = @{ $ref_printlist };
     @list = sort @list;
-    my $dataline_count=0;
-    # header
-    my $datablock="\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
+    my $dataline_max=&dataline_max_from_template_path(); # max pp entries
+    my $dataline_count=0; # counts pp entries
+    my $datablock="";
+    my $last_count=$#list+1; # number of elements starting with 1,2,...
     foreach my $item (@list){
-        #print "Add to datablock: $item\n";
         $dataline_count++;
+        if ($dataline_count==1){
+            # first sophomorixdatabox mus be preceeded by sophomorixnewpage
+            $datablock=$datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
+        }
         my @data=split(/;/,$item);
         $datablock=$datablock."\\sophomorixdatabox{".$data[0]."}".
                                                  "{".$data[1]."}".
@@ -497,13 +520,29 @@ sub datablock_from_list {
                                                  "{".$data[8]."}".
                                                  "{".$data[9]."}".
                                                  "{".$data[10]."}%\n";
+        # decide if dataline_count must be reset (page completely full)
+	if ($dataline_count==$dataline_max){
+            $dataline_count=0;
+        }
     }
-    until ($dataline_count==36){
+    # fill up last page
+    # $dataline_count==0: counter is reset, page was filled completely
+    until ($dataline_count==0 or $dataline_count==$dataline_max){
         $dataline_count++;
         $datablock=$datablock."\\sophomorixdatabox{}{}{}{}{}{}{}{}{}%\n";
     }
     #print $datablock;
     return $datablock;
+}
+
+
+
+sub dataline_max_from_template_path {
+    my $filename = basename($template_path_abs);
+    my @strings=split(/-/,$filename);
+    my $last_one = pop @strings; # the last
+    my $num = pop @strings; # the last but one gives the number
+    return $num;
 }
 
 
