@@ -297,7 +297,7 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       school=>$school,
                                       sophomorix_config=>\%sophomorix_config,
              });
-print Dumper($ref_AD_print_data);
+#print Dumper($ref_AD_print_data);
 
 
 
@@ -322,51 +322,58 @@ if ($info==1){
 # decide which list to print
 # ===========================================================================
 my $ref_printlist;
-my $datablock="";
+my $latex_datablock="";
+
+
 
 if ($class eq "" and $user eq "" and not defined $back_in_time){
     # print one school
-    print "HERE: print $school\n";
-
-    
     &open_output_files($output_file_basename);
-    #my $datablock="";
-
     # walk through classes
     my @classlist = @{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
     @classlist = sort @classlist;
     foreach my $class_item (@classlist){
-	print "Creating datablock for $class_item\n";
+	print "   * Creating datablock for $class_item\n";
         $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class_item};
-        $datablock=&datablock_from_list($datablock,$class_item,$ref_printlist);
+        $latex_datablock=&latex_datablock_from_list($class_item,$ref_printlist);
+        &create_csv_files($ref_printlist);
     }
 
-    print $datablock;
-    &create_latex_from_template({ADMINCLASS=>$class,
-                                 SCHOOL=>$school,
-                                 TEACHERMEMBERS=>"---",
-#                                 datablock=>$datablock,
-                                 FILENAME=>$output_file_basename,
-                                 sophomorix_config=>\%sophomorix_config,
-                                 sophomorix_result=>\%sophomorix_result,
-                    });
+    &latex_from_template_and_datablock({ADMINCLASS=>$class,
+                                        TEACHERMEMBERS=>"Todo: TEACHERMEMBERS",
+                                        FILENAME=>$output_file_basename,
+                                      });
 
-#    &create_csv_files($ref_printlist);
     &close_output_files($output_file_basename);
     &build_results; 
     &make_output_files_ro;
 
-
 } elsif ($class ne ""){
     # a class is given
+    &open_output_files($output_file_basename);
+
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
     if (not exists $ref_AD_print_data->{'LOOKUP_BY_sophomorixAdminClass'}{$class}){
         print "\nERROR: Class $class has no printout data in school $school\n\n";
         exit;
     }
-    &print_data($class,$output_file_basename,$ref_printlist);
+    $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
+    &create_csv_files($ref_printlist);
+
+    &latex_from_template_and_datablock({ADMINCLASS=>$class,
+                                        TEACHERMEMBERS=>"Todo: TEACHERMEMBERS",
+                                        FILENAME=>$output_file_basename,
+                               });
+
+    &close_output_files($output_file_basename);
+    &build_results; 
+    &make_output_files_ro;
+
 } elsif ($user ne ""){
     # --user <user1><user2>,... are given
+    &open_output_files($output_file_basename);
+
+    # create userlist
     my %printdata=();
     my @users=split(/,/,$user);
     foreach my $username (@users){
@@ -378,26 +385,44 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
             exit;
         }
     }
+
     $ref_printlist=$printdata{'LIST'};
-    &print_data("Users",$output_file_basename,$ref_printlist);
+    $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
+    &create_csv_files($ref_printlist);
+
+    &latex_from_template_and_datablock({ADMINCLASS=>"Users",
+                                        TEACHERMEMBERS=>"---",
+                                        FILENAME=>$output_file_basename,
+                                      });
+    &close_output_files($output_file_basename);
+    &build_results; 
+    &make_output_files_ro;
+
 } elsif (defined $back_in_time) {
+    &open_output_files($output_file_basename);
     # go for back in time stuff, if nothing else ist given
     my @datelist=&sorted_datelist();
     my $date=&ymdhms_to_date($datelist[$back_in_time]);
     print " Going Back in time $back_in_time steps to $date ($datelist[$back_in_time])\n";
+
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$datelist[$back_in_time]};
-    &print_data($date,$output_file_basename,$ref_printlist);
+    $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
+    &create_csv_files($ref_printlist);
+
+    &latex_from_template_and_datablock({ADMINCLASS=>$date,
+                                        TEACHERMEMBERS=>"--- ---",
+                                        FILENAME=>$output_file_basename,
+                                      });
+    &close_output_files($output_file_basename);
+    &build_results; 
+    &make_output_files_ro;
+
 } else {
     print "\nERROR: I don't know what to print\n\n";
     exit;
 }
 
  
-
-# Walk through printlist
-#foreach my $item ( @{ $ref_printlist } ){
-#    print "$item\n";
-#}
 
 # ===========================================================================
 # copy result, if necessary
@@ -495,28 +520,6 @@ sub sorted_datelist {
 
 
 
-sub print_data {
-    my ($class,$output_file_basename,$ref_printlist)=@_;
-    &open_output_files($output_file_basename);
-#    my $datablock=&datablock_from_list("",$class,$ref_printlist);
-    $datablock=&datablock_from_list("",$class,$ref_printlist);
-
-    &create_latex_from_template({ADMINCLASS=>$class,
-                                 SCHOOL=>$school,
-                                 TEACHERMEMBERS=>"---",
-#                                 datablock=>$datablock,
-                                 FILENAME=>$output_file_basename,
-                                 sophomorix_config=>\%sophomorix_config,
-                                 sophomorix_result=>\%sophomorix_result,
-                    });
-    &create_csv_files($ref_printlist);
-    &close_output_files($output_file_basename);
-    &build_results; 
-    &make_output_files_ro;
-}
-
-
-
 sub build_results {
     if ($command eq "pdflatex"){
         &pdflatex;
@@ -538,31 +541,30 @@ sub make_output_files_ro {
 
 
 
-sub datablock_from_list {
-    my ($datablock,$chead,$ref_printlist) = @_;
-    # $datablock ist the start value
+sub latex_datablock_from_list {
+    my ($chead,$ref_printlist) = @_;
+    # always APPEND to datablock
     my @list = @{ $ref_printlist };
     @list = sort @list;
     my $dataline_max=&dataline_max_from_template_path(); # max pp entries
     my $dataline_count=0; # counts pp entries
-#    my $datablock="";
     my $last_count=$#list+1; # number of elements starting with 1,2,...
     foreach my $item (@list){
         $dataline_count++;
         if ($dataline_count==1){
             # first sophomorixdatabox mus be preceeded by sophomorixnewpage
-            $datablock=$datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
+            $latex_datablock=$latex_datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
         }
         my @data=split(/;/,$item);
-        $datablock=$datablock."\\sophomorixdatabox{".$data[0]."}".
-                                                 "{".$data[1]."}".
-                                                 "{".$data[2]."}".
-                                                 "{".$data[3]."}".
-                                                 "{".$data[4]."}".
-                                                 "{".$data[5]."}".
-                                                 "{".$data[8]."}".
-                                                 "{".$data[9]."}".
-                                                 "{".$data[10]."}%\n";
+        $latex_datablock=$latex_datablock."\\sophomorixdatabox{".$data[0]."}".
+                                          "{".$data[1]."}".
+                                          "{".$data[2]."}".
+                                          "{".$data[3]."}".
+                                          "{".$data[4]."}".
+                                          "{".$data[5]."}".
+                                          "{".$data[8]."}".
+                                          "{".$data[9]."}".
+                                          "{".$data[10]."}%\n";
         # decide if dataline_count must be reset (page completely full)
 	if ($dataline_count==$dataline_max){
             $dataline_count=0;
@@ -572,10 +574,9 @@ sub datablock_from_list {
     # $dataline_count==0: counter is reset, page was filled completely
     until ($dataline_count==0 or $dataline_count==$dataline_max){
         $dataline_count++;
-        $datablock=$datablock."\\sophomorixdatabox{}{}{}{}{}{}{}{}{}%\n";
+        $latex_datablock=$latex_datablock."\\sophomorixdatabox{}{}{}{}{}{}{}{}{}%\n";
     }
-    #print $datablock;
-    return $datablock;
+    return $latex_datablock;
 }
 
 
@@ -615,18 +616,11 @@ sub create_csv_files {
 
 
 
-sub create_latex_from_template {
+sub latex_from_template_and_datablock {
     my ($arg_ref) = @_;
-#    my $ref_printlist = $arg_ref->{ref_printlist};
     my $adminclass = $arg_ref->{ADMINCLASS};
-    my $school = $arg_ref->{SCHOOL};
     my $teachermembers = $arg_ref->{TEACHERMEMBERS};
     my $filename = $arg_ref->{FILENAME};
-#    my $datablock = $arg_ref->{datablock};
-    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
-
-    #my $datablock=&datablock_from_list("",$adminclass,$ref_printlist);
 
     open(TEMPLATE,"<$template_path_abs") || die "Error: $!";
     my $datablockmode="FALSE";
@@ -635,16 +629,15 @@ sub create_latex_from_template {
 
         # replacements
         $line=~s/\\textcolor\{red\}\{ADMINCLASS\}/$adminclass/;
-        my $schoolstring=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
+        my $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
         $line=~s/\\textcolor\{red\}\{SCHOOL\}/$schoolstring/;
         $line=~s/\\textcolor\{red\}\{FILENAME\}/$filename/;
+        #$line=~s/\\textcolor\{red\}\{TEACHERMEMBERS\}/$teachermembers/;
 
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
             print LATEX $line; # print the line to make debugging easier
-### ??? use ref instead of data
-            print LATEX $datablock;
-
+            print LATEX $latex_datablock;
         } elsif ($line=~m/DATABLOCK END/){
             $datablockmode="FALSE";
         }
