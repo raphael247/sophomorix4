@@ -4058,6 +4058,7 @@ sub AD_get_print_data {
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found for password printout");
         $AD_print_data{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
+        my %seen_classes=();
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $line=$entry->get_value('sn').";".
@@ -4072,10 +4073,17 @@ sub AD_get_print_data {
                      $entry->get_value('sophomorixCreationDate').";".
                      $entry->get_value('uidNumber').";";
             # list creation
-            push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
-                                  {$entry->get_value('sophomorixSchoolname')}
-                                  {$entry->get_value('sophomorixAdminClass')} }, 
-                                  $line; 
+#            push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
+#                                  {$entry->get_value('sophomorixSchoolname')}
+#                                  {$entry->get_value('sophomorixAdminClass')} }, 
+#                                  $line; 
+#print Dumper(\%seen_classes);
+            if (not exists $seen_classes{$entry->get_value('sophomorixAdminClass')}){
+                push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
+		                      {$entry->get_value('sophomorixSchoolname')} },$entry->get_value('sophomorixAdminClass');
+                $seen_classes{$entry->get_value('sophomorixAdminClass')}="seen";
+		$seen_classes{'ONE'}="seen";
+            }
             push @{ $AD_print_data{'LIST_BY_sophomorixAdminClass'}
                                   {$entry->get_value('sophomorixAdminClass')} }, 
                                   $line; 

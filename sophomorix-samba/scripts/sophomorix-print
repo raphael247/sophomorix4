@@ -297,7 +297,7 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       school=>$school,
                                       sophomorix_config=>\%sophomorix_config,
              });
-#print Dumper($ref_AD_print_data);
+print Dumper($ref_AD_print_data);
 
 
 
@@ -322,11 +322,41 @@ if ($info==1){
 # decide which list to print
 # ===========================================================================
 my $ref_printlist;
-
+my $datablock="";
 
 if ($class eq "" and $user eq "" and not defined $back_in_time){
     # print one school
     print "HERE: print $school\n";
+
+    
+    &open_output_files($output_file_basename);
+    #my $datablock="";
+
+    # walk through classes
+    my @classlist = @{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
+    @classlist = sort @classlist;
+    foreach my $class_item (@classlist){
+	print "Creating datablock for $class_item\n";
+        $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class_item};
+        $datablock=&datablock_from_list($datablock,$class_item,$ref_printlist);
+    }
+
+    print $datablock;
+    &create_latex_from_template({ADMINCLASS=>$class,
+                                 SCHOOL=>$school,
+                                 TEACHERMEMBERS=>"---",
+#                                 datablock=>$datablock,
+                                 FILENAME=>$output_file_basename,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                    });
+
+#    &create_csv_files($ref_printlist);
+    &close_output_files($output_file_basename);
+    &build_results; 
+    &make_output_files_ro;
+
+
 } elsif ($class ne ""){
     # a class is given
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
@@ -468,10 +498,13 @@ sub sorted_datelist {
 sub print_data {
     my ($class,$output_file_basename,$ref_printlist)=@_;
     &open_output_files($output_file_basename);
-    &create_latex_from_template({ref_printlist=>$ref_printlist,
-                                 ADMINCLASS=>$class,
+#    my $datablock=&datablock_from_list("",$class,$ref_printlist);
+    $datablock=&datablock_from_list("",$class,$ref_printlist);
+
+    &create_latex_from_template({ADMINCLASS=>$class,
                                  SCHOOL=>$school,
                                  TEACHERMEMBERS=>"---",
+#                                 datablock=>$datablock,
                                  FILENAME=>$output_file_basename,
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
@@ -506,12 +539,13 @@ sub make_output_files_ro {
 
 
 sub datablock_from_list {
-    my ($chead,$ref_printlist) = @_;
+    my ($datablock,$chead,$ref_printlist) = @_;
+    # $datablock ist the start value
     my @list = @{ $ref_printlist };
     @list = sort @list;
     my $dataline_max=&dataline_max_from_template_path(); # max pp entries
     my $dataline_count=0; # counts pp entries
-    my $datablock="";
+#    my $datablock="";
     my $last_count=$#list+1; # number of elements starting with 1,2,...
     foreach my $item (@list){
         $dataline_count++;
@@ -583,15 +617,16 @@ sub create_csv_files {
 
 sub create_latex_from_template {
     my ($arg_ref) = @_;
-    my $ref_printlist = $arg_ref->{ref_printlist};
+#    my $ref_printlist = $arg_ref->{ref_printlist};
     my $adminclass = $arg_ref->{ADMINCLASS};
     my $school = $arg_ref->{SCHOOL};
     my $teachermembers = $arg_ref->{TEACHERMEMBERS};
     my $filename = $arg_ref->{FILENAME};
+#    my $datablock = $arg_ref->{datablock};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    my $datablock=&datablock_from_list($adminclass,$ref_printlist);
+    #my $datablock=&datablock_from_list("",$adminclass,$ref_printlist);
 
     open(TEMPLATE,"<$template_path_abs") || die "Error: $!";
     my $datablockmode="FALSE";
@@ -607,7 +642,9 @@ sub create_latex_from_template {
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
             print LATEX $line; # print the line to make debugging easier
+### ??? use ref instead of data
             print LATEX $datablock;
+
         } elsif ($line=~m/DATABLOCK END/){
             $datablockmode="FALSE";
         }
