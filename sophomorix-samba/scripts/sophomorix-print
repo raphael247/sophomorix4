@@ -86,7 +86,7 @@ my $user="";
 my $class="";
 my $project="";
 my $classlist="";
-my $back_in_time=0;
+my $back_in_time;# undef
 
 # template options
 my $template="";
@@ -281,11 +281,15 @@ if (not -f $template_path_abs){
 }
 
 &print_title("Basename of output files: $output_file_basename");
-&print_title("Template: $template_path_abs");
+my $template_dirname = dirname($template_path_abs);
+my $template_basename = basename($template_path_abs);
+&print_title("Template dir:  $template_dirname");
+&print_title("Template file: $template_basename");
 
 # ===========================================================================
 # Read data from AD
 # ===========================================================================
+&Sophomorix::SophomorixBase::print_title("Looking for printout data in school $school");
 my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
@@ -318,7 +322,12 @@ if ($info==1){
 # decide which list to print
 # ===========================================================================
 my $ref_printlist;
-if ($class ne ""){
+
+
+if ($class eq "" and $user eq "" and not defined $back_in_time){
+    # print one school
+    print "HERE: print $school\n";
+} elsif ($class ne ""){
     # a class is given
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
     if (not exists $ref_AD_print_data->{'LOOKUP_BY_sophomorixAdminClass'}{$class}){
@@ -341,13 +350,16 @@ if ($class ne ""){
     }
     $ref_printlist=$printdata{'LIST'};
     &print_data("Users",$output_file_basename,$ref_printlist);
-} else {
+} elsif (defined $back_in_time) {
     # go for back in time stuff, if nothing else ist given
     my @datelist=&sorted_datelist();
     my $date=&ymdhms_to_date($datelist[$back_in_time]);
     print " Going Back in time $back_in_time steps to $date ($datelist[$back_in_time])\n";
     $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$datelist[$back_in_time]};
     &print_data($date,$output_file_basename,$ref_printlist);
+} else {
+    print "\nERROR: I don't know what to print\n\n";
+    exit;
 }
 
  
@@ -539,6 +551,16 @@ sub dataline_max_from_template_path {
     my @strings=split(/-/,$filename);
     my $last_one = pop @strings; # the last
     my $num = pop @strings; # the last but one gives the number
+    if (not defined $num){
+        print "\nERROR: template max number could not be determined from filname $filename\n\n";
+        exit;
+    } elsif ($num < $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MIN_ITEM'}){
+        print "\nERROR: template max number ($num) is not at least $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MIN_ITEM'}\n\n";
+        exit;
+    } elsif ($num > $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MAX_ITEM'} ){
+        print "\nERROR: template max number ($num) is larger than $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MAX_ITEM'}\n\n";
+        exit;
+    }
     return $num;
 }
 
