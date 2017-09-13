@@ -1133,6 +1133,9 @@ sub load_sophomorix_ini {
                         push @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }, $school; 
                         $ref_sophomorix_config->{'SCHOOLS'}{$school}{'CONF_FILE'}=
                             $DevelConf::path_conf_sophomorix."/".$school."/".$school.".school.conf";
+                        $ref_sophomorix_config->{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}=
+                            $DevelConf::path_conf_sophomorix."/".$school."/".
+                            $ref_sophomorix_config->{'INI'}{'LATEX'}{'TEMPLATES_CUSTOM_SUBDIR'};
                     }
                 } else {
                     $ref_sophomorix_config->{$DevelConf::AD_global_ou}{$parameter}=

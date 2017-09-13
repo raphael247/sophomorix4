@@ -26,6 +26,16 @@ Ersetzungen:
    URLSCHUKO 
    URLMOODLE
    URLMAIL
+
+quota:
+
+was ist, wenn schoolshares auf anderen Servern liegen
+--> Linux-quotabefehl müsste per ssh auf anderem Server ausgeführt werden
+--> Abhilfe: smbcquotas ???
+    The smbcquotas program manipulates NT Quotas on SMB file shares.
+    /usr/bin/smbcquotas -U administrator%Muster! //linuxmuster.local/bsz 
+
+
 ############################################################
 
 ------------------------------------------------------------
@@ -60,9 +70,9 @@ List templates with help option
 OK: am template-dateinamen wird erkannt, wieviele sophomorixdatabox einem sophomorixnewpage folgen sollen
     (nicht option benutzen, da sonst eigene templates nicht gehen)
 
-ohne die optionen einen automatismus (Konsole):
---> --user user1,user2   -> 1
---class                  -> 32 falls möglich sonst 36
+OK: ohne die optionen einen automatismus (Konsole):
+OK: --> --user user1,user2   -> 1
+OK: --class                  -> 32 falls möglich sonst 36
 
 Ersetzungen???:
    ADMINLIST
@@ -70,23 +80,14 @@ Ersetzungen???:
    URLMOODLE
    URLMAIL
 
-BESSER überlegen:
-Konfigurierbar pro Schule, welche vorlagen dann genommen werden in xxx.school.conf
-PFAD vorgeben: /etc/linuxmster/sophomorix/school/hhg/latex/template
-[LATEX]
-	TEMPLATE36=hhg-DE-36-template.tex
-	TEMPLATE01=hhg-DE-1-template.tex
-ansonsten werden die mitgelieferten templates benutzt
-
-Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen?
+?? Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen?
 oder Fehler
 
 code cleanup sophomorix-print
 
---class soll listen akzeptieren, siehe user
+--project macht userliste (komplex da auch Gruppen mitglied sein können)
 --help update 
 
-rename subs?
 
 ??? 
 exam-mode nur bei bestimmten Status erlauben? Aktive user

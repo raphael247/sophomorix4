@@ -4,6 +4,12 @@
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
+############################################################
+# 
+#
+#
+#
+
 # modules
 use strict;
 use Getopt::Long;
@@ -85,7 +91,6 @@ my $command="latex";
 my $user="";
 my $class="";
 my $project="";
-my $classlist="";
 my $back_in_time;# undef
 
 # template options
@@ -104,7 +109,6 @@ my $testopt=GetOptions(
            "template=s" => \$template,
            "per-page|pp=i" => \$pp,
            "user|u=s" => \$user,
-           "classlist=s" => \$classlist,
            "help|h" => \$help,
            "caller=s" => \$caller,
            "caller-copy|callercopy=s" => \$caller_copy,
@@ -195,14 +199,16 @@ my $template_path_abs=$sophomorix_config{'INI'}{'LATEX'}{'TEMPLATES'}.
 my $class_filename_part="";
 if ($class ne ""){
     $template_num=36;
-    $class_filename_part="$class";
-}elsif ($project ne ""){
+    my $comma_count=$class=~tr/,//;
+    if ($comma_count > 0){
+        $class_filename_part="multiclass";
+    } else {
+        $class_filename_part=$class;
+    }
+} elsif ($project ne ""){
     $template_num=36;
-    $class_filename_part="$project";
-}elsif ($classlist ne ""){
-    $template_num=36;
-    $class_filename_part="$classlist-classlist";
-}elsif ($user ne ""){
+    $class_filename_part=$project;
+} elsif ($user ne ""){
     $template_num=1;
     $class_filename_part="user";
 } else {
@@ -268,9 +274,32 @@ if ($pp!=0){
 
 # --template  /abs/path/override
 if ($template ne ""){
+    # this overrides all
     $template_path_abs=$template;
+} elsif (-d $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}){
+    # what to look for
+    &print_title("Custom templates:  $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}");
+    my $search_string="-".$sophomorix_config{'GLOBAL'}{'LANG'}."-".$template_num."-template.tex";
+    my $custom_template="";
+    print "   * Looking for a custom template *$search_string\n";
+    opendir TEMPLATE, $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'};
+    foreach my $file (readdir TEMPLATE){        
+        if ($file eq "."){next};
+        if ($file eq ".."){next};
+        print "      * See if $file fits\n";
+        if ($file=~m/^$school\./ and $file=~m/${search_string}$/){
+            print "        * $file will be used as custom template\n";
+            $custom_template=$sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}."/".$file;
+        }
+    }
+
+    if ($custom_template ne ""){
+        $template_path_abs=$custom_template;
+    } else {
+        $template_path_abs=$template_path_abs.$template_num."-template.tex";
+    }
 } else {
-    # assemble template path
+    # assemble default template path
     $template_path_abs=$template_path_abs.$template_num."-template.tex";
 }
 
@@ -324,12 +353,14 @@ if ($info==1){
 my $ref_printlist;
 my $latex_datablock="";
 
-
-
 if ($class eq "" and $user eq "" and not defined $back_in_time){
-    # print one school
+    # print one school completely
     &open_output_files($output_file_basename);
     # walk through classes
+    if (not exists $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school}){
+        print "\nERROR: School $school has no printout data\n\n";
+        exit;
+    }
     my @classlist = @{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
     @classlist = sort @classlist;
     foreach my $class_item (@classlist){
@@ -339,31 +370,43 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
         &create_csv_files($ref_printlist);
     }
 
-    &latex_from_template_and_datablock({ADMINCLASS=>$class,
-                                        TEACHERMEMBERS=>"Todo: TEACHERMEMBERS",
-                                        FILENAME=>$output_file_basename,
-                                      });
+    &latex_from_template_and_datablock();
 
     &close_output_files($output_file_basename);
     &build_results; 
     &make_output_files_ro;
 
 } elsif ($class ne ""){
-    # a class is given
+    # --class <class1><class2>,...one ore commaseperated class/classes are given
     &open_output_files($output_file_basename);
 
-    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class};
-    if (not exists $ref_AD_print_data->{'LOOKUP_BY_sophomorixAdminClass'}{$class}){
-        print "\nERROR: Class $class has no printout data in school $school\n\n";
-        exit;
+    # create classlist
+    my %classes_seen=();
+    my @classlist=();
+    my @classlist_option=split(/,/,$class);
+    foreach my $class_item (@classlist_option){
+        if (exists $classes_seen{$class_item}){
+            # seen already, doing nothing
+        } elsif (exists $ref_AD_print_data->{'LOOKUP_BY_sophomorixAdminClass'}{$class_item} 
+            and not exists $classes_seen{$class_item}){
+            print "   * $class_item selected\n";
+            push @classlist, $class_item;
+            $classes_seen{$class_item}="seen";
+        } else {
+            print "\nERROR: Class $class_item has no printout data in school $school\n\n";
+            exit;
+        }
     }
-    $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
-    &create_csv_files($ref_printlist);
 
-    &latex_from_template_and_datablock({ADMINCLASS=>$class,
-                                        TEACHERMEMBERS=>"Todo: TEACHERMEMBERS",
-                                        FILENAME=>$output_file_basename,
-                               });
+    @classlist = sort @classlist;
+
+    foreach my $class_item (@classlist){
+	print "   * Creating datablock for $class_item\n";
+        $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class_item};
+        $latex_datablock=&latex_datablock_from_list($class_item,$ref_printlist);
+        &create_csv_files($ref_printlist);
+    }
+    &latex_from_template_and_datablock();
 
     &close_output_files($output_file_basename);
     &build_results; 
@@ -390,10 +433,8 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
     &create_csv_files($ref_printlist);
 
-    &latex_from_template_and_datablock({ADMINCLASS=>"Users",
-                                        TEACHERMEMBERS=>"---",
-                                        FILENAME=>$output_file_basename,
-                                      });
+    &latex_from_template_and_datablock();
+
     &close_output_files($output_file_basename);
     &build_results; 
     &make_output_files_ro;
@@ -409,10 +450,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
     &create_csv_files($ref_printlist);
 
-    &latex_from_template_and_datablock({ADMINCLASS=>$date,
-                                        TEACHERMEMBERS=>"--- ---",
-                                        FILENAME=>$output_file_basename,
-                                      });
+    &latex_from_template_and_datablock();
     &close_output_files($output_file_basename);
     &build_results; 
     &make_output_files_ro;
@@ -617,22 +655,15 @@ sub create_csv_files {
 
 
 sub latex_from_template_and_datablock {
-    my ($arg_ref) = @_;
-    my $adminclass = $arg_ref->{ADMINCLASS};
-    my $teachermembers = $arg_ref->{TEACHERMEMBERS};
-    my $filename = $arg_ref->{FILENAME};
-
     open(TEMPLATE,"<$template_path_abs") || die "Error: $!";
     my $datablockmode="FALSE";
     while (<TEMPLATE>){
         my $line=$_;
 
         # replacements
-        $line=~s/\\textcolor\{red\}\{ADMINCLASS\}/$adminclass/;
         my $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
         $line=~s/\\textcolor\{red\}\{SCHOOL\}/$schoolstring/;
-        $line=~s/\\textcolor\{red\}\{FILENAME\}/$filename/;
-        #$line=~s/\\textcolor\{red\}\{TEACHERMEMBERS\}/$teachermembers/;
+        $line=~s/\\textcolor\{red\}\{FILENAME\}/$output_file_basename/;
 
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
