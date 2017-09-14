@@ -520,6 +520,10 @@ sub config_sophomorix_read {
     # default school
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'CONF_FILE'}=
         $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/school.conf"; 
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'TEMPLATES_LATEX_DIR'}=
+                            $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/".
+                            $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATES_CUSTOM_SUBDIR'};
+
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'SCHOOL_LONGNAME'}=
         "School"; 
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=

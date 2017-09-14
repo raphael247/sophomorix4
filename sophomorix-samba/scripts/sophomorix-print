@@ -5,10 +5,10 @@
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
 ############################################################
-# 
-#
-#
-#
+# this script uses global variables to store data
+# as it goes through the lists it
+# A) prints the data to the files (csv files)
+# B) saves data in $latex_datablock (later used in latex files using the template)
 
 # modules
 use strict;
@@ -148,7 +148,7 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
 
-sophomorix-print looks only on one school for users (without option the default-school)
+sophomorix-print looks in ONE school for users (without option the default-school)
 For other schools use the following option:
   -s <schoolname> / --school <schoolname>
 
@@ -158,12 +158,20 @@ Choose the way of pdf generation:
   --command latex      (This is the default: *.tex ->latex->dvips->ps2pdf->*.pdf)
   --command pdflatex   (*.tex->pdflatex->*.pdf)
 
+Examples to print a school:
+  sophomorix-print  (print the school default-school)
+  sophomorix-print --school bsz  (print the school bsz)
+
 Examples to print a class:
-  sophomorix-print --class <prefix>-<class> --caller bz [--school <schoolname>]
-  sophomorix-print --class <prefix>-<class> --caller-copy bz [--school <schoolname>]
+  sophomorix-print --class <prefix>-<class>,... --caller bz [--school <schoolname>]
+  sophomorix-print --class <prefix>-<class>,... --caller-copy bz [--school <schoolname>]
+
+Examples to print som users:
+  sophomorix-print --user <user1>,... --caller bz [--school <schoolname>]
+  sophomorix-print --user <user1>,... --caller-copy bz [--school <schoolname>]
 
 Examples to print timely additions:
-  sophomorix-print -i  (shows values and dates for <num>)
+  sophomorix-print -i [--school <schoolname>] (shows values and dates for <num>)
   sophomorix-print --back-in-time <num> --caller bz [--school <schoolname>]
   sophomorix-print --back-in-time <num> --caller-copy bz [--school <schoolname>]
 
@@ -171,6 +179,9 @@ Changing the LaTeX-template:
   --per-page <num> / --pp <num> (change to the template with the given number)
   Test your template:
   --template  /abs/path/override  (use specified template, entries per page is calculated from filename)
+Custom templates are used for a school when 
+  A) they are saved in /etc/linuxmuster/sophomorix/<school>/latex-templates
+  B) They follow the naming convention <school>.*-<LANG>-<NUM>-template.tex
 
 Deprecated in sophomorix4 (at the moment):
   -p project / --project project
@@ -277,21 +288,30 @@ if ($template ne ""){
     # this overrides all
     $template_path_abs=$template;
 } elsif (-d $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}){
-    # what to look for
+    # looking for custom templates
     &print_title("Custom templates:  $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}");
     my $search_string="-".$sophomorix_config{'GLOBAL'}{'LANG'}."-".$template_num."-template.tex";
     my $custom_template="";
+
     print "   * Looking for a custom template *$search_string\n";
     opendir TEMPLATE, $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'};
     foreach my $file (readdir TEMPLATE){        
         if ($file eq "."){next};
         if ($file eq ".."){next};
         print "      * See if $file fits\n";
-        if ($file=~m/^$school\./ and $file=~m/${search_string}$/){
-            print "        * $file will be used as custom template\n";
-            $custom_template=$sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}."/".$file;
+        if ($school eq $DevelConf::name_default_school){
+            if ($file=~m/${search_string}$/){
+                print "        * $file will be used as custom template\n";
+                $custom_template=$sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}."/".$file;
+            }
+        } else {
+            if ($file=~m/^$school\./ and $file=~m/${search_string}$/){
+                print "        * $file will be used as custom template\n";
+                $custom_template=$sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}."/".$file;
+            }
         }
     }
+    closedir(TEMPLATE);
 
     if ($custom_template ne ""){
         $template_path_abs=$custom_template;
