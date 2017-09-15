@@ -27,6 +27,8 @@ Ersetzungen:
    URLMOODLE
    URLMAIL
 
+
+------------------------------------------------------------
 quota:
 
 was ist, wenn schoolshares auf anderen Servern liegen
@@ -35,6 +37,36 @@ was ist, wenn schoolshares auf anderen Servern liegen
     The smbcquotas program manipulates NT Quotas on SMB file shares.
     /usr/bin/smbcquotas -U administrator%Muster! //linuxmuster.local/bsz 
 
+Einschalten:
+mount options: usrjquota=aquota.user,jqfmt,vfsv0
+--> quotacheck -cvua    --> creates aquota.user
+--> quotaon /dir
+repquota -au
+
+smbcquotas -F //localhost/share
+
+--> Quotas Enabled On
+
+Flags:
+
+Enabled
+Deny Disk
+Log Soft Limit
+Log Hard Limit
+(--> wohin wird geloggt?)
+
+smbcquotas -L //localhost/share
+
+Add a limit:
+smbcquotas -S UQLIM:<user>:<num_hard_bytes>/num_soft_bytes //localhost/share
+
+--> wird nicht exakt umgesetzt (zum nächsten Block im FS umgesetzt)
+
+linux: repquota zeigt in 1k Blockgröße an (1024*kleiner als smbcquotas)
+
+smbcquotas -S UQLIM:<user>:-1/-1 //localhost/share
+--> No LIMIT
+------------------------------------------------------------
 
 ############################################################
 
