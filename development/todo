@@ -39,9 +39,27 @@ was ist, wenn schoolshares auf anderen Servern liegen
 
 Einschalten:
 mount options: usrjquota=aquota.user,jqfmt,vfsv0
+--> apt install quota
 --> quotacheck -cvua    --> creates aquota.user
 --> quotaon /dir
 repquota -au
+
+
+############ Achtung: das schein nur zu tun, wenn das smb-share einer Partition entspricht
+(aquota.user in )
+
+Beispiel:
+ net conf list
+[all]
+	path = /
+	guest ok = yes
+	read only = no
+und 
+/dev/mapper/xenialserver--vg-root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered,jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group)
+#############
+
+Also bräuchte man für eine 
+
 
 smbcquotas -F //localhost/share
 
