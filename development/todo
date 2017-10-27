@@ -10,6 +10,67 @@ deploy confidential attribute further
 
 
 
+
+Todo:
+
+ACL's
+-> sophomorix4/development/todo
+ohne SSH Zugriff
+
+Entwicklertreffen:
+sophomorix-webui user permissions, genauer
+sophomorix-school --check
+gibts smb-hare
+gibts dort aquota.user
+kann sophomorix darauf schreiben?
+kann sophomorix darauf quota setzen?
+--> Dann OK, user werden angelegt usw.
+5. Feld angleichen (lehrer,schüler)
+
+
+sophomorix-passwd, mit optionspasswort, interaktiv
+Attribute Quota als Multivalue name:wert
+
+
+Moodle Testzugriff Stefan
+Arbeitskreis
+- ACL, Windows-Clients, Linux-Clients???
+  Rainer, Buch kopiert mit sssd
+  Domänenbeitritt ja, Auswirkung auf linbo
+
+confidential: nicht schulweise
+sondern Mitgied in Gruppe
+
+sophomorix-device return json (import von Thomas auch)
+ WebUI rechte via Sophomorix (LDAP)
+
+CUPS via Samba
+wer macht das?
+
+
+Felder befüllen für Schulkonsole:
+Sophomorix-Webui-Dashboard            singlevalue
+Sophomorix-(Webui)-User-Permissions   multivalue -> todo
+wird je nach Rolle befüllt, 1 Zeile 1 Value
+sollte auch upgedated werden können, pro Schule
+-> Nach Urlaub
+
+
+
+Setup mit Partition =Schule
+-> lvm, usw...
+   sollte in die Doku von Linuxmuster-base
+
+-> Wann geht sophomorix von einer funktionierende Schule aus?,
+   -> gemountete Partition?
+   -> aquota.user existiert?
+   --> soll ja schnell gehen, oder 
+
+ext4 und 1 smbshare=1 partition
+Ubuntu 17.10 Base
+-> key nicht aktuell
+-> vor entwicklertreffen testen
+
 ############################################################
 Entwicklertreffen
 - Hardwareclasses
@@ -78,6 +139,9 @@ Beispiel:
 und 
 /dev/mapper/xenialserver--vg-root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered,jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group)
 #############
+
+Auf share setzen
+"strict allocate = yes"
 
 Also bräuchte man für eine 
 
@@ -717,12 +781,14 @@ Noch Todo:
 
 /srv/samba/schools/default-school/examusers
     TODO: examusers.ntacl  noch ersetzen
+--> wie normale students klassen homes
+
 
 /srv/samba/schools/default-school/examusers/?exam?
     repdir.exam
     -> nutzt examusers.ntacl  
        ersetzen mit examusers.subdir.ntacl??? entsprechend adminclass.ntacl???
-    
+-->     
 
 /srv/samba/schools/default-school/examusers/?exam?/<examuser>
    repdir.examuser_home 
