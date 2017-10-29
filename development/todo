@@ -25,7 +25,7 @@ toolbox script to query as ordinary user
 check if confidential attribute is hidden
 deploy confidential attribute further
 
-
+checken sophomorix.ini kommaseparierte schulenliste
 
 
 Todo:
@@ -44,7 +44,80 @@ kann sophomorix darauf quota setzen?
 --> Dann OK, user werden angelegt usw.
 5. Feld angleichen (lehrer,schüler)
 
+Schulkonsolen-konfiguration
+(SK=Schulkonsole(eine von vielen), Webui=Ajenti):
 
+Ziele:
+- auch weitere schulkonsolen managebar
+- SK-debian-Paket soll (ohne sophomorix-update)
+  - neues mudul forcen können
+  - neues modul auswählbar machen können 
+
+Umsetzung:
+1) Pfad zur Komnfigurationsdatei </pfad/festlegen/webui.conf>
+Diese Datei ist im Schulkonsolenpaket, von Entwickler verwaltet
+
+2) Beispiel Konfigurationsdatei des Pakets
+   A) DEFAULT module werden angezeigt, wenn der admin sie nicht sperrt
+      (z.B. neue, getestete module herausbringen)
+      DEFAULT|<modulname>|<Zeile>
+      (Beispiel: DEFAULT|auth-users|sidebar.view:/view/auth-users:true)
+   B) MUST module werden angezeigt und können nicht gesperrt werden
+      (z.B. selbstausperren verhindern)
+      MUST|<modulname>|<Zeile>
+   C) MAY module können angezeigt werden, wenn der admin das konfiguriert
+      (z.B. module testen)
+      MAY|<modulname>|<Zeile>
+
+3) Sperren/Blockieren der Module bei der Rolle in der school.ini
+[role.student]
+	webui_show=modulname1,modulname2
+	webui_block=modulname1,modulname2
+[role.teacher]
+	webui_show=modulname1,modulname2
+	webui_block=modulname1,modulname2
+[role.administrator]
+	webui_show=modulname1,modulname2
+	webui_block=modulname1,modulname2
+
+
+Script sophomorix-sk (schulkonsole??)
+
+Aufruf: sophomorix-sk --ui webui
+                      --school <schule>
+		      --role <student|teacher|administrator>
+
+A) liest die Paket-Konfiguration des ui ein
+B) modifiziert die einstellungen entsprechend der school.ini
+C) schreibt die attribute für alle user neu
+    ? Dauer
+    ? später auf eine Schule einschränkbar
+    ? später auf eine Rolle einschränkbar
+    ? evtl. nur die Differenzen schreiben
+
+
+
+Weitere Schulkonsole (z.B. 'miniui') hinzufügen wäre simple:
+A) Felder im AD schema anlegen sophomorix-miniui (multivalue)
+B) Pfad zur neuen SK-Konfigurationsdatei
+   -> config.developer
+   -> Attributnamen der Zielattribute configurieren
+   
+C) Code anpassen
+
+Konfiguration bei der Rolle, z.B.
+[role.student]
+	miniui_show=modulname1,modulname2
+	miniui_block=modulname1,modulname2
+	
+Todo:
+default schulkonsolennamen festlegen(Groß/klein beachten): Webui
+---> so ÜBERALL verwenden
+     (Dateinamen, Optionsnamen, Attribute, ...)
+
+
+
+------------------------------------------------------------
 sophomorix-passwd, mit optionspasswort, interaktiv
 Attribute Quota als Multivalue name:wert
 
