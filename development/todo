@@ -3164,12 +3164,6 @@ B) unid aus Datei gibts nicht im system, aber in  Dateien
    .add, -> .update (tolerate,deactivation date) or .kill
 5) Do it, oder sophomorix-teach-in 
 
-
-
-
-
-
-
 sophomorix-quota
 - option --show-non-default-quota
          --show-non-default-mail-quota
@@ -3178,6 +3172,89 @@ sophomorix-quota
   --adminclasses
   --projects
   evtl. auch einzeln
+
+sophomorix-quota workflow:
+
+1) Für alle user:
+   @userlist erzeugen (am ende sort)
+   Alter Wert sophomorixQuota aus AD holen, zerlegen in einen hash:
+   %old_quota
+      -> samAccount
+      -> school 
+        -> sophomorixQuota           (Attribut)
+        -> target_user -> 8000|---   (Sollwert der users)
+        -> target_calc -> 8000       (alter berechneter Wert)
+        -> quota -> failed|2997|...  (Realer Wert)
+
+     sophomorixQuota Attribut
+     -> 'empty' 
+     -> 'school:target_user:target_calc:failed'   i.e.: bsz:---|3000:failed
+     -> 'school:target_user:target_calc:quota'    i.e.: bsz:7000:7000:6997
+   @sort @userlist
+
+
+2) neue Quota für alle user berechnen:
+   * school-default
+   * adminclass
+   * project additions
+
+   --> ergibt für jeden user/schule ein Wert in MB (Sollwert, target_value)
+       (struktur wie bei %old_quota, jedoch %new_quota)
+
+   %new_quota -> samAccount -> school -> target_calc -> 3000
+                                      -> target_calc_info -> SD|CD|SDP|CDP
+                                      -> school -> 1000
+                                      -> adminclass -> 2000
+                                      -> project_add -> project1 -> 2000
+                                                     -> project2 -> 800
+                                      -> user   
+
+3) Entscheiden ob update erforderlich:
+
+   A) old quota target value exists
+      AND old quota target_value = new quota_target value
+      AND quota not failed
+      AND quota within x% of target_value
+      -> do nothing 
+   B) else
+      --> setzen, prüfen, updaten
+      1) smbcquota mit target_value absetzen
+      2) return auswerten, if OK, weiter else failed
+      3) gesetztes quota mit smbcquota abfragen
+      4) if gesetztes quota innerhalb x%, weiter else failed
+      5) sophomorixQuota updaten 
+
+sophomorix-quota --info 
+                 --school <school> (nur user 1er schule)
+                 --updates-only (failed and calc ne target)
+                 --use-smbcquota (use smbcquota to query quota) 
+                   display full info of smbcquota 
+
+-> alle user durchgehen
+-> sophomorixQuota abfragen
+
+Auflisten:
+userlogin | OK | global | calc | target_value | quota
+userlogin | !! |school1 | calc | target_value | failed 
+userlogin | OK |school2 | calc | target_value | quota 
+
+calculated: SD=3000
+            CD=5000
+            SDP=8000
+            CDP=9000
+wobei SD=school-default, CD=Class-default, +P=project modified
+
+Umsetzung:
+0. projects-memberhash
+   project -> sambasamaccount (membergroups auflösen, loop vermeiden) 
+1. Quotaberechnung neu
+2. --info
+3. quota setzen und updated
+4. quotaberechnung alt
+
+
+
+
 
 sophomorix-print:
 
