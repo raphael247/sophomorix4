@@ -85,6 +85,7 @@ Schulkonsolen-konfiguration
 
 Ziele:
 - auch weitere schulkonsolen managebar
+- Individuelle modulkonfiguration ermöglichen
 - SK-debian-Paket soll (ohne sophomorix-update)
   - neues modul forcen können
   - neues modul auswählbar machen können 
@@ -174,9 +175,72 @@ Fragen:
 
 
 ------------------------------------------------------------
+WIDERSPRUCH:
+single-user einstellungen in school.ini oder AD?
 
+2 unterschiedliche Methoden sind angedacht, auf welche einigen?
 
+1) festplattenquota, mailquota, ...:
+   sophomorix-quota trägt die Werte ins AD ein.
+   (nicht in eine Textdatei)
+   Falls beim user der Quota-Wert nicht leer ist
+   wird er benutzt um defaultquota, klassenquota zu überschreiben
+  
 
+2) schulkonsolenmodule
+   default aus school.ini, sophomorix schreibt bei JEDEM user die Werte ins AD rein.
+   Individuelle module nicht vorgesehen, aber notwendig
+   (modul testen, modul verbieten, ...)
+   Individuelle Werte:
+   A) In school.ini z.B. mit
+      [users]
+	webui_show=user1=modulname1,modulname2,user2=modulname2,
+	webui_block=user1=modulname1,modulname2
+      --> problematsch:
+        - sehr school.ini/lange Zeilen,
+	  (quota sollte dann eigentlich auch in school.ini)
+        - school.ini aus der Produktion nicht mehr so einfach kopierbar,
+	  da sie individuelle Einstellungen enthält
+   B) ins AD
+      wie erkennbar, dass ein user individuelle module sieht?
+      --> Zusatzattribut in AD
+          Sophomorix-Webui-Custom=TRUE/FALSE
+	  (in Anlehnung an quota sollte es dieses Attribut auch für
+	   Klassen/Projekte geben)
+
+Generelle Idee:
+Einstellungen (quota,SK-module, ...) habe folgende hierachie
+
+serverweit
+    --> globalweit
+    --> schulweit
+          --> rollenweit (begrenzte Anzahl)
+	      --> Gruppenweit
+	          (Klassenweit/Projektweit unbegrenzte Anzahl)
+	         --> Individuell (user)
+Vorschlag:
+1) school.ini:
+      Vorgaben für die ganze Schule
+      Vorgaben für eine Rolle
+   AD:
+      Vorgaben für eine Gruppe
+      Vorgaben für einen user
+
+2) sophomorix-quota/mailquota/sk (module) berechnet für jeden user:
+   - entsprechend der Schule/Rolle/Gruppe einen Wert, der für den user gilt:
+   - die kann individuell überschrieben werden, wenn ein FlagAttribut beim
+     user gesetzt wird (sophomorixQuotaCustom=TRUE/FALSE)
+
+3) im entsprechenden USER-Attribut
+        SophomorixQuota
+        SophomorixMailquota
+        Sophomorix-(Webui)-User-Permissions
+     steht dann IMMER der finale Wert.
+
+siehe auch Managementgroups:
+wäre wohl besser deren defaultmembers im AD bei der Gruppe zu speichern
+
+------------------------------------------------------------
 
 
 sophomorix-passwd, mit optionspasswort, interaktiv
@@ -1856,7 +1920,12 @@ Beliebige managemengruppen erlauben/nachliefern können, z.B. nextcloud
     sophomorix-school --create school <school>  (oder --update)
     sophomorix-school --create-all-schools     (todo, bei Paketinstallation)
 2) Managementgruppen auf default zurücksetzen:
-   Konfiguration in school.conf (ini format, subsections mit '.' getrennt, konfigurierbar)
+   Konfiguration in school.conf 
+   (ini format, subsections mit '.' getrennt, konfigurierbar)
+
+   Oder besser im AD konfigurierbar machen?
+   (neue Attribute erforderlich)
+
    school.conf: Konfiguriere den Default der memberships
    [group.wifi] # jede Managementgruppe (evtl. später projekte)
      allow_group=12a,12b,teachers # students
