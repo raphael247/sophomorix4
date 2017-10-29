@@ -14,8 +14,11 @@ git push https-origin xenial
 Username for 'https://github.com': ########
 Password for 'https://jeffbeck@github.com': ########
 
-
-
+ini Dateien:
+------------------------------------------------------------
+	var=Value
+	list=SCHOOLS=bsz,abc,...
+	key-value=key1=value1,key2=value2,... 
 
 
 
@@ -37,37 +40,75 @@ ohne SSH Zugriff
 Entwicklertreffen:
 sophomorix-webui user permissions, genauer
 sophomorix-school --check
-gibts smb-hare
-gibts dort aquota.user
-kann sophomorix darauf schreiben?
-kann sophomorix darauf quota setzen?
---> Dann OK, user werden angelegt usw.
-5. Feld angleichen (lehrer,schüler)
+   - sophomorix schaut, ob diese Schule existiert
+   - Woran erkennbar?
+      - Achtung: nur smb:// Befehle benutzen, da das share remote liegen könnte
+      - es gibt ein smb-share mit dem Schulnamen
+        (ein paar Namen für Schulen sind deshalb verboten, welche?)
+      - in dem smb-share befindet sich toplevel eine Datei aquota.user
+        (Sieht man die Datei im smb-share)
+      - Tests:
+         - kann sophomorix eine Datei anlegen? smbclient
+         - kann sophomorix eine NTACL setzen?  smbcacls
+         - kann sophomorix quota setzen?       smbcquota
+   - Wenn share nutzbar --> Schüler werden angelegt
+     sonst Abbruch BEVOR was gemacht wird:
+     Zur Schule <school> gibt es kein smb-share 
 
+5. Feld angleichen (lehrer,schüler)
+   A) schueler.txt an lehrer.txt/extraschueler:
+      5. Feld wunschlogin, 6. Feld unid
+      Problem:
+         - Schüler-Export ändert sich zur 6.x
+	 - Schüler export braucht Leerfeld (problematisch)
+	 - Migration
+   B) lehrer.txt/extraschueler an schueler.txt
+      5.Feld unid, 6. Feld wunschlogin
+      Problem:
+         - lehrer-export ändert sich zur 6.x
+	 - Lehrerexport braucht Leerfeld
+	 - Migration
+   Beides aufwendig und betrifft auch
+   - den workfow an den Schulen (Sekretariat Verwaltung, ...)
+     schwierig umzustellen
+   - Pakete, Fortbildungen, Beispieldateien, ...
+   - das ganze ohne jeglichen Mehrwert, Zusatzfeature
+   ---> Besser Finger weg.
+        SK solte sich den langjährigen Gegebenheiten anpassen.
+	Fallunterscheidung lehrer/extraschueler und schueler
+	(sophomorix-check -ij gibt die Infos)
+        
+
+------------------------------------------------------------
 Schulkonsolen-konfiguration
-(SK=Schulkonsole(eine von vielen), Webui=Ajenti):
+(SK=Schulkonsole(eine von vielen), Webui=Ajenti, ...):
 
 Ziele:
 - auch weitere schulkonsolen managebar
 - SK-debian-Paket soll (ohne sophomorix-update)
-  - neues mudul forcen können
+  - neues modul forcen können
   - neues modul auswählbar machen können 
 
 Umsetzung:
-1) Pfad zur Komnfigurationsdatei </pfad/festlegen/webui.conf>
-Diese Datei ist im Schulkonsolenpaket, von Entwickler verwaltet
+1) Pfad zur Konfigurationsdatei </pfad/festlegen/<Webui>.conf>
+  - Diese Datei ist im Schulkonsolenpaket, von Entwickler verwaltet
 
-2) Beispiel Konfigurationsdatei des Pakets
-   A) DEFAULT module werden angezeigt, wenn der admin sie nicht sperrt
-      (z.B. neue, getestete module herausbringen)
-      DEFAULT|<modulname>|<Zeile>
-      (Beispiel: DEFAULT|auth-users|sidebar.view:/view/auth-users:true)
-   B) MUST module werden angezeigt und können nicht gesperrt werden
-      (z.B. selbstausperren verhindern)
-      MUST|<modulname>|<Zeile>
-   C) MAY module können angezeigt werden, wenn der admin das konfiguriert
-      (z.B. module testen)
-      MAY|<modulname>|<Zeile>
+  - Beispiel Konfigurationsdatei des Pakets (je modul 1 Zeile)
+    A) DEFAULT module werden angezeigt, wenn der admin sie nicht sperrt
+       (z.B. neue, getestete module herausbringen)
+       DEFAULT|<modulname>|<Zeile>
+       (Beispiel: DEFAULT|auth-users|sidebar.view:/view/auth-users:true)
+    B) MUST module werden angezeigt und können nicht gesperrt werden
+       (z.B. selbstausperren verhindern)
+       MUST|<modulname>|<Zeile>
+    C) MAY module können angezeigt werden, wenn der admin das konfiguriert
+       (z.B. module testen)
+       MAY|<modulname>|<Zeile>
+
+    * <modulname> ist der name unter dem dieses Modul in der
+      school.ini, bei Optionen usw. angesprochen werden kann.
+      (Vorschlag: keine Leerzeichen, kleinbuchstaben)
+
 
 3) Sperren/Blockieren der Module bei der Rolle in der school.ini
 [role.student]
@@ -83,17 +124,23 @@ Diese Datei ist im Schulkonsolenpaket, von Entwickler verwaltet
 
 Script sophomorix-sk (schulkonsole??)
 
-Aufruf: sophomorix-sk --ui webui
-                      --school <schule>
-		      --role <student|teacher|administrator>
+Aufruf:
+sophomorix-sk --info
+  zeigt in jeder Schule, welche module wie konfiguriert sind
+sophomorix-sk --ui <Webui>
+              --school <schule>
+              --role <student|teacher|administrator>
+  konfiguriert für die sk <Webui> in der Schule <schule> für
+  alle user der Rolle <student|teacher|administrator> die zu
+  <Webui> gehörenden Attribute im AD.
 
-A) liest die Paket-Konfiguration des ui ein
-B) modifiziert die einstellungen entsprechend der school.ini
-C) schreibt die attribute für alle user neu
-    ? Dauer
-    ? später auf eine Schule einschränkbar
-    ? später auf eine Rolle einschränkbar
-    ? evtl. nur die Differenzen schreiben
+  A) liest die Paket-Konfiguration der SK ein <Webui>
+  B) modifiziert die Einstellungen entsprechend der school.ini
+  C) schreibt die attribute für alle user neu
+      ? Dauer
+      ? später auf eine Schule einschränkbar
+      ? später auf eine Rolle einschränkbar
+      ? evtl. nur die Differenzen schreiben
 
 
 
@@ -101,9 +148,9 @@ Weitere Schulkonsole (z.B. 'miniui') hinzufügen wäre simple:
 A) Felder im AD schema anlegen sophomorix-miniui (multivalue)
 B) Pfad zur neuen SK-Konfigurationsdatei
    -> config.developer
-   -> Attributnamen der Zielattribute configurieren
+   -> Attributnamen der Zielattribute Konfigurieren
    
-C) Code anpassen
+C) Neue parameter in school.ini zulassen:
 
 Konfiguration bei der Rolle, z.B.
 [role.student]
@@ -111,13 +158,27 @@ Konfiguration bei der Rolle, z.B.
 	miniui_block=modulname1,modulname2
 	
 Todo:
-default schulkonsolennamen festlegen(Groß/klein beachten): Webui
----> so ÜBERALL verwenden
-     (Dateinamen, Optionsnamen, Attribute, ...)
+1) default schulkonsolennamen festlegen(Groß/klein beachten): Webui
+   ---> so ÜBERALL verwenden
+        (Dateinamen, Optionsnamen, Attribute, ...)
+2) Attibute im Schema anpassen:
+   ---> Sophomorix-Webui-Dashboard            singlevalue
+   ---> Sophomorix-(Webui)-User-Permissions   multivalue -> todo
+        wird je nach Rolle befüllt, 1 Zeile 1 Value
 
+Fragen:
+1) Was kommt in dieses Attribut, und wie findet sophomorix den Inhalt:
+   Sophomorix-Webui-Dashboard            singlevalue
+   -> Zusatz-Paket-konfigurationsdatei???
+2) Brauchen andere schulkonsolen auch dieses Attribut??
 
 
 ------------------------------------------------------------
+
+
+
+
+
 sophomorix-passwd, mit optionspasswort, interaktiv
 Attribute Quota als Multivalue name:wert
 
@@ -137,13 +198,6 @@ sophomorix-device return json (import von Thomas auch)
 CUPS via Samba
 wer macht das?
 
-
-Felder befüllen für Schulkonsole:
-Sophomorix-Webui-Dashboard            singlevalue
-Sophomorix-(Webui)-User-Permissions   multivalue -> todo
-wird je nach Rolle befüllt, 1 Zeile 1 Value
-sollte auch upgedated werden können, pro Schule
--> Nach Urlaub
 
 
 
