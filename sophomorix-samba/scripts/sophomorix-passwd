@@ -135,7 +135,7 @@ my $testopt=GetOptions(
 #           "reset" => \$reset,
 #           "common" => \$common,
 #           "random" => \$random,
-#           "interactive" => \$interactive,
+           "interactive" => \$interactive,
 #           "all-characters" => \$all_characters,
            "nofirstpassupdate" => \$nofirstpassupdate,
 #           "plength=i" => \$char_num,
@@ -198,9 +198,15 @@ Options:
 
 Create a password:
   --pass password, --password password
+  --interactive
 
 Create userlist:
   -u user1,user2,...   /  --users  user1,user2,...
+
+
+Console examples:
+Interactively change password of a user (Always with --hide and --nofirstpassupdate)
+  sophomorix-passwd --user schneima42 --interactive
 
 Schukonsole examples:
 Change password for a user:
@@ -216,7 +222,6 @@ Todo:
 Create a password:
   --config  (use sophomorix.conf)
   --common
-  --interactive
   --reset
   --random
   --plength number
@@ -449,6 +454,10 @@ if ($set_firstpassword==1){
 
 
 
+
+
+
+
 ############################################################
 # create userlist from options
 ############################################################
@@ -456,22 +465,86 @@ my @userlist=();
 # --user
 if ($user ne ""){
     @userlist=split(",",$user);
+}
+my $userlist_count=$#userlist+1;
+
+
+############################################################
+# Setting passwords interacive
+############################################################
+if ($interactive==1){
+    if ($userlist_count==1){
+        # ask for password
+        use Term::ReadKey;
+        ReadMode('noecho');
+        # ask once
+        print "New password : ";
+        my $password_1 = ReadLine(0);
+        print "\n";
+        chomp($password_1);
+
+        # ask again
+        print "Retype new password : ";
+        my $password_2 = ReadLine(0);
+        print "\n";
+        chomp($password_2);
+        # reset to echo
+        ReadMode('normal');
+
+        # Look if they match
+        if ($password_1 eq $password_2){
+            print "New passwords match!\n";
+ 	    my $filter="( &(objectclass=user) (sAMAccountName=$user) )"; 
+            my $mesg = $ldap->search(
+                              base   => $root_dse,
+                              scope => 'sub',
+                              filter => $filter,
+                              attr => ['sAMAccountName','dn']
+                                     );
+            &AD_debug_logdump($mesg,2,(caller(0))[3]);
+            my $max = $mesg->count;
+	    if ($max==1){
+                my $entry = $mesg->entry(0);
+                my $dn=$entry->dn();
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$dn,
+                                 user=>$user,
+                                 user_count=>"1",
+                                 max_user_count=>"1",
+                                 hide_pwd=>"1",
+                                 sophomorix_first_password=>$password_1,
+                                 # firstpassword=>$password, # not updated
+                                 date_now=> $time_stamp_AD,
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                                });
+	    }
+            exit 0;
+         } else {
+             print "New passwords don't match!\n";
+             exit 10;
+         }
+     } else {
+         print "ERROR: I can set password interactively only for one user\n";
+         print "Unable to change password\n";
+         exit 0;
+     }
 
 }
+
 
 
 
 ############################################################
 # setting passwords from userlist
 ############################################################
-my $userlist_count=$#userlist+1;
 # set a password from userlist
 if ($password ne "" and $userlist_count>0){
     my $user_count=0;
     foreach my $userlist_user (@userlist){
 	$user_count++;
-        print "   $user_count) Setting password for user $userlist_user\n";
-
 	my $filter="( &(objectclass=user) (sAMAccountName=$userlist_user) )"; 
         my $mesg = $ldap->search(
                           base   => $root_dse,
@@ -568,55 +641,6 @@ if ($password ne "" and $userlist_count>0){
 # # --random
 # if ($random==1){
 #    $info_line="Every user will have its own a random password";
-# }
-
-
-
-# # Setting passwords interacive
-# if ($interactive==1){
-#     my $count_users=$#users+1;
-#     if ($count_users==1){
-#         # ask for password
-#         use Term::ReadKey;
-#         ReadMode('noecho');
-
-#         # ask once
-#         print "New password : ";
-#         my $password_1 = ReadLine(0);
-#         print "\n";
-#         chomp($password_1);
-
-#         # ask again
-#         print "Retype new password : ";
-#         my $password_2 = ReadLine(0);
-#         print "\n";
-#         chomp($password_2);
-
-#         # reset to echo
-#         ReadMode('normal');
-
-#         # Look if they match
-#         if ($password_1 eq $password_2){
-#             # check for invalid characters
-#             &validate_password($password_1);
-#             # Passwort für user setzen
-#             &set_sophomorix_passwd($users[0],$password_1);
-#             # do NOT set password in the Database as FirstPassword
-#             &nscd_start();
-#             exit 0;
-#         } else {
-#             print "New passwords don't match!\n";
-#             &nscd_start();
-#             exit 10;
-#         }
-#     } else {
-#         print "ERROR: I can set password interactively only for one user\n";
-#         print "Unable to change password\n";
-#         # smbldap-passwd returns 0 (10 should be better)
-#         &nscd_start();
-#         exit 0;
-#     }
-
 # }
 
 
