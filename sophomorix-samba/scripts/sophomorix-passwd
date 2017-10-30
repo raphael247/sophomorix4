@@ -124,25 +124,25 @@ my $testopt=GetOptions(
            "users|user|u=s" => \$user,
            "clone-from-user=s" => \$clone_from_user,
            "clone-to-user=s" => \$clone_to_user,
-           "class|classes|c=s" => \$classes,
-           "project|projects=s" => \$projects,
-           "student|students|s" => \$student,
-           "teacher|teachers|t" => \$teacher,
-           "room|rooms|r=s" => \$rooms,
-           "workstations|workstation|w" => \$ws,
+#           "class|classes|c=s" => \$classes,
+#           "project|projects=s" => \$projects,
+#           "student|students|s" => \$student,
+#           "teacher|teachers|t" => \$teacher,
+#           "room|rooms|r=s" => \$rooms,
+#           "workstations|workstation|w" => \$ws,
            "password|passwd|pass=s" => \$password,
-           "config" => \$config,
-           "reset" => \$reset,
-           "common" => \$common,
-           "random" => \$random,
-           "interactive" => \$interactive,
-           "all-characters" => \$all_characters,
+#           "config" => \$config,
+#           "reset" => \$reset,
+#           "common" => \$common,
+#           "random" => \$random,
+#           "interactive" => \$interactive,
+#           "all-characters" => \$all_characters,
            "nofirstpassupdate" => \$nofirstpassupdate,
-           "plength=i" => \$char_num,
-           "hide" => \$hide,
-           "samba-pwd-must-change!" => \$smb_pw_m_change,
-           "shell|loginshell=s" => \$shell,
-           "force" => \$force,
+#           "plength=i" => \$char_num,
+#           "hide" => \$hide,
+#           "samba-pwd-must-change!" => \$smb_pw_m_change,
+#           "shell|loginshell=s" => \$shell,
+#           "force" => \$force,
            "test-firstpassword" => \$test_firstpassword,
            "set-firstpassword" => \$set_firstpassword,
           );
@@ -193,15 +193,22 @@ Testing stuff:
   --test-firstpassword -u user
 
 
+Create a password:
+  --pass password, --password password
+  --nofirstpassupdate
+
+Create userlist:
+  -u user1,user2,...   /  --users  user1,user2,...
+
+
+
 
 Todo:
 
 Create a password:
   --config  (use sophomorix.conf)
-  --pass password, --password password
   --common
   --interactive
-  --nofirstpassupdate
   --reset
   --random
   --plength number
@@ -219,11 +226,9 @@ Create userlist:
   -s / --students
   -t / --teachers
   -w / --workstations (ExamAccouts)
-  -u user1,user2,...   /  --users  user1,user2,...
   -c class1,class2,... /  --class class1,class2,... 
   --project project1,project2,... 
   -r room1,room2,...   /  --rooms room1,room2,...
-
 
 Please see the sophomorix-passwd(8) man pages for full documentation
 ');
@@ -422,8 +427,8 @@ if ($set_firstpassword==1){
                      user=>$sam_account,
                      user_count=>$user_count,
                      max_user_count=>"-",
-                     firstpassword=>$firstpassword,
-                     plain_password=>$firstpassword,
+#                     firstpassword=>$firstpassword,
+                     sophomorix_first_password=>$firstpassword,
                      date_now=> $time_stamp_AD,
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
@@ -432,6 +437,87 @@ if ($set_firstpassword==1){
     }
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
+
+
+
+############################################################
+# create userlist from options
+############################################################
+my @userlist=();
+# --user
+if ($user ne ""){
+    @userlist=split(",",$user);
+
+}
+
+
+
+############################################################
+# setting passwords from userlist
+############################################################
+my $userlist_count=$#userlist+1;
+# set a password from userlist
+if ($password ne "" and $userlist_count>0){
+    my $user_count=0;
+    foreach my $userlist_user (@userlist){
+	$user_count++;
+        print "   $user_count) Setting password for user $userlist_user\n";
+
+	my $filter="( &(objectclass=user) (sAMAccountName=$userlist_user) )"; 
+        my $mesg = $ldap->search(
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attr => ['sAMAccountName','cn','dn','sophomorixFirstPassword']
+                                );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        my $max = $mesg->count;
+	if ($max==1){
+            my $entry = $mesg->entry(0);
+            my $dn=$entry->dn();
+            if ($nofirstpassupdate==1){
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$dn,
+                                 user=>$userlist_user,
+                                 user_count=>$user_count,
+                                 max_user_count=>$userlist_count,
+                                 sophomorix_first_password=>$password,
+#                                 firstpassword=>$password,
+                                 date_now=> $time_stamp_AD,
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+			        });
+	    } else {
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$dn,
+                                 user=>$userlist_user,
+                                 user_count=>$user_count,
+                                 max_user_count=>$userlist_count,
+                                 sophomorix_first_password=>$password,
+                                 firstpassword=>$password,
+                                 date_now=> $time_stamp_AD,
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+			        });
+	    }
+	} else {
+            print "\nERROR: $max users $userlist_user found instead of 1\n\n";
+	}
+    }
+} elsif ($password eq "" and $userlist_count>0) {
+    print "\n";
+    print "WARNING: No password given, but $userlist_count users in userlist\n";
+    print "         I do not know what password you want!\n\n";        
+}
+
+
+
+
+
 
 
 # # use the charlist of SophomorixBase

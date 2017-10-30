@@ -1835,8 +1835,8 @@ sub AD_user_update {
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
     my $user = $arg_ref->{user};
-    my $firstpassword = $arg_ref->{firstpassword};
-    my $sophomorix_first_password = $arg_ref->{sophomorix_first_password};
+    my $firstpassword = $arg_ref->{firstpassword}; # sophomorixFirstpassword
+    my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
