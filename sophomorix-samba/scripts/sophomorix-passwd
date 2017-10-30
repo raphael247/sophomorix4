@@ -139,7 +139,7 @@ my $testopt=GetOptions(
 #           "all-characters" => \$all_characters,
            "nofirstpassupdate" => \$nofirstpassupdate,
 #           "plength=i" => \$char_num,
-#           "hide" => \$hide,
+           "hide" => \$hide,
 #           "samba-pwd-must-change!" => \$smb_pw_m_change,
 #           "shell|loginshell=s" => \$shell,
 #           "force" => \$force,
@@ -192,15 +192,23 @@ Testing stuff:
   --test-firstpassword 
   --test-firstpassword -u user
 
+Options:
+  --nofirstpassupdate (do not update AD attribute sophomorixFirstPassword)
+  --hide (hide display of password in console output, when updating)
 
 Create a password:
   --pass password, --password password
-  --nofirstpassupdate
 
 Create userlist:
   -u user1,user2,...   /  --users  user1,user2,...
 
-
+Schukonsole examples:
+Change password for a user:
+   sophomorix-passwd --user schneima42 --pass \'Muster!7\' --hide (--nofirstpassupdate) 
+Reset a password for a user from Schulkonsole:
+    sophomorix-passwd --set-firstpassword -u schneima42
+Test if the sophomorixFirstPassword is the valid password:
+    sophomorix-passwd --test-firstpassword -u schneima42
 
 
 Todo:
@@ -427,6 +435,7 @@ if ($set_firstpassword==1){
                      user=>$sam_account,
                      user_count=>$user_count,
                      max_user_count=>"-",
+                     hide_pwd=>$hide,
 #                     firstpassword=>$firstpassword,
                      sophomorix_first_password=>$firstpassword,
                      date_now=> $time_stamp_AD,
@@ -482,8 +491,9 @@ if ($password ne "" and $userlist_count>0){
                                  user=>$userlist_user,
                                  user_count=>$user_count,
                                  max_user_count=>$userlist_count,
+                                 hide_pwd=>$hide,
                                  sophomorix_first_password=>$password,
-#                                 firstpassword=>$password,
+                                 # firstpassword=>$password, # not updated
                                  date_now=> $time_stamp_AD,
                                  json=>$json,
                                  sophomorix_config=>\%sophomorix_config,
@@ -496,6 +506,7 @@ if ($password ne "" and $userlist_count>0){
                                  user=>$userlist_user,
                                  user_count=>$user_count,
                                  max_user_count=>$userlist_count,
+                                 hide_pwd=>$hide,
                                  sophomorix_first_password=>$password,
                                  firstpassword=>$password,
                                  date_now=> $time_stamp_AD,

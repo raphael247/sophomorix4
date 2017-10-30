@@ -1834,6 +1834,7 @@ sub AD_user_update {
     my $unid = $arg_ref->{unid};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
+    my $hide_pwd = $arg_ref->{hide_pwd};
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword}; # sophomorixFirstpassword
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
@@ -1931,12 +1932,20 @@ sub AD_user_update {
     }
     if (defined $firstpassword){
         $replace{'sophomorixFirstpassword'}=$firstpassword;
-        print "   Firstpassword:              $firstpassword\n";
+	if ($hide_pwd==1){
+	    print "   Firstpassword:              ****** (omitted by --hide)\n";
+	} else {
+	    print "   Firstpassword:              $firstpassword\n";
+	}
     }
     if (defined $sophomorix_first_password){
         my $uni_password=&_unipwd_from_plainpwd($sophomorix_first_password);
         $replace{'unicodePwd'}=$uni_password;
-        print "   unicodePwd:                 **********\n";
+	if ($hide_pwd==1){
+	    print "   unicodePwd:                 ****** (omitted by --hide)\n";
+	} else {
+	    print "   unicodePwd:                 $sophomorix_first_password\n";
+	}
     }
     if (defined $status and $status ne "---"){
         $replace{'sophomorixStatus'}=$status;
