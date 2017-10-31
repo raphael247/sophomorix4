@@ -564,10 +564,10 @@ sub AD_test_object {
             is ($entry->get_value ('sophomorixStatus'),$s_status,
 		"  * sophomorixStatus is $s_status");
         }
-        if (defined $s_quota){
-            is ($entry->get_value ('sophomorixQuota'),$s_quota,
-		"  * sophomorixQuota is $s_quota");
-        }
+#        if (defined $s_quota){
+#            is ($entry->get_value ('sophomorixQuota'),$s_quota,
+#		"  * sophomorixQuota is $s_quota");
+#        }
         if (defined $s_mailquota){
             is ($entry->get_value ('sophomorixMailQuota'),$s_mailquota,
 		"  * sophomorixMailQuota is $s_mailquota");
@@ -689,6 +689,11 @@ sub AD_test_object {
                 "  * $sam_account has $spn_count servicePrincipalName entries: $test_count tested");
         }
 
+
+        ##################################################
+        if (defined $s_quota){
+            &test_multivalue($s_quota,"sophomorixQuota",$entry,$sam_account);
+        }
 
         ##################################################
         if (defined $s_user_permissions){

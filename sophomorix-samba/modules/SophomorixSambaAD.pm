@@ -4155,7 +4155,7 @@ sub AD_class_fetch {
             # adminclass attributes
 	    my $description = $entry->get_value('description');
 	    my $gidnumber = $entry->get_value('gidNumber');
-	    my $quota = $entry->get_value('sophomorixQuota');
+#	    my $quota = $entry->get_value('sophomorixQuota');
             my $mailquota = $entry->get_value('sophomorixMailQuota');
             my $mailalias = $entry->get_value('sophomorixMailAlias');
             my $maillist = $entry->get_value('sophomorixMailList');
@@ -4583,7 +4583,7 @@ sub AD_group_update {
     my $dn = $arg_ref->{dn};
     my $type = $arg_ref->{type};
     my $description = $arg_ref->{description};
-    my $quota = $arg_ref->{quota};
+#    my $quota = $arg_ref->{quota};
     my $mailquota = $arg_ref->{mailquota};
     my $addquota = $arg_ref->{addquota};
     my $addmailquota = $arg_ref->{addmailquota};
@@ -4611,10 +4611,10 @@ sub AD_group_update {
         my $mesg = $ldap->modify($dn,replace => {Description => $description}); 
     }
     # quota   
-    if (defined $quota){
-        print "   * Setting sophomorixQuota to $quota\n";
-        my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
-    }
+#    if (defined $quota){
+#        print "   * Setting sophomorixQuota to $quota\n";
+#        my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
+#    }
     # mailquota   
     if (defined $mailquota){
         print "   * Setting sophomorixMailquota to $mailquota\n";
@@ -4990,12 +4990,12 @@ sub AD_group_list {
             } else {
                 $status=$entry->get_value('sophomorixStatus')
 	    }
-            my $quota;
-            if (not defined $entry->get_value('sophomorixQuota')){
-                $quota=""
-            } else {
-                $quota=$entry->get_value('sophomorixQuota')
-	    }
+            my $quota="";
+#            if (not defined $entry->get_value('sophomorixQuota')){
+#                $quota=""
+#            } else {
+#                $quota=$entry->get_value('sophomorixQuota')
+#	    }
             my $mailquota;
             if (not defined $entry->get_value('sophomorixMailQuota')){
                 $mailquota=""
@@ -5219,7 +5219,8 @@ sub AD_group_create {
                                     sophomorixStatus => $status,
                                     sophomorixAddQuota => "---",
                                     sophomorixAddMailQuota => "---",
-                                    sophomorixQuota => "---",
+                                    sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---",
+                                                        "$school:---"],
                                     sophomorixMailQuota => "-1",
                                     sophomorixMaxMembers => "0",
                                     sophomorixMailAlias => "FALSE",
