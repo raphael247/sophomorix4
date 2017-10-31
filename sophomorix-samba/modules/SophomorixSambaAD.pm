@@ -4155,7 +4155,7 @@ sub AD_class_fetch {
             # adminclass attributes
 	    my $description = $entry->get_value('description');
 	    my $gidnumber = $entry->get_value('gidNumber');
-#	    my $quota = $entry->get_value('sophomorixQuota');
+	    my @quota = sort $entry->get_value('sophomorixQuota');
             my $mailquota = $entry->get_value('sophomorixMailQuota');
             my $mailalias = $entry->get_value('sophomorixMailAlias');
             my $maillist = $entry->get_value('sophomorixMailList');
@@ -4258,11 +4258,19 @@ sub AD_class_fetch {
                 }
             }
 
+	    # indet list
+	    my @quotashow=();
+	    foreach my $quotastring (@quota){
+		my $tmp=" ".$quotastring;
+                push @quotashow, $tmp;
+	    }
+
             # left column in printout
             my @project_attr=("gidnumber: $gidnumber",
                               "Description:",
                               " $description",
-                              "Quota: ${quota} MB",
+                              "Quota in MB:",
+			      @quotashow,
                               "MailQuota: ${mailquota} MB",
                               "MailAlias: $mailalias",
                               "MailList: $maillist",
