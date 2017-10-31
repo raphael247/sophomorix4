@@ -2538,7 +2538,7 @@ sub AD_school_create {
         my $command="net conf addshare ".
                     $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." ".
                     $DevelConf::homedir_global.
-                    " writeable=y guest_ok=y 'Share for school global'";
+                    " writeable=y guest_ok=N 'Share for school global'";
         print "   * $command\n";
         system($command);
         my $command_mod1="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'msdfs root' 'yes'";
@@ -2547,6 +2547,11 @@ sub AD_school_create {
         my $command_mod2="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'hide unreadable' 'yes'";
         print "   * $command_mod2\n";
         system($command_mod2);
+	my $groupstring=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}."\\".$DevelConf::sophomorix_file_admin.
+                        ", \@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}."\\SCHOOLS";
+        my $command_mod3="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'valid users' '$groupstring'";
+        print "   * $command_mod3\n";
+        system($command_mod3);
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
@@ -2571,9 +2576,12 @@ sub AD_school_create {
         print "   * $command_mod2\n";
         system($command_mod2);
 
-        my $groupstring=$DevelConf::sophomorix_file_admin."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
-                        ", ".$school."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
-                        ", global-admins\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'};
+#        my $groupstring=$DevelConf::sophomorix_file_admin."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
+#                        ", ".$school."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
+#                        ", global-admins\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'};
+        my $groupstring=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}."\\".$DevelConf::sophomorix_file_admin.
+                        ", \@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}."\\".$school.
+                        ", \@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}."\\global-admins";
         my $command_mod3="net conf setparm ".$school." 'valid users' '$groupstring'";
         print "   * $command_mod3\n";
         system($command_mod3);
