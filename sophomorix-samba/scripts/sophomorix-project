@@ -380,7 +380,7 @@ if ($project eq "" and $info==1){
 # --info --project <project>
 # list project(s) and exit
 if ($project ne "" and $info==1){
-    my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
+    my ($dn_pro,$count,$school_AD)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
     exit;
 }
 
@@ -633,7 +633,7 @@ if ($kill==1 and $project ne ""){
 
 # get dn if project exists and continue
 ############################################################
-my ($dn_pro,$count)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
+my ($dn_pro,$count,$school_AD)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
 
 if ($count>1){
     print "\n$count Projects found.\n";
@@ -667,6 +667,7 @@ if (defined $description){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       description=>$description,
                       sophomorix_config=>\%sophomorix_config,
@@ -678,6 +679,7 @@ if (defined $addquota){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       addquota=>$addquota,
                       sophomorix_config=>\%sophomorix_config,
@@ -690,6 +692,7 @@ if (defined $addmailquota){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       addmailquota=>$addmailquota,
                       sophomorix_config=>\%sophomorix_config,
@@ -702,6 +705,7 @@ if (defined $mailalias){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       mailalias=>$mailalias,
                       sophomorix_config=>\%sophomorix_config,
@@ -713,6 +717,7 @@ if (defined $maillist){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       maillist=>$maillist,
                       sophomorix_config=>\%sophomorix_config,
@@ -724,6 +729,7 @@ if (defined $status){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       status=>$status,
                       sophomorix_config=>\%sophomorix_config,
@@ -735,6 +741,7 @@ if (defined $join){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       join=>$join,
                       sophomorix_config=>\%sophomorix_config,
@@ -746,6 +753,7 @@ if (defined $hide){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       hide=>$hide,
                       sophomorix_config=>\%sophomorix_config,
@@ -757,6 +765,7 @@ if (defined $maxmembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       maxmembers=>$maxmembers,
                       sophomorix_config=>\%sophomorix_config,
@@ -768,6 +777,7 @@ if (defined $creationdate){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       creationdate=>$creationdate,
                       sophomorix_config=>\%sophomorix_config,
@@ -781,6 +791,7 @@ if (defined $members){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
@@ -796,6 +807,7 @@ if (defined $addmembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
@@ -810,6 +822,7 @@ if (defined $removemembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
@@ -825,6 +838,7 @@ if (defined $admins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
@@ -840,6 +854,7 @@ if (defined $addadmins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
@@ -854,6 +869,7 @@ if (defined $removeadmins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
@@ -869,6 +885,7 @@ if (defined $membergroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       membergroups=>$membergroups,
                       sophomorix_config=>\%sophomorix_config,
@@ -884,6 +901,7 @@ if (defined $addmembergroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       membergroups=>$membergroups,
                       sophomorix_config=>\%sophomorix_config,
@@ -898,6 +916,7 @@ if (defined $removemembergroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       membergroups=>$membergroups,
                       sophomorix_config=>\%sophomorix_config,
@@ -913,6 +932,7 @@ if (defined $admingroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       admingroups=>$admingroups,
                     });
@@ -927,6 +947,7 @@ if (defined $addadmingroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       admingroups=>$admingroups,
                       sophomorix_config=>\%sophomorix_config,
@@ -941,6 +962,7 @@ if (defined $removeadmingroups){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
+		      school=>$school_AD,
                       type=>"project",
                       admingroups=>$admingroups,
                       sophomorix_config=>\%sophomorix_config,

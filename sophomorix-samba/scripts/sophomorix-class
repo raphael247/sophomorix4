@@ -210,7 +210,7 @@ if ($info==1 and $class eq ""){
 # --info --class name
 # list class(es) and exit
 if ($class ne "" and $info==1){
-    my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
+    my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
     exit;
 }
 
@@ -274,7 +274,7 @@ if ($kill==1 and $class ne ""){
 
 # get dn if class exists and continue ($info=0)
 ############################################################
-my ($dn_class,$count)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
+my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
 
 if ($count>1){
     print "\n$count classes found.\n";
@@ -288,13 +288,14 @@ if ($count>1){
 ##################################################
 # ??? --sync_all_memberships for classes? ???
 
-
+print "HERE: $school_AD\n";
 
 # --description <strg>
 if (defined $description){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       description=>$description,
                       sophomorix_config=>\%sophomorix_config,
@@ -306,6 +307,7 @@ if (defined $quota){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       quota=>$quota,
                       sophomorix_config=>\%sophomorix_config,
@@ -317,6 +319,7 @@ if (defined $mailquota){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       mailquota=>$mailquota,
                       sophomorix_config=>\%sophomorix_config,
@@ -328,6 +331,7 @@ if (defined $mailalias){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       mailalias=>$mailalias,
                       sophomorix_config=>\%sophomorix_config,
@@ -339,6 +343,7 @@ if (defined $maillist){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       maillist=>$maillist,
                       sophomorix_config=>\%sophomorix_config,
@@ -350,6 +355,7 @@ if (defined $status){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       status=>$status,
                       sophomorix_config=>\%sophomorix_config,
@@ -361,6 +367,7 @@ if (defined $join){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       join=>$join,
                       sophomorix_config=>\%sophomorix_config,
@@ -372,6 +379,7 @@ if (defined $hide){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       hide=>$hide,
                       sophomorix_config=>\%sophomorix_config,
@@ -383,6 +391,7 @@ if (defined $maxmembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       maxmembers=>$maxmembers,
                       sophomorix_config=>\%sophomorix_config,
@@ -394,6 +403,7 @@ if (defined $creationdate){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       creationdate=>$creationdate,
                       sophomorix_config=>\%sophomorix_config,
@@ -405,6 +415,7 @@ if (defined $set_gidnumber){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       gidnumber=>$set_gidnumber,
                       sophomorix_config=>\%sophomorix_config,
@@ -430,6 +441,7 @@ if (defined $members){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
@@ -445,6 +457,7 @@ if (defined $addmembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
@@ -459,6 +472,7 @@ if (defined $removemembers){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
@@ -476,6 +490,7 @@ if (defined $admins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
@@ -491,6 +506,7 @@ if (defined $addadmins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
@@ -505,6 +521,7 @@ if (defined $removeadmins){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
+		      school=>$school_AD,
                       type=>"adminclass",
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,

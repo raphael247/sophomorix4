@@ -4131,6 +4131,7 @@ sub AD_class_fetch {
     my ($ldap,$root_dse,$class,$school,$info) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. class7a
+    my $school_AD="";
     my $adminclass="";  # the option i.e. 'class7*'
     if (defined $school){
         $adminclass=&AD_get_name_tokened($class,$school,"adminclass");
@@ -4150,7 +4151,8 @@ sub AD_class_fetch {
         my $entry = $mesg->entry($index);
         $dn=$entry->dn();
         $sam_account=$entry->get_value('sAMAccountName');
-
+	$school_AD = $entry->get_value('sophomorixSchoolname');
+	
         if($Conf::log_level>=2 or $info==1){
             # adminclass attributes
 	    my $description = $entry->get_value('description');
@@ -4258,7 +4260,7 @@ sub AD_class_fetch {
                 }
             }
 
-	    # indet list
+	    # indent list
 	    my @quotashow=();
 	    foreach my $quotastring (@quota){
 		my $tmp=" ".$quotastring;
@@ -4266,7 +4268,9 @@ sub AD_class_fetch {
 	    }
 
             # left column in printout
-            my @project_attr=("gidnumber: $gidnumber",
+            my @project_attr=("Schoolname:",
+                              " $school_AD",
+                              "gidnumber: $gidnumber",
                               "Description:",
                               " $description",
                               "Quota in MB:",
@@ -4346,7 +4350,7 @@ sub AD_class_fetch {
 	    }
         }
     }
-    return ($dn,$max_class);
+    return ($dn,$max_class,$school_AD);
 }
 
 
@@ -4355,6 +4359,7 @@ sub AD_project_fetch {
     my ($ldap,$root_dse,$pro,$school,$info) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. p_abt3
+    my $school_AD="";
     my $project="";     # the option i.e. 'p_abt*'
     # projects from ldap
     if (defined $school){
@@ -4375,6 +4380,7 @@ sub AD_project_fetch {
         my $entry = $mesg->entry($index);
         $dn=$entry->dn();
         $sam_account=$entry->get_value('sAMAccountName');
+	$school_AD = $entry->get_value('sophomorixSchoolname');
 
         if($Conf::log_level>=2 or $info==1){
             # project attributes
@@ -4484,7 +4490,9 @@ sub AD_project_fetch {
             }
 
             # left column in printout
-            my @project_attr=("gidnumber: $gidnumber",
+            my @project_attr=("Schoolname:",
+                              " $school_AD",
+                              "gidnumber: $gidnumber",
                               "Description:",
                               " $description",
                               "AddQuota: ${addquota} MB",
@@ -4563,7 +4571,7 @@ sub AD_project_fetch {
 	    }
         }
     }
-    return ($dn,$max_pro);
+    return ($dn,$max_pro,$school_AD);
 }
 
 
@@ -4600,6 +4608,7 @@ sub AD_group_update {
     my $status = $arg_ref->{status};
     my $join = $arg_ref->{join};
     my $hide = $arg_ref->{hide};
+    my $school = $arg_ref->{school};
     my $maxmembers = $arg_ref->{maxmembers};
     my $members = $arg_ref->{members};
     my $admins = $arg_ref->{admins};
@@ -4610,7 +4619,7 @@ sub AD_group_update {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my $sync_members=0;
-
+    
     print "\n";
     &Sophomorix::SophomorixBase::print_title("Updating $dn (start)");
     # description   
@@ -4618,14 +4627,8 @@ sub AD_group_update {
         print "   * Setting Description to '$description'\n";
         my $mesg = $ldap->modify($dn,replace => {Description => $description}); 
     }
-    # quota single value OLD   
-#    if (defined $quota){
-#        print "   * Setting sophomorixQuota to $quota\n";
-#        my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
-    #    }
-    # multi value NEW
 
-    
+    # quota
     if (defined $quota){
         my %quota_new=(); # save old quota and override with new quota
         my @quota_new=(); # option for ldap modify   
@@ -4648,13 +4651,13 @@ sub AD_group_update {
 		exit;
 	    }
             if ($value=~/[^0-9]/ and $value ne "---"){
-                print "\nERROR: Quota value $value does not consist of numerals 0-9 or is \"---\"\n\n";
+                print "\nERROR: Quota value $value does not consist ",
+                      "of numerals 0-9 or is \"---\"\n\n";
 		exit;
 	    }
             # overriding quota_new
     	    $quota_new{'QUOTA'}{$share}=$value;
    	    push @sharelist, $share;
-	    #print "   * Setting sophomorixQuota on $share to $value ($share:$value)\n";
 	}
         # debug
         #print "OLD: @quota_old\n";
@@ -4665,13 +4668,18 @@ sub AD_group_update {
 	@sharelist = uniq(@sharelist);
 	@sharelist = sort(@sharelist);
 	foreach my $share (@sharelist){
-            push @quota_new, $share.":".$quota_new{'QUOTA'}{$share};
+            if ($quota_new{'QUOTA'}{$share} eq "---" and 
+                $share ne $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'} and
+                $share ne $school){
+                # do nothing
+	    } else {
+		push @quota_new, $share.":".$quota_new{'QUOTA'}{$share};
+
+	    }
 	}
 	print "   * Setting sophomorixQuota to: @quota_new\n";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixQuota' => \@quota_new }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
-	
-    #    my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
     }
     
     # mailquota   
@@ -5267,7 +5275,35 @@ sub AD_group_create {
         my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
-        my $result = $ldap->add( $dn,
+	if ($type eq "project"){
+            my $result = $ldap->add( $dn,
+                                attr => [
+                                    cn   => $cn,
+                                    description => $description,
+                                    sAMAccountName => $group,
+                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixType => $type, 
+                                    sophomorixSchoolname => $school, 
+                                    sophomorixStatus => $status,
+                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---",
+                                                        "$school:---"],
+                                    sophomorixAddMailQuota => "---",
+                                    sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---",
+                                                        "$school:---"],
+                                    sophomorixMailQuota => "-1",
+                                    sophomorixMaxMembers => "0",
+                                    sophomorixMailAlias => "FALSE",
+                                    sophomorixMailList => "FALSE",
+                                    sophomorixJoinable => $joinable,
+                                    sophomorixHidden => "FALSE",
+                                    gidNumber => $gidnumber_wish,
+                                    objectclass => ['top',
+                                                      'group' ],
+                                ]
+                            );
+            &AD_debug_logdump($result,2,(caller(0))[3]);
+	} else {
+            my $result = $ldap->add( $dn,
                                 attr => [
                                     cn   => $cn,
                                     description => $description,
@@ -5291,7 +5327,8 @@ sub AD_group_create {
                                                       'group' ],
                                 ]
                             );
-        &AD_debug_logdump($result,2,(caller(0))[3]);
+           &AD_debug_logdump($result,2,(caller(0))[3]);
+	}
     } else {
         print "   * Group $group exists already ($count results)\n";
     }
