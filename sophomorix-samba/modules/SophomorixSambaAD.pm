@@ -4628,13 +4628,28 @@ sub AD_group_update {
         my $mesg = $ldap->modify($dn,replace => {Description => $description}); 
     }
 
-    # quota
+    # quota OR addquota
+    my $quota_attr="";
+    my $multiquota=""; # containes quota or addquota
     if (defined $quota){
+        $quota_attr="sophomorixQuota";
+	$multiquota=$quota;
+    }
+    if (defined $addquota){
+        $quota_attr="sophomorixAddQuota";
+	$multiquota=$addquota;
+    }
+    if (defined $quota and defined $addquota){
+	print "\nwrong use of function AD_group_update: quota and addquota at the same time\n\n";
+        exit;
+    }
+    
+    if (defined $quota or defined $addquota){
         my %quota_new=(); # save old quota and override with new quota
         my @quota_new=(); # option for ldap modify   
         my @sharelist=(); # list of shares, later uniqified and sorted   
         # work on OLD Quota
-        my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
+        my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,$quota_attr);
         foreach my $quota_old (@quota_old){
             my ($share,$value)=split(/:/,$quota_old);
 	    # save old values in quota_new
@@ -4643,7 +4658,7 @@ sub AD_group_update {
         }
 
         # work on NEW Quota, given by option
-	my @schoolquota=split(/,/,$quota);
+	my @schoolquota=split(/,/,$multiquota);
 	foreach my $schoolquota (@schoolquota){
 	    my ($share,$value)=split(/:/,$schoolquota);
 	    if (not exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}){
@@ -4677,8 +4692,8 @@ sub AD_group_update {
 
 	    }
 	}
-	print "   * Setting sophomorixQuota to: @quota_new\n";
-        my $mesg = $ldap->modify($dn,replace => {'sophomorixQuota' => \@quota_new }); 
+	print "   * Setting $quota_attr to: @quota_new\n";
+        my $mesg = $ldap->modify($dn,replace => { $quota_attr => \@quota_new }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
     
@@ -4686,11 +4701,6 @@ sub AD_group_update {
     if (defined $mailquota){
         print "   * Setting sophomorixMailquota to $mailquota\n";
         my $mesg = $ldap->modify($dn,replace => {sophomorixMailquota => $mailquota}); 
-    }
-    # addquota   
-    if (defined $addquota){
-        print "   * Setting sophomorixAddquota to $addquota\n";
-        my $mesg = $ldap->modify($dn,replace => {sophomorixAddquota => $addquota}); 
     }
     # addmailquota   
     if (defined $addmailquota){
