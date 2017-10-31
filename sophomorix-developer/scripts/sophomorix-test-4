@@ -1078,7 +1078,38 @@ if ($mod_class==1){
                    memberOf => "students",
                   });
     # --quota
-    &run_command("sophomorix-class $all_options -c class12-38 --quota 100+300");
+    &run_command("sophomorix-class $all_options -c class12-38 --quota default-school:1000,linuxmuster-global:800");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"class12-38",
+                   gidNumber=>"-1",
+                   description=>"Klasse 12 TG",
+                   sophomorixType=>"adminclass",
+                   sophomorixQuota=>"default-school:1000|linuxmuster-global:800",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"0",
+                   sophomorixCreationDate => "exists",
+                   sophomorixAdmins => "",
+                   sophomorixMembers => "",
+                   sophomorixAdminGroups => "",
+                   sophomorixMemberGroups => "",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   member => "",
+                   memberOf => "students",
+                  });
+
+    # tests go here
+
+    
+    # --quota (setting back)
+    &run_command("sophomorix-class $all_options -c class12-38 --quota default-school:---,linuxmuster-global:---");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    sAMAccountname=>"class12-38",
@@ -1105,6 +1136,7 @@ if ($mod_class==1){
                    memberOf => "students",
                   });
 
+    
     # --mailquota 
     &run_command("sophomorix-class $all_options -c class12-38 --mailquota 897");
     &AD_test_object({ldap=>$ldap,
@@ -1497,7 +1529,7 @@ if ($mod_class==1){
                   });
 
     # setting all back in one command
-    &run_command("sophomorix-class $all_options -c class12-38 --join --nohide --quota --- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38' --admins \"\" --members \"\" ");
+    &run_command("sophomorix-class $all_options -c class12-38 --join --nohide --quota default-school:---,linuxmuster-global:--- --mailquota -1 --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'class12-38' --admins \"\" --members \"\" ");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=class12-38,OU=class12-38,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,

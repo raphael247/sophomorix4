@@ -4591,7 +4591,7 @@ sub AD_group_update {
     my $dn = $arg_ref->{dn};
     my $type = $arg_ref->{type};
     my $description = $arg_ref->{description};
-#    my $quota = $arg_ref->{quota};
+    my $quota = $arg_ref->{quota};
     my $mailquota = $arg_ref->{mailquota};
     my $addquota = $arg_ref->{addquota};
     my $addmailquota = $arg_ref->{addmailquota};
@@ -4618,11 +4618,62 @@ sub AD_group_update {
         print "   * Setting Description to '$description'\n";
         my $mesg = $ldap->modify($dn,replace => {Description => $description}); 
     }
-    # quota   
+    # quota single value OLD   
 #    if (defined $quota){
 #        print "   * Setting sophomorixQuota to $quota\n";
 #        my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
-#    }
+    #    }
+    # multi value NEW
+
+    
+    if (defined $quota){
+        my %quota_new=(); # save old quota and override with new quota
+        my @quota_new=(); # option for ldap modify   
+        my @sharelist=(); # list of shares, later uniqified and sorted   
+        # work on OLD Quota
+        my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
+        foreach my $quota_old (@quota_old){
+            my ($share,$value)=split(/:/,$quota_old);
+	    # save old values in quota_new
+            $quota_new{'QUOTA'}{$share}=$value;
+	    push @sharelist, $share;
+        }
+
+        # work on NEW Quota, given by option
+	my @schoolquota=split(/,/,$quota);
+	foreach my $schoolquota (@schoolquota){
+	    my ($share,$value)=split(/:/,$schoolquota);
+	    if (not exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}){
+                print "\nERROR: SMB-share $share does not exist!\n\n";
+		exit;
+	    }
+            if ($value=~/[^0-9]/ and $value ne "---"){
+                print "\nERROR: Quota value $value does not consist of numerals 0-9 or is \"---\"\n\n";
+		exit;
+	    }
+            # overriding quota_new
+    	    $quota_new{'QUOTA'}{$share}=$value;
+   	    push @sharelist, $share;
+	    #print "   * Setting sophomorixQuota on $share to $value ($share:$value)\n";
+	}
+        # debug
+        #print "OLD: @quota_old\n";
+	# print Dumper(%quota_new);
+	# print "Sharelist: @sharelist\n";
+	
+        # prepare ldap modify list
+	@sharelist = uniq(@sharelist);
+	@sharelist = sort(@sharelist);
+	foreach my $share (@sharelist){
+            push @quota_new, $share.":".$quota_new{'QUOTA'}{$share};
+	}
+	print "   * Setting sophomorixQuota to: @quota_new\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixQuota' => \@quota_new }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+	
+    #    my $mesg = $ldap->modify($dn,replace => {sophomorixQuota => $quota}); 
+    }
+    
     # mailquota   
     if (defined $mailquota){
         print "   * Setting sophomorixMailquota to $mailquota\n";
