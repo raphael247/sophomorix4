@@ -1,0 +1,157 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-quota) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+
+#use Sophomorix::SophomorixConfig;
+#use Sophomorix::SophomorixBase;
+#use Sophomorix::SophomorixAPI;
+#use Sophomorix::SophomorixPgLdap;
+#use DBI;
+#use Net::LDAP;
+use Net::LDAP;
+use JSON;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_auk_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_add_summary
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 remove_from_list
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_dns_get
+                                 AD_get_user
+                                 AD_user_kill
+                                 AD_unbind_admin
+                                 AD_object_search
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_kill
+                                 AD_group_addmember
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_class_fetch
+                                 AD_project_fetch
+                                 AD_group_update
+                                 AD_project_sync_members
+                                 AD_dn_fetch_multivalue
+                                 AD_group_list
+                                 AD_admin_list
+                                 AD_get_passwd
+                                 get_forbidden_logins
+                                    );
+my @arguments = @ARGV;
+
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $json=0;
+#my $school="";
+
+$Conf::log_level=1;
+
+
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "json|j+" => \$json,
+           "verbose|v+" => \$Conf::log_level,
+#           "school|s=s" => \$school,
+          );
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt,\%sophomorix_result,$json);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
+
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlbeschreibung
+   print('
+sophomorix-quota sets filesystem quota and mailquota
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+
+
+
+Please see the sophomorix-quota(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+
+# --info
+if ($info==1){
+    print "HERE\n";
+    exit;
+}
+
+
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+# ===========================================================================
+# Start
+# ===========================================================================
+&log_script_start(\@arguments,\%sophomorix_result);
+
+
+&AD_unbind_admin($ldap);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+############################################################
+# End
+############################################################
+
+
+
+############################################################
+# subs
+############################################################
