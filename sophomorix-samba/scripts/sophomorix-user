@@ -118,6 +118,8 @@ my $add_user_permissions;
 my $remove_user_permissions;
 
 my $comment;
+my $quota;
+my $mailquota;
 
 
 # stati
@@ -144,7 +146,6 @@ my $old_mailbox="";
 my $new_mailbox="";
 my $new_class="";
 my $list_teachers_by_year=0;
-
 my $school="";
 
 # Parsen der Optionen
@@ -156,6 +157,8 @@ my $testopt=GetOptions(
        "school=s" => \$school,
        "u|user=s" => \$user,
        "comment=s" => \$comment,
+       "quota=s" => \$quota,
+       "mailquota=i" => \$mailquota,
        "webui-dashboard=s" => \$webui_dashboard,
        "user-permissions=s" => \$user_permissions,
        "add-user-permissions=s" => \$add_user_permissions,
@@ -229,6 +232,9 @@ These are done by the automatic workflow, you shold not need them
   -D --user <user>  /   --deactivate --user <user>
   -R --user <user>  /   --removable --user <user>
 
+Updating Quota of a user:
+    --quota <linuxmuster-global>:<number(MB)>,<school1>:<number(MB)>,...
+    --mailquota number
 
 
 Updating comment of a user:
@@ -753,6 +759,46 @@ if ($user ne "" and defined $comment){
                      sophomorix_result=>\%sophomorix_result,
                    });
 }
+
+
+
+# -user <user> --quota <school1>:<number1>;<school2>:<number2>
+if ($user ne "" and defined $quota){
+    print "Updating quota for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     quota=>$quota,
+                     user_count=>"1",
+                     max_user_count=>"1",
+                     date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+
+
+
+# -user <user> --mailquota <number>
+if ($user ne "" and defined $mailquota){
+    print "Updating mailquota for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     mailquota=>$quota,
+                     user_count=>"1",
+                     max_user_count=>"1",
+                     date_now=> $time_stamp_AD,
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+
+
 
 # -user <user> --webui-dashboard "String"
 if ($user ne "" and defined $webui_dashboard){

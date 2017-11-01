@@ -1835,6 +1835,8 @@ sub AD_user_update {
     my $filename = $arg_ref->{filename};
     my $birthdate = $arg_ref->{birthdate};
     my $unid = $arg_ref->{unid};
+    my $quota = $arg_ref->{quota};
+    my $mailquota = $arg_ref->{mailquota};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
     my $hide_pwd = $arg_ref->{hide_pwd};
@@ -1882,8 +1884,9 @@ sub AD_user_update {
     # list of what to delete
     my @delete=();
 
+    print "\n";
     &Sophomorix::SophomorixBase::print_title(
-          "Updating User ${user_count}: $user");
+          "Updating User ${user_count}/$max_user_count: $user (start)");
     print "   DN: $dn\n";
 
     if (defined $firstname_utf8 and $firstname_utf8 ne "---"){
@@ -1933,6 +1936,7 @@ sub AD_user_update {
         $replace{'sophomorixUnid'}=$unid;
         print "   sophomorixUnid:             $unid\n";
     }
+    # firstpassword for sophomorixFirstpassword
     if (defined $firstpassword){
         $replace{'sophomorixFirstpassword'}=$firstpassword;
 	if ($hide_pwd==1){
@@ -1941,6 +1945,8 @@ sub AD_user_update {
 	    print "   Firstpassword:              $firstpassword\n";
 	}
     }
+
+    # firstpassword (to create hashed password)
     if (defined $sophomorix_first_password){
         my $uni_password=&_unipwd_from_plainpwd($sophomorix_first_password);
         $replace{'unicodePwd'}=$uni_password;
@@ -1950,6 +1956,68 @@ sub AD_user_update {
 	    print "   unicodePwd:                 $sophomorix_first_password\n";
 	}
     }
+
+    # quota
+    if (defined $quota){
+        my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
+        foreach my $quota_old (@quota_old){
+            my ($share,$value,$calc,$info)=split(/:/,$quota_old);
+            if (not defined $calc){$calc="---";}
+            if (not defined $calc){$info="---";}
+	    # save old values in quota_new
+            $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+            $quota_new{'QUOTA'}{$share}{'CALC'}=$calc;
+            $quota_new{'QUOTA'}{$share}{'INFO'}=$info;
+	    push @sharelist, $share;
+        }
+        # work on NEW Quota, given by option
+	my @schoolquota=split(/,/,$quota);
+	foreach my $schoolquota (@schoolquota){
+	    my ($share,$value)=split(/:/,$schoolquota);
+	    if (not exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}){
+                print "\nERROR: SMB-share $share does not exist!\n\n";
+		exit;
+	    }
+            if ($value=~/[^0-9]/ and $value ne "---"){
+                print "\nERROR: Quota value $value does not consist ",
+                      "of numerals 0-9 or is \"---\"\n\n";
+		exit;
+	    }
+            # overriding quota_new
+    	    $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+   	    push @sharelist, $share;
+	}
+        # debug
+        #print "OLD: @quota_old\n";
+	#print Dumper(%quota_new);
+	#print "Sharelist: @sharelist\n";
+        # prepare ldap modify list
+	@sharelist = uniq(@sharelist);
+	@sharelist = sort(@sharelist);
+	foreach my $share (@sharelist){
+            if ($quota_new{'QUOTA'}{$share}{'VALUE'} eq "---" and 
+                $share ne $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'} and
+                $share ne $school_AD){
+                # push NOT in @quota_new -> attribute will be removed
+	    } else {
+		# push -> keep attribute
+		if (not exists $quota_new{'QUOTA'}{$share}{'CALC'}){
+                    # new share
+                    $quota_new{'QUOTA'}{$share}{'CALC'}="---";
+                }
+		push @quota_new, $share.":".
+                                 $quota_new{'QUOTA'}{$share}{'VALUE'}.":".
+                                 $quota_new{'QUOTA'}{$share}{'CALC'}.":".
+                                 $ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
+
+	    }
+	}
+	print "   * Setting sophomorixQuota to: @quota_new\n";
+        my $mesg = $ldap->modify($dn,replace => { sophomorixQuota => \@quota_new }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    
+    # status
     if (defined $status and $status ne "---"){
         $replace{'sophomorixStatus'}=$status;
         print "   sophomorixStatus:           $status\n";
@@ -2090,6 +2158,9 @@ sub AD_user_update {
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+    &Sophomorix::SophomorixBase::print_title(
+          "Updating User ${user_count}/$max_user_count: $user (end)");
+    print "\n";
 }
 
 
