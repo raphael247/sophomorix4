@@ -66,6 +66,7 @@ $Data::Dumper::Terse = 1;
             AD_school_create
             AD_object_search
             AD_get_AD
+            AD_get_quota
             AD_get_print_data
             AD_class_fetch
             AD_project_fetch
@@ -4121,6 +4122,21 @@ sub AD_get_AD {
     }
 
     return(\%AD);
+}
+
+
+
+sub AD_get_quota {
+    my %quota=();
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    $quota{'test'}="seen";
+
+    return(\%quota);
 }
 
 

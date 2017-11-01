@@ -10,13 +10,11 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
-
-#use Sophomorix::SophomorixConfig;
-#use Sophomorix::SophomorixBase;
-#use Sophomorix::SophomorixAPI;
-#use Sophomorix::SophomorixPgLdap;
-#use DBI;
-#use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 use Net::LDAP;
 use JSON;
 use Sophomorix::SophomorixBase qw(
@@ -46,6 +44,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_dns_get
                                  AD_get_user
+                                 AD_get_quota
                                  AD_user_kill
                                  AD_unbind_admin
                                  AD_object_search
@@ -78,7 +77,7 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
-#my $school="";
+my $school="";
 
 $Conf::log_level=1;
 
@@ -90,7 +89,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
-#           "school|s=s" => \$school,
+           "school|s=s" => \$school,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -128,11 +127,57 @@ Please see the sophomorix-quota(8) man pages for full documentation
    exit;
 }
 
+# create schoollist from options
+my @schoollist=();
+if ($school ne ""){
+    if (exists $sophomorix_config{'SCHOOLS'}{$school}){
+	push @schoollist,$school;
+    } else {
+        print "\nERROR: $school is not a school!\n\n";
+	exit;
+    }
+} else {
+    @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+}
 
 
 # --info
 if ($info==1){
-    print "HERE\n";
+    my $ref_quota=&AD_get_quota({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 root_dns=>$root_dns,
+                                 sophomorix_config=>\%sophomorix_config,
+                                });
+
+    print Dumper($ref_quota);
+
+    foreach my $school (@schoollist){
+        print "Default Quota settings of school $school:\n";
+        if ($school eq $DevelConf::name_default_school){
+	    print "  * Role administrator in school $school:\n";
+	    print "     quota_default_global: ".$sophomorix_config{'ROLES'}{'administrator'}{'quota_default_global'}."\n";
+	    print "     quota_default_school: ".$sophomorix_config{'ROLES'}{'administrator'}{'quota_default_school'}."\n";
+	    print "  * Role teacher in school $school:\n";
+	    print "     quota_default_global: ".$sophomorix_config{'ROLES'}{'teacher'}{'quota_default_global'}."\n";
+	    print "     quota_default_school: ".$sophomorix_config{'ROLES'}{'teacher'}{'quota_default_school'}."\n";
+	    print "  * Role student in school $school:\n";
+	    print "     quota_default_global: ".$sophomorix_config{'ROLES'}{'student'}{'quota_default_global'}."\n";
+	    print "     quota_default_school: ".$sophomorix_config{'ROLES'}{'student'}{'quota_default_school'}."\n";
+        } else {
+	    print "  * Role administrator in school $school:\n";
+	    print "     quota_default_global: ".$sophomorix_config{'ROLES'}{"$school-administrator"}{'quota_default_global'}."\n";
+	    print "     quota_default_school: ".$sophomorix_config{'ROLES'}{"$school-administrator"}{'quota_default_school'}."\n";
+	    print "  * Role teacher in school $school:\n";
+	    print "     quota_default_global: ".$sophomorix_config{'ROLES'}{"$school-teacher"}{'quota_default_global'}."\n";
+	    print "     quota_default_school: ".$sophomorix_config{'ROLES'}{"$school-teacher"}{'quota_default_school'}."\n";
+	    print "  * Role student in school $school:\n";
+	    print "     quota_default_global: ".$sophomorix_config{'ROLES'}{"$school-student"}{'quota_default_global'}."\n";
+	    print "     quota_default_school: ".$sophomorix_config{'ROLES'}{"$school-student"}{'quota_default_school'}."\n";
+	}
+
+        # print stuff from hash
+        
+    }
     exit;
 }
 
