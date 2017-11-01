@@ -3249,13 +3249,24 @@ calculated: SD=3000
 wobei SD=school-default, CD=Class-default, +P=project modified
 
 Umsetzung:
-0. projects-memberhash
-   project -> sambasamaccount (membergroups auflösen, loop vermeiden) 
-1. Quotaberechnung neu
-2. --info
-3. quota setzen und updated
-4. quotaberechnung alt
+OK: sophomorixQuota setzen für gruppen (sophomorix-project, sophomorix-class)
+OK: sophomorixQuota setzen für user (sophomorix-user)
 
+1. sophomorix-quota
+   projects-quota-memberhash
+   project -> sambasamaccount (membergroups auflösen, loop vermeiden) 
+   Quotaberechnung neu
+   --info gibt die Berechnung aus(-ij als json):
+   Schulweise (option --school) reduziert
+   Default: Schule
+   Classquota (nur abweichende)
+   Projectquota (nur abweichende)
+   Einzelquota (nur abweichende)
+2. quota setzen und updaten
+
+
+Todo:
+- tut sophomorix-user --quota auch für admins -> fixen
 
 
 
@@ -3268,7 +3279,7 @@ sophomorix-print:
        see pull requests for sophomorix2
 
 sophomorix-howcanihelp
-- unbekannte Vornamen, Nachnamen melde
+- unbekannte Vornamen, Nachnamen melden5. quotaberechnung alt
 - ... 
 
 sophomorix-belwue:
