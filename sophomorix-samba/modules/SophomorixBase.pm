@@ -900,7 +900,8 @@ sub check_config_ini {
                 # overwrite  %modmaster
                 $modmaster{$section}{$parameter}=$config{$section}{$parameter};
             } else {
-                &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$parameter." is NOT valid in section ".$section."!");
+		print " * ERROR: ".$parameter." is NOT valid in section ".$section."\n";
+                &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$parameter." is NOT valid in section ".$section." of ".$configfile."!");
                 #print "   * WARNING: $parameter is NOT valid in section $section\n";
             }
         }
