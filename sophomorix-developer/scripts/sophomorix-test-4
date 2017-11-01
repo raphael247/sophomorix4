@@ -47,6 +47,9 @@ my $test_add_class=0;
 my $mod_class=0;
 my $test_mod_class=0;
 
+my $mod_quota=0;
+my $test_mod_quota=0;
+
 my $kill_class=0;
 my $test_kill_class=0;
 
@@ -63,6 +66,8 @@ my $testopt=GetOptions(
            "test-add-class" => \$test_add_class,
            "mod-class" => \$mod_class,
            "test-mod-class" => \$test_mod_class,
+           "mod-quota" => \$mod_quota,
+           "test-mod-quota" => \$test_mod_quota,
            "kill-class" => \$kill_class,
            "test-kill-class" => \$test_kill_class,
   );
@@ -112,8 +117,11 @@ Options
   sophomorix-test-4 --test-add-class
     test the added classes
 
+  sophomorix-test-4 --mod-quota
+    modify quota of users
+
   sophomorix-test-4 --mod-class
-    modify added classes
+    modify added classes 
   sophomorix-test-4 --test-mod-class
     test modified classes
 
@@ -139,9 +147,11 @@ Options
 if ($full==1){
     $add_class=1;
     $mod_class=1;
+    $mod_quota=1;
     $kill_class=1;
     $test_add_class=1;
     $test_mod_class=1;
+    $test_mod_quota=1;
     $test_kill_class=1;
 }
 
@@ -194,6 +204,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Sarina",
                    sophomorixSurnameASCII  => "Maier",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -253,6 +265,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Gregor",
                    sophomorixSurnameASCII  => "Mueller",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -317,6 +331,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Adalradur",
                    sophomorixSurnameASCII  => "Jonsson",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -376,6 +392,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -435,6 +453,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Goekhan",
                    sophomorixSurnameASCII  => "Oemuer",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.teachers.csv",
@@ -482,6 +502,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Desiree",
                    sophomorixSurnameASCII  => "Wuerth",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.teachers.csv",
@@ -529,6 +551,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Richard",
                    sophomorixSurnameASCII  => "Blackmore",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"uni:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.students.csv",
@@ -588,6 +612,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Jon",
                    sophomorixSurnameASCII  => "Lord",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"uni:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.students.csv",
@@ -647,6 +673,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Johannes",
                    sophomorixSurnameASCII  => "Kepler",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"uni:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.teachers.csv",
@@ -694,6 +722,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Galileo",
                    sophomorixSurnameASCII  => "Galilei",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"uni:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.teachers.csv",
@@ -739,6 +769,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Marina",
                    sophomorixSurnameASCII  => "Schneider",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"default-school:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "students.csv",
@@ -796,6 +828,8 @@ if ($test_add_class==1){
                    sophomorixFirstnameASCII => "Michael",
                    sophomorixSurnameASCII  => "Schaefer",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new|linuxmuster-global:---:---:new",
+                   sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "teachers.csv",
@@ -1042,6 +1076,211 @@ if ($test_add_class==1){
 }
 
 
+
+
+############################################################
+# Modify user quota
+############################################################
+# --mod-quota  
+if ($mod_quota==1){
+
+    # --quota (1)
+    &run_command("sophomorix-user $all_options -u samardze38 --quota bsz:1000");
+    # samardze38
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=samardze38,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Željko Samardžić",
+                   givenName=>"Željko",
+                   name=>"samardze38",
+                   sAMAccountname=>"samardze38",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze38",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze38",
+                   sn=>"Samardžić",
+                   userPrincipalName => "samardze38@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Zeljko",
+                   sophomorixSurnameASCII  => "Samardzic",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:1000:---:update|linuxmuster-global:---:---:update",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid4567",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    # --quota (2)
+    &run_command("sophomorix-user $all_options -u samardze38 --quota uni:1111,default-school:2222");
+    # samardze38
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=samardze38,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Željko Samardžić",
+                   givenName=>"Željko",
+                   name=>"samardze38",
+                   sAMAccountname=>"samardze38",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze38",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze38",
+                   sn=>"Samardžić",
+                   userPrincipalName => "samardze38@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Zeljko",
+                   sophomorixSurnameASCII  => "Samardzic",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:1000:---:update|linuxmuster-global:---:---:update|uni:1111:---:update|default-school:2222:---:update",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid4567",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    # --quota (3)
+    &run_command("sophomorix-user $all_options -u samardze38 --quota uni:---");
+    # samardze38
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=samardze38,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Željko Samardžić",
+                   givenName=>"Željko",
+                   name=>"samardze38",
+                   sAMAccountname=>"samardze38",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze38",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze38",
+                   sn=>"Samardžić",
+                   userPrincipalName => "samardze38@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Zeljko",
+                   sophomorixSurnameASCII  => "Samardzic",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:1000:---:update|linuxmuster-global:---:---:update|default-school:2222:---:update",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid4567",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+    # --quota (4)
+    &run_command("sophomorix-user $all_options -u samardze38 --quota default-school:---");
+    # samardze38
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=samardze38,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Željko Samardžić",
+                   givenName=>"Željko",
+                   name=>"samardze38",
+                   sAMAccountname=>"samardze38",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze38",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze38",
+                   sn=>"Samardžić",
+                   userPrincipalName => "samardze38@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Zeljko",
+                   sophomorixSurnameASCII  => "Samardzic",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:1000:---:update|linuxmuster-global:---:---:update",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid4567",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+
+    # --quota (5)
+    &run_command("sophomorix-user $all_options -u samardze38 --quota bsz:---,linuxmuster-global:---");
+    # samardze38
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=samardze38,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Željko Samardžić",
+                   givenName=>"Željko",
+                   name=>"samardze38",
+                   sAMAccountname=>"samardze38",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m8cd\\homes\\samardze38",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m8cd/homes/samardze38",
+                   sn=>"Samardžić",
+                   userPrincipalName => "samardze38@".$root_dns,
+                   sophomorixAdminClass => "bsz-m8cd",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Zeljko",
+                   sophomorixSurnameASCII  => "Samardzic",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:update|linuxmuster-global:---:---:update",
+                   sophomorixMailQuota=>"-1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid4567",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m8cd|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+}
+
+
+############################################################
+#  Test modified quota
+############################################################
+# --test-mod-quota  
+if ($test_mod_quota==1){
+
+}
 
 
 ############################################################
