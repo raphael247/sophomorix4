@@ -232,7 +232,7 @@ These are done by the automatic workflow, you shold not need them
   -D --user <user>  /   --deactivate --user <user>
   -R --user <user>  /   --removable --user <user>
 
-Updating Quota of a user:
+Updating Quota/MailQuota of a user:
     --quota <linuxmuster-global>:<number(MB)>,<school1>:<number(MB)>,...
     --mailquota number
 
@@ -711,10 +711,6 @@ if ($user ne "" and $info==1){
             my $sam = $entry->get_value ('sAMAccountName');
             print "\n";
             &print_title("User $count: $sam");
-
-            my $pwd = $entry->get_value ('unicodePwd');
-
-	    print "PWD: $pwd\n";
             $entry->dump; 
         }
     }
@@ -788,7 +784,7 @@ if ($user ne "" and defined $mailquota){
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$user,
-                     mailquota=>$quota,
+                     mailquota=>$mailquota,
                      user_count=>"1",
                      max_user_count=>"1",
                      date_now=> $time_stamp_AD,

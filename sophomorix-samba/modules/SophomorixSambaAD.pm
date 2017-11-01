@@ -2016,6 +2016,18 @@ sub AD_user_update {
         my $mesg = $ldap->modify($dn,replace => { sophomorixQuota => \@quota_new }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+
+    # mailquota
+    if (defined $mailquota and $mailquota ne ""){
+        if ($mailquota=~/[^0-9]/ and $value=!-1){
+            print "\nERROR: MailQuota value $mailquota does not consist ",
+                  "of numerals 0-9 or is \"-1\"\n\n";
+	    exit;
+	} else {
+            $replace{'sophomorixMailQuota'}=$mailquota;
+            print "   sophomorixMailQuota:        $mailquota\n";
+	}
+    }
     
     # status
     if (defined $status and $status ne "---"){
