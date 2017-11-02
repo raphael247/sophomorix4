@@ -4640,7 +4640,7 @@ sub AD_project_fetch {
             # project attributes
 	    my $description = $entry->get_value('description');
 	    my $gidnumber = $entry->get_value('gidNumber');
-	    my $addquota = $entry->get_value('sophomorixAddQuota');
+	    my @addquota = sort $entry->get_value('sophomorixAddQuota');
             my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
             my $mailalias = $entry->get_value('sophomorixMailAlias');
             my $maillist = $entry->get_value('sophomorixMailList');
@@ -4692,7 +4692,8 @@ sub AD_project_fetch {
                     # save item
                     $seen{$item}="seen";
                 }
-                my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$item);
+                my ($count,$dn_exist,$cn_exist)=
+                    &AD_object_search($ldap,$root_dse,"user",$item);
                 if ($count==1){
                     # user of target state exists: save its dn
                     $s_allmem{$dn_exist}=$item;
@@ -4718,7 +4719,8 @@ sub AD_project_fetch {
                     # save item
                     $seen{$item}="seen";
                 }
-                my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$item);
+                my ($count,$dn_exist,$cn_exist)=
+                    &AD_object_search($ldap,$root_dse,"group",$item);
                 if ($count==1){
                     # group of target state exists: save its dn
                     $s_allmem{$dn_exist}=$item;
@@ -4743,13 +4745,22 @@ sub AD_project_fetch {
                 }
             }
 
+	    # indent list
+	    my @addquotashow=();
+	    foreach my $addquotastring (@addquota){
+		my $tmp=" ".$addquotastring;
+                push @addquotashow, $tmp;
+	    }
+
+	    
             # left column in printout
             my @project_attr=("Schoolname:",
                               " $school_AD",
                               "gidnumber: $gidnumber",
                               "Description:",
                               " $description",
-                              "AddQuota: ${addquota} MB",
+                              "AddQuota in MB:",
+			      @addquotashow,
                               "AddMailQuota: ${addmailquota} MB",
                               "MailAlias: $mailalias",
                               "MailList: $maillist",
@@ -5374,7 +5385,7 @@ sub AD_group_list {
             if ($type eq "project"){
                 printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
-                    $entry->get_value('sophomorixAddQuota'),
+                    "",#$entry->get_value('sophomorixAddQuota'),
                     $entry->get_value('sophomorixAddMailQuota'),
                     $maxmembers,
                     $hidden,
