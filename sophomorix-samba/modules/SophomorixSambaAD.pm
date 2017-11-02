@@ -4134,8 +4134,100 @@ sub AD_get_quota {
     my $root_dns = $arg_ref->{root_dns};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    $quota{'test'}="seen";
+    # USER quota
+    my $filter2="(&(objectClass=user) (sophomorixRole=*))";
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter2,
+                   attrs => ['sAMAccountName',
+                             'sophomorixSchoolname',
+                             'sophomorixRole',
+                             'memberOf',
+                             'sophomorixQuota',
+                            ]);
+    my $max_user = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title(
+        "$max_user user found in AD");
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+	my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        my $role=$entry->get_value('sophomorixRole');
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
+	my @quota = $entry->get_value('sophomorixQuota');
+	my @memberof = $entry->get_value('memberOf');
+#        foreach my $memberof (@memberof){
+#	    $quota{'QUOTA'}{'USERS'}{$sam}{'memberOf'}{$memberof}="seen";
+	    $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$dn}=$sam;
+	    $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_SAM'}{$sam}=$dn;
+	    foreach my $quota (@quota){
+	        my ($share,$value)=split(/:/,$quota);
+  		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
+	    }
+#	}
+    }
 
+    # CLASS quota 
+    # look for groups with primary membership
+    # use the name CLASS in the hash for ADMINCLASS|TEACHERCLASS
+    my $filter="(&".
+	" (objectClass=group)".
+	       "(| ".
+               " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}.")".
+               " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'TEACHERCLASS'}.")".
+               "))";
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                   attrs => ['sAMAccountName',
+                             'sophomorixSchoolname',
+                             'sophomorixType',
+                             'member',
+                             'memberOf',
+                             'sophomorixQuota',
+                            ]);
+    my $max_adminclass = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title(
+        "$max_adminclass sophomorix adminclasses found in AD");
+    for( my $index = 0 ; $index < $max_adminclass ; $index++) {
+        my $entry = $mesg->entry($index);
+	my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        my $type=$entry->get_value('sophomorixType');
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
+	my @quota = $entry->get_value('sophomorixQuota');
+	my @member = $entry->get_value('member');
+	my @memberof = $entry->get_value('memberOf');
+        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'DN_by_SAM'}{$sam}=$dn;
+
+        foreach my $member (@member){
+            my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member};
+            # save data about class at user
+            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'name'}=$sam;
+            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'type'}=$type;
+	    # save quota about class at user
+	    foreach my $quota (@quota){
+	        my ($share,$value)=split(/:/,$quota);
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}=$value;
+	       
+#  		$quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
+	    }
+	}
+        foreach my $memberof (@memberof){
+	    $quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'memberOf'}{$memberof}="seen";
+	    foreach my $quota (@quota){
+	        my ($share,$value)=split(/:/,$quota);
+  		$quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
+	    }
+	}
+    }
+
+
+
+    
     return(\%quota);
 }
 
