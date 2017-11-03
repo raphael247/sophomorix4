@@ -4158,21 +4158,17 @@ sub AD_get_quota {
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @memberof = $entry->get_value('memberOf');
 	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
-
-#        foreach my $memberof (@memberof){
-#	    $quota{'QUOTA'}{'USERS'}{$sam}{'memberOf'}{$memberof}="seen";
-	    $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$dn}=$sam;
-	    $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_SAM'}{$sam}=$dn;
-  	    $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
-  	    $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
-	    foreach my $quota (@quota){
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_SAM'}{$sam}=$dn;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
+        foreach my $quota (@quota){
 	        my ($share,$value)=split(/:/,$quota);
 		# remember quota
   		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
-	    }
-#	}
+        }
     }
 
     # CLASS quota 
@@ -4228,8 +4224,6 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}=$value;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
-	       
-#  		$quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
 	    }
 	}
         foreach my $memberof (@memberof){
@@ -4262,7 +4256,16 @@ sub AD_get_quota {
     my $max_project = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
         "$max_project sophomorix projects found in AD");
+    # create project LOOKUP table
     for( my $index = 0 ; $index < $max_project ; $index++) {
+        my $entry = $mesg->entry($index);
+	my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'SAM_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'DN_by_SAM'}{$sam}=$dn;
+    }
+    for( my $index = 0 ; $index < $max_project ; $index++) {
+	# walk through all projects
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
@@ -4271,34 +4274,38 @@ sub AD_get_quota {
 	my @addquota = $entry->get_value('sophomorixAddQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
-#        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$dn}=$sam;
-#        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'DN_by_SAM'}{$sam}=$dn;
 
+	# @addquota contains addquota info of the project
         foreach my $member (@member){
-            my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member};
-            # save data about class at user
-            $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'name'}=$sam;
-            $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'type'}=$type;
-	    # save quota about class at user
-	    foreach my $addquota (@addquota){
-	        my ($share,$value)=split(/:/,$addquota);
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
-		# remember share for later listing
-		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
+	    # walk through all members: (user,class,project)
+	    if (exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member}){
+                ########################################
+                # member is a user
+                my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member};
+                print "$sam_user is a member-USER of project $sam\n";
+                # save data about project at user
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'name'}=$sam;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'type'}=$type;
+	        # save quota about class at user
+	        foreach my $addquota (@addquota){
+	            my ($share,$value)=split(/:/,$addquota);
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+		    # remember share for later listing
+		    push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
+	        }
+	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$member}){
+                ########################################		
+                # member is a class (adminclass,teacherclass)
+                my $sam_class=$quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$member};
+                print "$sam_class is a member-CLASS of project $sam\n";
+	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'SAM_by_DN'}{$member}){
+		########################################
+		# member is a project
+                my $sam_project=$quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'SAM_by_DN'}{$member};
+                print "$sam_project is a member-PROJECT of project $sam\n";
 	    }
 	}
-#        foreach my $memberof (@memberof){
-#	    $quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'memberOf'}{$memberof}="seen";
-#	    foreach my $quota (@quota){
-#	        my ($share,$value)=split(/:/,$quota);
-#  		$quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
-#	    }
-#	}
     }
-
-
-
-    
     return(\%quota);
 }
 
