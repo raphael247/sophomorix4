@@ -4158,8 +4158,8 @@ sub AD_get_quota {
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @memberof = $entry->get_value('memberOf');
 	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
-        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$dn}=$sam;
-        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_SAM'}{$sam}=$dn;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
         $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
         $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
         foreach my $quota (@quota){
@@ -4203,21 +4203,22 @@ sub AD_get_quota {
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
-        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$dn}=$sam;
-        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'DN_by_SAM'}{$sam}=$dn;
+        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'sAMAccountName_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'DN_by_sAMAccountName'}{$sam}=$dn;
 
         foreach my $member (@member){
 	    my $sam_user;
-	    if ( not exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member}){
+	    if ( not exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member}){
 		# if member ist not a user, skip
   	        #print "HERE: No user for sam $sam member $member \n";
                 next;
 	    } else {
-		$sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member};
+		$sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member};
+                $quota{'QUOTA'}{'LOOKUP'}{'MEMBERS_by_CLASS'}{$sam}{$sam_user}=$member;
 	    }
             # save data about class at user
-            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'name'}=$sam;
-            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'type'}=$type;
+            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sAMAccountName'}=$sam;
+            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixType'}=$type;
 	    # save quota about class at user
 	    foreach my $quota (@quota){
 	        my ($share,$value)=split(/:/,$quota);
@@ -4261,8 +4262,8 @@ sub AD_get_quota {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
-        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'SAM_by_DN'}{$dn}=$sam;
-        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'DN_by_SAM'}{$sam}=$dn;
+        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'DN_by_sAMAccountName'}{$sam}=$dn;
     }
     for( my $index = 0 ; $index < $max_project ; $index++) {
 	# walk through all projects
@@ -4278,30 +4279,45 @@ sub AD_get_quota {
 	# @addquota contains addquota info of the project
         foreach my $member (@member){
 	    # walk through all members: (user,class,project)
-	    if (exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member}){
+	    if (exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member}){
                 ########################################
                 # member is a user
-                my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$member};
+                my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member};
                 print "$sam_user is a member-USER of project $sam\n";
                 # save data about project at user
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'name'}=$sam;
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'type'}=$type;
-	        # save quota about class at user
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'reason'}{'USER'}="TRUE";
+	        # save quota info at user
 	        foreach my $addquota (@addquota){
 	            my ($share,$value)=split(/:/,$addquota);
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
 		    # remember share for later listing
 		    push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
 	        }
-	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$member}){
+	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'sAMAccountName_by_DN'}{$member}){
                 ########################################		
                 # member is a class (adminclass,teacherclass)
-                my $sam_class=$quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'SAM_by_DN'}{$member};
+                my $sam_class=$quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'sAMAccountName_by_DN'}{$member};
                 print "$sam_class is a member-CLASS of project $sam\n";
-	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'SAM_by_DN'}{$member}){
+		# save quota info at each user of member-CLASS
+		foreach my $user (keys %{ $quota{'QUOTA'}{'LOOKUP'}{'MEMBERS_by_CLASS'}{$sam_class} }) {
+                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
+                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
+                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'reason'}{'CLASS'}="TRUE";
+	            # save quota info at user
+	            foreach my $addquota (@addquota){
+	                my ($share,$value)=split(/:/,$addquota);
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+		        # remember share for later listing
+		        push @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }, $share;
+	            }
+		}
+
+	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member}){
 		########################################
 		# member is a project
-                my $sam_project=$quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'SAM_by_DN'}{$member};
+                my $sam_project=$quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member};
                 print "$sam_project is a member-PROJECT of project $sam\n";
 	    }
 	}
