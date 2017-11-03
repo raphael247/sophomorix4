@@ -4257,16 +4257,21 @@ sub AD_get_quota {
     my $max_project = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
         "$max_project sophomorix projects found in AD");
+    # walk through all projects
     # create project LOOKUP table
     for( my $index = 0 ; $index < $max_project ; $index++) {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
+	my @member = $entry->get_value('member');
         $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'DN_by_sAMAccountName'}{$sam}=$dn;
+	push @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam} }, @member;
     }
+
+    # walk through all projects
+    # this time, update user quota
     for( my $index = 0 ; $index < $max_project ; $index++) {
-	# walk through all projects
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
@@ -4276,8 +4281,35 @@ sub AD_get_quota {
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
 
+	my $count=0;
+	print "\n\nPROJECT $sam\n";
+#	my %followed_projects=();
+	my %seen=();
+	my $count_initial_member=$#member+1;
 	# @addquota contains addquota info of the project
         foreach my $member (@member){
+
+	    # reicht seen already nicht aus?
+	    # brauchts noch followed
+	    if (exists $seen{$member}){
+		print "skipping (seen already): $member\n";
+                next;
+	    } else {
+                $seen{$member}="seen";
+	    }
+	    $count++;
+
+
+	    
+            # unneeded
+	    print "   MEMBERS $count ($sam):\n";
+	    foreach my $mem (@member){
+                print "     $mem\n";
+            }
+	    print "   Working on Member $count/$count_initial_member: $member\n";
+
+
+	    
 	    # walk through all members: (user,class,project)
 	    if (exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member}){
                 ########################################
@@ -4287,7 +4319,12 @@ sub AD_get_quota {
                 # save data about project at user
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'reason'}{'USER'}="TRUE";
+                if ($count>$count_initial_member){
+                    # appended memberships		
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'reason'}{'PROJECT'}="TRUE";
+                } else {
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'reason'}{'USER'}="TRUE";
+                }
 	        # save quota info at user
 	        foreach my $addquota (@addquota){
 	            my ($share,$value)=split(/:/,$addquota);
@@ -4304,7 +4341,12 @@ sub AD_get_quota {
 		foreach my $user (keys %{ $quota{'QUOTA'}{'LOOKUP'}{'MEMBERS_by_CLASS'}{$sam_class} }) {
                     $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
                     $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
-                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'reason'}{'CLASS'}="TRUE";
+                    if ($count>$count_initial_member){
+                        # appended memberships		
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'reason'}{'PROJECT'}="TRUE";
+                    } else {
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'reason'}{'CLASS'}="TRUE";
+                    }
 	            # save quota info at user
 	            foreach my $addquota (@addquota){
 	                my ($share,$value)=split(/:/,$addquota);
@@ -4319,7 +4361,17 @@ sub AD_get_quota {
 		# member is a project
                 my $sam_project=$quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member};
                 print "$sam_project is a member-PROJECT of project $sam\n";
+		# append the members of the project so that this foreach-loop will analyse it, too
+#                if (not exists $followed_projects{'FOLLOWED_PROJECTS'}{$sam_project}){
+	            push @member, @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam_project} };
+  		    # remember the member project so that it is not analyzed again
+		    $followed_projects{'FOLLOWED_PROJECTS'}{$sam_project}=$member;
+#		} else {
+#                    print "   * $sam_project followed already\n";
+#		}
 	    }
+                # ???
+#               print Dumper(\%followed_projects);
 	}
     }
     return(\%quota);
