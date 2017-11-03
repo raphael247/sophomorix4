@@ -1062,18 +1062,25 @@ sub load_school_ini {
 	} elsif ($section=~m/^role\./){ 
             ##### role.* section ########################################################################
 	    my ($string,$name)=split(/\./,$section);
-            my $rolename;
-            if ($school eq $DevelConf::name_default_school){
-                $rolename=$name;
-            } else {
-                $rolename=$school."-".$name;
-            }
+	    my $role=$name; # student, ...
+#            my $rolename; # <school>-student
+#            if ($school eq $DevelConf::name_default_school){
+#                $rolename=$name;
+#            } else {
+#                $rolename=$school."-".$name;
+#            }
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+#                if($Conf::log_level>=3){
+#                    print "   * ROLE $rolename: $parameter ---> <".
+#                          $ref_modmaster->{$section}{$parameter}.">\n";
+#                }
+#                $ref_sophomorix_config->{'ROLES'}{$rolename}{$parameter}=
+#                    $ref_modmaster->{$section}{$parameter};
                 if($Conf::log_level>=3){
-                    print "   * ROLE $rolename: $parameter ---> <".
+                    print "   * ROLE $role: $parameter ---> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
                 }
-                $ref_sophomorix_config->{'ROLES'}{$rolename}{$parameter}=
+                $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
 	} elsif ($section=~m/^type\./){ 

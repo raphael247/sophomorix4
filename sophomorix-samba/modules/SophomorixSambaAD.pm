@@ -3922,7 +3922,7 @@ sub AD_get_AD {
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'members'}{$user}=$member;
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'intranetaccess'} }, $member;
-                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'intranetaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$school}{'intranetaccess'} }, $member;
             }
         }
 
@@ -3951,11 +3951,11 @@ sub AD_get_AD {
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
-            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            my $school=$entry->get_value('sophomorixSchoolname');
             #$AD{'objectclass'}{'group'}{'printing'}{$sam}{'printing'}=$sam;
             $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixStatus'}=$stat;
             $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixType'}=$type;
-            $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            $AD{'objectclass'}{'group'}{'printing'}{$sam}{'sophomorixSchoolname'}=$school;
             if($Conf::log_level>=2){
                 print "   * $sam\n";
             }
@@ -3968,7 +3968,7 @@ sub AD_get_AD {
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'printing'}{$sam}{'members'}{$user}=$member;
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'printing'} }, $member;
-                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'printing'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$school}{'printing'} }, $member;
             }
         }
 
@@ -4134,7 +4134,7 @@ sub AD_get_quota {
     my $root_dns = $arg_ref->{root_dns};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    # USER quota
+    # USER quota (sophomorix user)
     my $filter2="(&(objectClass=user) (sophomorixRole=*))";
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -4154,16 +4154,23 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
-        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        my $school=$entry->get_value('sophomorixSchoolname');
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @memberof = $entry->get_value('memberOf');
+	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
+
 #        foreach my $memberof (@memberof){
 #	    $quota{'QUOTA'}{'USERS'}{$sam}{'memberOf'}{$memberof}="seen";
 	    $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'SAM_by_DN'}{$dn}=$sam;
 	    $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_SAM'}{$sam}=$dn;
+  	    $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
+  	    $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
 	    foreach my $quota (@quota){
 	        my ($share,$value)=split(/:/,$quota);
+		# remember quota
   		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
+		# remember share for later listing
+		push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
 	    }
 #	}
     }
@@ -4196,7 +4203,7 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $type=$entry->get_value('sophomorixType');
-        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        my $school=$entry->get_value('sophomorixSchoolname');
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
@@ -4219,6 +4226,8 @@ sub AD_get_quota {
 	    foreach my $quota (@quota){
 	        my ($share,$value)=split(/:/,$quota);
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}=$value;
+		# remember share for later listing
+		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
 	       
 #  		$quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
 	    }
@@ -4258,7 +4267,7 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $type=$entry->get_value('sophomorixType');
-        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        my $school=$entry->get_value('sophomorixSchoolname');
 	my @addquota = $entry->get_value('sophomorixAddQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
@@ -4274,6 +4283,8 @@ sub AD_get_quota {
 	    foreach my $addquota (@addquota){
 	        my ($share,$value)=split(/:/,$addquota);
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+		# remember share for later listing
+		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
 	    }
 	}
 #        foreach my $memberof (@memberof){
