@@ -156,42 +156,37 @@ if ($user ne ""){
 
 
 
-# --info
-if ($info==1){
-    my $ref_quota=&AD_get_quota({ldap=>$ldap,
-                                 root_dse=>$root_dse,
-                                 root_dns=>$root_dns,
-                                 sophomorix_config=>\%sophomorix_config,
-                                });
 
-	
-        my $line="+--------------------------+--------+------+".
-                 "------+------+-------------------+\n";
-        my $line2="+------------------------------------------".
-                  "-----------------------------+\n";
+my $ref_quota=&AD_get_quota({ldap=>$ldap,
+                             root_dse=>$root_dse,
+                             root_dns=>$root_dns,
+                             sophomorix_config=>\%sophomorix_config,
+                            });
 
-    print Dumper($ref_quota);
-
-    foreach my $school (@schoollist){
-        if ($user eq ""){
-            # use ALL sophomorix users
-	    if (not exists $ref_quota->{'LISTS'}{'USER'}{$school}){
-                @userlist=();
-	    } else {
-		# all users of school
-		@userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school} };
-	    }
-        }
-
-	print "\n";
+my $line="+--------------------------+--------+------+".
+         "------+------+-------------------+\n";
+my $line2="+------------------------------------------".
+          "-----------------------------+\n";
+foreach my $school (@schoollist){
+    if ($user eq ""){
+        # use ALL sophomorix users
+        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school}){
+            @userlist=();
+	} else {
+	    # all users of school
+	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school} };
+	}
+    }
+    if ($info==1){
+        print "\n";
         &Sophomorix::SophomorixBase::print_title("Quota of school $school:");
         if($#userlist==-1){
             print "     0 sophomorix users in school $school\n";
-	    next;
-	}
+            next;
+        }
         if($Conf::log_level==1){
             print $line;
-	    printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
+            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
                    "user(role:SCHOOLDEFAULT)",
                    "share",
                    "CALC",
@@ -201,112 +196,115 @@ if ($info==1){
         } else {
 
         }
-	foreach my $user (@userlist){
-            if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
-                print "  WARNING: User $user not found!\n";
-                next;
-            }
-	    if ($school ne 
-                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixSchoolname'}){
-                # skip users not in school that is processed
-                next;
-	    }
+    }
+    foreach my $user (@userlist){
+        if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+            print "  WARNING: User $user not found!\n";
+            next;
+        }
+	if ($school ne 
+            $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixSchoolname'}){
+            # skip users not in school that is processed
+            next;
+	}
 
-	    my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixRole'};
-	    my $quota_school=
-              $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_school'};
-	    my $quota_global=
-              $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_global'};
+	my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixRole'};
+	my $quota_school=
+          $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_school'};
+	my $quota_global=
+          $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_global'};
+        if ($info==1){
             if($Conf::log_level==1){
                 print $line;
             } else {
                 print $line2;
                 printf "| %-70s|\n", $user." in ".$school;
             }
+        }
+        # uniquefi and sort sharelist
+	@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
+            uniq(@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} });
+	@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
+            sort @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} };
+	# walk through shares
+	foreach my $share (@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+            my $school_default;
+	    my $sharedisplay;
+	    if ($share eq $sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
+                $school_default=$quota_global;
+		$sharedisplay="GLOBAL";
+	    } elsif ($share eq $school){
+                $school_default=$quota_school;
+		$sharedisplay=$share;
+	    } else {
+                $school_default="---";                    
+		$sharedisplay=$share;
+	    }
+	    if ($share eq $DevelConf::name_default_school){
+                $sharedisplay="DEFLT";
+	    }
+	    my $quota_user;
+	    if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
+                                    {'sophomorixQuota'}{$share}){
+	        $quota_user=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
+	                            {'sophomorixQuota'}{$share};
+	    } else {
+                $quota_user="---";
+	    }
 
-            # uniquefi and sort sharelist
-	    @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
-                uniq(@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} });
-	    @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
-                sort @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} };
-	    # walk through shares
-	    foreach my $share (@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
-                my $school_default;
-		my $sharedisplay;
-		if ($share eq $sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
-                    $school_default=$quota_global;
-		    $sharedisplay="GLOBAL";
-		} elsif ($share eq $school){
-                    $school_default=$quota_school;
-		    $sharedisplay=$share;
-		} else {
-                    $school_default="---";                    
-		    $sharedisplay=$share;
-		}
-		if ($share eq $DevelConf::name_default_school){
-                    $sharedisplay="DEFLT";
-		}
-		my $quota_user;
-		if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
-                                        {'sophomorixQuota'}{$share}){
-		    $quota_user=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
-		                            {'sophomorixQuota'}{$share};
-		} else {
-                    $quota_user="---";
-		}
-
-		my $quota_class;
-		if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
-                                        {'sophomorixQuota'}{$share}){
-		    $quota_class=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
-		                            {'sophomorixQuota'}{$share};
-		} else {
-                    $quota_class="---";
-		}
+	    my $quota_class;
+	    if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+                                    {'sophomorixQuota'}{$share}){
+	        $quota_class=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+	                            {'sophomorixQuota'}{$share};
+	    } else {
+                $quota_class="---";
+	    }
 		
-                # project
-                my $project_sum=0;
-                my $project_string="---";
-                my @project_alphabetical=();
-                foreach my $project (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'} }) {
-                    push @project_alphabetical,$project;
-                }
-		@project_alphabetical = sort @project_alphabetical;
+            # project
+            my $project_sum=0;
+            my $project_string="---";
+            my @project_alphabetical=();
+            foreach my $project (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'} }) {
+                push @project_alphabetical,$project;
+            }
+	    @project_alphabetical = sort @project_alphabetical;
 
-                foreach my $project (@project_alphabetical) {
-                    #print "HERE: $project\n";
-                    if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
-                        my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
-                        $project_sum=$project_sum+$add;
-                        if ($project_string eq "---"){
-                            $project_string=$add;
-                        } else {
-                            $project_string=$project_string."+".$add;
-                        }
-                    }
-                }
-
-	        # total calc
-	        my $calc=1;
-                if ($quota_user eq "---"){
-                    # calc base
-                    my $base=1;
-                    if ($quota_class ne "---"){
-                        $base=$quota_class;
-		    } elsif ($school_default ne "---") {
-                        $base=$school_default;
+            foreach my $project (@project_alphabetical) {
+                if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
+                    my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                    $project_sum=$project_sum+$add;
+                    if ($project_string eq "---"){
+                        $project_string=$add;
                     } else {
-                        $base=1;
+                        $project_string=$project_string."+".$add;
                     }
-                    # add addquota
-		    #print "SUM: $project_sum\n";
-                    $calc=$base+$project_sum;
-                } else {
-                    # override
-                    $calc=$quota_user;
                 }
+            }
 
+	    # total calc
+	    my $calc=1;
+            if ($quota_user eq "---"){
+                # calc base
+                my $base=1;
+                if ($quota_class ne "---"){
+                    $base=$quota_class;
+	        } elsif ($school_default ne "---") {
+                    $base=$school_default;
+                } else {
+                    $base=1;
+                }
+                # add addquota
+                $calc=$base+$project_sum;
+            } else {
+                # override
+                $calc=$quota_user;
+            }
 
+            # update hash
+            $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}=$calc;
+
+            if ($info==1){
                 if($Conf::log_level>=2){
                     # print extensive information
                     print $line2;
@@ -349,16 +347,88 @@ if ($info==1){
                            $project_string;
 		}
 	    }
-	}
-        # end of school
-        if($Conf::log_level==1){
-	    print $line;
-	} else {
-
         }
     }
+    # end of school
+    if ($info==1){
+        if($Conf::log_level==1){
+            print $line;
+        } else {
+            print $line2;
+        }
+    }
+}
+
+
+
+# --info
+if ($info==1){
     exit;
 }
+
+
+# continue with the calculated quota
+print Dumper($ref_quota);
+
+
+&Sophomorix::SophomorixBase::print_title("Setting Quota of the following users:");
+foreach my $school (@schoollist){
+    print "School $school:\n";
+    if ($user eq ""){
+        # use ALL sophomorix users
+        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school}){
+            @userlist=();
+	} else {
+	    # all users of school
+	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school} };
+	}
+    }
+
+    if($#userlist==-1){
+        print "     0 sophomorix users in school $school\n";
+        next;
+    }
+
+    foreach my $user (@userlist){
+        if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+            print "  WARNING: User $user not found!\n";
+            next;
+        }
+	print "   * Testing user $user\n";
+        foreach my $share (@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+            my $calc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share};
+            my $oldcalc;
+            if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}){
+                $oldcalc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share};
+            } else {
+                $oldcalc=-1;
+            }
+            my $quotastatus;
+            if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}){
+                $quotastatus=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share};
+            } else {
+                $quotastatus="unset";
+            }
+            # $quotastatus="124";
+            print "      * share: $share\n";
+            print "         * CALC:        $calc\n";
+            print "         * OLDCALC:     $oldcalc\n";
+            print "         * QUOTASTATUS: $quotastatus\n";
+
+            # add a percentage difference for status value/$calc
+            if ($quotastatus=~/[^0-9]/){
+                print "QUOTASTATUS: $quotastatus -> update\n";
+            }
+            if ($calc eq $oldcalc){
+                # nothing to do
+            } else {
+                # not numbers -> update
+                print "OLDCALC:     $oldcalc -> $calc\n";
+            }
+        }
+    }
+}
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
