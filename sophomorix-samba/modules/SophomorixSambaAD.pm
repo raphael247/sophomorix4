@@ -4321,9 +4321,9 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
                 if ($count>$count_initial_member){
                     # appended memberships		
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'reason'}{'PROJECT'}="TRUE";
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
                 } else {
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'reason'}{'USER'}="TRUE";
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'USER'}="TRUE";
                 }
 	        # save quota info at user
 	        foreach my $addquota (@addquota){
@@ -4343,9 +4343,9 @@ sub AD_get_quota {
                     $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
                     if ($count>$count_initial_member){
                         # appended memberships		
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'reason'}{'PROJECT'}="TRUE";
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
                     } else {
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'reason'}{'CLASS'}="TRUE";
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'REASON'}{'CLASS'}="TRUE";
                     }
 	            # save quota info at user
 	            foreach my $addquota (@addquota){

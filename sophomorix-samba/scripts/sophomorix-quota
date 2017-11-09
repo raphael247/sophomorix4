@@ -167,7 +167,8 @@ if ($info==1){
 	
         my $line="+--------------------------+--------+------+".
                  "------+------+-------------------+\n";
-
+        my $line2="+------------------------------------------".
+                  "-----------------------------+\n";
 
     print Dumper($ref_quota);
 
@@ -188,30 +189,40 @@ if ($info==1){
             print "     0 sophomorix users in school $school\n";
 	    next;
 	}
-        print $line;
-	printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
-               "user(role:SCHOOLDEFAULT)",
-               "share",
-               "CALC",
-               "USER",
-               "CLASS",
-               "PROJECTS";
+        if($Conf::log_level==1){
+            print $line;
+	    printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
+                   "user(role:SCHOOLDEFAULT)",
+                   "share",
+                   "CALC",
+                   "USER",
+                   "CLASS",
+                   "PROJECTS";
+        } else {
 
+        }
 	foreach my $user (@userlist){
+            if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+                print "  WARNING: User $user not found!\n";
+                next;
+            }
 	    if ($school ne 
                 $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixSchoolname'}){
                 # skip users not in school that is processed
                 next;
 	    }
+
 	    my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixRole'};
 	    my $quota_school=
               $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_school'};
 	    my $quota_global=
               $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_global'};
-            print $line;
-
-	    # calc
-	    my $calc=77;
+            if($Conf::log_level==1){
+                print $line;
+            } else {
+                print $line2;
+                printf "| %-70s|\n", $user." in ".$school;
+            }
 
             # uniquefi and sort sharelist
 	    @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
@@ -225,9 +236,6 @@ if ($info==1){
 		if ($share eq $sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
                     $school_default=$quota_global;
 		    $sharedisplay="GLOBAL";
-#		} elsif ($share eq $DevelConf::name_default_school){
-#                    $school_default=$quota_school;
-#		    $sharedisplay="DEFLT";
 		} elsif ($share eq $school){
                     $school_default=$quota_school;
 		    $sharedisplay=$share;
@@ -244,7 +252,7 @@ if ($info==1){
 		    $quota_user=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
 		                            {'sophomorixQuota'}{$share};
 		} else {
-                    $quota_user="";
+                    $quota_user="---";
 		}
 
 		my $quota_class;
@@ -253,26 +261,101 @@ if ($info==1){
 		    $quota_class=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
 		                            {'sophomorixQuota'}{$share};
 		} else {
-                    $quota_class="";
+                    $quota_class="---";
 		}
 		
-	        printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
-                       "$user($role:$school_default)",
-                       "$sharedisplay",
-                       "CALC",
-                       $quota_user,
-                       $quota_class,
-                       "PROJECTS";
+                # project
+                my $project_sum=0;
+                my $project_string="---";
+                my @project_alphabetical=();
+                foreach my $project (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'} }) {
+                    push @project_alphabetical,$project;
+                }
+		@project_alphabetical = sort @project_alphabetical;
+
+                foreach my $project (@project_alphabetical) {
+                    #print "HERE: $project\n";
+                    if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
+                        my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                        $project_sum=$project_sum+$add;
+                        if ($project_string eq "---"){
+                            $project_string=$add;
+                        } else {
+                            $project_string=$project_string."+".$add;
+                        }
+                    }
+                }
+
+	        # total calc
+	        my $calc=1;
+                if ($quota_user eq "---"){
+                    # calc base
+                    my $base=1;
+                    if ($quota_class ne "---"){
+                        $base=$quota_class;
+		    } elsif ($school_default ne "---") {
+                        $base=$school_default;
+                    } else {
+                        $base=1;
+                    }
+                    # add addquota
+		    #print "SUM: $project_sum\n";
+                    $calc=$base+$project_sum;
+                } else {
+                    # override
+                    $calc=$quota_user;
+                }
+
+
+                if($Conf::log_level>=2){
+                    # print extensive information
+                    print $line2;
+                    printf "| %-70s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
+                    printf "|%10s %-60s|\n",$school_default,"(A) default Quota for sophomorixRole \'".$role."\'";
+                    if ($quota_class ne "---"){
+                        printf "|%10s %-60s|\n",$quota_class,"(B) Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\': Overrides (A)";
+    		    } else {
+                        printf "|%10s %-60s|\n",$quota_class,"(B) No Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\'";
+                    }
+                    foreach my $project (@project_alphabetical) {
+                        my @reason=();
+                        my $membership_string="";
+                        foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
+                            push @reason,$reason;
+                        }
+                        @reason = sort @reason;
+                        $membership_string=join(",",@reason);
+                        my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                        if ($add eq "---"){    
+                            printf "|%10s %-60s|\n","0","No AddQuota for membership in project \'".$project."\' (".$membership_string.")";
+                        } else {
+                            printf "|%10s %-60s|\n","+ ".$add,"AddQuota for membership in project \'".$project."\' (".$membership_string.")";
+                        }
+                    }
+                    if ($quota_user eq "---"){
+                        printf "|%10s %-60s|\n",$quota_user,"(C) No Quota at the user Object \'".$user."\'";
+                    } else {
+                        printf "|%10s %-60s|\n",$quota_user,"(C) Quota at the user will override all above settings";
+                    }
+                    printf "|%10s %-60s|\n",$calc,"will be set for user ".$user." on share ".$share;
+	        } else {
+                    # print single line
+	            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
+                           "$user($role:$school_default)",
+                           "$sharedisplay",
+                           $calc,
+                           $quota_user,
+                           $quota_class,
+                           $project_string;
+		}
 	    }
-	    
-
 	}
-	print $line;
-        # print stuff from hash
-        # print school
-        # user | share | calc || | class | user | pro+pro+...+... 
+        # end of school
+        if($Conf::log_level==1){
+	    print $line;
+	} else {
 
-        # im hash userlist erstellen (schulweise)
+        }
     }
     exit;
 }
