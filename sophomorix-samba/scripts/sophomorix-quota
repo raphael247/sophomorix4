@@ -49,6 +49,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_unbind_admin
                                  AD_object_search
                                  AD_user_create
+                                 AD_user_setquota
                                  AD_group_create
                                  AD_group_kill
                                  AD_group_addmember
@@ -74,12 +75,14 @@ my $time_stamp_AD=&time_stamp_AD();
 # ==========================================================================
 # Variablen für Optionen
 $Conf::log_level=1;
+my $debug_level=0; # for smbcquotas --debuglevel=$debug_level
+
 my $help=0;
 my $info=0;
 my $json=0;
 my $school="";
 my $user="";
-
+my $developer_setquota="";
 $Conf::log_level=1;
 
 
@@ -92,6 +95,7 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "school|s=s" => \$school,
            "user|u=s" => \$user,
+           "developer-setquota=s" => \$developer_setquota,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -123,6 +127,15 @@ Options
 
   -s / --school <school>
   -u / --user
+
+Set a users quota manually:
+
+sophomorix-quota --developer-setquota <share>:<num(MiB)> -u <user>
+
+show quota:
+
+smbcquotas -L //localhost/<share>
+
 
 Please see the sophomorix-quota(8) man pages for full documentation
 ');
@@ -365,6 +378,30 @@ foreach my $school (@schoollist){
 if ($info==1){
     exit;
 }
+
+
+
+# --developer-setquota <share>:<value> -user u
+if($developer_setquota ne "" and $user ne ""){
+    my ($share,$quota)=split(":",$developer_setquota);
+    foreach my $user (@userlist){
+   &AD_user_setquota({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$user,
+                      share=>$share,
+                      quota=>$quota,
+                      smb_admin_pass=>$smb_admin_pass, 
+                      debug_level=>$debug_level,
+                      json=>$json,
+                      sophomorix_result=>\%sophomorix_result,
+                      sophomorix_config=>\%sophomorix_config,
+                    });
+
+    }
+    exit;
+}
+
 
 
 # continue with the calculated quota

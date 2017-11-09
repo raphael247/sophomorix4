@@ -44,6 +44,7 @@ $Data::Dumper::Terse = 1;
             AD_user_unset_exam_mode
             AD_user_create
             AD_user_update
+            AD_user_setquota
             AD_get_user
             AD_get_group
             AD_get_devices
@@ -2174,6 +2175,48 @@ sub AD_user_update {
     &Sophomorix::SophomorixBase::print_title(
           "Updating User ${user_count}/$max_user_count: $user (end)");
     print "\n";
+}
+
+
+
+sub AD_user_setquota {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $user = $arg_ref->{user};
+    my $share = $arg_ref->{share};
+    my $quota = $arg_ref->{quota};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $debug_level = $arg_ref->{debug_level};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user:");
+    print "   User: $user\n";
+    print "   Share: $share\n";
+    print "   Quota: $quota\n";
+    # /usr/bin/smbcquotas -U administrator%Muster! //linuxmuster.local/bsz
+    # /usr/bin/smbcquotas -U administrator%Muster! -S UQLIM:<user>:-1/-1 //linuxmuster.local/bsz
+
+    # calculate limits
+    my $hard_bytes;
+    my $soft_bytes;
+    if ($quota==-1){
+	$hard_bytes=-1;
+	$soft_bytes=-1;
+    } else {
+        $hard_bytes=1024*$quota;
+        $soft_bytes=int(0.80*$hard_bytes/1024)*1024;
+    }
+
+    my $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                          " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                          $smb_admin_pass."'".
+                          " -S UQLIM:".$user.":".$hard_bytes."/".$soft_bytes." //$root_dns/$share";
+                print "$smbcquotas_command\n";
+                system($smbcquotas_command);
+
 }
 
 
