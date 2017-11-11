@@ -2671,17 +2671,26 @@ sub AD_school_create {
                     " writeable=y guest_ok=N 'Share for school global'";
         print "   * $command\n";
         system($command);
-        my $command_mod1="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'msdfs root' 'yes'";
+        my $command_mod1="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}.
+                         " 'msdfs root' 'yes'";
         print "   * $command_mod1\n";
         system($command_mod1);
-        my $command_mod2="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'hide unreadable' 'yes'";
+        my $command_mod2="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}.
+                         " 'hide unreadable' 'yes'";
         print "   * $command_mod2\n";
         system($command_mod2);
-	my $groupstring=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}."\\".$DevelConf::sophomorix_file_admin.
+	my $groupstring=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}.
+                        "\\".$DevelConf::sophomorix_file_admin.
                         ", \@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}."\\SCHOOLS";
-        my $command_mod3="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}." 'valid users' '$groupstring'";
+        my $command_mod3="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}.
+                         " 'valid users' '$groupstring'";
         print "   * $command_mod3\n";
         system($command_mod3);
+        my $command_mod4="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}.
+                         " 'strict allocate' 'yes'";
+        print "   * $command_mod4\n";
+        system($command_mod4);
+
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
@@ -2698,23 +2707,27 @@ sub AD_school_create {
                     " writeable=y guest_ok=N 'Share for school $school'";
         print "   * $command\n";
         system($command);
-        my $command_mod1="net conf setparm ".$school." 'msdfs root' 'yes'";
+        my $command_mod1="net conf setparm ".$school.
+                         " 'msdfs root' 'yes'";
         print "   * $command_mod1\n";
         system($command_mod1);
 
-        my $command_mod2="net conf setparm ".$school." 'hide unreadable' 'yes'";
+        my $command_mod2="net conf setparm ".$school.
+                         " 'hide unreadable' 'yes'";
         print "   * $command_mod2\n";
         system($command_mod2);
-
-#        my $groupstring=$DevelConf::sophomorix_file_admin."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
-#                        ", ".$school."\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'}.
-#                        ", global-admins\@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'};
-        my $groupstring=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}."\\".$DevelConf::sophomorix_file_admin.
+        my $groupstring=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}.
+                        "\\".$DevelConf::sophomorix_file_admin.
                         ", \@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}."\\".$school.
                         ", \@".$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}."\\global-admins";
-        my $command_mod3="net conf setparm ".$school." 'valid users' '$groupstring'";
+        my $command_mod3="net conf setparm ".$school.
+                         " 'valid users' '$groupstring'";
         print "   * $command_mod3\n";
         system($command_mod3);
+        my $command_mod4="net conf setparm ".$school.
+                         " 'strict allocate' 'yes'";
+        print "   * $command_mod4\n";
+        system($command_mod4);
 
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
