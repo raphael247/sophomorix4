@@ -1838,6 +1838,8 @@ sub AD_user_update {
     my $birthdate = $arg_ref->{birthdate};
     my $unid = $arg_ref->{unid};
     my $quota = $arg_ref->{quota};
+    my $quota_calc = $arg_ref->{quota_calc};
+    my $quota_info = $arg_ref->{quota_info};
     my $mailquota = $arg_ref->{mailquota};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
@@ -1961,6 +1963,7 @@ sub AD_user_update {
 
     # quota
     if (defined $quota){
+        my %quota_new=();
         my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
         foreach my $quota_old (@quota_old){
             my ($share,$value,$calc,$info)=split(/:/,$quota_old);
@@ -1985,8 +1988,25 @@ sub AD_user_update {
                       "of numerals 0-9 or is \"---\"\n\n";
 		exit;
 	    }
-            # overriding quota_new
+            # overriding quota_new:
+            # -----------------------
+            # A) user value (used by sophomorix-user)
     	    $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+
+            # B) calc value (used by sophomorix-quota)
+            if (defined $quota_calc){
+                $quota_new{'QUOTA'}{$share}{'CALC'}=$quota_calc;
+#                $quota_new{'QUOTA'}{$share}{'CALC'}="300";
+            } else {
+                 $quota_new{'QUOTA'}{$share}{'CALC'}="---";
+            }
+            # C) info value (used by sophomorix-quota AFTER quota is set successfully)
+            if (defined $quota_info){
+                $quota_new{'QUOTA'}{$share}{'INFO'}=$quota_info;
+            } else {
+                $quota_new{'QUOTA'}{$share}{'INFO'}=$ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
+            }
+
    	    push @sharelist, $share;
 	}
         # debug
@@ -2007,10 +2027,15 @@ sub AD_user_update {
                     # new share
                     $quota_new{'QUOTA'}{$share}{'CALC'}="---";
                 }
+
+#		push @quota_new, $share.":".
+#                                 $quota_new{'QUOTA'}{$share}{'VALUE'}.":".
+#                                 $quota_new{'QUOTA'}{$share}{'CALC'}.":".
+#                                 $ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
 		push @quota_new, $share.":".
                                  $quota_new{'QUOTA'}{$share}{'VALUE'}.":".
                                  $quota_new{'QUOTA'}{$share}{'CALC'}.":".
-                                 $ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
+                                 $quota_new{'QUOTA'}{$share}{'INFO'};
 
 	    }
 	}
@@ -2216,7 +2241,21 @@ sub AD_user_setquota {
                           " -S UQLIM:".$user.":".$hard_bytes."/".$soft_bytes." //$root_dns/$share";
                 print "$smbcquotas_command\n";
                 system($smbcquotas_command);
-
+                my $stdout=`$smbcquotas_command`;
+                my $return=${^CHILD_ERROR_NATIVE}; # return of value of $smbcquotas_command
+                if ($return==0){
+                    chomp($return);
+                    my ($full_user,$colon,$used,$hard_limit,$soft_limit)=split(/\s+/,$stdout);
+                    my ($unused,$user)=split(/\\/,$full_user);
+                    $used=~s/\/$//;
+                    $hard_limit=~s/\/$//;
+                    if ($hard_limit eq "NO"){
+                        $hard_limit="NO LIMIT";
+                    }
+                    print "$user has used $used of $hard_limit\n";
+		} else {
+                    print "\nERROR: Setting quota failed\n\n";
+                }
 }
 
 
