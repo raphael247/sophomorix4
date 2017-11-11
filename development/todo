@@ -378,18 +378,53 @@ OK: sophomorix-passwd -u ... --pass .... sollte tun
 ------------------------------------------------------------
 quota:
 
-was ist, wenn schoolshares auf anderen Servern liegen
---> Linux-quotabefehl müsste per ssh auf anderem Server ausgeführt werden
---> Abhilfe: smbcquotas ???
+Reihenfolge:
+
+1) apt install quota
+
+
+2) Die Partition des share mit quota optionen mounten:
+   Hierauf kommts an: jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group
+   z.B. in /etc/fstab
+
+   /dev/mapper/srv-default--school on \n
+      /srv/samba/schools/default-school \n
+      type ext4 (rw,relatime,errors=remount-ro,data=ordered,jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group)
+
+
+   umount /srv/samba/schools/default-school
+   mount -a
+
+3) 
+    quotacheck -cvua    (create verbose userquota all-filesystems)
+    quotacheck -cvuga    (create verbose userquota groupquota all-filesystems)
+
+
+    - davor evtl alte aquota.user löschen mit:
+      lsattr /srv/samba/schools/default-school/aquota.user
+      --> ----i--A-----e--   immutable bit gesetzt
+      chattr /srv/samba/schools/default-school/aquota.user
+      rm -rf /srv/samba/schools/default-school/aquota.user
+      oder vorher
+      quotaoff -a
+
+4) Dafür sorgen dass auota.user/aquota.group upgedated werden:
+   quotaon /srv/samba/schools/default-school
+
+5)  Filesystemquota auf Linuxseite testen:
+
+    repquota -au
+    repquota -aus    (s=human readable)
+
+    --> was muss man tun, damit usernamen aufgelöst werden ????
+
+5) /usr/bin/smbcquotas -L //localhost/all -U administrator%'Muster!'
+
+--> smbcquotas examples
     The smbcquotas program manipulates NT Quotas on SMB file shares.
     /usr/bin/smbcquotas -U administrator%Muster! //linuxmuster.local/bsz 
 
-Einschalten:
-mount options: usrjquota=aquota.user,jqfmt,vfsv0
---> apt install quota
---> quotacheck -cvua    --> creates aquota.user
---> quotaon /dir
-repquota -au
+
 
 
 ############ Achtung: das scheint nur zu tun, wenn das smb-share einer Partition entspricht
@@ -405,8 +440,28 @@ und
 /dev/mapper/xenialserver--vg-root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered,jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group)
 #############
 
+
+
+
+
+
+
+Todo:
+
 Auf share setzen
-"strict allocate = yes"
+OK: "strict allocate = yes"
+--> document in souce
+
+bei 
+sophomorix-quota --developer-setquota all:-4 -u maiersa42
+gute Fehlermeldung anzeigen
+
+project ACL abernten
+
+sollte man default quota setzen auf dem share für alle schüler?
+haben die dann beim anlegen den default?
+
+
 
 Also bräuchte man für eine 
 

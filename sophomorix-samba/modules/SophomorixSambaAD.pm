@@ -1983,9 +1983,9 @@ sub AD_user_update {
                 print "\nERROR: SMB-share $share does not exist!\n\n";
 		exit;
 	    }
-            if ($value=~/[^0-9]/ and $value ne "---"){
+            if ($value=~/[^0-9]/ and $value ne "-1" and $value ne "---"){
                 print "\nERROR: Quota value $value does not consist ",
-                      "of numerals 0-9 or is \"---\"\n\n";
+                      "of numerals 0-9 or is -1 or is \"---\"\n\n";
 		exit;
 	    }
             # overriding quota_new:
@@ -1996,7 +1996,6 @@ sub AD_user_update {
             # B) calc value (used by sophomorix-quota)
             if (defined $quota_calc){
                 $quota_new{'QUOTA'}{$share}{'CALC'}=$quota_calc;
-#                $quota_new{'QUOTA'}{$share}{'CALC'}="300";
             } else {
                  $quota_new{'QUOTA'}{$share}{'CALC'}="---";
             }
@@ -2218,11 +2217,6 @@ sub AD_user_setquota {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
     &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user:");
-    print "   User: $user\n";
-    print "   Share: $share\n";
-    print "   Quota: $quota\n";
-    # /usr/bin/smbcquotas -U administrator%Muster! //linuxmuster.local/bsz
-    # /usr/bin/smbcquotas -U administrator%Muster! -S UQLIM:<user>:-1/-1 //linuxmuster.local/bsz
 
     # calculate limits
     my $hard_bytes;
@@ -2246,13 +2240,31 @@ sub AD_user_setquota {
                 if ($return==0){
                     chomp($return);
                     my ($full_user,$colon,$used,$hard_limit,$soft_limit)=split(/\s+/,$stdout);
-                    my ($unused,$user)=split(/\\/,$full_user);
+                    my ($unused,$quota_user)=split(/\\/,$full_user);
                     $used=~s/\/$//;
                     $hard_limit=~s/\/$//;
                     if ($hard_limit eq "NO"){
                         $hard_limit="NO LIMIT";
                     }
-                    print "$user has used $used of $hard_limit\n";
+                    print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit\n";
+                    # update the sophomorixQuota entry at the user
+                    print "Updating quota for user $user:\n";
+		    my $share_quota=$share.":".$quota;
+                    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+                    &AD_user_update({ldap=>$ldap,
+                                     root_dse=>$root_dse,
+                                     dn=>$dn,
+                                     user=>$user,
+                                     quota=>$share_quota,     # <share>:<quota_on_share>
+                                     quota_calc=>$quota,      # what was calculated (same as quota_on_share)
+                                     quota_info=>$hard_limit, # what was set
+                                     user_count=>"1",
+                                     max_user_count=>"1",
+                                     date_now=> $time_stamp_AD,
+                                     json=>$json,
+                                     sophomorix_config=>$ref_sophomorix_config,
+                                     sophomorix_result=>$ref_sophomorix_result,
+                                   });
 		} else {
                     print "\nERROR: Setting quota failed\n\n";
                 }
