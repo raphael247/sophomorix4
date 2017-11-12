@@ -369,11 +369,19 @@ foreach my $school_share (@sharelist){
                     # print extensive information
                     print $line2;
                     printf "| %-70s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
-                    printf "|%10s %-60s|\n",$school_default," (A) default Quota for sophomorixRole \'".$role."\'";
+                    printf "|%10s %-60s|\n",$school_default,
+                                            " (A) default Quota for sophomorixRole \'
+                                            ".$role."\'";
                     if ($quota_class ne "---"){
-                        printf "|%10s %-60s|\n",$quota_class," (B) Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\': Overrides (A)";
+                        printf "|%10s %-60s|\n",$quota_class,
+                                                " (B) Quota at the users class \'".
+                                                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                                                "\': Overrides (A)";
     		    } else {
-                        printf "|%10s %-60s|\n",$quota_class," (B) No Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\'";
+                        printf "|%10s %-60s|\n",$quota_class,
+                                                " (B) No Quota at the users class \'".
+                                                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                                                "\'";
                     }
                     foreach my $project (@project_alphabetical) {
                         my @reason=();
@@ -385,9 +393,12 @@ foreach my $school_share (@sharelist){
                         $membership_string=join(",",@reason);
                         my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
                         if ($add eq "---"){    
-                            printf "|%10s %-60s|\n","0"," No AddQuota for membership in project \'".$project."\' (".$membership_string.")";
+                            printf "|%10s %-60s|\n","0",
+                                                    " No AddQuota for membership in project \'".
+                                                    $project."\' (".$membership_string.")";
                         } else {
-                            printf "|%10s %-60s|\n","+ ".$add," AddQuota for membership in project \'".$project."\' (".$membership_string.")";
+                            printf "|%10s %-60s|\n","+ ".$add," AddQuota for membership in project \'".
+                                                    $project."\' (".$membership_string.")";
                         }
                     }
                     if ($quota_user eq "---"){
@@ -416,7 +427,6 @@ foreach my $school_share (@sharelist){
         } else {
             print $line2;
         }
-        print "* after CALC: quota not set\n";
     }
 }
 
@@ -457,7 +467,7 @@ if($developer_setquota ne "" and $user ne ""){
 
 # continue with the calculated quota
 print Dumper($ref_quota);
-exit;
+
 
 &Sophomorix::SophomorixBase::print_title("Setting Quota of the following users:");
 foreach my $school_share (@sharelist){
