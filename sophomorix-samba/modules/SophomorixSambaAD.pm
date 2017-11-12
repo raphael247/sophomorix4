@@ -4235,6 +4235,9 @@ sub AD_get_AD {
 
 sub AD_get_quota {
     my %quota=();
+    # LISTS of %quota
+    # LISTS->SHARE-><share>->@users  # list which users have quota on the share
+    # LISTS->USER-><school>->@users  # list which users are in which school
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -4277,6 +4280,8 @@ sub AD_get_quota {
   		$quota{'QUOTA'}{'USERS'}{$sam}{'QUOTASTATUS'}{$share}=$quotastatus;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
+                # remember on which share have which users quota settings
+		push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam;                
         }
     }
 
@@ -4334,6 +4339,8 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}=$value;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
+                # remember on which share have which users quota settings
+		push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam_user;                
 	    }
 	}
         foreach my $memberof (@memberof){
@@ -4447,6 +4454,8 @@ sub AD_get_quota {
                         $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
 		        # remember share for later listing
 		        push @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }, $share;
+                        # remember on which share have which users quota settings
+	    	        push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $user;                
 	            }
 		}
 	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member}){
@@ -4458,6 +4467,15 @@ sub AD_get_quota {
 	        push @member, @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam_project} };
 	    }
 	}
+    }
+    # uniquify some lists
+    foreach my $share (keys %{ $quota{'LISTS'}{'SHARE'} }) {
+        # uniquefi and sort users
+	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'SHARE'}{$share} });
+	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'SHARE'}{$share} };
+
     }
     return(\%quota);
 }
