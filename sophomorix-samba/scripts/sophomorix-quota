@@ -125,7 +125,7 @@ Options
   -vv / --verbose --verbose
   -i  / --info
 
-  -s / --school <school>
+  -s / --school <school>/<sharename>
   -u / --user
 
 Set a users quota manually:
@@ -146,10 +146,10 @@ Please see the sophomorix-quota(8) man pages for full documentation
 
 
 # create schoollist from options
-# --school
+# --school <school>
 my @schoollist=();
 if ($school ne ""){
-    if (exists $sophomorix_config{'SCHOOLS'}{$school}){
+    if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
 	push @schoollist,$school;
     } else {
         print "\nERROR: $school is not a school!\n\n";
@@ -158,7 +158,6 @@ if ($school ne ""){
 } else {
     @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 }
-
 
 
 # --user user1,user2
@@ -191,8 +190,15 @@ foreach my $school (@schoollist){
 	}
     }
     if ($info==1){
+        my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                               $smb_admin_pass."'".
+                               " -F //$root_dns/$school";
+        print "$smbcquotas_command\n";
+        system($smbcquotas_command);
+
         print "\n";
-        &Sophomorix::SophomorixBase::print_title("Quota of school $school:");
+        &Sophomorix::SophomorixBase::print_title("User quota of school $school:");
         if($#userlist==-1){
             print "     0 sophomorix users in school $school\n";
             next;
@@ -378,6 +384,7 @@ foreach my $school (@schoollist){
 if ($info==1){
     exit;
 }
+
 
 
 
