@@ -438,14 +438,16 @@ foreach my $school_share (@sharelist){
         }
     }
 }
-print Dumper($ref_quota_old->{'QUOTA'}{'USERS'}{'lordjo42'});
+print Dumper($ref_quota_old->{'QUOTA'}{'USERS'}{'blackmri42'});
+#print Dumper($ref_quota_old->{'QUOTA'}{'USERS'}{'lordjo42'});
 #print Dumper($ref_quota_old);
 print "############################################################\n";
 
 
 ### NEU
 #print Dumper($ref_quota);
-print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
+print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
+#print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
 
 # --info
 if ($info==1){
@@ -481,7 +483,7 @@ if ($info==1){
         if($Conf::log_level==1){
             print $line;
             printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
-                   "user(role:SCHOOLDEFAULT)",
+                   "user(role:SHAREDEFAULT)",
                    "share",
                    "CALC",
                    "USER",

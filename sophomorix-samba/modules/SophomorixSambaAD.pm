@@ -4272,6 +4272,11 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
         $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
+        # get SHAREDEFAULT for this role
+        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'SHAREDEFAULT'}{$school}=
+            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
+        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'SHAREDEFAULT'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}=
+            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
         $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
         foreach my $quota (@quota){
 	        my ($share,$value,$oldcalc,$quotastatus)=split(/:/,$quota);
@@ -4472,12 +4477,80 @@ sub AD_get_quota {
 
     # uniquify and sort sharelist at all users
     foreach my $user (keys %{ $quota{'QUOTA'}{'USERS'} }) {
+#	print "USER: $user\n";
+
         # uniquefi and sort sharelist
 	@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
             uniq(@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} });
 	@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
             sort @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} };
-    }
+
+        # create alphabetical projectlist (is unique alredy)
+        foreach my $project (keys %{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'} }) {
+            push @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'}}, $project; 
+        }
+        if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'}){
+	    @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }= 
+                sort @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} };
+	}
+
+        # sum up Addquota from projects for each share
+        my $calc=1;
+        my $project_sum=0;
+        my $project_string="---";
+        foreach my $share ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }) {
+            my $quota_user;
+  	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share}){
+	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
+	    } else {
+                $quota_user="---";
+	    }
+            my $quota_class; # for this share
+	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share}){
+	        $quota_class=$quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share};
+	    } else {
+                $quota_class="---";
+	    }
+		
+
+             foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+                 if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
+                     my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                     $project_sum=$project_sum+$add;
+                     if ($project_string eq "---"){
+                        $project_string=$add;
+                     } else {
+                         $project_string=$project_string."+".$add;
+                     }
+                 }
+             } # end project
+#             print "PROSTRG: $share $project_string $project_sum\n";
+             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share}=$project_string;
+             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
+             # add everything up
+
+             if ($quota_user eq "---"){
+                # start with nothing
+                my $base=$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NOQUOTA'};
+                # check for class quota
+                if ($quota_class ne "---"){
+                    $base=$quota_class;
+	    #    } elsif ($school_default ne "---") {
+            #        $base=$school_default;
+	        } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share}) {
+                    $base=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share};
+                }
+                # add addquota
+                $calc=$base+$project_sum;
+            } else {
+                # override
+                $calc=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
+            }
+
+             $quota{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}=$calc;
+	} # end share
+    } # end user
+    
     foreach my $share (keys %{ $quota{'LISTS'}{'SHARE'} }) {
         # uniquefi and sort users
 	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
