@@ -85,6 +85,9 @@ my $user="";
 my $developer_setquota="";
 $Conf::log_level=1;
 
+# smbcquotas options
+my $list=0;
+my $show=0;
 
 
 # Parsen der Optionen
@@ -96,6 +99,8 @@ my $testopt=GetOptions(
            "school|s=s" => \$school,
            "user|u=s" => \$user,
            "developer-setquota=s" => \$developer_setquota,
+           "show|F" => \$show,
+           "list|L" => \$list,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -132,7 +137,16 @@ Set a users quota manually:
 
 sophomorix-quota --developer-setquota <share>:<num(MiB)> -u <user>
 
-show quota:
+
+smbcquotas wrappers:
+
+   List quota of the users on a school/share:
+     sophomorix-quota --school <sharename> -L
+     sophomorix-quota --school <sharename> --list
+
+   Show quota quota settings of a school/share:
+     sophomorix-quota --school <sharename> -F
+     sophomorix-quota --school <sharename> --show
 
 smbcquotas -L //localhost/<share>
 
@@ -152,12 +166,42 @@ if ($school ne ""){
     if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
 	push @schoollist,$school;
     } else {
-        print "\nERROR: $school is not a school!\n\n";
+        print "\nERROR: $school is not a SMB-share!\n\n";
 	exit;
     }
 } else {
     @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 }
+
+# options that need only a sharename
+# --list/-L
+if ($list==1){
+    foreach my $school (@schoollist){
+        my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                               $smb_admin_pass."'".
+                               " -L //$root_dns/$school";
+        print "$smbcquotas_command\n";
+        system($smbcquotas_command);
+    }
+    exit;
+}
+
+
+# --show/-F
+if ($show==1){
+    foreach my $school (@schoollist){
+        my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                               $smb_admin_pass."'".
+                               " -F //$root_dns/$school";
+        print "$smbcquotas_command\n";
+        system($smbcquotas_command);
+    }
+    exit;
+}
+
+
 
 
 # --user user1,user2
@@ -168,7 +212,7 @@ if ($user ne ""){
 
 
 
-
+# calculate quota stuff
 my $ref_quota=&AD_get_quota({ldap=>$ldap,
                              root_dse=>$root_dse,
                              root_dns=>$root_dns,
