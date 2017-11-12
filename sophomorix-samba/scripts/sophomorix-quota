@@ -379,8 +379,7 @@ foreach my $school_share (@sharelist){
                     print $line2;
                     printf "| %-70s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
                     printf "|%10s %-60s|\n",$school_default,
-                                            " (A) default Quota for sophomorixRole \'
-                                            ".$role."\'";
+                                            " (A) default Quota for sophomorixRole \'".$role."\'";
                     if ($quota_class ne "---"){
                         printf "|%10s %-60s|\n",$quota_class,
                                                 " (B) Quota at the users class \'".
@@ -454,7 +453,7 @@ if ($info==1){
     my $line="+--------------------------+--------+------+".
              "------+------+-------------------+\n";
     my $line2="+------------------------------------------".
-              "-----------------------------+\n";
+              "------------------------------------+\n";
     print"############################################################\n";
     print "FORGET before\n";
     foreach my $school_share (@sharelist){
@@ -493,7 +492,6 @@ if ($info==1){
             # no such header for higher loglevels
         }
 
-
         ############################################################
         # Walk through users
         foreach my $user (@userlist){
@@ -514,7 +512,7 @@ if ($info==1){
                 print $line;
             } else {
                 print $line2;
-                printf "| %-70s|\n", $user." in ".$school_share;
+                printf "| %-77s|\n", $user." in ".$school_share;
             }
 
             ############################################################
@@ -556,53 +554,51 @@ if ($info==1){
                     $quota_class_display="---";
 	        }
 
-
-
-                
-
-
+                # printout
                 if($Conf::log_level>=2){
-                    # # print extensive information
-                    # print $line2;
-                    # printf "| %-70s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
-                    # printf "|%10s %-60s|\n",$school_default,
-                    #                         " (A) default Quota for sophomorixRole \'
-                    #                         ".$role."\'";
-                    # if ($quota_class ne "---"){
-                    #     printf "|%10s %-60s|\n",$quota_class,
-                    #                             " (B) Quota at the users class \'".
-                    #                             $ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
-                    #                             "\': Overrides (A)";
-    		    # } else {
-                    #     printf "|%10s %-60s|\n",$quota_class,
-                    #                             " (B) No Quota at the users class \'".
-                    #                             $ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
-                    #                             "\'";
-                    # }
-                    # foreach my $project (@project_alphabetical) {
-                    #     my @reason=();
-                    #     my $membership_string="";
-                    #     foreach my $reason (keys %{ $ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
-                    #         push @reason,$reason;
-                    #     }
-                    #     @reason = sort @reason;
-                    #     $membership_string=join(",",@reason);
-                    #     my $add=$ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
-                    #     if ($add eq "---"){    
-                    #         printf "|%10s %-60s|\n","0",
-                    #                                 " No AddQuota for membership in project \'".
-                    #                                 $project."\' (".$membership_string.")";
-                    #     } else {
-                    #         printf "|%10s %-60s|\n","+ ".$add," AddQuota for membership in project \'".
-                    #                                 $project."\' (".$membership_string.")";
-                    #     }
-                    # }
-                    # if ($quota_user eq "---"){
-                    #     printf "|%10s %-60s|\n",$quota_user," (C) No Quota at the user Object \'".$user."\'";
-                    # } else {
-                    #     printf "|%10s %-60s|\n",$quota_user," (C) Quota at the user will override all above settings";
-                    # }
-                    # printf "|%10s %-60s|\n",$calc," will be set for user ".$user." on share ".$share;
+                    # print extensive information
+                    print $line2;
+                    printf "| %-77s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
+                    printf "|%10s %-67s|\n",$school_default,
+                                             " (A) default Quota for sophomorixRole \'".$role."\'";
+                    if ($quota_class_display ne "---"){
+                        printf "|%10s %-67s|\n",$quota_class_display,
+                                                " (B) Quota at the users class \'".
+                                                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                                                "\': Overrides (A)";
+    		    } else {
+                        printf "|%10s %-67s|\n",$quota_class_display,
+                                                " (B) No Quota at the users class \'".
+                                                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                                                "\'";
+                    }
+#                     foreach my $project (@project_alphabetical) {
+                     foreach my $project ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+                         my @reason=();
+                         my $membership_string="";
+                         foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
+                             push @reason,$reason;
+                         }
+                         @reason = sort @reason;
+                         $membership_string=join(",",@reason);
+                         my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                         if ($add eq "---"){    
+                             printf "|%10s %-67s|\n","0",
+                                                     " No AddQuota for membership in project \'".
+                                                     $project."\' (".$membership_string.")";
+                         } else {
+                             printf "|%10s %-67s|\n","+ ".$add," AddQuota for membership in project \'".
+                                                     $project."\' (".$membership_string.")";
+                         }
+                    }
+                    if ($quota_user_display eq "---"){
+                        printf "|%10s %-67s|\n",$quota_user_display," (C) No Quota at the user Object \'".$user."\'";
+                    } else {
+                        printf "|%10s %-67s|\n",$quota_user_display," (C) Quota at the user will override all above settings";
+                    }
+                    printf "|%10s %-67s|\n",
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share},
+                           " will be set for user ".$user." on share ".$share;
 	        } else {
                     # print single line
 	            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
@@ -617,18 +613,6 @@ if ($info==1){
 #                           $project_string;
                            $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share};
 		}
-
-
-
-
-
-
-
-
-
-
-
-
             } # end of share walk
         } # end of user walk
     } # end of school
