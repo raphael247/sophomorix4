@@ -775,6 +775,7 @@ sub read_smb_conf {
     $domain_dns = join(',DC=', @dns);
     $domain_dns="DC=".$domain_dns;
     $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'DomainDNS'}=$domain_dns;
+    
 }
 
 
@@ -831,6 +832,12 @@ sub read_smb_net_conf_list {
           -handle_trailing_comment => 1,
         );
     system("rm $tmpfile");
+    # create sharelist
+    foreach my $share (keys %{ $ref_sophomorix_config->{'samba'}{'net_conf_list'} }) {
+        print "HERE17 $share\n";
+        push @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }, $share; 
+    }
+    @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }= sort @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} };
 }
 
 
