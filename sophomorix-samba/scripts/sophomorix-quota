@@ -438,7 +438,7 @@ foreach my $school_share (@sharelist){
         }
     }
 }
-print Dumper($ref_quota_old->{'QUOTA'}{'USERS'}{'blackmri42'});
+#print Dumper($ref_quota_old->{'QUOTA'}{'USERS'}{'blackmri42'});
 #print Dumper($ref_quota_old->{'QUOTA'}{'USERS'}{'lordjo42'});
 #print Dumper($ref_quota_old);
 print "############################################################\n";
@@ -446,7 +446,7 @@ print "############################################################\n";
 
 ### NEU
 #print Dumper($ref_quota);
-print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
+#print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
 #print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
 
 # --info
@@ -497,7 +497,7 @@ if ($info==1){
         ############################################################
         # Walk through users
         foreach my $user (@userlist){
-	    print "DEBUG: User: $user\n";
+	    #print "DEBUG: User: $user\n";
             if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
                 print "  WARNING: User $user not found!\n";
                 next;
@@ -518,17 +518,9 @@ if ($info==1){
             }
 
             ############################################################
-# #  This should be done in AD_get_quota ????????
-# #        # uniquefi and sort sharelist
-# #	@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
-# #            uniq(@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} });
-# #	@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
-# #            sort @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} };
-
-
             # Walk through all shares
             foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
-  	        print "   DEBUG: Share: $share\n";
+  	        #print "   DEBUG: Share: $share\n";
                 # get values for display
                 my $school_default;
 	        my $sharedisplay;
@@ -563,6 +555,77 @@ if ($info==1){
 	        } else {
                     $quota_class_display="---";
 	        }
+
+
+
+                
+
+
+                if($Conf::log_level>=2){
+                    # # print extensive information
+                    # print $line2;
+                    # printf "| %-70s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
+                    # printf "|%10s %-60s|\n",$school_default,
+                    #                         " (A) default Quota for sophomorixRole \'
+                    #                         ".$role."\'";
+                    # if ($quota_class ne "---"){
+                    #     printf "|%10s %-60s|\n",$quota_class,
+                    #                             " (B) Quota at the users class \'".
+                    #                             $ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                    #                             "\': Overrides (A)";
+    		    # } else {
+                    #     printf "|%10s %-60s|\n",$quota_class,
+                    #                             " (B) No Quota at the users class \'".
+                    #                             $ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                    #                             "\'";
+                    # }
+                    # foreach my $project (@project_alphabetical) {
+                    #     my @reason=();
+                    #     my $membership_string="";
+                    #     foreach my $reason (keys %{ $ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
+                    #         push @reason,$reason;
+                    #     }
+                    #     @reason = sort @reason;
+                    #     $membership_string=join(",",@reason);
+                    #     my $add=$ref_quota_old->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                    #     if ($add eq "---"){    
+                    #         printf "|%10s %-60s|\n","0",
+                    #                                 " No AddQuota for membership in project \'".
+                    #                                 $project."\' (".$membership_string.")";
+                    #     } else {
+                    #         printf "|%10s %-60s|\n","+ ".$add," AddQuota for membership in project \'".
+                    #                                 $project."\' (".$membership_string.")";
+                    #     }
+                    # }
+                    # if ($quota_user eq "---"){
+                    #     printf "|%10s %-60s|\n",$quota_user," (C) No Quota at the user Object \'".$user."\'";
+                    # } else {
+                    #     printf "|%10s %-60s|\n",$quota_user," (C) Quota at the user will override all above settings";
+                    # }
+                    # printf "|%10s %-60s|\n",$calc," will be set for user ".$user." on share ".$share;
+	        } else {
+                    # print single line
+	            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
+                           "$user($role:$school_default)",
+                           "$sharedisplay",
+#                           $calc,
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share},
+#                           $quota_user,
+                           $quota_user_display,
+#                           $quota_class,
+                           $quota_class_display,
+#                           $project_string;
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share};
+		}
+
+
+
+
+
+
+
+
+
 
 
 
