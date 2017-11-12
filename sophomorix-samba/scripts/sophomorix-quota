@@ -223,6 +223,8 @@ my $ref_quota=&AD_get_quota({ldap=>$ldap,
                              sophomorix_config=>\%sophomorix_config,
                             });
 
+
+
 my $line="+--------------------------+--------+------+".
          "------+------+-------------------+\n";
 my $line2="+------------------------------------------".
@@ -433,9 +435,127 @@ foreach my $school_share (@sharelist){
 
 
 
-
+print Dumper($ref_quota);
 # --info
 if ($info==1){
+    my $line="+--------------------------+--------+------+".
+             "------+------+-------------------+\n";
+    my $line2="+------------------------------------------".
+              "-----------------------------+\n";
+    print"############################################################\n";
+    print "FORGET before\n";
+    foreach my $school_share (@sharelist){
+        if ($user eq ""){
+            # use ALL sophomorix users
+            if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
+                @userlist=();
+	    } else {
+	        # all users of school
+	        @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
+	    }
+        }
+
+
+        ############################################################
+        # HEADER for SCHOOL
+        print "\n";
+        &Sophomorix::SophomorixBase::print_title("User quota of school $school_share:");
+        # there are 0 users
+        if($#userlist==-1){
+            print "     0 sophomorix users in school $school_share\n";
+            next;
+        }
+
+        # there are users
+        if($Conf::log_level==1){
+            print $line;
+            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
+                   "user(role:SCHOOLDEFAULT)",
+                   "share",
+                   "CALC",
+                   "USER",
+                   "CLASS",
+                   "PROJECTS";
+        } else {
+            # no such header for higher loglevels
+        }
+
+
+        ############################################################
+        # Walk through users
+        foreach my $user (@userlist){
+	    print "DEBUG: User: $user\n";
+            if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+                print "  WARNING: User $user not found!\n";
+                next;
+            } 
+
+            # ????? skip user not in this school????
+            # there are only the users of the school selected ????
+
+            # create shortcut vars
+            my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixRole'};
+
+            # print user end/share begin line
+            if($Conf::log_level==1){
+                print $line;
+            } else {
+                print $line2;
+                printf "| %-70s|\n", $user." in ".$school_share;
+            }
+
+            ############################################################
+# #  This should be done in AD_get_quota ????????
+# #        # uniquefi and sort sharelist
+# #	@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
+# #            uniq(@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} });
+# #	@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
+# #            sort @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} };
+
+
+            # Walk through all shares
+            foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+  	        print "   DEBUG: Share: $share\n";
+                # get values for display
+                my $school_default;
+	        my $sharedisplay;
+	        if ($share eq $sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
+                    $school_default=$sophomorix_config{'ROLES'}{$school_share}{$role}{'quota_default_global'};
+		    $sharedisplay="GLOBAL";
+	        } elsif ($share eq $school_share){
+                    $school_default=$sophomorix_config{'ROLES'}{$school_share}{$role}{'quota_default_school'};
+		    $sharedisplay=$share;
+	        } else {
+                    $school_default="---";                    
+		    $sharedisplay=$share;
+	        }
+  	        if ($share eq $DevelConf::name_default_school){
+                    $sharedisplay="DEFLT";
+	        }
+
+                # get the users quota or --- for display
+                my $quota_user_display;
+	        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
+                                        {'sophomorixQuota'}{$share}){
+	            $quota_user_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
+	                                            {'sophomorixQuota'}{$share};
+	        } else {
+                    $quota_user_display="---";
+	        }
+                my $quota_class_display;
+	        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+                                        {'sophomorixQuota'}{$share}){
+	            $quota_class_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+	                                             {'sophomorixQuota'}{$share};
+	        } else {
+                    $quota_class_display="---";
+	        }
+
+
+
+            } # end of share walk
+        } # end of user walk
+    } # end of school
     exit;
 }
 
