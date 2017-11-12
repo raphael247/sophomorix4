@@ -448,9 +448,26 @@ und
 
 Todo:
 
+smbcacls7smbcquotas usw. command
+
+sub execute_smbx_command($base_command,$part1,$part2,$smb_pass);
+  $smb_pass is fitted between $part1 and $part2
+-> centrally configurable sophomorix.ini
+   SHOW_SMBX_COMMAND=TRUE/FALSE
+   # command zeigen, ohne password bzw '******'
+   SHOW_SMBX_COMMAND_PASSWORDS=TRUE/FALSE
+   --> wichtig beim debuggen usw.
+
+testen mit: 
+&execute_smbx_command("SMBCQUOTAS",$debug_level,$smb_admin_pass,""," -L //$root_dns/$share"
+sophomorix-quota --share all -F
+sophomorix-quota --share all -L
+
+
+
 Auf share setzen
 OK: "strict allocate = yes"
---> document in souce
+Todo: --> document in source
 
 bei 
 sophomorix-quota --developer-setquota all:-4 -u maiersa42

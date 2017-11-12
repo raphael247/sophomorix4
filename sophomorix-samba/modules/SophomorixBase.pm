@@ -834,7 +834,6 @@ sub read_smb_net_conf_list {
     system("rm $tmpfile");
     # create sharelist
     foreach my $share (keys %{ $ref_sophomorix_config->{'samba'}{'net_conf_list'} }) {
-        print "HERE17 $share\n";
         push @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }, $share; 
     }
     @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }= sort @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} };
