@@ -96,7 +96,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
-           "school|s=s" => \$school,
+           "school|share|s=s" => \$school,
            "user|u=s" => \$user,
            "developer-setquota=s" => \$developer_setquota,
            "show|F" => \$show,
@@ -128,28 +128,31 @@ Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
-  -i  / --info
 
-  -s / --school <school>/<sharename>
-  -u / --user
+show sophomorix info about quota calculation
+  show info about all school-shares
+    -i  / --info
+  show info about a school or another share 
+    -s <school>/<sharename> / --school <school>/<sharename> / --share <school>/<sharename>
+  limit the output to some users
+    -u / --user <user1>,<user2>,... 
+  
 
-Set a users quota manually:
 
-sophomorix-quota --developer-setquota <share>:<num(MiB)> -u <user>
+Set a users quota manually (in AD AND on smbshare):
+
+  sophomorix-quota --developer-setquota <share>:<num(MiB)> -u <user>
 
 
 smbcquotas wrappers:
 
-   List quota of the users on a school/share:
-     sophomorix-quota --school <sharename> -L
-     sophomorix-quota --school <sharename> --list
+  List quota of the users on a school/share:
+    sophomorix-quota --share <sharename> -L
+    sophomorix-quota --share <sharename> --list
 
-   Show quota quota settings of a school/share:
-     sophomorix-quota --school <sharename> -F
-     sophomorix-quota --school <sharename> --show
-
-smbcquotas -L //localhost/<share>
-
+  Show quota quota settings of a school/share:
+    sophomorix-quota --share <sharename> -F
+    sophomorix-quota --share <sharename> --show
 
 Please see the sophomorix-quota(8) man pages for full documentation
 ');
@@ -159,28 +162,29 @@ Please see the sophomorix-quota(8) man pages for full documentation
 
 
 
-# create schoollist from options
-# --school <school>
-my @schoollist=();
+# create sharelist from options
+# --school <school>/--share <share>
+my @sharelist=();
 if ($school ne ""){
     if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
-	push @schoollist,$school;
+	push @sharelist,$school;
     } else {
         print "\nERROR: $school is not a SMB-share!\n\n";
 	exit;
     }
 } else {
-    @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+    # without option use only school shares
+    @sharelist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 }
 
 # options that need only a sharename
 # --list/-L
 if ($list==1){
-    foreach my $school (@schoollist){
+    foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
-                               " -L //$root_dns/$school";
+                               " -L //$root_dns/$share";
         print "$smbcquotas_command\n";
         system($smbcquotas_command);
     }
@@ -190,11 +194,11 @@ if ($list==1){
 
 # --show/-F
 if ($show==1){
-    foreach my $school (@schoollist){
+    foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
-                               " -F //$root_dns/$school";
+                               " -F //$root_dns/$share";
         print "$smbcquotas_command\n";
         system($smbcquotas_command);
     }
@@ -223,28 +227,21 @@ my $line="+--------------------------+--------+------+".
          "------+------+-------------------+\n";
 my $line2="+------------------------------------------".
           "-----------------------------+\n";
-foreach my $school (@schoollist){
+foreach my $school_share (@sharelist){
     if ($user eq ""){
         # use ALL sophomorix users
-        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school}){
+        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
             @userlist=();
 	} else {
 	    # all users of school
-	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school} };
+	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
 	}
     }
     if ($info==1){
-        my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
-                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                               $smb_admin_pass."'".
-                               " -F //$root_dns/$school";
-        print "$smbcquotas_command\n";
-        system($smbcquotas_command);
-
         print "\n";
-        &Sophomorix::SophomorixBase::print_title("User quota of school $school:");
+        &Sophomorix::SophomorixBase::print_title("User quota of school $school_share:");
         if($#userlist==-1){
-            print "     0 sophomorix users in school $school\n";
+            print "     0 sophomorix users in school $school_share\n";
             next;
         }
         if($Conf::log_level==1){
@@ -265,7 +262,7 @@ foreach my $school (@schoollist){
             print "  WARNING: User $user not found!\n";
             next;
         }
-	if ($school ne 
+	if ($school_share ne 
             $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixSchoolname'}){
             # skip users not in school that is processed
             next;
@@ -273,15 +270,15 @@ foreach my $school (@schoollist){
 
 	my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixRole'};
 	my $quota_school=
-          $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_school'};
+          $sophomorix_config{'ROLES'}{$school_share}{$role}{'quota_default_school'};
 	my $quota_global=
-          $sophomorix_config{'ROLES'}{$school}{$role}{'quota_default_global'};
+          $sophomorix_config{'ROLES'}{$school_share}{$role}{'quota_default_global'};
         if ($info==1){
             if($Conf::log_level==1){
                 print $line;
             } else {
                 print $line2;
-                printf "| %-70s|\n", $user." in ".$school;
+                printf "| %-70s|\n", $user." in ".$school_share;
             }
         }
         # uniquefi and sort sharelist
@@ -296,7 +293,7 @@ foreach my $school (@schoollist){
 	    if ($share eq $sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
                 $school_default=$quota_global;
 		$sharedisplay="GLOBAL";
-	    } elsif ($share eq $school){
+	    } elsif ($share eq $school_share){
                 $school_default=$quota_school;
 		$sharedisplay=$share;
 	    } else {
@@ -372,11 +369,11 @@ foreach my $school (@schoollist){
                     # print extensive information
                     print $line2;
                     printf "| %-70s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
-                    printf "|%10s %-60s|\n",$school_default,"(A) default Quota for sophomorixRole \'".$role."\'";
+                    printf "|%10s %-60s|\n",$school_default," (A) default Quota for sophomorixRole \'".$role."\'";
                     if ($quota_class ne "---"){
-                        printf "|%10s %-60s|\n",$quota_class,"(B) Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\': Overrides (A)";
+                        printf "|%10s %-60s|\n",$quota_class," (B) Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\': Overrides (A)";
     		    } else {
-                        printf "|%10s %-60s|\n",$quota_class,"(B) No Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\'";
+                        printf "|%10s %-60s|\n",$quota_class," (B) No Quota at the users class \'".$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}."\'";
                     }
                     foreach my $project (@project_alphabetical) {
                         my @reason=();
@@ -388,17 +385,17 @@ foreach my $school (@schoollist){
                         $membership_string=join(",",@reason);
                         my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
                         if ($add eq "---"){    
-                            printf "|%10s %-60s|\n","0","No AddQuota for membership in project \'".$project."\' (".$membership_string.")";
+                            printf "|%10s %-60s|\n","0"," No AddQuota for membership in project \'".$project."\' (".$membership_string.")";
                         } else {
-                            printf "|%10s %-60s|\n","+ ".$add,"AddQuota for membership in project \'".$project."\' (".$membership_string.")";
+                            printf "|%10s %-60s|\n","+ ".$add," AddQuota for membership in project \'".$project."\' (".$membership_string.")";
                         }
                     }
                     if ($quota_user eq "---"){
-                        printf "|%10s %-60s|\n",$quota_user,"(C) No Quota at the user Object \'".$user."\'";
+                        printf "|%10s %-60s|\n",$quota_user," (C) No Quota at the user Object \'".$user."\'";
                     } else {
-                        printf "|%10s %-60s|\n",$quota_user,"(C) Quota at the user will override all above settings";
+                        printf "|%10s %-60s|\n",$quota_user," (C) Quota at the user will override all above settings";
                     }
-                    printf "|%10s %-60s|\n",$calc,"will be set for user ".$user." on share ".$share;
+                    printf "|%10s %-60s|\n",$calc," will be set for user ".$user." on share ".$share;
 	        } else {
                     # print single line
 	            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
@@ -419,8 +416,11 @@ foreach my $school (@schoollist){
         } else {
             print $line2;
         }
+        print "* after CALC: quota not set\n";
     }
 }
+
+
 
 
 
@@ -457,23 +457,23 @@ if($developer_setquota ne "" and $user ne ""){
 
 # continue with the calculated quota
 print Dumper($ref_quota);
-
+exit;
 
 &Sophomorix::SophomorixBase::print_title("Setting Quota of the following users:");
-foreach my $school (@schoollist){
-    print "School $school:\n";
+foreach my $school_share (@sharelist){
+    print "School $school_share:\n";
     if ($user eq ""){
         # use ALL sophomorix users
-        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school}){
+        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
             @userlist=();
 	} else {
 	    # all users of school
-	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school} };
+	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
 	}
     }
 
     if($#userlist==-1){
-        print "     0 sophomorix users in school $school\n";
+        print "     0 sophomorix users in school $school_share\n";
         next;
     }
 
