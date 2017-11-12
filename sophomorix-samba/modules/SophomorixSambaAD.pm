@@ -4475,10 +4475,8 @@ sub AD_get_quota {
 	}
     }
 
-    # uniquify and sort sharelist at all users
+    # update share info in %quota
     foreach my $user (keys %{ $quota{'QUOTA'}{'USERS'} }) {
-#	print "USER: $user\n";
-
         # uniquefi and sort sharelist
 	@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
             uniq(@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} });
@@ -4510,47 +4508,80 @@ sub AD_get_quota {
 	        $quota_class=$quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share};
 	    } else {
                 $quota_class="---";
-	    }
-		
-
-             foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
-                 if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
-                     my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
-                     $project_sum=$project_sum+$add;
-                     if ($project_string eq "---"){
+            }
+            foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+                if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
+                    my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                    $project_sum=$project_sum+$add;
+                    if ($project_string eq "---"){
                         $project_string=$add;
-                     } else {
-                         $project_string=$project_string."+".$add;
-                     }
-                 }
-             } # end project
-#             print "PROSTRG: $share $project_string $project_sum\n";
-             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share}=$project_string;
-             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
-             # add everything up
+                    } else {
+                        $project_string=$project_string."+".$add;
+                    }
+                }
+            } # end project
+            $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share}=$project_string;
+            $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
 
-             if ($quota_user eq "---"){
-                # start with nothing
+            # add everything up
+            if ($quota_user eq "---"){
+                # start with nothing as quota
                 my $base=$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NOQUOTA'};
                 # check for class quota
                 if ($quota_class ne "---"){
                     $base=$quota_class;
-	    #    } elsif ($school_default ne "---") {
-            #        $base=$school_default;
 	        } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share}) {
                     $base=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share};
                 }
                 # add addquota
                 $calc=$base+$project_sum;
             } else {
-                # override
+                # override with quota from user attribute
                 $calc=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
             }
+            # update CALC
+            $quota{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}=$calc;
 
-             $quota{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}=$calc;
+            # add --- for undefined values
+            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}){
+                $quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}="---";
+            }
+            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}){
+		$quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}="---";
+            }
+
+            # some shortnames for vars
+            $oldcalc=$quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share};
+            $quotastatus=$quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share};
+
+            # check for updates
+            if ($quotastatus=~/[^0-9]/){
+                # nonumbers
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'NonNumbers in QUOTASTATUS'}="TRUE";
+            }
+
+            if ($calc ne $oldcalc){
+                # new caluladed value
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'CALC differs from OLDCALC'}="TRUE";
+            }
+
+            if ($oldcalc eq "---"){
+                # no oldcalc set
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'OLDCALC is ---'}="TRUE";
+            }
+
+            # FALSE if not set to TRUE
+            if (not exists $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}){
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="FALSE";
+            }
+
 	} # end share
     } # end user
     
+    # uniquify and sort sharelist at all users
     foreach my $share (keys %{ $quota{'LISTS'}{'SHARE'} }) {
         # uniquefi and sort users
 	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 

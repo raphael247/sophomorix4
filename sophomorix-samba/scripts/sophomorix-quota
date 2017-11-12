@@ -552,11 +552,20 @@ if ($info==1){
                     $quota_class_display="---";
 	        }
 
+                my $calc_display;
+                if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
+                    # append asterisk
+                    $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}."*";
+                } else {
+                    # append space
+                    $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}." ";
+                }
+
                 # printout
                 if($Conf::log_level>=2){
                     # print extensive information
                     print $line2;
-                    printf "| %-77s|\n",$user."\'s Quota on share ".$share." in MiB (Mebibyte):";
+                    printf "| %-77s|\n",$share." share for user ".$user." in MiB (Mebibyte):";
                     printf "|%10s %-67s|\n",$school_default,
                                              " (A) default Quota for sophomorixRole \'".$role."\'";
                     if ($quota_class_display ne "---"){
@@ -594,16 +603,32 @@ if ($info==1){
                     } else {
                         printf "|%10s %-67s|\n",$quota_user_display," (C) Quota at the user will override all above settings";
                     }
-                    printf "|%10s %-67s|\n",
-                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share},
-                           " will be set for user ".$user." on share ".$share;
+
+                    # show calc 
+                    if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
+                        printf "|%11s%-67s|\n",
+                               $calc_display,
+                               " CALC must be set for ".$user." on ".$share;
+                    } else {
+                        printf "|%11s%-67s|\n",
+                               $calc_display,
+                               " CALC was already set for ".$user." on ".$share;
+                        my $mib=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}/1024;
+                        printf "|%11s%-67s|\n",
+                               "",
+                               " SMB share quota was set to ".
+                               $ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}." Bytes (".
+                               $mib.
+                               " MiB)";
+                    }
 	        } else {
                     # print single line
 	            printf "| %-25s| %-7s|%5s |%5s |%5s | %-18s|\n",
                            "$user($role:$school_default)",
                            "$sharedisplay",
 #                           $calc,
-                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share},
+#                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share},
+                           $calc_display,
 #                           $quota_user,
                            $quota_user_display,
 #                           $quota_class,
@@ -618,7 +643,9 @@ if ($info==1){
         } else {
             print $line2;
         }
+        print "* at end of CALC: quota must be updated\n";
     } # end of school
+    #print Dumper($ref_quota);
     exit;
 }
 
