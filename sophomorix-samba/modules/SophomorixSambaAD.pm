@@ -631,6 +631,7 @@ sub AD_repdir_using_file {
             ########################################
             # group loop start
             foreach my $group (@groups){
+		print "GRP: $group\n";
                 if ($group eq "" and $groupvar_seen>0){
                     # skip, if a groupvar should be replaced, but there is only an empty string a group
                     print "Skipping $line: group would be replaced by empty string\n";
@@ -4031,7 +4032,7 @@ sub AD_get_AD {
                 #print "$sam: <$user> $cn  --- $member\n";
                 $AD{'objectclass'}{'group'}{'intranetaccess'}{$sam}{'members'}{$user}=$member;
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'intranetaccess'} }, $member;
-                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$school}{'intranetaccess'} }, $member;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'intranetaccess'} }, $member;
             }
         }
 
