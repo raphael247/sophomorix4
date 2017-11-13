@@ -474,8 +474,10 @@ sophomorix-quota --developer-setquota all:-4 -u maiersa42
 gute Fehlermeldung anzeigen
 
 
+Testen project-acls (Tests anpassen)
 
-project ACL abernten
+Nutzen von:
+sophomorix-samba/config-devel/ntacl/examsession.ntacl.template
 
 sollte man default quota setzen auf dem share für alle schüler?
 haben die dann beim anlegen den default?
@@ -1123,6 +1125,9 @@ OK
 /srv/samba/global
 -> vorbereitet in global.ntacl.template
 
+OK
+/srv/samba/global/projects/<p_name>
+-> in projects.share.ntacl.template
 
 
 
@@ -1148,8 +1153,6 @@ sollte OK sein?
 
 
 
-/srv/samba/global/projects/<p_name>
--> kommt nach projects.share.ntacl.template
 
 Und unloeschbar:
 /srv/samba/schools/default-school/students/5a/homes/adamskke/transfer
