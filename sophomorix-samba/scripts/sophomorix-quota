@@ -37,7 +37,8 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
-                                 remove_from_list
+                                 remove_from_list    
+                                 json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -469,8 +470,18 @@ my $ref_quota=&AD_get_quota({ldap=>$ldap,
 # #print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
 # #print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
 
-# --info
-if ($info==1){
+if ($info==1 and $json>0){
+    # --info --json
+    &json_dump({json => $json,
+                jsoninfo => "QUOTA",
+                jsoncomment => "sophomorix quota",
+                log_level => $Conf::log_level,
+                hash_ref=>$ref_quota,
+                sophomorix_config=>\%sophomorix_config,
+              });
+    exit;
+} elsif ($info==1 and $json==0){
+    # --info 
     my $line="+--------------------------+--------+------+".
              "------+------+-------------------+\n";
     my $line2="+------------------------------------------".
