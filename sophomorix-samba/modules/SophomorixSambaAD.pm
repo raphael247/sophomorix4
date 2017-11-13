@@ -631,10 +631,10 @@ sub AD_repdir_using_file {
             ########################################
             # group loop start
             foreach my $group (@groups){
-		print "GRP: $group\n";
                 if ($group eq "" and $groupvar_seen>0){
                     # skip, if a groupvar should be replaced, but there is only an empty string a group
-                    print "Skipping $line: group would be replaced by empty string\n";
+                    print "Skipping $line:\n";
+                    print "  -> group would be replaced by empty string\n";
                     next;
                 }
 

@@ -1701,6 +1701,7 @@ sub NTACL_set_file {
         print "\nERROR: $ntacl_abs not found/readable\n\n";
         exit;
     } 
+    print "\n";
     &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (start)");
     #print "Setting the NTACL for $smbpath from $ntacl (user=$user, group=$group, school=$school):\n";
     my $smbcacls_option="";
@@ -1758,6 +1759,7 @@ sub NTACL_set_file {
     }
     close(NTACL);
     &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (end)");
+    print "\n";
 }
 
 
