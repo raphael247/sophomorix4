@@ -89,7 +89,7 @@ $Conf::log_level=1;
 # smbcquotas options
 my $list=0;
 my $show=0;
-
+my $default_quota="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -102,6 +102,7 @@ my $testopt=GetOptions(
            "developer-setquota=s" => \$developer_setquota,
            "show|F" => \$show,
            "list|L" => \$list,
+           "default-quota|FSQLIM=s" => \$default_quota,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -155,6 +156,9 @@ smbcquotas wrappers:
     sophomorix-quota --share <sharename> -F
     sophomorix-quota --share <sharename> --show
 
+  Set default quota on smb-share
+     sophomorix-quota --share <sharename> --default-quota <softlimit>/<hardlimit>
+
 Please see the sophomorix-quota(8) man pages for full documentation
 ');
    print "\n";
@@ -178,6 +182,8 @@ if ($school ne ""){
     @sharelist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 }
 
+
+
 # options that need only a sharename
 # --list/-L
 if ($list==1){
@@ -193,6 +199,7 @@ if ($list==1){
 }
 
 
+
 # --show/-F
 if ($show==1){
     foreach my $share (@sharelist){
@@ -206,6 +213,20 @@ if ($show==1){
     exit;
 }
 
+
+
+# --share <share> --default-quota <soft>/<hard>
+if ($school ne "" and  $default_quota ne ""){
+    foreach my $share (@sharelist){
+        my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                               $smb_admin_pass."'".
+                               " -S FSQLIM:".$default_quota." //$root_dns/$share";
+        print "$smbcquotas_command\n";
+        system($smbcquotas_command);
+    }
+    exit;
+}
 
 
 
