@@ -2234,7 +2234,7 @@ sub AD_user_setquota {
     my $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                           " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                           $smb_admin_pass."'".
-                          " -S UQLIM:".$user.":".$hard_bytes."/".$soft_bytes." //$root_dns/$share";
+                          " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //$root_dns/$share";
                 print "$smbcquotas_command\n";
                 system($smbcquotas_command);
                 my $stdout=`$smbcquotas_command`;
