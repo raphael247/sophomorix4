@@ -22,63 +22,52 @@ ini Dateien:
 
 
 
-next:
+NEXT/Todo:
 
-Linux AK:
-
-sophomorix-quota --developer-set-quota sharename:quota_in_mb
-  set quota on share for user, do not remember, not list
-     --developer-set-quota-schoolshare school:quota
-     test function to update quota on a school
-     --developer-set-quota-on-any-share share:quota
-     set quota and remember it in sophomorixQuota
+test4 fixen
 
 ACL:
 
+* Tests für project acl
+* nichtlöschbar fehlt noch
+* examgroup fehlt noch, examuser, ...
 
-Feintuning:
-shares:
+
+SMB-shares
+school shares anlegen scripten:
 1) lokal -> scripten
 2) share existiert
    sophomorix-repair --school aufrufen
 (bisher: schule wird repariert bevor user angelegt werden)
-
-nichtlöschbar fehlt noch
+3) quotatest
 
 Bug:
-sophomorix-add -j soll auch json Objekt ausgeben, wenn nix anzulegen ist.
+sophomorix-add -j soll auch json Return Objekt ausgeben, wenn nix anzulegen ist.
+dito -update, -add.....
 
+sophomorix-quota:
+* option --json
+  gibt den quotahash aus
+* tests schreiben
 
-quota:
-
-* printout stuff with -i option CALC project, ...
-* option json
-* use loglever for printout of projects
-* function: update user attribute with CALC value
-  and set quota
+* use loglevel for printout of projects
 * setup test
-* setup partitions for school with quota
 * sophomorix-check -ij: check which schools have a working smb file server
   * exit with error, when a user would be created
 * sophomorix-quota: test if quota can be set
 * sophomorix-school: test for school
-* create tests
-* 
+
+
 
 
 toolbox script to query as ordinary user
 check if confidential attribute is hidden
 deploy confidential attribute further
 
-checken sophomorix.ini kommaseparierte schulenliste
 
 
-Todo:
 
-ACL's
--> sophomorix4/development/todo
-ohne SSH Zugriff
-
+###########################################################
 Entwicklertreffen:
  sharename of global: linuxmuster-global ist sehr lang: besser lml-global|linuxmuster
 
@@ -3431,6 +3420,9 @@ NUR-Mailversand Konten, z.B. Sekretärinnen
   * Konto bei belwue
   * kein Konto im pädagogischen Netz 
 
+sophomorix-class
+ - mit useranzahl listen
+ - bereich angeben um einzuschränken (z.B. über x user)
 
 
 ############################################################
