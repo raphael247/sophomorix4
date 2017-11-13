@@ -872,6 +872,12 @@ sub test_multivalue {
     foreach my $should_be (@should_be){
         is (exists $is{$should_be},1,
 	    "  * Entry <$should_be> IS in multivalue attribute $attr of $sam_account");
+        if (not exists $is{$should_be}){
+            print "   Found the following $count entries in AD:\n";
+   	    foreach my $entry (@data){
+                print "      $entry\n";
+            }
+        }
 	$test_count++;
     } 
     # were all actual memberships tested
