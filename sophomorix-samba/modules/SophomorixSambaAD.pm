@@ -2217,7 +2217,7 @@ sub AD_user_setquota {
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
-    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user:");
+    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user (start):");
 
     # calculate limits
     my $hard_bytes;
@@ -2267,8 +2267,9 @@ sub AD_user_setquota {
                                      sophomorix_result=>$ref_sophomorix_result,
                                    });
 		} else {
-                    print "\nERROR: Setting quota failed\n\n";
+                    print "ERROR: Setting quota on share $share for user $user failed\n";
                 }
+    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user (end)");
 }
 
 

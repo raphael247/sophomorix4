@@ -656,19 +656,18 @@ if ($info==1){
 if($developer_setquota ne "" and $user ne ""){
     my ($share,$quota)=split(":",$developer_setquota);
     foreach my $user (@userlist){
-   &AD_user_setquota({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      user=>$user,
-                      share=>$share,
-                      quota=>$quota,
-                      smb_admin_pass=>$smb_admin_pass, 
-                      debug_level=>$debug_level,
-                      json=>$json,
-                      sophomorix_result=>\%sophomorix_result,
-                      sophomorix_config=>\%sophomorix_config,
-                    });
-
+    &AD_user_setquota({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       user=>$user,
+                       share=>$share,
+                       quota=>$quota,
+                       smb_admin_pass=>$smb_admin_pass, 
+                       debug_level=>$debug_level,
+                       json=>$json,
+                       sophomorix_result=>\%sophomorix_result,
+                       sophomorix_config=>\%sophomorix_config,
+                     });
     }
     exit;
 }
@@ -681,7 +680,7 @@ if($developer_setquota ne "" and $user ne ""){
 
 &Sophomorix::SophomorixBase::print_title("Setting Quota of the following users:");
 foreach my $school_share (@sharelist){
-    print "School $school_share:\n";
+    &Sophomorix::SophomorixBase::print_title("Setting quota for school $school_share:");
     if ($user eq ""){
         # use ALL sophomorix users
         if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
@@ -697,41 +696,36 @@ foreach my $school_share (@sharelist){
         next;
     }
 
+    ############################################################
+    # Walk through users
     foreach my $user (@userlist){
         if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
             print "  WARNING: User $user not found!\n";
             next;
         }
-	print "   * Testing user $user\n";
-        foreach my $share (@{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
-            my $calc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share};
-            my $oldcalc;
-            if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}){
-                $oldcalc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share};
+        
+        print "   * User $user:\n";
+        ############################################################
+        # Walk through all shares
+        foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
+                my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share};
+                print "      * SET: $share to $quota MiB:\n";
+                &AD_user_setquota({ldap=>$ldap,
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   user=>$user,
+                                   share=>$share,
+                                   quota=>$quota,
+                                   smb_admin_pass=>$smb_admin_pass, 
+                                   debug_level=>$debug_level,
+                                   json=>$json,
+                                   sophomorix_result=>\%sophomorix_result,
+                                   sophomorix_config=>\%sophomorix_config,
+                                 });
+                print "\n";
             } else {
-                $oldcalc=-1;
-            }
-            my $quotastatus;
-            if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}){
-                $quotastatus=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share};
-            } else {
-                $quotastatus="unset";
-            }
-            # $quotastatus="124";
-            print "      * share: $share\n";
-            print "         * CALC:        $calc\n";
-            print "         * OLDCALC:     $oldcalc\n";
-            print "         * QUOTASTATUS: $quotastatus\n";
-
-            # add a percentage difference for status value/$calc
-            if ($quotastatus=~/[^0-9]/){
-                print "QUOTASTATUS: $quotastatus -> update\n";
-            }
-            if ($calc eq $oldcalc){
-                # nothing to do
-            } else {
-                # not numbers -> update
-                print "OLDCALC:     $oldcalc -> $calc\n";
+                print "      * OK:  $share\n";
             }
         }
     }
