@@ -4405,6 +4405,17 @@ sub AD_get_quota {
 
 	my $count=0;
 	my %seen=();
+
+        # save stuff about projects
+  	$quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{'sophomorixSchoolname'}=$school;
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{'sophomorixType'}=$type;
+
+	foreach my $addquota (@addquota){
+	    my ($share,$value,$comment)=split(/:/,$addquota);
+            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{$share}{'VALUE'}=$value;
+            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{$share}{'COMMENT'}=$comment;
+        }
+
 	my $count_initial_member=$#member+1;
 	# @addquota contains addquota info of the project
         foreach my $member (@member){
@@ -4436,7 +4447,7 @@ sub AD_get_quota {
                 }
 	        # save quota info at user
 	        foreach my $addquota (@addquota){
-	            my ($share,$value)=split(/:/,$addquota);
+	            my ($share,$value,$comment)=split(/:/,$addquota);
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
 		    # remember share for later listing
 		    push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
@@ -5475,16 +5486,18 @@ sub AD_group_update {
         # work on OLD Quota
         my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,$quota_attr);
         foreach my $quota_old (@quota_old){
-            my ($share,$value)=split(/:/,$quota_old);
+            my ($share,$value,$comment)=split(/:/,$quota_old);
 	    # save old values in quota_new
-            $quota_new{'QUOTA'}{$share}=$value;
+#            $quota_new{'QUOTA'}{$share}=$value;
+            $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+            $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
 	    push @sharelist, $share;
         }
 
         # work on NEW Quota, given by option
 	my @schoolquota=split(/,/,$multiquota);
 	foreach my $schoolquota (@schoolquota){
-	    my ($share,$value)=split(/:/,$schoolquota);
+	    my ($share,$value,$comment)=split(/:/,$schoolquota);
 	    if (not exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}){
                 print "\nERROR: SMB-share $share does not exist!\n\n";
 		exit;
@@ -5495,7 +5508,12 @@ sub AD_group_update {
 		exit;
 	    }
             # overriding quota_new
-    	    $quota_new{'QUOTA'}{$share}=$value;
+#    	    $quota_new{'QUOTA'}{$share}=$value;
+    	    $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+            if (not defined $comment){
+                $comment="---";
+            }
+    	    $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
    	    push @sharelist, $share;
 	}
         # debug
@@ -5507,12 +5525,17 @@ sub AD_group_update {
 	@sharelist = uniq(@sharelist);
 	@sharelist = sort(@sharelist);
 	foreach my $share (@sharelist){
-            if ($quota_new{'QUOTA'}{$share} eq "---" and 
+#            if ($quota_new{'QUOTA'}{$share} eq "---" and 
+            if ($quota_new{'QUOTA'}{$share}{'VALUE'} eq "---" and 
                 $share ne $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'} and
                 $share ne $school){
                 # do nothing
 	    } else {
-		push @quota_new, $share.":".$quota_new{'QUOTA'}{$share};
+#		push @quota_new, $share.":".$quota_new{'QUOTA'}{$share};
+		push @quota_new, $share.":".$quota_new{'QUOTA'}{$share}{'VALUE'}.
+                                        ":".$quota_new{'QUOTA'}{$share}{'COMMENT'}.
+                                        ":";
+
 
 	    }
 	}
@@ -5944,7 +5967,7 @@ sub AD_group_list {
             if ($type eq "project"){
                 printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
                     $entry->get_value('sAMAccountName'),
-                    "",#$entry->get_value('sophomorixAddQuota'),
+                    "",
                     $entry->get_value('sophomorixAddMailQuota'),
                     $maxmembers,
                     $hidden,
@@ -6119,8 +6142,8 @@ sub AD_group_create {
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
                                     sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---",
-                                                        "$school:---"],
+                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                                        "$school:---:---:"],
                                     sophomorixAddMailQuota => ["---"],
                                     sophomorixQuota => "---",
                                     sophomorixMailQuota => "-1",
@@ -6147,8 +6170,8 @@ sub AD_group_create {
                                     sophomorixStatus => $status,
                                     sophomorixAddQuota => ["---"],
                                     sophomorixAddMailQuota => "---",
-                                    sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---",
-                                                        "$school:---"],
+                                    sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                                        "$school:---:---:"],
                                     sophomorixMailQuota => "-1",
                                     sophomorixMaxMembers => "0",
                                     sophomorixMailAlias => "FALSE",

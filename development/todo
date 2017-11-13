@@ -44,8 +44,19 @@ sophomorix-add -j soll auch json Return Objekt ausgeben, wenn nix anzulegen ist.
 dito -update, -add.....
 
 sophomorix-quota:
-* tests schreiben
+* add comment field to each quota
+  and add final :
+    sohomorix-user  bsz:1000:comment
+    sophomorix-class
 
+    OK: sophomorix-project
+    OK: add comments to tests
+    OK:   update help
+
+  read the comments in quotahash (projects: OK)
+  use them with sophomorix-quota -iv
+* tests schreiben
+* add json progress object to setquota command
 * use loglevel for printout of projects
 * setup test
 * sophomorix-check -ij: check which schools have a working smb file server
@@ -305,6 +316,32 @@ wer macht das?
 Setup mit Partition =Schule
 -> lvm, usw...
    sollte in die Doku von Linuxmuster-base
+
+
+#####################################
+LVM einrichten
+
+pvcreate /dev/xvdb
+vgcreate srv /dev/xvdb
+
+lvcreate -L 10G -n default-school srv
+mkfs.ext4 /dev/srv/default-school
+mkdir -p /srv/samba/schools/default-school
+
+lvcreate -L 30G -n linbo srv
+mkfs.ext4 /dev/srv/linbo
+mkdir -p /srv/linbo
+
+lvcreate -l +100%FREE -n global srv
+mkfs.ext4 /dev/srv/global
+mkdir -p /srv/samba/global
+
+## /etc/fstab
+/dev/srv/default-school /srv/samba/schools/default-school  ext4  defaults       0       0
+/dev/srv/linbo /srv/linbo       ext4  defaults       0       0
+/dev/srv/global /srv/samba/global       ext4  defaults       0       0
+##############################################
+
 
 -> Wann geht sophomorix von einer funktionierende Schule aus?,
    -> gemountete Partition?
