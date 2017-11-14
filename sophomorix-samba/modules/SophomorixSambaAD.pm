@@ -1591,8 +1591,8 @@ sub AD_user_create {
                    sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
-                   sophomorixQuota=>["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}",
-                                     "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}"],
+                   sophomorixQuota=>["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:",
+                                     "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:"],
                    sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
@@ -1968,19 +1968,20 @@ sub AD_user_update {
         my %quota_new=();
         my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
         foreach my $quota_old (@quota_old){
-            my ($share,$value,$calc,$info)=split(/:/,$quota_old);
+            my ($share,$value,$calc,$info,$comment)=split(/:/,$quota_old);
             if (not defined $calc){$calc="---";}
             if (not defined $calc){$info="---";}
 	    # save old values in quota_new
             $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
             $quota_new{'QUOTA'}{$share}{'CALC'}=$calc;
             $quota_new{'QUOTA'}{$share}{'INFO'}=$info;
+            $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
 	    push @sharelist, $share;
         }
         # work on NEW Quota, given by option
 	my @schoolquota=split(/,/,$quota);
 	foreach my $schoolquota (@schoolquota){
-	    my ($share,$value)=split(/:/,$schoolquota);
+	    my ($share,$value,$comment)=split(/:/,$schoolquota);
 	    if (not exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}){
                 print "\nERROR: SMB-share $share does not exist!\n\n";
 		exit;
@@ -2005,9 +2006,15 @@ sub AD_user_update {
             if (defined $quota_info){
                 $quota_new{'QUOTA'}{$share}{'INFO'}=$quota_info;
             } else {
-                $quota_new{'QUOTA'}{$share}{'INFO'}=$ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
+                $quota_new{'QUOTA'}{$share}{'INFO'}=
+                    $ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
+	    }
+            # D) comment
+            if (defined $comment){
+                $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
+            } else {
+                $quota_new{'QUOTA'}{$share}{'COMMENT'}="---";
             }
-
    	    push @sharelist, $share;
 	}
         # debug
@@ -2028,16 +2035,11 @@ sub AD_user_update {
                     # new share
                     $quota_new{'QUOTA'}{$share}{'CALC'}="---";
                 }
-
-#		push @quota_new, $share.":".
-#                                 $quota_new{'QUOTA'}{$share}{'VALUE'}.":".
-#                                 $quota_new{'QUOTA'}{$share}{'CALC'}.":".
-#                                 $ref_sophomorix_config->{'INI'}{'QUOTA'}{'UPDATEUSER'};
 		push @quota_new, $share.":".
                                  $quota_new{'QUOTA'}{$share}{'VALUE'}.":".
                                  $quota_new{'QUOTA'}{$share}{'CALC'}.":".
-                                 $quota_new{'QUOTA'}{$share}{'INFO'};
-
+                                 $quota_new{'QUOTA'}{$share}{'INFO'}.":".
+                                 $quota_new{'QUOTA'}{$share}{'COMMENT'}.":";
 	    }
 	}
 	print "   * Setting sophomorixQuota to: @quota_new\n";
