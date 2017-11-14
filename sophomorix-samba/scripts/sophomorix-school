@@ -76,6 +76,7 @@ my $school="";
 my $create=0;
 my $recreate_all_schools=0;
 my $kill=0;
+my $test_schools=0;
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -96,6 +97,7 @@ my $testopt=GetOptions(
            "create|c" => \$create,
            "recreate-all-schools" => \$recreate_all_schools,
            "kill" => \$kill,
+           "test-schools" => \$test_schools,
            "school=s" => \$school,
           );
 
@@ -177,6 +179,50 @@ if ($info==1){
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         print "   * $school\n";
     }
+    exit;
+}
+
+
+# ============================================================
+# testing schools
+# ============================================================
+# --test-schools
+if ($test_schools==1){
+    print "\n";
+    &print_title("Testing schools");
+    my @schools= ($sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'},
+                  @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} });
+    foreach my $school (@schools) {
+        print "\n";
+        print "   * Testing school $school\n";
+	# share test
+	if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
+	    print "         OK: SMB-share $school exists\n ";
+        } else {
+	    print "     NOT OK: SMB-share $school is missing\n ";
+        }
+        # write acces test
+
+	# delete access test
+
+	# quotainfo test
+
+	# quota set test
+
+	# quota unset test
+	
+    }
+    print "\n";
+    &print_title("Testing shares that are not schools");
+    foreach my $share ( @{ $sophomorix_config{'LISTS'}{'SHARES'} } ) {
+        if (exists $sophomorix_config{'SCHOOLS'}{$share} ) {
+            # skip
+        } else {
+	    print "   * Testing share $share\n";
+	}
+   }
+
+    exit;
 }
 
 
