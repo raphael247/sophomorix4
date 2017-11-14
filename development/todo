@@ -44,12 +44,6 @@ sophomorix-add -j soll auch json Return Objekt ausgeben, wenn nix anzulegen ist.
 dito -update, -add.....
 
 sophomorix-quota:
-* add comment field to each quota
-  and add final :
-    sohomorix-user  bsz:1000:comment
-    -> useradd
-    -> usermod
-
 
 Testen ob project sum richtig kalkuliert wird
 
@@ -62,31 +56,22 @@ dopelte dinge Vermeiden:
                "linuxmuster-global" : "---"
             },
 
-
-
-
-
-    OK: sophomorix-class
-    OK: sophomorix-project
-    OK: add comments to tests
-    OK:   update help
-
+sophomorix-project
+sophomorix-class
 bei Option -i, die Quota angaben (mit Comments, UNTERdie Mitgliedersummierung),
 ganze Zeile verwenden
 
 
-  read the comments in quotahash (projects: OK)
-  use them with sophomorix-quota -iv
+sophomorix-quota 
+show comments with sophomorix-quota -iv
 * tests schreiben
 * add json progress object to setquota command
 * use loglevel for printout of projects
-* setup test
+
 * sophomorix-check -ij: check which schools have a working smb file server
   * exit with error, when a user would be created
 * sophomorix-quota: test if quota can be set
 * sophomorix-school: test for school
-
-
 
 
 toolbox script to query as ordinary user
