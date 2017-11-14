@@ -4328,6 +4328,16 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'DN_by_sAMAccountName'}{$sam}=$dn;
 
+        # save stuff about classes
+  	$quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixSchoolname'}=$school;
+        $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixType'}=$type;
+
+	foreach my $quota (@quota){
+	    my ($share,$value,$comment)=split(/:/,$quota);
+            $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixQuota'}{$share}{'VALUE'}=$value;
+            $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixQuota'}{$share}{'COMMENT'}=$comment;
+        }
+
         foreach my $member (@member){
 	    my $sam_user;
 	    if ( not exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member}){
@@ -4407,21 +4417,18 @@ sub AD_get_quota {
 	my %seen=();
 
         # save stuff about projects
-  	$quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{'sophomorixSchoolname'}=$school;
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{'sophomorixType'}=$type;
+  	$quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixSchoolname'}=$school;
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixType'}=$type;
 
 	foreach my $addquota (@addquota){
 	    my ($share,$value,$comment)=split(/:/,$addquota);
-            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{$share}{'VALUE'}=$value;
-            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'PROJECT'}{$share}{'COMMENT'}=$comment;
+            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
+            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
         }
 
 	my $count_initial_member=$#member+1;
 	# @addquota contains addquota info of the project
         foreach my $member (@member){
-
-	    # reicht seen already nicht aus?
-	    # brauchts noch followed
 	    if (exists $seen{$member}){
 		print "skipping (seen already): $member\n";
                 next;
@@ -4507,9 +4514,12 @@ sub AD_get_quota {
 
         # sum up Addquota from projects for each share
         my $calc=1;
-        my $project_sum=0;
-        my $project_string="---";
+        #my $project_sum=0;
+        #my $project_string="---";
         foreach my $share ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }) {
+            my $project_sum=0;
+            my $project_string="---";
+
             my $quota_user;
   	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share}){
 	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
@@ -4522,17 +4532,21 @@ sub AD_get_quota {
 	    } else {
                 $quota_class="---";
             }
+            # save the quota values of a project for later use
             foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
-                if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
-                    my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
-                    $project_sum=$project_sum+$add;
-                    if ($project_string eq "---"){
-                        $project_string=$add;
-                    } else {
-                        $project_string=$project_string."+".$add;
+                if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}){
+                    if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
+                        my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                        $project_sum=$project_sum+$add;
+                        if ($project_string eq "---"){
+                            $project_string=$add;
+                        } else {
+                            $project_string=$project_string."+".$add;
+                        }
                     }
                 }
             } # end project
+
             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share}=$project_string;
             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
 

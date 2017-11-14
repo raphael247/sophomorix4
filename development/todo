@@ -47,11 +47,53 @@ sophomorix-quota:
 * add comment field to each quota
   and add final :
     sohomorix-user  bsz:1000:comment
-    sophomorix-class
 
+Testen ob project sum richtig kalkuliert wird
+
+bei USERS ->  $user speichern: 
+ "USER" : {
+               "sophomorixQuota" : {
+                  "bsz" : "---",
+                  "linuxmuster-global" : "---"
+               },
+               "sophomorixSchoolname" : "bsz",
+
+
+ "CLASS" : {
+               "sophomorixType" : "teacherclass",
+               "sophomorixQuota" : {
+                  "linuxmuster-global" : "---",
+                  "bsz" : "---"
+               },
+noch VALUE und Comment dazu, dito bei projects:
+
+ "p_bsz-Chemie-AG23" : {
+                  "sophomorixType" : "project",
+                  "sophomorixAddQuota" : {
+                     "bsz" : "333",
+                     "linuxmuster-global" : "444"
+                  },
+dito
+
+ "GROUPS_by_GROUPS" : {
+         "bsz-teachers" : {
+            "sophomorixQuota" : {
+               "bsz" : "---",
+               "linuxmuster-global" : "---"
+            },
+
+
+
+
+
+    OK: sophomorix-class
     OK: sophomorix-project
     OK: add comments to tests
     OK:   update help
+
+bei Option -i, die Quota angaben (mit Comments, UNTERdie Mitgliedersummierung),
+ganze Zeile verwenden
+
 
   read the comments in quotahash (projects: OK)
   use them with sophomorix-quota -iv
@@ -76,7 +118,6 @@ deploy confidential attribute further
 
 ###########################################################
 Entwicklertreffen:
- sharename of global: linuxmuster-global ist sehr lang: besser lml-global|linuxmuster
 
 sophomorix-webui user permissions, genauer
 sophomorix-school --check
