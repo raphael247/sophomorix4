@@ -198,19 +198,20 @@ if ($test_schools==1){
 	# share test
 	if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
 	    print "         OK: SMB-share $school exists\n ";
+            # write acces test
+
+	    # delete access test
+
+	    # quotainfo test
+	    &_smbcquotas_testshare($school);
+
+	    # quota set test
+
+	    # quota unset test
+	
         } else {
 	    print "     NOT OK: SMB-share $school is missing\n ";
         }
-        # write acces test
-
-	# delete access test
-
-	# quotainfo test
-
-	# quota set test
-
-	# quota unset test
-	
     }
     print "\n";
     &print_title("Testing shares that are not schools");
@@ -219,6 +220,8 @@ if ($test_schools==1){
             # skip
         } else {
 	    print "   * Testing share $share\n";
+  	    # quotainfo test
+	    &_smbcquotas_testshare($share);
 	}
    }
 
@@ -306,3 +309,18 @@ if ($school ne "" and $kill==1){
 # 
 ################################################################################
 
+sub _smbcquotas_testshare {
+    my ($share)=@_;
+    my $smbcquotas_command=
+        $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " -U ".$DevelConf::sophomorix_file_admin."%'".
+        $smb_admin_pass."'".
+        " -F //$root_dns/$share";
+        #print "$smbcquotas_command\n";
+        my $return_quota=system("$smbcquotas_command > /dev/null");
+        if ($return_quota==0){
+	    print "        OK: smbcquotas -F returned $return_quota\n ";
+	}  else {
+	    print "    NOT OK: smbcquotas -F failed with $return_quota\n ";
+	}
+}
