@@ -2728,7 +2728,9 @@ sub AD_school_create {
         print "   * $command\n";
         system($command);
         my $command_mod1="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}.
-                         " 'msdfs root' 'yes'";
+# ??????
+#                         " 'msdfs root' 'yes'";
+                         " 'msdfs root' 'no'";
         print "   * $command_mod1\n";
         system($command_mod1);
         my $command_mod2="net conf setparm ".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}.
@@ -2764,7 +2766,9 @@ sub AD_school_create {
         print "   * $command\n";
         system($command);
         my $command_mod1="net conf setparm ".$school.
-                         " 'msdfs root' 'yes'";
+# ?????
+#                         " 'msdfs root' 'yes'";
+                         " 'msdfs root' 'no'";
         print "   * $command_mod1\n";
         system($command_mod1);
 
