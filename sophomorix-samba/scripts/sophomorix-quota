@@ -577,9 +577,9 @@ if ($info==1 and $json>0){
 	        }
                 my $quota_class_display;
 	        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
-                                        {'sophomorixQuota'}{$share}){
+                                        {'sophomorixQuota'}{$share}{'VALUE'}){
 	            $quota_class_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
-	                                             {'sophomorixQuota'}{$share};
+	                                             {'sophomorixQuota'}{$share}{'VALUE'};
 	        } else {
                     $quota_class_display="---";
 	        }
@@ -620,15 +620,15 @@ if ($info==1 and $json>0){
                          }
                          @reason = sort @reason;
                          $membership_string=join(",",@reason);
-                         my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
-                         if ($add eq "---"){    
+			 if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'}){
+			     my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'};
+                             printf "|%10s %-67s|\n","+ ".$add," AddQuota for membership in project \'".
+                                                     $project."\' (".$membership_string.")";
+			 } else {
                              printf "|%10s %-67s|\n","0",
                                                      " No AddQuota for membership in project \'".
                                                      $project."\' (".$membership_string.")";
-                         } else {
-                             printf "|%10s %-67s|\n","+ ".$add," AddQuota for membership in project \'".
-                                                     $project."\' (".$membership_string.")";
-                         }
+		         }
                     }
                     if ($quota_user_display eq "---"){
                         printf "|%10s %-67s|\n",$quota_user_display," (C) No Quota at the user Object \'".$user."\'";

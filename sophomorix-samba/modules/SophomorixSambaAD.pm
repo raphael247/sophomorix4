@@ -4364,8 +4364,10 @@ sub AD_get_quota {
             $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixType'}=$type;
 	    # save quota about class at user
 	    foreach my $quota (@quota){
-	        my ($share,$value)=split(/:/,$quota);
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}=$value;
+	        my ($share,$value,$comment)=split(/:/,$quota);
+#                $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}=$value;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}{'VALUE'}=$value;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}{'COMMENT'}=$value;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
                 # remember on which share have which users quota settings
@@ -4466,7 +4468,9 @@ sub AD_get_quota {
 	        # save quota info at user
 	        foreach my $addquota (@addquota){
 	            my ($share,$value,$comment)=split(/:/,$addquota);
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+#                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
 		    # remember share for later listing
 		    push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
 	        }
@@ -4487,8 +4491,10 @@ sub AD_get_quota {
                     }
 	            # save quota info at user
 	            foreach my $addquota (@addquota){
-	                my ($share,$value)=split(/:/,$addquota);
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+	                my ($share,$value,$comment)=split(/:/,$addquota);
+#                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}=$value;
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
+                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
 		        # remember share for later listing
 		        push @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }, $share;
                         # remember on which share have which users quota settings
@@ -4538,16 +4544,18 @@ sub AD_get_quota {
                 $quota_user="---";
 	    }
             my $quota_class; # for this share
-	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share}){
-	        $quota_class=$quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share};
+	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share}{'VALUE'}){
+#	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share}){
+#	        $quota_class=$quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share};
+	        $quota_class=$quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixQuota'}{$share}{'VALUE'};
 	    } else {
                 $quota_class="---";
             }
             # save the quota values of a project for later use
             foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
-                if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}){
-                    if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share} ne "---"){
-                        my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share};
+                if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'}){
+                    if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'} ne "---"){
+                        my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'};
                         $project_sum=$project_sum+$add;
                         if ($project_string eq "---"){
                             $project_string=$add;
