@@ -162,7 +162,7 @@ if ($add_pro==1){
 
     # projects in OU=bsz
     &run_command("sophomorix-project $all_options --create -p mathe23 --school bsz");
-    &run_command("sophomorix-project $all_options --create -p Chemie-AG23 --school bsz --description 'Chemie AG des Gymnasiums' --addquota bsz:333,linuxmuster-global:444 --addmailquota 200 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
+    &run_command("sophomorix-project $all_options --create -p Chemie-AG23 --school bsz --description 'Chemie AG des Gymnasiums' --addquota \"bsz:333:Chemie Datenbank,linuxmuster-global:444\" --addmailquota 200 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
     # projects in OU=default-school
     &run_command("sophomorix-project $all_options --create -p mathe23");
     &run_command("sophomorix-project $all_options --create -p Chemie-AG23");
@@ -960,7 +960,7 @@ if ($test_add_pro==1){
                    gidNumber=>"-1",
                    description=>"Chemie AG des Gymnasiums",
                    sophomorixType=>"project",
-                   sophomorixAddQuota=>"bsz:333:---:|linuxmuster-global:444:---:",
+                   sophomorixAddQuota=>"bsz:333:Chemie Datenbank:|linuxmuster-global:444:---:",
                    sophomorixAddMailQuota=>"200",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
