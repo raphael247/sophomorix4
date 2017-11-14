@@ -1861,7 +1861,9 @@ sub AD_user_update {
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
-  
+    # start with empty sharelist
+    my @sharelist=();
+    
     if (not defined $max_user_count){
 	$max_user_count="-";
     }
@@ -1966,6 +1968,7 @@ sub AD_user_update {
     # quota
     if (defined $quota){
         my %quota_new=();
+        my @quota_new=();
         my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
         foreach my $quota_old (@quota_old){
             my ($share,$value,$calc,$info,$comment)=split(/:/,$quota_old);
@@ -2012,8 +2015,6 @@ sub AD_user_update {
             # D) comment
             if (defined $comment){
                 $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
-            } else {
-                $quota_new{'QUOTA'}{$share}{'COMMENT'}="---";
             }
    	    push @sharelist, $share;
 	}
@@ -2252,8 +2253,8 @@ sub AD_user_setquota {
                     }
                     print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit\n";
                     # update the sophomorixQuota entry at the user
-                    print "Updating quota for user $user:\n";
 		    my $share_quota=$share.":".$quota;
+                    print "Updating quota for user $user to $share_quota:\n";
                     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
                     &AD_user_update({ldap=>$ldap,
                                      root_dse=>$root_dse,
@@ -4287,11 +4288,12 @@ sub AD_get_quota {
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
         $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
         foreach my $quota (@quota){
-	        my ($share,$value,$oldcalc,$quotastatus)=split(/:/,$quota);
+	        my ($share,$value,$oldcalc,$quotastatus,$comment)=split(/:/,$quota);
 		# remember quota
   		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
   		$quota{'QUOTA'}{'USERS'}{$sam}{'OLDCALC'}{$share}=$oldcalc;
   		$quota{'QUOTA'}{'USERS'}{$sam}{'QUOTASTATUS'}{$share}=$quotastatus;
+  		$quota{'QUOTA'}{'USERS'}{$sam}{'COMMENT'}{$share}=$comment;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
                 # remember on which share have which users quota settings
