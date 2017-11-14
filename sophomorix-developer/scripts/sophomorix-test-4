@@ -1085,7 +1085,7 @@ if ($test_add_class==1){
 if ($mod_quota==1){
 
     # --quota (1)
-    &run_command("sophomorix-user $all_options -u samardze38 --quota bsz:1000");
+    &run_command("sophomorix-user $all_options -u samardze38 --quota \"bsz:1000:For HomePage\"");
     # samardze38
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=samardze38,OU=m8cd,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -1106,7 +1106,7 @@ if ($mod_quota==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:1000:---:update:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixQuota=>"bsz:1000:---:update:For HomePage:|linuxmuster-global:---:---:new:---:",
                    sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
@@ -1143,7 +1143,7 @@ if ($mod_quota==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:1000:---:update:---:|linuxmuster-global:---:---:new:---:|uni:1111:---:update:---:|default-school:2222:---:update:---:",
+                   sophomorixQuota=>"bsz:1000:---:update:For HomePage:|linuxmuster-global:---:---:new:---:|uni:1111:---:update:---:|default-school:2222:---:update:---:",
                    sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
@@ -1180,7 +1180,7 @@ if ($mod_quota==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:1000:---:update:---:|linuxmuster-global:---:---:new:---:|default-school:2222:---:update:---:",
+                   sophomorixQuota=>"bsz:1000:---:update:For HomePage:|linuxmuster-global:---:---:new:---:|default-school:2222:---:update:---:",
                    sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
@@ -1217,7 +1217,7 @@ if ($mod_quota==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:1000:---:update:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixQuota=>"bsz:1000:---:update:For HomePage:|linuxmuster-global:---:---:new:---:",
                    sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
@@ -1256,7 +1256,7 @@ if ($mod_quota==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:---:---:update:---:|linuxmuster-global:---:---:update:---:",
+                   sophomorixQuota=>"bsz:---:---:update:For HomePage:|linuxmuster-global:---:---:update:---:",
                    sophomorixMailQuota=>"-1",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
