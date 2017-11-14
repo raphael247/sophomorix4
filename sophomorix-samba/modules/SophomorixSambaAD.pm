@@ -2036,6 +2036,9 @@ sub AD_user_update {
                     # new share
                     $quota_new{'QUOTA'}{$share}{'CALC'}="---";
                 }
+		if (not defined $quota_new{'QUOTA'}{$share}{'COMMENT'}){
+                    $quota_new{'QUOTA'}{$share}{'COMMENT'}="---";
+		}
 		push @quota_new, $share.":".
                                  $quota_new{'QUOTA'}{$share}{'VALUE'}.":".
                                  $quota_new{'QUOTA'}{$share}{'CALC'}.":".
@@ -2239,7 +2242,7 @@ sub AD_user_setquota {
                           $smb_admin_pass."'".
                           " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //$root_dns/$share";
                 print "$smbcquotas_command\n";
-                system($smbcquotas_command);
+                #system($smbcquotas_command);
                 my $stdout=`$smbcquotas_command`;
                 my $return=${^CHILD_ERROR_NATIVE}; # return of value of $smbcquotas_command
                 if ($return==0){

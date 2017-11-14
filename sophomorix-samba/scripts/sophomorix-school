@@ -198,6 +198,7 @@ if ($test_schools==1){
 	# share test
 	if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
 	    print "         OK: SMB-share $school exists\n ";
+            &_smb_msdfs($school);
             # write acces test
 
 	    # delete access test
@@ -220,6 +221,8 @@ if ($test_schools==1){
             # skip
         } else {
 	    print "   * Testing share $share\n";
+            # show msdfs
+            &_smb_msdfs($share);
   	    # quotainfo test
 	    &_smbcquotas_testshare($share);
 	}
@@ -319,8 +322,20 @@ sub _smbcquotas_testshare {
         #print "$smbcquotas_command\n";
         my $return_quota=system("$smbcquotas_command > /dev/null");
         if ($return_quota==0){
-	    print "        OK: smbcquotas -F returned $return_quota\n ";
+	    print "      OK: smbcquotas -F returned $return_quota\n ";
 	}  else {
 	    print "    NOT OK: smbcquotas -F failed with $return_quota\n ";
 	}
+}
+
+
+sub _smb_msdfs {
+    my ($share)=@_;
+    if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$share}{'msdfs root'}){
+	print "      OK: msdfs root = ".
+              $sophomorix_config{'samba'}{'net_conf_list'}{$share}{'msdfs root'}.
+              "\n ";
+    } else {
+        print "    NOT OK: msdfs root option on ".$share." NOT set to yes/no\n";
+    }
 }
