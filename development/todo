@@ -46,12 +46,37 @@ Nextcloud:
 
 
 
-sophomorix-mail/belwue/...
-- AD-Abfrage überall gleich: wer ist in welcher Gruppe
+sophomorix-mail
+* sorgt dafür dass
+  * mailaccounts da sind
+  * mailinglisten da sind
+Egalwo Mail gehostet wird, gleiches prinzipielles vorgehen:
+1) AD-Abfrage: 
+   * wer ist in welcher Gruppe
    --> JSON
-   --> schon Umsetzbar
-- zu erstellende Dateien verschieden (bewlue, Mailman, ....)
---> Im Code trennen
+   --> schon umsetzbar
+Individueller Teil:
+2) school.ini:
+   welche Art wird benutzt
+   [mail]
+       MAILTYPE = belwue
+       MAILTYPE = mailman
+       .....
+       --> sucht automatisch nach einer Datei <MAILTYPE>.conf im schulordner
+       Dort dann jeweils das was man braucht:
+        - passwort remote server
+        - konfiguration, ...
+        - .....
+   Abfrage Maildienst
+   A) Belwue über webinterface
+   B) ...
+3) Erstellen von Resultatdateien
+   - zu erstellende Dateien (bewlue, Mailman, ....)
+4) synchronisation
+   A) Belwue mit links und passwort der admin interfaces
+   B) scp upload
+   C)...
+
 
 
 
@@ -81,26 +106,24 @@ sophomorix-quota:
 
 Testen ob project sum richtig kalkuliert wird
 
-dopelte dinge Vermeiden:
-
- "GROUPS_by_GROUPS" : {
-         "bsz-teachers" : {
-            "sophomorixQuota" : {
-               "bsz" : "---",
-               "linuxmuster-global" : "---"
-            },
+upzudatende user hochzählen, progress objekt, das 1/23 anzeigt
 
 sophomorix-project
 sophomorix-class
 bei Option -i, die Quota angaben (mit Comments, UNTERdie Mitgliedersummierung),
 ganze Zeile verwenden
 
+sophomorix-class -i 
+sophomorix-group -i 
+* user zählen
+* --min-user <num> --max-user <num>
+
 
 sophomorix-quota 
 show comments with sophomorix-quota -iv
 * tests schreiben
-* add json progress object to setquota command
 * use loglevel for printout of projects
+
 
 * sophomorix-check -ij: check which schools have a working smb file server
   * exit with error, when a user would be created

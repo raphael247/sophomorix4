@@ -484,7 +484,8 @@ if($developer_setquota ne "" and $user ne ""){
 # continue with the calculated quota
 #print Dumper($ref_quota);
 
-
+my %user_updated=();
+my $user_count=0;
 &Sophomorix::SophomorixBase::print_title("Setting Quota of the following users:");
 foreach my $school_share (@sharelist){
     &Sophomorix::SophomorixBase::print_title("Setting quota for school $school_share:");
@@ -505,13 +506,11 @@ foreach my $school_share (@sharelist){
 
     ############################################################
     # Walk through users
-    my $user_count=0;
     foreach my $user (@userlist){
         if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
             print "  WARNING: User $user not found!\n";
             next;
         }
-        $user_count++;
         print "   * User $user:\n";
         ############################################################
         # Walk through all shares
@@ -521,6 +520,11 @@ foreach my $school_share (@sharelist){
             if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
                 my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share};
                 print "      * SET: $share to $quota MiB:\n";
+                if (not exists $user_updated{$user}){
+                    $user_updated{$user}="seen";
+                    $user_count++;
+                }
+
                 &AD_user_setquota({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
@@ -545,6 +549,18 @@ foreach my $school_share (@sharelist){
     }
 }
 #    print Dumper($ref_quota);
+
+
+&result_sophomorix_add_summary({
+                     NAME=>"UPDATED", 
+                     RESULT=>$user_count, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => "users smbquota updated", 
+                     DESCRIPTION_PRE => "users with updated smbquota", 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+
 
 
 
