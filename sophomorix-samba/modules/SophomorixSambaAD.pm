@@ -4564,7 +4564,7 @@ sub AD_get_quota {
                 }
             } # end project
 
-            $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSTRING'}{$share}=$project_string;
+            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSTRING'}=$project_string;
             $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
 
             # add everything up
