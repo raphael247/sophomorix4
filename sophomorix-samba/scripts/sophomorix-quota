@@ -505,12 +505,13 @@ foreach my $school_share (@sharelist){
 
     ############################################################
     # Walk through users
+    my $user_count=0;
     foreach my $user (@userlist){
         if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
             print "  WARNING: User $user not found!\n";
             next;
         }
-        
+        $user_count++;
         print "   * User $user:\n";
         ############################################################
         # Walk through all shares
@@ -524,8 +525,10 @@ foreach my $school_share (@sharelist){
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
                                    user=>$user,
+                                   user_count=>$user_count,
+                                   max_user_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'},
                                    share_count=>$share_count,
-                                   max_share_count=>$ref_quota->{'QUOTA'}{'UPDATE_SHARE_COUNT'},
+                                   max_share_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'},
                                    share=>$share,
                                    quota=>$quota,
                                    smb_admin_pass=>$smb_admin_pass, 

@@ -2216,6 +2216,8 @@ sub AD_user_setquota {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $user = $arg_ref->{user};
+    my $user_count = $arg_ref->{user_count};
+    my $max_user_count = $arg_ref->{max_user_count};
     my $share_count = $arg_ref->{share_count};
     my $max_share_count = $arg_ref->{max_share_count};
     my $share = $arg_ref->{share};
@@ -2266,8 +2268,8 @@ sub AD_user_setquota {
                                      quota=>$share_quota,     # <share>:<quota_on_share>
                                      quota_calc=>$quota,      # what was calculated (same as quota_on_share)
                                      quota_info=>$hard_limit, # what was set
-                                     user_count=>"1",
-                                     max_user_count=>"1",
+                                     user_count=>$user_count,
+                                     max_user_count=>$max_user_count,
                                      date_now=> $time_stamp_AD,
                                      json=>$json,
                                      sophomorix_config=>$ref_sophomorix_config,
@@ -4248,7 +4250,8 @@ sub AD_get_AD {
 
 sub AD_get_quota {
     my %quota=();
-    $quota{'QUOTA'}{'UPDATE_SHARE_COUNT'}=0;
+    $quota{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'}=0;
+    $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'}=0;
     # LISTS of %quota
     # LISTS->SHARE-><share>->@users  # list which users have quota on the share
     # LISTS->USER-><school>->@users  # list which users are in which school
@@ -4512,6 +4515,7 @@ sub AD_get_quota {
     }
 
     # update share info in %quota
+    my %updated_user=();
     foreach my $user (keys %{ $quota{'QUOTA'}{'USERS'} }) {
         # uniquefi and sort sharelist
 	@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
@@ -4613,10 +4617,15 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'OLDCALC is ---'}="TRUE";
             }
 
-            # increase update share counter
+            # increase share counter
             if (defined $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} and
                 $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
-                $quota{'QUOTA'}{'UPDATE_SHARE_COUNT'}++;
+                if ( not exists $updated_user{$user} ){
+                    # update user counter only once for a user
+                    $updated_user{$user}="updated";
+                    $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'}++;
+                }
+                $quota{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'}++;
             }
 
             # FALSE if not set to TRUE
