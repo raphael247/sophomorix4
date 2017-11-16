@@ -68,7 +68,6 @@ $Data::Dumper::Terse = 1;
             AD_object_search
             AD_get_AD
             AD_get_quota
-            AD_get_quota_old
             AD_get_print_data
             AD_class_fetch
             AD_project_fetch
@@ -2217,6 +2216,8 @@ sub AD_user_setquota {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $user = $arg_ref->{user};
+    my $share_count = $arg_ref->{share_count};
+    my $max_share_count = $arg_ref->{max_share_count};
     my $share = $arg_ref->{share};
     my $quota = $arg_ref->{quota};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
@@ -2224,7 +2225,7 @@ sub AD_user_setquota {
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
-    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user (start):");
+    &Sophomorix::SophomorixBase::print_title("Setting Quota for user $user on share $share_count/$max_share_count (start):");
 
     # calculate limits
     my $hard_bytes;
@@ -4247,6 +4248,7 @@ sub AD_get_AD {
 
 sub AD_get_quota {
     my %quota=();
+    $quota{'QUOTA'}{'UPDATE_SHARE_COUNT'}=0;
     # LISTS of %quota
     # LISTS->SHARE-><share>->@users  # list which users have quota on the share
     # LISTS->USER-><school>->@users  # list which users are in which school
@@ -4372,13 +4374,13 @@ sub AD_get_quota {
 		push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam_user;                
 	    }
 	}
-        foreach my $memberof (@memberof){
-	    $quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'memberOf'}{$memberof}="seen";
-	    foreach my $quota (@quota){
-	        my ($share,$value)=split(/:/,$quota);
-  		$quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
-	    }
-	}
+        #foreach my $memberof (@memberof){
+	#    $quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'memberOf'}{$memberof}="seen";
+	#    foreach my $quota (@quota){
+	#        my ($share,$value)=split(/:/,$quota);
+        #	       $quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
+	#    }
+	#}
     }
 
     # PROJECT quota 
@@ -4609,6 +4611,12 @@ sub AD_get_quota {
                 # no oldcalc set
                 $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
                 $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'OLDCALC is ---'}="TRUE";
+            }
+
+            # increase update share counter
+            if (defined $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} and
+                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
+                $quota{'QUOTA'}{'UPDATE_SHARE_COUNT'}++;
             }
 
             # FALSE if not set to TRUE

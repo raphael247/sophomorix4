@@ -46,7 +46,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_get_user
                                  AD_get_quota
-                                 AD_get_quota_old
                                  AD_user_kill
                                  AD_unbind_admin
                                  AD_object_search
@@ -462,18 +461,20 @@ if ($info==1 and $json>0){
 if($developer_setquota ne "" and $user ne ""){
     my ($share,$quota)=split(":",$developer_setquota);
     foreach my $user (@userlist){
-    &AD_user_setquota({ldap=>$ldap,
-                       root_dse=>$root_dse,
-                       root_dns=>$root_dns,
-                       user=>$user,
-                       share=>$share,
-                       quota=>$quota,
-                       smb_admin_pass=>$smb_admin_pass, 
-                       debug_level=>$debug_level,
-                       json=>$json,
-                       sophomorix_result=>\%sophomorix_result,
-                       sophomorix_config=>\%sophomorix_config,
-                     });
+        &AD_user_setquota({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           user=>$user,
+                           share_count=>"1",
+                           max_share_count=>"1",
+                           share=>$share,
+                           quota=>$quota,
+                           smb_admin_pass=>$smb_admin_pass, 
+                           debug_level=>$debug_level,
+                           json=>$json,
+                           sophomorix_result=>\%sophomorix_result,
+                           sophomorix_config=>\%sophomorix_config,
+                         });
     }
     exit;
 }
@@ -513,7 +514,9 @@ foreach my $school_share (@sharelist){
         print "   * User $user:\n";
         ############################################################
         # Walk through all shares
+        my $share_count=0;
         foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+            $share_count++;
             if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
                 my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share};
                 print "      * SET: $share to $quota MiB:\n";
@@ -521,6 +524,8 @@ foreach my $school_share (@sharelist){
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
                                    user=>$user,
+                                   share_count=>$share_count,
+                                   max_share_count=>$ref_quota->{'QUOTA'}{'UPDATE_SHARE_COUNT'},
                                    share=>$share,
                                    quota=>$quota,
                                    smb_admin_pass=>$smb_admin_pass, 
