@@ -83,6 +83,34 @@ Individueller Teil:
 
 NEXT/Todo:
 
+ordner share,program
+
+parallel zu management,students,teachers in jeder Schule
+dito
+dann paket
+anschließend ntacl abernten
+
+
+mounten
+
+root@server:/# mkdir -p /srv/samba/mounts/default-school
+
+root@server:/# mount -t cifs -o user=administrator,pass=`cat /etc/linuxmuster/.secret/administrator`,domain=linuxmuster //linuxmuster.lan/default-school /srv/samba/mounts/default-school/
+
+sophomorix-school --mount <share>
+....
+
+
+sophomorixWebuiDashboard voerst single
+sophomorixWebuiDashboardCalculated
+sophomorixWebuiPermissions (war userpermissions), multi
+
+sophomorixWebuiPermissionsCalculated multi
+
+-> 
+
+
+
 ACL:
 
 * Tests für project acl
@@ -110,7 +138,7 @@ upzudatende user hochzählen, progress objekt, das 1/23 anzeigt
 
 sophomorix-project
 sophomorix-class
-bei Option -i, die Quota angaben (mit Comments, UNTERdie Mitgliedersummierung),
+bei Option -i, die Quota angaben (mit Comments, UNTER die Mitgliedersummierung),
 ganze Zeile verwenden
 
 sophomorix-class -i 
@@ -156,6 +184,52 @@ Undefined subroutine &Sophomorix::SophomorixAPI::fetch_error_string called at /u
 
 ###########################################################
 Entwicklertreffen:
+
+Mailserver.
+wird per ssh mit eingerichtet
+  --mailserver IP
+    --> wenn ja mailserver setup 
+    --> Paket: linuxmuster-mail
+besteht aus (Docker):
+-dovecut
+
+-mailman extra dazu
+
+Docker:
+container unter /var/lib/docker/...
+daten unter /srv/docker/linuxmuster-mail
+c't-Artikel lesen
+
+sophomorix-gruppe
+Gruppe mail anlegen
+
+sophomorixMailQuota             individueler Wert für user
+sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
+nur beim user
+
+Mailattribute
+attribut mail  -> Füllen  loginname@linuxmuster.net ()
+proxyAdresses  - multivalue, noch leer
+mailAdresses
+
+
+paketserver:
+- weiterhin mit minidinstall
+  synchronisation nach
+  
+  deb http://schmitt.linuxmuster.org/lmn7/ /
+  deb http://fleischsalat.linuxmuster.org/lmn7/ /
+
+viertelstündlich
+
+nicenstein 
+
+
+-- mehrschullösung
+   1 Mailserver für alle schulen, gleiche maildomain (vorerst)
+
+
+
 
 sophomorix-webui user permissions, genauer
 sophomorix-school --check
