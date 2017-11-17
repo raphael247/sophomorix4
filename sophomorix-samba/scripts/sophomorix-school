@@ -203,6 +203,8 @@ if ($test_schools==1){
 
 	    # delete access test
 
+            # aquota.user test
+            &_smbclient_testfile($school,"aquota.user");
 	    # quotainfo test
 	    &_smbcquotas_testshare($school);
 
@@ -223,6 +225,8 @@ if ($test_schools==1){
 	    print "   * Testing share $share\n";
             # show msdfs
             &_smb_msdfs($share);
+            # aquota.user test
+            &_smbclient_testfile($share,"aquota.user");
   	    # quotainfo test
 	    &_smbcquotas_testshare($share);
 	}
@@ -311,6 +315,32 @@ if ($school ne "" and $kill==1){
 
 # 
 ################################################################################
+
+
+sub _smbclient_testfile {
+    my ($share,$testfile)=@_;
+    my $file_exists=0;
+    my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+        " -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
+        " //$root_dns/$share -c 'ls'";
+    my $stdout=`$smbclient_command 2> /dev/null`;
+    my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    my @lines=split(/\n/,$stdout);
+    foreach my $line (@lines){
+        my ($unused,$file,@unused)=split(/\s+/,$line);
+	if (defined $file){
+	    if ($file eq $testfile){
+		$file_exists=1;
+		last;
+	    }
+	}
+    }
+    if ($file_exists==1){
+        print "      OK: File $testfile exists on share $share\n ";
+    }  else {
+        print "  NOT OK: File $testfile does NOT exist on share $share\n ";
+    }
+}
 
 sub _smbcquotas_testshare {
     my ($share)=@_;
