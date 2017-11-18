@@ -4287,20 +4287,34 @@ sub AD_get_quota {
 	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
-        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
+#        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixRole'}=$role;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         # get SHAREDEFAULT for this role
-        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'SHAREDEFAULT'}{$school}=
+#        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'SHAREDEFAULT'}{$school}=
+#            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
+#        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'SHAREDEFAULT'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}=
+#            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
+        $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$school}{'SHAREDEFAULT'}=
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
-        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'SHAREDEFAULT'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}=
+        $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}{'SHAREDEFAULT'}=
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
-        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
+
+#        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
+
         foreach my $quota (@quota){
 	        my ($share,$value,$oldcalc,$quotastatus,$comment)=split(/:/,$quota);
 		# remember quota
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'OLDCALC'}{$share}=$oldcalc;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'QUOTASTATUS'}{$share}=$quotastatus;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'COMMENT'}{$share}=$comment;
+#  		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
+  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'sophomorixQuota'}=$value;
+#  		$quota{'QUOTA'}{'USERS'}{$sam}{'OLDCALC'}{$share}=$oldcalc;
+  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'OLDCALC'}=$oldcalc;
+#  		$quota{'QUOTA'}{'USERS'}{$sam}{'QUOTASTATUS'}{$share}=$quotastatus;
+  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'QUOTASTATUS'}=$quotastatus;
+#  		$quota{'QUOTA'}{'USERS'}{$sam}{'COMMENT'}{$share}=$comment;
+  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'COMMENT'}=$comment;
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
                 # remember on which share have which users quota settings
@@ -4460,7 +4474,7 @@ sub AD_get_quota {
                 my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member};
                 #print "$sam_user is a member-USER of project $sam\n";
                 # save data about project at user
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
+#                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
                 if ($count>$count_initial_member){
                     # appended memberships		
@@ -4483,7 +4497,7 @@ sub AD_get_quota {
                 #print "$sam_class is a member-CLASS of project $sam\n";
 		# save quota info at each user of member-CLASS
 		foreach my $user (keys %{ $quota{'QUOTA'}{'LOOKUP'}{'MEMBERS_by_CLASS'}{$sam_class} }) {
-                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
+#                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sAMAccountName'}=$sam;
                     $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
                     if ($count>$count_initial_member){
                         # appended memberships		
@@ -4538,8 +4552,10 @@ sub AD_get_quota {
             my $project_sum=0;
             my $project_string="---";
             my $quota_user;
-  	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share}){
-	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
+#  	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share}){
+#	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
+  	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'}){
+	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'};
 	    } else {
                 $quota_user="---";
 	    }
@@ -4565,7 +4581,8 @@ sub AD_get_quota {
             } # end project
 
             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSTRING'}=$project_string;
-            $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
+#            $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
+            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSUM'}=$project_sum;
 
             # add everything up
             if ($quota_user eq "---"){
@@ -4574,52 +4591,73 @@ sub AD_get_quota {
                 # check for class quota
                 if ($quota_class ne "---"){
                     $base=$quota_class;
-	        } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share}) {
-                    $base=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share};
+#	        } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share}) {
+#                    $base=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'SHAREDEFAULT'}{$share};
+#                }
+	        } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'SHAREDEFAULT'}) {
+                    $base=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'SHAREDEFAULT'};
                 }
                 # add addquota
                 $calc=$base+$project_sum;
             } else {
                 # override with quota from user attribute
-                $calc=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
+#                $calc=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
+                $calc=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'};
             }
             # update CALC
-            $quota{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}=$calc;
+#            $quota{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}=$calc;
+            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'}=$calc;
 
             # add --- for undefined values
-            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}){
-                $quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}="---";
+#            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}){
+#                $quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share}="---";
+#            }
+            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'OLDCALC'}){
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'OLDCALC'}="---";
             }
-            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}){
-		$quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}="---";
+#            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}){
+#		$quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}="---";
+            if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}){
+		$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}="---";
             }
 
             # some shortnames for vars
-            $oldcalc=$quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share};
-            $quotastatus=$quota{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share};
+#            $oldcalc=$quota{'QUOTA'}{'USERS'}{$user}{'OLDCALC'}{$share};
+#
+# 
+            $oldcalc=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'OLDCALC'};
+            $quotastatus=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'};
 
             # check for updates
             if ($quotastatus=~/[^0-9]/){
                 # nonumbers
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'NonNumbers in QUOTASTATUS'}="TRUE";
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'NonNumbers in QUOTASTATUS'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'REASON'}{'NonNumbers in QUOTASTATUS'}="TRUE";
             }
 
             if ($calc ne $oldcalc){
                 # new caluladed value
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'CALC differs from OLDCALC'}="TRUE";
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'CALC differs from OLDCALC'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'REASON'}{'CALC differs from OLDCALC'}="TRUE";
             }
 
             if ($oldcalc eq "---"){
                 # no oldcalc set
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'OLDCALC is ---'}="TRUE";
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="TRUE";
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'REASON'}{'OLDCALC is ---'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'REASON'}{'OLDCALC is ---'}="TRUE";
             }
 
             # increase share counter
-            if (defined $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} and
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
+#            if (defined $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} and
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
+            if (defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} and
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
                 if ( not exists $updated_user{$user} ){
                     # update user counter only once for a user
                     $updated_user{$user}="updated";
@@ -4629,8 +4667,10 @@ sub AD_get_quota {
             }
 
             # FALSE if not set to TRUE
-            if (not exists $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}){
-                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="FALSE";
+#            if (not exists $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}){
+#                $quota{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'}="FALSE";
+            if (not exists $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}){
+                $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}="FALSE";
             }
 
 	} # end share
