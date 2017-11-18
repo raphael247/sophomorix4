@@ -19,8 +19,6 @@ ini Dateien:
 	var=Value
 	list=SCHOOLS=bsz,abc,...
 	key-value=key1=value1,key2=value2,... 
-
-
 AK:
 Win 10, wie sichtbar, wer angemeldet ist.
 
@@ -82,6 +80,21 @@ Individueller Teil:
 
 
 NEXT/Todo:
+
+sophomorix-samba --confidential/notconfidential Sophomorix-First-Password
+
+translates to the command:
+
+ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchflags --option="dsdb:schema update allowed=yes" -b "cn=schema,CN=configuration,DC=...,DC=..."
+
+? überlebt das einen reboot?
+? reicht das wenn es global verändert wird ?
+? für entwickleroptionen scheint es ok
+? policy: alles confidential, global-admin kann es freischalten
+
+
+- welche Folgen hat das?
+
 
 - neues Paket:
   school/share
