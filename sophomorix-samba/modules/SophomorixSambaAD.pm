@@ -569,6 +569,8 @@ sub AD_repdir_using_file {
             $dir=~s/>\$directory_projects</${DevelConf::directory_projects}/;
             $dir=~s/>\$directory_management</${DevelConf::directory_management}/;
             $dir=~s/>\$directory_examusers</${DevelConf::directory_examusers}/;
+            $dir=~s/>\$directory_share</${DevelConf::directory_share}/;
+            $dir=~s/>\$directory_program</${DevelConf::directory_program}/;
             # remove <,>
             $dir=~s/^>//g;
             $dir=~s/<$//g;
