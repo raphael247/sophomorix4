@@ -83,12 +83,34 @@ Individueller Teil:
 
 NEXT/Todo:
 
-ordner share,program
+- neues Paket:
+  school/share
+  school/program
+  dito global
 
-parallel zu management,students,teachers in jeder Schule
-dito
-dann paket
-anschließend ntacl abernten
+AD attribute
+webui
+   * sophomorixWebuiDashboard (voerst single lassen
+   * sophomorixWebuiDashboardCalculated (vorerst weglassen)
+   OK: sophomorixUserPermissions -> sophomorixWebuiPermissions (multi)
+   todo: sophomorixWebuiPermissionsCalculated multi
+mailquota:
+sophomorixMailQuota             individueler Wert für user
+sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
+nur beim user
+
+
+comment zu mailquota Angaben
+
+mailquota umsetzen (in sophomorix-quota)
+
+testen ob bei developersetquota auch comments gehen,
+wird der user auch upgedated?
+
+ordner share,program
+OK 1) parallel zu management,students,teachers in jeder Schule und global
+Todo   2) dann paket
+Todo   3)anschließend ntacl abernten
 
 
 mounten
@@ -99,14 +121,6 @@ root@server:/# mount -t cifs -o user=administrator,pass=`cat /etc/linuxmuster/.s
 
 sophomorix-school --mount <share>
 ....
-
-
-sophomorixWebuiDashboard voerst single
-sophomorixWebuiDashboardCalculated
-sophomorixWebuiPermissions (war userpermissions), multi
-
-sophomorixWebuiPermissionsCalculated multi
-
 -> 
 
 
@@ -203,9 +217,6 @@ c't-Artikel lesen
 sophomorix-gruppe
 Gruppe mail anlegen
 
-sophomorixMailQuota             individueler Wert für user
-sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
-nur beim user
 
 Mailattribute
 attribut mail  -> Füllen  loginname@linuxmuster.net ()

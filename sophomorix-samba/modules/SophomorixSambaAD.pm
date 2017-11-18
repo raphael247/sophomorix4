@@ -1853,7 +1853,7 @@ sub AD_user_update {
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
-    my $user_permissions = $arg_ref->{user_permissions};
+    my $webui_permissions = $arg_ref->{webui_permissions};
     my $school = $arg_ref->{school};
     my $date_now = $arg_ref->{date_now};
     my $role = $arg_ref->{role};
@@ -2170,11 +2170,11 @@ sub AD_user_update {
         }
         print "   sophomorixWebuiDashboard:   $webui_dashboard\n";
     }
-    if (defined $user_permissions){
-        my @user_permissions=split(/,/,$user_permissions);
-        @user_permissions = reverse @user_permissions;
-        print "   * Setting sophomorixUserPermissions to: @user_permissions\n";
-        my $mesg = $ldap->modify($dn,replace => {'sophomorixUserPermissions' => \@user_permissions }); 
+    if (defined $webui_permissions){
+        my @webui_permissions=split(/,/,$webui_permissions);
+        @webui_permissions = reverse @webui_permissions;
+        print "   * Setting sophomorixWebuiPermissions to: @webui_permissions\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixWebuiPermissions' => \@webui_permissions }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
 

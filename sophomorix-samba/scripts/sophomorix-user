@@ -113,9 +113,9 @@ my $json=0;
 my $empty_password=0;
 
 my $webui_dashboard;
-my $user_permissions;
-my $add_user_permissions;
-my $remove_user_permissions;
+my $webui_permissions;
+my $add_webui_permissions;
+my $remove_webui_permissions;
 
 my $comment;
 my $quota;
@@ -160,9 +160,9 @@ my $testopt=GetOptions(
        "quota=s" => \$quota,
        "mailquota=i" => \$mailquota,
        "webui-dashboard=s" => \$webui_dashboard,
-       "user-permissions=s" => \$user_permissions,
-       "add-user-permissions=s" => \$add_user_permissions,
-       "remove-user-permissions=s" => \$remove_user_permissions,
+       "webui-permissions=s" => \$webui_permissions,
+       "add-webui-permissions=s" => \$add_webui_permissions,
+       "remove-webui-permissions=s" => \$remove_webui_permissions,
        "U|usable" => \$usable,
        "E|enable" => \$enable,
        "A|activate" => \$activate,
@@ -243,9 +243,9 @@ Updating comment of a user:
 
 Updating WebuiDashboard of a user:
   --user <user> --webui-dashboard "Webui Dashboard String"
-  --user <user> --user-permissions permission1,permission2,permission3, ... 
-  --user <user> --add-user-permissions permission1,permission2,permission3, ...
-  --user <user> --remove-user-permissions permission1,permission2,permission3, ...
+  --user <user> --webui-permissions permission1,permission2,permission3, ... 
+  --user <user> --add-webui-permissions permission1,permission2,permission3, ...
+  --user <user> --remove-webui-permissions permission1,permission2,permission3, ...
 
 -> continue here
   --list-teachers-by-year
@@ -817,14 +817,14 @@ if ($user ne "" and defined $webui_dashboard){
 
 
 
-# user-permissions
-# --user-permissions permission1,permission2,permission3, ... 
-if (defined $user_permissions and $user ne ""){
+# webui-permissions
+# --webui-permissions permission1,permission2,permission3, ... 
+if (defined $webui_permissions and $user ne ""){
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$user,
-                     user_permissions=>$user_permissions,
+                     webui_permissions=>$webui_permissions,
                      user_count=>"",
                      max_user_count=>"-",
                      date_now=> $time_stamp_AD,
@@ -835,17 +835,17 @@ if (defined $user_permissions and $user ne ""){
 }
 
 
-# --add-user-permissions permission1,permission2,permission3, ...
-if (defined $add_user_permissions and $user ne ""){
-    my @add_user_permissions=split(/,/,$add_user_permissions);
-    my @old_user_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixUserPermissions");
-    my @user_permissions = uniq(@old_user_permissions,@add_user_permissions); 
-    my $user_permissions=join(",",@user_permissions);
+# --add-webui-permissions permission1,permission2,permission3, ...
+if (defined $add_webui_permissions and $user ne ""){
+    my @add_webui_permissions=split(/,/,$add_webui_permissions);
+    my @old_webui_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixWebuiPermissions");
+    my @webui_permissions = uniq(@old_webui_permissions,@add_webui_permissions); 
+    my $webui_permissions=join(",",@webui_permissions);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$user,
-                     user_permissions=>$user_permissions,
+                     webui_permissions=>$webui_permissions,
                      user_count=>"",
                      max_user_count=>"-",
                      date_now=> $time_stamp_AD,
@@ -856,16 +856,16 @@ if (defined $add_user_permissions and $user ne ""){
 }
 
 
-# --remove-user-permissions permission1,permission2,permission3, ...
-if (defined $remove_user_permissions){
-    my @old_user_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixUserPermissions");
-    my @user_permissions = &remove_from_list($remove_user_permissions,@old_user_permissions);
-    my $user_permissions=join(",",@user_permissions);
+# --remove-webui-permissions permission1,permission2,permission3, ...
+if (defined $remove_webui_permissions){
+    my @old_webui_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixWebuiPermissions");
+    my @webui_permissions = &remove_from_list($remove_webui_permissions,@old_webui_permissions);
+    my $webui_permissions=join(",",@webui_permissions);
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$user,
-                     user_permissions=>$user_permissions,
+                     webui_permissions=>$webui_permissions,
                      user_count=>"",
                      max_user_count=>"-",
                      date_now=> $time_stamp_AD,

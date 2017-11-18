@@ -3561,7 +3561,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --user-permissions one,two,three --user maiersa42");
+    &run_command("sophomorix-user $all_options --webui-permissions one,two,three --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3594,7 +3594,7 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixUserPermissions => "one|two|three",
+                   sophomorixWebuiPermissions => "one|two|three",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
@@ -3602,7 +3602,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --add-user-permissions four,five --user maiersa42");
+    &run_command("sophomorix-user $all_options --add-webui-permissions four,five --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3635,7 +3635,7 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixUserPermissions => "one|two|three|four|five",
+                   sophomorixWebuiPermissions => "one|two|three|four|five",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
@@ -3643,7 +3643,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --remove-user-permissions one,two --user maiersa42");
+    &run_command("sophomorix-user $all_options --remove-webui-permissions one,two --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3676,7 +3676,7 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixUserPermissions => "three|four|five",
+                   sophomorixWebuiPermissions => "three|four|five",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
@@ -3684,7 +3684,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options -U --user maiersa42 --remove-user-permissions three,four,five --webui-dashboard \"\" --comment \"created by sophomorix\"");
+    &run_command("sophomorix-user $all_options -U --user maiersa42 --remove-webui-permissions three,four,five --webui-dashboard \"\" --comment \"created by sophomorix\"");
     # Testing if maiersa42 is feft as before
     # maiersa42
     &AD_test_object({ldap=>$ldap,

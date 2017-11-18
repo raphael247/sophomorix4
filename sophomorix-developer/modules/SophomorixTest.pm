@@ -343,7 +343,7 @@ sub AD_test_object {
     my $s_deactivationdate = $arg_ref->{sophomorixDeactivationDate};
     my $s_comment = $arg_ref->{sophomorixComment};
     my $s_webui = $arg_ref->{sophomorixWebuiDashboard};
-    my $s_user_permissions = $arg_ref->{sophomorixUserPermissions};
+    my $s_user_permissions = $arg_ref->{sophomorixWebuiPermissions};
     my $s_admin_file = $arg_ref->{sophomorixAdminFile};
     my $s_unid = $arg_ref->{sophomorixUnid};
     my $s_exammode = $arg_ref->{sophomorixExamMode};
@@ -702,7 +702,7 @@ sub AD_test_object {
 
         ##################################################
         if (defined $s_user_permissions){
-            &test_multivalue($s_user_permissions,"sophomorixUserPermissions",$entry,$sam_account);
+            &test_multivalue($s_user_permissions,"sophomorixWebuiPermissions",$entry,$sam_account);
         }
 
         ##################################################
