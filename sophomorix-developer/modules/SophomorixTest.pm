@@ -310,6 +310,7 @@ sub AD_test_object {
     my $name = $arg_ref->{name};
     my $given_name = $arg_ref->{givenName};
     my $upn =$arg_ref->{userPrincipalName};
+    my $mail =$arg_ref->{mail};
     my $sam_account =$arg_ref->{sAMAccountname};
     my $account_expires =$arg_ref->{accountExpires};
     my $dns_hostname =$arg_ref->{dNSHostName};
@@ -501,6 +502,10 @@ sub AD_test_object {
         if (defined $upn){
             is ($entry->get_value ('userPrincipalName'),$upn,
 		"  * userPrincipalName is $upn");
+        }
+        if (defined $mail){
+            is ($entry->get_value ('mail'),$mail,
+		"  * mail is $mail");
         }
         if (defined $s_admin_class){
             is ($entry->get_value ('sophomorixAdminClass'),$s_admin_class,

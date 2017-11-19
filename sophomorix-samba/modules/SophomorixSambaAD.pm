@@ -1429,6 +1429,7 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@".$root_dns;
+    my $mail = $login."\@".$root_dns;
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
@@ -1578,6 +1579,7 @@ sub AD_user_create {
                    sn => $surname_utf8,
                    displayName => [$display_name],
                    userPrincipalName => $user_principal_name,
+                   mail => $mail,
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
                    homeDirectory => $homedirectory,

@@ -94,8 +94,9 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 - neues Paket:
   school/share (dito global)
   school/program (dito global)
-
-
+  sophomorixWebuiPermissions
+  sophomorixMailQuotaCalculated
+  mail-attribut wird gefüllt
 
 AD attribute
 webui
@@ -104,9 +105,9 @@ webui
    OK: sophomorixUserPermissions -> sophomorixWebuiPermissions (multi)
    todo: sophomorixWebuiPermissionsCalculated multi
 mailquota:
-sophomorixMailQuota             individueler Wert für user
-sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
-nur beim user
+    OK: sophomorixMailQuota             individueler Wert für user/gruppe
+    OK: sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
+        NUR beim user
 
 
 comment zu mailquota Angaben
