@@ -23,6 +23,44 @@ $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
 #    return \%master;
 
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_auk_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_add_summary
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_dns_get
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_object_search
+                                 AD_get_passwd
+                                 get_forbidden_logins
+                                    );
+
 
 my @arguments = @ARGV;
 
@@ -34,12 +72,16 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 my $backup_samba="";
 my $restore_samba="";
 my $schema_load=0;
 my $restart=0;
 my $stop=0;
 my $start=0;
+
+my $edit_searchflags="";
+my $editor="emacs";
 
 my $samba_private="/var/lib/samba/private";
 my $samba_private_d="/var/lib/samba/private/sam.ldb.d";
@@ -54,12 +96,24 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "backup-samba=s" => \$backup_samba,
            "restore-samba=s" => \$restore_samba,
+           "edit-searchflags=s" => \$edit_searchflags,
+           "editor=s" => \$editor,
            "schema-load" => \$schema_load,
            "start" => \$start,
            "stop" => \$stop,
            "restart" => \$restart,
           );
 
+my %sophomorix_result=&result_sophomorix_init("sophomorix-add");
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt,\%sophomorix_result,$json);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
@@ -86,6 +140,17 @@ Options
 
 If you forgot the suffix look here:
 # ls -l /var/lib/samba/private/*ldb*
+
+
+You shold know exactly what you are doing, if you use the following options:
+
+Editing searchFlags of <attribute> with an editor (default is emacs):
+  --edit-searchflags <attribute> (--editor <nano>|<vi>) 
+    (use hyphenated name for <attribute>)
+  Example
+    --edit-searchflags sophomorix-Comment (--editor vi)
+       searchFlags: 0    -> public visible attribute
+       searchFlags: 128  -> confidential attribute
 
 Please see the sophomorix-add(8) man pages for full documentation
 ');
@@ -146,6 +211,24 @@ if ($schema_load==1){
     print "$command\n";
     system($command);
     &samba_start();
+}
+
+
+# --set-confidential / --set-nonconfidential /
+if ($edit_searchflags ne ""){
+    my $attribute=$edit_searchflags;
+
+    my $command="ldbedit --editor ".$editor." -H /var/lib/samba/private/sam.ldb CN=".
+                $attribute." searchflags --option=\"dsdb:schema update allowed=yes\"".
+                " -b CN=schema,CN=configuration,".$root_dse;
+    print "$command\n";
+
+    system($command);
+
+    #my $ldif="dn: CN=Sophomorix-Comment,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local\n".
+    #         "searchFlags: 1\n";
+
+
 }
 
 

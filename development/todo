@@ -81,25 +81,21 @@ Individueller Teil:
 
 NEXT/Todo:
 
-sophomorix-samba --confidential/notconfidential Sophomorix-First-Password
-
-translates to the command:
+searchFlags (0=public, 128=confidential)
 
 ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchflags --option="dsdb:schema update allowed=yes" -b "cn=schema,CN=configuration,DC=...,DC=..."
 
-? überlebt das einen reboot?
-? reicht das wenn es global verändert wird ?
-? für entwickleroptionen scheint es ok
-? policy: alles confidential, global-admin kann es freischalten
-
-
-- welche Folgen hat das?
+* ist leider etwas umständlich
+* überlebt einen reboot
+* wird global verändert (alle Schulen)?
+* wie geht das/geht das mit ldap-modify?
 
 
 - neues Paket:
-  school/share
-  school/program
-  dito global
+  school/share (dito global)
+  school/program (dito global)
+
+
 
 AD attribute
 webui
