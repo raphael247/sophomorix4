@@ -4257,8 +4257,12 @@ sub AD_get_quota {
     $quota{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'}=0;
     $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'}=0;
     # LISTS of %quota
-    # LISTS->SHARE-><share>->@users  # list which users have quota on the share
-    # LISTS->USER_by_SCHOOL-><school>->@users  # list which users are in which school
+    # LISTS->USER_by_SHARE-><share>->@users  # list which users have quota on the share
+    # LISTS->USER_by_SCHOOL-><school>->@users  # list which users have quota on this school
+    # LISTS->CLASS_by_SHARE-><share>->@users  # list which classes have quota on the share
+    # LISTS->CLASS_by_SCHOOL-><school>->@users  # list which classes have quota on this school
+    # LISTS->PROJECT_by_SHARE-><share>->@users  # list which projects have quota on the share
+    # LISTS->PROJECT_by_SCHOOL-><school>->@users  # list which projects have quota on this school
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -4276,6 +4280,7 @@ sub AD_get_quota {
                              'sophomorixRole',
                              'memberOf',
                              'sophomorixQuota',
+                             'sophomorixMailQuota',
                             ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -4286,6 +4291,7 @@ sub AD_get_quota {
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
         my $school=$entry->get_value('sophomorixSchoolname');
+	my $mailquota = $entry->get_value('sophomorixMailQuota');
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @memberof = $entry->get_value('memberOf');
 #	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
@@ -4309,6 +4315,15 @@ sub AD_get_quota {
 #        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
 
+        # mailquota
+        my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
+        $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
+        if ($mailquota_value ne "---" or $mailquota_comment ne "---"){
+  	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixMailQuota'} }, $mailquota;
+        }                
+
+        # quota
         foreach my $quota (@quota){
 	    my ($share,$value,$oldcalc,$quotastatus,$comment)=split(/:/,$quota);
 	    # remember quota
@@ -4357,6 +4372,7 @@ sub AD_get_quota {
                              'member',
                              'memberOf',
                              'sophomorixQuota',
+                             'sophomorixMailQuota',
                             ]);
     my $max_adminclass = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -4367,6 +4383,7 @@ sub AD_get_quota {
         my $sam=$entry->get_value('sAMAccountName');
         my $type=$entry->get_value('sophomorixType');
         my $school=$entry->get_value('sophomorixSchoolname');
+	my $mailquota = $entry->get_value('sophomorixMailQuota');
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
@@ -4378,6 +4395,15 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixType'}=$type;
 	push @{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$school} }, $sam; 
 
+        # mailquota
+        my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
+        $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
+        $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
+        if ($mailquota_value ne "---" or $mailquota_comment ne "---"){
+    	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixAddQuota'} }, $quota;
+        }                
+
+        # quota
 	foreach my $quota (@quota){
 	    my ($share,$value,$comment)=split(/:/,$quota);
             $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixQuota'}{$share}{'VALUE'}=$value;
@@ -4407,7 +4433,13 @@ sub AD_get_quota {
             # save data about class at user
             $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sAMAccountName'}=$sam;
             $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixType'}=$type;
-	    # save quota about class at user
+
+            # save mailquota for class at user
+            my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
+            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
+            $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
+
+	    # save quota for class at user
 	    foreach my $quota (@quota){
 	        my ($share,$value,$comment)=split(/:/,$quota);
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixQuota'}{$share}{'VALUE'}=$value;
@@ -4443,6 +4475,7 @@ sub AD_get_quota {
                              'member',
                              'memberOf',
                              'sophomorixAddQuota',
+                             'sophomorixAddMailQuota',
                             ]);
     my $max_project = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -4468,6 +4501,7 @@ sub AD_get_quota {
         my $sam=$entry->get_value('sAMAccountName');
         my $type=$entry->get_value('sophomorixType');
         my $school=$entry->get_value('sophomorixSchoolname');
+	my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
 	my @addquota = $entry->get_value('sophomorixAddQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
@@ -4480,6 +4514,16 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixType'}=$type;
 	push @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }, $sam; 
 
+        # addmailquota
+        my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
+        # remember nondefault mailquota
+        if ($addmailquota_value ne "---" or $addmailquota_comment ne "---"){
+  	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'} }, $addmailquota;
+        }                
+
+        # addquota
 	foreach my $addquota (@addquota){
 	    my ($share,$value,$comment)=split(/:/,$addquota);
             $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
@@ -4522,6 +4566,12 @@ sub AD_get_quota {
                 } else {
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'USER'}="TRUE";
                 }
+
+                # save mailquota info at user
+                my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
+
 	        # save quota info at user
 	        foreach my $addquota (@addquota){
 	            my ($share,$value,$comment)=split(/:/,$addquota);
@@ -4545,6 +4595,12 @@ sub AD_get_quota {
                     } else {
                         $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'REASON'}{'CLASS'}="TRUE";
                     }
+
+                    # save mailquota info at user
+                    my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
+                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
+                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
+
 	            # save quota info at user
 	            foreach my $addquota (@addquota){
 	                my ($share,$value,$comment)=split(/:/,$addquota);
