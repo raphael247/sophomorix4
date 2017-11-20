@@ -4281,6 +4281,7 @@ sub AD_get_quota {
                              'memberOf',
                              'sophomorixQuota',
                              'sophomorixMailQuota',
+                             'sophomorixMailQuotaCalculated',
                             ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -4311,11 +4312,14 @@ sub AD_get_quota {
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
         $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}{'SHAREDEFAULT'}=
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'SCHOOLDEFAULT'}=
+            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'mailquota_default'};
 
 #        $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
 
         # mailquota
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}=$entry->get_value('sophomorixMailQuotaCalculated');;
         my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
@@ -4350,8 +4354,7 @@ sub AD_get_quota {
             @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixAddQuota'} }= sort
 	        @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixAddQuota'} };
         }
-
-    }
+    } # end USER quota
 
     # CLASS quota 
     # look for groups with primary membership
@@ -4458,7 +4461,7 @@ sub AD_get_quota {
         #	       $quota{'QUOTA'}{'GROUPS_by_GROUPS'}{$sam}{'sophomorixQuota'}{$share}=$value;
 	#    }
 	#}
-    }
+    } # end CLASS
 
     # PROJECT quota 
     my $filter3="(&".
@@ -4623,8 +4626,9 @@ sub AD_get_quota {
 	        push @member, @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam_project} };
 	    }
 	}
-    }
+    } # end PROJECT quota
 
+    ############################################################
     # update share info in %quota
     my %updated_user=();
     foreach my $user (keys %{ $quota{'QUOTA'}{'USERS'} }) {
@@ -4643,7 +4647,61 @@ sub AD_get_quota {
                 sort @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} };
 	}
 
-        # sum up Addquota from projects for each share
+        ############################################################
+        # sum up AddMailQuota from projects for each share
+        my $mailcalc=1;
+        my $mailproject_sum=0;
+        my $mailproject_string="---";
+         foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+             if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'}){
+                 if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'} ne "---"){
+                     my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'};
+                     $mailproject_sum=$mailproject_sum+$add;
+                     if ($mailproject_string eq "---"){
+                         $mailproject_string=$add;
+                     } else {
+                         $mailproject_string=$mailproject_string."+".$add;
+                     }
+                 }
+             }
+        }
+        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSTRING'}=$mailproject_string;
+        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSUM'}=$mailproject_sum;
+
+        ############################################################
+        # add everything up (mailquota)
+        if ($quota{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'} eq "---"){
+            # start with nothing as quota
+            my $base=$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NOQUOTA'};
+            if ($quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'} ne "---"){
+                $base=$quota{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'};
+            } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'SCHOOLDEFAULT'}){
+                $base=$quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'SCHOOLDEFAULT'};
+            }
+            $mailcalc=$base+$mailproject_sum;
+        } else {
+            $mailcalc=$quota{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'}
+        }
+        # add addmailquota
+        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}=$mailcalc;
+
+        # check for updates
+        if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}){
+            # nothing set
+            $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'}="TRUE";
+            $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'REASON'}{'Not set: sophomorixMailQuotaCalculated'}="TRUE";
+        } else {
+            # sophomorixMailQuotaCalculated defined
+            if ($mailcalc ne $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}){
+               # new caluladed value
+                $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'}="TRUE";
+                $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'REASON'}{'Not set: sophomorixMailQuotaCalculated'}="TRUE";
+            }
+        }
+
+
+        ############################################################
+        # sum up AddQuota from projects for each share
         my $calc=1;
         foreach my $share ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }) {
             my $project_sum=0;
@@ -4652,7 +4710,7 @@ sub AD_get_quota {
 #  	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share}){
 #	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixQuota'}{$share};
   	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'}){
-	        $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'};
+	         $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'};
 	    } else {
                 $quota_user="---";
 	    }
@@ -4681,7 +4739,8 @@ sub AD_get_quota {
 #            $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTSUM'}{$share}=$project_sum;
             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSUM'}=$project_sum;
 
-            # add everything up
+            ############################################################
+            # add everything up (quota)
             if ($quota_user eq "---"){
                 # start with nothing as quota
                 my $base=$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NOQUOTA'};
