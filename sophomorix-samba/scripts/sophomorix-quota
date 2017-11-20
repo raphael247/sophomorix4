@@ -306,12 +306,10 @@ if ($info==1 and $json>0){
     foreach my $school_share (@sharelist){
         if ($user eq ""){
             # use ALL sophomorix users
-#            if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
             if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
                 @userlist=();
 	    } else {
 	        # all users of school
-#	        @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
 	        @userlist = @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share} };
 	    }
         }
@@ -353,7 +351,6 @@ if ($info==1 and $json>0){
             # there are only the users of the school selected ????
 
             # create shortcut vars
-#            my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}{'sophomorixRole'};
             my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
 
             # print user end/share begin line
@@ -367,7 +364,6 @@ if ($info==1 and $json>0){
             ############################################################
             # Walk through all shares
             foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
-  	        #print "   DEBUG: Share: $share\n";
                 # get values for display
                 my $school_default;
 	        my $sharedisplay;
@@ -387,10 +383,6 @@ if ($info==1 and $json>0){
 
                 # get the users quota or --- for display
                 my $quota_user_display;
-#	        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
-#                                        {'sophomorixQuota'}{$share}){
-#	            $quota_user_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'USER'}
-#	                                            {'sophomorixQuota'}{$share};
 	        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}
                                         {$share}{'sophomorixQuota'}){
 	            $quota_user_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}
@@ -408,14 +400,11 @@ if ($info==1 and $json>0){
 	        }
 
                 my $calc_display;
-#                if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
                 if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
                     # append asterisk
-#                    $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}."*";
                     $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'}."*";
                 } else {
                     # append space
-#                    $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share}." ";
                     $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'}." ";
                 }
 
@@ -462,7 +451,6 @@ if ($info==1 and $json>0){
                     }
 
                     # show calc 
-#                    if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
                     if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
                         printf "|%11s%-67s|\n",
                                $calc_display,
@@ -471,12 +459,10 @@ if ($info==1 and $json>0){
                         printf "|%11s%-67s|\n",
                                $calc_display,
                                " CALC was already set for ".$user." on ".$share;
-#                        my $mib=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}/1024;
                         my $mib=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}/1024;
                         printf "|%11s%-67s|\n",
                                "",
                                " SMB share quota was set to ".
-#                               $ref_quota->{'QUOTA'}{'USERS'}{$user}{'QUOTASTATUS'}{$share}." Bytes (".
                                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}." Bytes (".
                                $mib.
                                " MiB)";
@@ -545,12 +531,10 @@ foreach my $school_share (@sharelist){
     &Sophomorix::SophomorixBase::print_title("Setting quota for school $school_share:");
     if ($user eq ""){
         # use ALL sophomorix users
-#        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
         if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
             @userlist=();
 	} else {
 	    # all users of school
-#	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
 	    @userlist = @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share} };
 	}
     }
@@ -606,9 +590,7 @@ foreach my $school_share (@sharelist){
         my $share_count=0;
         foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
             $share_count++;
-#            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'ACTION'}{$share}{'UPDATE'} eq "TRUE"){
             if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
-#                my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CALC'}{$share};
                 my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'};
                 print "      * SET: $share to $quota MiB:\n";
                 if (not exists $user_updated{$user}){
