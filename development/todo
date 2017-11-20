@@ -91,32 +91,11 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 * wie geht das/geht das mit ldap-modify?
 
 
-- neues Paket:
-  school/share (dito global)
-  school/program (dito global)
-  sophomorixWebuiPermissions
-  sophomorixMailQuotaCalculated
-  mail-attribut wird gefüllt
-  Custom attribute hinzugenommen:
-   sophomorixCustom1
-   sophomorixCustom2
-   sophomorixCustom3
-   sophomorixCustom4
-   sophomorixCustom5
-   sophomorixCustomMulti1
-   sophomorixCustomMulti2
-   sophomorixCustomMulti3
-   sophomorixCustomMulti4
-   sophomorixCustomMulti5
-
-
 
 AD attribute
 webui
    * sophomorixWebuiDashboard (voerst single lassen
    * sophomorixWebuiDashboardCalculated (vorerst weglassen)
-   OK: sophomorixUserPermissions -> sophomorixWebuiPermissions (multi)
-   todo: sophomorixWebuiPermissionsCalculated multi
 mailquota:
     OK: sophomorixMailQuota             individueler Wert für user/gruppe
     OK: sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
@@ -128,6 +107,11 @@ mailquota umsetzen (in sophomorix-quota)
 
 testen ob bei developersetquota auch comments gehen,
 wird der user auch upgedated?
+
+man sollte bei quotaangaben auch nur Comment angeben können
+z.B.: kein userquota wegen ... mit --quota bsz:---:Kommentar
+
+(Datum abspeichern bei quotasetzungen??)
 
 
 ordner share,program

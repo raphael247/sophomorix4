@@ -4376,6 +4376,7 @@ sub AD_get_quota {
         # save stuff about classes
   	$quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixType'}=$type;
+	push @{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$school} }, $sam; 
 
 	foreach my $quota (@quota){
 	    my ($share,$value,$comment)=split(/:/,$quota);
@@ -4385,6 +4386,7 @@ sub AD_get_quota {
             if ($value ne "---" or $comment ne "---"){
     		push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} }, $quota;
             }                
+	    push @{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} }, $sam; 
         }
         if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} ){
             # sort list if its there (otherwise empty list is created)
@@ -4476,6 +4478,7 @@ sub AD_get_quota {
         # save stuff about projects
   	$quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixType'}=$type;
+	push @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }, $sam; 
 
 	foreach my $addquota (@addquota){
 	    my ($share,$value,$comment)=split(/:/,$addquota);
@@ -4485,6 +4488,7 @@ sub AD_get_quota {
             if ($value ne "---" or $comment ne "---"){
   	        push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} }, $addquota;
             }                
+	    push @{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }, $sam; 
         }
         if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} ){
             # sort list if its there (otherwise empty list is created)
@@ -4726,6 +4730,42 @@ sub AD_get_quota {
 	@{ $quota{'LISTS'}{'USER_by_SHARE'}{$share} }= 
             sort @{ $quota{'LISTS'}{'USER_by_SHARE'}{$share} };
     }
+    foreach my $share (keys %{ $quota{'LISTS'}{'USER_by_SCHOOL'} }) {
+        # uniquefi and sort users
+	@{ $quota{'LISTS'}{'USER_by_SCHOOL'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'USER_by_SCHOOL'}{$share} });
+	@{ $quota{'LISTS'}{'USER_by_SCHOOL'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'USER_by_SCHOOL'}{$share} };
+    }
+    foreach my $share (keys %{ $quota{'LISTS'}{'CLASS_by_SCHOOL'} }) {
+        # uniquefi and sort users
+	@{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$share} });
+	@{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$share} };
+    }
+    foreach my $share (keys %{ $quota{'LISTS'}{'CLASS_by_SHARE'} }) {
+        # uniquefi and sort users
+	@{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} });
+	@{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} };
+    }
+    foreach my $share (keys %{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'} }) {
+        # uniquefi and sort users
+	@{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} });
+	@{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} };
+    }
+    foreach my $share (keys %{ $quota{'LISTS'}{'PROJECT_by_SHARE'} }) {
+        # uniquefi and sort users
+	@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} });
+	@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} };
+    }
+
     return(\%quota);
 }
 

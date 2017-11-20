@@ -103,7 +103,7 @@ my $testopt=GetOptions(
            "user|u=s" => \$user,
            "developer-setquota=s" => \$developer_setquota,
            "show|F" => \$show,
-           "show-nondefault" => \$show_nondefault,
+           "n|nondefault|show-nondefault" => \$show_nondefault,
            "list|L" => \$list,
            "default-quota|FSQLIM=s" => \$default_quota,
           );
@@ -138,7 +138,7 @@ show sophomorix info about quota calculation
   show info about all school-shares
     -i  / --info
   show info about quota that differ from default
-    --show-nondefault
+    -n / --nondefault / --show-nondefault
   show info about a school or another share 
     -s <school>/<sharename> / --school <school>/<sharename> / --share <school>/<sharename>
   limit the output to some users
@@ -255,11 +255,28 @@ my $ref_quota=&AD_get_quota({ldap=>$ldap,
 # print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
 # print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
 
+# --nondefault / --show-nondefault
 if ($show_nondefault==1){
-    foreach my $school_share (@sharelist){
-    print "\n";
-    &Sophomorix::SophomorixBase::print_title("Nondefault quota of school $school_share:");
-    
+    foreach my $school (@sharelist){
+        &Sophomorix::SophomorixBase::print_title("Nondefault quota of school $school:");
+        foreach my $class ( @{ $ref_quota->{'LISTS'}{'CLASS_by_SCHOOL'}{$school} }){
+            #print "CLASS: $class\n";
+            foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$class}{'sophomorixQuota'} }){
+	        print "  CLASS: $class --> $quota\n";
+	    }            
+        }
+        foreach my $project ( @{ $ref_quota->{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }){
+            #print "PROJECT: $project\n";
+            foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$project}{'sophomorixAddQuota'} }){
+	        print "  PROJECT: $project --> $quota\n";
+	    }
+        }
+        foreach my $user ( @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
+            #print "USER: $user\n";
+            foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$user}{'sophomorixQuota'} }){
+	        print "  USER: $user --> $quota\n";
+	    }
+        }
     }
     exit;
 }
