@@ -158,7 +158,7 @@ my $testopt=GetOptions(
        "u|user=s" => \$user,
        "comment=s" => \$comment,
        "quota=s" => \$quota,
-       "mailquota=i" => \$mailquota,
+       "mailquota=s" => \$mailquota,
        "webui-dashboard=s" => \$webui_dashboard,
        "webui-permissions=s" => \$webui_permissions,
        "add-webui-permissions=s" => \$add_webui_permissions,
@@ -234,8 +234,8 @@ These are done by the automatic workflow, you shold not need them
 
 Updating Quota/MailQuota of a user:
     --quota <linuxmuster-global>:<number(MiB)>:<comment>,
-            <school1>:<number1(MiB)><comment1>,...
-    --mailquota number
+            <share1>:<quota1 in MiB>:<comment1>,...
+    --mailquota <mailquota in MiB)>:<comment>
 
 
 Updating comment of a user:

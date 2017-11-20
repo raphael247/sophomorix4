@@ -115,7 +115,7 @@ my $testopt=GetOptions(
            "school=s" => \$school,
            "description=s" => \$description,
            "quota=s" => \$quota,
-           "mailquota=i" => \$mailquota,
+           "mailquota=s" => \$mailquota,
            "status=s" => \$status,
            "maxmembers=s" => \$maxmembers,
            "creationdate=s" => \$creationdate,
@@ -165,7 +165,7 @@ Changing an adminclass:
   (can set values also for the group teachers with --class teachers)
     --description \'multiple words possible\'
     --quota <share1>:<quota1 in MiB>:<comment1>,<share2>:<quota2 in MiB>:<comment2>,...
-    --mailquota number
+    --mailquota <mailquota in MiB>:<Comment>
     --mailalias, --nomailalias
     --maillist, --nomaillist 
     --status <letter>

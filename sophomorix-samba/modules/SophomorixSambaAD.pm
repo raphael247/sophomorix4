@@ -1596,7 +1596,7 @@ sub AD_user_create {
                    sophomorixRole => $role,
                    sophomorixQuota=>["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:",
                                      "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:"],
-                   sophomorixMailQuota=>"-1",
+                   sophomorixMailQuota=>"---:---:",
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate, 
@@ -2055,15 +2055,15 @@ sub AD_user_update {
     }
 
     # mailquota
-    if (defined $mailquota and $mailquota ne ""){
-        if ($mailquota=~/[^0-9]/ and $value=!-1){
-            print "\nERROR: MailQuota value $mailquota does not consist ",
-                  "of numerals 0-9 or is \"-1\"\n\n";
-	    exit;
-	} else {
-            $replace{'sophomorixMailQuota'}=$mailquota;
-            print "   sophomorixMailQuota:        $mailquota\n";
-	}
+    if (defined $mailquota){
+	print "HERE: $mailquota\n";
+        my ($value,$comment)=split(/:/,$mailquota);
+        if (not defined $comment){
+            $comment="---";
+        }
+        my $mailquota_new=$value.":".$comment.":";
+        $replace{'sophomorixMailQuota'}=$mailquota_new;
+        print "   sophomorixMailQuota:        $mailquota_new\n";
     }
     
     # status
@@ -5454,13 +5454,23 @@ sub AD_group_update {
     
     # mailquota   
     if (defined $mailquota){
-        print "   * Setting sophomorixMailquota to $mailquota\n";
-        my $mesg = $ldap->modify($dn,replace => {sophomorixMailquota => $mailquota}); 
+        my ($value,$comment)=split(/:/,$mailquota);
+        if (not defined $comment){
+            $comment="---";
+        }
+        my $mailquota_new=$value.":".$comment.":";
+        print "   * Setting sophomorixMailquota to $mailquota_new\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixMailquota => $mailquota_new}); 
     }
     # addmailquota   
     if (defined $addmailquota){
-        print "   * Setting sophomorixAddmailquota to $addmailquota\n";
-        my $mesg = $ldap->modify($dn,replace => {sophomorixAddmailquota => $addmailquota}); 
+        my ($value,$comment)=split(/:/,$addmailquota);
+        if (not defined $comment){
+            $comment="---";
+        }
+        my $addmailquota_new=$value.":".$comment.":";
+        print "   * Setting sophomorixAddmailquota to $addmailquota_new\n";
+        my $mesg = $ldap->modify($dn,replace => {sophomorixAddmailquota => $addmailquota_new}); 
     }
     # mailalias   
     if (defined $mailalias){
@@ -6052,9 +6062,9 @@ sub AD_group_create {
                                     sophomorixStatus => $status,
                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
                                                         "$school:---:---:"],
-                                    sophomorixAddMailQuota => ["---"],
+                                    sophomorixAddMailQuota => ["---:---:"],
                                     sophomorixQuota => "---",
-                                    sophomorixMailQuota => "-1",
+                                    sophomorixMailQuota => "---",
                                     sophomorixMaxMembers => "0",
                                     sophomorixMailAlias => "FALSE",
                                     sophomorixMailList => "FALSE",
@@ -6080,7 +6090,7 @@ sub AD_group_create {
                                     sophomorixAddMailQuota => "---",
                                     sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
                                                         "$school:---:---:"],
-                                    sophomorixMailQuota => "-1",
+                                    sophomorixMailQuota => "---:---:",
                                     sophomorixMaxMembers => "0",
                                     sophomorixMailAlias => "FALSE",
                                     sophomorixMailList => "FALSE",
@@ -6529,6 +6539,7 @@ sub AD_examuser_create {
         $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
     }
     my $user_principal_name = $examuser."\@".$root_dns;
+    my $mail = $examuser."\@".$root_dns;
 
     # create OU for session
     my $dn_session;
@@ -6605,6 +6616,7 @@ sub AD_examuser_create {
                    sn => $lastname_utf8_AD,
                    displayName => [$display_name],
                    userPrincipalName => $user_principal_name,
+                   mail => $mail,
                    unicodePwd => $uni_password,
                    homeDrive => "H:",
                    homeDirectory => $homedirectory,
