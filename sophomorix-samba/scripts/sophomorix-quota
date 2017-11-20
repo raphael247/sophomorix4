@@ -86,6 +86,8 @@ my $user="";
 my $developer_setquota="";
 $Conf::log_level=1;
 
+my $show_nondefault=0;
+
 # smbcquotas options
 my $list=0;
 my $show=0;
@@ -101,6 +103,7 @@ my $testopt=GetOptions(
            "user|u=s" => \$user,
            "developer-setquota=s" => \$developer_setquota,
            "show|F" => \$show,
+           "show-nondefault" => \$show_nondefault,
            "list|L" => \$list,
            "default-quota|FSQLIM=s" => \$default_quota,
           );
@@ -134,6 +137,8 @@ Options
 show sophomorix info about quota calculation
   show info about all school-shares
     -i  / --info
+  show info about quota that differ from default
+    --show-nondefault
   show info about a school or another share 
     -s <school>/<sharename> / --school <school>/<sharename> / --share <school>/<sharename>
   limit the output to some users
@@ -250,6 +255,15 @@ my $ref_quota=&AD_get_quota({ldap=>$ldap,
 # print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
 # print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
 
+if ($show_nondefault==1){
+    foreach my $school_share (@sharelist){
+    print "\n";
+    &Sophomorix::SophomorixBase::print_title("Nondefault quota of school $school_share:");
+    
+    }
+    exit;
+}
+
 if ($info==1 and $json>0){
     # --info --json
     &json_dump({json => $json,
@@ -269,11 +283,13 @@ if ($info==1 and $json>0){
     foreach my $school_share (@sharelist){
         if ($user eq ""){
             # use ALL sophomorix users
-            if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
+#            if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
+            if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
                 @userlist=();
 	    } else {
 	        # all users of school
-	        @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
+#	        @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
+	        @userlist = @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share} };
 	    }
         }
 
@@ -493,8 +509,8 @@ if($developer_setquota ne "" and $user ne ""){
 
 
 # continue with the calculated quota
-#print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'gal23'});
-#exit;
+print Dumper($ref_quota->{'NONDEFAULT_QUOTA'});
+exit;
 
 my %user_updated=();
 my $user_count=0;
@@ -503,11 +519,13 @@ foreach my $school_share (@sharelist){
     &Sophomorix::SophomorixBase::print_title("Setting quota for school $school_share:");
     if ($user eq ""){
         # use ALL sophomorix users
-        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
+#        if (not exists $ref_quota->{'LISTS'}{'USER'}{$school_share}){
+        if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
             @userlist=();
 	} else {
 	    # all users of school
-	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
+#	    @userlist = @{ $ref_quota->{'LISTS'}{'USER'}{$school_share} };
+	    @userlist = @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share} };
 	}
     }
 

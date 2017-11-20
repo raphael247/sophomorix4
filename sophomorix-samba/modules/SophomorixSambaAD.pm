@@ -4258,7 +4258,7 @@ sub AD_get_quota {
     $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'}=0;
     # LISTS of %quota
     # LISTS->SHARE-><share>->@users  # list which users have quota on the share
-    # LISTS->USER-><school>->@users  # list which users are in which school
+    # LISTS->USER_by_SCHOOL-><school>->@users  # list which users are in which school
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -4288,7 +4288,8 @@ sub AD_get_quota {
         my $school=$entry->get_value('sophomorixSchoolname');
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @memberof = $entry->get_value('memberOf');
-	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
+#	push @{ $quota{'LISTS'}{'USER'}{$school} }, $sam; 
+	push @{ $quota{'LISTS'}{'USER_by_SCHOOL'}{$school} }, $sam; 
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
@@ -4309,21 +4310,32 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
 
         foreach my $quota (@quota){
-	        my ($share,$value,$oldcalc,$quotastatus,$comment)=split(/:/,$quota);
-		# remember quota
-#  		$quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'sophomorixQuota'}=$value;
-#  		$quota{'QUOTA'}{'USERS'}{$sam}{'OLDCALC'}{$share}=$oldcalc;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'OLDCALC'}=$oldcalc;
-#  		$quota{'QUOTA'}{'USERS'}{$sam}{'QUOTASTATUS'}{$share}=$quotastatus;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'QUOTASTATUS'}=$quotastatus;
-#  		$quota{'QUOTA'}{'USERS'}{$sam}{'COMMENT'}{$share}=$comment;
-  		$quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'COMMENT'}=$comment;
-		# remember share for later listing
-		push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
-                # remember on which share have which users quota settings
-		push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam;                
+	    my ($share,$value,$oldcalc,$quotastatus,$comment)=split(/:/,$quota);
+	    # remember quota
+#  	    $quota{'QUOTA'}{'USERS'}{$sam}{'USER'}{'sophomorixQuota'}{$share}=$value;
+  	    $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'sophomorixQuota'}=$value;
+#  	    $quota{'QUOTA'}{'USERS'}{$sam}{'OLDCALC'}{$share}=$oldcalc;
+  	    $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'OLDCALC'}=$oldcalc;
+#  	    $quota{'QUOTA'}{'USERS'}{$sam}{'QUOTASTATUS'}{$share}=$quotastatus;
+  	    $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'QUOTASTATUS'}=$quotastatus;
+#  	    $quota{'QUOTA'}{'USERS'}{$sam}{'COMMENT'}{$share}=$comment;
+  	    $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$share}{'COMMENT'}=$comment;
+	    # remember share for later listing
+	    push @{ $quota{'QUOTA'}{'USERS'}{$sam}{'SHARELIST'} }, $share;
+            # remember on which share have which users quota settings
+#	    push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam;
+	    push @{ $quota{'LISTS'}{'USER_by_SHARE'}{$share}}, $sam;
+            # remember nondefault quota
+            if ($value ne "---" or $comment ne "---"){
+    		push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixQuota'} }, $quota;
+            }                
         }
+        if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixAddQuota'} ){
+            # sort list if its there (otherwise empty list is created)
+            @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixAddQuota'} }= sort
+	        @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixAddQuota'} };
+        }
+
     }
 
     # CLASS quota 
@@ -4369,6 +4381,15 @@ sub AD_get_quota {
 	    my ($share,$value,$comment)=split(/:/,$quota);
             $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixQuota'}{$share}{'VALUE'}=$value;
             $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixQuota'}{$share}{'COMMENT'}=$comment;
+            # remember nondefault quota
+            if ($value ne "---" or $comment ne "---"){
+    		push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} }, $quota;
+            }                
+        }
+        if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} ){
+            # sort list if its there (otherwise empty list is created)
+            @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} }= sort
+	        @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} };
         }
 
         foreach my $member (@member){
@@ -4392,7 +4413,8 @@ sub AD_get_quota {
 		# remember share for later listing
 		push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
                 # remember on which share have which users quota settings
-		push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam_user;                
+#		push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $sam_user;  
+		push @{ $quota{'LISTS'}{'USER_by_SHARE'}{$share}}, $sam_user;  
 	    }
 	}
         #foreach my $memberof (@memberof){
@@ -4429,6 +4451,7 @@ sub AD_get_quota {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
+        my $school=$entry->get_value('sophomorixSchoolname');
 	my @member = $entry->get_value('member');
         $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'DN_by_sAMAccountName'}{$sam}=$dn;
@@ -4458,6 +4481,15 @@ sub AD_get_quota {
 	    my ($share,$value,$comment)=split(/:/,$addquota);
             $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
             $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
+            # remember nondefault quota
+            if ($value ne "---" or $comment ne "---"){
+  	        push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} }, $addquota;
+            }                
+        }
+        if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} ){
+            # sort list if its there (otherwise empty list is created)
+            @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} }= sort
+	        @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} };
         }
 
 	my $count_initial_member=$#member+1;
@@ -4518,7 +4550,8 @@ sub AD_get_quota {
 		        # remember share for later listing
 		        push @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }, $share;
                         # remember on which share have which users quota settings
-	    	        push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $user;                
+#	    	        push @{ $quota{'LISTS'}{'SHARE'}{$share}}, $user;                
+	    	        push @{ $quota{'LISTS'}{'USER_by_SHARE'}{$share}}, $user;                
 	            }
 		}
 	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member}){
@@ -4681,13 +4714,17 @@ sub AD_get_quota {
     } # end user
     
     # uniquify and sort sharelist at all users
-    foreach my $share (keys %{ $quota{'LISTS'}{'SHARE'} }) {
+#    foreach my $share (keys %{ $quota{'LISTS'}{'SHARE'} }) {
+    foreach my $share (keys %{ $quota{'LISTS'}{'USER_by_SHARE'} }) {
         # uniquefi and sort users
-	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
-            uniq(@{ $quota{'LISTS'}{'SHARE'}{$share} });
-	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
-            sort @{ $quota{'LISTS'}{'SHARE'}{$share} };
-
+#	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
+#            uniq(@{ $quota{'LISTS'}{'SHARE'}{$share} });#
+#	@{ $quota{'LISTS'}{'SHARE'}{$share} }= 
+#            sort @{ $quota{'LISTS'}{'SHARE'}{$share} };
+	@{ $quota{'LISTS'}{'USER_by_SHARE'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'USER_by_SHARE'}{$share} });
+	@{ $quota{'LISTS'}{'USER_by_SHARE'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'USER_by_SHARE'}{$share} };
     }
     return(\%quota);
 }
