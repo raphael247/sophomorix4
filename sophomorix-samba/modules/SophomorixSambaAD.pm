@@ -1846,6 +1846,7 @@ sub AD_user_update {
     my $quota_calc = $arg_ref->{quota_calc};
     my $quota_info = $arg_ref->{quota_info};
     my $mailquota = $arg_ref->{mailquota};
+    my $mailquota_calc = $arg_ref->{mailquota_calc};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
     my $hide_pwd = $arg_ref->{hide_pwd};
@@ -2056,7 +2057,6 @@ sub AD_user_update {
 
     # mailquota
     if (defined $mailquota){
-	print "HERE: $mailquota\n";
         my ($value,$comment)=split(/:/,$mailquota);
         if (not defined $comment){
             $comment="---";
@@ -2064,6 +2064,13 @@ sub AD_user_update {
         my $mailquota_new=$value.":".$comment.":";
         $replace{'sophomorixMailQuota'}=$mailquota_new;
         print "   sophomorixMailQuota:        $mailquota_new\n";
+    }
+    
+    # mailquota_calc
+    if (defined $mailquota_calc){
+	print "HERE: $mailquota_calc\n";
+        $replace{'sophomorixMailQuotaCalculated'}=$mailquota_calc;
+        print "   sophomorixMailQuotaCalculated:        $mailquota_calc\n";
     }
     
     # status
@@ -4256,6 +4263,7 @@ sub AD_get_quota {
     my %quota=();
     $quota{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'}=0;
     $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'}=0;
+    $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERMAILQUOTA'}=0;
     # LISTS of %quota
     # LISTS->USER_by_SHARE-><share>->@users  # list which users have quota on the share
     # LISTS->USER_by_SCHOOL-><school>->@users  # list which users have quota on this school
@@ -4697,6 +4705,15 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'}="TRUE";
                 $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'REASON'}{'Not set: sophomorixMailQuotaCalculated'}="TRUE";
             }
+        }
+        # update user counter
+        if (defined $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} and
+                $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+            $quota{'QUOTA'}{'UPDATE_COUNTER'}{'USERMAILQUOTA'}++;
+	}
+        # FALSE if not set to TRUE
+        if (not exists $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'}){
+                $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'}="FALSE";
         }
 
 
