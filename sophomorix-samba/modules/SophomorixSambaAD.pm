@@ -2068,7 +2068,6 @@ sub AD_user_update {
     
     # mailquota_calc
     if (defined $mailquota_calc){
-	print "HERE: $mailquota_calc\n";
         $replace{'sophomorixMailQuotaCalculated'}=$mailquota_calc;
         print "   sophomorixMailQuotaCalculated:        $mailquota_calc\n";
     }

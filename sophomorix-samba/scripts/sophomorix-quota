@@ -94,6 +94,13 @@ my $list=0;
 my $show=0;
 my $default_quota="";
 
+# set quota option
+my $set_quota=1;
+my $set_mailquota=1;
+
+my $set_quota_only=0;
+my $set_mailquota_only=0;
+
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -107,6 +114,8 @@ my $testopt=GetOptions(
            "n|nondefault|show-nondefault" => \$show_nondefault,
            "list|L" => \$list,
            "default-quota|FSQLIM=s" => \$default_quota,
+           "set-quota-only" => \$set_quota_only,
+           "set-mailquota-only" => \$set_mailquota_only,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -128,41 +137,46 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
-sophomorix-quota sets filesystem quota and mailquota
+sophomorix-quota sets SMB-Share-Quota(=Quota) and MailQuota
+
+  * Quota is set with the smbcquotas command from samba
+  * MailQuota sets the attribute sophomorixMailQuotaCalculated
+    (for use by )
 
 Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
 
-show sophomorix info about quota calculation
-  show info about all school-shares
+Show sophomorix info about quota calculation
+  Show info about all school-shares:
     -i  / --info
-  show info about quota that differ from default
+  Show info about quota that differ from default:
     -n / --nondefault / --show-nondefault
-  show info about a school or another share 
+  Show info about a school or another share:
     -s <school>/<sharename> / --school <school>/<sharename> / --share <school>/<sharename>
-  limit the output to some users
+  Limit the output to some users:
     -u / --user <user1>,<user2>,... 
   
-
+Setting the user Quota/MailQuota
+  set Quota AND MailQuota
+    sophomorix-quota
+  set Quota only:
+    sophomorix-quota --set-quota-only
+  set MailQuota only:
+    sophomorix-quota --set-mailquota-only
 
 Set a users quota manually (in AD AND on smbshare):
-
   sophomorix-quota --developer-setquota <share>:<num(MiB)> -u <user>
 
-
 smbcquotas wrappers:
-
   List quota of the users on a school/share:
     sophomorix-quota --share <sharename> -L
     sophomorix-quota --share <sharename> --list
-
   Show quota quota settings of a school/share:
     sophomorix-quota --share <sharename> -F
     sophomorix-quota --share <sharename> --show
-
-  Set default quota on smb-share
+  Set default quota on smb-share:
      sophomorix-quota --share <sharename> --default-quota <softlimit>/<hardlimit>
 
 Please see the sophomorix-quota(8) man pages for full documentation
@@ -170,6 +184,7 @@ Please see the sophomorix-quota(8) man pages for full documentation
    print "\n";
    exit;
 }
+
 
 
 
@@ -520,15 +535,30 @@ if($developer_setquota ne "" and $user ne ""){
 #print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri23'});
 #exit;
 
+################################################################################
+# continue with the calculated quota from $ref_quota
+################################################################################
 
-# continue with the calculated quota
-############################################################
-my %user_updated=();
-my $user_count=0;
-my $mail_user_count=0;
-&Sophomorix::SophomorixBase::print_title("Setting Quota of the following users:");
+# --set-quota-only
+if ($set_quota_only==1){
+    # do not set other stuff
+    $set_mailquota=0;
+}
+
+
+# --set-mailquota-only
+if ($set_mailquota_only==1){
+    # do not set other stuff
+    $set_quota=0;
+}
+
+my %user_updated=(); # make sure user is not updated twice
+my $user_count=0; # count the users for progression output 
+my $mail_user_count=0; # count the users for progression output
+
+&Sophomorix::SophomorixBase::print_title("Setting Quota/MailQuota of the following users:");
 foreach my $school_share (@sharelist){
-    &Sophomorix::SophomorixBase::print_title("Setting quota for school $school_share:");
+    &Sophomorix::SophomorixBase::print_title("Setting Quota/MailQuota for school $school_share:");
     if ($user eq ""){
         # use ALL sophomorix users
         if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
@@ -538,113 +568,121 @@ foreach my $school_share (@sharelist){
 	    @userlist = @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share} };
 	}
     }
-
     if($#userlist==-1){
         print "     0 sophomorix users in school $school_share\n";
         next;
     }
 
 
-    ############################################################
-    # Walk through users for MailQuota
-    foreach my $user (@userlist){
-        if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
-            print "  WARNING: User $user not found!\n";
-            next;
-        }
-        print "   * User $user:\n";
+    if ($set_mailquota==1){
         ############################################################
-        # set user MailQuota
-        if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
-            $mail_user_count++;
-            my $mailquota_calc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
-            print "      * SET: sophomorixMailQuotaCalculated to $mailquota_calc MiB:\n";
-            my $dn=$ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$user};
-            &AD_user_update({ldap=>$ldap,
-                             root_dse=>$root_dse,
-                             dn=>$dn,
-                             user=>$user,
-                             mailquota_calc=>$mailquota_calc,
-                             user_count=>$mail_user_count,
-                             max_user_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'MAILQUOTA'},
-                             json=>$json,
-                             sophomorix_config=>\%sophomorix_config,
-                             sophomorix_result=>\%sophomorix_result,
-                           });
-        } else {
-            print "      *  OK: sophomorixMailQuotaCalculated\n";
-	}
-    }
-
-
-    ############################################################
-    # Walk through users for Quota
-    foreach my $user (@userlist){
-        if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
-            print "  WARNING: User $user not found!\n";
-            next;
-        }
-        print "   * User $user:\n";
-        ############################################################
-        # Walk through all shares
-        my $share_count=0;
-        foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
-            $share_count++;
-            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
-                my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'};
-                print "      * SET: $share to $quota MiB:\n";
-                if (not exists $user_updated{$user}){
-                    $user_updated{$user}="seen";
-                    $user_count++;
-                }
-
-                &AD_user_setquota({ldap=>$ldap,
-                                   root_dse=>$root_dse,
-                                   root_dns=>$root_dns,
-                                   user=>$user,
-                                   user_count=>$user_count,
-                                   max_user_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'},
-                                   share_count=>$share_count,
-                                   max_share_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'},
-                                   share=>$share,
-                                   quota=>$quota,
-                                   smb_admin_pass=>$smb_admin_pass, 
-                                   debug_level=>$debug_level,
-                                   json=>$json,
-                                   sophomorix_result=>\%sophomorix_result,
-                                   sophomorix_config=>\%sophomorix_config,
-                                 });
-                print "\n";
+        # Walk through users for MailQuota
+        foreach my $user (@userlist){
+            if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+                print "  WARNING: User $user not found!\n";
+                next;
+            }
+            print "   * User $user:\n";
+            ############################################################
+            # set user MailQuota
+            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+                $mail_user_count++;
+                my $mailquota_calc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
+                print "      * SET: sophomorixMailQuotaCalculated to $mailquota_calc MiB:\n";
+                my $dn=$ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$user};
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$dn,
+                                 user=>$user,
+                                 mailquota_calc=>$mailquota_calc,
+                                 user_count=>$mail_user_count,
+                                 max_user_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'MAILQUOTA'},
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                               });
             } else {
-                print "      * OK:  $share\n";
+                print "      *  OK: sophomorixMailQuotaCalculated\n";
+	    }
+        }
+    } # set mailquota end
+
+
+    if ($set_quota==1){
+        ############################################################
+        # Walk through users for Quota
+        foreach my $user (@userlist){
+            if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+                print "  WARNING: User $user not found!\n";
+                next;
+            }
+            print "   * User $user:\n";
+            ############################################################
+            # Walk through all shares
+            my $share_count=0;
+            foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+                $share_count++;
+                if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
+                    my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'};
+                    print "      * SET: $share to $quota MiB:\n";
+                    if (not exists $user_updated{$user}){
+                        $user_updated{$user}="seen";
+                        $user_count++;
+                    }
+                    &AD_user_setquota({ldap=>$ldap,
+                                       root_dse=>$root_dse,
+                                       root_dns=>$root_dns,
+                                       user=>$user,
+                                       user_count=>$user_count,
+                                       max_user_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'USERS'},
+                                       share_count=>$share_count,
+                                       max_share_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'SHARES'},
+                                       share=>$share,
+                                       quota=>$quota,
+                                       smb_admin_pass=>$smb_admin_pass, 
+                                       debug_level=>$debug_level,
+                                       json=>$json,
+                                       sophomorix_result=>\%sophomorix_result,
+                                       sophomorix_config=>\%sophomorix_config,
+                                     });
+                    print "\n";
+                } else {
+                    print "      * OK:  $share\n";
+                }
             }
         }
-    }
+    } # set quota end
 }
+
+
 #    print Dumper($ref_quota);
 
 
-&result_sophomorix_add_summary({
-                     NAME=>"UPDATED MAILQUOTA", 
-                     RESULT=>$mail_user_count, 
-                     RESULT_TYPE => "integer",
-                     DESCRIPTION_POST => "users mailquota updated", 
-                     DESCRIPTION_PRE => "users with updated mailquota", 
-                     FORMAT_TYPE => 1,
-                     sophomorix_result=>\%sophomorix_result,
-			       });
+# add result mailquota
+if ($set_mailquota==1){
+    &result_sophomorix_add_summary({
+        NAME=>"UPDATED MAILQUOTA", 
+        RESULT=>$mail_user_count, 
+        RESULT_TYPE => "integer",
+        DESCRIPTION_POST => "users mailquota updated", 
+        DESCRIPTION_PRE => "users with updated mailquota", 
+        FORMAT_TYPE => 1,
+        sophomorix_result=>\%sophomorix_result,
+      });
+}
 
-&result_sophomorix_add_summary({
-                     NAME=>"UPDATED QUOTA", 
-                     RESULT=>$user_count, 
-                     RESULT_TYPE => "integer",
-                     DESCRIPTION_POST => "users smbquota updated", 
-                     DESCRIPTION_PRE => "users with updated smbquota", 
-                     FORMAT_TYPE => 1,
-                     sophomorix_result=>\%sophomorix_result,
-			       });
-
-
+# add result quota
+if ($set_quota==1){
+    &result_sophomorix_add_summary({
+        NAME=>"UPDATED QUOTA", 
+        RESULT=>$user_count, 
+        RESULT_TYPE => "integer",
+        DESCRIPTION_POST => "users smbquota updated", 
+        DESCRIPTION_PRE => "users with updated smbquota", 
+        FORMAT_TYPE => 1,
+        sophomorix_result=>\%sophomorix_result,
+      });
+}
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
