@@ -163,7 +163,7 @@ if ($add_pro==1){
 
     # projects in OU=bsz
     &run_command("sophomorix-project $all_options --create -p mathe23 --school bsz");
-    &run_command("sophomorix-project $all_options --create -p Chemie-AG23 --school bsz --description 'Chemie AG des Gymnasiums' --addquota \"bsz:333:Chemie Datenbank,linuxmuster-global:444\" --addmailquota 200 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
+    &run_command("sophomorix-project $all_options --create -p Chemie-AG23 --school bsz --description 'Chemie AG des Gymnasiums' --addquota \"bsz:333:Chemie Datenbank,linuxmuster-global:444\" --addmailquota 210 --mailalias --maillist --status G --join --nohide --maxmembers 36 --admins oe23,wu23 --members maiersa23,muellegr23 --membergroups bsz-m7ab,bsz-m8cd --admingroups uni-teachers");
     # projects in OU=default-school
     &run_command("sophomorix-project $all_options --create -p mathe23");
     &run_command("sophomorix-project $all_options --create -p Chemie-AG23");
@@ -174,6 +174,9 @@ if ($add_pro==1){
     # groups in OU=default-school
     &run_command("sophomorix-group $all_options --create --group super12");
     &run_command("sophomorix-group $all_options --create --group super13");
+
+    # setting Mailquota now
+    &run_command("sophomorix-quota $all_options --set-mailquota-only");
 }
 
 ############################################################
@@ -203,6 +206,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Sarina",
                    sophomorixSurnameASCII  => "Maier",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"362",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -263,6 +269,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Gregor",
                    sophomorixSurnameASCII  => "Mueller",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"362",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -323,6 +332,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Adalradur",
                    sophomorixSurnameASCII  => "Jonsson",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"362",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -383,6 +395,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Zeljko",
                    sophomorixSurnameASCII  => "Samardzic",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"362",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.students.csv",
@@ -443,6 +458,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Goekhan",
                    sophomorixSurnameASCII  => "Oemuer",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"512",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.teachers.csv",
@@ -491,6 +509,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Desiree",
                    sophomorixSurnameASCII  => "Wuerth",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"512",
                    sophomorixSchoolPrefix => "bsz",
                    sophomorixSchoolname => "bsz",
                    sophomorixAdminFile => "bsz.teachers.csv",
@@ -539,6 +560,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Richard",
                    sophomorixSurnameASCII  => "Blackmore",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"uni:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"158",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.students.csv",
@@ -599,6 +623,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Jon",
                    sophomorixSurnameASCII  => "Lord",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"uni:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"158",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.students.csv",
@@ -659,6 +686,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Johannes",
                    sophomorixSurnameASCII  => "Kepler",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"uni:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"518",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.teachers.csv",
@@ -707,6 +737,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Galileo",
                    sophomorixSurnameASCII  => "Galilei",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"uni:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"518",
                    sophomorixSchoolPrefix => "uni",
                    sophomorixSchoolname => "uni",
                    sophomorixAdminFile => "uni.teachers.csv",
@@ -753,6 +786,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Marina",
                    sophomorixSurnameASCII  => "Schneider",
                    sophomorixRole => "student",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"156",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "students.csv",
@@ -811,6 +847,9 @@ if ($test_add_pro==1){
                    sophomorixFirstnameASCII => "Michael",
                    sophomorixSurnameASCII  => "Schaefer",
                    sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"306",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "teachers.csv",
@@ -978,7 +1017,7 @@ if ($test_add_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"bsz:333:Chemie Datenbank:|linuxmuster-global:444:---:",
-                   sophomorixAddMailQuota=>"200:---:",
+                   sophomorixAddMailQuota=>"210:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"G",
@@ -1238,6 +1277,7 @@ if ($test_add_pro==1){
 # --mod-pro  
 if ($mod_pro==1){
 
+
     # --description
     &run_command("sophomorix-project $all_options -p mathe23 --description 'Mathe23 Grundschule'");
     &AD_test_object({ldap=>$ldap,
@@ -1373,35 +1413,6 @@ if ($mod_pro==1){
                    member => "",
                    memberOf => "",
                   });
-    # --addmailquota (1) 
-    &run_command("sophomorix-project $all_options -p mathe23 --addmailquota 366");
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"p_mathe23",
-                   gidNumber=>"-1",
-                   description=>"Mathe23 Grundschule",
-                   sophomorixType=>"project",
-                   sophomorixQuota=>"---",
-                   sophomorixMailQuota=>"---",
-                   sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
-                   sophomorixMailAlias=>"FALSE",
-                   sophomorixMailList=>"FALSE",
-                   sophomorixStatus=>"P",
-                   sophomorixJoinable=>"FALSE",
-                   sophomorixMaxMembers=>"0",
-                   sophomorixCreationDate => "exists",
-                   sophomorixAdmins => "",
-                   sophomorixMembers => "",
-                   sophomorixAdminGroups => "",
-                   sophomorixMemberGroups => "",
-                   sophomorixHidden=>"FALSE",
-                   sophomorixSchoolname => "default-school",
-                   member => "",
-                   memberOf => "",
-                  });
-    #&run_command("sophomorix-quota $all_options --set-mailquota-only");
-
     # --mailalias
     &run_command("sophomorix-project $all_options -p mathe23 --mailalias");
     &AD_test_object({ldap=>$ldap,
@@ -1413,7 +1424,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
@@ -1440,7 +1451,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"P",
@@ -1467,7 +1478,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1494,7 +1505,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1521,7 +1532,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1548,7 +1559,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1576,7 +1587,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1605,7 +1616,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1632,7 +1643,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1659,7 +1670,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1686,7 +1697,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1715,7 +1726,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1742,7 +1753,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1769,7 +1780,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1796,7 +1807,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1825,7 +1836,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1852,7 +1863,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1879,7 +1890,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1906,7 +1917,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1935,7 +1946,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1962,7 +1973,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -1989,7 +2000,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -2016,7 +2027,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -2045,7 +2056,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -2072,7 +2083,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -2099,7 +2110,7 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
-                   sophomorixAddMailQuota=>"366:---:",
+                   sophomorixAddMailQuota=>"---:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
                    sophomorixStatus=>"S",
@@ -2126,6 +2137,37 @@ if ($mod_pro==1){
                    sophomorixQuota=>"---",
                    sophomorixMailQuota=>"---",
                    sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
+                   sophomorixAddMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"TRUE",
+                   sophomorixMailList=>"TRUE",
+                   sophomorixStatus=>"S",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMaxMembers=>"16",
+                   sophomorixCreationDate => "19880529093330.0Z",
+                   sophomorixAdmins => "maiersa23|wu23|oe23",
+                   sophomorixMembers => "muellegr23|samardze23|schneima23",
+                   sophomorixAdminGroups => "super12|super13",
+                   sophomorixMemberGroups => "bsz-super6|bsz-super7",
+                   sophomorixHidden=>"TRUE",
+                   sophomorixSchoolname => "default-school",
+                   member => "wu23|oe23|maiersa23|muellegr23|samardze23|schneima23|super12|super13|bsz-super6|bsz-super7",
+                   memberOf => "",
+                  });
+
+
+
+    # testing mailquota with a lot of users members in project
+    # --addmailquota (1) 
+    &run_command("sophomorix-project $all_options -p mathe23 --addmailquota 366");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"p_mathe23",
+                   gidNumber=>"-1",
+                   description=>"Mathe23 Grundschule",
+                   sophomorixType=>"project",
+                   sophomorixQuota=>"---",
+                   sophomorixMailQuota=>"---",
+                   sophomorixAddQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
                    sophomorixAddMailQuota=>"366:---:",
                    sophomorixMailAlias=>"TRUE",
                    sophomorixMailList=>"TRUE",
@@ -2142,6 +2184,131 @@ if ($mod_pro==1){
                    member => "wu23|oe23|maiersa23|muellegr23|samardze23|schneima23|super12|super13|bsz-super6|bsz-super7",
                    memberOf => "",
                   });
+
+
+
+    # muellegr23 (unmodified)
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=muellegr23,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Gregor Müller",
+                   givenName=>"Gregor",
+                   name=>"muellegr23",
+                   sAMAccountname=>"muellegr23",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\muellegr23",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/muellegr23",
+                   sn=>"Müller",
+                   userPrincipalName => "muellegr23@".$root_dns,
+                   mail => "muellegr23@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster23!",
+                   sophomorixFirstnameASCII => "Gregor",
+                   sophomorixSurnameASCII  => "Mueller",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"362",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid2345",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m7ab|p_mathe23|p_bsz-Chemie-AG23|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # setting individual mailquota for muellegr23
+    &run_command("sophomorix-user $all_options -u muellegr23 --mailquota 789:Teststring");
+
+    # setting Mailquota now
+    &run_command("sophomorix-quota $all_options --set-mailquota-only");
+    #exit;
+
+    # testing some users for sophomorixMailQuotaCaculated
+    # maiersa23 SCHOOL: 152, noCLASS, +210(p_bsz-Chemie-AG23), +366(p_mathe) = 726
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maiersa23,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Sarina Maier",
+                   givenName=>"Sarina",
+                   name=>"maiersa23",
+                   sAMAccountname=>"maiersa23",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\maiersa23",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/maiersa23",
+                   sn=>"Maier",
+                   userPrincipalName => "maiersa23@".$root_dns,
+                   mail => "maiersa23@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Sarina",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"728",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid1234",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m7ab|p_mathe23|p_bsz-Chemie-AG23|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # muellegr23
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=muellegr23,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Gregor Müller",
+                   givenName=>"Gregor",
+                   name=>"muellegr23",
+                   sAMAccountname=>"muellegr23",
+                   uidNumber=>"-1",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\linuxmuster.local\\bsz\\students\\m7ab\\homes\\muellegr23",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/m7ab/homes/muellegr23",
+                   sn=>"Müller",
+                   userPrincipalName => "muellegr23@".$root_dns,
+                   mail => "muellegr23@".$root_dns,
+                   sophomorixAdminClass => "bsz-m7ab",
+                   sophomorixExitAdminClass => "unknown",
+                   sophomorixFirstPassword => "Muster23!",
+                   sophomorixFirstnameASCII => "Gregor",
+                   sophomorixSurnameASCII  => "Mueller",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"789:Teststring:",
+                   sophomorixMailQuotaCalculated=>"789",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus=>"U",
+                   sophomorixUnid => "unid2345",
+                   userAccountControl => "512",
+                   memberOf => "bsz-m7ab|p_mathe23|p_bsz-Chemie-AG23|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
 
 
     # --removeadmins (1 removing from existing value)
@@ -2254,9 +2421,16 @@ if ($mod_pro==1){
                   });
 
 
+    # setting back individual mailquota for muellegr23
+    &run_command("sophomorix-user $all_options -u muellegr23 --mailquota ---:---");
+
 
     # setting all back in one command
-    &run_command("sophomorix-project $all_options -p mathe23 --nojoin --nohide --addquota default-school:---,linuxmuster-global:---  --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20170529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
+    &run_command("sophomorix-project $all_options -p mathe23 --nojoin --nohide --addquota default-school:---,linuxmuster-global:---  --addmailquota ---:--- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20170529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
+
+    # setting Mailquota now
+    &run_command("sophomorix-quota $all_options --set-mailquota-only");
+
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,

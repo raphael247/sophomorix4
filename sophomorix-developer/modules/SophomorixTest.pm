@@ -348,12 +348,13 @@ sub AD_test_object {
     my $s_admin_file = $arg_ref->{sophomorixAdminFile};
     my $s_unid = $arg_ref->{sophomorixUnid};
     my $s_exammode = $arg_ref->{sophomorixExamMode};
+    my $s_quota = $arg_ref->{sophomorixQuota};
+    my $s_mailquota = $arg_ref->{sophomorixMailQuota};
+    my $s_mailquotacalc = $arg_ref->{sophomorixMailQuotaCalculated};
 
 
     # sophomorix group
     my $s_type = $arg_ref->{sophomorixType};
-    my $s_quota = $arg_ref->{sophomorixQuota};
-    my $s_mailquota = $arg_ref->{sophomorixMailQuota};
     my $s_addquota = $arg_ref->{sophomorixAddQuota};
     my $s_addmailquota = $arg_ref->{sophomorixAddMailQuota};
     my $s_mailalias = $arg_ref->{sophomorixMailAlias};
@@ -569,18 +570,20 @@ sub AD_test_object {
             is ($entry->get_value ('sophomorixStatus'),$s_status,
 		"  * sophomorixStatus is $s_status");
         }
-#        if (defined $s_quota){
-#            is ($entry->get_value ('sophomorixQuota'),$s_quota,
-#		"  * sophomorixQuota is $s_quota");
-#        }
         if (defined $s_mailquota){
             is ($entry->get_value ('sophomorixMailQuota'),$s_mailquota,
 		"  * sophomorixMailQuota is $s_mailquota");
         }
-#        if (defined $s_addquota){
-#            is ($entry->get_value ('sophomorixAddQuota'),$s_addquota,
-#		"  * sophomorixAddQuota is $s_addquota");
-#        }
+        if (defined $s_mailquotacalc){
+            if (defined $entry->get_value ('sophomorixMailQuotaCalculated')){
+                is ($entry->get_value ('sophomorixMailQuotaCalculated'),$s_mailquotacalc,
+  		    "  * sophomorixMailQuotaCalculated is $s_mailquotacalc");
+            } else {
+                # undef
+                is ("undef",$s_mailquotacalc,
+  		    "  * sophomorixMailQuotaCalculated is undef");
+            }
+        }
         if (defined $s_addmailquota){
             is ($entry->get_value ('sophomorixAddMailQuota'),$s_addmailquota,
 		"  * sophomorixAddMailQuota is $s_addmailquota");
