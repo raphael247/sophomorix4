@@ -6155,7 +6155,7 @@ sub AD_group_create {
                                 ]
                             );
             &AD_debug_logdump($result,2,(caller(0))[3]);
-	} else {
+	} elsif ($type eq "adminclass" or $type eq "teacherclass"){
             my $result = $ldap->add( $dn,
                                 attr => [
                                     cn   => $cn,
@@ -6170,6 +6170,31 @@ sub AD_group_create {
                                     sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
                                                         "$school:---:---:"],
                                     sophomorixMailQuota => "---:---:",
+                                    sophomorixMaxMembers => "0",
+                                    sophomorixMailAlias => "FALSE",
+                                    sophomorixMailList => "FALSE",
+                                    sophomorixJoinable => $joinable,
+                                    sophomorixHidden => "FALSE",
+                                    gidNumber => $gidnumber_wish,
+                                    objectclass => ['top',
+                                                      'group' ],
+                                ]
+                            );
+           &AD_debug_logdump($result,2,(caller(0))[3]);
+        }else {
+            my $result = $ldap->add( $dn,
+                                attr => [
+                                    cn   => $cn,
+                                    description => $description,
+                                    sAMAccountName => $group,
+                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixType => $type, 
+                                    sophomorixSchoolname => $school, 
+                                    sophomorixStatus => $status,
+                                    sophomorixAddQuota => ["---"],
+                                    sophomorixAddMailQuota => "---",
+                                    sophomorixQuota => ["---"],
+                                    sophomorixMailQuota => "---",
                                     sophomorixMaxMembers => "0",
                                     sophomorixMailAlias => "FALSE",
                                     sophomorixMailList => "FALSE",
