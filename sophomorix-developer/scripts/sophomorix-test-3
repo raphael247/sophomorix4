@@ -101,7 +101,8 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-test-3 tests the addition and modifications of projects.
+sophomorix-test-3 tests the addition and modifications of projects as well as
+  Quota amd MailQuota.
 
 Options
   -h  / --help
@@ -1372,7 +1373,7 @@ if ($mod_pro==1){
                    member => "",
                    memberOf => "",
                   });
-    # --addmailquota 
+    # --addmailquota (1) 
     &run_command("sophomorix-project $all_options -p mathe23 --addmailquota 366");
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1399,6 +1400,8 @@ if ($mod_pro==1){
                    member => "",
                    memberOf => "",
                   });
+    #&run_command("sophomorix-quota $all_options --set-mailquota-only");
+
     # --mailalias
     &run_command("sophomorix-project $all_options -p mathe23 --mailalias");
     &AD_test_object({ldap=>$ldap,
@@ -2253,7 +2256,7 @@ if ($mod_pro==1){
 
 
     # setting all back in one command
-    &run_command("sophomorix-project $all_options -p mathe23 --nojoin --nohide --addquota default-school:---,linuxmuster-global:---  --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20160529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
+    &run_command("sophomorix-project $all_options -p mathe23 --nojoin --nohide --addquota default-school:---,linuxmuster-global:---  --addmailquota --- --nomailalias --nomaillist --status P --maxmembers 0 --creationdate 20170529093330.0Z --description 'Mathematik' --admins \"\" --members \"\" --admingroups \"\" --membergroups \"\"");
     # checking if all is set back
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=p_mathe23,OU=Projects,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -2270,7 +2273,7 @@ if ($mod_pro==1){
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"FALSE",
                    sophomorixMaxMembers=>"0",
-                   sophomorixCreationDate => "20160529093330.0Z",
+                   sophomorixCreationDate => "20170529093330.0Z",
                    sophomorixAdmins => "",
                    sophomorixMembers => "",
                    sophomorixAdminGroups => "",
