@@ -81,6 +81,9 @@ Individueller Teil:
 
 NEXT/Todo:
 
+sophomorix-user - abfrage
+
+
 searchFlags (0=public, 128=confidential)
 
 ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchflags --option="dsdb:schema update allowed=yes" -b "cn=schema,CN=configuration,DC=...,DC=..."
@@ -105,8 +108,8 @@ mailquota:
 
 
 mailquota testen
-- -n zeigt änderungen?
-- tests
+
+
 
 
 tests aller quota (4 angaben bei allen gruppen)
@@ -116,6 +119,12 @@ wird der user auch upgedated?
 
 man sollte bei quotaangaben auch nur Comment angeben können
 z.B.: kein userquota wegen ... mit --quota bsz:---:Kommentar
+
+wird Kommentar auch upgedated werden
+testen der werte die an --quota --mailquota übergeben werden
+Zahlen: 0-9
+Kommentare: a-9a-zA-Z 
+
 
 (Datum abspeichern bei quotasetzungen??)
 
@@ -161,10 +170,6 @@ sophomorix-add -j soll auch json Return Objekt ausgeben, wenn nix anzulegen ist.
 dito -update, -add.....
 
 sophomorix-quota:
-
-Testen ob project sum richtig kalkuliert wird
-
-upzudatende user hochzählen, progress objekt, das 1/23 anzeigt
 
 sophomorix-project
 sophomorix-class
