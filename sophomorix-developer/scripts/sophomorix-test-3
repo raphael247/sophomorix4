@@ -43,7 +43,7 @@ my $help=0;
 my $full=0;
 my $add_pro=0;
 my $test_add_pro=0;
-
+my $exit=0;
 my $mod_pro=0;
 my $test_mod_pro=0;
 
@@ -62,6 +62,7 @@ my $testopt=GetOptions(
            "add-pro" => \$add_pro,
            "test-add-pro" => \$test_add_pro,
            "mod-pro" => \$mod_pro,
+           "exit" => \$exit,
            "test-mod-pro" => \$test_mod_pro,
            "kill-pro" => \$kill_pro,
            "test-kill-pro" => \$test_kill_pro,
@@ -115,8 +116,9 @@ Options
 
   sophomorix-test-3 --mod-pro
     modify added projects
+  (interrupt with --exit, when users are added, quota set, ...)
   sophomorix-test-3 --test-mod-pro
-    test modified projects
+    test modified projects (nothing to do here)
 
   sophomorix-test-3 --kill-pro
     kill all added projects
@@ -2368,7 +2370,12 @@ if ($mod_pro==1){
 
     # setting Mailquota now
     &run_command("sophomorix-quota $all_options --set-mailquota-only");
-    #exit;
+
+    # exit if necessary
+    if ($exit==1){
+        print "\nExit by option --exit\n\n";
+        exit;
+    }
 
     # testing some users for sophomorixMailQuotaCaculated
     # maiersa23 SCHOOL: 152, noCLASS, +210(p_bsz-Chemie-AG23), +366(p_mathe) = 726
