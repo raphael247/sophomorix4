@@ -4319,7 +4319,11 @@ sub AD_get_quota {
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'mailquota_default'};
 
         # save USER mailquota
-        $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}=$entry->get_value('sophomorixMailQuotaCalculated');;
+        if (defined $entry->get_value('sophomorixMailQuotaCalculated')){
+            $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}=$entry->get_value('sophomorixMailQuotaCalculated');
+	} else {
+            $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}="---";
+        }
         my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
@@ -5475,7 +5479,6 @@ sub AD_group_update {
         foreach my $quota_old (@quota_old){
             my ($share,$value,$comment)=split(/:/,$quota_old);
 	    # save old values in quota_new
-#            $quota_new{'QUOTA'}{$share}=$value;
             $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
             $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
 	    push @sharelist, $share;
@@ -5495,7 +5498,6 @@ sub AD_group_update {
 		exit;
 	    }
             # overriding quota_new
-#    	    $quota_new{'QUOTA'}{$share}=$value;
     	    $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
             if (not defined $comment){
                 $comment="---";
@@ -5512,13 +5514,11 @@ sub AD_group_update {
 	@sharelist = uniq(@sharelist);
 	@sharelist = sort(@sharelist);
 	foreach my $share (@sharelist){
-#            if ($quota_new{'QUOTA'}{$share} eq "---" and 
             if ($quota_new{'QUOTA'}{$share}{'VALUE'} eq "---" and 
                 $share ne $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'} and
                 $share ne $school){
                 # do nothing
 	    } else {
-#		push @quota_new, $share.":".$quota_new{'QUOTA'}{$share};
 		push @quota_new, $share.":".$quota_new{'QUOTA'}{$share}{'VALUE'}.
                                         ":".$quota_new{'QUOTA'}{$share}{'COMMENT'}.
                                         ":";
