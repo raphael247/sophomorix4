@@ -4322,7 +4322,7 @@ sub AD_get_quota {
         if (defined $entry->get_value('sophomorixMailQuotaCalculated')){
             $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}=$entry->get_value('sophomorixMailQuotaCalculated');
 	} else {
-            $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}="---";
+            $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}="";
         }
         my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;

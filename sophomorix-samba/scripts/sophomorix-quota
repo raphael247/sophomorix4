@@ -281,17 +281,26 @@ if ($show_nondefault==1){
             foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$class}{'sophomorixQuota'} }){
 	        print "  CLASS: $class --> $quota\n";
 	    }            
+            foreach my $mailquota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$class}{'sophomorixMailQuota'} }){
+	        print "  CLASS: $class --> $mailquota\n";
+	    }            
         }
         foreach my $project ( @{ $ref_quota->{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }){
             #print "PROJECT: $project\n";
             foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$project}{'sophomorixAddQuota'} }){
 	        print "  PROJECT: $project --> $quota\n";
 	    }
+            foreach my $mailquota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$project}{'sophomorixAddMailQuota'} }){
+	        print "  PROJECT: $project --> $mailquota (MAILQUOTA)\n";
+	    }
         }
         foreach my $user ( @{ $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
             #print "USER: $user\n";
             foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$user}{'sophomorixQuota'} }){
 	        print "  USER: $user --> $quota\n";
+	    }
+            foreach my $mailquota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$user}{'sophomorixMailQuota'} }){
+	        print "  USER: $user --> $mailquota\n";
 	    }
         }
     }
