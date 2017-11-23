@@ -282,10 +282,8 @@ sub _console_print_users_overview {
         &print_title("Users of school $school:");
         my $line="----------+---+------+------+------+------+------++------+------+-----+\n";
         print $line;
-#        print "status    |   | stud | teach| gadm | sadm | gbin | sbin | comp | oth |\n";
         print "status    |   | stud | teach| sadm | sbin | comp || gadm | gbin | oth |\n";
         print $line;
-        #printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
         printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "permanent | P",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'P'},
@@ -293,8 +291,6 @@ sub _console_print_users_overview {
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'computer'},
-#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globaladministrator'},
-#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'OTHER'};
@@ -357,8 +353,6 @@ sub _console_print_users_overview {
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'computer'},
-#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globaladministrator'},
-#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'OTHER'};
@@ -372,6 +366,7 @@ sub _console_print_users_overview {
     }
     print "\n";
 }
+
 
 
 sub _console_print_users_v {

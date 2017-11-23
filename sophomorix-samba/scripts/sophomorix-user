@@ -297,17 +297,6 @@ my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 
-# Setting the filters
-my $school_filter="";
-my $user_filter="";
-if ($school eq $DevelConf::name_default_school){
-    $school_filter="";
-} elsif ($school ne ""){
-    $school_filter="(sophomorixSchoolPrefix=$school)";
-}
-if ($user ne ""){
-    $user_filter="(sAMAccountName=$user)";
-}
 
 if ($user eq "" and $info==1 and $Conf::log_level==2){
     my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
@@ -316,7 +305,7 @@ if ($user eq "" and $info==1 and $Conf::log_level==2){
                                   school=>$school,
                                   sophomorix_config=>\%sophomorix_config,
                                 });
-    print Dumper($ref_user_v);
+    #print Dumper($ref_user_v);
     my $jsoninfo="USERS_V";
     my $jsoncomment="The sophomorix users";
     &json_dump({json => $json,
@@ -331,6 +320,8 @@ if ($user eq "" and $info==1 and $Conf::log_level==2){
    exit;
 }
 
+
+
 # --info
 if ($user eq "" and $info==1){
     my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
@@ -339,7 +330,7 @@ if ($user eq "" and $info==1){
                                   school=>$school,
                                   sophomorix_config=>\%sophomorix_config,
                                 });
-    print Dumper($ref_user_v);
+    #print Dumper($ref_user_v);
     my $jsoninfo="USERS_OVERVIEW";
     my $jsoncomment="The sophomorix users";
     &json_dump({json => $json,
@@ -350,240 +341,9 @@ if ($user eq "" and $info==1){
                 hash_ref => $ref_user_v,
                 sophomorix_config => \%sophomorix_config,
                });
-
-
-
-    ##################################################
-    # vars for results
-    my %results=();
-    my @students_u=();
-    my @teachers_u=();
-    my @students_e=();
-    my @teachers_e=();
-    my @students_t=();
-    my @teachers_t=();
-    my @students_a=();
-    my @teachers_a=();
-    my @students_s=();
-    my @teachers_s=();
-    my @students_d=();
-    my @teachers_d=();
-    my @students_l=();
-    my @teachers_l=();
-    my @students_r=();
-    my @teachers_r=();
-    my @students_k=();
-    my @teachers_k=();
-    my @students_f=();
-    my @teachers_f=();
-    my @students_p=();
-    my @teachers_p=();
-    my @globaladmin_p=();
-    my @schooladmin_p=();
-    my @globalbind_p=();
-    my @schoolbind_p=();
-    my @computers_p=();
-    my @others=();
-
-    ##################################################
-    # search for all users
-    my $filter="( &(objectclass=user) (cn=*) $school_filter)"; 
-    if($Conf::log_level>=2){
-        print "Filter: $filter\n";
-    }
-    my $mesg = $ldap->search(
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attr => ['cn']
-                            );
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
-    my $max = $mesg->count;
-
-    ##################################################
-    # walk through all results
-    # save results in lists
-    for( my $index = 0 ; $index < $max ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $dn=$entry->dn();
-        my $role=$entry->get_value('sophomorixRole');
-        my $status=$entry->get_value('sophomorixStatus');
-	if (not defined $role or not defined $status){
-            push @others, $dn;
-	} elsif ($role eq "student" and $status eq "U"){
-            push @students_u, $dn;
-	} elsif ($role eq "teacher" and $status eq "U"){
-            push @teachers_u, $dn;
-	} elsif ($role eq "student" and $status eq "E"){
-            push @students_e, $dn;
-	} elsif ($role eq "teacher" and $status eq "E"){
-            push @teachers_e, $dn;
-	} elsif ($role eq "student" and $status eq "T"){
-            push @students_t, $dn;
-	} elsif ($role eq "teacher" and $status eq "T"){
-            push @teachers_t, $dn;
-	} elsif ($role eq "student" and $status eq "A"){
-            push @students_a, $dn;
-	} elsif ($role eq "teacher" and $status eq "A"){
-            push @teachers_a, $dn;
-	} elsif ($role eq "student" and $status eq "S"){
-            push @students_s, $dn;
-	} elsif ($role eq "teacher" and $status eq "S"){
-            push @teachers_s, $dn;
-	} elsif ($role eq "student" and $status eq "D"){
-            push @students_d, $dn;
-	} elsif ($role eq "teacher" and $status eq "D"){
-            push @teachers_d, $dn;
-	} elsif ($role eq "student" and $status eq "L"){
-            push @students_l, $dn;
-	} elsif ($role eq "teacher" and $status eq "L"){
-            push @teachers_l, $dn;
-	} elsif ($role eq "student" and $status eq "R"){
-            push @students_r, $dn;
-	} elsif ($role eq "teacher" and $status eq "R"){
-            push @teachers_r, $dn;
-	} elsif ($role eq "student" and $status eq "K"){
-            push @students_k, $dn;
-	} elsif ($role eq "teacher" and $status eq "K"){
-            push @teachers_k, $dn;
-	} elsif ($role eq "student" and $status eq "F"){
-            push @students_f, $dn;
-	} elsif ($role eq "teacher" and $status eq "F"){
-            push @teachers_f, $dn;
-	} elsif ($role eq "student" and $status eq "P"){
-            push @students_p, $dn;
-	} elsif ($role eq "teacher" and $status eq "P"){
-            push @teachers_p, $dn;
-	} elsif ($role eq "globaladministrator" and $status eq "P"){
-            push @globaladmin_p, $dn;
-	} elsif ($role eq "schooladministrator" and $status eq "P"){
-            push @schooladmin_p, $dn;
-	} elsif ($role eq "globalbinduser" and $status eq "P"){
-            push @globalbind_p, $dn;
-	} elsif ($role eq "schoolbinduser" and $status eq "P"){
-            push @schoolbind_p, $dn;
-	} elsif ($role eq "computer" and $status eq "P"){
-            push @computers_p, $dn;
-	} else {
-            print "$dn\n";
-        }
-    }
-
-    ##################################################    
-    # save list sums in hash
-    $results{'count'}{'students'}{'U'}=$#students_u+1;
-    $results{'count'}{'teachers'}{'U'}=$#teachers_u+1;
-    $results{'count'}{'students'}{'E'}=$#students_e+1;
-    $results{'count'}{'teachers'}{'E'}=$#teachers_e+1;
-    $results{'count'}{'students'}{'T'}=$#students_t+1;
-    $results{'count'}{'teachers'}{'T'}=$#teachers_t+1;
-    $results{'count'}{'students'}{'A'}=$#students_a+1;
-    $results{'count'}{'teachers'}{'A'}=$#teachers_a+1;
-    $results{'count'}{'students'}{'S'}=$#students_s+1;
-    $results{'count'}{'teachers'}{'S'}=$#teachers_s+1;
-    $results{'count'}{'students'}{'D'}=$#students_d+1;
-    $results{'count'}{'teachers'}{'D'}=$#teachers_d+1;
-    $results{'count'}{'students'}{'L'}=$#students_l+1;
-    $results{'count'}{'teachers'}{'L'}=$#teachers_l+1;
-    $results{'count'}{'students'}{'R'}=$#students_r+1;
-    $results{'count'}{'teachers'}{'R'}=$#teachers_r+1;
-    $results{'count'}{'students'}{'K'}=$#students_k+1;
-    $results{'count'}{'teachers'}{'K'}=$#teachers_k+1;
-    $results{'count'}{'students'}{'F'}=$#students_f+1;
-    $results{'count'}{'teachers'}{'F'}=$#teachers_f+1;
-    $results{'count'}{'students'}{'P'}=$#students_p+1;
-    $results{'count'}{'teachers'}{'P'}=$#teachers_p+1;
-    $results{'count'}{'globaladministrators'}{'P'}=$#globaladmin_p+1;
-    $results{'count'}{'schooladministrators'}{'P'}=$#schooladmin_p+1;
-    $results{'count'}{'globalbindusers'}{'P'}=$#globalbind_p+1;
-    $results{'count'}{'schoolbindusers'}{'P'}=$#schoolbind_p+1;
-    $results{'count'}{'computers'}{'P'}=$#computers_p+1;
-    $results{'count'}{'others'}=$#others+1;
-
-    ##################################################
-    # sum all together
-    my $sum_student=$results{'count'}{'students'}{'U'}+
-                    $results{'count'}{'students'}{'E'}+
-                    $results{'count'}{'students'}{'T'}+
-                    $results{'count'}{'students'}{'A'}+
-                    $results{'count'}{'students'}{'S'}+
-                    $results{'count'}{'students'}{'D'}+
-                    $results{'count'}{'students'}{'L'}+
-                    $results{'count'}{'students'}{'R'}+
-                    $results{'count'}{'students'}{'K'}+
-                    $results{'count'}{'students'}{'F'}+
-                    $results{'count'}{'students'}{'P'};
-
-    my $sum_teacher=$results{'count'}{'teachers'}{'U'}+
-                    $results{'count'}{'teachers'}{'E'}+
-                    $results{'count'}{'teachers'}{'T'}+
-                    $results{'count'}{'teachers'}{'A'}+
-                    $results{'count'}{'teachers'}{'S'}+
-                    $results{'count'}{'teachers'}{'D'}+
-                    $results{'count'}{'teachers'}{'L'}+
-                    $results{'count'}{'teachers'}{'R'}+
-                    $results{'count'}{'teachers'}{'K'}+
-                    $results{'count'}{'teachers'}{'F'}+
-                    $results{'count'}{'teachers'}{'P'};
-    my $sum_globaladministrators=$results{'count'}{'globaladministrators'}{'P'};
-    my $sum_schooladministrators=$results{'count'}{'schooladministrators'}{'P'};
-    my $sum_globalbindusers=$results{'count'}{'globalbindusers'}{'P'};
-    my $sum_schoolbindusers=$results{'count'}{'schoolbindusers'}{'P'};
-
-    my $sum_examaccounts=$results{'count'}{'examaccounts'}{'P'};
-    my $sum_computers=$results{'count'}{'computers'}{'P'};
-
-    # # OUTPUT
-    # ##################################################
-    print "----------+---+------+------+------+------+------+------+------+-----+\n";
-    print "status    |   | stud | teach| gadm | sadm | gbin | sbin | comp | oth |\n";
-    print "----------+---+------+------+------+------+------+------+------+-----+\n";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "permanent | P",
-           $results{'count'}{'students'}{'P'},
-           $results{'count'}{'teachers'}{'P'},
-           $results{'count'}{'globaladministrators'}{'P'},
-           $results{'count'}{'schooladministrators'}{'P'},
-           $results{'count'}{'globalbindusers'}{'P'},
-           $results{'count'}{'schoolbindusers'}{'P'},
-           $results{'count'}{'computers'}{'P'},
-           "";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "usable    | U",$results{'count'}{'students'}{'U'},$results{'count'}{'teachers'}{'U'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "activated | A",$results{'count'}{'students'}{'A'},$results{'count'}{'teachers'}{'A'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "enabled   | E",$results{'count'}{'students'}{'E'},$results{'count'}{'teachers'}{'E'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "selfactiv.| S",$results{'count'}{'students'}{'S'},$results{'count'}{'teachers'}{'S'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "tolerated | T",$results{'count'}{'students'}{'T'},$results{'count'}{'teachers'}{'T'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "disabled  | D",$results{'count'}{'students'}{'D'},$results{'count'}{'teachers'}{'D'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "locked    | L",$results{'count'}{'students'}{'L'},$results{'count'}{'teachers'}{'L'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "frozen    | F",$results{'count'}{'students'}{'F'},$results{'count'}{'teachers'}{'F'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "removeable| R",$results{'count'}{'students'}{'R'},$results{'count'}{'teachers'}{'R'},"","","","","","";
-    printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "killable  | K",$results{'count'}{'students'}{'K'},$results{'count'}{'teachers'}{'K'},"","","","","","";
-    print "----------+---+------+------+------+------+------+------+------+-----+\n";
-    printf "%-10s|%2s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
-           "sum: $max","",$sum_student,$sum_teacher,
-           $sum_globaladministrators,$sum_schooladministrators,
-           $sum_globalbindusers,$sum_schoolbindusers,
-           $sum_computers,$results{'count'}{'others'};
-    print "----------+---+------+------+------+------+------+------+------+-----+\n";
-    print "(stud=student,teach=teacher,gadm=globaladministrator,\n";
-    print " sadm=schooladministrator,comp=computer,oth=other)\n";
-
-    print "\nOther (oth) user objects (objectclass=user):\n";
-    foreach my $dn (@others){
-        print "   * $dn\n";
-    }
     exit;
 }
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
@@ -736,6 +496,19 @@ if ($user eq "" and $info==1){
 #   print "I don't know what to search for! (searchstring is empty)\n";
 #   &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 #}
+
+
+# Setting the filters
+my $school_filter="";
+my $user_filter="";
+if ($school eq $DevelConf::name_default_school){
+    $school_filter="";
+} elsif ($school ne ""){
+    $school_filter="(sophomorixSchoolPrefix=$school)";
+}
+if ($user ne ""){
+    $user_filter="(sAMAccountName=$user)";
+}
 
 
 # --info --user <user>

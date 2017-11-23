@@ -4864,10 +4864,11 @@ sub AD_get_users_v {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my %users=();
+    # set back global counters
     $users{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'}=0;
     $users{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'}=0;
-
     foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+        # set back school counters
         $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'P'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'P'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'U'}=0;
@@ -4897,22 +4898,12 @@ sub AD_get_users_v {
         $users{'COUNTER'}{$school}{'by_role'}{'computer'}=0;
         $users{'COUNTER'}{$school}{'MAX'}=0;
     }
-    # creating 
-    # status Counters
-    # user lists per school
-    # key, hash login data
-
-    # Setting the filters
-    my $school_filter="";
-    my $user_filter="";
 
     ##################################################
-    # search for all users
-#    my $filter="( &(objectclass=user) (sAMAccountName=*) $school_filter)"; 
-    my $filter="( & ( |(objectclass=user) (objectclass=computer)) (sAMAccountName=*) $school_filter)"; 
-    if($Conf::log_level>=2){
-        print "Filter: $filter\n";
-    }
+    # search for all users and computers
+    # Setting the filters
+    my $filter="( & ( |(objectclass=user) (objectclass=computer)) (sAMAccountName=*))"; 
+    # print "Filter: $filter\n";
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
@@ -4937,7 +4928,6 @@ sub AD_get_users_v {
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
         my $status=$entry->get_value('sophomorixStatus');
-	print "$sam\n";
         my $schoolname=$entry->get_value('sophomorixSchoolname');
         if (not defined $role or not defined $status){
             # non sophomorix user
@@ -4957,7 +4947,6 @@ sub AD_get_users_v {
             push @{ $users{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
         }
     }
-print Dumper(\$users);
     return \%users;
 }
 
