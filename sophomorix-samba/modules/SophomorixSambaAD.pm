@@ -1599,6 +1599,7 @@ sub AD_user_create {
                    sophomorixQuota=>["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:",
                                      "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:"],
                    sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'MAILQUOTA'}{'CALCULATED_DEFAULT'},
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate, 
