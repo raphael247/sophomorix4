@@ -69,6 +69,7 @@ $Data::Dumper::Terse = 1;
             AD_get_AD
             AD_get_quota
             AD_get_users_v
+            AD_get_groups_v
             AD_get_full_userdata
             AD_get_print_data
             AD_class_fetch
@@ -4966,6 +4967,65 @@ sub AD_get_full_userdata {
     }
     return \%users;
 }
+
+
+
+sub AD_get_groups_v {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $school = $arg_ref->{school};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my %groups=();
+    ##################################################
+    # search for all sophomorix groups
+    # Setting the filters
+    my $filter="(objectclass=group)"; 
+    print "Filter: $filter\n";
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['sAMAccountName',
+                               'cn',
+                               'displayName',
+                               'sophomorixType',
+                               'sophomorixStatus',
+                               'sophomorixSchoolname',
+                              ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+    ##################################################
+    # walk through all results
+    # save results in lists
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        my $type=$entry->get_value('sophomorixType');
+        my $status=$entry->get_value('sophomorixStatus');
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        if (not defined $type or not defined $status){
+            # non sophomorix group
+            $groups{'COUNTER'}{'OTHER'}++;
+            $groups{'GROUPS_by_sophomorixType'}{'OTHER'}{$sam}=$dn;
+            $groups{'GROUPS'}{$sam}{'DN'}=$dn;
+       } else {
+            # sophomorix group
+            $groups{'COUNTER'}{$schoolname}{'TOTAL'}++;
+            $groups{'COUNTER'}{$schoolname}{'status_by_type'}{$type}{$status}++;
+            $groups{'COUNTER'}{$schoolname}{'by_type'}{$type}++;
+            $groups{'GROUPS'}{$sam}{'DN'}=$dn;
+            $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$status;
+            $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+            push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
+        }
+    }
+    return \%groups;
+}
+
 
 
 sub AD_get_users_v {
