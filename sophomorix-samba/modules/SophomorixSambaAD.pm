@@ -1571,7 +1571,18 @@ sub AD_user_create {
 	} else {
 	    $user_account_control=$DevelConf::default_user_account_control;
         }
-   }
+    }
+
+    # create quotalist
+    my @quotalist;
+    if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+        # school <global>: only one quota entry
+        @quotalist=("$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:"); 
+   } else {
+       # other schools: global + school quota entry
+       @quotalist=("$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:",
+                   "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:");
+    }
 
     # add the user
     my $result = $ldap->add( $dn,
@@ -1596,8 +1607,7 @@ sub AD_user_create {
                    sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
-                   sophomorixQuota=>["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:",
-                                     "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:"],
+                   sophomorixQuota=> [@quotalist],
                    sophomorixMailQuota=>"---:---:",
                    sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'MAILQUOTA'}{'CALCULATED_DEFAULT'},
                    sophomorixSchoolPrefix => $prefix,
