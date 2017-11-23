@@ -147,6 +147,8 @@ sub json_dump {
             &_console_print_users_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USERS_OVERVIEW"){
             &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "USER"){
+            &_console_print_users_full_userdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -365,6 +367,16 @@ sub _console_print_users_overview {
         print "   * $user (".$ref_users_v->{'USERS'}{$user}{'DN'}.")\n";
     }
     print "\n";
+}
+
+
+
+sub _console_print_users_full_userdata {
+    my ($ref_users,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    foreach my $user (@{ $ref_users->{'LISTS'}{'USERS'} }){
+        print "Working on $user\n";
+
+    }
 }
 
 

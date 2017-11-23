@@ -61,6 +61,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_list
                                  AD_dns_get
                                  AD_get_users_v
+                                 AD_get_full_userdata
                                  AD_debug_logdump
                                  AD_object_search
                                  get_forbidden_logins
@@ -316,7 +317,6 @@ if ($user eq "" and $info==1 and $Conf::log_level==2){
                 hash_ref => $ref_user_v,
                 sophomorix_config => \%sophomorix_config,
                });
-
    exit;
 }
 
@@ -512,6 +512,27 @@ if ($user ne ""){
 
 
 # --info --user <user>
+    my $ref_users=&AD_get_full_userdata({ldap=>$ldap,
+                                        root_dse=>$root_dse,
+                                        root_dns=>$root_dns,
+                                        userlist=>$user,
+                                        sophomorix_config=>\%sophomorix_config,
+                                      });
+    print Dumper($ref_users);
+    my $jsoninfo="USER";
+    my $jsoncomment="One sophomorix users";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $user,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_users,
+                sophomorix_config => \%sophomorix_config,
+               });
+   exit;
+
+
+
 if ($user ne "" and $info==1){
     my $filter="(&(objectclass=user) $user_filter  $school_filter)"; 
     if($Conf::log_level>=2){

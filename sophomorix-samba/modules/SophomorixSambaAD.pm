@@ -69,6 +69,7 @@ $Data::Dumper::Terse = 1;
             AD_get_AD
             AD_get_quota
             AD_get_users_v
+            AD_get_full_userdata
             AD_get_print_data
             AD_class_fetch
             AD_project_fetch
@@ -4853,6 +4854,80 @@ sub AD_get_quota {
     return(\%quota);
 }
 
+
+
+sub AD_get_full_userdata {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $userlist = $arg_ref->{userlist};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my @userlist=split(/,/,$userlist);
+    my $filter;
+    if ($#userlist==0){
+        $filter="(sAMAccountName=".$userlist[0].")"; 
+    } else {
+        #$filter="( | (sAMAccountName=))"; 
+    }
+    print "$filter\n";
+    my %users=();
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                       );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        push @{ $users{'LISTS'}{'USERS'} }, $sam;
+
+        $users{'USERS'}{$sam}{'dn'}=$entry->dn();
+        $users{'USERS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
+        $users{'USERS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+        $users{'USERS'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+        $users{'USERS'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+        $users{'USERS'}{$sam}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
+        $users{'USERS'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
+        $users{'USERS'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
+        $users{'USERS'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+        $users{'USERS'}{$sam}{'sophomorixExitAdminClass'}=$entry->get_value('sophomorixExitAdminClass');
+        $users{'USERS'}{$sam}{'sophomorixFirstPassword'}=$entry->get_value('sophomorixFirstPassword');
+        $users{'USERS'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
+        $users{'USERS'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
+        $users{'USERS'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
+
+        $users{'USERS'}{$sam}{'sn'}=$entry->get_value('sn');
+        $users{'USERS'}{$sam}{'givenName'}=$entry->get_value('givenName');
+        $users{'USERS'}{$sam}{'cn'}=$entry->get_value('cn');
+        $users{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+        $users{'USERS'}{$sam}{'userAccountControl'}=$entry->get_value('userAccountControl');
+        $users{'USERS'}{$sam}{'mail'}=$entry->get_value('mail');
+        $users{'USERS'}{$sam}{'sophomorixSchoolPrefix'}=$entry->get_value('sophomorixSchoolPrefix');
+        $users{'USERS'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+        $users{'USERS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+        $users{'USERS'}{$sam}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
+        $users{'USERS'}{$sam}{'sophomorixMailQuotaCalculated'}=$entry->get_value('sophomorixMailQuotaCalculated');
+        $users{'USERS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
+        @{ $users{'USERS'}{$sam}{'memberOf'} }=$entry->get_value('memberOf');
+        @{ $users{'USERS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
+        $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+
+    }
+    @{ $users{'LISTS'}{'USERS'} } = sort @{ $users{'LISTS'}{'USERS'} };
+    return \%users;
+}
 
 
 sub AD_get_users_v {
