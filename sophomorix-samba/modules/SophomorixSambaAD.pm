@@ -4866,11 +4866,17 @@ sub AD_get_full_userdata {
     my @userlist=split(/,/,$userlist);
     my $filter;
     if ($#userlist==0){
-        $filter="(sAMAccountName=".$userlist[0].")"; 
+        $filter="(& (sophomorixRole=*) (sAMAccountName=".$userlist[0]."))"; 
     } else {
-        #$filter="( | (sAMAccountName=))"; 
+        $filter="(& (sophomorixRole=*) (|";
+        foreach my $user (@userlist){
+           $filter=$filter." (sAMAccountName=".$user.")";
+
+        } 
+        $filter=$filter." ))";
     }
-    print "$filter\n";
+
+    #print "$filter\n";
     my %users=();
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -4883,7 +4889,6 @@ sub AD_get_full_userdata {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         push @{ $users{'LISTS'}{'USERS'} }, $sam;
-
         $users{'USERS'}{$sam}{'dn'}=$entry->dn();
         $users{'USERS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
         $users{'USERS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
@@ -4898,6 +4903,7 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
         $users{'USERS'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
         $users{'USERS'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
+        $users{'USERS'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
 
         $users{'USERS'}{$sam}{'sn'}=$entry->get_value('sn');
         $users{'USERS'}{$sam}{'givenName'}=$entry->get_value('givenName');
@@ -4913,19 +4919,40 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
         @{ $users{'USERS'}{$sam}{'memberOf'} }=$entry->get_value('memberOf');
         @{ $users{'USERS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
-        $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
 
+        # samba
+        $users{'USERS'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
+        $users{'USERS'}{$sam}{'homeDrive'}=$entry->get_value('homeDrive');
+        $users{'USERS'}{$sam}{'accountExpires'}=$entry->get_value('accountExpires');
+        $users{'USERS'}{$sam}{'badPasswordTime'}=$entry->get_value('badPasswordTime');
+        $users{'USERS'}{$sam}{'badPwdCount'}=$entry->get_value('badPwdCount');
+        $users{'USERS'}{$sam}{'codePage'}=$entry->get_value('codePage');
+        $users{'USERS'}{$sam}{'countryCode'}=$entry->get_value('countryCode');
+        $users{'USERS'}{$sam}{'lastLogoff'}=$entry->get_value('lastLogoff');
+        $users{'USERS'}{$sam}{'lastLogon'}=$entry->get_value('lastLogon');
+        $users{'USERS'}{$sam}{'logonCount'}=$entry->get_value('logonCount');
+        $users{'USERS'}{$sam}{'objectSid'}=$entry->get_value('objectSid');
+        $users{'USERS'}{$sam}{'objectGUID'}=$entry->get_value('objectGUID');
+        $users{'USERS'}{$sam}{'pwdLastSet'}=$entry->get_value('pwdLastSet');
+        $users{'USERS'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
+        $users{'USERS'}{$sam}{'userPrincipalName'}=$entry->get_value('userPrincipalName');
+        $users{'USERS'}{$sam}{'uSNChanged'}=$entry->get_value('uSNChanged');
+        $users{'USERS'}{$sam}{'uSNCreated'}=$entry->get_value('uSNCreated');
+
+        # unix
+        $users{'USERS'}{$sam}{'uidNumber'}=$entry->get_value('uidNumber');
+        $users{'USERS'}{$sam}{'unixHomeDirectory'}=$entry->get_value('unixHomeDirectory');
+        $users{'USERS'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
+
+        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
     }
-    @{ $users{'LISTS'}{'USERS'} } = sort @{ $users{'LISTS'}{'USERS'} };
+    $users{'COUNTER'}{'MAX'}=$max;
+    if ($max>0){
+        @{ $users{'LISTS'}{'USERS'} } = sort @{ $users{'LISTS'}{'USERS'} };
+    }    
+    if ($max==0){
+        print "0 users found\n";
+    }
     return \%users;
 }
 

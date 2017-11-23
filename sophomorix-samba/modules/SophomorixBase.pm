@@ -20,6 +20,7 @@ $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
 
+# use Net::LDAP::SID;  17.10 18.04
 
 @ISA = qw(Exporter);
 
@@ -373,13 +374,122 @@ sub _console_print_users_overview {
 
 sub _console_print_users_full_userdata {
     my ($ref_users,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+#    my $line="-----------------------------:--------------------------------------------------\n";
+    my $line1="################################################################################\n";
+     my $line="--------------------------------------------------------------------------------\n";
+    my $user_count=0;
+    if ($ref_users->{'COUNTER'}{'MAX'}==0){
+        print "0 users can be displayed\n";
+        return;
+    }
     foreach my $user (@{ $ref_users->{'LISTS'}{'USERS'} }){
-        print "Working on $user\n";
+        $user_count++;
+        print "\n";
+        print $line1;
+        print "User $user_count/$ref_users->{'COUNTER'}{'MAX'}: ",
+              "$user in school $ref_users->{'USERS'}{$user}{'sophomorixSchoolname'}\n";
+        print "$ref_users->{'USERS'}{$user}{'dn'}\n";
+        print $line1;
+        printf "%29s: %-40s\n","displayName",$ref_users->{'USERS'}{$user}{'displayName'};
+        printf "%29s: %-40s\n","sn",$ref_users->{'USERS'}{$user}{'sn'};
+        printf "%29s: %-40s\n","givenName",$ref_users->{'USERS'}{$user}{'givenName'};
+        printf "%29s: %-40s\n","sophomorixFirstnameASCII",$ref_users->{'USERS'}{$user}{'sophomorixFirstnameASCII'};
+        printf "%29s: %-40s\n","sophomorixSurnameASCII",$ref_users->{'USERS'}{$user}{'sophomorixSurnameASCII'};
+        printf "%29s: %-40s\n","sophomorixBirthdate",$ref_users->{'USERS'}{$user}{'sophomorixBirthdate'};
+        printf "%29s: %-40s\n","sophomorixUnid",$ref_users->{'USERS'}{$user}{'sophomorixUnid'};
+        printf "%29s: %-40s\n","sophomorixAdminClass",$ref_users->{'USERS'}{$user}{'sophomorixAdminClass'};
+        printf "%29s: %-40s\n","sophomorixExitAdminClass",$ref_users->{'USERS'}{$user}{'sophomorixExitAdminClass'};
+        printf "%29s: %-40s\n","sophomorixAdminFile",$ref_users->{'USERS'}{$user}{'sophomorixAdminFile'};
+        printf "%29s: %-40s\n","sophomorixComment",$ref_users->{'USERS'}{$user}{'sophomorixComment'};
+        printf "%29s: %-40s\n","sophomorixFirstPassword",$ref_users->{'USERS'}{$user}{'sophomorixFirstPassword'};
+        printf "%29s: %-40s\n","sophomorixExamMode",$ref_users->{'USERS'}{$user}{'sophomorixExamMode'};
+        print $line;
+        printf "%29s: %-40s\n","sophomorixRole",$ref_users->{'USERS'}{$user}{'sophomorixRole'};
+        printf "%29s: %-40s\n","sophomorixStatus",$ref_users->{'USERS'}{$user}{'sophomorixStatus'};
+        printf "%29s: %-40s\n","sophomorixCreationDate",$ref_users->{'USERS'}{$user}{'sophomorixCreationDate'};
+        printf "%29s: %-40s\n","sophomorixTolerationDate",$ref_users->{'USERS'}{$user}{'sophomorixTolerationDate'};
+        printf "%29s: %-40s\n","sophomorixDeactivationDate",$ref_users->{'USERS'}{$user}{'sophomorixDeactivationDate'};
+        printf "%29s: %-40s\n","userAccountControl",$ref_users->{'USERS'}{$user}{'userAccountControl'};
+        print $line;
+        printf "%29s: %-40s\n","mail",$ref_users->{'USERS'}{$user}{'mail'};
+        printf "%29s: %-40s\n","sophomorixMailQuota",$ref_users->{'USERS'}{$user}{'sophomorixMailQuota'};
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixMailQuotaCalculated'}){
+            printf "%29s: %-40s\n","sophomorixMailQuotaCalculated",
+                $ref_users->{'USERS'}{$user}{'sophomorixMailQuotaCalculated'};
+        } else {
+            printf "%29s: %-40s\n","sophomorixMailQuotaCalculated","(undef)";
+        }
 
+        print $line;
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixQuota'} } ){
+            printf "%29s: %-40s\n","sophomorixQuota",$item;
+	}
+        print $line;
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'memberOf'} } ){
+            print "memberOf: $item\n";
+	}
+
+        # samba stuff:
+        print $line;
+        if ($log_level>=2){
+            printf "%19s: %-50s\n","homeDirectory",$ref_users->{'USERS'}{$user}{'homeDirectory'};
+            printf "%19s: %-50s\n","homeDrive",$ref_users->{'USERS'}{$user}{'homeDrive'};
+
+            printf "%19s: %-50s\n","accountExpires",$ref_users->{'USERS'}{$user}{'accountExpires'};
+            printf "%19s: %-50s\n","badPasswordTime",$ref_users->{'USERS'}{$user}{'badPasswordTime'};
+            printf "%19s: %-50s\n","badPwdCount",$ref_users->{'USERS'}{$user}{'badPwdCount'};
+            printf "%19s: %-50s\n","pwdLastSet",$ref_users->{'USERS'}{$user}{'pwdLastSet'};
+
+            printf "%19s: %-50s\n","lastLogoff",$ref_users->{'USERS'}{$user}{'lastLogoff'};
+            printf "%19s: %-50s\n","lastLogon",$ref_users->{'USERS'}{$user}{'lastLogon'};
+            printf "%19s: %-50s\n","logonCount",$ref_users->{'USERS'}{$user}{'logonCount'};
+
+            if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "17.10"){
+                #my $sid = Net::LDAP::SID->new($ref_users->{'USERS'}{$user}{'objectSid'});
+
+                printf "%19s: %-50s\n","objectSid",$ref_users->{'USERS'}{$user}{'objectSid'};
+                printf "%19s: %-50s\n","objectGUID","(binary)";
+            } else {
+                printf "%19s: %-50s\n","objectSid","(binary)";
+                printf "%19s: %-50s\n","objectGUID","(binary)";
+            }
+
+            printf "%19s: %-50s\n","sAMAccountType",$ref_users->{'USERS'}{$user}{'sAMAccountType'};
+            printf "%19s: %-50s\n","userPrincipalName",$ref_users->{'USERS'}{$user}{'userPrincipalName'};
+
+            printf "%19s: %-50s\n","uSNChanged",$ref_users->{'USERS'}{$user}{'uSNChanged'};
+            printf "%19s: %-50s\n","uSNCreated",$ref_users->{'USERS'}{$user}{'uSNCreated'};
+
+            printf "%19s: %-50s\n","codePage",$ref_users->{'USERS'}{$user}{'codePage'};
+            printf "%19s: %-50s\n","countryCode",$ref_users->{'USERS'}{$user}{'countryCode'};
+            #printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
+	}
+
+        # unix stuff:
+        print $line;
+        if ($log_level>=2){
+            printf "%19s: %-50s\n","uidNumber",$ref_users->{'USERS'}{$user}{'uidNumber'};
+            printf "%19s: %-50s\n","unixHomeDirectory",$ref_users->{'USERS'}{$user}{'unixHomeDirectory'};
+            printf "%19s: %-50s\n","primaryGroupID",$ref_users->{'USERS'}{$user}{'primaryGroupID'};
+#            printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
+#            printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
+	}
+
+        #printf "%29s: %-40s\n","",$ref_users->{'USERS'}{$user}{''};
     }
 }
 
-
+# sub _sid2string {
+#   my ($sid) = @_;
+#   my ($revision_level, $authority, $sub_authority_count, @sub_authorities) = unpack 'C Vxx C V*', $sid;
+#   die if $sub_authority_count != scalar @sub_authorities;
+#   my $string = join '-', 'S', $revision_level, $authority, @sub_authorities;
+#   if ( $ENV{LDAP_DEBUG} ) {
+#     carp "sid    = " . join( '\\', unpack '(H2)*', $sid );
+#     carp "string = $string";
+#   }
+#   return $string;
+# }
 
 sub _console_print_users_v {
     my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
@@ -669,6 +779,8 @@ sub config_sophomorix_read {
 
     # read sophomorix.ini
     &read_sophomorix_ini(\%sophomorix_config,$ref_result);
+    # read lsbrelease
+    &read_lsbrelease(\%sophomorix_config,$ref_result);
     # read smb.conf
     &read_smb_conf(\%sophomorix_config,$ref_result);
     # read more samba stuff
@@ -956,6 +1068,39 @@ sub read_sophomorix_ini {
         ( -file => $DevelConf::sophomorix_ini, 
           -handle_trailing_comment => 1,
         );
+}
+
+
+
+sub read_lsbrelease {
+    my ($ref_sophomorix_config,$ref_result)=@_;
+    open(LSB_RELEASE,"<$ref_sophomorix_config->{'INI'}{'LINUX'}{'LSB_RELEASE'}") || 
+        die "Cannot find $ref_sophomorix_config->{'INI'}{'LINUX'}{'LSB_RELEASE'}\n";
+    while (<LSB_RELEASE>){
+        chomp();
+        my ($key,$value)=split(/=/);
+        $ref_sophomorix_config->{'linux'}{'lsb-release'}{$key}=$value;
+    }
+    close(LSB_RELEASE);
+    $allowed_distrib_id=$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_ID'};
+    $distrib_id=$ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_ID'};
+    $release=$ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'};
+    if ($distrib_id ne $allowed_distrib_id){
+	print "ERROR: sophomorix is best run on $allowed_distrib_id (You are using: $distrib_id)\n";
+        exit;
+    }
+    if ($release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_STABLE'} or
+        $release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_UPCOMING'} or
+        $release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_EXPERIMENTAL'}){
+        print "Distro-check: $distrib_id $release is OK\n";
+    } else {
+	print "ERROR: sophomorix runs only on certain $allowed_distrib_id distributions:\n";
+	print "       $ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_STABLE'} (STABLE)\n";
+	print "       $ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_UPCOMING'} (UPCOMING)\n";
+	print "       $ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_EXPERIMENTAL'} (EXPERIMENTAL)\n";
+        print "You have $distrib_id $release\n";
+        exit;
+    }
 }
 
 
