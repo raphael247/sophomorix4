@@ -511,7 +511,9 @@ if ($user ne ""){
 }
 
 
+
 # --info --user <user>
+if ($user ne "" and $info==1){
     my $ref_users=&AD_get_full_userdata({ldap=>$ldap,
                                         root_dse=>$root_dse,
                                         root_dns=>$root_dns,
@@ -529,11 +531,9 @@ if ($user ne ""){
                 hash_ref => $ref_users,
                 sophomorix_config => \%sophomorix_config,
                });
-   exit;
+    exit;
 
 
-
-if ($user ne "" and $info==1){
     my $filter="(&(objectclass=user) $user_filter  $school_filter)"; 
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
