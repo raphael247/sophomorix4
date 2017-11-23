@@ -14,7 +14,13 @@ use List::MoreUtils qw(uniq);
 #use IMAP::Admin;
 #use DBI;
 use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 use JSON;
+
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -35,6 +41,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  remove_from_list
+                                 json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -53,6 +60,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_group_list
                                  AD_dns_get
+                                 AD_get_users_v
                                  AD_debug_logdump
                                  AD_object_search
                                  get_forbidden_logins
@@ -204,7 +212,8 @@ sophomorix-user edits the sophomorix user database.
 
 Options
   -h   /  --help
-  -i   /  --info
+  -i   /  --info                        summary
+  -iv  (-school <school>)               one user per line
   -v   /  --verbose
   -vv  /  --verbose --verbose
 
@@ -300,10 +309,50 @@ if ($user ne ""){
     $user_filter="(sAMAccountName=$user)";
 }
 
+if ($user eq "" and $info==1 and $Conf::log_level==2){
+    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  school=>$school,
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+    print Dumper($ref_user_v);
+    my $jsoninfo="USERS_V";
+    my $jsoncomment="The sophomorix users";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_user_v,
+                sophomorix_config => \%sophomorix_config,
+               });
 
+   exit;
+}
 
 # --info
 if ($user eq "" and $info==1){
+    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  school=>$school,
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+    print Dumper($ref_user_v);
+    my $jsoninfo="USERS_OVERVIEW";
+    my $jsoncomment="The sophomorix users";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_user_v,
+                sophomorix_config => \%sophomorix_config,
+               });
+
+
+
     ##################################################
     # vars for results
     my %results=();

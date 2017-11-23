@@ -13,6 +13,7 @@ require Exporter;
 #use Sys::Filesystem ();
 use Time::Local;
 use Config::IniFiles;
+#use Unicode::GCString;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -142,6 +143,10 @@ sub json_dump {
             &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "DEVICES"){
             &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "USERS_V"){
+            &_console_print_users_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "USERS_OVERVIEW"){
+            &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -262,6 +267,158 @@ sub _console_print_devices {
 }
 
 
+
+sub _console_print_users_overview {
+    my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    foreach my $school (@school_list){
+        print "\n";
+        &print_title("Users of school $school:");
+        my $line="----------+---+------+------+------+------+------++------+------+-----+\n";
+        print $line;
+#        print "status    |   | stud | teach| gadm | sadm | gbin | sbin | comp | oth |\n";
+        print "status    |   | stud | teach| sadm | sbin | comp || gadm | gbin | oth |\n";
+        print $line;
+        #printf "%-13s |%5s |%5s |%5s |%5s |%5s |%5s |%5s |%4s |\n",
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "permanent | P",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'P'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'P'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'computer'},
+#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globaladministrator'},
+#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globalbinduser'},
+               $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
+               $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
+               $ref_users_v->{'COUNTER'}{'OTHER'};
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "usable    | U",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'U'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'U'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "activated | A",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'A'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'A'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "enabled   | E",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'E'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'E'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "selfactiv.| S",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'S'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'S'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "tolerated | T",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'T'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'T'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "disabled  | D",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'D'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'D'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "locked    | L",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'L'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'L'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "frozen    | F",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'F'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'F'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "removable | R",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'R'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'R'},
+            "","","","","","";
+        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "killable  | K",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'K'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'K'},
+            "","","","","","";
+        print $line;
+        printf "%-10s|%2s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+               "sum: ".$ref_users_v->{'COUNTER'}{$school}{'MAX'},
+               "",
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'teacher'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'},
+               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'computer'},
+#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globaladministrator'},
+#               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globalbinduser'},
+               $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
+               $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
+               $ref_users_v->{'COUNTER'}{'OTHER'};
+        print $line;
+        print "(stud=student,teach=teacher,sadm=schooladministrator,sbin=schoolbinduser,\n";
+        print " comp=computer,gadm=globaladministrator,gbin=globalbinduser,oth=other)\n";
+    }
+    print "\nOther (oth) user objects (objectclass=user):\n";
+    foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_SCHOOL'}{'OTHER'}{'OTHER'} }  ){
+        print "   * $user (".$ref_users_v->{'USERS'}{$user}{'DN'}.")\n";
+    }
+    print "\n";
+}
+
+
+sub _console_print_users_v {
+    my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    # one user per line
+
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    my @rolelist=("schooladministrator","schoolbinduser","teacher","student");
+
+    my $line="+---------------+---+----------------+----------+---------------------------+\n";
+
+    foreach my $school (@school_list){
+        print $line;
+        &print_title("Users of school $school:");
+
+        print $line;
+        print "| sAMAccountName| S | AdminClass     | Role     | displayName               |\n";
+
+        foreach my $role (@rolelist){
+            if ($#{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
+                print $line;
+                foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
+                    #my $gcs  = Unicode::GCString->new($ref_users_v->{'USERS'}{$user}{'displayName'});
+                    if ($role eq "schooladministrator"){
+                        $role="sadmin";
+                    }
+                    if ($role eq "schoolbinduser"){
+                        $role="sbind";
+                    }
+	  	    printf "| %-14s| %-2s| %-15s| %-9s| %-24s\n",
+                        $user,
+                        $ref_users_v->{'USERS'}{$user}{'sophomorixStatus'},
+                        $ref_users_v->{'USERS'}{$user}{'sophomorixAdminClass'},
+                        $role,
+		        $ref_users_v->{'USERS'}{$user}{'displayName'};
+                }
+            }
+        }
+    } 
+    print $line;   
+}
 
 # helper stuff
 ######################################################################

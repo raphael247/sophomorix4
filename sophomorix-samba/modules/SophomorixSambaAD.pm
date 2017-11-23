@@ -68,6 +68,7 @@ $Data::Dumper::Terse = 1;
             AD_object_search
             AD_get_AD
             AD_get_quota
+            AD_get_users_v
             AD_get_print_data
             AD_class_fetch
             AD_project_fetch
@@ -4850,6 +4851,114 @@ sub AD_get_quota {
     }
 
     return(\%quota);
+}
+
+
+
+sub AD_get_users_v {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $school = $arg_ref->{school};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my %users=();
+    $users{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'}=0;
+    $users{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'}=0;
+
+    foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'P'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'P'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'U'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'U'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'A'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'A'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'E'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'E'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'S'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'S'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'T'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'T'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'D'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'D'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'L'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'L'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'F'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'F'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'R'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'R'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'K'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'K'}=0;
+        $users{'COUNTER'}{$school}{'by_role'}{'student'}=0;
+        $users{'COUNTER'}{$school}{'by_role'}{'teacher'}=0;
+        $users{'COUNTER'}{$school}{'by_role'}{'schooladministrator'}=0;
+        $users{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'}=0;
+        $users{'COUNTER'}{$school}{'by_role'}{'computer'}=0;
+        $users{'COUNTER'}{$school}{'MAX'}=0;
+    }
+    # creating 
+    # status Counters
+    # user lists per school
+    # key, hash login data
+
+    # Setting the filters
+    my $school_filter="";
+    my $user_filter="";
+
+    ##################################################
+    # search for all users
+#    my $filter="( &(objectclass=user) (sAMAccountName=*) $school_filter)"; 
+    my $filter="( & ( |(objectclass=user) (objectclass=computer)) (sAMAccountName=*) $school_filter)"; 
+    if($Conf::log_level>=2){
+        print "Filter: $filter\n";
+    }
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['sAMAccountName',
+                               'cn',
+                               'displayName',
+                               'sophomorixRole',
+                               'sophomorixStatus',
+                               'sophomorixSchoolname',
+                               'sophomorixAdminClass',
+                              ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+
+    ##################################################
+    # walk through all results
+    # save results in lists
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        my $role=$entry->get_value('sophomorixRole');
+        my $status=$entry->get_value('sophomorixStatus');
+	print "$sam\n";
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        if (not defined $role or not defined $status){
+            # non sophomorix user
+            $users{'COUNTER'}{'OTHER'}++;
+            $users{'USERS_by_sophomorixRole'}{'OTHER'}{$sam}="seen";
+            $users{'USERS'}{$sam}{'DN'}=$dn;
+            push @{ $users{'LISTS'}{'USER_by_SCHOOL'}{'OTHER'}{'OTHER'} },$sam;
+        } else {
+            # sophomorix user
+            $users{'COUNTER'}{$schoolname}{'MAX'}++;
+            $users{'COUNTER'}{$schoolname}{'status_by_role'}{$role}{$status}++;
+            $users{'COUNTER'}{$schoolname}{'by_role'}{$role}++;
+            $users{'USERS'}{$sam}{'DN'}=$dn;
+            $users{'USERS'}{$sam}{'sophomorixStatus'}=$status;
+            $users{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+            $users{'USERS'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+            push @{ $users{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
+        }
+    }
+print Dumper(\$users);
+    return \%users;
 }
 
 
