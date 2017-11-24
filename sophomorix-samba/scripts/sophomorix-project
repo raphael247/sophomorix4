@@ -287,6 +287,7 @@ if ($info==1 and $project eq "" ){
                                    school=>$school,
                                    sophomorix_config=>\%sophomorix_config,
                                  });
+    print Dumper($ref_group_v);
     #print Dumper($ref_group_v->{'GROUPS'}{'p_Chemie-AG23'});
     my $jsoninfo="PROJECTS_OVERVIEW";
     my $jsoncomment="All Groups";
@@ -312,7 +313,7 @@ if ($info==1 and $project ne ""){
                                            grouplist=>$project,
                                            sophomorix_config=>\%sophomorix_config,
                                       });
-    print Dumper($ref_groups);
+    #print Dumper($ref_groups);
     my $jsoninfo="PROJECT";
     my $jsoncomment="Project";
     &json_dump({json => $json,
@@ -323,9 +324,6 @@ if ($info==1 and $project ne ""){
                 hash_ref => $ref_groups,
                 sophomorix_config => \%sophomorix_config,
                });
-
-    # ????
-    my ($dn_pro,$count,$school_AD)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
     exit;
 }
 

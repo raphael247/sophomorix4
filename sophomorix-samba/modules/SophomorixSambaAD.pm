@@ -4910,9 +4910,9 @@ sub AD_get_full_groupdata {
         $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
         $groups{'GROUPS'}{$sam}{'gidNumber'}=$entry->get_value('gidNumber');
         $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
-        #$groups{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');
+        $groups{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');
         @{ $groups{'GROUPS'}{$sam}{'memberOf'} }=$entry->get_value('memberOf');
-        @{ $groups{'GROUPS'}{$sam}{'members'} }=$entry->get_value('members');
+        @{ $groups{'GROUPS'}{$sam}{'member'} }=$entry->get_value('member');
 
         $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
         $groups{'GROUPS'}{$sam}{'sophomorixType'}=$entry->get_value('sophomorixType');
@@ -4929,10 +4929,18 @@ sub AD_get_full_groupdata {
 
         @{ $groups{'GROUPS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
         @{ $groups{'GROUPS'}{$sam}{'sophomorixAddQuota'} }=$entry->get_value('sophomorixAddQuota');
+
         @{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }=$entry->get_value('sophomorixAdmins');
+        $groups{'GROUPS'}{$sam}{'sophomorixAdmins_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }+1;
+
         @{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} }=$entry->get_value('sophomorixMembers');
+        $groups{'GROUPS'}{$sam}{'sophomorixMembers_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} }+1;
+
         @{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} }=$entry->get_value('sophomorixAdminGroups');
+        $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} }+1;
+
         @{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }=$entry->get_value('sophomorixMemberGroups');
+        $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }+1;
     }
     $groups{'COUNTER'}{'MAX'}=$max;
     if ($max>0){
