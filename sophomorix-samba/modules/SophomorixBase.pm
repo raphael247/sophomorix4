@@ -358,7 +358,10 @@ sub _console_print_users_overview {
 
     foreach my $school (@school_list){
         print "\n";
-        &print_title("$ref_users_v->{'COUNTER'}{$school}{'MAX'} users in school $school:");
+        &print_title("$ref_users_v->{'COUNTER'}{$school}{'TOTAL'} users in school $school:");
+        if ($ref_users_v->{'COUNTER'}{$school}{'TOTAL'}==0){
+            next;
+        }
         my $line="+-----------+---+------+------+------+------+------++------+------+-----+\n";
         print $line;
         print "| status    |   | stud | teach| sadm | sbin | comp || gadm | gbin | oth |\n";
@@ -425,7 +428,7 @@ sub _console_print_users_overview {
             "","","","","","";
         print $line;
         printf "| %-10s|%2s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
-               "sum: ".$ref_users_v->{'COUNTER'}{$school}{'MAX'},
+               "sum: ".$ref_users_v->{'COUNTER'}{$school}{'TOTAL'},
                "",
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'teacher'},
@@ -550,22 +553,10 @@ sub _console_print_users_full_userdata {
 #            printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
 #            printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
 	}
-
-        #printf "%29s: %-40s\n","",$ref_users->{'USERS'}{$user}{''};
     }
 }
 
-# sub _sid2string {
-#   my ($sid) = @_;
-#   my ($revision_level, $authority, $sub_authority_count, @sub_authorities) = unpack 'C Vxx C V*', $sid;
-#   die if $sub_authority_count != scalar @sub_authorities;
-#   my $string = join '-', 'S', $revision_level, $authority, @sub_authorities;
-#   if ( $ENV{LDAP_DEBUG} ) {
-#     carp "sid    = " . join( '\\', unpack '(H2)*', $sid );
-#     carp "string = $string";
-#   }
-#   return $string;
-# }
+
 
 sub _console_print_users_v {
     my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
@@ -584,8 +575,8 @@ sub _console_print_users_v {
 
     foreach my $school (@school_list){
         #print $line;
-        &print_title("$ref_users_v->{'COUNTER'}{$school}{'MAX'} users in school $school:");
-        if ($ref_users_v->{'COUNTER'}{$school}{'MAX'}==0){
+        &print_title("$ref_users_v->{'COUNTER'}{$school}{'TOTAL'} users in school $school:");
+        if ($ref_users_v->{'COUNTER'}{$school}{'TOTAL'}==0){
             next;
         }
         print $line;
@@ -614,6 +605,8 @@ sub _console_print_users_v {
         print $line;   
     } # school end 
 }
+
+
 
 # helper stuff
 ######################################################################

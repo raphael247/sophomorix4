@@ -5098,13 +5098,13 @@ sub AD_get_users_v {
         $users{'COUNTER'}{$school}{'by_role'}{'schooladministrator'}=0;
         $users{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'}=0;
         $users{'COUNTER'}{$school}{'by_role'}{'computer'}=0;
-        $users{'COUNTER'}{$school}{'MAX'}=0;
+        $users{'COUNTER'}{$school}{'TOTAL'}=0;
     }
 
     ##################################################
     # search for all users and computers
     # Setting the filters
-    my $filter="( & ( |(objectclass=user) (objectclass=computer)) (sAMAccountName=*))"; 
+    my $filter="( |(objectclass=user) (objectclass=computer) )"; 
     # print "Filter: $filter\n";
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -5134,12 +5134,12 @@ sub AD_get_users_v {
         if (not defined $role or not defined $status){
             # non sophomorix user
             $users{'COUNTER'}{'OTHER'}++;
-            $users{'USERS_by_sophomorixRole'}{'OTHER'}{$sam}="seen";
+            $users{'USERS_by_sophomorixRole'}{'OTHER'}{$sam}=$dn;
             $users{'USERS'}{$sam}{'DN'}=$dn;
             push @{ $users{'LISTS'}{'USER_by_SCHOOL'}{'OTHER'}{'OTHER'} },$sam;
         } else {
             # sophomorix user
-            $users{'COUNTER'}{$schoolname}{'MAX'}++;
+            $users{'COUNTER'}{$schoolname}{'TOTAL'}++;
             $users{'COUNTER'}{$schoolname}{'status_by_role'}{$role}{$status}++;
             $users{'COUNTER'}{$schoolname}{'by_role'}{$role}++;
             $users{'USERS'}{$sam}{'DN'}=$dn;
