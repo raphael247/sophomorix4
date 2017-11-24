@@ -350,7 +350,6 @@ sub _console_print_groups_overview {
 sub _console_print_users_overview {
     my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my @school_list;
-    print "SO>$school_opt<\n";
     if ($school_opt eq ""){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
     } else {
@@ -359,12 +358,12 @@ sub _console_print_users_overview {
 
     foreach my $school (@school_list){
         print "\n";
-        &print_title("Users of school $school:");
-        my $line="----------+---+------+------+------+------+------++------+------+-----+\n";
+        &print_title("$ref_users_v->{'COUNTER'}{$school}{'MAX'} users in school $school:");
+        my $line="+-----------+---+------+------+------+------+------++------+------+-----+\n";
         print $line;
-        print "status    |   | stud | teach| sadm | sbin | comp || gadm | gbin | oth |\n";
+        print "| status    |   | stud | teach| sadm | sbin | comp || gadm | gbin | oth |\n";
         print $line;
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "permanent | P",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'P'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'P'},
@@ -374,58 +373,58 @@ sub _console_print_users_overview {
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'OTHER'};
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "usable    | U",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'U'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'U'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "activated | A",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'A'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'A'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "enabled   | E",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'E'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'E'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "selfactiv.| S",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'S'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'S'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "tolerated | T",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'T'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'T'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "disabled  | D",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'D'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'D'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "locked    | L",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'L'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'L'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "frozen    | F",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'F'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'F'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "removable | R",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'R'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'R'},
             "","","","","","";
-        printf "%-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "killable  | K",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'K'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'K'},
             "","","","","","";
         print $line;
-        printf "%-10s|%2s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-10s|%2s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
                "sum: ".$ref_users_v->{'COUNTER'}{$school}{'MAX'},
                "",
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'},
@@ -584,9 +583,11 @@ sub _console_print_users_v {
     my $line="+---------------+---+----------------+----------+---------------------------+\n";
 
     foreach my $school (@school_list){
-        print $line;
-        &print_title("Users of school $school:");
-
+        #print $line;
+        &print_title("$ref_users_v->{'COUNTER'}{$school}{'MAX'} users in school $school:");
+        if ($ref_users_v->{'COUNTER'}{$school}{'MAX'}==0){
+            next;
+        }
         print $line;
         print "| sAMAccountName| S | AdminClass     | Role     | displayName               |\n";
 
@@ -610,8 +611,8 @@ sub _console_print_users_v {
                 }
             }
         }
-    } 
-    print $line;   
+        print $line;   
+    } # school end 
 }
 
 # helper stuff
