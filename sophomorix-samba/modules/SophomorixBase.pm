@@ -161,6 +161,8 @@ sub json_dump {
             &_console_print_class_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
             &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "GROUP"){
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -617,6 +619,58 @@ sub _console_print_class_full {
 	print "\n";
     }
 }
+
+
+
+sub _console_print_group_full {
+    my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line1="#####################################################################\n";
+    my $line= "---------------------------------------------------------------------\n";
+    my $line2="+---------------------------------+---------------------------------+\n";
+    my $group_count=0;
+    if ($ref_groups->{'COUNTER'}{'MAX'}==0){
+        print "0 sophomorix-groups can be displayed\n";
+        return;
+    }
+    foreach my $group (@{ $ref_groups->{'LISTS'}{'GROUPS'} }){
+	$group_count++;
+
+        ############################################################
+        # printout
+        ############################################################
+        # header
+        print $line1;
+        print "Group $group_count/$ref_groups->{'COUNTER'}{'MAX'}: ",
+              "$group in school $ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}\n";
+        print "$ref_groups->{'GROUPS'}{$group}{'dn'}\n";
+        print $line1;
+
+        # attributes
+        printf "%23s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
+        printf "%23s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
+        printf "%23s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
+        # sophomorix attributes
+        printf "%23s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
+        # sophomorix mail attributes
+        printf "%23s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
+
+        # memberships
+        print $line;
+        print "memberOf:\n";
+        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
+            print "$item\n";
+	}
+        print $line;
+        print "member:\n";
+        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
+            print "$item\n";
+	}
+        print $line;
+	print "\n";
+    }
+}
+
+
 
 
 

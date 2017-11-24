@@ -44,8 +44,9 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_removemember
                                  AD_group_list
                                  AD_get_passwd
-                                 get_forbidden_logins
                                  AD_get_groups_v
+                                 get_forbidden_logins
+                                 AD_get_full_groupdata
                                     );
 
 my @arguments = @ARGV;
@@ -86,7 +87,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "skiplock" => \$skiplock,
-           "group=s" => \$group,
+           "group|g=s" => \$group,
            "create" => \$create,
            "kill" => \$kill,
            "school=s" => \$school,
@@ -147,7 +148,7 @@ Please see the sophomorix-group(8) man pages for full documentation
 
 
 # --info
-if ($info==1){
+if ($info==1 and $group eq ""){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
@@ -171,6 +172,30 @@ if ($info==1){
 
 
 
+# --info --class <name>
+# list groups and exit
+if ($info==1 and $group ne ""){
+   my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           grouplist=>$group,
+                                           sophomorix_config=>\%sophomorix_config,
+                                      });
+    #print Dumper($ref_groups);
+    my $jsoninfo="GROUP";
+    my $jsoncomment="Group";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_groups,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
+
+
 
 # # exit if options are missing
 # if ($group eq ""){ 
@@ -179,6 +204,7 @@ if ($info==1){
 #      print "is mandatory.\n\n";
 #      exit;
 # }
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
