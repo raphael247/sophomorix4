@@ -65,6 +65,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_passwd
                                  AD_get_groups_v
                                  get_forbidden_logins
+                                 AD_get_full_groupdata
                                     );
 my @arguments = @ARGV;
 
@@ -232,9 +233,28 @@ if ($info==1 and $class eq ""){
    exit;
 }
 
-# --info --class name
+# --info --class <name>
 # list class(es) and exit
-if ($class ne "" and $info==1){
+if ($info==1 and $class ne ""){
+   my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           grouplist=>$class,
+                                           sophomorix_config=>\%sophomorix_config,
+                                      });
+    #print Dumper($ref_groups);
+    my $jsoninfo="CLASS";
+    my $jsoncomment="Class";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_groups,
+                sophomorix_config => \%sophomorix_config,
+               });
+
+
     my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
     exit;
 }

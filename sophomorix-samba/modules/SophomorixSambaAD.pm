@@ -5590,205 +5590,205 @@ sub AD_project_fetch {
         $sam_account=$entry->get_value('sAMAccountName');
 	$school_AD = $entry->get_value('sophomorixSchoolname');
 
-        if($Conf::log_level>=2 or $info==1){
-            # project attributes
-	    my $description = $entry->get_value('description');
-	    my $gidnumber = $entry->get_value('gidNumber');
-	    my @addquota = sort $entry->get_value('sophomorixAddQuota');
-            my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
-            my $mailalias = $entry->get_value('sophomorixMailAlias');
-            my $maillist = $entry->get_value('sophomorixMailList');
-            my $status = $entry->get_value('sophomorixStatus');
-            my $joinable = $entry->get_value('sophomorixJoinable');
-            my $hidden = $entry->get_value('sophomorixHidden');
-            my $maxmembers = $entry->get_value('sophomorixMaxMembers');
-            my $creationdate = $entry->get_value('sophomorixCreationDate');
-            my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
-            my $admin_by_attr = $#admin_by_attr+1;
-            my @member_by_attr = sort $entry->get_value('sophomorixMembers');
-            my $member_by_attr = $#member_by_attr+1;
-            my @admingroups_by_attr = sort $entry->get_value('sophomorixAdminGroups');
-            my $admingroups_by_attr = $#admingroups_by_attr+1;
-            my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
-            my $membergroups_by_attr = $#membergroups_by_attr+1;
+        # if($Conf::log_level>=2 or $info==1){
+        #     # project attributes
+	#     my $description = $entry->get_value('description');
+	#     my $gidnumber = $entry->get_value('gidNumber');
+	#     my @addquota = sort $entry->get_value('sophomorixAddQuota');
+        #     my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
+        #     my $mailalias = $entry->get_value('sophomorixMailAlias');
+        #     my $maillist = $entry->get_value('sophomorixMailList');
+        #     my $status = $entry->get_value('sophomorixStatus');
+        #     my $joinable = $entry->get_value('sophomorixJoinable');
+        #     my $hidden = $entry->get_value('sophomorixHidden');
+        #     my $maxmembers = $entry->get_value('sophomorixMaxMembers');
+        #     my $creationdate = $entry->get_value('sophomorixCreationDate');
+        #     my @admin_by_attr = sort $entry->get_value('sophomorixAdmins');
+        #     my $admin_by_attr = $#admin_by_attr+1;
+        #     my @member_by_attr = sort $entry->get_value('sophomorixMembers');
+        #     my $member_by_attr = $#member_by_attr+1;
+        #     my @admingroups_by_attr = sort $entry->get_value('sophomorixAdminGroups');
+        #     my $admingroups_by_attr = $#admingroups_by_attr+1;
+        #     my @membergroups_by_attr = sort $entry->get_value('sophomorixMemberGroups');
+        #     my $membergroups_by_attr = $#membergroups_by_attr+1;
 
-            # memberships (actual state)
-            my @members= $entry->get_value('member');
-            my %members=();
-            foreach my $entry (@members){
-                $members{$entry}="seen";
-            }
+        #     # memberships (actual state)
+        #     my @members= $entry->get_value('member');
+        #     my %members=();
+        #     foreach my $entry (@members){
+        #         $members{$entry}="seen";
+        #     }
 
-            # sophomorix-memberships (target state of memberships)
-            my @s_members= (@member_by_attr, @admin_by_attr);
-            my @s_groups= (@membergroups_by_attr,@admingroups_by_attr);
-            # all memberships
-            my %s_allmem=();
-            # remember all users and groups (warn when double)
-            my %seen=();
-            # save warnings for later printout
-            my @membership_warn=();
+        #     # sophomorix-memberships (target state of memberships)
+        #     my @s_members= (@member_by_attr, @admin_by_attr);
+        #     my @s_groups= (@membergroups_by_attr,@admingroups_by_attr);
+        #     # all memberships
+        #     my %s_allmem=();
+        #     # remember all users and groups (warn when double)
+        #     my %seen=();
+        #     # save warnings for later printout
+        #     my @membership_warn=();
 
-            # mapping of display names
-            #           key    ---> value
-            # example1: maier1 ---> +maier1   (+: exists and is member)
-            # example2: maier2 ---> -maier2   (-: exists and is NOT member)
-            # example3: maier3 ---> ?maier3   (?: maier does not exist)
-            # empty element stays empty
-            my %name_prefixname_map=(""=>""); 
+        #     # mapping of display names
+        #     #           key    ---> value
+        #     # example1: maier1 ---> +maier1   (+: exists and is member)
+        #     # example2: maier2 ---> -maier2   (-: exists and is NOT member)
+        #     # example3: maier3 ---> ?maier3   (?: maier does not exist)
+        #     # empty element stays empty
+        #     my %name_prefixname_map=(""=>""); 
            
-            # go through all user memberships (target state)
-            foreach my $item (@s_members){
-                if (exists $seen{$item}){
-                    push @membership_warn, 
-                         "WARNING: $item seen twice! Remove one of them!\n";
-                } else {
-                    # save item
-                    $seen{$item}="seen";
-                }
-                my ($count,$dn_exist,$cn_exist)=
-                    &AD_object_search($ldap,$root_dse,"user",$item);
-                if ($count==1){
-                    # user of target state exists: save its dn
-                    $s_allmem{$dn_exist}=$item;
-                    if (exists $members{$dn_exist}){
-                        # existing user is member (+)
-                        $name_prefixname_map{$item}="+$item";
-                    } else {
-                        # existing user is not member (-)
-                        $name_prefixname_map{$item}="-$item";
-                    }
-                } else {
-                    # nonexisting user 
-                    $name_prefixname_map{$item}="?$item";
-                }
-            }
+        #     # go through all user memberships (target state)
+        #     foreach my $item (@s_members){
+        #         if (exists $seen{$item}){
+        #             push @membership_warn, 
+        #                  "WARNING: $item seen twice! Remove one of them!\n";
+        #         } else {
+        #             # save item
+        #             $seen{$item}="seen";
+        #         }
+        #         my ($count,$dn_exist,$cn_exist)=
+        #             &AD_object_search($ldap,$root_dse,"user",$item);
+        #         if ($count==1){
+        #             # user of target state exists: save its dn
+        #             $s_allmem{$dn_exist}=$item;
+        #             if (exists $members{$dn_exist}){
+        #                 # existing user is member (+)
+        #                 $name_prefixname_map{$item}="+$item";
+        #             } else {
+        #                 # existing user is not member (-)
+        #                 $name_prefixname_map{$item}="-$item";
+        #             }
+        #         } else {
+        #             # nonexisting user 
+        #             $name_prefixname_map{$item}="?$item";
+        #         }
+        #     }
 
-            # go through all user memberships (target state)
-            foreach my $item (@s_groups){
-                if (exists $seen{$item}){
-                    push @membership_warn, 
-                         "WARNING: $item seen twice! Remove one of them!\n";
-                } else {
-                    # save item
-                    $seen{$item}="seen";
-                }
-                my ($count,$dn_exist,$cn_exist)=
-                    &AD_object_search($ldap,$root_dse,"group",$item);
-                if ($count==1){
-                    # group of target state exists: save its dn
-                    $s_allmem{$dn_exist}=$item;
-                    if (exists $members{$dn_exist}){
-                        # existing group is member (+)
-                        $name_prefixname_map{$item}="+$item";
-                    } else {
-                        # existing group is not member (-)
-                        $name_prefixname_map{$item}="-$item";
-                    }
-                } else {
-                    # nonexisting group 
-                    $name_prefixname_map{$item}="?$item";
-                }
-            }
+        #     # go through all user memberships (target state)
+        #     foreach my $item (@s_groups){
+        #         if (exists $seen{$item}){
+        #             push @membership_warn, 
+        #                  "WARNING: $item seen twice! Remove one of them!\n";
+        #         } else {
+        #             # save item
+        #             $seen{$item}="seen";
+        #         }
+        #         my ($count,$dn_exist,$cn_exist)=
+        #             &AD_object_search($ldap,$root_dse,"group",$item);
+        #         if ($count==1){
+        #             # group of target state exists: save its dn
+        #             $s_allmem{$dn_exist}=$item;
+        #             if (exists $members{$dn_exist}){
+        #                 # existing group is member (+)
+        #                 $name_prefixname_map{$item}="+$item";
+        #             } else {
+        #                 # existing group is not member (-)
+        #                 $name_prefixname_map{$item}="-$item";
+        #             }
+        #         } else {
+        #             # nonexisting group 
+        #             $name_prefixname_map{$item}="?$item";
+        #         }
+        #     }
 
-            # check for actual members that should not be members
-            foreach my $mem (@members){
-                if (not exists $s_allmem{$mem}){
-                    push @membership_warn, 
-                         "WARNING: $mem\n         IS member but SHOULD NOT BE member of $sam_account\n";
-                }
-            }
+        #     # check for actual members that should not be members
+        #     foreach my $mem (@members){
+        #         if (not exists $s_allmem{$mem}){
+        #             push @membership_warn, 
+        #                  "WARNING: $mem\n         IS member but SHOULD NOT BE member of $sam_account\n";
+        #         }
+        #     }
 
-	    # indent list
-	    my @addquotashow=();
-	    foreach my $addquotastring (@addquota){
-		my $tmp=" ".$addquotastring;
-                push @addquotashow, $tmp;
-	    }
+	#     # indent list
+	#     my @addquotashow=();
+	#     foreach my $addquotastring (@addquota){
+	# 	my $tmp=" ".$addquotastring;
+        #         push @addquotashow, $tmp;
+	#     }
 
 	    
-            # left column in printout
-            my @project_attr=("Schoolname:",
-                              " $school_AD",
-                              "gidnumber: $gidnumber",
-                              "Description:",
-                              " $description",
-                              "AddQuota in MB:",
-			      @addquotashow,
-                              "AddMailQuota: ${addmailquota} MB",
-                              "MailAlias: $mailalias",
-                              "MailList: $maillist",
-                              "SophomorixStatus: $status",
-                              "Joinable: $joinable",
-                              "Hidden: $hidden",
-                              "MaxMembers: $maxmembers",
-                              "CreationDate:",
-                              " $creationdate"
-                             );
+        #     # left column in printout
+        #     my @project_attr=("Schoolname:",
+        #                       " $school_AD",
+        #                       "gidnumber: $gidnumber",
+        #                       "Description:",
+        #                       " $description",
+        #                       "AddQuota in MB:",
+	# 		      @addquotashow,
+        #                       "AddMailQuota: ${addmailquota} MB",
+        #                       "MailAlias: $mailalias",
+        #                       "MailList: $maillist",
+        #                       "SophomorixStatus: $status",
+        #                       "Joinable: $joinable",
+        #                       "Hidden: $hidden",
+        #                       "MaxMembers: $maxmembers",
+        #                       "CreationDate:",
+        #                       " $creationdate"
+        #                      );
 
-            # calculate max height of colums
-            my $max=$#project_attr;
-            if ($#admin_by_attr > $max){
-	        $max=$#admin_by_attr;
-            }
-            if ($#member_by_attr > $max){
-	        $max=$#member_by_attr;
-            }
-            if ($#membergroups_by_attr > $max){
-	        $max=$#membergroups_by_attr;
-            }
-            if ($#admingroups_by_attr > $max){
-	        $max=$#admingroups_by_attr;
-            }
+        #     # calculate max height of colums
+        #     my $max=$#project_attr;
+        #     if ($#admin_by_attr > $max){
+	#         $max=$#admin_by_attr;
+        #     }
+        #     if ($#member_by_attr > $max){
+	#         $max=$#member_by_attr;
+        #     }
+        #     if ($#membergroups_by_attr > $max){
+	#         $max=$#membergroups_by_attr;
+        #     }
+        #     if ($#admingroups_by_attr > $max){
+	#         $max=$#admingroups_by_attr;
+        #     }
 
-            &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
-            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
-                   "Project:"," "," "," "," ";
-            printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
-                   "  $sam_account"," Admins "," Members "," AdminGroups "," MemberGroups ";
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
+        #     &Sophomorix::SophomorixBase::print_title("($max_pro) $dn");
+        #     print "+---------------------+-----------+-----------+",
+        #           "---------------+---------------+\n";
+        #     printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+        #            "Project:"," "," "," "," ";
+        #     printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+        #            "  $sam_account"," Admins "," Members "," AdminGroups "," MemberGroups ";
+        #     print "+---------------------+-----------+-----------+",
+        #           "---------------+---------------+\n";
 
-            # print the columns
-            for (my $i=0;$i<=$max;$i++){
-                if (not defined $project_attr[$i]){
-	            $project_attr[$i]="";
-                }
-                if (not defined $admin_by_attr[$i]){
-	            $admin_by_attr[$i]="";
-                }
-                if (not defined $member_by_attr[$i]){
-	            $member_by_attr[$i]="";
-                }
-                if (not defined $membergroups_by_attr[$i]){
-	            $membergroups_by_attr[$i]="";
-                }
-                if (not defined $admingroups_by_attr[$i]){
-	            $admingroups_by_attr[$i]="";
-                }
-                printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
-                       $project_attr[$i],
-                       $name_prefixname_map{$admin_by_attr[$i]},
-                       $name_prefixname_map{$member_by_attr[$i]},
-                       $name_prefixname_map{$admingroups_by_attr[$i]},
-		       $name_prefixname_map{$membergroups_by_attr[$i]};
-            }
+        #     # print the columns
+        #     for (my $i=0;$i<=$max;$i++){
+        #         if (not defined $project_attr[$i]){
+	#             $project_attr[$i]="";
+        #         }
+        #         if (not defined $admin_by_attr[$i]){
+	#             $admin_by_attr[$i]="";
+        #         }
+        #         if (not defined $member_by_attr[$i]){
+	#             $member_by_attr[$i]="";
+        #         }
+        #         if (not defined $membergroups_by_attr[$i]){
+	#             $membergroups_by_attr[$i]="";
+        #         }
+        #         if (not defined $admingroups_by_attr[$i]){
+	#             $admingroups_by_attr[$i]="";
+        #         }
+        #         printf "|%-21s|%-11s|%-11s|%-15s|%-15s|\n",
+        #                $project_attr[$i],
+        #                $name_prefixname_map{$admin_by_attr[$i]},
+        #                $name_prefixname_map{$member_by_attr[$i]},
+        #                $name_prefixname_map{$admingroups_by_attr[$i]},
+	# 	       $name_prefixname_map{$membergroups_by_attr[$i]};
+        #     }
 
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
-            printf "|%20s |%10s |%10s |%14s |%14s |\n",
-                   "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
-            print "+---------------------+-----------+-----------+",
-                  "---------------+---------------+\n";
-            print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
+        #     print "+---------------------+-----------+-----------+",
+        #           "---------------+---------------+\n";
+        #     printf "|%20s |%10s |%10s |%14s |%14s |\n",
+        #            "",$admin_by_attr,$member_by_attr,$admingroups_by_attr,$membergroups_by_attr;
+        #     print "+---------------------+-----------+-----------+",
+        #           "---------------+---------------+\n";
+        #     print "?: nonexisting user/group, -: existing but not member, +: existing and member\n";
 
-            # print warnings            
-            foreach my $warn (@membership_warn){
-                print $warn;
-	    }
-        }
+        #     # print warnings            
+        #     foreach my $warn (@membership_warn){
+        #         print $warn;
+	#     }
+        # } # end info
     }
     return ($dn,$max_pro,$school_AD);
 }
@@ -6492,6 +6492,8 @@ sub AD_group_create {
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$group.",".$target_branch;
+    my $mail = $group."\@".$root_dns;
+
 
     if (defined $dn_wish){
         # override DN
@@ -6528,6 +6530,7 @@ sub AD_group_create {
                                     cn   => $cn,
                                     description => $description,
                                     sAMAccountName => $group,
+                                    mail => $mail,
                                     sophomorixCreationDate => $creationdate, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
@@ -6554,6 +6557,7 @@ sub AD_group_create {
                                     cn   => $cn,
                                     description => $description,
                                     sAMAccountName => $group,
+                                    mail => $mail,
                                     sophomorixCreationDate => $creationdate, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
@@ -6580,6 +6584,7 @@ sub AD_group_create {
                                     cn   => $cn,
                                     description => $description,
                                     sAMAccountName => $group,
+                                    mail => $mail,
                                     sophomorixCreationDate => $creationdate, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
