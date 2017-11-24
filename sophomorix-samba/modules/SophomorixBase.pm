@@ -151,8 +151,8 @@ sub json_dump {
             &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USER"){
             &_console_print_users_full_userdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
-        } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
-            &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type)
+        } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
+            &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "CLASSES_OVERVIEW"){
             &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
@@ -303,8 +303,8 @@ sub _console_print_classes_overview {
                 $MQ=" * "; # modified
             }
             my $Q=0;
-            foreach my $addquota ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixQuota'} }){
-                my ($share,$value,$comment)=split(/:/,$addquota);
+            foreach my $quota ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixQuota'} }){
+                my ($share,$value,$comment)=split(/:/,$quota);
 		if ($value ne "---" or $comment ne "---"){
                     $Q++;
                 }
@@ -328,8 +328,12 @@ sub _console_print_classes_overview {
 }
 
 
-sub _console_print_groups_overview {
-    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config,$type)=@_;
+
+
+
+sub _console_print_projects_overview {
+    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -337,33 +341,16 @@ sub _console_print_groups_overview {
         @school_list=($school_opt);
     }
 
-    my $groupstring;
-    my $header;
-    my $line;
-    if ($type eq "project"){
-        $groupstring="projects";
-        $header="| Project Name         |AQ|AMQ|MM|H|A|L|S|J| Project Description             |\n";
-        $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
-    } elsif ($type eq "class"){
-        $groupstring="classes (adminclass, teacherclass)";
-        $header="| Class Name           | Q| MQ|MM|H|A|L|S|J| Class Description               |\n";
-        $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
-    } else {
-        $groupstring="... Groups ... ";
-        $header="";
-        $line="";
-    }
-
     foreach my $school (@school_list){
         print "\n";
-        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$type} $groupstring in school $school:");
-        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$type}==0){
+        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'project'} projects in school $school:");
+        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'project'}==0){
             next;
         }
         print $line;
-        print $header;
+        print "| Project Name         |AQ|AMQ|MM|H|A|L|S|J| Project Description             |\n";
         print $line;
-        foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{$type} }){
+        foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'project'} }){
             my $AMQ;
             if ($ref_groups_v->{'GROUPS'}{$group}{'sophomorixAddMailQuota'} eq "---:---:"){
                 $AMQ=" - "; # unmodified
@@ -390,16 +377,8 @@ sub _console_print_groups_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
-        if ($type eq "project"){
-            print "AQ=AddQuota  AMQC=AddMailQuotaCalculated  J=Joinable MM=MaxMembers\n";
-            print " A=MailAlias    L=MaiList     S=Status    H=Hidden\n";
-        } elsif ($type eq "sophomorix-group"){
-            print "MQ=MailQuota   J=Joinable   MM=MaxMembers    H=Hidden\n";
-            print " A=MailAlias   L=MaiList     S=Status\n";
-        } elsif ($type eq "adminclass"){
-            print "MQ=MailQuota   J=Joinable   MM=MaxMembers    H=Hidden\n";
-            print " A=MailAlias   L=MaiList     S=Status\n";
-        }
+        print "AQ=AddQuota  AMQ=AddMailQuota  J=Joinable  MM=MaxMembers\n";
+        print " A=MailAlias   L=MaiList       S=Status     H=Hidden\n";
     }
 }
 

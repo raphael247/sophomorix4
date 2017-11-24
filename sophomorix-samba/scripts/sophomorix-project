@@ -287,13 +287,12 @@ if ($info==1 and $project eq "" ){
                                    sophomorix_config=>\%sophomorix_config,
                                  });
     #print Dumper($ref_group_v->{'GROUPS'}{'p_Chemie-AG23'});
-    my $jsoninfo="GROUPS_OVERVIEW";
+    my $jsoninfo="PROJECTS_OVERVIEW";
     my $jsoncomment="All Groups";
     &json_dump({json => $json,
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
                 object_name => $school,
-                type => "project",
                 log_level => $Conf::log_level,
                 hash_ref => $ref_group_v,
                 sophomorix_config => \%sophomorix_config,
