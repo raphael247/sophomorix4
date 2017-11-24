@@ -524,12 +524,12 @@ sub _console_print_users_overview {
 
 sub _console_print_class_full {
     my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line1="###############################################################################\n";
-    my $line= "-------------------------------------------------------------------------------\n";
-    my $line2="+----------------+----------------+---------------------+---------------------+\n";
+    my $line1="#####################################################################\n";
+    my $line= "---------------------------------------------------------------------\n";
+    my $line2="+---------------------------------+---------------------------------+\n";
     my $group_count=0;
     if ($ref_groups->{'COUNTER'}{'MAX'}==0){
-        print "0 projects can be displayed\n";
+        print "0 classes (adminclass, teacherclass) can be displayed\n";
         return;
     }
     foreach my $group (@{ $ref_groups->{'LISTS'}{'GROUPS'} }){
@@ -542,56 +542,48 @@ sub _console_print_class_full {
         if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'} > $max){
 	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
         }
-        if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'} > $max){
-	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
-        }
-        if ($ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'} > $max){
-	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'};
-        }
 
         ############################################################
         # printout
         ############################################################
         # header
         print $line1;
-        print "Project $group_count/$ref_groups->{'COUNTER'}{'MAX'}: ",
+        print "Class $group_count/$ref_groups->{'COUNTER'}{'MAX'}: ",
               "$group in school $ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}\n";
         print "$ref_groups->{'GROUPS'}{$group}{'dn'}\n";
         print $line1;
 
         # attributes
-        printf "%31s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
-        printf "%31s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
-        printf "%31s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
+        printf "%23s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
+        printf "%23s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
+        printf "%23s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
         print $line;
         # sophomorix attributes
-        printf "%31s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
-        printf "%31s: %-40s\n","sophomorixHidden",$ref_groups->{'GROUPS'}{$group}{'sophomorixHidden'};
-        printf "%31s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
-        printf "%31s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
-        printf "%31s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
+        printf "%23s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
+        printf "%23s: %-40s\n","sophomorixHidden",$ref_groups->{'GROUPS'}{$group}{'sophomorixHidden'};
+        printf "%23s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
+        printf "%23s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
+        printf "%23s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
         print $line;
         # sophomorix mail attributes
-        printf "%31s: %-40s\n","sophomorixAddMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixAddMailQuota'};
-        printf "%31s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
-        printf "%31s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
-        printf "%31s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
+        printf "%23s: %-40s\n","sophomorixMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailQuota'};
+        printf "%23s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
+        printf "%23s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
+        printf "%23s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
         print $line;
         # sophomorix quota attributes
-        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixAddQuota'} } ){
-            printf "%31s: %-40s\n","sophomorixAddQuota",$item;
+        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixQuota'} } ){
+            printf "%23s: %-40s\n","sophomorixQuota",$item;
 	}
 
         # members
         print $line2;
-        print "| Admins         | Members        | AdminGroups         | MemberGroups        |\n";
+        print "| Admins:                         | Members:                        |\n";
         print $line2;
         for (my $i=0;$i<$max;$i++){
 	    # default display values:
             my $admin="";
             my $member="";
-            my $admingroup="";
-            my $membergroup="";
             # modify defaults if defined:
             if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins'}[$i]){
                 $admin=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins'}[$i];
@@ -599,14 +591,13 @@ sub _console_print_class_full {
             if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers'}[$i]){
                 $member=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers'}[$i];
             }
-            if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups'}[$i]){
-                $admingroup=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups'}[$i];
-            }
-            if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups'}[$i]){
-                $membergroup=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups'}[$i];
-            }
-            printf "| %-15s| %-15s| %-20s| %-20s|\n",$admin,$member,$admingroup,$membergroup;
+            printf "|%32s |%32s |\n",$admin,$member;
 	}
+        print $line2;
+        # sum up
+        printf "| Number of Admins:  %12s | Number of Members: %12s |\n",
+            $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'},
+            $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
         print $line2;
 
         # optional -v : memberships
@@ -646,11 +637,11 @@ sub _console_print_project_full {
         if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'} > $max){
 	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
         }
-        if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'} > $max){
-	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
-        }
         if ($ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'} > $max){
 	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'};
+        }
+        if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'} > $max){
+	    $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
         }
 
         ############################################################
@@ -688,7 +679,7 @@ sub _console_print_project_full {
 
         # members
         print $line2;
-        print "| Admins         | Members        | AdminGroups         | MemberGroups        |\n";
+        print "| Admins:        | Members:       | AdminGroups:        | MemberGroups:       |\n";
         print $line2;
         for (my $i=0;$i<$max;$i++){
 	    # default display values:
@@ -709,8 +700,15 @@ sub _console_print_project_full {
             if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups'}[$i]){
                 $membergroup=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups'}[$i];
             }
-            printf "| %-15s| %-15s| %-20s| %-20s|\n",$admin,$member,$admingroup,$membergroup;
+            printf "|%15s |%15s |%20s |%20s |\n",$admin,$member,$admingroup,$membergroup;
 	}
+        print $line2;
+        # sum up
+        printf "| Admins: %6s | Members:%6s | AdminGroups: %6s | MemberGroups:%6s |\n",
+            $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'},
+            $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'},
+            $ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'},
+            $ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
         print $line2;
 
         # optional -v : memberships
