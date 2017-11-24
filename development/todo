@@ -85,6 +85,11 @@ OK: 1 dovecot default beim anlegen eines users in sophomorix.ini + tests
 
 
 remove AD_group_list (at least display/print options)
+remove AD_project_fetch (at least display/print options)
+
+MAX -> TOTAL in AD_get_full_userdata,AD_get_full_groupdata
+
+creationdate bei Anzeige umwandel in lesbares Datum (Konfigurierbar)
 
 gibts erst ab artful:
 libnet-ldap-sid-perl
@@ -93,7 +98,10 @@ libnet-ldap-sid-perl
 option to add a description:
 sophomorix-group --description --group >name<
 
-
+bei gruppen ausfüllen:
+   displayname?
+   sophomorixComment (nicht nötig, da es displayname gibt?)
+   mail gruppe@....
 
 sophomorix-user - abfrage
 see SophomorixBase.pm at json_dump

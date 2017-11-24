@@ -150,9 +150,11 @@ sub json_dump {
         } elsif ($jsoninfo eq "USERS_OVERVIEW"){
             &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USER"){
-            &_console_print_users_full_userdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_user_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
             &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "PROJECT"){
+            &_console_print_project_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "CLASSES_OVERVIEW"){
             &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
@@ -518,11 +520,20 @@ sub _console_print_users_overview {
 
 
 
-sub _console_print_users_full_userdata {
+sub _console_print_project_full {
+    my ($ref_users,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line1="################################################################################\n";
+    my $line= "--------------------------------------------------------------------------------\n";
+    print"\nHERE\n\n";
+}
+
+
+
+sub _console_print_user_full {
     my ($ref_users,$school_opt,$log_level,$ref_sophomorix_config)=@_;
 #    my $line="-----------------------------:--------------------------------------------------\n";
     my $line1="################################################################################\n";
-     my $line="--------------------------------------------------------------------------------\n";
+    my $line= "--------------------------------------------------------------------------------\n";
     my $user_count=0;
     if ($ref_users->{'COUNTER'}{'MAX'}==0){
         print "0 users can be displayed\n";

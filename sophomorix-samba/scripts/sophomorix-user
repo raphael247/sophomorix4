@@ -323,7 +323,7 @@ if ($user eq "" and $info==1 and $Conf::log_level==2){
 
 
 # --info
-if ($user eq "" and $info==1){
+if ($info==1 and $user eq ""){
     my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,

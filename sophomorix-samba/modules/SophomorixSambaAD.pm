@@ -71,6 +71,7 @@ $Data::Dumper::Terse = 1;
             AD_get_users_v
             AD_get_groups_v
             AD_get_full_userdata
+            AD_get_full_groupdata
             AD_get_print_data
             AD_class_fetch
             AD_project_fetch
@@ -4864,6 +4865,83 @@ sub AD_get_quota {
     }
 
     return(\%quota);
+}
+
+
+
+sub AD_get_full_groupdata {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $grouplist = $arg_ref->{grouplist};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my @grouplist=split(/,/,$grouplist);
+    my $filter;
+    if ($#grouplist==0){
+        $filter="(& (sophomorixType=*) (sAMAccountName=".$grouplist[0]."))"; 
+    } else {
+        $filter="(& (sophomorixType=*) (|";
+        foreach my $group (@grouplist){
+           $filter=$filter." (sAMAccountName=".$group.")";
+
+        } 
+        $filter=$filter." ))";
+    }
+
+    print "$filter\n";
+    my %groups=();
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                       );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        push @{ $groups{'LISTS'}{'GROUPS'} }, $sam;
+
+
+        $groups{'GROUPS'}{$sam}{'dn'}=$entry->dn();
+        $groups{'GROUPS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
+        $groups{'GROUPS'}{$sam}{'cn'}=$entry->get_value('cn');
+        $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
+        $groups{'GROUPS'}{$sam}{'gidNumber'}=$entry->get_value('gidNumber');
+        $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+        #$groups{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');
+        @{ $groups{'GROUPS'}{$sam}{'memberOf'} }=$entry->get_value('memberOf');
+        @{ $groups{'GROUPS'}{$sam}{'members'} }=$entry->get_value('members');
+
+        $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+        $groups{'GROUPS'}{$sam}{'sophomorixType'}=$entry->get_value('sophomorixType');
+        $groups{'GROUPS'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+        $groups{'GROUPS'}{$sam}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
+        $groups{'GROUPS'}{$sam}{'sophomorixJoinable'}=$entry->get_value('sophomorixJoinable');
+        $groups{'GROUPS'}{$sam}{'sophomorixHidden'}=$entry->get_value('sophomorixHidden');
+        $groups{'GROUPS'}{$sam}{'sophomorixMaxMembers'}=$entry->get_value('sophomorixMaxMembers');
+        $groups{'GROUPS'}{$sam}{'sophomorixMailList'}=$entry->get_value('sophomorixMailList');
+        $groups{'GROUPS'}{$sam}{'sophomorixMailAlias'}=$entry->get_value('sophomorixMailAlias');
+        $groups{'GROUPS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+        $groups{'GROUPS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
+        $groups{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}=$entry->get_value('sophomorixAddMailQuota');
+
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixAddQuota'} }=$entry->get_value('sophomorixAddQuota');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }=$entry->get_value('sophomorixAdmins');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} }=$entry->get_value('sophomorixMembers');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} }=$entry->get_value('sophomorixAdminGroups');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }=$entry->get_value('sophomorixMemberGroups');
+    }
+    $groups{'COUNTER'}{'MAX'}=$max;
+    if ($max>0){
+        @{ $groups{'LISTS'}{'GROUPS'} } = sort @{ $groups{'LISTS'}{'GROUPS'} };
+    }    
+    if ($max==0){
+        print "0 groups found\n";
+    }
+    return \%groups;
 }
 
 

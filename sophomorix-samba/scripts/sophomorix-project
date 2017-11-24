@@ -63,6 +63,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  get_forbidden_logins
                                  next_free_gidnumber_get
                                  next_free_gidnumber_set
+                                 AD_get_full_groupdata
                                     );
 
 my @arguments = @ARGV;
@@ -298,15 +299,32 @@ if ($info==1 and $project eq "" ){
                 sophomorix_config => \%sophomorix_config,
                });
    exit;
-    #&AD_group_list($ldap,$root_dse,"project",1);
-    #exit;
 }
 
 
 
 # --info --project <project>
 # list project(s) and exit
-if ($project ne "" and $info==1){
+if ($info==1 and $project ne ""){
+    my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           grouplist=>$project,
+                                           sophomorix_config=>\%sophomorix_config,
+                                      });
+    print Dumper($ref_groups);
+    my $jsoninfo="PROJECT";
+    my $jsoncomment="Project";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_groups,
+                sophomorix_config => \%sophomorix_config,
+               });
+
+    # ????
     my ($dn_pro,$count,$school_AD)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
     exit;
 }
