@@ -602,13 +602,16 @@ sub _console_print_class_full {
 
         # optional -v : memberships
         if ($log_level>1){
+            print "memberOf:\n";
             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-                print "memberOf: $item\n";
+                print "$item\n";
 	    }
+            print $line;
+            print "member:\n";
             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-                print "member: $item\n";
+                print "$item\n";
 	    }
-            print $line2;
+            print $line;
         }
 
 	print "\n";
@@ -713,13 +716,16 @@ sub _console_print_project_full {
 
         # optional -v : memberships
         if ($log_level>1){
+            print "memberOf:\n";
             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-                print "memberOf: $item\n";
+                print "$item\n";
 	    }
+            print $line;
+            print "member:\n";
             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-                print "member: $item\n";
+                print "$item\n";
 	    }
-            print $line2;
+            print $line;
         }
 
 	print "\n";
