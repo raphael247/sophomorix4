@@ -4984,6 +4984,7 @@ sub AD_get_groups_v {
         $groups{'COUNTER'}{$school}{'by_type'}{'project'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'adminclass'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'teacherclass'}=0;
+        $groups{'COUNTER'}{$school}{'by_type'}{'class'}=0;
     }
 
     ##################################################
@@ -5034,6 +5035,11 @@ sub AD_get_groups_v {
             $groups{'COUNTER'}{$schoolname}{'TOTAL'}++;
             $groups{'COUNTER'}{$schoolname}{'status_by_type'}{$type}{$status}++;
             $groups{'COUNTER'}{$schoolname}{'by_type'}{$type}++;
+            push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
+            if ($type eq "adminclass" or $type eq "teacherclass"){
+                $groups{'COUNTER'}{$schoolname}{'by_type'}{'class'}++;
+                push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{'class'} },$sam;
+            }
             $groups{'GROUPS'}{$sam}{'DN'}=$dn;
             $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$status;
             $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
@@ -5049,7 +5055,7 @@ sub AD_get_groups_v {
             $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
 #            $groups{'GROUPS'}{$sam}{''}=$entry->get_value('');
 #            $groups{'GROUPS'}{$sam}{''}=$entry->get_value('');
-            push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
+#            push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
         }
     }
     return \%groups;

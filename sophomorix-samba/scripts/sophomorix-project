@@ -279,7 +279,7 @@ Please see the sophomorix-project(8) man pages for full documentation
 
 # --info
 # show all projects when no specific projects is given
-if ($project eq "" and $info==1){
+if ($info==1 and $project eq "" ){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,

@@ -153,6 +153,8 @@ sub json_dump {
             &_console_print_users_full_userdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
             &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type)
+        } elsif ($jsoninfo eq "CLASSES_OVERVIEW"){
+            &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -274,6 +276,58 @@ sub _console_print_devices {
 
 
 
+sub _console_print_classes_overview {
+    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line="+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
+    my @school_list;
+    if ($school_opt eq "" or $school_opt eq "---"){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    foreach my $school (@school_list){
+        print "\n";
+        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'} classes (adminclass, teacherclass) in school $school:");
+        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'}==0){
+            next;
+        }
+        print $line;
+        print "| Class Name           | Q| MQ|MM|H|A|L|S|J| Class Description               |\n";
+        print $line;
+        foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
+            my $MQ;
+            if ($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailQuota'} eq "---:---:"){
+                $MQ=" - "; # unmodified
+            } else {
+                $MQ=" * "; # modified
+            }
+            my $Q=0;
+            foreach my $addquota ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixQuota'} }){
+                my ($share,$value,$comment)=split(/:/,$addquota);
+		if ($value ne "---" or $comment ne "---"){
+                    $Q++;
+                }
+            }
+            printf "| %-21s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s\n",
+                    $group,
+                    $Q,
+                    $MQ,
+                    $ref_groups_v->{'GROUPS'}{$group}{'sophomorixMaxMembers'},
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixHidden'},0,1),
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailAlias'},0,1),
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailList'},0,1),
+                    $ref_groups_v->{'GROUPS'}{$group}{'sophomorixStatus'},
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixJoinable'},0,1),
+	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
+        }
+        print $line;
+        print "MQ=MailQuota  Q=Quota    J=Joinable   MM=MaxMembers    H=Hidden\n";
+        print " A=MailAlias  L=MaiList  S=Status\n";
+    }
+}
+
+
 sub _console_print_groups_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config,$type)=@_;
     my @school_list;
@@ -289,6 +343,10 @@ sub _console_print_groups_overview {
     if ($type eq "project"){
         $groupstring="projects";
         $header="| Project Name         |AQ|AMQ|MM|H|A|L|S|J| Project Description             |\n";
+        $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
+    } elsif ($type eq "class"){
+        $groupstring="classes (adminclass, teacherclass)";
+        $header="| Class Name           | Q| MQ|MM|H|A|L|S|J| Class Description               |\n";
         $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
     } else {
         $groupstring="... Groups ... ";
