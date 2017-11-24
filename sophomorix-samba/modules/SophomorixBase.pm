@@ -134,6 +134,7 @@ sub json_dump {
     my $json = $arg_ref->{json};
     my $log_level = $arg_ref->{log_level};
     my $hash_ref = $arg_ref->{hash_ref};
+    my $type = $arg_ref->{type};
     my $object_name = $arg_ref->{object_name};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     # json 
@@ -150,6 +151,8 @@ sub json_dump {
             &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USER"){
             &_console_print_users_full_userdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
+            &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type)
         }
     } elsif ($json==1){
         # pretty output
@@ -271,9 +274,83 @@ sub _console_print_devices {
 
 
 
+sub _console_print_groups_overview {
+    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config,$type)=@_;
+    my @school_list;
+    if ($school_opt eq "" or $school_opt eq "---"){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    my $groupstring;
+    my $header;
+    my $line;
+    if ($type eq "project"){
+        $groupstring="projects";
+        $header="| Project Name         |AQ|AMQ|MM|H|A|L|S|J| Project Description             |\n";
+        $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
+    } else {
+        $groupstring="... Groups ... ";
+        $header="";
+        $line="";
+    }
+
+    foreach my $school (@school_list){
+        print "\n";
+        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$type} $groupstring in school $school:");
+        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$type}==0){
+            next;
+        }
+        print $line;
+        print $header;
+        print $line;
+        foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{$type} }){
+            my $AMQ;
+            if ($ref_groups_v->{'GROUPS'}{$group}{'sophomorixAddMailQuota'} eq "---:---:"){
+                $AMQ=" - "; # unmodified
+            } else {
+                $AMQ=" * "; # modified
+            }
+            my $AQ=0;
+            foreach my $addquota ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAddQuota'} }){
+                my ($share,$value,$comment)=split(/:/,$addquota);
+		if ($value ne "---" or $comment ne "---"){
+                    $AQ++;
+                }
+            }
+            printf "| %-21s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s\n",
+                    $group,
+                    $AQ,
+                    $AMQ,
+                    $ref_groups_v->{'GROUPS'}{$group}{'sophomorixMaxMembers'},
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixHidden'},0,1),
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailAlias'},0,1),
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailList'},0,1),
+                    $ref_groups_v->{'GROUPS'}{$group}{'sophomorixStatus'},
+                    substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixJoinable'},0,1),
+	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
+        }
+        print $line;
+        if ($type eq "project"){
+            print "AQ=AddQuota  AMQC=AddMailQuotaCalculated  J=Joinable MM=MaxMembers\n";
+            print " A=MailAlias    L=MaiList     S=Status    H=Hidden\n";
+        } elsif ($type eq "sophomorix-group"){
+            print "MQ=MailQuota   J=Joinable   MM=MaxMembers    H=Hidden\n";
+            print " A=MailAlias   L=MaiList     S=Status\n";
+        } elsif ($type eq "adminclass"){
+            print "MQ=MailQuota   J=Joinable   MM=MaxMembers    H=Hidden\n";
+            print " A=MailAlias   L=MaiList     S=Status\n";
+        }
+    }
+}
+
+
+
 sub _console_print_users_overview {
     my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my @school_list;
+    print "SO>$school_opt<\n";
     if ($school_opt eq ""){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
     } else {

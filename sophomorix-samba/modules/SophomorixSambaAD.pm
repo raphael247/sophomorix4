@@ -4979,6 +4979,13 @@ sub AD_get_groups_v {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my %groups=();
+    foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+        # set back school counters
+        $groups{'COUNTER'}{$school}{'by_type'}{'project'}=0;
+        $groups{'COUNTER'}{$school}{'by_type'}{'adminclass'}=0;
+        $groups{'COUNTER'}{$school}{'by_type'}{'teacherclass'}=0;
+    }
+
     ##################################################
     # search for all sophomorix groups
     # Setting the filters
@@ -4991,8 +4998,18 @@ sub AD_get_groups_v {
                       attr => ['sAMAccountName',
                                'cn',
                                'displayName',
+                               'description',
                                'sophomorixType',
+                               'sophomorixHidden',
                                'sophomorixStatus',
+                               'sophomorixQuota',
+                               'sophomorixMailQuota',
+                               'sophomorixAddQuota',
+                               'sophomorixAddMailQuota',
+                               'sophomorixMailAlias',
+                               'sophomorixMailList',
+                               'sophomorixJoinable',
+                               'sophomorixMaxMembers',
                                'sophomorixSchoolname',
                               ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -5020,6 +5037,18 @@ sub AD_get_groups_v {
             $groups{'GROUPS'}{$sam}{'DN'}=$dn;
             $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$status;
             $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+            $groups{'GROUPS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
+            $groups{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}=$entry->get_value('sophomorixAddMailQuota');
+            @{ $groups{'GROUPS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
+            @{ $groups{'GROUPS'}{$sam}{'sophomorixAddQuota'} }=$entry->get_value('sophomorixAddQuota');
+            $groups{'GROUPS'}{$sam}{'sophomorixMaxMembers'}=$entry->get_value('sophomorixMaxMembers');
+            $groups{'GROUPS'}{$sam}{'sophomorixHidden'}=$entry->get_value('sophomorixHidden');
+            $groups{'GROUPS'}{$sam}{'sophomorixMailAlias'}=$entry->get_value('sophomorixMailAlias');
+            $groups{'GROUPS'}{$sam}{'sophomorixMailList'}=$entry->get_value('sophomorixMailList');
+            $groups{'GROUPS'}{$sam}{'sophomorixJoinable'}=$entry->get_value('sophomorixJoinable');
+            $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
+#            $groups{'GROUPS'}{$sam}{''}=$entry->get_value('');
+#            $groups{'GROUPS'}{$sam}{''}=$entry->get_value('');
             push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
         }
     }
