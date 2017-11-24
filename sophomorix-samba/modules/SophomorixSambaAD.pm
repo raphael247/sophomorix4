@@ -4985,6 +4985,7 @@ sub AD_get_groups_v {
         $groups{'COUNTER'}{$school}{'by_type'}{'adminclass'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'teacherclass'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'class'}=0;
+        $groups{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'}=0;
     }
 
     ##################################################
