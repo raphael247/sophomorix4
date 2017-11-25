@@ -1,0 +1,190 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-test-infoscripts) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 check_options
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_dns_get
+                                 AD_object_search
+                                    );
+use Sophomorix::SophomorixTest qw(
+                                 AD_object_nonexist
+                                 AD_dn_nonexist
+                                 AD_test_object
+                                 directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
+                                 run_command
+                                 AD_test_session_count
+                                 ACL_test
+                                 file_test_lines
+                                 AD_user_timeupdate
+                                 AD_get_samaccountname
+                                 cat_wcl_test
+                                 );
+
+$Conf::log_level=1;
+my $help=0;
+my $json=0;
+my $all_options="";
+my $full=0;
+
+my $show_nonexisting=0;
+my $all_info=0;
+
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "verbose|v+" => \$Conf::log_level,
+           "json|j+" => \$json,
+           "show-nonexisting" => \$show_nonexisting,
+           "all-info" => \$all_info,
+          );
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+if ($Conf::log_level==1){
+    $all_options="";
+} elsif ($Conf::log_level==2){
+    $all_options="-v";
+} elsif ($Conf::log_level==3){
+    $all_options="-vv";
+}
+
+if ($json==0){
+    # nothing to do
+} elsif ($json==1){
+    $all_options=$all_options." -j";
+} elsif ($json==2){
+    $all_options=$all_options." -jj";
+} elsif ($json==3){
+    $all_options=$all_options." -jjj";
+} 
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-test-infoscripts executes scripts with option --info to find errors in them visually
+
+to have users,groups, ... you should run:
+
+To test the scripts
+
+1) set back system
+
+   --> run tests
+
+2) Add  users,groups, ...
+
+  sophomorix-test-3 --add-pro
+  sophomorix-test-3 --test-mod-pro --exit
+
+  --> run tests
+
+
+Options
+  -h  / --help
+
+Full automated test:
+
+  -f, --full 
+
+Step by step Test:
+
+   --show-nonexisting
+     tries to list nonexisting users,groups,schools
+     --> you should see appropriate errors
+
+   --all-info
+     tries to list users,groups,schools
+
+
+');
+   print "\n";
+   exit;
+}
+
+
+
+
+############################################################
+# Prepare
+############################################################
+
+&run_command("mkdir -p /var/lib/sophomorix/check-result");
+
+
+# --full
+if ($full==1){
+    $show_nonexisting=1;
+    $all_info=1;
+}
+
+
+
+############################################################
+# --show-nonexisting
+############################################################
+if ($show_nonexisting==1){
+    &run_command("rm /tmp/test");
+
+}
+
+
+############################################################
+# --all-info
+############################################################
+if ($all_info==1){
+    &run_command("rm /tmp/test");
+
+    # user overview    
+    &run_info_command("/usr/sbin/sophomorix-user -i");
+    print "---> you should see nothing\n\n";
+
+    print "All output can be analysed in /tmp/test\n\n"
+}
+
+
+
+
+############################################################
+# subs
+############################################################
+
+sub run_info_command {
+    my ($command)=@_;
+    my $tmp="/tmp/test";
+    my $line="§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§\n";
+    my $info_command=$command." >> ".$tmp;
+    open(OUT,">>/tmp/test");
+    print OUT $line;
+    print OUT "  $info_command (output starts here)\n";
+    print OUT $line;
+    close(OUT);
+    &run_command($info_command);
+    open(OUT,">>/tmp/test");
+    print OUT $line;
+    print OUT "  $info_command (output ends here)\n";
+    print OUT $line;
+    print OUT "\n";
+    close(OUT);
+}
