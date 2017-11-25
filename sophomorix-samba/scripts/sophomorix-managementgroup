@@ -43,6 +43,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember_management
                                  AD_group_removemember
                                  AD_get_groups_v
+                                 AD_get_full_groupdata
                                  get_forbidden_logins
                                     );
 
@@ -65,6 +66,8 @@ my $json=0;
 $Conf::log_level=1;
 
 my $school="---";
+
+my $managementgroup="";
 
 my $internet="";
 my $intranet="";
@@ -89,6 +92,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "skiplock" => \$skiplock,
+           "managementgroup|m=s" => \$managementgroup,
            "internet=s" => \$internet,
            "intranet=s" => \$intranet,
            "wifi=s" => \$wifi,
@@ -126,6 +130,7 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
+  -i -m <groupname> / --info --managementgroup <groupname>
 
 Examples 
   sophomorix-managementgroup  --internet  <user1,user2,...>   --nointernet  <user1,user2,...>
@@ -142,7 +147,7 @@ Please see the sophomorix-managementgroup(8) man pages for full documentation
 }
 
 # --info
-if ($info==1){
+if ($info==1 and $managementgroup eq ""){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
@@ -158,6 +163,28 @@ if ($info==1){
                 object_name => $school,
                 log_level => $Conf::log_level,
                 hash_ref => $ref_group_v,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
+
+
+
+if ($info==1 and $managementgroup ne ""){
+    my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           grouplist=>$managementgroup,
+                                           sophomorix_config=>\%sophomorix_config,
+                                      });
+    my $jsoninfo="MANAGEMENTGROUP";
+    my $jsoncomment="Managementgroup";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_groups,
                 sophomorix_config => \%sophomorix_config,
                });
     exit;

@@ -162,9 +162,13 @@ sub json_dump {
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
             &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "GROUP"){
+            # see MANAGEMENTGROUP
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "MANAGEMENTGROUPS_OVERVIEW"){
             &_console_print_managementgroups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "MANAGEMENTGROUP"){
+            # see GROUP
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -695,6 +699,7 @@ sub _console_print_group_full {
         printf "%23s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
         # sophomorix attributes
         printf "%23s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
+        printf "%23s: %-40s\n","sophomorixType",$ref_groups->{'GROUPS'}{$group}{'sophomorixType'};
         # sophomorix mail attributes
         printf "%23s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
 
@@ -713,8 +718,6 @@ sub _console_print_group_full {
 	print "\n";
     }
 }
-
-
 
 
 
