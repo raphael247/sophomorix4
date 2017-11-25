@@ -5853,7 +5853,6 @@ sub AD_admin_list {
 
 sub AD_group_list {
     # show==0 return list of project dn's
-    # show==1 print list, no return
     my ($ldap,$root_dse,$type,$show) = @_;
     my $filter;
     if ($type eq "project"){
@@ -5864,9 +5863,9 @@ sub AD_group_list {
         $filter="(&(objectClass=group)(sophomorixType=adminclass))";
     }
     my $sort = Net::LDAP::Control::Sort->new(order => "sAMAccountName");
-#    if($Conf::log_level>=2){
+    if($Conf::log_level>=2){
         print "Filter: $filter\n";
-#    }
+    }
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -5874,142 +5873,7 @@ sub AD_group_list {
                    control => [ $sort ]
                          );
     my $max_pro = $mesg->count;
-#     if ($show==1){ 
-#         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
-#         print "-------------------+----------+-----+----+-+-",
-#               "+-+-+-+--------------------------------\n";
-# 	if ($type eq "project"){
-#         printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
-#                "Project Name","AQ","AMQ","MM","H","A","L","S","J","Project Description";
-#         } elsif ($type eq "sophomorix-group"){
-#         printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
-#                "Group Name","Quota","MQ","MM","H","A","L","S","J","Class Description";
-#         } elsif ($type eq "adminclass"){
-#         printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s \n",
-#                "Class Name","Quota","MQ","MM","H","A","L","S","J","Class Description";
-#         }
-#         print "-------------------+----------+-----+----+-+-",
-#               "+-+-+-+--------------------------------\n";
-        
-
-#         for( my $index = 0 ; $index < $max_pro ; $index++) {
-#             my $entry = $mesg->entry($index);
-#             $dn=$entry->dn();
-#             my $description;
-#             if (not defined $entry->get_value('description')){
-#                 $description=""
-#             } else {
-#                 $description=$entry->get_value('description')
-# 	    }
-#             my $status;
-#             if (not defined $entry->get_value('sophomorixStatus')){
-#                 $status=""
-#             } else {
-#                 $status=$entry->get_value('sophomorixStatus')
-# 	    }
-#             my $quota="";
-# #            if (not defined $entry->get_value('sophomorixQuota')){
-# #                $quota=""
-# #            } else {
-# #                $quota=$entry->get_value('sophomorixQuota')
-# #	    }
-#             my $mailquota;
-#             if (not defined $entry->get_value('sophomorixMailQuota')){
-#                 $mailquota=""
-#             } else {
-#                 $mailquota=$entry->get_value('sophomorixMailQuota')
-# 	    }
-#             my $maxmembers;
-#             if (not defined $entry->get_value('sophomorixMaxMembers')){
-#                 $maxmembers=""
-#             } else {
-#                 $maxmembers=$entry->get_value('sophomorixMaxMembers')
-# 	    }
-#             my $mailalias;
-#             if (not defined $entry->get_value('sophomorixMailAlias')){
-#                 $mailalias=""
-#             } elsif ($entry->get_value('sophomorixMailAlias') eq "FALSE"){
-#                 $mailalias=0;
-#             } else {
-#                 $mailalias=1;
-#             }
-#             my $maillist;
-#             if (not defined $entry->get_value('sophomorixMailList')){
-#                 $maillist="";
-#             } elsif ($entry->get_value('sophomorixMailList') eq "FALSE"){
-#                 $maillist=0;
-#             } else {
-#                 $maillist=1;
-#             }
-#             my $joinable;
-#             if (not defined $entry->get_value('sophomorixJoinable')){
-#                 $joinable="";
-#             } elsif ($entry->get_value('sophomorixJoinable') eq "FALSE"){
-#                 $joinable=0;
-#             } else {
-#                 $joinable=1;
-#             }
-#             my $hidden;
-#             if (not defined $entry->get_value('sophomorixHidden')){
-#                 $hidden="";
-#             } elsif ($entry->get_value('sophomorixHidden') eq "FALSE"){
-#                 $hidden=0;
-#             } else {
-#                 $hidden=1;
-#             }
-#             if ($type eq "project"){
-#                 printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
-#                     $entry->get_value('sAMAccountName'),
-#                     "",
-#                     $entry->get_value('sophomorixAddMailQuota'),
-#                     $maxmembers,
-#                     $hidden,
-#                     $mailalias,
-#                     $maillist,
-#                     $status,
-#                     $joinable,
-# 	            $description;
-#             } elsif ($type eq "sophomorix-group"){
-#                 printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
-#                     $entry->get_value('sAMAccountName'),
-#                     $quota,
-#                     $mailquota,
-#                     $maxmembers,
-#                     $hidden,
-#                     $mailalias,
-#                     $maillist,
-#                     $status,
-#                     $joinable,
-# 	            $description;
-#             } elsif ($type eq "adminclass"){
-#                 printf "%-19s|%9s |%4s |%3s |%1s|%1s|%1s|%1s|%1s| %-31s\n",
-#                     $entry->get_value('sAMAccountName'),
-#                     $quota,
-#                     $mailquota,
-#                     $maxmembers,
-#                     $hidden,
-#                     $mailalias,
-#                     $maillist,
-#                     $status,
-#                     $joinable,
-# 	            $description;
-#             }
-#         }
-#         print "-------------------+----------+-----+----+-+-",
-#               "+-+-+-+--------------------------------\n";
-# 	if ($type eq "project"){
-#             print "AQ=addquota   AMQ=addmailquota   J=joinable   MM=maxmembers\n";
-#             print " A=mailalias    L=mailist,       S=status      H=hidden\n";
-#         } elsif ($type eq "sophomorix-group"){
-#             print "MQ=mailquota   J=joinable   MM=maxmembers      H=hidden\n";
-#             print " A=mailalias      L=mailist,    S=status\n";
-#         } elsif ($type eq "adminclass"){
-#             print "MQ=mailquota   J=joinable   MM=maxmembers      H=hidden\n";
-#             print " A=mailalias      L=mailist,    S=status\n";
-#         }
-#         &Sophomorix::SophomorixBase::print_title("$max_pro ${type}-groups");
-#     } elsif ($show==0){
-   my @projects_dn=();
+    my @projects_dn=();
     for( my $index = 0 ; $index < $max_pro ; $index++) {
         my $entry = $mesg->entry($index);
         $dn=$entry->dn();
@@ -6017,7 +5881,6 @@ sub AD_group_list {
     }
     @projects_dn = sort @projects_dn;
     return @projects_dn;
-#    }
 }
 
 
