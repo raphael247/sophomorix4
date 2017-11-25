@@ -11,6 +11,11 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
@@ -26,15 +31,18 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
+                                 json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
                                  AD_bind_admin
+                                 AD_dns_get
                                  AD_unbind_admin
                                  AD_get_name_tokened
                                  AD_group_addmember
                                  AD_group_addmember_management
                                  AD_group_removemember
+                                 AD_get_groups_v
                                  get_forbidden_logins
                                     );
 
@@ -55,6 +63,8 @@ my $json=0;
 # ==========================================================================
 
 $Conf::log_level=1;
+
+my $school="---";
 
 my $internet="";
 my $intranet="";
@@ -99,6 +109,7 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-managementgroup");
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 
 # --help
@@ -130,6 +141,27 @@ Please see the sophomorix-managementgroup(8) man pages for full documentation
    exit;
 }
 
+# --info
+if ($info==1){
+    my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   school=>$school,
+                                   sophomorix_config=>\%sophomorix_config,  
+                                  });
+    print Dumper($ref_group_v);
+    my $jsoninfo="MANAGEMENTGROUPS_OVERVIEW";
+    my $jsoncomment="Managementgroup";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_group_v,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
 
 
 

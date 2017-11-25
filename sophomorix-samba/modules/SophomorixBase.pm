@@ -163,6 +163,8 @@ sub json_dump {
             &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "GROUP"){
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "MANAGEMENTGROUPS_OVERVIEW"){
+            &_console_print_managementgroups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -360,11 +362,47 @@ sub _console_print_groups_overview {
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }){
             printf "| %-18s|%2s|%2s|%2s| %-45s|\n",
+                $group,
+                $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'TOTAL'},
+                $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'teacher'},
+                $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'student'},
+	        $ref_groups_v->{'GROUPS'}{$group}{'description'};
+        }
+        print $line;
+        print "m=member-entries  t=teachers  s=students\n";
+    }
+}
+
+
+
+sub _console_print_managementgroups_overview {
+    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line="+------------------+----+----+----+----------------------------------------------+\n";
+    my @school_list;
+    if ($school_opt eq "" or $school_opt eq "---"){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+ 
+    foreach my $school (@school_list){
+        print "\n";
+        &print_title("Managementgroups in school $school:");
+        print $line;
+        print "| Managementgroup  |  m |  t |  s | Group Description                            |\n";
+        print $line;
+
+        # walk through all the list of managementgroup-TYPES (sophomorixType)
+        foreach my $grouptype ( @{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} } ){
+            # fetch all groups that have this sophomorixType
+            foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{$grouptype} }){
+                printf "| %-17s|%4s|%4s|%4s| %-45s|\n",
                     $group,
                     $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'TOTAL'},
                     $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'teacher'},
                     $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'student'},
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
+            }
         }
         print $line;
         print "m=member-entries  t=teachers  s=students\n";
