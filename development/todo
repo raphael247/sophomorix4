@@ -81,7 +81,36 @@ Individueller Teil:
 
 NEXT/Todo:
 
-OK: 1 dovecot default beim anlegen eines users in sophomorix.ini + tests
+Überlegen:
+
+Neue such subs sind:
+
+Alle Gruppen (aller Schulen):
+   AD_get_groups_v
+Gruppen im Detail:
+   AD_get_full_groupdata
+
+Alle User (aller Schulen):
+   AD_get_users_v
+User im Detail:
+   AD_get_full_userdata
+
+Alle User/Gruppen
+Diese sollten mit der Option <school> aufgerufen werden
+wenn school eine Schule ist, dann 
+--> dann wird nur der Unterbaum durchsucht
+wenn es keine Schule ist
+--> abbruch
+wenn es "---" oder "ist", dann alle schulen
+
+--> Rückgabe in der gleichen Datenstruktur
+
+? Was tun wenn man eine Gruppenliste braucht
+? Was tun wenn man eine Userliste braucht:
+--> festlegen
+
+
+
 
 order member lists ascibetically
 
@@ -93,10 +122,12 @@ remove AD_group_list (at least display/print options)
 remove AD_project_fetch (at least display/print options)
        -> print commented
        -> replace with other function
+dito: AD_class_fetch
 
-AD_class_fetch
 
-MAX -> TOTAL in AD_get_full_userdata,AD_get_full_groupdata
+sophomorix-managementgroup: listet management gruppen
+
+AD_admin_list?
 
 creationdate bei Anzeige umwandel in lesbares Datum (Konfigurierbar)
 

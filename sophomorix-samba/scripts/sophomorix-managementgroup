@@ -35,7 +35,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_group_addmember_management
                                  AD_group_removemember
-                                 AD_group_list
                                  get_forbidden_logins
                                     );
 
@@ -132,11 +131,6 @@ Please see the sophomorix-managementgroup(8) man pages for full documentation
 }
 
 
-
-#if ($info==1){
-#    &AD_group_list($ldap,$root_dse,"management",1);
-#    exit;
-#} 
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);

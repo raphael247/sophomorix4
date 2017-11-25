@@ -571,7 +571,40 @@ if ($kill==1 and $project ne ""){
                     sophomorix_config=>\%sophomorix_config,
                   });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    exit;
 }
+
+
+##################################################
+# --sync_all_memberships
+if (defined $sync_all_memberships){
+   #my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+   #                                root_dse=>$root_dse,
+   #                                root_dns=>$root_dns,
+   #                                school=>$school,
+   #                                sophomorix_config=>\%sophomorix_config,
+   #                              });
+   # print Dumper($ref_group_v);
+   #my @school_list;
+   # if ($school eq "" or $school_opt eq "---"){
+   #     @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+   # } else {
+   #     @school_list=($school_opt);
+   # }
+
+    print "Syncing memberships of the following projects:\n";
+    my @projects_dn=&AD_group_list($ldap,$root_dse,"project",0);
+
+
+
+    foreach my $pro_dn (@projects_dn){
+        &AD_project_sync_members($ldap,$root_dse,$pro_dn);
+    }
+    exit;
+}
+
+
+
 
 
 # get dn if project exists and continue
@@ -589,16 +622,6 @@ if ($count>1){
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
-
-##################################################
-# --sync_all_memberships
-if (defined $sync_all_memberships){
-    print "Syncing memberships of the following projects:\n";
-    my @projects_dn=&AD_group_list($ldap,$root_dse,"project",0);
-    foreach my $pro_dn (@projects_dn){
-        &AD_project_sync_members($ldap,$root_dse,$pro_dn);
-    }
-}
 
 
 

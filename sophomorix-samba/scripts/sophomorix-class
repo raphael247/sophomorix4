@@ -61,7 +61,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_update
                                  AD_project_sync_members
                                  AD_dn_fetch_multivalue
-                                 AD_group_list
                                  AD_get_passwd
                                  AD_get_groups_v
                                  get_forbidden_logins
@@ -228,8 +227,6 @@ if ($info==1 and $class eq ""){
                 hash_ref => $ref_group_v,
                 sophomorix_config => \%sophomorix_config,
                });
-
-   #&AD_group_list($ldap,$root_dse,"adminclass",1);
    exit;
 }
 
