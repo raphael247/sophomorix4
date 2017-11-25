@@ -5074,6 +5074,26 @@ sub AD_get_groups_v {
         $groups{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'}=0;
     }
 
+    ############################################################
+    # create lookup dn -> role
+    ############################################################
+    my $user_filter="(objectclass=user)"; 
+    # print "Filter: $user_filter\n";
+    my $mesg0 = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $user_filter,
+                      attr => ['sAMAccountName',
+                               'dn',
+                               'sophomorixRole',
+                              ]);
+    &AD_debug_logdump($mesg0,2,(caller(0))[3]);
+    my $max_user = $mesg0->count;
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg0->entry($index);
+        $groups{'LOOKUP'}{'sophomorixRole_by_DN'}{$entry->dn()}=$entry->get_value('sophomorixRole');
+    }
+
     ##################################################
     # search for all sophomorix groups
     # Setting the filters
@@ -5142,17 +5162,26 @@ sub AD_get_groups_v {
             $groups{'GROUPS'}{$sam}{'sophomorixJoinable'}=$entry->get_value('sophomorixJoinable');
             $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
             # count members
-            @{ $groups{'GROUPS'}{$sam}{'member'} }=$entry->get_value('member');
-            $groups{'GROUPS'}{$sam}{'member_COUNT'}{'TOTAL'}=$#{ $groups{'GROUPS'}{$sam}{'member'} }+1;
+            @{ $groups{'GROUPS'}{$sam}{'member'}{'TOTAL'} }=$entry->get_value('member');
+            $groups{'GROUPS'}{$sam}{'member_COUNT'}{'TOTAL'}=$#{ $groups{'GROUPS'}{$sam}{'member'}{'TOTAL'} }+1;
             # sort members into role ????
             # query all users
             # create lookup dn --> role
-            # add up according to role:
-            # $groups{'GROUPS'}{$sam}{'member_COUNT'}{$role}
-
+            foreach my $mem_dn (@{ $groups{'GROUPS'}{$sam}{'member'}{'TOTAL'} }){
+                my $role;
+                if ( defined $groups{'LOOKUP'}{'sophomorixRole_by_DN'}{$mem_dn} ){
+                    $role=$groups{'LOOKUP'}{'sophomorixRole_by_DN'}{$mem_dn};
+                } else {
+                    $role="OTHER";
+                }
+                push @{ $groups{'GROUPS'}{$sam}{'member'}{$role} },$mem_dn;
+            }
+            # count the entries for certain roles
+            $groups{'GROUPS'}{$sam}{'member_COUNT'}{'student'}=$#{ $groups{'GROUPS'}{$sam}{'member'}{'student'} }+1;
+            $groups{'GROUPS'}{$sam}{'member_COUNT'}{'teacher'}=$#{ $groups{'GROUPS'}{$sam}{'member'}{'teacher'} }+1;
+            $groups{'GROUPS'}{$sam}{'member_COUNT'}{'OTHER'}=$#{ $groups{'GROUPS'}{$sam}{'member'}{'OTHER'} }+1;
 #            $groups{'GROUPS'}{$sam}{''}=$entry->get_value('');
 #            $groups{'GROUPS'}{$sam}{''}=$entry->get_value('');
-#            push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
         }
     }
     return \%groups;
