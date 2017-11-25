@@ -286,7 +286,7 @@ sub _console_print_devices {
 
 sub _console_print_classes_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line="+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
+    my $line="+--------------------+--+--+--+---+--+-+-+-+-+-+--------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -301,7 +301,7 @@ sub _console_print_classes_overview {
             next;
         }
         print $line;
-        print "| Class Name           | Q| MQ|MM|H|A|L|S|J| Class Description               |\n";
+        print "| Class Name         | t| s| Q| MQ|MM|H|A|L|S|J| Class Description              |\n";
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
             my $MQ;
@@ -317,8 +317,10 @@ sub _console_print_classes_overview {
                     $Q++;
                 }
             }
-            printf "| %-21s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s\n",
+            printf "| %-19s|%2s|%2s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-30s\n",
                     $group,
+                    $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'teacher'},
+                    $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'student'},
                     $Q,
                     $MQ,
                     $ref_groups_v->{'GROUPS'}{$group}{'sophomorixMaxMembers'},
@@ -330,8 +332,8 @@ sub _console_print_classes_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
-        print "MQ=MailQuota  Q=Quota    J=Joinable   MM=MaxMembers    H=Hidden\n";
-        print " A=MailAlias  L=MaiList  S=Status\n";
+        print "t=teachers  s=students   Q=Quota   MQ=MailQuota  MM=MaxMembers\n";
+        print "H=Hidden    A=MailAlias  L=MaiList  S=Status      J=Joinable \n";
     }
 }
 
@@ -354,7 +356,7 @@ sub _console_print_groups_overview {
             next;
         }
         print $line;
-        print "| Group Name        | M| T| S| Group Description                            |\n";
+        print "| Group Name        | m| t| s| Group Description                            |\n";
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }){
             printf "| %-18s|%2s|%2s|%2s| %-45s|\n",
@@ -365,6 +367,7 @@ sub _console_print_groups_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
+        print "m=member-entries  t=teachers  s=students\n";
     }
 }
 
