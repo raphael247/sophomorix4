@@ -339,7 +339,7 @@ sub _console_print_classes_overview {
 
 sub _console_print_groups_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line="+-----------------------+---------------------------------------------------+\n";
+    my $line="+-------------------+--+--+--+----------------------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -354,11 +354,14 @@ sub _console_print_groups_overview {
             next;
         }
         print $line;
-        print "| Group Name            | Group Description                                 |\n";
+        print "| Group Name        | M| T| S| Group Description                            |\n";
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }){
-            printf "| %-22s| %-50s|\n",
+            printf "| %-18s|%2s|%2s|%2s| %-45s|\n",
                     $group,
+                    $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'TOTAL'},
+                    $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'teacher'},
+                    $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'student'},
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
