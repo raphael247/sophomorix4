@@ -4942,7 +4942,7 @@ sub AD_get_full_groupdata {
         @{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }=$entry->get_value('sophomorixMemberGroups');
         $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }+1;
     }
-    $groups{'COUNTER'}{'MAX'}=$max;
+    $groups{'COUNTER'}{'TOTAL'}=$max;
     if ($max>0){
         @{ $groups{'LISTS'}{'GROUPS'} } = sort @{ $groups{'LISTS'}{'GROUPS'} };
     }    
@@ -5044,7 +5044,7 @@ sub AD_get_full_userdata {
 
         # $users{'USERS'}{$sam}{''}=$entry->get_value('');
     }
-    $users{'COUNTER'}{'MAX'}=$max;
+    $users{'COUNTER'}{'TOTAL'}=$max;
     if ($max>0){
         @{ $users{'LISTS'}{'USERS'} } = sort @{ $users{'LISTS'}{'USERS'} };
     }    

@@ -530,7 +530,7 @@ sub _console_print_class_full {
     my $line= "---------------------------------------------------------------------\n";
     my $line2="+---------------------------------+---------------------------------+\n";
     my $group_count=0;
-    if ($ref_groups->{'COUNTER'}{'MAX'}==0){
+    if ($ref_groups->{'COUNTER'}{'TOTAL'}==0){
         print "0 classes (adminclass, teacherclass) can be displayed\n";
         return;
     }
@@ -550,7 +550,7 @@ sub _console_print_class_full {
         ############################################################
         # header
         print $line1;
-        print "Class $group_count/$ref_groups->{'COUNTER'}{'MAX'}: ",
+        print "Class $group_count/$ref_groups->{'COUNTER'}{'TOTAL'}: ",
               "$group in school $ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}\n";
         print "$ref_groups->{'GROUPS'}{$group}{'dn'}\n";
         print $line1;
@@ -628,7 +628,7 @@ sub _console_print_group_full {
     my $line= "---------------------------------------------------------------------\n";
     my $line2="+---------------------------------+---------------------------------+\n";
     my $group_count=0;
-    if ($ref_groups->{'COUNTER'}{'MAX'}==0){
+    if ($ref_groups->{'COUNTER'}{'TOTAL'}==0){
         print "0 sophomorix-groups can be displayed\n";
         return;
     }
@@ -640,7 +640,7 @@ sub _console_print_group_full {
         ############################################################
         # header
         print $line1;
-        print "Group $group_count/$ref_groups->{'COUNTER'}{'MAX'}: ",
+        print "Group $group_count/$ref_groups->{'COUNTER'}{'TOTAL'}: ",
               "$group in school $ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}\n";
         print "$ref_groups->{'GROUPS'}{$group}{'dn'}\n";
         print $line1;
@@ -680,7 +680,7 @@ sub _console_print_project_full {
     my $line= "-------------------------------------------------------------------------------\n";
     my $line2="+----------------+----------------+---------------------+---------------------+\n";
     my $group_count=0;
-    if ($ref_groups->{'COUNTER'}{'MAX'}==0){
+    if ($ref_groups->{'COUNTER'}{'TOTAL'}==0){
         print "0 projects can be displayed\n";
         return;
     }
@@ -706,7 +706,7 @@ sub _console_print_project_full {
         ############################################################
         # header
         print $line1;
-        print "Project $group_count/$ref_groups->{'COUNTER'}{'MAX'}: ",
+        print "Project $group_count/$ref_groups->{'COUNTER'}{'TOTAL'}: ",
               "$group in school $ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}\n";
         print "$ref_groups->{'GROUPS'}{$group}{'dn'}\n";
         print $line1;
@@ -794,7 +794,7 @@ sub _console_print_user_full {
     my $line1="################################################################################\n";
     my $line= "--------------------------------------------------------------------------------\n";
     my $user_count=0;
-    if ($ref_users->{'COUNTER'}{'MAX'}==0){
+    if ($ref_users->{'COUNTER'}{'TOTAL'}==0){
         print "0 users can be displayed\n";
         return;
     }
@@ -802,7 +802,7 @@ sub _console_print_user_full {
         $user_count++;
         print "\n";
         print $line1;
-        print "User $user_count/$ref_users->{'COUNTER'}{'MAX'}: ",
+        print "User $user_count/$ref_users->{'COUNTER'}{'TOTAL'}: ",
               "$user in school $ref_users->{'USERS'}{$user}{'sophomorixSchoolname'}\n";
         print "$ref_users->{'USERS'}{$user}{'dn'}\n";
         print $line1;
