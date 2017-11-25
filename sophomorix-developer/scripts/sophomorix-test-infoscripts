@@ -146,7 +146,14 @@ if ($full==1){
 ############################################################
 if ($show_nonexisting==1){
     &run_command("rm /tmp/test");
-
+    # nonexisting user    
+    &run_info_command("/usr/sbin/sophomorix-user -i -u ghsgdgsdh");
+    # nonexisting project
+    &run_info_command("/usr/sbin/sophomorix-project -i -p ghsgdgsdh");
+    # nonexisting class
+    &run_info_command("/usr/sbin/sophomorix-class -i -c ghsgdgsdh");
+    # nonexisting group
+    &run_info_command("/usr/sbin/sophomorix-group -i -g ghsgdgsdh");
 }
 
 
