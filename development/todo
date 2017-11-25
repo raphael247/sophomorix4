@@ -81,7 +81,25 @@ Individueller Teil:
 
 NEXT/Todo:
 
+sophomorix-school --mount <schoolname/sharename>
+sophomorix-school --umount <schoolname/sharename>
+- davor verzeichnisbaum erstellen, testen
 
+AD_get_quota:
+-> mailinglistendaten erstellen im JSON-Object
+  -> beim user den alias erzeugen nach school.ini
+
+  -> bei der Klasse:
+  mailist und mailalias attribut merken
+  -> beim memberdurchgehen maillist erzeigen
+    $quota{'MAILLIST'}{$sam_gruppe}{LIST}=[  , , , ] 
+    $quota{'MAILLIST'}{$sam_gruppe}{sophomorixMailAlias}=T/F
+    $quota{'MAILLIST'}{$sam_gruppe}{sophomorixMailList}=T/F
+
+  -> dito bei Projekten
+
+
+sophomorix-mail ruft dann denselben hash auf und macht was mit den Mailinglisten
 
 ------------------------------------------------------------
 Überlegen:
@@ -117,7 +135,6 @@ wenn es "---" oder "ist", dann alle schulen
 
 order member lists ascibetically
 
-comments to listing of Values (... in MiB)
 
 remove AD_group_list (at least display/print options)
 remove AD_project_fetch (at least display/print options)
@@ -125,13 +142,13 @@ remove AD_project_fetch (at least display/print options)
        -> replace with other function
 dito: AD_class_fetch
 
-
-sophomorix-managementgroup -m <group>: 
-  -> listet management gruppen details
-
 AD_admin_list?
+-> anzeige der admins mit neuen subs
 
-creationdate bei Anzeige umwandel in lesbares Datum (Konfigurierbar)
+
+Ausgabe von user/Klasseninfo:
+creationdate bei Anzeige umwandeln in lesbares Datum (Format Konfigurierbar)
+comments to listing of Values (... in MiB)
 
 
 gibts erst ab artful:
@@ -139,20 +156,20 @@ libnet-ldap-sid-perl
 
 
 option to add a description:
-sophomorix-group --description --group >name< ????
+sophomorix-group --description --group >name< tut das schon ????
 
 bei gruppen ausfüllen:
    displayname?
    sophomorixComment (nicht nötig, da es displayname,description gibt?)
-   mail gruppe@....
 
+
+DOKU:
 sophomorix-user - abfrage
 see SophomorixBase.pm at json_dump
 for an Info Listing:
  A) create a sub that creates a json object
     give it a name with $jsoninfo
  B) with &json==1, the json obect ist printed
-
  C) without, a _console_print_... function is called that uses this json object
 
 
