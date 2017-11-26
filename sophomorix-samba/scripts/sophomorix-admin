@@ -68,6 +68,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_passwd
                                  get_forbidden_logins
                                  AD_get_users_v
+                                 AD_get_full_userdata
                                     );
 my @arguments = @ARGV;
 
@@ -87,6 +88,7 @@ my $create_global_admin="";
 my $create_school_binduser="";
 my $create_global_binduser="";
 my $school="";
+my $admin="";
 
 my $password="";
 my $random_password_save=0;
@@ -109,6 +111,7 @@ my $testopt=GetOptions(
            "create-school-binduser=s" => \$create_school_binduser,
            "create-global-binduser=s" => \$create_global_binduser,
            "school|s=s" => \$school,
+           "admin|a=s" => \$admin,
            "password|passwd=s" => \$password,
            "random-passwd-save|random-password-save" => \$random_password_save,
            "random-passwd-show|random-password-show" => \$random_password_show,
@@ -140,7 +143,8 @@ Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
-  -i  / --info
+  -i  / --info           one user per line
+ --info --admin <user1>,<user2>         detailed view of user            
 
 
 
@@ -185,8 +189,8 @@ Please see the sophomorix-admin(8) man pages for full documentation
 
 
 
-# --info
-if ($info==1){
+# --info  overview
+if ($info==1 and $admin eq ""){
    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
@@ -206,6 +210,31 @@ if ($info==1){
                });
     exit;
 }
+
+
+
+# --info --admin <admin1>, ...
+if ($info==1 and $admin ne ""){
+    my $ref_users=&AD_get_full_userdata({ldap=>$ldap,
+                                        root_dse=>$root_dse,
+                                        root_dns=>$root_dns,
+                                        userlist=>$admin,
+                                        sophomorix_config=>\%sophomorix_config,
+                                      });
+    #print Dumper($ref_users);
+    my $jsoninfo="USER";
+    my $jsoncomment="One sophomorix user";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $admin,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_users,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);

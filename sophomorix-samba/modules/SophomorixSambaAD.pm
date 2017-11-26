@@ -5041,7 +5041,20 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'unixHomeDirectory'}=$entry->get_value('unixHomeDirectory');
         $users{'USERS'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
 
-        # $users{'USERS'}{$sam}{''}=$entry->get_value('');
+        # password from file
+        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ALLADMINS'}{$entry->get_value('sophomorixRole')}){
+            # check for password file
+            my $pwf="FALSE";
+            my $password="Password was not saved on the server!";
+            my $pwd_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$sam;
+            if (-e $pwd_file){
+                $pwf="TRUE";
+                $password=`cat $pwd_file`;
+            }
+            $users{'USERS'}{$sam}{'PWDFile'}=$pwd_file;
+            $users{'USERS'}{$sam}{'PWDFileExists'}=$pwf;
+            $users{'USERS'}{$sam}{'PASSWORD'}=$password;
+        }
     }
     $users{'COUNTER'}{'TOTAL'}=$max;
     if ($max>0){

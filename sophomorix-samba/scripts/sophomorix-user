@@ -211,8 +211,9 @@ sophomorix-user edits the sophomorix user database.
 
 Options
   -h   /  --help
-  -i   /  --info                        summary
+  -i   /  --info                        summary of users
   -iv  (-school <school>)               one user per line
+  --info --user <user1>,<user2>         detailed view of user                 
   -v   /  --verbose
   -vv  /  --verbose --verbose
 
@@ -297,7 +298,35 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 
 
-if ($user eq "" and $info==1 and $Conf::log_level==2){
+
+
+# --info (overview)
+if ($info==1 and $user eq "" and $Conf::log_level==1){
+    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  school=>$school,
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+    #print Dumper($ref_user_v);
+    my $jsoninfo="USERS_OVERVIEW";
+    my $jsoncomment="The sophomorix users";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_user_v,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
+
+
+
+
+# --info --verbose (one user per line)
+if ($info==1 and $user eq "" and $Conf::log_level==2){
     my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
@@ -320,27 +349,74 @@ if ($user eq "" and $info==1 and $Conf::log_level==2){
 
 
 
-# --info
-if ($info==1 and $user eq ""){
-    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
-                                  root_dse=>$root_dse,
-                                  root_dns=>$root_dns,
-                                  school=>$school,
-                                  sophomorix_config=>\%sophomorix_config,
-                                });
-    #print Dumper($ref_user_v);
-    my $jsoninfo="USERS_OVERVIEW";
-    my $jsoncomment="The sophomorix users";
+
+# Setting the filters
+my $school_filter="";
+my $user_filter="";
+if ($school eq $DevelConf::name_default_school){
+    $school_filter="";
+} elsif ($school ne ""){
+    $school_filter="(sophomorixSchoolPrefix=$school)";
+}
+if ($user ne ""){
+    $user_filter="(sAMAccountName=$user)";
+}
+
+
+
+# --info --user <user>
+if ($user ne "" and $info==1){
+    my $ref_users=&AD_get_full_userdata({ldap=>$ldap,
+                                        root_dse=>$root_dse,
+                                        root_dns=>$root_dns,
+                                        userlist=>$user,
+                                        sophomorix_config=>\%sophomorix_config,
+                                      });
+    #print Dumper($ref_users);
+    my $jsoninfo="USER";
+    my $jsoncomment="One sophomorix user";
     &json_dump({json => $json,
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
-                object_name => $school,
+                object_name => $user,
                 log_level => $Conf::log_level,
-                hash_ref => $ref_user_v,
+                hash_ref => $ref_users,
                 sophomorix_config => \%sophomorix_config,
                });
     exit;
+    # my $filter="(&(objectclass=user) $user_filter  $school_filter)"; 
+    # if($Conf::log_level>=2){
+    #     print "Filter: $filter\n";
+    # }
+    # my $mesg = $ldap->search(
+    #                   base   => $root_dse,
+    #                   scope => 'sub',
+    #                   filter => $filter,
+    #                   attr => ['cn','unicodePwd']
+    # 	);
+    # my $number = $mesg->count;
+    # if ($number==0){
+    #     print "\n";
+    #     print "No results found in this search\n";
+    # } else {
+    #     my $count=0;
+    #     foreach my $entry ($mesg->all_entries) {
+    #         $count++; 
+    #         my $sam = $entry->get_value ('sAMAccountName');
+    #         print "\n";
+    #         &print_title("User $count: $sam");
+    #         $entry->dump; 
+    #     }
+    # }
+    # exit;
+} elsif ($list_teachers_by_year==1){
+    print "... still to do!\n";
+    #&list_teachers_by_year();
+    exit;
 }
+
+
+
 
 
 
@@ -494,75 +570,6 @@ if ($info==1 and $user eq ""){
 #   print "I don't know what to search for! (searchstring is empty)\n";
 #   &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
 #}
-
-
-# Setting the filters
-my $school_filter="";
-my $user_filter="";
-if ($school eq $DevelConf::name_default_school){
-    $school_filter="";
-} elsif ($school ne ""){
-    $school_filter="(sophomorixSchoolPrefix=$school)";
-}
-if ($user ne ""){
-    $user_filter="(sAMAccountName=$user)";
-}
-
-
-
-# --info --user <user>
-if ($user ne "" and $info==1){
-    my $ref_users=&AD_get_full_userdata({ldap=>$ldap,
-                                        root_dse=>$root_dse,
-                                        root_dns=>$root_dns,
-                                        userlist=>$user,
-                                        sophomorix_config=>\%sophomorix_config,
-                                      });
-    #print Dumper($ref_users);
-    my $jsoninfo="USER";
-    my $jsoncomment="One sophomorix users";
-    &json_dump({json => $json,
-                jsoninfo => $jsoninfo,
-                jsoncomment => $jsoncomment,
-                object_name => $user,
-                log_level => $Conf::log_level,
-                hash_ref => $ref_users,
-                sophomorix_config => \%sophomorix_config,
-               });
-    exit;
-
-
-    my $filter="(&(objectclass=user) $user_filter  $school_filter)"; 
-    if($Conf::log_level>=2){
-        print "Filter: $filter\n";
-    }
-    my $mesg = $ldap->search(
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attr => ['cn','unicodePwd']
-	);
-    my $number = $mesg->count;
-    if ($number==0){
-        print "\n";
-        print "No results found in this search\n";
-    } else {
-        my $count=0;
-        foreach my $entry ($mesg->all_entries) {
-            $count++; 
-            my $sam = $entry->get_value ('sAMAccountName');
-            print "\n";
-            &print_title("User $count: $sam");
-            $entry->dump; 
-        }
-    }
-    exit;
-} elsif ($list_teachers_by_year==1){
-    print "... still to do!\n";
-    #&list_teachers_by_year();
-    exit;
-}
-
 
 
 

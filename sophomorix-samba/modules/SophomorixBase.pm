@@ -152,6 +152,7 @@ sub json_dump {
         } elsif ($jsoninfo eq "USERS_OVERVIEW"){
             &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USER"){
+            # incl. administrators            
             &_console_print_user_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
             &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
@@ -830,7 +831,6 @@ sub _console_print_project_full {
 	    }
             print $line;
         }
-
 	print "\n";
     }
 }
@@ -855,6 +855,23 @@ sub _console_print_user_full {
               "$user in school $ref_users->{'USERS'}{$user}{'sophomorixSchoolname'}\n";
         print "$ref_users->{'USERS'}{$user}{'dn'}\n";
         print $line1;
+        if (exists $ref_sophomorix_config->{'LOOKUP'}{'BINDUSERS'}{$ref_users->{'USERS'}{$user}{'sophomorixRole'}}){
+            # its a bind user
+            print "Bind DN for $user:\n",
+                  "  $ref_users->{'USERS'}{$user}{'dn'}\n";
+            print "PASSWORD for $user (PWDFileExists: $ref_users->{'USERS'}{$user}{'PWDFileExists'}):\n",
+                  "  $ref_users->{'USERS'}{$user}{'PASSWORD'}\n";
+            print $line;
+        } elsif (exists $ref_sophomorix_config->{'LOOKUP'}{'ADMINISTRATORS'}{$ref_users->{'USERS'}{$user}{'sophomorixRole'}}){
+            # its an adminisrator
+            printf "%29s: %-40s\n","PWDFileExists",$ref_users->{'USERS'}{$user}{'PWDFileExists'};
+            printf "%29s: %-40s\n","PASSWORD",$ref_users->{'USERS'}{$user}{'PASSWORD'};
+            if ($ref_users->{'USERS'}{$user}{'PWDFileExists'} eq "TRUE"){
+                printf "%29s: %-40s\n","PWDFile",$ref_users->{'USERS'}{$user}{'PWDFile'};
+            }
+            print $line;
+        }
+
         printf "%29s: %-40s\n","displayName",$ref_users->{'USERS'}{$user}{'displayName'};
         printf "%29s: %-40s\n","sn",$ref_users->{'USERS'}{$user}{'sn'};
         printf "%29s: %-40s\n","givenName",$ref_users->{'USERS'}{$user}{'givenName'};
@@ -931,13 +948,11 @@ sub _console_print_user_full {
 	}
 
         # unix stuff:
-        print $line;
         if ($log_level>=2){
             printf "%19s: %-50s\n","uidNumber",$ref_users->{'USERS'}{$user}{'uidNumber'};
             printf "%19s: %-50s\n","unixHomeDirectory",$ref_users->{'USERS'}{$user}{'unixHomeDirectory'};
             printf "%19s: %-50s\n","primaryGroupID",$ref_users->{'USERS'}{$user}{'primaryGroupID'};
-#            printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
-#            printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
+            print $line;
 	}
     }
 }
@@ -1413,18 +1428,18 @@ sub config_sophomorix_read {
         } elsif ($section=~m/^administrator\./){ 
             # remember in lists
             my ($string,$name)=split(/\./,$section);
-	    push @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+	    push @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
 	    push @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
-            $sophomorix_config{'LOOKUP'}{'BINDUSERS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
+            $sophomorix_config{'LOOKUP'}{'ADMINISTRATORS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
             $sophomorix_config{'LOOKUP'}{'ALLADMINS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
         } elsif ($section=~m/^binduser\./){ 
             my ($string,$name)=split(/\./,$section);
             # remember in lists
-	    push @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+	    push @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
 	    push @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
-            $sophomorix_config{'LOOKUP'}{'ADMINISTRATORS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
+            $sophomorix_config{'LOOKUP'}{'BINDUSERS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
             $sophomorix_config{'LOOKUP'}{'ALLADMINS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
