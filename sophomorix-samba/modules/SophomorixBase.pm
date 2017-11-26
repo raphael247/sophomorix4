@@ -1019,16 +1019,26 @@ sub _console_print_admins_v {
         @school_list=($school_opt);
     }
 
-    my @rolelist=("schooladministrator","schoolbinduser"); # update counter if you add a role here
+    my @rolelist=("globaladministrator","globalbinduser",
+                  "schooladministrator","schoolbinduser"); # update counter if you add a role here
+    # add global to be displayed always
+    @school_list=($ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'},@school_list);
 
-    my $line="+----------------------+-+----------------------------+------+-----------------------------+\n";
+    my $line="+----------------------+-+-------------------------+------+--------------------------------+\n";
 
     foreach my $school (@school_list){
-        $count_string=$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'}+
-                      $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'};
+        my $count_admin;
+        if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+            $count_admin=$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globaladministrator'}+
+                          $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'globalbinduser'};
+            
+        } else {
+            $count_admin=$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'}+
+                          $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'};
+        }
 
-        &print_title("$count_string administrators in school $school:");
-        if ($ref_users_v->{'COUNTER'}{$school}{'TOTAL'}==0){
+        &print_title("$count_admin administrators in school $school:");
+        if ($count_admin==0){
             next;
         }
         print $line;
@@ -1038,22 +1048,33 @@ sub _console_print_admins_v {
             if ($#{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
                 foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
                     #my $gcs  = Unicode::GCString->new($ref_users_v->{'USERS'}{$user}{'displayName'});
-                    if ($role eq "schooladministrator"){
-                        $role="sadm";
-                    }
-                    if ($role eq "schoolbinduser"){
-                        $role="sbin";
+                    my $role_display;
+                    if ($role eq "globaladministrator"){
+                        $role_display="gadm";
+                    } elsif ($role eq "globalbinduser"){
+                        $role_display="gbin";
+                    } elsif ($role eq "schooladministrator"){
+                        $role_display="sadm";
+                    } elsif ($role eq "schoolbinduser"){
+                        $role_display="sbin";
+                    } else {
+                        $role_display=$role;
                     }
 	  	    printf "| %-21s|%-1s| %-24s| %-4s | %-31s|\n",
                         $user,
                         $ref_users_v->{'USERS'}{$user}{'sophomorixStatus'},
                         $ref_users_v->{'USERS'}{$user}{'displayName'},
-                        $role,
+                        $role_display,
 		        $ref_users_v->{'USERS'}{$user}{'sophomorixComment'};
                 }
             }
         }
-        print $line;      
+        print $line; 
+        if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+            print "P: Password file exists(1) or not(0)   gadm: globaladministrator   gbin: globalbinduser\n";
+        } else {
+            print "P: Password file exists(1) or not(0)   sadm: schooladministrator   sbin: schoolbinduser\n";
+        }
         print "\n";
     } # school end 
 }
