@@ -145,6 +145,8 @@ sub json_dump {
             &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "DEVICES"){
             &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "ADMINS_V"){
+            &_console_print_admins_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USERS_V"){
             &_console_print_users_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USERS_OVERVIEW"){
@@ -953,20 +955,34 @@ sub _console_print_users_v {
         @school_list=($school_opt);
     }
 
-    my @rolelist=("schooladministrator","schoolbinduser","teacher","student");
-
-    my $line="+---------------+---+----------------+----------+---------------------------+\n";
+    my @rolelist=("teacher","student");
+    my $line= "+---------------+---+----------------+----------+--------------------------+\n";
+    my $line2="+===========================================================================+\n";
 
     foreach my $school (@school_list){
-        #print $line;
-        &print_title("$ref_users_v->{'COUNTER'}{$school}{'TOTAL'} users in school $school:");
+        $count_string=$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'teacher'}+
+	              $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'}.
+                      " users (".$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'teacher'}.
+                      " Teachers + ".
+                      $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'}.
+                      " Students)";
+        &print_title("$count_string in school $school:");
         if ($ref_users_v->{'COUNTER'}{$school}{'TOTAL'}==0){
             next;
         }
-        print $line;
-        print "| sAMAccountName| S | AdminClass     | Role     | displayName               |\n";
 
         foreach my $role (@rolelist){
+            print $line;
+            my $role_display;
+            if ($role eq "student"){
+                $role_display="Students";
+            } elsif ($role eq "teacher"){
+                $role_display="Teachers";
+            } else {
+                $role_display=$role;
+            }
+	    printf "|%5s %-9s| S | AdminClass     | Role     | displayName              |\n",
+                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{$role},$role_display;
             if ($#{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
                 print $line;
                 foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
@@ -977,7 +993,7 @@ sub _console_print_users_v {
                     if ($role eq "schoolbinduser"){
                         $role="sbind";
                     }
-	  	    printf "| %-14s| %-2s| %-15s| %-9s| %-24s\n",
+	  	    printf "| %-14s| %-2s| %-15s| %-9s| %-23s\n",
                         $user,
                         $ref_users_v->{'USERS'}{$user}{'sophomorixStatus'},
                         $ref_users_v->{'USERS'}{$user}{'sophomorixAdminClass'},
@@ -985,8 +1001,60 @@ sub _console_print_users_v {
 		        $ref_users_v->{'USERS'}{$user}{'displayName'};
                 }
             }
+            print $line;
         }
-        print $line;   
+    } # school end 
+}
+
+
+
+sub _console_print_admins_v {
+    my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    # one user per line
+
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    my @rolelist=("schooladministrator","schoolbinduser"); # update counter if you add a role here
+
+    my $line="+----------------------+-+----------------------------+------+-----------------------------+\n";
+
+    foreach my $school (@school_list){
+        $count_string=$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'}+
+                      $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'};
+
+        &print_title("$count_string administrators in school $school:");
+        if ($ref_users_v->{'COUNTER'}{$school}{'TOTAL'}==0){
+            next;
+        }
+        print $line;
+        print "| Administrator        |P| displayName             | Role | Comment                        |\n";
+        print $line;
+        foreach my $role (@rolelist){
+            if ($#{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
+                foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
+                    #my $gcs  = Unicode::GCString->new($ref_users_v->{'USERS'}{$user}{'displayName'});
+                    if ($role eq "schooladministrator"){
+                        $role="sadm";
+                    }
+                    if ($role eq "schoolbinduser"){
+                        $role="sbin";
+                    }
+	  	    printf "| %-21s|%-1s| %-24s| %-4s | %-31s|\n",
+                        $user,
+                        $ref_users_v->{'USERS'}{$user}{'sophomorixStatus'},
+                        $ref_users_v->{'USERS'}{$user}{'displayName'},
+                        $role,
+		        $ref_users_v->{'USERS'}{$user}{'sophomorixComment'};
+                }
+            }
+        }
+        print $line;      
+        print "\n";
     } # school end 
 }
 

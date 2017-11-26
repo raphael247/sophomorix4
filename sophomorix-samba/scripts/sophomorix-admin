@@ -18,7 +18,13 @@ use List::MoreUtils qw(uniq);
 #use DBI;
 #use Net::LDAP;
 use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 use JSON;
+
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -40,6 +46,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  remove_from_list
+                                 json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -61,6 +68,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_admin_list
                                  AD_get_passwd
                                  get_forbidden_logins
+                                 AD_get_users_v
                                     );
 my @arguments = @ARGV;
 
@@ -180,6 +188,26 @@ Please see the sophomorix-admin(8) man pages for full documentation
 
 # --info
 if ($info==1){
+   my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  school=>$school,
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+    print Dumper($ref_user_v);
+    my $jsoninfo="ADMINS_V";
+    my $jsoncomment="All admins";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_user_v,
+                sophomorix_config => \%sophomorix_config,
+               });
+
+
+
     &AD_admin_list($ldap,$root_dse,\%sophomorix_config);
     exit;
 }

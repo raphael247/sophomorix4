@@ -5248,6 +5248,7 @@ sub AD_get_users_v {
                                'sophomorixRole',
                                'sophomorixStatus',
                                'sophomorixSchoolname',
+                               'sophomorixComment',
                                'sophomorixAdminClass',
                               ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -5277,6 +5278,7 @@ sub AD_get_users_v {
             $users{'USERS'}{$sam}{'DN'}=$dn;
             $users{'USERS'}{$sam}{'sophomorixStatus'}=$status;
             $users{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+            $users{'USERS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
             $users{'USERS'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
             push @{ $users{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
         }
