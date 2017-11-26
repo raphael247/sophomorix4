@@ -1011,17 +1011,12 @@ sub _console_print_users_v {
 sub _console_print_admins_v {
     my ($ref_users_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     # one user per line
-
     my @school_list;
     if ($school_opt eq ""){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
     } else {
         @school_list=($school_opt);
     }
-
-    my @rolelist=("globaladministrator","globalbinduser",
-                  "schooladministrator","schoolbinduser"); # update counter if you add a role here
-    # add global to be displayed always
     @school_list=($ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'},@school_list);
 
     my $line="+----------------------+-+-------------------------+------+--------------------------------+\n";
@@ -1044,25 +1039,14 @@ sub _console_print_admins_v {
         print $line;
         print "| Administrator        |P| displayName             | Role | Comment                        |\n";
         print $line;
-        foreach my $role (@rolelist){
+        foreach my $role ( @{ $ref_sophomorix_config->{'LISTS'}{'ALLADMINS'} } ){
             if ($#{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
                 foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
                     #my $gcs  = Unicode::GCString->new($ref_users_v->{'USERS'}{$user}{'displayName'});
-                    my $role_display;
-                    if ($role eq "globaladministrator"){
-                        $role_display="gadm";
-                    } elsif ($role eq "globalbinduser"){
-                        $role_display="gbin";
-                    } elsif ($role eq "schooladministrator"){
-                        $role_display="sadm";
-                    } elsif ($role eq "schoolbinduser"){
-                        $role_display="sbin";
-                    } else {
-                        $role_display=$role;
-                    }
+		    my $role_display=$ref_sophomorix_config->{'LOOKUP'}{'ALLADMINS'}{$role};
 	  	    printf "| %-21s|%-1s| %-24s| %-4s | %-31s|\n",
                         $user,
-                        $ref_users_v->{'USERS'}{$user}{'sophomorixStatus'},
+                        substr($ref_users_v->{'USERS'}{$user}{'PWDFileExists'},0,1),,
                         $ref_users_v->{'USERS'}{$user}{'displayName'},
                         $role_display,
 		        $ref_users_v->{'USERS'}{$user}{'sophomorixComment'};
@@ -1071,9 +1055,9 @@ sub _console_print_admins_v {
         }
         print $line; 
         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
-            print "P: Password file exists(1) or not(0)   gadm: globaladministrator   gbin: globalbinduser\n";
+            print "P: Password file exists(T) or not(F)   gadm: globaladministrator   gbin: globalbinduser\n";
         } else {
-            print "P: Password file exists(1) or not(0)   sadm: schooladministrator   sbin: schoolbinduser\n";
+            print "P: Password file exists(T) or not(F)   sadm: schooladministrator   sbin: schoolbinduser\n";
         }
         print "\n";
     } # school end 
@@ -1426,6 +1410,24 @@ sub config_sophomorix_read {
                 # save in lookup table
                 $sophomorix_config{'INI'}{$section}{'KEEPGROUP_LOOKUP'}{$group}="keepgroup";
             }
+        } elsif ($section=~m/^administrator\./){ 
+            # remember in lists
+            my ($string,$name)=split(/\./,$section);
+	    push @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+	    push @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+            $sophomorix_config{'LOOKUP'}{'BINDUSERS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
+                $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
+            $sophomorix_config{'LOOKUP'}{'ALLADMINS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
+                $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
+        } elsif ($section=~m/^binduser\./){ 
+            my ($string,$name)=split(/\./,$section);
+            # remember in lists
+	    push @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+	    push @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+            $sophomorix_config{'LOOKUP'}{'ADMINISTRATORS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
+                $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
+            $sophomorix_config{'LOOKUP'}{'ALLADMINS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
+                $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
         } elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
             my ($string,$name,$extension)=split(/\./,$section);
             foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -1559,6 +1561,9 @@ sub config_sophomorix_read {
 
     # sorting some lists
     @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+    @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} } = sort @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} };
+    @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} } = sort @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} };
+    @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} } = sort @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} };
 
     return %sophomorix_config; 
 }

@@ -194,7 +194,7 @@ if ($info==1){
                                   school=>$school,
                                   sophomorix_config=>\%sophomorix_config,
                                 });
-    print Dumper($ref_user_v);
+    #print Dumper($ref_user_v);
     my $jsoninfo="ADMINS_V";
     my $jsoncomment="All admins";
     &json_dump({json => $json,
@@ -208,7 +208,7 @@ if ($info==1){
 
 
 
-    &AD_admin_list($ldap,$root_dse,\%sophomorix_config);
+    #&AD_admin_list($ldap,$root_dse,\%sophomorix_config);
     exit;
 }
 

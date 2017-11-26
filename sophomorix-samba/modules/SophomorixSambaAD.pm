@@ -5281,6 +5281,16 @@ sub AD_get_users_v {
             $users{'USERS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
             $users{'USERS'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
             push @{ $users{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
+            # if its an administrator
+            if (exists $ref_sophomorix_config->{'LOOKUP'}{'ALLADMINS'}{$role}){
+                # check for password file
+                my $pwf="FALSE";
+                my $pwd_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$sam;
+                if (-e $pwd_file){
+                    $pwf="TRUE";
+                }
+                $users{'USERS'}{$sam}{'PWDFileExists'}=$pwf;
+            }
         }
     }
     return \%users;
