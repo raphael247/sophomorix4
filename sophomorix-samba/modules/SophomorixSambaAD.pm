@@ -77,7 +77,6 @@ $Data::Dumper::Terse = 1;
             AD_project_fetch
             AD_dn_fetch_multivalue
             AD_project_sync_members
-            AD_admin_list
             AD_object_move
             AD_debug_logdump
             AD_login_test
@@ -5828,76 +5827,6 @@ sub AD_project_sync_members {
     }
     &Sophomorix::SophomorixBase::print_title("Sync member: $dn (end)");
     print "\n";
-}
-
-
-
-sub AD_admin_list {
-    my ($ldap,$root_dse,$ref_sophomorix_config)=@_;
-    # filter for all admin roles
-    my $filter="(&(objectClass=user) (| (sophomorixRole=".
-       $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}.") (sophomorixRole=".
-       $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}.") (sophomorixRole=".
-       $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}.") (sophomorixRole=".
-       $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}.") ))";
-    # sophomorix students,teachers from ldap
-    my $mesg = $ldap->search( # perform a search
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attrs => ['sAMAccountName',
-                                'sophomorixAdminClass',
-                                'givenName',
-                                'sn',
-                                'displayname',
-                                'sophomorixStatus',
-                                'sophomorixSchoolname',
-                                'sophomorixSchoolPrefix',
-                                'sophomorixRole',
-                                'sophomorixComment',
-                                'userAccountControl',
-                               ]);
-    my $max_user = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_user sophomorix administrators found in AD");
-    print "+---------------------+-+-------------------------+------+--------+------------------------+\n";
-    printf "| %-19s |%1s| %-23s | %-4s | %-6s | %-22s |\n","administrator","P","displayName","Role","School","Comment";
-    print "+---------------------+-+-------------------------+------+--------+------------------------+\n";
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
-        my $school=$entry->get_value('sophomorixSchoolname');
-        my $comment=$entry->get_value('sophomorixComment');
-        my $displayschool="";
-        if ($school eq $DevelConf::name_default_school){
-            $displayschool="*";
-        } else {
-            $displayschool=$school;
-        }
-        my $role=$entry->get_value('sophomorixRole');
-        my $displayrole="";
-        if ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
-            $displayrole="sadm";
-        } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
-            $displayrole="gadm";
-        } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
-            $displayrole="sbin";
-        } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
-            $displayrole="gbin";
-        } else {
-            $displayrole=$role;
-        }
-        my $displayname=$entry->get_value('displayname');
-        my $pw=0;
-        my $pwd_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$sam;
-        if (-e $pwd_file){
-            $pw=1;
-        }
-        printf "| %-19s |%1s| %-23s | %-4s | %-6s | %-22s |\n",$sam,$pw,$displayname,$displayrole,$displayschool,$comment;
-    }
-    print "+---------------------+-+-------------------------+------+--------+------------------------+\n";
-    print "P: Password file exists(1)/does not exist(0)\n";
-    print "sbin:  schoolbinduser        gbin:  globalbinduser\n";
-    print "sadm:  schooladministrator   gadm:  globaladministrator\n";
 }
 
 
