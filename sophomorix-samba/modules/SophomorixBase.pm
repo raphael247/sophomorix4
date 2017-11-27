@@ -1392,24 +1392,37 @@ sub config_sophomorix_read {
                      $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
                          $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
                  }
+
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
+        # mountpoint
+        $sophomorix_config{'SCHOOLS'}{$school}{MOUNTPOINT}=
+            $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$school;
+
     }
 
     # GLOBAL
-    $sophomorix_config{$DevelConf::AD_global_ou}{OU_TOP}=
+    $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'}=
         "OU=".$DevelConf::AD_global_ou.",".$root_dse;
     # read global
-    $sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}=$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
-    #$sophomorix_config{$DevelConf::AD_global_ou}{SCHOOL}="global2";
-    $sophomorix_config{$DevelConf::AD_global_ou}{PREFIX}="";
+    $sophomorix_config{$DevelConf::AD_global_ou}{'SCHOOL'}=$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
+    #$sophomorix_config{$DevelConf::AD_global_ou}{'SCHOOL'}="global2";
+    $sophomorix_config{$DevelConf::AD_global_ou}{'PREFIX'}="";
+    # mountpoint
+    $sophomorix_config{$DevelConf::AD_global_ou}{'MOUNTPOINT'}=
+        $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/".$sophomorix_config{'INI'}{'GLOBAL'}{'SCHOOLNAME'};
+
     # SCHOOL
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP}=
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
         "OU=".$DevelConf::name_default_school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{SCHOOL}=
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'SCHOOL'}=
         $DevelConf::name_default_school;
-    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{PREFIX}="";
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'PREFIX'}="";
+    # mountpoint
+    $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'MOUNTPOINT'}=
+        $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$DevelConf::name_default_school;
+
 
     #print Dumper(%sophomorix_config);
     #exit;

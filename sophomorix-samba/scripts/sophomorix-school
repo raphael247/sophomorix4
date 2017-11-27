@@ -78,6 +78,9 @@ my $recreate_all_schools=0;
 my $kill=0;
 my $test_schools=0;
 
+my $mount="";
+my $umount="";
+
 # ===========================================================================
 # Optionen verarbeiten
 # ==========================================================================
@@ -99,6 +102,8 @@ my $testopt=GetOptions(
            "kill" => \$kill,
            "test-schools" => \$test_schools,
            "school=s" => \$school,
+           "mount=s" => \$mount,
+           "umount=s" => \$umount,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-school");
@@ -133,6 +138,9 @@ Options:
   --kill --school <schoolname>
 
   --recreate-all-schools   (recreates all configured schools from sophomorix.conf)
+
+  --mount <school>
+  --umount <school>
 
 Dumping data:                     
   -ij / --info --json              (dump configuration)
@@ -230,8 +238,7 @@ if ($test_schools==1){
   	    # quotainfo test
 	    &_smbcquotas_testshare($share);
 	}
-   }
-
+    }
     exit;
 }
 
@@ -261,6 +268,26 @@ if ($school ne "" and $create==1){
     }
     exit;
 }
+
+
+
+# ============================================================
+# mounting/umounting a school
+# ============================================================
+if ($mount ne ""){
+    &print_title("Mounting school $mount");
+
+
+    exit;
+}
+
+
+if ($umount ne ""){
+    &print_title("Umounting school $umount");
+
+    exit;
+}
+
 
 
 
