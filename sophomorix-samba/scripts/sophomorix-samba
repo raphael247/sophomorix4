@@ -104,9 +104,41 @@ my $testopt=GetOptions(
            "restart" => \$restart,
           );
 
-my %sophomorix_result=&result_sophomorix_init("sophomorix-add");
+
+
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-samba");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
+
+# start and stop before connect-test 
+# --start
+if ($start==1){
+    print "\nStarting samba\n\n";
+    &samba_start();
+    exit;
+}
+
+
+
+# --stop
+if ($stop==1){
+    print "\nStopping samba\n\n";
+    &samba_stop();
+    exit;
+}
+
+
+
+# --restart
+if ($restart==1){
+    print "\nRestarting samba\n\n";
+    &samba_stop();
+    &samba_start();
+    exit;
+}
+
+
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
@@ -202,6 +234,7 @@ if ($restore_samba ne ""){
 }
 
 
+
 # --schema-load
 if ($schema_load==1){
     print "\nLoading sophomorix schema into ldap\n\n";
@@ -212,6 +245,7 @@ if ($schema_load==1){
     system($command);
     &samba_start();
 }
+
 
 
 # --set-confidential / --set-nonconfidential /
@@ -232,40 +266,19 @@ if ($edit_searchflags ne ""){
 }
 
 
-# --start
-if ($start==1){
-    print "\nStarting samba\n\n";
-    &samba_start();
-}
-
-
-# --stop
-if ($stop==1){
-    print "\nStopping samba\n\n";
-    &samba_stop();
-}
-
-
-# --restart
-if ($restart==1){
-    print "\nRestarting samba\n\n";
-    &samba_stop();
-    &samba_start();
-}
-
 
 ############################################################
 # subs
 ############################################################
 
 sub samba_stop {
-    system("/etc/init.d/samba stop");
+    system("/bin/systemctl stop samba-ad-dc");
 }
 
 
 
 sub samba_start {
-    system("/etc/init.d/samba start");
+    system("/bin/systemctl start samba-ad-dc");
 }
 
 

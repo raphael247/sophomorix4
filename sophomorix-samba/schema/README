@@ -46,7 +46,8 @@ Anleitung:
 - Backup der AD Datenbanken, /path/to/dbs/ durch Pfad aus Schritt 1 ersetzen:
   # find /var/lib/samba/private -name '*.ldb' -exec tdbbackup {} \; 
 
-- /etc/init.d/samba stop      (Samba stoppen)
+- # alt: /etc/init.d/samba stop   (Samba stoppen)
+  systemctl stop samba-ad-dc      (Samba stoppen)
 
 - Schema Änderungen mit Script, base dn DOMAIN NAME anpassen:
 
@@ -54,13 +55,16 @@ Anleitung:
   (# cd sophomorix)
   # ./sophomorix_schema_add.sh DC=DOMAIN,DC=NAME . -H /var/lib/samba/private/sam.ldb -writechanges
 
-- /etc/init.d/samba start     (Samba starten)
+  # alt: /etc/init.d/samba start   (Samba starten)
+- systemctl start samba-ad-dc    (Samba starten)
 
 Backup einspielen:
 
-- /etc/init.d/samba stop      (Samba stoppen)
+- # alt: /etc/init.d/samba stop      (Samba stoppen)
+  systemctl stop samba-ad-dc      (Samba stoppen)
 
 - Backup der AD Datenbanken zurückkopieren:
   find /var/lib/samba/private -name '*.ldb' -exec echo cp {}.bak {} \; 
 
-- /etc/init.d/samba start     (Samba starten)   
+- # alt: /etc/init.d/samba start     (Samba starten)     
+  systemctl stop samba-ad-dc      (Samba stoppen)

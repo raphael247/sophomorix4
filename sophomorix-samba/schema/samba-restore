@@ -3,11 +3,13 @@
 if [ -z "$1" ]; then
     echo "Give option for the appendix of the backup files"
 else
-    /etc/init.d/samba stop
+    # alt: /etc/init.d/samba stop
+    systemctl stop samba-ad-dc
 
     find /var/lib/samba/private -name '*.ldb' -exec echo cp {}-$1 {} \;
 
-    /etc/init.d/samba start
+    # alt: /etc/init.d/samba start
+    systemctl start samba-ad-dc
 fi
 
 
