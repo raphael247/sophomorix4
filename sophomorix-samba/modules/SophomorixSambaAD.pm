@@ -4299,6 +4299,9 @@ sub AD_get_quota {
                    attrs => ['sAMAccountName',
                              'sophomorixSchoolname',
                              'sophomorixRole',
+                             'mail',
+                             'sn',
+                             'givenName',
                              'memberOf',
                              'sophomorixQuota',
                              'sophomorixMailQuota',
@@ -4312,6 +4315,9 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
+        my $sn=$entry->get_value('sn');
+        my $given_name=$entry->get_value('givenName');
+        my $mail=$entry->get_value('mail');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my $mailquota = $entry->get_value('sophomorixMailQuota');
 	my @quota = $entry->get_value('sophomorixQuota');
@@ -4332,6 +4338,13 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'SCHOOLDEFAULT'}=
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'mailquota_default'};
 
+        # save mail adress/alias
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'mail'}=$mail;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIAS'}=
+            &Sophomorix::SophomorixBase::alias_from_name($sn,$given_name,$ref_sophomorix_config); 
+
+        print "TEST $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIAS'}\n";
+  
         # save USER mailquota
         if (defined $entry->get_value('sophomorixMailQuotaCalculated')){
             $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}=$entry->get_value('sophomorixMailQuotaCalculated');
@@ -4390,6 +4403,8 @@ sub AD_get_quota {
                              'memberOf',
                              'sophomorixQuota',
                              'sophomorixMailQuota',
+                             'sophomorixMailList',
+                             'sophomorixMailAlias',
                             ]);
     my $max_adminclass = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -4401,6 +4416,8 @@ sub AD_get_quota {
         my $type=$entry->get_value('sophomorixType');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my $mailquota = $entry->get_value('sophomorixMailQuota');
+	my $maillist = $entry->get_value('sophomorixMailList');
+	my $mailalias = $entry->get_value('sophomorixMailAlias');
 	my @quota = $entry->get_value('sophomorixQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
@@ -4411,6 +4428,10 @@ sub AD_get_quota {
   	$quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixType'}=$type;
 	push @{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$school} }, $sam; 
+
+        # save maillist stuff about classes
+        $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailList'}=$maillist;
+        $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailAlias'}=$mailalias;
 
         # mailquota
         my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
@@ -4451,6 +4472,11 @@ sub AD_get_quota {
             $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sAMAccountName'}=$sam;
             $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixType'}=$type;
 
+            # save member in maillist if requested
+            if ($quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailList'} eq "TRUE"){
+                push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
+            }
+
             # save mailquota for class at user
             my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
             $quota{'QUOTA'}{'USERS'}{$sam_user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
@@ -4486,6 +4512,8 @@ sub AD_get_quota {
                              'memberOf',
                              'sophomorixAddQuota',
                              'sophomorixAddMailQuota',
+                             'sophomorixMailList',
+                             'sophomorixMailAlias',
                             ]);
     my $max_project = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -4512,6 +4540,8 @@ sub AD_get_quota {
         my $type=$entry->get_value('sophomorixType');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my $addmailquota = $entry->get_value('sophomorixAddMailQuota');
+	my $maillist = $entry->get_value('sophomorixMailList');
+	my $mailalias = $entry->get_value('sophomorixMailAlias');
 	my @addquota = $entry->get_value('sophomorixAddQuota');
 	my @member = $entry->get_value('member');
 	my @memberof = $entry->get_value('memberOf');
@@ -4523,6 +4553,10 @@ sub AD_get_quota {
   	$quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixType'}=$type;
 	push @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }, $sam; 
+
+        # save maillist stuff about projects
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'}=$maillist;
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailAlias'}=$mailalias;
 
         # addmailquota
         my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
@@ -4574,6 +4608,11 @@ sub AD_get_quota {
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
                 } else {
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'USER'}="TRUE";
+                }
+
+                # save member in maillist if requested 
+                if ($quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'} eq "TRUE"){
+                    push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
                 }
 
                 # save mailquota info at user

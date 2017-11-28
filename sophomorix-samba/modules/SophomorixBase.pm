@@ -210,6 +210,16 @@ sub umount_school {
 
 
 
+# mail stuff
+######################################################################
+sub alias_from_name {
+    my ($sn,$given_name,$ref_sophomorix_config)=@_;
+    my $alias="aliaS";
+
+    return $alias;
+}
+
+
 # json stuff
 ######################################################################
 sub json_progress_print {
