@@ -25,6 +25,8 @@ use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
+                                 mount_school
+                                 umount_school
                                  time_stamp_AD
                                  time_stamp_file
                                  unlock_sophomorix
@@ -275,19 +277,16 @@ if ($school ne "" and $create==1){
 # mounting/umounting a school
 # ============================================================
 if ($mount ne ""){
-    &print_title("Mounting school $mount");
-
-
+    &mount_school($mount,$root_dns,$smb_admin_pass,\%sophomorix_config);
     exit;
 }
+
 
 
 if ($umount ne ""){
-    &print_title("Umounting school $umount");
-
+    &umount_school($umount,$root_dns,$smb_admin_pass,\%sophomorix_config);
     exit;
 }
-
 
 
 

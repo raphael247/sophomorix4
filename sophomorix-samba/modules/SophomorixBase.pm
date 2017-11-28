@@ -29,6 +29,8 @@ $Data::Dumper::Terse = 1;
 @EXPORT = qw(
             print_line
             print_title
+            mount_school
+            umount_school
             NTACL_set_file
             remove_from_list
             time_stamp_AD
@@ -88,6 +90,64 @@ sub print_title {
    } else {
          printf "#### %-69s####\n",$a;
    }
+}
+
+
+
+# mount/umount school
+######################################################################
+sub mount_school {
+    my ($share,$root_dns,$smb_admin_pass,$ref_sophomorix_config)=@_;
+    &print_title("Mounting school $share");
+    my $mountpoint;
+    if ($share eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'} or
+        $share eq $DevelConf::AD_global_ou){
+        $mountpoint=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'MOUNTPOINT'};
+    } else {
+        $mountpoint=$ref_sophomorix_config->{'SCHOOLS'}{$share}{'MOUNTPOINT'};
+    }
+    if (defined $mountpoint){
+        system ("install -oroot -groot --mode=0755 -d $mountpoint");
+        # mount -t cifs -o user=administrator,pass=`cat /etc/linuxmuster/.secret/administrator`,domain=linuxmuster //linuxmuster.lan/default-school /srv/samba/mounts/default-school/
+        my $user=$DevelConf::sophomorix_AD_admin;
+        my $smb_unc="//".$root_dns."/".$share;
+        my $mount_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'MOUNT'}.
+                          " -t cifs -o user=".
+                          $user.
+                          ",pass=\"".
+                          $smb_admin_pass.
+                          "\",domain=".
+                          $ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}.
+                          " ".
+                          $smb_unc.
+                          " ".
+                          $mountpoint."/";
+        print "$mount_command\n";
+        system($mount_command);
+    } else {
+        print "\nERROR: No mountpoint found for $share (Not a school?)\n\n";
+        exit;
+    }
+    print "$mountpoint\n";
+}
+
+
+
+sub umount_school {
+    my ($share,$root_dns,$smb_admin_pass,$ref_sophomorix_config)=@_;
+    &print_title("Umounting school $share");
+    my $mountpoint;
+    if ($share eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'} or
+        $share eq $DevelConf::AD_global_ou){
+        $mountpoint=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'MOUNTPOINT'};
+    } else {
+        $mountpoint=$ref_sophomorix_config->{'SCHOOLS'}{$share}{'MOUNTPOINT'};
+    }
+    if (defined $mountpoint){
+        my $umount_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'UMOUNT'}." ".$mountpoint;
+        print "$umount_command\n";
+        system($umount_command);
+    }
 }
 
 
@@ -240,7 +300,7 @@ sub _console_print_onesession {
               " ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'givenName'} ",
               "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})",
               " ExamMode: $exammode_string\n";
-        foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
+        foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMUNTPODE'}{'MANAGEMENTGROUPLIST'} }){
             printf "      %-16s%-20s\n",
                 $grouptype.":",
                 $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_'.$grouptype};
@@ -1376,28 +1436,28 @@ sub config_sophomorix_read {
 
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
+        $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
                  if ($school eq $DevelConf::name_default_school){
                      # default-school
-                     $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=
+                     $sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL'}=
                           $DevelConf::name_default_school;
-                     $sophomorix_config{'SCHOOLS'}{$school}{PREFIX}="";
-                     $sophomorix_config{'SCHOOLS'}{$school}{POSTFIX}="";
+                     $sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}="";
+                     $sophomorix_config{'SCHOOLS'}{$school}{'POSTFIX'}="";
                  } else {
                      # *school
-                     $sophomorix_config{'SCHOOLS'}{$school}{SCHOOL}=$school;
-                     $sophomorix_config{'SCHOOLS'}{$school}{PREFIX}=$school."-";
-                     $sophomorix_config{'SCHOOLS'}{$school}{POSTFIX}="-".$school;
-                     $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP}=
-                         $sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
+                     $sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL'}=$school;
+                     $sophomorix_config{'SCHOOLS'}{$school}{'PREFIX'}=$school."-";
+                     $sophomorix_config{'SCHOOLS'}{$school}{'POSTFIX'}="-".$school;
+                     $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
+                         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
                  }
 
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
         # mountpoint
-        $sophomorix_config{'SCHOOLS'}{$school}{MOUNTPOINT}=
+        $sophomorix_config{'SCHOOLS'}{$school}{'MOUNTPOINT'}=
             $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$school;
 
     }
@@ -1553,7 +1613,7 @@ sub config_sophomorix_read {
     # GROUP in section SCHOOLS
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         $sophomorix_config{'SCHOOLS'}{$school}{'ADMINS'}{OU}=
-            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{OU_TOP};
+            $sophomorix_config{'INI'}{'OU'}{'AD_management_ou'}.",".$sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
         foreach my $entry ( &Sophomorix::SophomorixBase::ini_list($sophomorix_config{'INI'}{'SCHOOLS'}{'GROUP'}) ){
             my ($groupname,$grouptype,$sub_ou)=split(/\|/,$entry);
             $groupname=&replace_vars($groupname,\%sophomorix_config,$school);
