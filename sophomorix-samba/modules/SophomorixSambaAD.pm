@@ -4300,8 +4300,8 @@ sub AD_get_quota {
                              'sophomorixSchoolname',
                              'sophomorixRole',
                              'mail',
-                             'sn',
-                             'givenName',
+                             'sophomorixSurnameASCII',
+                             'sophomorixFirstnameASCII',
                              'memberOf',
                              'sophomorixQuota',
                              'sophomorixMailQuota',
@@ -4315,8 +4315,6 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
-        my $sn=$entry->get_value('sn');
-        my $given_name=$entry->get_value('givenName');
         my $mail=$entry->get_value('mail');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my $mailquota = $entry->get_value('sophomorixMailQuota');
@@ -4341,10 +4339,10 @@ sub AD_get_quota {
         # save mail adress/alias
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'mail'}=$mail;
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIAS'}=
-            &Sophomorix::SophomorixBase::alias_from_name($sn,$given_name,$ref_sophomorix_config); 
-
-        print "TEST $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIAS'}\n";
-  
+            &Sophomorix::SophomorixBase::alias_from_name($entry->get_value('sophomorixSurnameASCII'),
+                                                         $entry->get_value('sophomorixFirstnameASCII'),
+                                                         $root_dns,
+                                                         $ref_sophomorix_config); 
         # save USER mailquota
         if (defined $entry->get_value('sophomorixMailQuotaCalculated')){
             $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'OLDCALC'}=$entry->get_value('sophomorixMailQuotaCalculated');
