@@ -27,6 +27,7 @@ use Sophomorix::SophomorixBase qw(
                                  print_title
                                  mount_school
                                  umount_school
+                                 testmount_school
                                  time_stamp_AD
                                  time_stamp_file
                                  unlock_sophomorix
@@ -82,6 +83,7 @@ my $test_schools=0;
 
 my $mount="";
 my $umount="";
+my $listmount=0;
 
 # ===========================================================================
 # Optionen verarbeiten
@@ -106,6 +108,7 @@ my $testopt=GetOptions(
            "school=s" => \$school,
            "mount=s" => \$mount,
            "umount=s" => \$umount,
+           "listmount|list-mount" => \$listmount,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-school");
@@ -143,6 +146,7 @@ Options:
 
   --mount <school>
   --umount <school>
+  --listmount
 
 Dumping data:                     
   -ij / --info --json              (dump configuration)
@@ -276,6 +280,7 @@ if ($school ne "" and $create==1){
 # ============================================================
 # mounting/umounting a school
 # ============================================================
+# --mount <school>
 if ($mount ne ""){
     &mount_school($mount,$root_dns,$smb_admin_pass,\%sophomorix_config);
     exit;
@@ -283,8 +288,17 @@ if ($mount ne ""){
 
 
 
+# --umount <school>
 if ($umount ne ""){
-    &umount_school($umount,$root_dns,$smb_admin_pass,\%sophomorix_config);
+    &umount_school($umount,$root_dns,\%sophomorix_config);
+    exit;
+}
+
+
+
+# --listmount
+if ($listmount==1){
+    &testmount_school("","",\%sophomorix_config,1);
     exit;
 }
 

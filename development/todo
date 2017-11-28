@@ -81,10 +81,6 @@ Individueller Teil:
 
 NEXT/Todo:
 
-sophomorix-school --mount <schoolname/sharename>
-sophomorix-school --umount <schoolname/sharename>
-- davor verzeichnisbaum erstellen, testen
-
 AD_get_quota:
 -> mailinglistendaten erstellen im JSON-Object
   -> beim user den alias erzeugen nach school.ini
@@ -222,16 +218,6 @@ OK 1) parallel zu management,students,teachers in jeder Schule und global
 Todo   2) dann paket
 Todo   3)anschließend ntacl abernten
 
-
-mounten
-
-root@server:/# mkdir -p /srv/samba/mounts/default-school
-
-root@server:/# mount -t cifs -o user=administrator,pass=`cat /etc/linuxmuster/.secret/administrator`,domain=linuxmuster //linuxmuster.lan/default-school /srv/samba/mounts/default-school/
-
-sophomorix-school --mount <share>
-....
--> 
 
 sophomorix-class/project
 show on quota fields if a quota exists

@@ -31,6 +31,7 @@ $Data::Dumper::Terse = 1;
             print_title
             mount_school
             umount_school
+            testmount_school
             NTACL_set_file
             remove_from_list
             time_stamp_AD
@@ -99,6 +100,7 @@ sub print_title {
 sub mount_school {
     my ($share,$root_dns,$smb_admin_pass,$ref_sophomorix_config)=@_;
     &print_title("Mounting school $share");
+    my $smb_unc="//".$root_dns."/".$share;
     my $mountpoint;
     if ($share eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'} or
         $share eq $DevelConf::AD_global_ou){
@@ -106,36 +108,92 @@ sub mount_school {
     } else {
         $mountpoint=$ref_sophomorix_config->{'SCHOOLS'}{$share}{'MOUNTPOINT'};
     }
-    if (defined $mountpoint){
-        system ("install -oroot -groot --mode=0755 -d $mountpoint");
-        # mount -t cifs -o user=administrator,pass=`cat /etc/linuxmuster/.secret/administrator`,domain=linuxmuster //linuxmuster.lan/default-school /srv/samba/mounts/default-school/
-        my $user=$DevelConf::sophomorix_AD_admin;
-        my $smb_unc="//".$root_dns."/".$share;
-        my $mount_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'MOUNT'}.
-                          " -t cifs -o user=".
-                          $user.
-                          ",pass=\"".
-                          $smb_admin_pass.
-                          "\",domain=".
-                          $ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}.
-                          " ".
-                          $smb_unc.
-                          " ".
-                          $mountpoint."/";
-        print "$mount_command\n";
-        system($mount_command);
-    } else {
+    if ( not defined $mountpoint){
         print "\nERROR: No mountpoint found for $share (Not a school?)\n\n";
         exit;
     }
-    print "$mountpoint\n";
+
+    # test if it is mounted already
+    my $res1=&testmount_school($mountpoint,$smb_unc,$ref_sophomorix_config,0);
+    if ($res1 eq "TRUE"){
+        print "\n   $smb_unc is mounted already\n\n";
+        return;
+    }
+
+    # mount
+    system ("install -oroot -groot --mode=0755 -d $mountpoint");
+    my $user=$DevelConf::sophomorix_AD_admin;
+    my $mount_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'MOUNT'}.
+                      " -t cifs -o user=".
+                      $user.
+                      ",pass=\"".
+                      $smb_admin_pass.
+                      "\",domain=".
+                      $ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'}.
+                      " ".
+                      $smb_unc.
+                      " ".
+                      $mountpoint."/";
+    print "COMMAND: $mount_command\n";
+    system($mount_command);
+
+    # Test if mount was successful
+    my $res2=&testmount_school($mountpoint,$smb_unc,$ref_sophomorix_config,0);
+    if ($res2 eq "FALSE"){
+        print "\nERROR: $smb_unc not mounted to $mountpoint\n\n";
+    }
+}
+
+
+
+sub testmount_school {
+    my ($mountpoint,$smb_unc,$ref_sophomorix_config,$list)=@_;
+    # collect data from system
+    my %mounts=();
+    open(PROCMOUNTS, $ref_sophomorix_config->{'INI'}{'PATHS'}{'PROCMOUNTS'}) or die "Mount File not found";
+    while(<PROCMOUNTS>){
+        my ($unc,$mpoint,$mtype,$mopts) = split(/ +/, $_);
+        if ($mtype eq "cifs"){ # care only about cifs mounts
+        $mounts{$unc}{'MPOINT'}=$mpoint;
+        $mounts{$unc}{'MTYPE'}=$mtype;
+        $mounts{$unc}{'MOPTS'}=$mopts;
+        }
+    }
+    close(PROCMOUNTS);
+    #print Dumper(\%mounts);
+    if ($list==1){
+        ##### list
+        my @unc_list=();
+        my $line="+------------------------------------------+------------------------------------+\n";
+        print "\n";
+        print "List of cifs mounts on this server:\n";
+        foreach my $unc (keys %mounts) {
+            push @unc_list,$unc;
+        }
+	@unc_list = sort @unc_list;
+        print $line;
+        print    "| Mountpoint                               | UNC-Path                           |\n";
+        print $line;
+        foreach my $unc (@unc_list){
+            printf "| %-41s| %-35s|\n",$mounts{$unc}{'MPOINT'},$unc;
+        }
+        print $line;
+    } else {
+        ##### test
+        if (exists $mounts{$smb_unc} and $mounts{$smb_unc}{'MPOINT'} eq $mountpoint){
+	    print "OK: UNC-Path $smb_unc  is mounted to $mountpoint as $mounts{$smb_unc}{'MTYPE'}\n";
+            return "TRUE";
+        } else {
+            return "FALSE";
+        }
+    }
 }
 
 
 
 sub umount_school {
-    my ($share,$root_dns,$smb_admin_pass,$ref_sophomorix_config)=@_;
-    &print_title("Umounting school $share");
+    my ($share,$root_dns,$ref_sophomorix_config)=@_;
+    &print_title("Umounting school $share $DevelConf::AD_global_ou $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}");
     my $mountpoint;
     if ($share eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'} or
         $share eq $DevelConf::AD_global_ou){
@@ -145,8 +203,8 @@ sub umount_school {
     }
     if (defined $mountpoint){
         my $umount_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'UMOUNT'}." ".$mountpoint;
-        print "$umount_command\n";
-        system($umount_command);
+        print "COMMAND: $umount_command\n";
+        my $return=system($umount_command);
     }
 }
 
