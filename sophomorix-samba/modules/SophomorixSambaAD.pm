@@ -4430,6 +4430,9 @@ sub AD_get_quota {
         # save maillist stuff about classes
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailList'}=$maillist;
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailAlias'}=$mailalias;
+        if ($maillist eq "TRUE"){
+            push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
+        }
 
         # mailquota
         my ($mailquota_value,$mailquota_comment)=split(/:/,$mailquota);
@@ -4555,6 +4558,9 @@ sub AD_get_quota {
         # save maillist stuff about projects
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'}=$maillist;
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailAlias'}=$mailalias;
+        if ($maillist eq "TRUE"){
+            push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
+        }
 
         # addmailquota
         my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
@@ -4899,7 +4905,9 @@ sub AD_get_quota {
 	@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }= 
             sort @{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} };
     }
-
+    foreach my $school (keys %{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'} }) {
+        @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } = sort @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} };
+    }
     return(\%quota);
 }
 

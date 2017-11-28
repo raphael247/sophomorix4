@@ -193,17 +193,25 @@ if ($info==1 and $json>0){
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Mailaccounts and maillists of school $school:");
         # there are 0 users
-        if($#userlist==-1){
-            print "     0 sophomorix users in school $school\n";
-            next;
-        }
-
+#        if($#userlist==-1){
+#            print "     0 sophomorix users in school $school\n";
+#            next;
+#        }
         # there are users
-
         ############################################################
         # Walk through users
         foreach my $user (@userlist){
 	    #print "DEBUG: User: $user\n";
+        }
+
+
+        ############################################################
+        # Walk through mailists
+        foreach my $maillist ( @{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } ){
+	    print "Maillist $maillist:\n";
+            foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{LIST} } ){
+	        print "   * $member\n";
+            }
         }
     } # end of school
     #print Dumper($ref_mail);
