@@ -4300,6 +4300,7 @@ sub AD_get_quota {
                              'sophomorixSchoolname',
                              'sophomorixRole',
                              'mail',
+                             'displayName',
                              'sophomorixSurnameASCII',
                              'sophomorixFirstnameASCII',
                              'memberOf',
@@ -4315,7 +4316,6 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
-        my $mail=$entry->get_value('mail');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my $mailquota = $entry->get_value('sophomorixMailQuota');
 	my @quota = $entry->get_value('sophomorixQuota');
@@ -4337,8 +4337,9 @@ sub AD_get_quota {
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'mailquota_default'};
 
         # save mail adress/alias
-        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'mail'}=$mail;
-        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIAS'}=
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'mail'}=$entry->get_value('mail');
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'displayName'}=$entry->get_value('displayName');;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIASNAME'}=
             &Sophomorix::SophomorixBase::alias_from_name($entry->get_value('sophomorixSurnameASCII'),
                                                          $entry->get_value('sophomorixFirstnameASCII'),
                                                          $root_dns,
@@ -4479,6 +4480,13 @@ sub AD_get_quota {
             # save member in maillist if requested
             if ($quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailList'} eq "TRUE"){
                 push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
+            }
+
+            # save alias=TRUE at user if class requests alias
+            if ($quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailAlias'} eq "TRUE"){
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'ALIAS'}="TRUE";
+            } else {
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'ALIAS'}="FALSE";
             }
 
             # save mailquota for class at user
@@ -4623,6 +4631,13 @@ sub AD_get_quota {
                 # save member in maillist if requested 
                 if ($quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'} eq "TRUE"){
                     push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
+                }
+
+                # save alias=TRUE at user if class requests alias
+                if ($quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailAlias'} eq "TRUE"){
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'ALIAS'}="TRUE";
+                } else {
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'ALIAS'}="FALSE";
                 }
 
                 # save mailquota info at user
