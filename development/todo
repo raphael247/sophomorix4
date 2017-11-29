@@ -70,6 +70,40 @@ Individueller Teil:
    B) ...
 3) Erstellen von Resultatdateien
    - zu erstellende Dateien (bewlue, Mailman, ....)
+
+
+TODO
+
+   belwue:
+    mailaccounts in UTF8
+     OK: login -> samaccount
+     TODO: Realname (Vor/Nach) -> displayName  (Vorname Nachname) --> OHNE KOMMA
+     OK: Type MultiMailbox -> fix
+     password -> zufallspassword Kriterien in belwue.ini
+     storage -> 512M MAILQUOTA -> CALC
+     alias -> so wie erzeugt in MAIL->ALIAS
+
+belwue.ini erstellen:
+
+PASSWORD=*****               # zum login con admin@domain.de besser ADMINPASSWORD
+PASSWORDKUNDENINFO=****      # eigentlich ungeutzt
+PWD_LENGTH=10
+
+BASE=bszleo.de               # die domain hier eintragen
+  ADMINURL=https://mbox1.belwue.de:9010/DomainAdmin # sollte gleich sein
+  ADMINUSER=admin@domain.de    # domain aus BASE nehmen hier nur ADMINUSER=admin
+  SERVER=mbox1.belwue.de       # eigentlich gleich
+  PORT=636                     # gleich  
+  PROTOCOL=ldaps               # gleich
+
+
+# zum kopieren der logindaten
+TEACHERSERVERDIR=/data/lehrershare/LehrerInnen
+TEACHERSERVER=10.175.1.10
+TEACHERUSER=root
+
+
+
 4) synchronisation
    A) Belwue mit links und passwort der admin interfaces
    B) scp upload
