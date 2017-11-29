@@ -4905,8 +4905,12 @@ sub AD_get_quota {
 	@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }= 
             sort @{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} };
     }
+    # sort maillist stuff
     foreach my $school (keys %{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'} }) {
         @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } = sort @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} };
+        foreach my $maillist (keys %{ $quota{'MAILLIST'} } ){
+	    @{ $quota{'MAILLIST'}{$maillist}{'LIST'} } = sort @{ $quota{'MAILLIST'}{$maillist}{'LIST'} };
+        }
     }
     return(\%quota);
 }
