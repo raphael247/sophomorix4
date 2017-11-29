@@ -4399,6 +4399,7 @@ sub AD_get_quota {
                              'sophomorixType',
                              'member',
                              'memberOf',
+                             'mail',
                              'sophomorixQuota',
                              'sophomorixMailQuota',
                              'sophomorixMailList',
@@ -4425,12 +4426,14 @@ sub AD_get_quota {
         # save stuff about classes
   	$quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixType'}=$type;
+        $quota{'QUOTA'}{'CLASSES'}{$sam}{'mail'}=$entry->get_value('mail');
 	push @{ $quota{'LISTS'}{'CLASS_by_SCHOOL'}{$school} }, $sam; 
 
         # save maillist stuff about classes
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailList'}=$maillist;
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailAlias'}=$mailalias;
         if ($maillist eq "TRUE"){
+            $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
         }
 
@@ -4511,6 +4514,7 @@ sub AD_get_quota {
                              'sophomorixType',
                              'member',
                              'memberOf',
+                             'mail',
                              'sophomorixAddQuota',
                              'sophomorixAddMailQuota',
                              'sophomorixMailList',
@@ -4558,7 +4562,9 @@ sub AD_get_quota {
         # save maillist stuff about projects
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'}=$maillist;
         $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailAlias'}=$mailalias;
+        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'mail'}=$entry->get_value('mail');
         if ($maillist eq "TRUE"){
+            $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
         }
 

@@ -208,8 +208,8 @@ if ($info==1 and $json>0){
         ############################################################
         # Walk through mailists
         foreach my $maillist ( @{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } ){
-	    print "Maillist $maillist:\n";
-            foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{LIST} } ){
+	    print "Maillist $maillist ($ref_mail->{'MAILLIST'}{$maillist}{'mail'}):\n";
+            foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
 	        print "   * $member\n";
             }
         }
