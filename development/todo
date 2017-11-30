@@ -48,11 +48,10 @@ sophomorix-mail
 * sorgt dafür dass
   * mailaccounts da sind
   * mailinglisten da sind
-Egalwo Mail gehostet wird, gleiches prinzipielles vorgehen:
-1) AD-Abfrage: 
+Egal wo Mail gehostet wird, gleiches prinzipielles vorgehen:
+1) OK: AD-Abfrage: 
    * wer ist in welcher Gruppe
    --> JSON
-   --> schon umsetzbar
 Individueller Teil:
 2) school.ini:
    welche Art wird benutzt
@@ -60,19 +59,13 @@ Individueller Teil:
        MAILTYPE = belwue
        MAILTYPE = mailman
        .....
-       --> sucht automatisch nach einer Datei <MAILTYPE>.conf im schulordner
-       Dort dann jeweils das was man braucht:
-        - passwort remote server
-        - konfiguration, ...
-        - .....
+       --> sucht automatisch nach einer Datei <MAILTYPE>.ini im schulordner
+
    Abfrage Maildienst
    A) Belwue über webinterface
    B) ...
 3) Erstellen von Resultatdateien
    - zu erstellende Dateien (bewlue, Mailman, ....)
-
-
-TODO
 
    belwue:
     mailaccounts in UTF8
@@ -115,27 +108,10 @@ TEACHERUSER=root
 
 NEXT/Todo:
 
-AD_get_quota: OK, done
--> mailinglistendaten erstellen im JSON-Object
-  -> beim user den alias erzeugen nach school.ini
-  -> bei der Klasse:
-  OK: mailist und mailalias attribut merken
-  OK -> beim memberdurchgehen maillist erzeigen
-    $quota{'MAILLIST'}{$sam_gruppe}{LIST}=[  , , , ] 
-    $quota{'MAILLIST'}{$sam_gruppe}{sophomorixMailAlias}=T/F
-    $quota{'MAILLIST'}{$sam_gruppe}{sophomorixMailList}=T/F
-  projekte
-  OK: mailist und mailalias attribut merken
-  OK: -> dito bei Projekten
---> alles ok
-
-mailalis:
+mailalias:
 make configurable in school.ini
 --> in role section ???
    todo: sub alias_from_name  in sophomorixBase werted das aus
-
-
-sophomorix-mail ruft dann denselben hash auf und macht was mit den Mailinglisten
 
 ------------------------------------------------------------
 Überlegen:
@@ -167,11 +143,7 @@ wenn es "---" oder "ist", dann alle schulen
 --> festlegen
 
 
-
-
-order member lists ascibetically
-
-
+---> alte Funktionen evtl. weglassen/umscreiben auf eigentlichen Zweck:
 remove AD_group_list (at least display/print options)
 remove AD_project_fetch (at least display/print options)
        -> print commented
@@ -179,13 +151,11 @@ remove AD_project_fetch (at least display/print options)
 dito: AD_class_fetch
 
 Ausgabe von user/Klasseninfo:
-creationdate bei Anzeige umwandeln in lesbares Datum (Format Konfigurierbar)
-comments to listing of Values (... in MiB)
-
-
-gibts erst ab artful:
-libnet-ldap-sid-perl
-
+  * creationdate bei Anzeige umwandeln in lesbares Datum (Format Konfigurierbar)
+  * comments to listing of Values (... in MiB)
+  * SID:
+    gibts erst ab artful 17.10:
+    libnet-ldap-sid-perl
 
 option to add a description:
 sophomorix-group --description --group >name< tut das schon ????
@@ -231,17 +201,12 @@ mailquota:
 
 
 
-mailquota testen
-
-
-
-
 tests aller quota (4 angaben bei allen gruppen)
 
 testen ob bei developersetquota auch comments gehen,
 wird der user auch upgedated?
 
-man sollte bei quotaangaben auch nur Comment angeben können
+man sollte bei quotaangaben auch NUR Comment angeben können
 z.B.: kein userquota wegen ... mit --quota bsz:---:Kommentar
 
 wird Kommentar auch upgedated werden
@@ -253,18 +218,14 @@ Kommentare: a-9a-zA-Z
 (Datum abspeichern bei quotasetzungen??)
 
 
+
+
+ACL:
+
 ordner share,program
 OK 1) parallel zu management,students,teachers in jeder Schule und global
 Todo   2) dann paket
 Todo   3)anschließend ntacl abernten
-
-
-sophomorix-class/project
-show on quota fields if a quota exists
-mailquota: the number
-quota * for each share that is quoted
-
-ACL:
 
 * Tests für project acl
 * nichtlöschbar fehlt noch
@@ -290,16 +251,14 @@ sophomorix-class
 bei Option -i, die Quota angaben (mit Comments, UNTER die Mitgliedersummierung),
 ganze Zeile verwenden
 
+sophomorix-project -i
 sophomorix-class -i 
 sophomorix-group -i 
-* user zählen
 * --min-user <num> --max-user <num>
 
 
 sophomorix-quota 
-show comments with sophomorix-quota -iv
 * tests schreiben
-* use loglevel for printout of projects
 
 
 * sophomorix-check -ij: check which schools have a working smb file server
@@ -349,12 +308,9 @@ container unter /var/lib/docker/...
 daten unter /srv/docker/linuxmuster-mail
 c't-Artikel lesen
 
-sophomorix-gruppe
-Gruppe mail anlegen
-
-
 Mailattribute
-attribut mail  -> Füllen  loginname@linuxmuster.net ()
+OK: attribut mail  -> Füllen  loginname@linuxmuster.net ()
+TODO? Was ist zu tun? 
 proxyAdresses  - multivalue, noch leer
 mailAdresses
 
@@ -373,8 +329,6 @@ nicenstein
 
 -- mehrschullösung
    1 Mailserver für alle schulen, gleiche maildomain (vorerst)
-
-
 
 
 sophomorix-webui user permissions, genauer
@@ -608,8 +562,6 @@ sophomorix-device return json (import von Thomas auch)
 
 CUPS via Samba
 wer macht das?
-
-
 
 
 Setup mit Partition =Schule

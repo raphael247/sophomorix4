@@ -4958,7 +4958,7 @@ sub AD_get_full_groupdata {
         $filter=$filter." ))";
     }
 
-    print "$filter\n";
+    #print "$filter\n";
     my %groups=();
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -4972,7 +4972,6 @@ sub AD_get_full_groupdata {
         my $sam=$entry->get_value('sAMAccountName');
         push @{ $groups{'LISTS'}{'GROUPS'} }, $sam;
 
-
         $groups{'GROUPS'}{$sam}{'dn'}=$entry->dn();
         $groups{'GROUPS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
         $groups{'GROUPS'}{$sam}{'cn'}=$entry->get_value('cn');
@@ -4980,8 +4979,8 @@ sub AD_get_full_groupdata {
         $groups{'GROUPS'}{$sam}{'gidNumber'}=$entry->get_value('gidNumber');
         $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
         $groups{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');
-        @{ $groups{'GROUPS'}{$sam}{'memberOf'} }=$entry->get_value('memberOf');
-        @{ $groups{'GROUPS'}{$sam}{'member'} }=$entry->get_value('member');
+        @{ $groups{'GROUPS'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');
+        @{ $groups{'GROUPS'}{$sam}{'member'} } = sort $entry->get_value('member');
 
         $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
         $groups{'GROUPS'}{$sam}{'sophomorixType'}=$entry->get_value('sophomorixType');
@@ -4996,20 +4995,20 @@ sub AD_get_full_groupdata {
         $groups{'GROUPS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
         $groups{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}=$entry->get_value('sophomorixAddMailQuota');
 
-        @{ $groups{'GROUPS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
-        @{ $groups{'GROUPS'}{$sam}{'sophomorixAddQuota'} }=$entry->get_value('sophomorixAddQuota');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixQuota'} } = sort $entry->get_value('sophomorixQuota');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixAddQuota'} } = sort $entry->get_value('sophomorixAddQuota');
 
-        @{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }=$entry->get_value('sophomorixAdmins');
-        $groups{'GROUPS'}{$sam}{'sophomorixAdmins_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }+1;
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} } = sort $entry->get_value('sophomorixAdmins');
+        $groups{'GROUPS'}{$sam}{'sophomorixAdmins_count'} = $#{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }+1;
 
-        @{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} }=$entry->get_value('sophomorixMembers');
-        $groups{'GROUPS'}{$sam}{'sophomorixMembers_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} }+1;
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} } = sort $entry->get_value('sophomorixMembers');
+        $groups{'GROUPS'}{$sam}{'sophomorixMembers_count'} = $#{ $groups{'GROUPS'}{$sam}{'sophomorixMembers'} }+1;
 
-        @{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} }=$entry->get_value('sophomorixAdminGroups');
-        $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} }+1;
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} } = sort $entry->get_value('sophomorixAdminGroups');
+        $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups_count'} = $#{ $groups{'GROUPS'}{$sam}{'sophomorixAdminGroups'} }+1;
 
-        @{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }=$entry->get_value('sophomorixMemberGroups');
-        $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups_count'}=$#{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }+1;
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} } = sort $entry->get_value('sophomorixMemberGroups');
+        $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups_count'} = $#{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }+1;
     }
     $groups{'COUNTER'}{'TOTAL'}=$max;
     if ($max>0){
@@ -5084,8 +5083,8 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
         $users{'USERS'}{$sam}{'sophomorixMailQuotaCalculated'}=$entry->get_value('sophomorixMailQuotaCalculated');
         $users{'USERS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
-        @{ $users{'USERS'}{$sam}{'memberOf'} }=$entry->get_value('memberOf');
-        @{ $users{'USERS'}{$sam}{'sophomorixQuota'} }=$entry->get_value('sophomorixQuota');
+        @{ $users{'USERS'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');
+        @{ $users{'USERS'}{$sam}{'sophomorixQuota'} } = sort $entry->get_value('sophomorixQuota');
 
         # samba
         $users{'USERS'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
