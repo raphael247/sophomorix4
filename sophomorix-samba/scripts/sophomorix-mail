@@ -191,17 +191,32 @@ if ($info==1 and $json>0){
         ############################################################
         # HEADER for SCHOOL
         print "\n";
-        &Sophomorix::SophomorixBase::print_title("Mailaccounts and maillists of school $school:");
+        &Sophomorix::SophomorixBase::print_title("Mailaccounts/Maillists of school $school:");
         # there are 0 users
-#        if($#userlist==-1){
-#            print "     0 sophomorix users in school $school\n";
-#            next;
-#        }
+        if($#{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }==-1){
+            print "     0 sophomorix users in school $school\n";
+            next;
+        }
         # there are users
         ############################################################
         # Walk through users
-        foreach my $user (@userlist){
-	    #print "DEBUG: User: $user\n";
+        print "Mailaccounts:\n";
+        foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
+            my $alias="Alias: FALSE";
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
+                $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+            }
+            my $user_string="  * ".
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'mail'}.
+                            " (".
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}.
+                            ") ".
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}.
+                            " MiB, ".
+                            $alias.
+                            ")\n";
+  
+	    print $user_string;
         }
 
 
@@ -210,7 +225,7 @@ if ($info==1 and $json>0){
         foreach my $maillist ( @{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } ){
 	    print "Maillist $maillist ($ref_mail->{'MAILLIST'}{$maillist}{'mail'}):\n";
             foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
-	        print "   * $member\n";
+	        print "  * $member\n";
             }
         }
     } # end of school
