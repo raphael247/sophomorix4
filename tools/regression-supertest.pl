@@ -136,7 +136,8 @@ sub reset_smb {
     system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv");
-    system("sophomorix-samba --restore-samba ohne-user --schema-load");
+#    system("sophomorix-samba --restore-samba ohne-user --schema-load");
+    system("sophomorix-samba --restore-samba ohne-user");
     system("rm -rf /srv/samba");
     sleep 5;
     system("sshpass -p \"Muster!\" samba-tool user setpassword Administrator");

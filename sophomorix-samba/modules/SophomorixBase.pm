@@ -1851,7 +1851,9 @@ sub read_smb_net_conf_list {
     foreach my $share (keys %{ $ref_sophomorix_config->{'samba'}{'net_conf_list'} }) {
         push @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }, $share; 
     }
-    @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }= sort @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} };
+    if ($#{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} } >0){
+        @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} }= sort @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} };
+    }
 }
 
 
