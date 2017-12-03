@@ -42,6 +42,116 @@ Umgang mit Tauschlaufwerken:
 
 Nextcloud:
 
+------------------------------------------------------------
+Essen-Tagung
+firewall: wie für einzelne user ssh nach außen zulassen
+Funktionsgruppe ssh allow?
+
+wo sollen sophomorix-group hin: nach custom
+
+doku: Gruppenkonzept Hirarchie
+schüler -> klasse -> schulstudents -> SCHOOLS
+Prefix-schule: dort wo notwendig
+ Klassenobjekt:ja, Verzeichnis Nein
+ name global (ausnahme Sharename)
+
+generierte Loginnamen der Schüler merken und
+nicht wiederverwenden, bzw. erst nach 1/2 Jahren Pause wieder??
+Nextclod-Probleme verhindern (ans AD gekoppelte) 
+
+Klassenarbeiten mit Moodle
+gibts was umzusetzen??
+
+--------------------
+VirtualBox:
+Host-only Netzwerk: neu anlegen, IP ist die des Wirts in diesem Host-only Netz
+importieren:
+- Namen ändern, Ort anpassen, vdi als Plattenabbild
+- FW booten
+- vom wirt via vboxnet2 auf die innenseite der FW pingen: ping 10.0.0.254
+- Server booten:
+
+
+
+
+
+
+Ideen/Todo:
+- linuxmuster-prepare umbenennen in turnkey (wie bei anderen appliances)
+- loginprompt-farbe je server (server: rot)
+- linuxmuster-setup
+  extra script zum docker setup, und andere
+- Passwortabfragen:
+  Unterscheiden ob Passwort VERGEBEN wird ODER
+  Passwort zum Zugriff auf Docker, ... BENÖTIGT wird
+- user name nicht wiederverwenden
+- Docker-container hash
+  liste mit hashes auf die upgedated werden kann
+  (nach überprüfung on der neue Docker container tut)
+
+
+- default reverse proxy beim docker
+
+Docker:
+
+/srv/li../docker
+docker stats
+docker container ls
+
+
+Firewall:
+https://10.0.0.254/
+root --> Muster!
+
+
+--------------------
+Bugs:
+sophomorix-school --mount GLOBAL/global/linuxmuster-global
+tut nicht.
+
+sophomorix-device:
+Listet auch nicht-sophomorix nodes --> verbessern
+wie werden die Einträge gemacht (devices.csv)
+--> ist bei default-school drin, sollte nach global?
+
+create testusers.py
+wie ermittelt ob command succesful war?
+--> json auswerten
+
+extraclasses-Datei, gibts die schon
+
+   ini:
+[HOOK]
+   HOOK_PATH= /etc/linuxmuster/sophomorix
+   dann:school/global
+   ADD_HOOK_DIR=sophomorix-add.d
+   UPDATE_HOOK_DIR=sophomorix-update.d
+   KILL_HOOK_DIR=sophomorix-kill.d
+
+--> TODO: einlesen in Config
+   sub run_hook("ADD_HOOK");
+   -> verzeichnis lesen
+-> schauen ob executable, ascibetisch ordnen
+-> mit abs_path aufrufen
+   -> PROGRESSION-JSON für jedes script (script 1/3)
+   
+sophomorix-add hook:
+sophomorix-update hook:
+sophomorix-kill hook:
+Rückgabewert auslesen, bei 0 OK, sonst 1
+progress-Objekt ausgeben: starte hook script
+
+
+
+
+LOGIN_RECYCLE_AFTER_DAYS=365
+xxx days Nutzernamen nicht wiederverwenden (automatisch geherierte)
+Für geforcte samaccountnames warnung bzw. testmöglichkeit
+--> warnung bei sophomorix-check
+--> bei sohomorix-add dann machen
+
+------------------------------------------------------------
+
 
 
 sophomorix-mail
@@ -376,12 +486,12 @@ sophomorix-school --check
       5. Feld wunschlogin, 6. Feld unid
       Problem:
          - Schüler-Export ändert sich zur 6.x
-	 - Schüler export braucht Leerfeld (problematisch)
+	 - Schüler export braucht Leerfeld (sehr problematisch)
 	 - Migration
    B) lehrer.txt/extraschueler an schueler.txt
       5.Feld unid, 6. Feld wunschlogin
       Problem:
-         - lehrer-export ändert sich zur 6.x
+         - lehrer-export ändert sich zur 6.x (eher gangbar als A))
 	 - Lehrerexport braucht Leerfeld
 	 - Migration
    Beides aufwendig und betrifft auch
