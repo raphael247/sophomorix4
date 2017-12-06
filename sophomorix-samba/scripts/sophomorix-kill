@@ -44,6 +44,7 @@ use Sophomorix::SophomorixSambaAD qw(
 my @arguments = @ARGV;
 
 my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
 my $user_count=0;
 
 my $identifier_to_kill="";
@@ -272,6 +273,7 @@ if ($killuser ne ""){
                        user_count=>$user_count,
                        max_user_count=>$max_user_count,
                        smb_admin_pass=>$smb_admin_pass,
+                       time_stamp_AD=>$time_stamp_AD,
                        json=>$json,
                        sophomorix_config=>\%sophomorix_config,
                        sophomorix_result=>\%sophomorix_result,
@@ -299,6 +301,7 @@ if ($killuser ne ""){
                        user_count=>$user_count,
                        max_user_count=>$max_user_count,
                        smb_admin_pass=>$smb_admin_pass,
+                       time_stamp_AD=>$time_stamp_AD,
                        json=>$json,
                        sophomorix_config=>\%sophomorix_config,
                        sophomorix_result=>\%sophomorix_result,

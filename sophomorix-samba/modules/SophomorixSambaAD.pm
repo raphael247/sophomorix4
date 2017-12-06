@@ -756,6 +756,7 @@ sub AD_user_kill {
     my $max_user_count = $arg_ref->{max_user_count};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
+    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
@@ -795,9 +796,13 @@ sub AD_user_kill {
         }
 
         # deleting user
+	my $kill_return=-1;
+        my $home_delete=-1;
+        my $home_delete_string="";
+
         my $command="samba-tool user delete ". $user;
         print "   # $command\n";
-        system($command);
+        $kill_return=system($command);
 
         # deleting home
         if ($role_AD eq "student" or 
@@ -809,13 +814,30 @@ sub AD_user_kill {
                                                password  => $smb_admin_pass,
                                                debug     => 0);
               #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-              my $return=$smb->rmdir_recurse($smb_home);
-              if($return==1){
+              $home_delete=$smb->rmdir_recurse($smb_home);
+              if($home_delete==1){
+                  $home_delete_string="TRUE";
                   print "OK: Deleted with succes $smb_home\n";
               } else {
+                  $home_delete_string="FALSE";
                   print "ERROR: rmdir_recurse $smb_home $!\n";
               }
         }
+
+        if ($kill_return==0){
+            # log the killing of a user 
+            &Sophomorix::SophomorixBase::log_user_kill({sAMAccountName=>$user,
+                                                        sophomorixRole=>$role_AD, 
+                                                        time_stamp_AD=>$time_stamp_AD,
+                                                        home_delete_string=>$home_delete_string,
+                                                        sophomorixSchoolname=>$school_AD,
+                                                        firstname=>$firstname_utf8_AD,    
+                                                        lastname=>$lastname_utf8_AD,
+                                                        adminclass=>$adminclass_AD,
+                                                        sophomorix_config=>$ref_sophomorix_config,
+                                                        sophomorix_result=>$ref_sophomorix_result,
+                                                      });
+	}
         return;
     } else {
         print "   * User $user nonexisting ($count results)\n";

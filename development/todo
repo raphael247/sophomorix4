@@ -122,7 +122,48 @@ paket signieren, pgp-schlüssel
    rename samaccountname-> not supported
      
    
-   
+Logging(alt): 
+/var/log/sophomorix/user-modify.log
+update_unids::01.01.1970::<login>::<last>;<first>;04.12.1997::->::<last>;<first>;01.01.1970::-10uid
+new-unid::01.01.1970::<login>::<last>;<first>;26.04.1996::->::<last>;<first>;01.01.1970::-10uid
+auto-teach-in::06.09.2013::kog::Koenig;Michuela;01.01.1970::->::Koenig;Michaela;01.01.1970::
+
+/var/log/sophomorix/user-modify-archive.log
+user archived::04.09.2013::<login>::<uid>::<Last>::first::
+4 Jahre-->  13000 Entries, davon 4000 new-unid, 2000 Exam, 300 Computer
+--> neu: Eigenes logfile for killed users
+    --> OK: + mit unix-Zeit
+    --> OK:+ mit Rolle
+    --> OK: Schule
+    --> daraus oldlogins erzeugen
+    --> janitor/cronjob macht
+        a) anonymisiert den Eintrag nach x Tagen (nur uid->login bleibt erhalten)
+           - entfernt user auch aus add,update, ...
+        b) entfernt den Eintrag nach x Tagen (x=730), y tagen bei teacher, z tage bei anderen Rollen
+
+Migration: Daten konvertieren ?
+
+
+Todo: 
+OK: kill logging
+update logging
+add logging
+      
+
+??? samba_sid mitloggen?
+
+
+BUG:
+
+when 
+ 1)a user is in sophomorix.update
+ 2) and it is set to killable:  sophomorixx-user -K -u gal42
+ 3) sophomorix-check again
+ 4) then it cannot be killed, only updated
+    --> is this ok so?
+    --> should the user appear in both update and kill?
+
+
 --------------------
 Bugs:
 sophomorix-school --mount GLOBAL/global/linuxmuster-global

@@ -1436,6 +1436,8 @@ sub config_sophomorix_read {
 
     my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
                                                                 $DevelConf::secret_file_sophomorix_AD_admin);
+    # read epoch
+    $sophomorix_config{'UNIX'}{'EPOCH'}=time;
 
     # read available encodings from iconv --list
     my %encodings_set=();
@@ -2671,6 +2673,36 @@ sub log_script_exit {
     # output the result object
     &result_sophomorix_print($ref_result,$ref_sophomorix_config,$json);
     exit $return;
+}
+
+
+
+sub log_user_kill {
+    my ($arg_ref) = @_;
+    my $sam = $arg_ref->{sAMAccountName};
+    my $role = $arg_ref->{sophomorixRole};
+    my $school = $arg_ref->{sophomorixSchoolname};
+    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
+    my $lastname = $arg_ref->{lastname};
+    my $firstname = $arg_ref->{firstname};
+    my $adminclass = $arg_ref->{adminclass};
+    my $home_delete_string = $arg_ref->{home_delete_string};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    my $log_line="KILL::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
+                 $role."::".$school."::".$time_stamp_AD."::".
+                 $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
+                 "::HOME_DELETED=".$home_delete_string."::\n";
+
+    my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_KILL'};
+
+    system ("mkdir -p $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}");
+
+    open (LOG,">>$logfile");
+    print LOG $log_line;
+    close(LOG);
 }
 
 
