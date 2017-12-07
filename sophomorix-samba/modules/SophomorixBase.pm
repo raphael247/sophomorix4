@@ -2677,6 +2677,33 @@ sub log_script_exit {
 
 
 
+sub log_user_update {
+    my ($arg_ref) = @_;
+    my $sam = $arg_ref->{sAMAccountName};
+    my $unid = $arg_ref->{unid};
+    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
+    my $update_log_string = $arg_ref->{update_log_string};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    $update_log_string=~s/,$//g;# remove trailing ,
+
+    my $log_line="UPDATE::".$sam."::".$unid."::".$time_stamp_AD."::".
+                 $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
+                 "::".$update_log_string."::\n";
+
+    my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_UPDATE'};
+
+    system ("mkdir -p $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}");
+
+    open (LOG,">>$logfile");
+    print LOG $log_line;
+    close(LOG);
+}
+
+
+
 sub log_user_kill {
     my ($arg_ref) = @_;
     my $sam = $arg_ref->{sAMAccountName};

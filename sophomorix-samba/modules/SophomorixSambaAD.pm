@@ -1895,7 +1895,7 @@ sub AD_user_update {
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $school = $arg_ref->{school};
-    my $date_now = $arg_ref->{time_stamp_AD};
+    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
     my $uac_force = $arg_ref->{uac_force};
@@ -1905,6 +1905,8 @@ sub AD_user_update {
     # start with empty sharelist
     my @sharelist=();
     
+    my $update_log_string="";
+
     if (not defined $max_user_count){
 	$max_user_count="-";
     }
@@ -1942,10 +1944,12 @@ sub AD_user_update {
     if (defined $firstname_utf8 and $firstname_utf8 ne "---"){
         $replace{'givenName'}=$firstname_utf8;
         print "   givenName:                  $firstname_utf8\n";
+        $update_log_string=$update_log_string."givenName=".$firstname_utf8.",";
     }
     if (defined $surname_utf8 and $surname_utf8 ne "---"){
         $replace{'sn'}=$surname_utf8;
         print "   sn:                         $surname_utf8\n";
+        $update_log_string=$update_log_string."sn=".$surname_utf8.",";
     }
 
    # IF first AND last are defined AND one of them is NOT "---" -> update displayname
@@ -1961,23 +1965,28 @@ sub AD_user_update {
         }
         $replace{'displayName'}=$display_name;
         print "   displayName:                $display_name\n";
+        $update_log_string=$update_log_string."displayName=".$display_name.",";
     }
 
     if (defined $firstname_ascii and $firstname_ascii ne "---" ){
         $replace{'sophomorixFirstnameASCII'}=$firstname_ascii;
         print "   sophomorixFirstnameASCII:   $firstname_ascii\n";
+        $update_log_string=$update_log_string."sophomorixFirstnameASCII=".$firstname_ascii.",";
     }
     if (defined $surname_ascii and $surname_ascii ne "---"){
         $replace{'sophomorixSurnameASCII'}=$surname_ascii;
         print "   sophomorixSurnameASCII:     $surname_ascii\n";
+        $update_log_string=$update_log_string."sophomorixSurnameASCII=".$surname_ascii.",";
     }
     if (defined $birthdate and $birthdate ne "---"){
         $replace{'sophomorixBirthdate'}=$birthdate;
         print "   sophomorixBirthdate:        $birthdate\n";
+        $update_log_string=$update_log_string."sophomorixBirthdate=".$birthdate.",";
     }
     if (defined $filename and $filename ne "---"){
         $replace{'sophomorixAdminFile'}=$filename;
         print "   sophomorixAdminFile:        $filename\n";
+        $update_log_string=$update_log_string."sophomorixAdminFile=".$filename.",";
     }
     if (defined $unid and $unid ne "---"){
         if ($unid eq ""){
@@ -1985,14 +1994,17 @@ sub AD_user_update {
         }
         $replace{'sophomorixUnid'}=$unid;
         print "   sophomorixUnid:             $unid\n";
+        $update_log_string=$update_log_string."sophomorixUnid=".$unid.",";
     }
     # firstpassword for sophomorixFirstpassword
     if (defined $firstpassword){
-        $replace{'sophomorixFirstpassword'}=$firstpassword;
+        $replace{'sophomorixFirstPassword'}=$firstpassword;
 	if ($hide_pwd==1){
-	    print "   Firstpassword:              ****** (omitted by --hide)\n";
+	    print "   sophomorixFirstPassword: ****** (omitted by --hide)\n";
+            $update_log_string=$update_log_string."sophomorixFirstPassword=******,";
 	} else {
-	    print "   Firstpassword:              $firstpassword\n";
+	    print "   sophomorixFirstPassword: $firstpassword\n";
+            $update_log_string=$update_log_string."sophomorixFirstPassword=".$firstpassword.",";
 	}
     }
 
@@ -2002,8 +2014,10 @@ sub AD_user_update {
         $replace{'unicodePwd'}=$uni_password;
 	if ($hide_pwd==1){
 	    print "   unicodePwd:                 ****** (omitted by --hide)\n";
+            $update_log_string=$update_log_string."unicodePwd=******,";
 	} else {
 	    print "   unicodePwd:                 $sophomorix_first_password\n";
+            $update_log_string=$update_log_string."unicodePwd=".$sophomorix_first_password.",";
 	}
     }
 
@@ -2089,6 +2103,7 @@ sub AD_user_update {
 	    }
 	}
 	print "   * Setting sophomorixQuota to: @quota_new\n";
+        $update_log_string=$update_log_string."sophomorixQuota=".@quota_new.",";
         my $mesg = $ldap->modify($dn,replace => { sophomorixQuota => \@quota_new }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
@@ -2102,18 +2117,21 @@ sub AD_user_update {
         my $mailquota_new=$value.":".$comment.":";
         $replace{'sophomorixMailQuota'}=$mailquota_new;
         print "   sophomorixMailQuota:        $mailquota_new\n";
+        $update_log_string=$update_log_string."sophomorixMailQuota=".$mailquota_new.",";
     }
     
     # mailquota_calc
     if (defined $mailquota_calc){
         $replace{'sophomorixMailQuotaCalculated'}=$mailquota_calc;
         print "   sophomorixMailQuotaCalculated:        $mailquota_calc\n";
+        $update_log_string=$update_log_string."sophomorixMailQuotaCalculated=".$mailquota_calc.",";
     }
     
     # status
     if (defined $status and $status ne "---"){
         $replace{'sophomorixStatus'}=$status;
         print "   sophomorixStatus:           $status\n";
+        $update_log_string=$update_log_string."sophomorixStatus=".$status.",";
         # setting userAccountControl and Dates
         my $user_account_control;
         my $toleration_date;
@@ -2131,7 +2149,7 @@ sub AD_user_update {
         } elsif  ($status eq "T"){
             # Status T
             $user_account_control=&_uac_enable_user($user_account_control_AD);
-            $toleration_date=$date_now;
+            $toleration_date=$time_stamp_AD;
             $deactivation_date=$DevelConf::default_date;
         } elsif  ($status eq "D" or
                   $status eq "F" or
@@ -2139,7 +2157,7 @@ sub AD_user_update {
             # Status D,F,L
             $user_account_control=&_uac_disable_user($user_account_control_AD);
             $toleration_date=$toleration_date_AD;
-            $deactivation_date=$date_now;
+            $deactivation_date=$time_stamp_AD;
         } elsif  ($status eq "K" or
                   $status eq "R"){
             # Status K,R
@@ -2161,6 +2179,10 @@ sub AD_user_update {
         print "   sophomorixDeactivationDate: $deactivation_date\n";
         print "   userAccountControl:         $user_account_control",
               " (was: $user_account_control_AD)\n";
+        $update_log_string=$update_log_string."sophomorixTolerationDate=".$toleration_date.",";
+        $update_log_string=$update_log_string."sophomorixDeactivationDate=".$deactivation_date.",";
+        $update_log_string=$update_log_string."userAccountControl=".$user_account_control.",";
+
     }
     # update userAccountControl for exam users
     if (defined $uac_force and not defined $status){
@@ -2170,17 +2192,20 @@ sub AD_user_update {
             $replace{'userAccountControl'}=$user_account_control;
             print "   userAccountControl:         $user_account_control",
                   " (was: $user_account_control_AD)\n";
+        $update_log_string=$update_log_string."userAccountControl=".$user_account_control.",";
         } elsif ($uac_force eq "disable"){
             $user_account_control=&_uac_disable_user($user_account_control_AD);
             $replace{'userAccountControl'}=$user_account_control;
             print "   userAccountControl:         $user_account_control",
                   " (was: $user_account_control_AD)\n";
+            $update_log_string=$update_log_string."userAccountControl=".$user_account_control.",";
 	}
     }
     if (defined $school and $school ne "---"){
         # update sophomorixSchoolname AND sophomorixSchoolPrefix
         $replace{'sophomorixSchoolname'}=$school;
         print "   sophomorixSchoolname:       $school\n";
+        $update_log_string=$update_log_string."sophomorixSchoolname=".$school.",";
         my $prefix;
         if ($school eq $DevelConf::name_default_school){
             $prefix="---";
@@ -2189,14 +2214,17 @@ sub AD_user_update {
         }
         $replace{'sophomorixSchoolPrefix'}=$prefix;
         print "   sophomorixSchoolPrefix:     $prefix\n";
+        $update_log_string=$update_log_string."sophomorixSchoolPrefix=".$prefix.",";
     }
     if (defined $role and $role ne "---"){
         $replace{'sophomorixRole'}=$role;
         print "   sophomorixRole:             $role\n";
+        $update_log_string=$update_log_string."sophomorixRole=".$role.",";
     }
     if (defined $examteacher and $examteacher ne ""){
         $replace{'sophomorixExamMode'}=$examteacher;
         print "   sophomorixExamMode:        $examteacher\n";
+        $update_log_string=$update_log_string."sophomorixExamMode=".$examteacher.",";
     }
     if (defined $comment){
         if ($comment eq ""){
@@ -2206,6 +2234,7 @@ sub AD_user_update {
             $replace{'sophomorixComment'}=$comment;
         }
         print "   sophomorixComment:          $comment\n";
+        $update_log_string=$update_log_string."sophomorixComment=".$comment.",";
     }
     if (defined $webui_dashboard){
         if ($webui_dashboard eq ""){
@@ -2215,11 +2244,13 @@ sub AD_user_update {
             $replace{'sophomorixWebuiDashboard'}=$webui_dashboard;
         }
         print "   sophomorixWebuiDashboard:   $webui_dashboard\n";
+        $update_log_string=$update_log_string."sophomorixWebuiDashboard=".$webui_dashboard.",";
     }
     if (defined $webui_permissions){
         my @webui_permissions=split(/,/,$webui_permissions);
         @webui_permissions = reverse @webui_permissions;
         print "   * Setting sophomorixWebuiPermissions to: @webui_permissions\n";
+        $update_log_string=$update_log_string."sophomorixWebuiPermissions=".@webui_permissions.",";
         my $mesg = $ldap->modify($dn,replace => {'sophomorixWebuiPermissions' => \@webui_permissions }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
@@ -2250,8 +2281,13 @@ sub AD_user_update {
 	  	          replace => { %replace }
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
-        
-
+        &Sophomorix::SophomorixBase::log_user_update({sAMAccountName=>$user,
+                                                      time_stamp_AD=>$time_stamp_AD,
+                                                      unid=>$unid_AD,
+                                                      update_log_string=>$update_log_string,
+                                                      sophomorix_config=>$ref_sophomorix_config,
+                                                      sophomorix_result=>$ref_sophomorix_result,
+                                                    });
     }
     &Sophomorix::SophomorixBase::print_title(
           "Updating User ${user_count}/$max_user_count: $user (end)");
