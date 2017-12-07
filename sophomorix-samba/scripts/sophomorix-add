@@ -6,13 +6,10 @@
 
 # modules
 use strict;
-#use Quota;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
-#use IMAP::Admin;
-#use DBI;
 use Net::LDAP;
 use JSON;
 use Sophomorix::SophomorixBase qw(
@@ -65,7 +62,6 @@ my $firstname_ascii;
 my $firstname_utf8;
 my $surname_utf8;
 my $birthdate;
-my $gecos="";
 my $login_wish;
 my $password_wish;
 my $uidnumber_wish;
@@ -75,43 +71,34 @@ my $creationdate;
 my $tolerationdate;
 my $deactivationdate;
 my $unid;
-my $login_teil_1="";
-my $login_teil_2="";
-my $login_name_to_check="";
-my $login_name_to_check_mod="";
 my $login_check_ok="";
 my $sophomorix_first_password="";
 my $file="";
 my $class_group="";
 my $school="";
 my $role="unknown";
-my @loglines=();
 
 my @users_for_quota=();
-my %forbidden_login_hash=();
 
 # ou's that have been created in this script
 my %school_created=();
 $school_created{$school}="created";
 
 
-# ===========================================================================
-# Optionen verarbeiten
-# ==========================================================================
+############################################################
+# options
+############################################################
 
-# Variablen für Optionen
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
 my $loginname="";
-my $gruppe="";
+my $group="";
 my $password="";
 my $lock=0;
 my $unlock=0;
 
-
-# Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
@@ -120,12 +107,11 @@ my $testopt=GetOptions(
            "lock" => \$lock,
            "unlock" => \$unlock,
            "users|user|u=s" => \$loginname,
-           "class|classes|c=s" => \$gruppe,
+           "class|classes|c=s" => \$group,
            "password" => \$password,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-add");
-# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
 
 # Reading Configuration
@@ -140,10 +126,9 @@ my $add_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix
 
 # --help
 if ($help==1) {
-   # Scriptname ermitteln
+   # get scriptname
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
-   # Befehlsbeschreibung
    print('
 sophomorix-add adds users from the file sophomorix.add to the sophomorix 
 database and the authentification system.
@@ -164,19 +149,20 @@ Please see the sophomorix-add(8) man pages for full documentation
 }
 
 
+
 # --unlock
 if ($unlock==1) {
     &unlock_sophomorix();
     exit;
 }
 
+
+
 # --lock
 if ($lock==1) {
     &lock_sophomorix("lock",0,\@arguments);
     exit;
 }
-
-
 
 
 
@@ -189,7 +175,6 @@ if ($info==1) {
        exit;
    }
 
-   # Ausgabe der Anlegbaren user
    print "\nThe following users can be added:\n";
    print "(Fields with --- are automatically created by sophomorix-add):\n\n";
    printf "%-14s%-35s%-12s%-9s%-9s%-12s%-12s\n",
@@ -203,7 +188,6 @@ if ($info==1) {
 
    open(SOPHOMORIXADD,"$add_file") || 
              die "ERROR: sophomorix.add not found!";
-
    &print_line;
    my @lines=();
    while(<SOPHOMORIXADD>){
@@ -243,7 +227,6 @@ if ($info==1) {
        $role)=split("::",$line);
 
        my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
-
        my $identifier_cut=substr($identifier,0,28);
        printf "%-14s%-35s%-12s%-9s%-9s%-12s%-12s\n",
               $group_token,
@@ -261,77 +244,49 @@ if ($info==1) {
 
 
 
-
 # --loginname
 if ($loginname ne "") {
-  #
-  print "Loginname $loginname angegeben.\n";
+  print "Loginname $loginname given as option.\n";
 }
 
-# --gruppe
-if ($gruppe ne "") {
-  #
-  print "Gruppe/Klasse $gruppe angegeben.\n";
+
+
+# --group
+if ($group ne "") {
+  print "Group $group given as option.\n";
 }
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-&log_script_start(\@arguments,\%sophomorix_result);
-
 
 ################################################################################
 # Start
 ################################################################################
-# ===========================================================================
-# Abbruch, wenn sophomorix.add fehlt oder leer
-# ===========================================================================
+&log_script_start(\@arguments,\%sophomorix_result);
+# exit if there are no users to add
 if (not (-s "$add_file") ) {
   &log_script_exit("No users to add!",1,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
-my $epoche_jetzt=time;
-if($Conf::log_level>=2){
-   print "Epoch:                                 ",
-         "$epoche_jetzt (right now)\n";
-}
-
-
-#my $dbh=&db_connect();
-#my $imap=&imap_connect("localhost",${DevelConf::imap_admin});
-
-################################################################################
-# User (Schüler und Lehrer) anlegen aus sophomorix.add
-################################################################################
-
-# repair.directories einlesen ???
-#&get_alle_verzeichnis_rechte();
-
-# fetch permission for all homes
-#&fetch_repairhome();
-
-# backup database
-#&backup_user_database($time_stamp_file, "before-add.sql");
-# ??????????????????????
-
-# sophomorix.add mitloggen
-&backup_auk_file($time_stamp_file,"add","before",\%sophomorix_config);
-
+# create students and teachers
 my @password_chars=&get_passwd_charlist();
 
-# ?????????????? more to forbid
-%forbidden_login_hash=&get_forbidden_logins($ldap,$root_dse);
-
+# logging sophomorix.add
+&backup_auk_file($time_stamp_file,"add","before",\%sophomorix_config);
 
 # calulate users to add
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.add | wc -l`;
 chomp($max_user_count);
 
-
-# Datei mit den Schülern, die nicht angelegt wurden
+# file for users that are NOT added
 open(STILLTOADD,">$add_file_new") 
     || die "ERROR: $!";
+
+# the users
 open(SOPHOMORIXADD,"$add_file") 
     || die "ERROR: $!";
+# loop through all users in sophomorix.add
 while(<SOPHOMORIXADD>){
     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
         next;
@@ -358,75 +313,6 @@ while(<SOPHOMORIXADD>){
     )=split("::");
 
     ($surname_ascii,$firstname_ascii,$birthdate)=split(";", $identifier);
-    # GECOS-field:
-    $gecos=$firstname_ascii." ".$surname_ascii; 
-
-    # my $login_name_to_check;
-    # if ($login_wish eq "---"){
-    #     # create login and check it
-    #     my $surname_login=$surname_ascii;
-    #     $surname_login=~s/-//g;  # remove minus
-    #     $surname_login=~s/\.//g; # remove dots
-    #     $surname_login=~s/ //g;  # remove whitespace
-    #     $surname_login=~tr/A-Z/a-z/; # small letters
-    #     $surname_login=~s/[^a-zA-Z0-9]//; # ignore non a-z
-
-    #     my $firstname_login=$firstname_ascii;
-    #     $firstname_login=~s/-//g; # remove minus
-    #     $firstname_login=~s/\.//g; # remove dots
-    #     $firstname_login=~s/ //g;  # remove whitespace
-    #     $firstname_login=~tr/A-Z/a-z/; # small letters
-    #     $firstname_login=~s/[^a-zA-Z0-9]//; # ignore non a-z
-
-    #     if ($sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
-    #         $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
-    #         print "\n   WARNING: File $file is not configured for auto login creation\n\n";
-    #     }
-    #     # firstname+surname or surname+firstname
-    #     if ( $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
-    #         $login_teil_2=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
-    #         $login_teil_1=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
-    #     } else {
-    #         $login_teil_1=substr($surname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
-    #         $login_teil_2=substr($firstname_login,0,$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
-    #     }
-    #     # proposed login
-    #     $login_name_to_check="$login_teil_1"."$login_teil_2";
-    # } else {
-    #     # check wish login
-    #     $login_name_to_check="$login_wish";
-    # }
-
-    # # Existenz prüfen ???ldap
-    # if (not exists($forbidden_login_hash{$login_name_to_check})){
-    #     # Wenn der zu prüfende Login-Name nicht schon vorhanden
-    #     # Kann er benutzt werden 
-    #     $login_check_ok=$login_name_to_check;
-    # } elsif ($login_wish ne "---"){
-    #     # Wunsch-Login angegeben
-    #     # Abbrechen, Wunsch-Login soll nicht verändert werden
-    #     print "\nERROR:\n";
-    #     print "Cannot add user $firstname_ascii $surname_ascii ($firstname_utf8 $surname_utf8) \n";
-    #     print "Login $login_wish exists already ($forbidden_login_hash{$login_name_to_check})!\n\n";
-    #     my $error_line="   ERROR: $login_wish not added ($forbidden_login_hash{$login_name_to_check})";
-    #     push @loglines,$error_line;
-    #     next;
-    # } else {
-    #     # Wenn schon vorhanden, muss Login-Namen modifiziert werden
-    #     $login_name_to_check_mod="$login_name_to_check";
-    #     my $i=1; # Erster Wert für Zusatzziffer
-    #     while (exists($forbidden_login_hash{$login_name_to_check_mod})) { 
-    #         # An zu prüfenden Loginame eine Ziffer anhängen
-    #         $login_name_to_check_mod="$login_name_to_check"."$i";
-    #         $i=$i+1;
-    #     }
-    #     # Nun kann modifizierter Loginname benutzt werden
-    #     $login_check_ok=$login_name_to_check_mod;
-    # } 
-
-    # # Login-Name des anzulegenden users darf ab jetzt nicht mehr verwendet werden,
-    # # deshalb dem Hash mit vorhandenen Loginnamen hinzufügen
-    # $forbidden_login_hash{$login_check_ok}="neu";
 
     # login
     if ($login_wish eq "---" or $login_wish eq ""){
@@ -437,7 +323,7 @@ while(<SOPHOMORIXADD>){
         $login_check_ok=$login_wish;
     }
 
-    # Abbruch, wenn nicht der richtige loginname angelegt wird
+    # skip users that are not  given by option 
     if ($loginname ne "") {
         if ($login_check_ok ne $loginname) {
             print "##### $login_check_ok wird nicht angelegt!\n";
@@ -446,16 +332,16 @@ while(<SOPHOMORIXADD>){
         }
     }
 
-    # Abbruch, wenn nicht die richtige klasse angelegt wird
-    if ($gruppe ne "") {
-        if ($class_group ne $gruppe) {
+    # skip users that are not in the class given by option 
+    if ($group ne "") {
+        if ($class_group ne $group) {
             print "$login_check_ok ($class_group) wird nicht angelegt!\n";
             print STILLTOADD "$_\n";
             next;
         }
     }
 
-    # Klartext-Passwort
+    # Plain password
     if ($password_wish eq "---") {
         $sophomorix_first_password=&get_plain_password(
                         $role,
@@ -478,7 +364,7 @@ while(<SOPHOMORIXADD>){
     # 0. rember login to set quota later
     push @users_for_quota, $login_check_ok;
 
-    # Nun wird der User angelegt
+    # add user
     ##############################
     $user_count++;
 
@@ -554,133 +440,14 @@ while(<SOPHOMORIXADD>){
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
                    });
-
-   # 1. Entry in sophomorix database and auth system
-   #&create_user_db_entry($surname,
-   #                      $firstname,
-   #                      $birthdate,
-   #                      $class_group,
-   #                      $login_check_ok,
-   #                      $sophomorix_first_password,
-   #                      $shell,
-   #                      "",
-   #                      $unid,
-   #                      $epoche_jetzt,
-   #                      $time_stamp_AD,
-   #                      "",
-   #                      $uidnumber_wish,
-   #                      undef,
-   #                      undef,
-   #                      undef,
-   #                      $gidnumber_wish
-   #                     );
-
-    # 2. Add the class (db and dirs,links, ...)
-    #&provide_class_files($class_group);
-
-
-  # 3. set a password
-  #&set_sophomorix_passwd($login_check_ok,$sophomorix_first_password);
-
-  # 4. Creating dirs, links for the user
-  #&provide_user_files($login_check_ok,$class_group);
-
-  # 5. Add user to all groups she is in (files must exist to create links)
-  #&add_newuser_to_her_projects($login_check_ok,$class_group);
-
-
-    # add student/teacher to its adminclass-group
-    # find dn of adminclass.group
-#    my ($count,$dn_class,$cn_exist,$infos)=&AD_object_search($ldap,$root_dse,"group",$group_token);
-#    # fetch old members from sophomorixmembers
-#    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
-#    # create a unique list of new members
-#    my @members = uniq(@old_members,$login_token); 
-#    my $members=join(",",@members);
-#    # update group
-
-
-# use this instead of sophomorix.ini MEMBEROF 
-# to add a user NOT only as a member, but also in sophomorixMember
-#    &AD_group_update({ldap=>$ldap,
-#                      root_dse=>$root_dse,
-#                      dn=>$dn_class,
-#                      type=>"adminclass",
-#                      members=>$members,
-#                      sophomorix_config=>\%sophomorix_config,
-#                    });
-
-
-  # 6. Add a mailbox for the user
-  #&imap_create_mailbox($imap,$login_check_ok);
 }
 
 close(SOPHOMORIXADD);
 close(STILLTOADD);
 
-############################################################
-# print logs
-if ($#loglines >= 0){
-    print "\n";
-    &print_title("The following Problems were encountered");
-    foreach my $line (@loglines){
-        print "$line\n";
-    }
-}
-
-if ($user_count==0){ 
-    &print_title("NOT creating userlists (0 users added)");
-} else {
-    &sophomorix_print();
-}
-
-
 &backup_auk_file($time_stamp_file,"add","after",\%sophomorix_config);
 rename("$add_file_new","$add_file" );
 
-
-# ===========================================================================
-# add.pdf, add.csv mitloggen
-# ===========================================================================
-#system("cp ${DevelConf::druck_pfad}/add.pdf ${DevelConf::log_pfad}/${time_stamp_file}.add.pdf");
-#system("chmod 600 ${DevelConf::log_pfad}/${time_stamp_file}.add.pdf");
-#system("chown root:root ${DevelConf::log_pfad}/${time_stamp_file}.add.pdf");
-#system("cp ${DevelConf::druck_pfad}/add.csv ${DevelConf::log_pfad}/${time_stamp_file}.add.csv");
-#system("chown root:root ${DevelConf::log_pfad}/${time_stamp_file}.add.pdf");
-#rename("$add_file_new","$add_file" );
-
-# # Setting Quota
-# if ($Conf::use_quota eq "yes" 
-#     and $user_count>0
-#     and $user_count<101) {
-#     my $users=join(",",@users_for_quota);
-#     system("${DevelConf::executable_pfad}/sophomorix-quota --skiplock --users $users --noninteractive");
-#     &nscd_stop();
-# } elsif ($Conf::use_quota eq "yes" and $user_count>100){
-#     system("${DevelConf::executable_pfad}/sophomorix-quota --skiplock --students --teachers --noninteractive");
-#     &nscd_stop();
-# } else {
-#     if ($user_count==0){ 
-#         &print_title("NOT setting quota (0 users added)");
-#     } else {
-#         &print_title("NOT setting quota");
-#     }
-# }
-
-# # Creating Mailing Aliases and Lists
-# if ($user_count>0) {
-#     system("${DevelConf::executable_pfad}/sophomorix-mail --skiplock");
-#     &nscd_stop();
-# } else {
-#     &print_title("NOT creating mailaliases/lists (0 users added)");
-# }
-
-
-
-#&db_disconnect($dbh);
-#&imap_disconnect($imap);
-
-#&print_title("$user_count users added");
 &result_sophomorix_add_summary({
                      NAME=>"ADDED", 
                      RESULT=>$user_count, 
@@ -691,27 +458,9 @@ rename("$add_file_new","$add_file" );
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-
 &AD_unbind_admin($ldap);
-
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
-
-
-################################################################################
-# Subroutinen
-################################################################################
-
-# ===========================================================================
-# sophomorix-print aufrufen
-# ===========================================================================
-sub sophomorix_print {
-      # Mit 1mal sophomorix-print aufrufen sollte es tun, tut es aber nicht
-      #system("$DevelConf::path_sbin/sophomorix-print --skiplock");
-      #&nscd_stop();
-}
-
-
-
-
-
+############################################################
+# sub
+############################################################
