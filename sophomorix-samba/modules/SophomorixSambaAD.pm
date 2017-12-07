@@ -1348,7 +1348,7 @@ sub AD_user_set_exam_mode {
                      max_user_count=>$max_user_count,
                      exammode=>$supervisor,
                      uac_force=>"disable",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $date_now,
                      json=>$json,
                      sophomorix_config=>$ref_sophomorix_config,
                      sophomorix_result=>$ref_sophomorix_result,
@@ -1386,7 +1386,7 @@ sub AD_user_unset_exam_mode {
                      max_user_count=>$max_user_count,
                      exammode=>"---",
                      uac_force=>"enable",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $date_now,
                      json=>$json,
                      sophomorix_config=>$ref_sophomorix_config,
                      sophomorix_result=>$ref_sophomorix_result,
@@ -1649,7 +1649,23 @@ sub AD_user_create {
 #                   'objectclass' => \@objectclass,
                            ]
                            );
-    &AD_debug_logdump($result,2,(caller(0))[3]);
+    my $add_result=&AD_debug_logdump($result,2,(caller(0))[3]);
+    if ($add_result!=0){ # add was succesful
+        # log the killing of a user 
+        &Sophomorix::SophomorixBase::log_user_add({sAMAccountName=>$login,
+                                                   sophomorixRole=>$role, 
+                                                   time_stamp_AD=>$creationdate,
+                                                   #home_delete_string=>$home_delete_string,
+                                                   sophomorixSchoolname=>$school,
+                                                   firstname=>$firstname_utf8,    
+                                                   lastname=>$surname_utf8,
+                                                   adminclass=>$group,
+                                                   unid=>$unid,
+                                                   sophomorix_config=>$ref_sophomorix_config,
+                                                   sophomorix_result=>$ref_sophomorix_result,
+                                                 });
+    }
+
 
     ######################################################################
     # memberships of created user
@@ -6503,17 +6519,22 @@ sub  get_forbidden_logins{
 sub AD_debug_logdump {
     # dumping ldap message object in loglevels
     my ($message,$level,$text) = @_;
+    my $return=-1;
     my $string=$message->error;
     if ($string=~/.*: Success/ or $string eq "Success"){
         # ok
+        $return=1;
     } elsif ($string=~/Entry .* already exists/){
+        $return=2;
         # not so bad, just display it
         #print "         * OK: $string\n";
     } elsif ($string=~/Attribute member already exists for target/){
         # not so bad, just display it
         #print "         * OK: $string\n";
+        $return=3;
     } else {
         # bad error
+        $return=0;
         print "\nERROR in $text:\n";
         print "   $string\n\n";
         if($Conf::log_level>=$level){
@@ -6523,6 +6544,7 @@ sub AD_debug_logdump {
             }
         }
     }
+    return $return;
 }
 
 

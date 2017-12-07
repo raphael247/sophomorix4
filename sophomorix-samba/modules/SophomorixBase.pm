@@ -2677,6 +2677,36 @@ sub log_script_exit {
 
 
 
+sub log_user_add {
+    my ($arg_ref) = @_;
+    my $sam = $arg_ref->{sAMAccountName};
+    my $role = $arg_ref->{sophomorixRole};
+    my $school = $arg_ref->{sophomorixSchoolname};
+    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
+    my $lastname = $arg_ref->{lastname};
+    my $firstname = $arg_ref->{firstname};
+    my $adminclass = $arg_ref->{adminclass};
+    my $unid = $arg_ref->{unid};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    my $log_line="ADD::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
+                 $role."::".$school."::".$time_stamp_AD."::".
+                 $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
+                 "::".$unid."::\n";
+
+    my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_ADD'};
+
+    system ("mkdir -p $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}");
+
+    open (LOG,">>$logfile");
+    print LOG $log_line;
+    close(LOG);
+}
+
+
+
 sub log_user_update {
     my ($arg_ref) = @_;
     my $sam = $arg_ref->{sAMAccountName};
