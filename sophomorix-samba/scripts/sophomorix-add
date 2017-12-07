@@ -361,10 +361,6 @@ while(<SOPHOMORIXADD>){
     # GECOS-field:
     $gecos=$firstname_ascii." ".$surname_ascii; 
 
-
-
-
-
     my $login_name_to_check;
     if ($login_wish eq "---"){
         # create login and check it
@@ -400,6 +396,12 @@ while(<SOPHOMORIXADD>){
         # check wish login
         $login_name_to_check="$login_wish";
     }
+
+
+
+
+
+
 
     # Existenz prüfen ???ldap
     if (not exists($forbidden_login_hash{$login_name_to_check})){

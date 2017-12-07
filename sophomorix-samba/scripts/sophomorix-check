@@ -36,6 +36,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_end
                                  log_script_exit
                                  get_login_avoid
+                                 create_login
                                  backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
@@ -556,6 +557,8 @@ if ($dump_login_avoid==1){
               });
 }
 
+
+my %forbidden_logins=&get_forbidden_logins($ldap,$root_dse);
 
 
 # --dump-AD
@@ -1153,10 +1156,32 @@ sub write_add_file {
     } else {
         $status="U";
     }
+    # handle login
+    # login given:
+    #   error if login is in use
+    #   warning if login should be avoided
+    # login NOT given
+    #   create suitable login
+    my $login=&create_login($Match{'ACTION'}{$line_new}{'identifier_ascii'},
+                            $Match{'ACTION'}{$line_new}{'filename'},
+                            $Match{'ACTION'}{$line_new}{'login'},
+                            \%forbidden_logins,
+                            $ref_login_avoid,
+                            \%sophomorix_config);
+    # if ($Match{'ACTION'}{$line_new}{'login'} eq "---"){
+    #     # create suitable login
+    #     $login=&create_login($Match{'ACTION'}{$line_new}{'identifier_ascii'});
+    # } else {
+    #     # login given:
+    #     #   error if login is in use
+    #     #   warning if login should be avoided
+    # }
+
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
                  $Match{'ACTION'}{$line_new}{'class'}."::".
                  $Match{'ACTION'}{$line_new}{'identifier_ascii'}."::".
-                 $Match{'ACTION'}{$line_new}{'login'}."::".
+#                 $Match{'ACTION'}{$line_new}{'login'}."::".
+                 $login."::".
                  "---::". # firstpassword
                  "---::". # uid
                  "---::". # gid
@@ -1448,6 +1473,7 @@ sub analyze_user_line {
             $first_raw,
             $birthdate_raw,
             $field5,
+            $field6,
            )=split(/;/,$line);
 
         my ($class_valid,$class,$error_strg_class)=&check_class($class_raw);
@@ -1491,11 +1517,27 @@ sub analyze_user_line {
 
         my $unid="";
         my $login="";
+        # field5
         my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_5};
         if ($field5_key eq "LOGIN"){
-            $login=&check_login($field5);
+            if (defined $field6){
+                $login=&check_login($field5);
+            }
         } elsif ($field5_key eq "UNID"){
-            $unid=&check_unid($field5);
+            if (defined $field6){
+                $unid=&check_unid($field5);
+            }
+        }
+        # field6
+        my $field6_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_6};
+        if ($field6_key eq "LOGIN"){
+            if (defined $field6){
+                $login=&check_login($field6);
+            }
+        } elsif ($field6_key eq "UNID"){
+            if (defined $field6){
+                $unid=&check_unid($field6);
+            }
         }
         if ($unid eq ""){
 	    $unid="---";
