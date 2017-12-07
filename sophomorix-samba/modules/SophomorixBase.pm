@@ -43,6 +43,7 @@ $Data::Dumper::Terse = 1;
             log_script_start
             log_script_end
             log_script_exit
+            get_login_avoid
             backup_auk_file
             get_passwd_charlist
             get_plain_password
@@ -2761,6 +2762,29 @@ sub log_user_kill {
     open (LOG,">>$logfile");
     print LOG $log_line;
     close(LOG);
+}
+
+
+
+sub get_login_avoid {
+    my ($ref_sophomorix_config)=@_;
+    my %login_avoid=();
+    my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	        $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_KILL'};
+    my $reuse_limit=86400*$ref_sophomorix_config->{'INI'}{'LOGIN_REUSE'}{'REUSE_LIMIT_DAYS'};
+    open (KILL,"<$logfile");
+    while(<KILL>){
+        #print $_;
+        chomp();
+        my ($type,$login,$last,$first,$class,$role,$school,$time_AD,$epoch,$homedel,$unid)=split(/::/);
+        my $unused_sec=$ref_sophomorix_config->{'UNIX'}{'EPOCH'}-$epoch;
+        #print "$login unused for $unused_sec seconds (Min. limit for reuse is $reuse_limit)\n";
+        if ($unused_sec<$reuse_limit){
+            $login_avoid{'AVOID_LOGINS'}{$login}{'UNUSED'}=$unused_sec;
+        }
+    }
+    close(KILL);
+    return \%login_avoid;
 }
 
 

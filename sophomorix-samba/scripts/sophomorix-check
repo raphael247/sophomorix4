@@ -35,6 +35,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
+                                 get_login_avoid
                                  backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
@@ -202,6 +203,7 @@ my %Match=();
 my $dump_matches=0;
 my $dump_files=0;
 my $dump_AD=0;
+my $dump_login_avoid=0;
 my $list_files=0;
 my $lock=0;
 my $unlock=0;
@@ -222,6 +224,7 @@ my $testopt=GetOptions(
            "unlock" => \$unlock,
            "dump-files" => \$dump_files,
            "dump-AD" => \$dump_AD,
+           "dump-login-avoid" => \$dump_login_avoid,
            "dump-matches" => \$dump_matches,
            "list-files" => \$list_files,
            "analyze-encoding=s" => \$analyze_encoding,
@@ -287,6 +290,7 @@ Dumping data:
   -ij / --info --json              (dump configuration)
   --dump-files -j                  (dump contents of user files)
   --dump-AD -j                     (dump AD data)
+  --dump-login-avoid -j            (dump historic data from log files)
   --dump-matches -j                (dump matched users)
 
   -j / --json                      (dump as a nice json object)
@@ -537,6 +541,21 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            dnsnodes=>"FALSE",
                            sophomorix_config=>\%sophomorix_config,
              });
+
+
+my ($ref_login_avoid) = &get_login_avoid(\%sophomorix_config);
+
+# --dump-login-avoid
+if ($dump_login_avoid==1){
+    &json_dump({json => $json,
+                jsoninfo => "LOGIN_AVOID",
+                jsoncomment => "Logins to avoid from log files",
+                log_level => $Conf::log_level,
+                hash_ref=>$ref_login_avoid,
+                sophomorix_config=>\%sophomorix_config,
+              });
+}
+
 
 
 # --dump-AD
