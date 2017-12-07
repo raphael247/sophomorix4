@@ -262,6 +262,15 @@ TEACHERUSER=root
 
 NEXT/Todo:
 
+login-creation in sophomorix.check
+--> OK:never add sophomorix.add with empty loginname (sophomorix-add shoul exit if yes)
+--> OK: take out login-name creation in sophomorix-add
+--> adjust tests to that
+--> forbidden login names
+    search for sAMAccout names only?
+--> use create_test_login
+
+
 Tests auf 17.10 linuxmuster.local/lan -> parameter testen 
 
 apt install emacs sshpass make nfs-common
@@ -272,7 +281,7 @@ apt install emacs sshpass make nfs-common
 sophomorix-school -i:
 
 * create JSON Object
-* replace --listmount?
+* replace --listmount with -i?
 * do some checks?
 
 sophomorix-exam-mode -i:
@@ -350,6 +359,18 @@ for an Info Listing:
     give it a name with $jsoninfo
  B) with &json==1, the json obect ist printed
  C) without, a _console_print_... function is called that uses this json object
+
+multischool:
+sophomorix-userlock --global
+sophomorix-userlock --school <name>
+
+
+Adding a user/group/...:
+when AD adding was succesful, continue, else not
+
+session2group
+session2project
+--> sollte es sowas geben (z.B. Oberstufengruppen, einer klickt, andere können nutzen)
 
 
 
@@ -2304,6 +2325,9 @@ Later:
       a) anonymisiert den Eintrag nach x Tagen (nur uid->login bleibt erhalten)
          - entfernt user auch aus add,update, ...
       b) entfernt den Eintrag nach x Tagen (x=730), y tagen bei teacher, z tage bei anderen Rollen
+* more tests for forced loginnames
+  min_length, max_length more characters?
+
 ############################################################
 
 
