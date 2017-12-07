@@ -762,7 +762,7 @@ sub AD_user_kill {
 
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-        $school_AD,$status_AD,$firstpassword_AD)=
+        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
         &AD_get_user({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
@@ -834,6 +834,7 @@ sub AD_user_kill {
                                                         firstname=>$firstname_utf8_AD,    
                                                         lastname=>$lastname_utf8_AD,
                                                         adminclass=>$adminclass_AD,
+                                                        unid=>$unid_AD,
                                                         sophomorix_config=>$ref_sophomorix_config,
                                                         sophomorix_result=>$ref_sophomorix_result,
                                                       });
@@ -2355,6 +2356,7 @@ sub AD_get_user {
                               'sophomorixSchoolname',
                               'sophomorixStatus',
                               'sophomorixFirstPassword',
+                              'sophomorixUnid',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -2376,10 +2378,11 @@ sub AD_get_user {
         my $school = $entry->get_value('sophomorixSchoolname');
         my $status = $entry->get_value('sophomorixStatus');
         my $firstpassword = $entry->get_value('sophomorixFirstPassword');
+        my $unid = $entry->get_value('sophomorixUnid');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,
                 $home_directory,$user_account_control,$toleration_date,
-                $deactivation_date,$school,$status,$firstpassword);
+                $deactivation_date,$school,$status,$firstpassword,$unid);
     }
 }
 

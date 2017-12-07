@@ -2686,6 +2686,7 @@ sub log_user_kill {
     my $lastname = $arg_ref->{lastname};
     my $firstname = $arg_ref->{firstname};
     my $adminclass = $arg_ref->{adminclass};
+    my $unid = $arg_ref->{unid};
     my $home_delete_string = $arg_ref->{home_delete_string};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -2693,7 +2694,7 @@ sub log_user_kill {
     my $log_line="KILL::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
                  $role."::".$school."::".$time_stamp_AD."::".
                  $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
-                 "::HOME_DELETED=".$home_delete_string."::\n";
+                 "::HOME_DELETED=".$home_delete_string."::".$unid."::\n";
 
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
 	$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_KILL'};
