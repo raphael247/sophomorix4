@@ -1921,7 +1921,8 @@ sub AD_user_update {
         $deactivation_date_AD,
         $school_AD,
         $status_AD,
-        $firstpassword_AD
+        $firstpassword_AD,
+        $unid_AD
        )=&AD_get_user({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
@@ -3244,7 +3245,7 @@ sub AD_get_sessions {
                     # get userinfo
                     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
                         &AD_get_user({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
@@ -3257,7 +3258,7 @@ sub AD_get_sessions {
                         # get data again
                         ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
                         &AD_get_user({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
@@ -3339,7 +3340,7 @@ sub AD_get_sessions {
                     # transfer directory of supervisor
                     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD)=
+                        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
                     &AD_get_user({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
@@ -6568,7 +6569,7 @@ sub AD_examuser_create {
     # get data from (non-exam-)user
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-        $school_AD,$status_AD,$firstpassword_AD)=
+        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
         &AD_get_user({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
@@ -6744,7 +6745,7 @@ sub AD_examuser_kill {
     } elsif ($count > 0){
         my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
             $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-            $school_AD,$status_AD,$firstpassword_AD)=
+            $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
             &AD_get_user({ldap=>$ldap,
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
