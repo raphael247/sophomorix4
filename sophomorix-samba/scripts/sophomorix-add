@@ -192,7 +192,7 @@ if ($info==1) {
    # Ausgabe der Anlegbaren user
    print "\nThe following users can be added:\n";
    print "(Fields with --- are automatically created by sophomorix-add):\n\n";
-   printf "%-11s%-29s%-10s%-6s%-6s%-10s%-10s\n",
+   printf "%-14s%-35s%-12s%-9s%-9s%-12s%-12s\n",
           "AdminClass",
           "Identifier",
           "login",
@@ -245,7 +245,7 @@ if ($info==1) {
        my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
 
        my $identifier_cut=substr($identifier,0,28);
-       printf "%-11s%-29s%-10s%-6s%-6s%-10s%-10s\n",
+       printf "%-14s%-35s%-12s%-9s%-9s%-12s%-12s\n",
               $group_token,
               $identifier_cut,
               $login_wish,

@@ -36,7 +36,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_end
                                  log_script_exit
                                  get_login_avoid
-                                 create_login
+                                 create_test_login
                                  backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
@@ -1156,31 +1156,15 @@ sub write_add_file {
     } else {
         $status="U";
     }
-    # handle login
-    # login given:
-    #   error if login is in use
-    #   warning if login should be avoided
-    # login NOT given
-    #   create suitable login
-    my $login=&create_login($Match{'ACTION'}{$line_new}{'identifier_ascii'},
-                            $Match{'ACTION'}{$line_new}{'filename'},
-                            $Match{'ACTION'}{$line_new}{'login'},
-                            \%forbidden_logins,
-                            $ref_login_avoid,
-                            \%sophomorix_config);
-    # if ($Match{'ACTION'}{$line_new}{'login'} eq "---"){
-    #     # create suitable login
-    #     $login=&create_login($Match{'ACTION'}{$line_new}{'identifier_ascii'});
-    # } else {
-    #     # login given:
-    #     #   error if login is in use
-    #     #   warning if login should be avoided
-    # }
-
+    my $login=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
+                                 $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
+                                 $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
+                                 \%forbidden_logins, # forbidden logins
+                                 $ref_login_avoid, # logins to avoid
+                                 \%sophomorix_config);
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
                  $Match{'ACTION'}{$line_new}{'class'}."::".
                  $Match{'ACTION'}{$line_new}{'identifier_ascii'}."::".
-#                 $Match{'ACTION'}{$line_new}{'login'}."::".
                  $login."::".
                  "---::". # firstpassword
                  "---::". # uid
@@ -1197,8 +1181,12 @@ sub write_add_file {
                  "---::". # sambantpassword
                  "---::". # userpassword
                  "\n";
-
-    print ADD $add_line;
+    if ($login ne "---"){
+        print ADD $add_line;
+    } else {
+        print "\n   ERROR: Login for $line_new could no be created\n\n";
+        exit;
+    }
 }
 
 
@@ -1552,6 +1540,8 @@ sub analyze_user_line {
         if ($login eq ""){
 	    $login="---";
         }
+
+	print "HERE: $line -> $login\n";
 
         # converting names to utf8 and then to ascii
         my $conv = Text::Iconv->new($enc_used,"utf8");

@@ -44,7 +44,7 @@ $Data::Dumper::Terse = 1;
             log_script_end
             log_script_exit
             get_login_avoid
-            create_login
+            create_test_login
             backup_auk_file
             get_passwd_charlist
             get_plain_password
@@ -2776,6 +2776,10 @@ sub get_login_avoid {
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
 	        $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_KILL'};
     my $reuse_limit=86400*$ref_sophomorix_config->{'INI'}{'LOGIN_REUSE'}{'REUSE_LIMIT_DAYS'};
+    if (not -f $logfile){
+        # nothing foun
+        return \%login_avoid;
+    }
     open (KILL,"<$logfile");
     while(<KILL>){
         #print $_;
@@ -2793,10 +2797,11 @@ sub get_login_avoid {
 
 
 
-sub create_login {
+sub create_test_login {
     my ($identifier_ascii,$file,$login_wish,$ref_forbidden_logins,$ref_login_avoid,$ref_sophomorix_config)=@_;
     my ($surname_login,$firstname_login,$birthdate)=split(";", $identifier_ascii);
     my $login_check_ok; # the approved login name
+
     $surname_login=~s/-//g;  # remove minus
     $surname_login=~s/\.//g; # remove dots
     $surname_login=~s/ //g;  # remove whitespace
@@ -2809,27 +2814,46 @@ sub create_login {
     $firstname_login=~tr/A-Z/a-z/; # only small letters
     $firstname_login=~s/[^a-zA-Z0-9]//; # ignore non a-z
 
-    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
-        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
-        print "\n   WARNING: File $file is not configured for auto login creation\n\n";
-    }
-    # firstname+surname or surname+firstname
-    if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
-        $login_part_2=substr($surname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
-        $login_part_1=substr($firstname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
-    } else {
-        $login_part_1=substr($surname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
-        $login_part_2=substr($firstname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
-    }
-    # proposed login
-    $login_name_to_check="$login_part_1"."$login_part_2";
+    my $login_name_to_check;
+    if ($login_wish eq "---"){
+        ############################################################
+        # login creation
+        if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
+            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
+            print "\n   WARNING: File $file is not configured for auto login creation\n\n";
+            return "---";
+        }
+        # firstname+surname or surname+firstname
+        if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
+            $login_part_2=substr($surname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
+            $login_part_1=substr($firstname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
+        } else {
+            $login_part_1=substr($surname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
+            $login_part_2=substr($firstname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
+        }
 
-    # Test proposed login
-    if (not exists $ref_forbidden_logins->{$login_name_to_check} and
-        not exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_name_to_check} ){
-        # not forbidden an not to be avoided -> use it!
-        $login_check_ok=$login_name_to_check;
-    } elsif ($login_wish ne "---"){
+        ############################################################
+        # test proposed login
+        $login_name_to_check="$login_part_1"."$login_part_2";
+        if (not exists $ref_forbidden_logins->{$login_name_to_check} and
+            not exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_name_to_check} ){
+            # not forbidden an not to be avoided -> use it!
+            $login_check_ok=$login_name_to_check;
+        } else {
+            # if login is not OK: add 1,2,3,... until OK
+            my $login_name_to_check_mod=$login_name_to_check;
+            my $i=1; # start for appending numbers
+            while (exists $ref_forbidden_logins->{$login_name_to_check_mod} or
+                   exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_name_to_check_mod} ){
+                # Append number
+                $login_name_to_check_mod="$login_name_to_check"."$i";
+                $i=$i+1;
+            }
+            # Nun kann modifizierter Loginname benutzt werden
+            $login_check_ok=$login_name_to_check_mod;
+        } 
+    } else {
+        ############################################################
         # check wish login
         if (not $login_wish=~m/^[a-z0-9-_]+$/){
             # put in result hash ?????
@@ -2848,30 +2872,11 @@ sub create_login {
             # put in result hash ?????
 	    print "\n   WARNING: $login_wish was used $days days ago (Not recommended to reuse $login_wish already)\n\n"; 
         }
-
-        # use wish login
         $login_check_ok=$login_wish;
-    } else {
-        # if login is not OK: add 1,2,3,... until OK
-        my $login_name_to_check_mod=$login_name_to_check;
-        my $i=1; # start for appending numbers
-        while (exists $ref_forbidden_logins->{$login_name_to_check_mod} or
-               exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_name_to_check_mod} ){
-            # Append number
-            $login_name_to_check_mod="$login_name_to_check"."$i";
-            $i=$i+1;
-        }
-        # Nun kann modifizierter Loginname benutzt werden
-        $login_check_ok=$login_name_to_check_mod;
-    } 
+    }
 
-    # the found loginname is added to the forbidden logins from now an
+    # the found loginname is added to the forbidden logins from now on
     $ref_forbidden_logins->{$login_check_ok}="new";
-
-
-
-
-
     return $login_check_ok;
 }
 
