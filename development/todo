@@ -122,7 +122,7 @@ paket signieren, pgp-schlüssel
    rename samaccountname-> not supported
      
    
-Logging(alt): 
+Logging(alt) ist ersetzt: 
 /var/log/sophomorix/user-modify.log
 update_unids::01.01.1970::<login>::<last>;<first>;04.12.1997::->::<last>;<first>;01.01.1970::-10uid
 new-unid::01.01.1970::<login>::<last>;<first>;26.04.1996::->::<last>;<first>;01.01.1970::-10uid
@@ -131,24 +131,8 @@ auto-teach-in::06.09.2013::kog::Koenig;Michuela;01.01.1970::->::Koenig;Michaela;
 /var/log/sophomorix/user-modify-archive.log
 user archived::04.09.2013::<login>::<uid>::<Last>::first::
 4 Jahre-->  13000 Entries, davon 4000 new-unid, 2000 Exam, 300 Computer
---> neu: Eigenes logfile for killed users
-    --> OK: + mit unix-Zeit
-    --> OK:+ mit Rolle
-    --> OK: Schule
-    --> daraus oldlogins erzeugen
-    --> janitor/cronjob macht
-        a) anonymisiert den Eintrag nach x Tagen (nur uid->login bleibt erhalten)
-           - entfernt user auch aus add,update, ...
-        b) entfernt den Eintrag nach x Tagen (x=730), y tagen bei teacher, z tage bei anderen Rollen
 
-Migration: Daten konvertieren ?
-
-
-Todo: 
-OK: kill logging
-update logging
-add logging
-      
+Migration: Log-Daten konvertieren ?
 
 ??? samba_sid mitloggen?
 
@@ -2308,14 +2292,18 @@ Later:
   - Falls derselbe user dann in einer Schuldatei auftaucht wird integriert/zusammengefpührt
     (sophomorixAdminFile, ...)
 * Referenzen statt Kopien großer hashes:
-  Beispiel: sophomorix-check
-            my %AD= %$ref_AD; 
-            Ist diese Kopie notwendig?
-            Suchen, ob weitere Kopien gibt wo Referenzen möglich wären
+  --> checken ob das so ist
 * sophomorix-user
   in allen optionen kommasepatierte userlisten zulassen
   user_count und max_user_count nutzen im PROGRESS Objekt
-* code cleanup: surname mit lastname ersetzen
+* code cleanup: 
+   surname mit lastname ersetzen
+   $date_now --> $time_stamp_AD
+* user logging (user-add.log/user-update.log/user-kill.log):
+  --> janitor/cronjob macht
+      a) anonymisiert den Eintrag nach x Tagen (nur uid->login bleibt erhalten)
+         - entfernt user auch aus add,update, ...
+      b) entfernt den Eintrag nach x Tagen (x=730), y tagen bei teacher, z tage bei anderen Rollen
 ############################################################
 
 
