@@ -1348,7 +1348,7 @@ sub AD_user_set_exam_mode {
                      max_user_count=>$max_user_count,
                      exammode=>$supervisor,
                      uac_force=>"disable",
-                     date_now=> $time_stamp_AD,
+                     time_stamp_AD=> $time_stamp_AD,
                      json=>$json,
                      sophomorix_config=>$ref_sophomorix_config,
                      sophomorix_result=>$ref_sophomorix_result,
@@ -1386,7 +1386,7 @@ sub AD_user_unset_exam_mode {
                      max_user_count=>$max_user_count,
                      exammode=>"---",
                      uac_force=>"enable",
-                     date_now=> $time_stamp_AD,
+                     time_stamp_AD=> $time_stamp_AD,
                      json=>$json,
                      sophomorix_config=>$ref_sophomorix_config,
                      sophomorix_result=>$ref_sophomorix_result,
@@ -1895,7 +1895,7 @@ sub AD_user_update {
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $school = $arg_ref->{school};
-    my $date_now = $arg_ref->{date_now};
+    my $date_now = $arg_ref->{time_stamp_AD};
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
     my $uac_force = $arg_ref->{uac_force};
@@ -2250,6 +2250,8 @@ sub AD_user_update {
 	  	          replace => { %replace }
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        
+
     }
     &Sophomorix::SophomorixBase::print_title(
           "Updating User ${user_count}/$max_user_count: $user (end)");
@@ -2318,7 +2320,7 @@ sub AD_user_setquota {
                                      quota_info=>$hard_limit, # what was set
                                      user_count=>$user_count,
                                      max_user_count=>$max_user_count,
-                                     date_now=> $time_stamp_AD,
+                                     time_stamp_AD=> $time_stamp_AD,
                                      json=>$json,
                                      sophomorix_config=>$ref_sophomorix_config,
                                      sophomorix_result=>$ref_sophomorix_result,

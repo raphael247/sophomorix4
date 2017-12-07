@@ -109,6 +109,7 @@ my $update_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.
 my $update_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update.new";
 
 
+
 # --help
 if ($help==1) {
    # Scriptname ermitteln
@@ -131,6 +132,7 @@ Please see the sophomorix-update(8) man pages for full documentation
 }
 
 
+
 # --unlock
 if ($unlock==1) {
     &unlock_sophomorix();
@@ -138,11 +140,13 @@ if ($unlock==1) {
 }
 
 
+
 # --lock
 if ($lock==1) {
     &lock_sophomorix("lock",0,\@arguments);
     exit;
 }
+
 
 
 # --info
@@ -326,7 +330,7 @@ while(<USERUPDATE>){
                          unid=>$unid_new,
                          user_count=>$user_count,
                          max_user_count=>$max_user_count,
-                         date_now=> $time_stamp_AD,
+                         time_stamp_AD=> $time_stamp_AD,
                          json=>$json,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
