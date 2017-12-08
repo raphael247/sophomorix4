@@ -1976,11 +1976,8 @@ sub read_master_ini {
 
 
 sub check_config_ini {
-    my ($ref_master,$configfile,$ref_result)=@_;
-    #my %modmaster= %{ $ref_master }; # copies ref_master
-    my %modmaster = %$ref_master;
-    #my $ref_modmaster={%ref_master}; 
-    # instead of copying master, read it 
+    my ($ref_school,$configfile,$ref_result)=@_;
+    # take the master reference as school reference and overwrite it
     &print_title("Reading $configfile");
     if (not -e $configfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$configfile." not found!");
@@ -1992,14 +1989,15 @@ sub check_config_ini {
         ( -file => $configfile, 
           -handle_trailing_comment => 1,
         );
+
     # walk through all settings in the fonfig
     foreach my $section ( keys %config ) {
         foreach my $parameter ( keys %{$config{$section}} ) {
             #print "Verifying if parameter $parameter is valid in section $section\n";
-            if (exists $modmaster{$section}{$parameter}){
+            if (exists $ref_school->{$section}{$parameter}){
                 #print "parameter $parameter is valid OK\n";
-                # overwrite  %modmaster
-                $modmaster{$section}{$parameter}=$config{$section}{$parameter};
+                # overwrite  $ref_school
+                $ref_school->{$section}{$parameter}=$config{$section}{$parameter};
             } else {
 		print " * ERROR: ".$parameter." is NOT valid in section ".$section."\n";
                 &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$parameter." is NOT valid in section ".$section." of ".$configfile."!");
@@ -2007,7 +2005,7 @@ sub check_config_ini {
             }
         }
     }
-    return \%modmaster;
+    return $ref_school;
 }
 
 
@@ -2019,10 +2017,10 @@ sub load_school_ini {
             ##### school section ########################################################################
             # walk through parameters
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                #if($Conf::log_level>=3){
+                if($Conf::log_level>=3){
                     print "   * SCHOOL $school: Para: $parameter -> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
-                #}
+                }
                 $ref_sophomorix_config->{'SCHOOLS'}{$school}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
