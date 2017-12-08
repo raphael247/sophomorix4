@@ -19,6 +19,8 @@ ini Dateien:
 	var=Value
 	list=SCHOOLS=bsz,abc,...
 	key-value=key1=value1,key2=value2,... 
+------------------------------------------------------------
+
 AK:
 Win 10, wie sichtbar, wer angemeldet ist.
 
@@ -54,10 +56,6 @@ schüler -> klasse -> schulstudents -> SCHOOLS
 Prefix-schule: dort wo notwendig
  Klassenobjekt:ja, Verzeichnis Nein
  name global (ausnahme Sharename)
-
-generierte Loginnamen der Schüler merken und
-nicht wiederverwenden, bzw. erst nach 1/2 Jahren Pause wieder??
-Nextclod-Probleme verhindern (ans AD gekoppelte) 
 
 Klassenarbeiten mit Moodle
 gibts was umzusetzen??
@@ -188,16 +186,33 @@ progress-Objekt ausgeben: starte hook script
 
 
 
-LOGIN_RECYCLE_AFTER_DAYS=365
-xxx days Nutzernamen nicht wiederverwenden (automatisch geherierte)
-Für geforcte samaccountnames warnung bzw. testmöglichkeit
---> warnung bei sophomorix-check
---> bei sohomorix-add dann machen
-
 ------------------------------------------------------------
 
+weiter mail:
+
+download belwue und auswertung by option splitten
+
+upload file erzeugen für belwue
+
+maillisten auswerten
+
+options
 
 
+??? wie limitiert man mail auf einige rolen, benutzer, gruppen (maillist_users)
+   MAIL_FOR: all
+   MAIL_FOR: maillist-members
+   MAIL_FOR: role1,role2
+   MAIL_FOR: role1,role2
+
+   external members für maillinglisten in dateien schreiben, die hinzugenommen werden
+
+
+     -> alle user, die in einer maillist sind
+
+   belwue.conf ?? (positivliste)
+   belwue_mail_roles=teacher, student
+   belwue_mail_groups
 sophomorix-mail
 * sorgt dafür dass
   * mailaccounts da sind
@@ -403,10 +418,6 @@ wird Kommentar auch upgedated werden
 testen der werte die an --quota --mailquota übergeben werden
 Zahlen: 0-9
 Kommentare: a-9a-zA-Z 
-
-
-(Datum abspeichern bei quotasetzungen??)
-
 
 
 

@@ -664,8 +664,22 @@ sub belwue_maildata_check {
     }
 
     # create walk through lists
-    #$action{'MAILBOXES'}
-
+    print "\n";
+    print "ACTION:\n";
+    foreach my $user (keys %{ $action{'MAILBOXES'} } ){
+        if ($action{'MAILBOXES'}{$user}{'ACTION'} eq "KEEP"){
+            print "   KEEP:   $user\n";
+            push @{ $action{'ACTIONLIST'}{'KEEP'} }, $user;
+        } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "DELETE"){
+            print "   DELETE: $user\n";
+            push @{ $action{'ACTIONLIST'}{'DELETE'} }, $user;
+        } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "ADD"){
+            print "   ADD:    $user\n";
+            push @{ $action{'ACTIONLIST'}{'ADD'} }, $user;
+        } else {
+            print "##########################unknown #######:    $user\n";
+        }
+    }
 
     my $ref_action=\%action;
     print "bz:\n";
@@ -676,6 +690,8 @@ sub belwue_maildata_check {
     print Dumper( $ref_action->{'MAILBOXES'}{'znk'} );
     print "maiersa23:\n";
     print Dumper( $ref_action->{'MAILBOXES'}{'maiersa23'} );
+
+    print Dumper( $ref_action->{'ACTIONLIST'} );
 
     #print Dumper( \%action{'MAILBOXES'}{'EXISTS'}{'bz'} );
     #print Dumper( \%action{'MAILBOXES'}{'EXISTS'}{'bz2'} );
