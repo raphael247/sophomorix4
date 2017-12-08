@@ -2835,7 +2835,7 @@ sub create_test_login {
         ############################################################
         # test proposed login
         $login_name_to_check="$login_part_1"."$login_part_2";
-        if (not exists $ref_forbidden_logins->{$login_name_to_check} and
+        if (not exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_name_to_check} and
             not exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_name_to_check} ){
             # not forbidden an not to be avoided -> use it!
             $login_check_ok=$login_name_to_check;
@@ -2843,7 +2843,7 @@ sub create_test_login {
             # if login is not OK: add 1,2,3,... until OK
             my $login_name_to_check_mod=$login_name_to_check;
             my $i=1; # start for appending numbers
-            while (exists $ref_forbidden_logins->{$login_name_to_check_mod} or
+            while (exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_name_to_check_mod} or
                    exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_name_to_check_mod} ){
                 # Append number
                 $login_name_to_check_mod="$login_name_to_check"."$i";
@@ -2861,10 +2861,12 @@ sub create_test_login {
 	    print "   ERROR: $login_wish contains invalid characters ...\n"; 
             print "          Allowed characters are: a-z0-9-_\n\n";
             exit;
-        } elsif (exists $ref_forbidden_logins->{$login_wish}){
+        } elsif (exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}){
             # forbidden login
             # put in result hash ?????
-	    print "\n   ERROR: $login_wish is forbidden ($identifier_ascii) Existing user,group, ...\n\n"; 
+	    print "\n"; 
+	    print "   ERROR: $login_wish FOR $identifier_ascii FORBIDDEN ($file)\n"; 
+	    print "          REASON: $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}\n"; 
             exit;
         } elsif (exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}){
             # non reusable login
@@ -2876,7 +2878,7 @@ sub create_test_login {
     }
 
     # the found loginname is added to the forbidden logins from now on
-    $ref_forbidden_logins->{$login_check_ok}="new";
+    $ref_forbidden_logins->{'FORBIDDEN'}{$login_check_ok}="new";
     return $login_check_ok;
 }
 

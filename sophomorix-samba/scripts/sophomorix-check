@@ -201,10 +201,13 @@ my $help=0;
 my $info=0;
 my $json=0;
 my %Match=();
+
 my $dump_matches=0;
 my $dump_files=0;
 my $dump_AD=0;
 my $dump_login_avoid=0;
+my $dump_forbidden_logins=0;
+
 my $list_files=0;
 my $lock=0;
 my $unlock=0;
@@ -227,6 +230,7 @@ my $testopt=GetOptions(
            "dump-AD" => \$dump_AD,
            "dump-login-avoid" => \$dump_login_avoid,
            "dump-matches" => \$dump_matches,
+           "dump-forbidden-logins" => \$dump_forbidden_logins,
            "list-files" => \$list_files,
            "analyze-encoding=s" => \$analyze_encoding,
            "follow=s" => \$follow,
@@ -542,10 +546,20 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            dnsnodes=>"FALSE",
                            sophomorix_config=>\%sophomorix_config,
              });
+# --dump-AD
+if ($dump_AD==1){
+    &json_dump({json => $json,
+                jsoninfo => "SEARCH",
+                jsoncomment => "AD Content",
+                log_level => $Conf::log_level,
+                hash_ref=>$ref_AD,
+                sophomorix_config=>\%sophomorix_config,
+              });
+}
+
 
 
 my ($ref_login_avoid) = &get_login_avoid(\%sophomorix_config);
-
 # --dump-login-avoid
 if ($dump_login_avoid==1){
     &json_dump({json => $json,
@@ -558,19 +572,19 @@ if ($dump_login_avoid==1){
 }
 
 
-my %forbidden_logins=&get_forbidden_logins($ldap,$root_dse);
 
-
-# --dump-AD
-if ($dump_AD==1){
+my $ref_forbidden_logins=&get_forbidden_logins($ldap,$root_dse);
+# --dump-forbidden-logins
+if ($dump_forbidden_logins==1){
     &json_dump({json => $json,
-                jsoninfo => "SEARCH",
-                jsoncomment => "AD Content",
+                jsoninfo => "LOGIN_FORBIDDEN",
+                jsoncomment => "Forbidden logins",
                 log_level => $Conf::log_level,
-                hash_ref=>$ref_AD,
+                hash_ref=>$ref_forbidden_logins,
                 sophomorix_config=>\%sophomorix_config,
               });
 }
+
 
 
 # ============================================================
@@ -1159,7 +1173,7 @@ sub write_add_file {
     my $login=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
                                  $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
                                  $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
-                                 \%forbidden_logins, # forbidden logins
+                                 $ref_forbidden_logins, # forbidden logins
                                  $ref_login_avoid, # logins to avoid
                                  \%sophomorix_config);
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".

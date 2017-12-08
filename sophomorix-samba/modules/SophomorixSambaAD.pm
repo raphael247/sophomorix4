@@ -6433,9 +6433,15 @@ sub AD_group_removemember {
 
 sub  get_forbidden_logins{
     my ($ldap,$root_dse) = @_;
-    my %forbidden_logins = %DevelConf::forbidden_logins;
+    my %forbidden_logins= ();
+    # add to list manually
+    $forbidden_logins{'FORBIDDEN'}{'root'}="forbidden by Hand";
+    $forbidden_logins{'FORBIDDEN'}{'root1'}="forbidden by Hand";
+    $forbidden_logins{'FORBIDDEN'}{'root2'}="forbidden by Hand";
+    $forbidden_logins{'FORBIDDEN'}{'root3'}="forbidden by Hand";
+    $forbidden_logins{'FORBIDDEN'}{'root4'}="forbidden by Hand";
 
-    # users from ldap
+    # users from ldap 
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -6447,19 +6453,19 @@ sub  get_forbidden_logins{
         my $entry = $mesg->entry($index);
         my @values = $entry->get_value( 'sAMAccountName' );
         foreach my $login (@values){
-            $forbidden_logins{$login}="login $login exists in AD";
+            $forbidden_logins{'FORBIDDEN'}{$login}="AD (user $login exists already)";
         }
     }
 
-    # users in /etc/passwd
-    if (-e "/etc/passwd"){
-        open(PASS, "/etc/passwd");
-        while(<PASS>) {
-            my ($login)=split(/:/);
-            $forbidden_logins{$login}="login $login exists in /etc/passwd";
-        }
-        close(PASS);
-    }
+    ## users in /etc/passwd
+    #if (-e "/etc/passwd"){
+    #    open(PASS, "/etc/passwd");
+    #    while(<PASS>) {
+    #        my ($login)=split(/:/);
+    #        $forbidden_logins{$login}="login $login exists in /etc/passwd";
+    #    }
+    #    close(PASS);
+    #}
 
     # future groups in students.csv
     #my $schueler_file=$DevelConf::path_conf_user."/schueler.txt";
@@ -6487,31 +6493,20 @@ sub  get_forbidden_logins{
         my $entry = $mesg->entry($index);
         my @values = $entry->get_value( 'sAMAccountName' );
         foreach my $group (@values){
-            $forbidden_logins{$group}="group $group exists in AD";
+            $forbidden_logins{'FORBIDDEN'}{$group}="AD (group $group exists already)";
         }
     }
 
-    # groups in /etc/group
-    if (-e "/etc/group"){
-        open(GROUP, "/etc/group");
-        while(<GROUP>) {
-            my ($group)=split(/:/);
-            $forbidden_logins{$group}="group $group exists in /etc/group";
-        }
-        close(GROUP);
-    }
-
-    # output forbidden logins:
-    if($Conf::log_level>=3){
-        print("Login-Name:                    ",
-              "                                   Status:\n");
-        print("================================",
-              "===========================================\n");
-        while (($k,$v) = each %forbidden_logins){
-            printf "%-50s %3s\n","$k","$v";
-        }
-    }
-    return %forbidden_logins;
+    ## groups in /etc/group
+    #if (-e "/etc/group"){
+    #    open(GROUP, "/etc/group");
+    #    while(<GROUP>) {
+    #        my ($group)=split(/:/);
+    #        $forbidden_logins{$group}="group $group exists in /etc/group";
+    #    }
+    #    close(GROUP);
+    #}
+    return \%forbidden_logins;
 }
 
 
