@@ -162,76 +162,88 @@ my $ref_mail=&AD_get_quota({ldap=>$ldap,
                              sophomorix_config=>\%sophomorix_config,
                            });
 
-
-
 # print Dumper($ref_mail);
 # print Dumper($ref_mail->{'QUOTA'}{'USERS'}{'blackmri42'});
 # print Dumper($ref_mail->{'QUOTA'}{'USERS'}{'lordjo42'});
 
 
-############################################################
-# --info --json
-if ($info==1 and $json>0){
+if ($info==1){
     &json_dump({json => $json,
                 jsoninfo => "MAIL",
                 jsoncomment => "sophomorix mail",
+                object_name => $school,
                 log_level => $Conf::log_level,
                 hash_ref=>$ref_mail,
                 sophomorix_config=>\%sophomorix_config,
               });
-    exit;
-############################################################
-# --info 
-} elsif ($info==1 and $json==0){
-    my $line="+--------------------------+--------+------+".
-             "------+------+-------------------+\n";
-    my $line2="+------------------------------------------".
-              "------------------------------------+\n";
-    foreach my $school (@sharelist){
-        ############################################################
-        # HEADER for SCHOOL
-        print "\n";
-        &Sophomorix::SophomorixBase::print_title("Mailaccounts/Maillists of school $school:");
-        # there are 0 users
-        if($#{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }==-1){
-            print "     0 sophomorix users in school $school\n";
-            next;
-        }
-        # there are users
-        ############################################################
-        # Walk through users
-        print "Mailaccounts:\n";
-        foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
-            my $alias="Alias: FALSE";
-            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
-                $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
-            }
-            my $user_string="  * ".
-                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'mail'}.
-                            " (".
-                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}.
-                            ") ".
-                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}.
-                            " MiB, ".
-                            $alias.
-                            ")\n";
-  
-	    print $user_string;
-        }
 
-
-        ############################################################
-        # Walk through mailists
-        foreach my $maillist ( @{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } ){
-	    print "Maillist $maillist ($ref_mail->{'MAILLIST'}{$maillist}{'mail'}):\n";
-            foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
-	        print "  * $member\n";
-            }
-        }
-    } # end of school
-    #print Dumper($ref_mail);
     exit;
 }
+# exit;
+
+# ############################################################
+# # --info --json
+# if ($info==1 and $json>0){
+#     &json_dump({json => $json,
+#                 jsoninfo => "MAIL",
+#                 jsoncomment => "sophomorix mail",
+#                 log_level => $Conf::log_level,
+#                 hash_ref=>$ref_mail,
+#                 sophomorix_config=>\%sophomorix_config,
+#               });
+#     exit;
+# ############################################################
+# # --info 
+# } elsif ($info==1 and $json==0){
+#     my $line="+--------------------------+--------+------+".
+#              "------+------+-------------------+\n";
+#     my $line2="+------------------------------------------".
+#               "------------------------------------+\n";
+#     foreach my $school (@sharelist){
+#         ############################################################
+#         # HEADER for SCHOOL
+#         print "\n";
+#         &Sophomorix::SophomorixBase::print_title("Mailaccounts/Maillists of school $school:");
+#         # there are 0 users
+#         if($#{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }==-1){
+#             print "     0 sophomorix users in school $school\n";
+#             next;
+#         }
+#         # there are users
+#         ############################################################
+#         # Walk through users
+#         print "Mailaccounts:\n";
+#         foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
+#             my $alias="Alias: FALSE";
+#             if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
+#                 $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+#             }
+#             my $user_string="  * ".
+#                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'mail'}.
+#                             " (".
+#                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}.
+#                             ") ".
+#                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}.
+#                             " MiB, ".
+#                             $alias.
+#                             ")\n";
+  
+# 	    print $user_string;
+#         }
+
+
+#         ############################################################
+#         # Walk through mailists
+#         foreach my $maillist ( @{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } ){
+# 	    print "Maillist $maillist ($ref_mail->{'MAILLIST'}{$maillist}{'mail'}):\n";
+#             foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
+# 	        print "  * $member\n";
+#             }
+#         }
+#     } # end of school
+#     #print Dumper($ref_mail);
+#     exit;
+# }
 
 
 
@@ -242,7 +254,28 @@ if ($info==1 and $json>0){
 # continue with the calculated mail from $ref_mail
 ################################################################################
 
-# ???? todo
+foreach my $school (@sharelist){
+    my %mailconf=();
+    my $config;
+    if (exists $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'}){
+        $config=$sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'};
+    }
+
+    if (not -e $config){
+        print "No config for $school ($config)\n";
+        next;
+    } else {
+        print "Config: $school $config\n";
+    }
+
+    tie %mailconf, 'Config::IniFiles',
+        ( -file => $config, 
+          -handle_trailing_comment => 1,
+        );
+    print Dumper(\%mailconf);
+    # ???? todo
+}
+
 
 
 

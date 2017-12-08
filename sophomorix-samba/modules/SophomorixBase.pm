@@ -303,6 +303,8 @@ sub json_dump {
         } elsif ($jsoninfo eq "MANAGEMENTGROUP"){
             # see GROUP
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "MAIL"){
+            &_console_print_mail_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -1211,6 +1213,61 @@ sub _console_print_admins_v {
 
 
 
+sub _console_print_mail_full {
+    my ($ref_mail,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line1="#####################################################################\n";
+
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+    @school_list=($ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'},@school_list);
+    foreach my $school (@school_list){
+        &print_title("Mailaccounts/Maillists of school $school:");
+        # there are 0 users
+        if($#{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }==-1){
+            print "     0 sophomorix users in school $school\n";
+            next;
+        }
+
+        # there are users
+        ############################################################
+        # Walk through users
+        print "Mailaccounts:\n";
+        foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
+            my $alias="Alias: FALSE";
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
+                $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+            }
+            my $user_string="  * ".
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'mail'}.
+                            " (".
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}.
+                            ") ".
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}.
+                            " MiB, ".
+                            $alias.
+                            ")\n";
+  
+	    print $user_string;
+        }
+        print "\n";
+
+        ############################################################
+        # Walk through mailists
+        foreach my $maillist ( @{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} } ){
+	    print "Maillist $maillist ($ref_mail->{'MAILLIST'}{$maillist}{'mail'}):\n";
+            foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
+	        print "  * $member\n";
+            }
+            print "\n";
+        }
+    } # end of school
+}
+
+
 # helper stuff
 ######################################################################
 sub remove_from_list {
@@ -1505,7 +1562,7 @@ sub config_sophomorix_read {
     ##################################################
     # SCHOOLS  
     # load the master once
-    my $ref_master=&read_master_ini($DevelConf::path_conf_master_school,$ref_result);
+    #my $ref_master=&read_master_ini($DevelConf::path_conf_master_school,$ref_result);
 
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
@@ -1526,13 +1583,24 @@ sub config_sophomorix_read {
                          $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
                  }
 
+        # load the master ini
+        my $ref_master=&read_master_ini($DevelConf::path_conf_master_school,$ref_result);
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
+        # modify the master
         my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
         # mountpoint
         $sophomorix_config{'SCHOOLS'}{$school}{'MOUNTPOINT'}=
             $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$school;
-
+        # mailconf
+        if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} ne "none"){
+	    print "$school $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'}\n";
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'}=
+                $DevelConf::path_conf_sophomorix."/".$school."/".
+                $school.".".$sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'}.".conf";
+        } else {
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'}="none";
+        }
     }
 
     # GLOBAL
@@ -1909,7 +1977,10 @@ sub read_master_ini {
 
 sub check_config_ini {
     my ($ref_master,$configfile,$ref_result)=@_;
-    my %modmaster= %{ $ref_master }; # copies ref_master
+    #my %modmaster= %{ $ref_master }; # copies ref_master
+    my %modmaster = %$ref_master;
+    #my $ref_modmaster={%ref_master}; 
+    # instead of copying master, read it 
     &print_title("Reading $configfile");
     if (not -e $configfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$configfile." not found!");
@@ -1936,7 +2007,6 @@ sub check_config_ini {
             }
         }
     }
-    #print Dumper(\%modmaster);
     return \%modmaster;
 }
 
@@ -1949,10 +2019,10 @@ sub load_school_ini {
             ##### school section ########################################################################
             # walk through parameters
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                if($Conf::log_level>=3){
+                #if($Conf::log_level>=3){
                     print "   * SCHOOL $school: Para: $parameter -> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
-                }
+                #}
                 $ref_sophomorix_config->{'SCHOOLS'}{$school}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
             }
