@@ -275,11 +275,21 @@ foreach my $school (@sharelist){
 
     # decide which sub to use
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
-        &belwue_mail_read($school,
-                          $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-                          $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-                          \%mailconf,
-                          \%sophomorix_config);
+        $mailconf{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}="/var/lib/sophomorix/belwue/downloads";
+        $mailconf{'OUTPUT_FILES'}{'MAILBOXES'}="/var/lib/sophomorix/belwue/belwue.multimailboxes";
+        $mailconf{'OUTPUT_FILES'}{'MAILLISTS'}="/var/lib/sophomorix/belwue/belwue.maillists";
+        $mailconf{'OUTPUT_FILES'}{'ALIASES'}="/var/lib/sophomorix/belwue/belwue.aliases";
+#        &belwue_maildata_fetch($school,
+#                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+#                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+#                               \%mailconf,
+#                               \%sophomorix_config);
+       &belwue_maildata_check($school,
+                              $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+                              $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+                              \%mailconf,
+                              $ref_mail,
+                              \%sophomorix_config);
     } else {
         print "\n\nERROR: $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} not known\n";
         exit;
@@ -353,13 +363,13 @@ sub wget_return {
 
 
 
-sub belwue_mail_read {
+sub belwue_maildata_fetch {
     my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_sophomorix_config)=@_;
     my %belwue=();
-    $belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}="/var/lib/sophomorix/belwue/downloads";
-    $belwue{'OUTPUT_FILES'}{'MAILBOXES'}="/var/lib/sophomorix/belwue/belwue.multimailboxes";
-    $belwue{'OUTPUT_FILES'}{'MAILLISTS'}="/var/lib/sophomorix/belwue/belwue.maillists";
-    $belwue{'OUTPUT_FILES'}{'ALIASES'}="/var/lib/sophomorix/belwue/belwue.aliases";
+    #$belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}="/var/lib/sophomorix/belwue/downloads";
+    #$belwue{'OUTPUT_FILES'}{'MAILBOXES'}="/var/lib/sophomorix/belwue/belwue.multimailboxes";
+    #$belwue{'OUTPUT_FILES'}{'MAILLISTS'}="/var/lib/sophomorix/belwue/belwue.maillists";
+    #$belwue{'OUTPUT_FILES'}{'ALIASES'}="/var/lib/sophomorix/belwue/belwue.aliases";
 
     &print_title("Fetching maildata for school $school: $mailtype");
     print "   * Config: $mailconf\n";
@@ -449,12 +459,12 @@ sub belwue_mail_read {
     # downloading
     ############################################################ 
     print "Downloading Objects page:\n";
-    system("mkdir -p $belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}");
+    system("mkdir -p $ref_mailconf->{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}");
 
     # download object list
     my $download_objects_command="wget -q --http-user=admin ".
          "--http-password=$ref_mailconf->{'CONNECT'}{PASSWORD} ".
-         "--output-document=$belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}/objects.html ".
+         "--output-document=$ref_mailconf->{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}/objects.html ".
          "\"$ref_mailconf->{'CONNECT'}{ADMINURL}/$ref_mailconf->{'CONNECT'}{BASESIMPLE}".
          "/ObjectList.html?domainName=$ref_mailconf->{'CONNECT'}{BASESIMPLE}\"";
 
@@ -469,7 +479,7 @@ sub belwue_mail_read {
     ############################################################
 
     # file to parse
-    my $html_doc = "$belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}/objects.html";
+    my $html_doc = $ref_mailconf->{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}."/objects.html";
     print "   * Parsing $html_doc\n";
 
     # list of headers
@@ -506,7 +516,7 @@ sub belwue_mail_read {
             ############################################################
             my $download_list_command="wget -q --http-user=admin ".
                 "--http-password=$ref_mailconf->{'CONNECT'}{PASSWORD} ".
-                "--output-document=$belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}/$object.html ".
+                "--output-document=$ref_mailconf->{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}/$object.html ".
                 "\"$ref_mailconf->{'CONNECT'}{ADMINURL}/$ref_mailconf->{'CONNECT'}{BASESIMPLE}".
                 "/Subscribers.html?InCluster=1&domainName=$ref_mailconf->{'CONNECT'}{BASESIMPLE}".
                 "&&listName=$object\"";
@@ -519,7 +529,7 @@ sub belwue_mail_read {
             ############################################################
             # parsing maillist data
             ############################################################
-            my $html_doc = "$belwue{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}/$object.html";
+            my $html_doc = $ref_mailconf->{'OUTPUT_FILES'}{'DOWNLOAD_DIR'}."/".$object.".html";
             print "   * Parsing $html_doc\n";
 
             # list of headers
@@ -566,16 +576,16 @@ sub belwue_mail_read {
     ############################################################
     # printout data/write data into files
     ############################################################
-    open (BOX,   ">$belwue{'OUTPUT_FILES'}{'MAILBOXES'}");
-    open (ALIAS, ">$belwue{'OUTPUT_FILES'}{'ALIASES'}");
-    open (LIST,  ">$belwue{'OUTPUT_FILES'}{'MAILLISTS'}");
+    open (BOX,   ">$ref_mailconf->{'OUTPUT_FILES'}{'MAILBOXES'}");
+    open (ALIAS, ">$ref_mailconf->{'OUTPUT_FILES'}{'ALIASES'}");
+    open (LIST,  ">$ref_mailconf->{'OUTPUT_FILES'}{'MAILLISTS'}");
 
     # MAILBOXES
     @{ $belwue{'LISTS'}{'MAILBOXES'} } = sort @{ $belwue{'LISTS'}{'MAILBOXES'} };
     print "\nMultiMailboxes:\n";
     my $num_mbox=1;
     foreach my $uid (@{ $belwue{'LISTS'}{'MAILBOXES'} }){
-        print BOX "$uid\n";
+        print BOX $uid.";\n";
         print "   $num_mbox) $uid\n";
         $num_mbox++;
     }
@@ -611,13 +621,62 @@ sub belwue_mail_read {
     close(ALIAS);
     close(LIST);
 
-    #if($Conf::log_level>=2){
+    if($Conf::log_level>=2){
         print Dumper(\%belwue);
-    #}
+    }
+}
 
 
 
-    # ???? todo
+sub belwue_maildata_check {
+    my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
+    my %action=();
+    my @belwue_tmp=();
+
+    open (BOX,   "<$ref_mailconf->{'OUTPUT_FILES'}{'MAILBOXES'}");
+    while (<BOX>){
+        my ($user)=split(/;/);
+        # the unmodified archive
+        $action{'MAILBOXES'}{$user}{'BELWUE'}="EXISTS";
+        push @belwue_tmp, $user;
+    }
+    close(BOX);
+    # mailaccounts
+    # Walk through AD users
+    print "Mailaccounts for school $school:\n";
+    foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
+	print "USER: $user\n";
+        if (exists $action{'MAILBOXES'}{$user}){
+            print "  * Mailbox $user: nothing to do\n";
+            $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
+            $action{'MAILBOXES'}{$user}{'ACTION'}="KEEP";
+        } else {
+            print "  * Mailbox $user: ADD\n";
+            $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
+            $action{'MAILBOXES'}{$user}{'ACTION'}="ADD";
+        }
+    }
+    
+    foreach my $belwue_user (@belwue_tmp){
+        if (not exists $ref_mail->{'QUOTA'}{'USERS'}{$belwue_user}){
+            $action{'MAILBOXES'}{$belwue_user}{'ACTION'}="DELETE";
+        }
+    }
+
+    # create walk through lists
+    #$action{'MAILBOXES'}
 
 
+    my $ref_action=\%action;
+    print "bz:\n";
+    print Dumper( $ref_action->{'MAILBOXES'}{'bz'} );
+    print "bz2:\n";
+    print Dumper( $ref_action->{'MAILBOXES'}{'bz2'} );
+    print "znk:\n";
+    print Dumper( $ref_action->{'MAILBOXES'}{'znk'} );
+    print "maiersa23:\n";
+    print Dumper( $ref_action->{'MAILBOXES'}{'maiersa23'} );
+
+    #print Dumper( \%action{'MAILBOXES'}{'EXISTS'}{'bz'} );
+    #print Dumper( \%action{'MAILBOXES'}{'EXISTS'}{'bz2'} );
 }
