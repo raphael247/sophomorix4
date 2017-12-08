@@ -535,6 +535,10 @@ sub belwue_mail_read {
             my ($table) = $table_extract->tables;
             foreach my $row ($table->rows) {
                 my ($member_email,$type,$time,$bounced,$displayname)=@$row;
+                if (not defined $member_email){
+                    # no members
+                    last;
+                }
                 #print "$object: $member_email  $type  $time\n";
                 if ($type ne "Abonnement aufheben"){
                     $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
