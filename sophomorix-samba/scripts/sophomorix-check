@@ -1555,8 +1555,6 @@ sub analyze_user_line {
 	    $login="---";
         }
 
-	print "HERE: $line -> $login\n";
-
         # converting names to utf8 and then to ascii
         my $conv = Text::Iconv->new($enc_used,"utf8");
         my $first_utf8 = $conv->convert($first);
