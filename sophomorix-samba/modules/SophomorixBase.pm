@@ -216,9 +216,12 @@ sub umount_school {
 ######################################################################
 sub alias_from_name {
     my ($surname,$firstname,$root_dns,$ref_sophomorix_config)=@_;
-    my $alias=$firstname.".".$surname."\@".$root_dns;
+    $surname=~tr/A-Z/a-z/; # make lowercase
+    $firstname=~tr/A-Z/a-z/; # make lowercase
+    my $alias_short=$firstname.".".$surname;
+    my $alias_long=$firstname.".".$surname."\@".$root_dns;
     # print "TEST: Alias is $alias\n";
-    return $alias;
+    return ($alias_short,$alias_long);
 }
 
 

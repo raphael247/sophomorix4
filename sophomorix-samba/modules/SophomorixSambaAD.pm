@@ -4379,6 +4379,7 @@ sub AD_get_quota {
                    attrs => ['sAMAccountName',
                              'sophomorixSchoolname',
                              'sophomorixRole',
+                             'sophomorixAdminFile',
                              'mail',
                              'displayName',
                              'sophomorixSurnameASCII',
@@ -4396,6 +4397,7 @@ sub AD_get_quota {
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
+        my $file=$entry->get_value('sophomorixAdminFile');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my $mailquota = $entry->get_value('sophomorixMailQuota');
 	my @quota = $entry->get_value('sophomorixQuota');
@@ -4406,6 +4408,7 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixAdminFile'}=$file;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
         # get SHAREDEFAULT for this role
         $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$school}{'SHAREDEFAULT'}=
@@ -4419,7 +4422,8 @@ sub AD_get_quota {
         # save mail adress/alias
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'mail'}=$entry->get_value('mail');
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'displayName'}=$entry->get_value('displayName');;
-        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIASNAME'}=
+        ($quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIASNAME'},
+         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIASNAME_LONG'})=
             &Sophomorix::SophomorixBase::alias_from_name($entry->get_value('sophomorixSurnameASCII'),
                                                          $entry->get_value('sophomorixFirstnameASCII'),
                                                          $root_dns,
@@ -4516,6 +4520,7 @@ sub AD_get_quota {
         if ($maillist eq "TRUE"){
             $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
+            $quota{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$sam}{'EXISTS'}="TRUE";
         }
 
         # mailquota
@@ -4654,6 +4659,7 @@ sub AD_get_quota {
         if ($maillist eq "TRUE"){
             $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
+            $quota{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$sam}{'EXISTS'}="TRUE";
         }
 
         # addmailquota

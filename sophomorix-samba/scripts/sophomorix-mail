@@ -208,24 +208,30 @@ foreach my $school (@sharelist){
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
         # download stuff
         $mailconf{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-                                                  "/belwue/".$school."/".$school.".belwue.downloads";
+            "/belwue/".$school."/".$school.".belwue.downloads";
+
+        $mailconf{'DOWNLOAD_FILES'}{'DATA_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+            "/belwue/".$school."/".$school.".belwue.data";
+
         $mailconf{'DOWNLOAD_FILES'}{'MAILBOXES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-                                               "/belwue/".$school."/".$school.".belwue.multimailboxes";
+            "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.multimailboxes";
         $mailconf{'DOWNLOAD_FILES'}{'MAILLISTS'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-                                               "/belwue/".$school."/".$school.".belwue.maillists";
+            "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.maillists";
         $mailconf{'DOWNLOAD_FILES'}{'ALIASES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-                                             "/belwue/".$school."/".$school.".belwue.aliases";
+            "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.aliases";
 
         $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-                                                  "/belwue/".$school."/".$school.".belwue.uploads";
+            "/belwue/".$school."/".$school.".belwue.uploads";
         $mailconf{'UPLOAD_FILES'}{'MAILBOXES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-                                               "/belwue/".$school."/".$school.".belwue.uploads/.belwue.multimailboxes";
+            "/belwue/".$school."/".$school.".belwue.uploads/".
+            $school.".belwue.multimailboxes-utf8.txt";
 
-        &belwue_maildata_fetch($school,
-                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-                               \%mailconf,
-                               \%sophomorix_config);
+
+#        &belwue_maildata_fetch($school,
+#                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+#                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+#                               \%mailconf,
+#                               \%sophomorix_config);
        &belwue_maildata_check($school,
                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
@@ -308,10 +314,6 @@ sub wget_return {
 sub belwue_maildata_fetch {
     my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_sophomorix_config)=@_;
     my %belwue=();
-    #$belwue{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}="/var/lib/sophomorix/belwue/downloads";
-    #$belwue{'DOWNLOAD_FILES'}{'MAILBOXES'}="/var/lib/sophomorix/belwue/belwue.multimailboxes";
-    #$belwue{'DOWNLOAD_FILES'}{'MAILLISTS'}="/var/lib/sophomorix/belwue/belwue.maillists";
-    #$belwue{'DOWNLOAD_FILES'}{'ALIASES'}="/var/lib/sophomorix/belwue/belwue.aliases";
 
     &print_title("Fetching maildata for school $school: $mailtype");
     print "   * Config: $mailconf\n";
@@ -402,6 +404,7 @@ sub belwue_maildata_fetch {
     ############################################################ 
     print "Downloading Objects page:\n";
     system("mkdir -p $ref_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}");
+    system("mkdir -p $ref_mailconf->{'DOWNLOAD_FILES'}{'DATA_DIR'}");
 
     # download object list
     my $download_objects_command="wget -q --http-user=admin ".
@@ -575,16 +578,17 @@ sub belwue_maildata_check {
     my %action=();
     my @belwue_tmp=();
 
-    open (BOX,   "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILBOXES'}");
+    # MAILBOXES
+    ############################################################
+    open (BOX, "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILBOXES'}");
     while (<BOX>){
         my ($user)=split(/;/);
-        # the unmodified archive
         $action{'MAILBOXES'}{$user}{'BELWUE'}="EXISTS";
         push @belwue_tmp, $user;
     }
     close(BOX);
     # mailaccounts
-    # Walk through AD users
+    # Walk through AD users, decide ADD/KEEP
     print "Mailaccounts for school $school:\n";
     foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
 	print "USER: $user\n";
@@ -599,48 +603,137 @@ sub belwue_maildata_check {
         }
     }
     
+    # Walk through belwue users, decide DELETE
     foreach my $belwue_user (@belwue_tmp){
         if (not exists $ref_mail->{'QUOTA'}{'USERS'}{$belwue_user}){
             $action{'MAILBOXES'}{$belwue_user}{'ACTION'}="DELETE";
         }
     }
 
-    # create walk through lists
+    # create walk through lists ADD/KEEP/DELETE
     print "\n";
     print "ACTION:\n";
     foreach my $user (keys %{ $action{'MAILBOXES'} } ){
         if ($action{'MAILBOXES'}{$user}{'ACTION'} eq "KEEP"){
-            print "   KEEP:   $user\n";
+            #print "   KEEP:   $user\n";
             push @{ $action{'ACTIONLIST'}{'KEEP'} }, $user;
         } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "DELETE"){
-            print "   DELETE: $user\n";
+            #print "   DELETE: $user\n";
             push @{ $action{'ACTIONLIST'}{'DELETE'} }, $user;
         } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "ADD"){
-            print "   ADD:    $user\n";
+            #print "   ADD:    $user\n";
             push @{ $action{'ACTIONLIST'}{'ADD'} }, $user;
         } else {
             print "##########################unknown #######:    $user\n";
         }
     }
 
-    # sort the results
+    # sort the result lists for ADD/KEEP/DELETE
     @{ $action{'ACTIONLIST'}{'KEEP'} } = sort @{ $action{'ACTIONLIST'}{'KEEP'} };
     @{ $action{'ACTIONLIST'}{'DELETE'} } = sort @{ $action{'ACTIONLIST'}{'DELETE'} };
     @{ $action{'ACTIONLIST'}{'ADD'} } = sort @{ $action{'ACTIONLIST'}{'ADD'} };
 
     # write the files
+    # ADD
+    system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
+    open (ADD,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES'}");
+    print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
 
-    my $ref_action=\%action;
-    print "bz:\n";
-    print Dumper( $ref_action->{'MAILBOXES'}{'bz'} );
-    print "bz2:\n";
-    print Dumper( $ref_action->{'MAILBOXES'}{'bz2'} );
-    print "znk:\n";
-    print Dumper( $ref_action->{'MAILBOXES'}{'znk'} );
-    print "maiersa23:\n";
-    print Dumper( $ref_action->{'MAILBOXES'}{'maiersa23'} );
+    my @password_chars=&get_passwd_charlist();
+    foreach my $user (@{ $action{'ACTIONLIST'}{'ADD'} }){
+        my $alias="";
+        if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
+            $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+        }
 
-    print Dumper( $ref_action->{'ACTIONLIST'} );
+        my $file=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixAdminFile'};
+        my $plain_password=&get_plain_password(
+                           $ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'},
+                           $file,
+                           $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
+                           $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
+                           @password_chars);
+        my $mailquota=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
+        print ADD "$user\t".
+                  "$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}\t".
+                  "MultiMailbox\t".
+                  "$plain_password\t".
+                  "${mailquota}M\t".
+                  "$alias\n";
+    }
+    close(ADD);
+
+    # DELETE
+    system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
+    open (DELETE,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES'}");
+    foreach my $user (@{ $action{'ACTIONLIST'}{'DELETE'} }){
+        print DELETE $user."\n";
+    }
+    close(DELETE);
+
+
+    # MAILLISTS
+    ############################################################
+    my %belwue_maillist_tmp=();
+    my @belwue_maillist_tmp=();    
+
+    open (LIST, "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILLISTS'}");
+    while (<LIST>){
+        #print "$_";
+        my ($maillist,$string)=split(/:/);
+	#print "ML: $maillist\n";
+        $action{'MAILLISTS'}{$maillist}{'BELWUE'}="EXISTS";
+        push @belwue_maillist_tmp, $maillist;
+    }
+    close(LIST);
+
+    # Walk through AD maillists, decide ADD/KEEP
+    print "Maillists for school $school:\n";
+    foreach my $maillist (@{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} }){
+	print "MAILLIST: $maillist\n";
+        if (exists $action{'MAILLISTS'}{$maillist}){
+            print "  * Maillist $maillist: nothing to do\n";
+            $action{'MAILLISTS'}{$maillist}{'AD'}="EXISTS";
+            $action{'MAILLISTS'}{$maillist}{'ACTION'}="KEEP";
+        } else {
+            print "  * Maillist: $maillist ADD\n";
+            $action{'MAILLISTS'}{$maillist}{'AD'}="EXISTS";
+            $action{'MAILLISTS'}{$maillist}{'ACTION'}="ADD";
+        }
+    }
+
+    # Walk through belwue maillist, decide DELETE
+    foreach my $belwue_maillist (@belwue_maillist_tmp){
+        if (not exists $ref_mail->{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$belwue_maillist}){
+            $action{'MAILLISTS'}{$belwue_maillist}{'ACTION'}="DELETE";
+            print "  * Maillist: $belwue_maillist DELETE\n";
+        }
+    }
+
+    # ADD MAILLIST file erzeugen
+
+    # DELETE MAILLIST file erzeugen
+
+    # update members list erzeugen
+
+    # sophomorix-gruppe sollte auch eine maillist anlegen
+    # (zusammenlegen von hausmeister, teachers, zu kollegium )
+
+
+
+#    my $ref_action=\%action;
+#print Dumper( $ref_action );
+#print Dumper( $ref_action->{'MAILLISTS'} );
+    # print "bz:\n";
+    # print Dumper( $ref_action->{'MAILBOXES'}{'bz'} );
+    # print "bz2:\n";
+    # print Dumper( $ref_action->{'MAILBOXES'}{'bz2'} );
+    # print "znk:\n";
+    # print Dumper( $ref_action->{'MAILBOXES'}{'znk'} );
+    # print "maiersa23:\n";
+    # print Dumper( $ref_action->{'MAILBOXES'}{'maiersa23'} );
+
+    # print Dumper( $ref_action->{'ACTIONLIST'} );
 
     #print Dumper( \%action{'MAILBOXES'}{'EXISTS'}{'bz'} );
     #print Dumper( \%action{'MAILBOXES'}{'EXISTS'}{'bz2'} );
