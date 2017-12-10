@@ -222,9 +222,12 @@ foreach my $school (@sharelist){
 
         $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
             "/belwue/".$school."/".$school.".belwue.uploads";
-        $mailconf{'UPLOAD_FILES'}{'MAILBOXES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        $mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
             "/belwue/".$school."/".$school.".belwue.uploads/".
-            $school.".belwue.multimailboxes-utf8.txt";
+            "ADD_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+        $mailconf{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+            "/belwue/".$school."/".$school.".belwue.uploads/".
+            "DELETE_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
 
 
 #        &belwue_maildata_fetch($school,
@@ -636,7 +639,7 @@ sub belwue_maildata_check {
     # write the files
     # ADD
     system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
-    open (ADD,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES'}");
+    open (ADD,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}");
     print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
 
     my @password_chars=&get_passwd_charlist();
@@ -665,7 +668,7 @@ sub belwue_maildata_check {
 
     # DELETE
     system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
-    open (DELETE,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES'}");
+    open (DELETE,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}");
     foreach my $user (@{ $action{'ACTIONLIST'}{'DELETE'} }){
         print DELETE $user."\n";
     }
@@ -685,8 +688,8 @@ sub belwue_maildata_check {
         my @members=split(/,/,$string);
 	#print "ML: $maillist\n";
         $action{'MAILLISTS'}{$maillist}{'BELWUE'}="EXISTS";
-        push @{ $action{'MAILLISTS'}{$maillist}{'MEMBERS'} }, @members;
 
+        push @{ $action{'MAILLISTS'}{$maillist}{'MEMBERS'} }, @members;
         push @belwue_maillist_tmp, $maillist;
     }
     close(LIST);
@@ -744,12 +747,27 @@ sub belwue_maildata_check {
 
     # ADD_MAILLIST
     foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
-         # filename ADD_MAILLIST_name.txt
+        # filename ADD_MAILLIST_name.txt
+        my $upload_file="ADD_MAILLIST_".$school.".belwue.".$maillist.".txt";
+        my $upload_file_abs=$ref_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}."/".$upload_file;
+	print "ADD $upload_file to upload dir\n";
+        open (ADD_MAILLIST,">$upload_file_abs");
+        foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
+            print "   * $member\n";
+            print ADD_MAILLIST "$member\n";
+        }
+        close('ADD_MAILLIST');
+
     }
+
+    # KEEP_MAILLIST
+    # nothing to do, maillist and members are kept as is
+
     # UPDATE_MAILLIST
     foreach my $maillist (@{ $action{'ACTIONLIST'}{'UPDATE_MAILLIST'} }){
          # filename UPDATE_MAILLIST_name.txt
     }
+
     # DELETE_MAILLIST
     foreach my $maillist (@{ $action{'ACTIONLIST'}{'DELETE_MAILLIST'} }){
          # filename DELETE_MAILLIST_name.txt
