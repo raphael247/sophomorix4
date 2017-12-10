@@ -612,7 +612,7 @@ sub belwue_maildata_check {
 
     # create walk through lists ADD/KEEP/DELETE
     print "\n";
-    print "ACTION:\n";
+    print "ACTION MAILBOXES:\n";
     foreach my $user (keys %{ $action{'MAILBOXES'} } ){
         if ($action{'MAILBOXES'}{$user}{'ACTION'} eq "KEEP"){
             #print "   KEEP:   $user\n";
@@ -680,14 +680,18 @@ sub belwue_maildata_check {
     open (LIST, "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILLISTS'}");
     while (<LIST>){
         #print "$_";
+        chomp();
         my ($maillist,$string)=split(/:/);
+        my @members=split(/,/,$string);
 	#print "ML: $maillist\n";
         $action{'MAILLISTS'}{$maillist}{'BELWUE'}="EXISTS";
+        push @{ $action{'MAILLISTS'}{$maillist}{'MEMBERS'} }, @members;
+
         push @belwue_maillist_tmp, $maillist;
     }
     close(LIST);
 
-    # Walk through AD maillists, decide ADD/KEEP
+    # Walk through AD maillists, decide ADD/KEEP/UPDATE
     print "Maillists for school $school:\n";
     foreach my $maillist (@{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} }){
 	print "MAILLIST: $maillist\n";
@@ -695,6 +699,8 @@ sub belwue_maildata_check {
             print "  * Maillist $maillist: nothing to do\n";
             $action{'MAILLISTS'}{$maillist}{'AD'}="EXISTS";
             $action{'MAILLISTS'}{$maillist}{'ACTION'}="KEEP";
+            # ... test for update, matching users?
+            
         } else {
             print "  * Maillist: $maillist ADD\n";
             $action{'MAILLISTS'}{$maillist}{'AD'}="EXISTS";
@@ -710,18 +716,51 @@ sub belwue_maildata_check {
         }
     }
 
-    # ADD MAILLIST file erzeugen
 
-    # DELETE MAILLIST file erzeugen
+    # create walk through lists ADD/KEEP/DELETE
+    print "\n";
+    print "ACTION MAILLISTS:\n";
+    foreach my $maillist (keys %{ $action{'MAILLISTS'} } ){
+        if ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "KEEP"){
+            print "   KEEP:   $maillist\n";
+            push @{ $action{'ACTIONLIST'}{'KEEP_MAILLIST'} }, $maillist;
+        } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "DELETE"){
+            print "   DELETE: $maillist\n";
+            push @{ $action{'ACTIONLIST'}{'DELETE_MAILLIST'} }, $maillist;
+        } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "UPDATE"){
+            print "   UPDATE: $maillist\n";
+            push @{ $action{'ACTIONLIST'}{'UPDATE_MAILLIST'} }, $maillist;
+        } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "ADD"){
+            print "   ADD:    $maillist\n";
+            push @{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }, $maillist;
+            # create file with users
 
-    # update members list erzeugen
+        } else {
+            print "##########################unknown #######:    $maillist\n";
+        }
+    }
+    
+    # write the files
+
+    # ADD_MAILLIST
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
+         # filename ADD_MAILLIST_name.txt
+    }
+    # UPDATE_MAILLIST
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'UPDATE_MAILLIST'} }){
+         # filename UPDATE_MAILLIST_name.txt
+    }
+    # DELETE_MAILLIST
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'DELETE_MAILLIST'} }){
+         # filename DELETE_MAILLIST_name.txt
+    }
 
     # sophomorix-gruppe sollte auch eine maillist anlegen
     # (zusammenlegen von hausmeister, teachers, zu kollegium )
 
 
 
-#    my $ref_action=\%action;
+    my $ref_action=\%action;
 #print Dumper( $ref_action );
 #print Dumper( $ref_action->{'MAILLISTS'} );
     # print "bz:\n";
