@@ -206,6 +206,10 @@ foreach my $school (@sharelist){
 
     # decide which sub to use
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
+        # firstpassword stuff
+        $mailconf{'PWD'}{'FIRSTPWD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+            "/belwue/".$school."/".$school.".belwue.firstpassword";
+        
         # download stuff
         $mailconf{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
             "/belwue/".$school."/".$school.".belwue.downloads";
@@ -220,6 +224,7 @@ foreach my $school (@sharelist){
         $mailconf{'DOWNLOAD_FILES'}{'ALIASES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
             "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.aliases";
 
+        # upload stuff
         $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
             "/belwue/".$school."/".$school.".belwue.uploads";
         $mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
@@ -581,6 +586,9 @@ sub belwue_maildata_check {
     my %action=();
     my @belwue_tmp=();
 
+    system("mkdir -p $ref_mailconf->{'PWD'}{'FIRSTPWD_DIR'}");
+
+
     # MAILBOXES
     ############################################################
     open (BOX, "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILBOXES'}");
@@ -639,10 +647,12 @@ sub belwue_maildata_check {
     # write the files
     # ADD
     system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
-    open (ADD,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}");
-    print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
 
     my @password_chars=&get_passwd_charlist();
+    
+    if ( $#{ $action{'ACTIONLIST'}{'ADD'} }>-1 ){
+        open (ADD,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}");
+    print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
     foreach my $user (@{ $action{'ACTIONLIST'}{'ADD'} }){
         my $alias="";
         if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
@@ -650,12 +660,31 @@ sub belwue_maildata_check {
         }
 
         my $file=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixAdminFile'};
-        my $plain_password=&get_plain_password(
-                           $ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'},
-                           $file,
-                           $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
-                           $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
-                           @password_chars);
+
+
+        my $plain_password;
+        my $pwd_file=$ref_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
+        if ( -f $pwd_file ){
+            $plain_password=`cat $pwd_file`;
+            open (PWD,"<$pwd_file");
+            while (<PWD>){
+                print "LINE: $_\n";
+                $plain_password=$_;
+            }
+            close(PWD);
+        } else {
+            $plain_password=&get_plain_password(
+                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'},
+                            $file,
+                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
+                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
+                            @password_chars);
+            # save password in file
+            open (PWD,">$pwd_file");
+            print PWD $plain_password;
+            close(PWD);
+	}
+        # write entry
         my $mailquota=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
         print ADD "$user\t".
                   "$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}\t".
@@ -665,6 +694,7 @@ sub belwue_maildata_check {
                   "$alias\n";
     }
     close(ADD);
+	 }
 
     # DELETE
     system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
