@@ -82,10 +82,16 @@ my $school="";
 my $user="";
 $Conf::log_level=1;
 
+# belwue options
+my $download_belwue_data=0;
+my $analyze_belwue_data=0;
+
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "download-belwue-data" => \$download_belwue_data,
+           "analyze-belwue-data" => \$analyze_belwue_data,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "school|share|s=s" => \$school,
@@ -102,6 +108,22 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
+
+
+# no option --> do all
+if ($download_belwue_data==0 and
+    $analyze_belwue_data==0){
+    # analyze and download
+    $download_belwue_data=1;
+    $analyze_belwue_data=1;
+} elsif ($download_belwue_data==1){
+    # only download
+    $analyze_belwue_data=0;
+} elsif ($analyze_belwue_data==1){
+    # only analyze
+    $download_belwue_data=0;
+}
+
 
 
 # --help
@@ -184,7 +206,7 @@ if ($info==1){
 ################################################################################
 # continue with the calculated mail from $ref_mail
 ################################################################################
-my %mailconf=();
+#my %mailconf=();
 
 # setting up mailconf
 foreach my $school (@sharelist){
@@ -204,23 +226,23 @@ foreach my $school (@sharelist){
     # decide which sub to use
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
         # belwue
-        my $ref_belwue_mailconf=&belwue_maildata_config($school,
-            $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+        my $ref_belwue_mailconf=&belwue_maildata_config(
+            $school,
             $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-            \%mailconf,
-            $ref_mail,
             \%sophomorix_config);
-#        &belwue_maildata_fetch($school,
-#            $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-#            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-#            $ref_belwue_mailconf,
-#            \%sophomorix_config);
-        &belwue_maildata_check($school,
-            $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-            $ref_belwue_mailconf,
-            $ref_mail,
-            \%sophomorix_config);
+	if ($download_belwue_data==1){
+            &belwue_maildata_fetch(
+                $school,
+                $ref_belwue_mailconf,
+                \%sophomorix_config);
+        }
+	if ($analyze_belwue_data==1){
+            &belwue_maildata_check(
+                $school,
+                $ref_belwue_mailconf,
+                $ref_mail,
+                \%sophomorix_config);
+        }
     } else {
         print "\n\nERROR: $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} not known\n";
         exit;
@@ -293,10 +315,10 @@ sub wget_return {
 
 
 sub belwue_maildata_config {
-    my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
+    my ($school,$mailconf,$ref_sophomorix_config)=@_;
     my %belwue_mailconf=();
     my $ref_belwue_mailconf=\%belwue_mailconf;
-    &print_title("Fetching maildata for school $school: $mailtype");
+    &print_title("Fetching maildata for school $school:");
     tie %{ $ref_belwue_mailconf->{'CONFIG'} }, 'Config::IniFiles',
         ( -file => $mailconf, 
           -handle_trailing_comment => 1,
@@ -354,7 +376,7 @@ sub belwue_maildata_config {
 
 
 sub belwue_maildata_fetch {
-    my ($school,$mailtype,$mailconf,$ref_belwue_mailconf,$ref_sophomorix_config)=@_;
+    my ($school,$ref_belwue_mailconf,$ref_sophomorix_config)=@_;
     my %belwue=();
     
     ############################################################
@@ -600,7 +622,7 @@ sub belwue_maildata_fetch {
 
 
 sub belwue_maildata_check {
-    my ($school,$mailtype,$mailconf,$ref_belwue_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
+    my ($school,$ref_belwue_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
     my %action=();
     my @belwue_tmp=();
 
