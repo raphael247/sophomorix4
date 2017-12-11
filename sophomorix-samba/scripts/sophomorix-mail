@@ -203,24 +203,24 @@ foreach my $school (@sharelist){
 
     # decide which sub to use
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
-        
-    my $ref_belwue_mailconf=&belwue_maildata_config($school,
-        $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-        $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-        \%mailconf,
-        $ref_mail,
-        \%sophomorix_config);
-    &belwue_maildata_fetch($school,
-        $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-        $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-        $ref_belwue_mailconf,
-        \%sophomorix_config);
-    &belwue_maildata_check($school,
-        $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-        $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-        $ref_belwue_mailconf,
-        $ref_mail,
-        \%sophomorix_config);
+        # belwue
+        my $ref_belwue_mailconf=&belwue_maildata_config($school,
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+            \%mailconf,
+            $ref_mail,
+            \%sophomorix_config);
+#        &belwue_maildata_fetch($school,
+#            $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+#            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+#            $ref_belwue_mailconf,
+#            \%sophomorix_config);
+        &belwue_maildata_check($school,
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+            $ref_belwue_mailconf,
+            $ref_mail,
+            \%sophomorix_config);
     } else {
         print "\n\nERROR: $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} not known\n";
         exit;
@@ -407,7 +407,7 @@ sub belwue_maildata_fetch {
     ############################################################
     # downloading
     ############################################################ 
-    print "Downloading Objects page:\n";
+    print "Downloading/parsing Objects page:\n";
     system("mkdir -p $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}");
     system("mkdir -p $ref_belwue_mailconf->{'RESULT_FILES'}{'DATA_DIR'}");
 
@@ -440,22 +440,27 @@ sub belwue_maildata_fetch {
     $table_extract->parse_file($html_doc);
     my ($table) = $table_extract->tables;
     print "... done with Objects page:\n";
+    print "Downloading/parsing html pages:\n";
 
     foreach my $row ($table->rows) {
         my ($object,$type,$storage,$access)=@$row;
-        print "  Object: $object\n";
-        print "  Type: $type\n";
         if (not defined $storage){
             $storage="---";
         }
         if (not defined $access){
             $access="---";
         }
-        print "  Storage: $storage\n";
-        print "  Access: $access\n";
         if (not defined $access){
             $access="never";
         }
+
+        if($Conf::log_level>=2){
+            print "      Object: $object\n";
+            print "      Type: $type\n";
+            print "      Storage: $storage\n";
+            print "      Access: $access\n";
+        }
+
         # add to types
         if ($type eq "Mailingliste"){
             $belwue{'maillist'}{$object}{'type'}=$type;
@@ -531,44 +536,61 @@ sub belwue_maildata_fetch {
 
     # MAILBOXES
     @{ $belwue{'LISTS'}{'MAILBOXES'} } = sort @{ $belwue{'LISTS'}{'MAILBOXES'} };
-    print "\nMultiMailboxes:\n";
+    print "MultiMailboxes:\n";
     my $num_mbox=1;
+
+    my $mailbox_num=$#{ $belwue{'LISTS'}{'MAILBOXES'} }+1;
+    print "   $mailbox_num MAILBOXES at belwue.\n";
     foreach my $uid (@{ $belwue{'LISTS'}{'MAILBOXES'} }){
         print BOX $uid.";\n";
-        print "   $num_mbox) $uid\n";
+        if($Conf::log_level>=2){
+            print "   $num_mbox) $uid\n";
+        }
         $num_mbox++;
     }
 
     # MAILLISTS
     @{ $belwue{'LISTS'}{'MAILLISTS'} } = sort @{ $belwue{'LISTS'}{'MAILLISTS'} };
-    print "\nMailing Lists:\n";
+    my $maillist_num=$#{ $belwue{'LISTS'}{'MAILLISTS'} }+1;
+    print "Mailing Lists:\n";
+    print "   $maillist_num MAILLISTS at belwue.\n";
     foreach my $list ( @{ $belwue{'LISTS'}{'MAILLISTS'} } ){
         my $member_string=join(",",@{ $belwue{'maillist'}{$list}{'memberlist'} });
+        my $member_num=$#{ $belwue{'maillist'}{$list}{'memberlist'} }+1;
         print LIST "$list:$member_string\n";
-        print "   * $list\n";
+        if($Conf::log_level>=2){
+            print "   * $list ($member_num members)\n";
+        }
         my $num_list=1;
         foreach my $member ( @{ $belwue{'maillist'}{$list}{'memberlist'} } ){
             if (not defined $member){
                 next;
             } 
-            print "     $num_list) --> $member\n";
+            if($Conf::log_level>=2){
+                print "     $num_list) --> $member\n";
+            }
             $num_list++;
         }
     }
 
     # ALIASES
     @{ $belwue{'LISTS'}{'ALIASES'} } = sort @{ $belwue{'LISTS'}{'ALIASES'} };
-    print "\nMail Aliase:\n";
+    print "Mail Aliase:\n";
+    my $mailalias_num=$#{ $belwue{'LISTS'}{'ALIASES'} };
+    print "   $mailalias_num MAILALIAS at belwue.\n";
     my $num=1;
     foreach my $alias ( @{ $belwue{'LISTS'}{'ALIASES'} }){
         print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
-        print "   $num) $alias --> $belwue{'alias'}{$alias}\n";
-        $num++
+        if($Conf::log_level>=2){
+            print "   $num) $alias --> $belwue{'alias'}{$alias}\n";
+        }
+        $num++;
     }
 
     close(BOX);
     close(ALIAS);
     close(LIST);
+    print "\n";
 
     if($Conf::log_level>=2){
         print Dumper(\%belwue);
@@ -594,17 +616,14 @@ sub belwue_maildata_check {
         push @belwue_tmp, $user;
     }
     close(BOX);
+
     # mailaccounts
     # Walk through AD users, decide ADD/KEEP
-    print "Mailaccounts for school $school:\n";
     foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
-	print "USER: $user\n";
         if (exists $action{'MAILBOXES'}{$user}){
-            print "  * Mailbox $user: nothing to do\n";
             $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
             $action{'MAILBOXES'}{$user}{'ACTION'}="KEEP";
         } else {
-            print "  * Mailbox $user: ADD\n";
             $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
             $action{'MAILBOXES'}{$user}{'ACTION'}="ADD";
         }
@@ -622,13 +641,13 @@ sub belwue_maildata_check {
     print "ACTION MAILBOXES:\n";
     foreach my $user (keys %{ $action{'MAILBOXES'} } ){
         if ($action{'MAILBOXES'}{$user}{'ACTION'} eq "KEEP"){
-            #print "   KEEP:   $user\n";
+            print "   KEEP:   $user\n";
             push @{ $action{'ACTIONLIST'}{'KEEP'} }, $user;
         } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "DELETE"){
-            #print "   DELETE: $user\n";
+            print "   DELETE: $user\n";
             push @{ $action{'ACTIONLIST'}{'DELETE'} }, $user;
         } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "ADD"){
-            #print "   ADD:    $user\n";
+            print "   ADD:    $user\n";
             push @{ $action{'ACTIONLIST'}{'ADD'} }, $user;
         } else {
             print "##########################unknown #######:    $user\n";
@@ -648,49 +667,46 @@ sub belwue_maildata_check {
     
     if ( $#{ $action{'ACTIONLIST'}{'ADD'} }>-1 ){
         open (ADD,">$ref_belwue_mailconf->{'UPLOAD_FILES'}{'MAILBOXES_ADD'}");
-    print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
-    foreach my $user (@{ $action{'ACTIONLIST'}{'ADD'} }){
-        my $alias="";
-        if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
-            $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
-        }
-
-        my $file=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixAdminFile'};
-
-
-        my $plain_password;
-        my $pwd_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
-        if ( -f $pwd_file ){
-            $plain_password=`cat $pwd_file`;
-            open (PWD,"<$pwd_file");
-            while (<PWD>){
-                print "LINE: $_\n";
-                $plain_password=$_;
+        print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
+        foreach my $user (@{ $action{'ACTIONLIST'}{'ADD'} }){
+            my $alias="";
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
+                $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
             }
-            close(PWD);
-        } else {
-            $plain_password=&get_plain_password(
-                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'},
-                            $file,
-                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
-                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
-                            @password_chars);
-            # save password in file
-            open (PWD,">$pwd_file");
-            print PWD $plain_password;
-            close(PWD);
-	}
-        # write entry
-        my $mailquota=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
-        print ADD "$user\t".
+
+            my $file=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixAdminFile'};
+            my $plain_password;
+            my $pwd_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
+            if ( -f $pwd_file ){
+                $plain_password=`cat $pwd_file`;
+                open (PWD,"<$pwd_file");
+                while (<PWD>){
+                    $plain_password=$_;
+                }
+                close(PWD);
+            } else {
+                $plain_password=&get_plain_password(
+                                $ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'},
+                                $file,
+                                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
+                                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
+                                @password_chars);
+                # save password in file
+                open (PWD,">$pwd_file");
+                print PWD $plain_password;
+                close(PWD);
+	    }
+            # write entry
+            my $mailquota=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
+            print ADD "$user\t".
                   "$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}\t".
                   "MultiMailbox\t".
                   "$plain_password\t".
                   "${mailquota}M\t".
                   "$alias\n";
+        }
+        close(ADD);
     }
-    close(ADD);
-	 }
 
     # DELETE
     system("mkdir -p $ref_belwue_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
@@ -708,11 +724,9 @@ sub belwue_maildata_check {
 
     open (LIST, "<$ref_belwue_mailconf->{'RESULT_FILES'}{'MAILLISTS'}");
     while (<LIST>){
-        #print "$_";
         chomp();
         my ($maillist,$string)=split(/:/);
         my @members=split(/,/,$string);
-	#print "ML: $maillist\n";
         $action{'MAILLISTS'}{$maillist}{'BELWUE'}="EXISTS";
 
         push @{ $action{'MAILLISTS'}{$maillist}{'MEMBERS'} }, @members;
@@ -721,17 +735,15 @@ sub belwue_maildata_check {
     close(LIST);
 
     # Walk through AD maillists, decide ADD/KEEP/UPDATE
-    print "Maillists for school $school:\n";
     foreach my $maillist (@{ $ref_mail->{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} }){
-	print "MAILLIST: $maillist\n";
         if (exists $action{'MAILLISTS'}{$maillist}){
-            print "  * Maillist $maillist: nothing to do\n";
+            #print "  * Maillist $maillist: nothing to do\n";
             $action{'MAILLISTS'}{$maillist}{'AD'}="EXISTS";
             $action{'MAILLISTS'}{$maillist}{'ACTION'}="KEEP";
             # ... test for update, matching users?
             
         } else {
-            print "  * Maillist: $maillist ADD\n";
+            #print "  * Maillist: $maillist ADD\n";
             $action{'MAILLISTS'}{$maillist}{'AD'}="EXISTS";
             $action{'MAILLISTS'}{$maillist}{'ACTION'}="ADD";
         }
@@ -741,7 +753,7 @@ sub belwue_maildata_check {
     foreach my $belwue_maillist (@belwue_maillist_tmp){
         if (not exists $ref_mail->{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$belwue_maillist}){
             $action{'MAILLISTS'}{$belwue_maillist}{'ACTION'}="DELETE";
-            print "  * Maillist: $belwue_maillist DELETE\n";
+            #print "  * Maillist: $belwue_maillist DELETE\n";
         }
     }
 
@@ -772,9 +784,8 @@ sub belwue_maildata_check {
     # write the files
 
     # ADD_MAILLIST
-print Dumper($ref_belwue_mailconf);
-  
-   foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
+    print "\n";
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
         # filename ADD_MAILLIST_name.txt
         my $upload_file="ADD_MAILLIST_".$school.".belwue.".$maillist.".txt";
         my $upload_file_abs=$ref_belwue_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}."/".$upload_file;
