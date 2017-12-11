@@ -140,6 +140,42 @@ if ($restart==1){
 
 
 
+# --schema-load
+if ($schema_load==1){
+    print "\nLoading sophomorix schema into ldap\n\n";
+    my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
+    &samba_stop();
+    my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
+    print "$command\n";
+    system($command);
+    &samba_start();
+}
+
+
+
+# --restore-samba
+if ($restore_samba ne ""){
+    print "\nRestoring samba databases with suffix -$restore_samba\n\n";
+    &samba_stop();
+    my @ldb_files = &get_ldb_files();
+    print "##### restoring ldb files: #####\n";
+    foreach my $ldb (@ldb_files){
+        my $command="cp -v ${samba_private}/${ldb}-${restore_samba} ${samba_private}/${ldb} ";
+        #print "  $command\n";
+        system($command);
+    } 
+    my @ldb_files_d = &get_ldb_d_files();
+    print "##### restoring ldb files: #####\n";
+    foreach my $ldb_d (@ldb_files_d){
+        my $command="cp -v ${samba_private_d}/${ldb_d}-${restore_samba} ${samba_private_d}/${ldb_d} ";
+        #print "  $command\n";
+        system($command);
+    } 
+    &samba_start();
+}
+
+
+
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
@@ -209,41 +245,6 @@ if ($backup_samba ne ""){
         system($command);
     } 
     exit;
-}
-
-
-# --restore-samba
-if ($restore_samba ne ""){
-    print "\nRestoring samba databases with suffix -$restore_samba\n\n";
-    &samba_stop();
-    my @ldb_files = &get_ldb_files();
-    print "##### restoring ldb files: #####\n";
-    foreach my $ldb (@ldb_files){
-        my $command="cp -v ${samba_private}/${ldb}-${restore_samba} ${samba_private}/${ldb} ";
-        #print "  $command\n";
-        system($command);
-    } 
-    my @ldb_files_d = &get_ldb_d_files();
-    print "##### restoring ldb files: #####\n";
-    foreach my $ldb_d (@ldb_files_d){
-        my $command="cp -v ${samba_private_d}/${ldb_d}-${restore_samba} ${samba_private_d}/${ldb_d} ";
-        #print "  $command\n";
-        system($command);
-    } 
-    &samba_start();
-}
-
-
-
-# --schema-load
-if ($schema_load==1){
-    print "\nLoading sophomorix schema into ldap\n\n";
-    my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
-    &samba_stop();
-    my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
-    print "$command\n";
-    system($command);
-    &samba_start();
 }
 
 
