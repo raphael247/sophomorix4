@@ -652,7 +652,6 @@ sub belwue_maildata_check {
 
     system("mkdir -p $ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}");
 
-
     # MAILBOXES
     ############################################################
     open (BOX, "<$ref_belwue_mailconf->{'RESULT'}{'MAILBOXES'}");
@@ -778,6 +777,15 @@ sub belwue_maildata_check {
     open (DELETE,">$ref_belwue_mailconf->{'UPLOAD'}{'MAILBOXES_DELETE'}");
     foreach my $user (@{ $action{'ACTIONLIST'}{'DELETE'} }){
         print DELETE $user."\n";
+        # delete cached firstpassword/logindata, when user disappears in AD
+        my $pwd_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
+        my $login_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".txt";
+        if ( -f $pwd_file ){
+            system("rm $pwd_file");
+        }
+        if ( -f $login_file ){
+            system("rm $login_file");
+        }
     }
     close(DELETE);
 
