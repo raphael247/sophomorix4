@@ -165,9 +165,6 @@ my $ref_mail=&AD_get_quota({ldap=>$ldap,
                              sophomorix_config=>\%sophomorix_config,
                            });
 
-# print Dumper($ref_mail);
-# print Dumper($ref_mail->{'QUOTA'}{'USERS'}{'blackmri42'});
-# print Dumper($ref_mail->{'QUOTA'}{'USERS'}{'lordjo42'});
 
 
 if ($info==1){
@@ -179,9 +176,10 @@ if ($info==1){
                 hash_ref=>$ref_mail,
                 sophomorix_config=>\%sophomorix_config,
               });
-
     exit;
 }
+
+
 
 ################################################################################
 # continue with the calculated mail from $ref_mail
@@ -203,67 +201,31 @@ foreach my $school (@sharelist){
         next;
     } 
 
-
     # decide which sub to use
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
         
-        my $ref_belwue_mailconf=&belwue_maildata_config($school,
-                                $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-                                $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-                                \%mailconf,
-                                $ref_mail,
-                                \%sophomorix_config);
-        # # firstpassword dir
-        # $mailconf{'PWD'}{'FIRSTPWD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.firstpassword";
-        
-        # # download dir
-        # $mailconf{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.downloads";
-
-        # # result dir/files  ??? DOWNLOAD_FILES  RESULT_FILES
-        # $mailconf{'RESULT_FILES'}{'DATA_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.data";
-
-        # $mailconf{'RESULT_FILES'}{'MAILBOXES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.multimailboxes";
-        # $mailconf{'RESULT_FILES'}{'MAILLISTS'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.maillists";
-        # $mailconf{'RESULT_FILES'}{'ALIASES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.aliases";
-
-        # # upload dir/files
-        # $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.uploads";
-        # $mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.uploads/".
-        #     "ADD_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
-        # $mailconf{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-        #     "/belwue/".$school."/".$school.".belwue.uploads/".
-        #     "DELETE_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
-
-#print Dumper($ref_belwue_mailconf);
-#	exit;
-        &belwue_maildata_fetch($school,
-                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-#                               \%mailconf,
-                               $ref_belwue_mailconf,
-                               \%sophomorix_config);
-       &belwue_maildata_check($school,
-                              $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-                              $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-#                              \%mailconf,
-                              $ref_belwue_mailconf,
-                              $ref_mail,
-                              \%sophomorix_config);
+    my $ref_belwue_mailconf=&belwue_maildata_config($school,
+        $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+        $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+        \%mailconf,
+        $ref_mail,
+        \%sophomorix_config);
+    &belwue_maildata_fetch($school,
+        $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+        $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+        $ref_belwue_mailconf,
+        \%sophomorix_config);
+    &belwue_maildata_check($school,
+        $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+        $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+        $ref_belwue_mailconf,
+        $ref_mail,
+        \%sophomorix_config);
     } else {
         print "\n\nERROR: $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} not known\n";
         exit;
     }
-
 }
-
 
 
 
@@ -291,9 +253,6 @@ sub bind_belwue_admin {
     if($Conf::log_level>=3){
         print "   Checking Belwue connection ...\n";
     }
-
-print Dumper($ref_belwue_mailconf);
-
 
     # bind
     if($Conf::log_level>=3){
@@ -331,6 +290,8 @@ sub wget_return {
     }
 }
 
+
+
 sub belwue_maildata_config {
     my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
     my %belwue_mailconf=();
@@ -366,7 +327,7 @@ sub belwue_maildata_config {
     $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
         "/belwue/".$school."/".$school.".belwue.downloads";
 
-    # result dir/files  ??? DOWNLOAD_FILES  RESULT_FILES
+    # result dir/files
     $ref_belwue_mailconf->{'RESULT_FILES'}{'DATA_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
         "/belwue/".$school."/".$school.".belwue.data";
 
@@ -391,41 +352,14 @@ sub belwue_maildata_config {
 }
 
 
+
 sub belwue_maildata_fetch {
     my ($school,$mailtype,$mailconf,$ref_belwue_mailconf,$ref_sophomorix_config)=@_;
     my %belwue=();
-
-    # &print_title("Fetching maildata for school $school: $mailtype");
-    # print "   * Config: $mailconf\n";
-    # # read the config
-    # tie %{ $ref_mailconf->{'CONFIG'} }, 'Config::IniFiles',
-    #     ( -file => $mailconf, 
-    #       -handle_trailing_comment => 1,
-    #     );
-
-    # # calculate connect data
-    # $ref_mailconf->{'CONNECT'}{BASE}="CN=".$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-    # $ref_mailconf->{'CONNECT'}{BASESIMPLE}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-    # $ref_mailconf->{'CONNECT'}{SCOPE}="sub";
-    # $ref_mailconf->{'CONNECT'}{FILTER}="(cn=*)";
-    # $ref_mailconf->{'CONNECT'}{HOST}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PROTOCOL}."://".
-    #                                  $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.":".
-    #                                  $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PORT};
-
-    # $ref_mailconf->{'CONNECT'}{ADMINUSER}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{ADMINUSER}.
-    #                                       "@".
-    #                                       $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-    # $ref_mailconf->{'CONNECT'}{ADMINURL}="https://".
-    #                                      $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.
-    #                                      ":9010/DomainAdmin";
-    # $ref_mailconf->{'CONNECT'}{PASSWORD}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PASSWORD};
-
-    # print Dumper(\%mailconf);
     
     ############################################################
     # ldap address book
     ############################################################ 
-
     print "Accessing Belwue addressbook via ldap\n";
     my ($ldap) = &bind_belwue_admin($ref_belwue_mailconf);
     my $mesg = $ldap->search(
@@ -467,7 +401,6 @@ sub belwue_maildata_fetch {
         $belwue{'OBJECTS'}{$uid}{'mail'}=$mail;
         $belwue{'OBJECTS'}{$uid}{'sn'}=$sn;
         $belwue{'OBJECTS'}{$uid}{'uid'}=$uid;
-        #print Dumper(\%belwue);
     }
     &unbind_belwue_admin($ldap); 
 
@@ -494,7 +427,6 @@ sub belwue_maildata_fetch {
     ############################################################
     # parsing
     ############################################################
-
     # file to parse
     my $html_doc = $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}."/objects.html";
     print "   * Parsing $html_doc\n";
