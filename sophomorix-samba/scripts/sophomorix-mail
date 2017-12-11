@@ -206,44 +206,55 @@ foreach my $school (@sharelist){
 
     # decide which sub to use
     if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} eq "belwue"){
-        # firstpassword stuff
-        $mailconf{'PWD'}{'FIRSTPWD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.firstpassword";
         
-        # download stuff
-        $mailconf{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.downloads";
+        my $ref_belwue_mailconf=&belwue_maildata_config($school,
+                                $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+                                $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+                                \%mailconf,
+                                $ref_mail,
+                                \%sophomorix_config);
+        # # firstpassword dir
+        # $mailconf{'PWD'}{'FIRSTPWD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.firstpassword";
+        
+        # # download dir
+        # $mailconf{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.downloads";
 
-        $mailconf{'DOWNLOAD_FILES'}{'DATA_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.data";
+        # # result dir/files  ??? DOWNLOAD_FILES  RESULT_FILES
+        # $mailconf{'RESULT_FILES'}{'DATA_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.data";
 
-        $mailconf{'DOWNLOAD_FILES'}{'MAILBOXES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.multimailboxes";
-        $mailconf{'DOWNLOAD_FILES'}{'MAILLISTS'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.maillists";
-        $mailconf{'DOWNLOAD_FILES'}{'ALIASES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.aliases";
+        # $mailconf{'RESULT_FILES'}{'MAILBOXES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.multimailboxes";
+        # $mailconf{'RESULT_FILES'}{'MAILLISTS'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.maillists";
+        # $mailconf{'RESULT_FILES'}{'ALIASES'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.aliases";
 
-        # upload stuff
-        $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.uploads";
-        $mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.uploads/".
-            "ADD_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
-        $mailconf{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
-            "/belwue/".$school."/".$school.".belwue.uploads/".
-            "DELETE_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+        # # upload dir/files
+        # $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.uploads";
+        # $mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.uploads/".
+        #     "ADD_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+        # $mailconf{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}=$sophomorix_config{'INI'}{'PATHS'}{'MAIL'}.
+        #     "/belwue/".$school."/".$school.".belwue.uploads/".
+        #     "DELETE_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
 
-
-#        &belwue_maildata_fetch($school,
-#                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
-#                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
+#print Dumper($ref_belwue_mailconf);
+#	exit;
+        &belwue_maildata_fetch($school,
+                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
+                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
 #                               \%mailconf,
-#                               \%sophomorix_config);
+                               $ref_belwue_mailconf,
+                               \%sophomorix_config);
        &belwue_maildata_check($school,
                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'},
                               $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'},
-                              \%mailconf,
+#                              \%mailconf,
+                              $ref_belwue_mailconf,
                               $ref_mail,
                               \%sophomorix_config);
     } else {
@@ -275,22 +286,25 @@ foreach my $school (@sharelist){
 # subs
 ############################################################
 sub bind_belwue_admin {
-    my ($ref_mailconf)=@_;
+    my ($ref_belwue_mailconf)=@_;
     # check connection 
     if($Conf::log_level>=3){
         print "   Checking Belwue connection ...\n";
     }
 
+print Dumper($ref_belwue_mailconf);
+
+
     # bind
     if($Conf::log_level>=3){
-        print "HOST:      $ref_mailconf->{'CONNECT'}{HOST} \n";
-        print "ADMINUSER: $ref_mailconf->{'CONNECT'}{ADMINUSER} \n";
-        print "PASS:      $ref_mailconf->{'CONNECT'}{PASSWORD}\n";
+        print "HOST:      $ref_belwue_mailconf->{'CONNECT'}{HOST} \n";
+        print "ADMINUSER: $ref_belwue_mailconf->{'CONNECT'}{ADMINUSER} \n";
+        print "PASS:      $ref_belwue_mailconf->{'CONNECT'}{PASSWORD}\n";
     }
-    my $ldap = Net::LDAP->new($ref_mailconf->{'CONNECT'}{HOST});
+    my $ldap = Net::LDAP->new($ref_belwue_mailconf->{'CONNECT'}{HOST});
 
-    my $mesg = $ldap->bind($ref_mailconf->{'CONNECT'}{ADMINUSER}, 
-                      password => $ref_mailconf->{'CONNECT'}{PASSWORD});
+    my $mesg = $ldap->bind($ref_belwue_mailconf->{'CONNECT'}{ADMINUSER}, 
+                      password => $ref_belwue_mailconf->{'CONNECT'}{PASSWORD});
     # show errors from bind
     $mesg->code && die $mesg->error;
     return ($ldap);
@@ -317,57 +331,107 @@ sub wget_return {
     }
 }
 
-
-
-sub belwue_maildata_fetch {
-    my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_sophomorix_config)=@_;
-    my %belwue=();
-
+sub belwue_maildata_config {
+    my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
+    my %belwue_mailconf=();
+    my $ref_belwue_mailconf=\%belwue_mailconf;
     &print_title("Fetching maildata for school $school: $mailtype");
-    print "   * Config: $mailconf\n";
-    # read the config
-    tie %{ $ref_mailconf->{'CONFIG'} }, 'Config::IniFiles',
+    tie %{ $ref_belwue_mailconf->{'CONFIG'} }, 'Config::IniFiles',
         ( -file => $mailconf, 
           -handle_trailing_comment => 1,
         );
 
     # calculate connect data
-    $ref_mailconf->{'CONNECT'}{BASE}="CN=".$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-    $ref_mailconf->{'CONNECT'}{BASESIMPLE}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-    $ref_mailconf->{'CONNECT'}{SCOPE}="sub";
-    $ref_mailconf->{'CONNECT'}{FILTER}="(cn=*)";
-    $ref_mailconf->{'CONNECT'}{HOST}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PROTOCOL}."://".
-                                     $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.":".
-                                     $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PORT};
+    $ref_belwue_mailconf->{'CONNECT'}{BASE}="CN=".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+    $ref_belwue_mailconf->{'CONNECT'}{BASESIMPLE}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+    $ref_belwue_mailconf->{'CONNECT'}{SCOPE}="sub";
+    $ref_belwue_mailconf->{'CONNECT'}{FILTER}="(cn=*)";
+    $ref_belwue_mailconf->{'CONNECT'}{HOST}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{PROTOCOL}."://".
+                                     $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.":".
+                                     $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{PORT};
 
-    $ref_mailconf->{'CONNECT'}{ADMINUSER}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{ADMINUSER}.
+    $ref_belwue_mailconf->{'CONNECT'}{ADMINUSER}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{ADMINUSER}.
                                           "@".
-                                          $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-    $ref_mailconf->{'CONNECT'}{ADMINURL}="https://".
-                                         $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.
+                                          $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+    $ref_belwue_mailconf->{'CONNECT'}{ADMINURL}="https://".
+                                         $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.
                                          ":9010/DomainAdmin";
-    $ref_mailconf->{'CONNECT'}{PASSWORD}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PASSWORD};
+    $ref_belwue_mailconf->{'CONNECT'}{PASSWORD}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{PASSWORD};
 
-    #  "ADMINURL" => "https://mbox1.belwue.de:9010/DomainAdmin",
-    #  "ADMINUSER" => "admin\@bszleo.de",
-    #  "BASE" => "CN=bszleo.de",
-    #  "BASESIMPLE" => "bszleo.de",
-    #  "FILTER" => "(cn=*)",
-    #  "HOST" => "ldaps://mbox1.belwue.de:636",
-    #  "PASSWORD" => "******",
-    #  "SCOPE" => "sub"
-    print Dumper(\%mailconf);
+    # firstpassword dir
+    $ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.firstpassword";
+        
+    # download dir
+    $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.downloads";
+
+    # result dir/files  ??? DOWNLOAD_FILES  RESULT_FILES
+    $ref_belwue_mailconf->{'RESULT_FILES'}{'DATA_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.data";
+
+    $ref_belwue_mailconf->{'RESULT_FILES'}{'MAILBOXES'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.multimailboxes";
+    $ref_belwue_mailconf->{'RESULT_FILES'}{'MAILLISTS'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.maillists";
+    $ref_belwue_mailconf->{'RESULT_FILES'}{'ALIASES'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.data/".$school.".belwue.aliases";
+
+    # upload dir/files
+    $ref_belwue_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.uploads";
+    $ref_belwue_mailconf->{'UPLOAD_FILES'}{'MAILBOXES_ADD'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.uploads/".
+        "ADD_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+    $ref_belwue_mailconf->{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
+        "/belwue/".$school."/".$school.".belwue.uploads/".
+    "DELETE_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+
+    return \%belwue_mailconf;
+}
+
+
+sub belwue_maildata_fetch {
+    my ($school,$mailtype,$mailconf,$ref_belwue_mailconf,$ref_sophomorix_config)=@_;
+    my %belwue=();
+
+    # &print_title("Fetching maildata for school $school: $mailtype");
+    # print "   * Config: $mailconf\n";
+    # # read the config
+    # tie %{ $ref_mailconf->{'CONFIG'} }, 'Config::IniFiles',
+    #     ( -file => $mailconf, 
+    #       -handle_trailing_comment => 1,
+    #     );
+
+    # # calculate connect data
+    # $ref_mailconf->{'CONNECT'}{BASE}="CN=".$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+    # $ref_mailconf->{'CONNECT'}{BASESIMPLE}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+    # $ref_mailconf->{'CONNECT'}{SCOPE}="sub";
+    # $ref_mailconf->{'CONNECT'}{FILTER}="(cn=*)";
+    # $ref_mailconf->{'CONNECT'}{HOST}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PROTOCOL}."://".
+    #                                  $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.":".
+    #                                  $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PORT};
+
+    # $ref_mailconf->{'CONNECT'}{ADMINUSER}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{ADMINUSER}.
+    #                                       "@".
+    #                                       $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+    # $ref_mailconf->{'CONNECT'}{ADMINURL}="https://".
+    #                                      $ref_mailconf->{'CONFIG'}{'ACCOUNT'}{SERVER}.
+    #                                      ":9010/DomainAdmin";
+    # $ref_mailconf->{'CONNECT'}{PASSWORD}=$ref_mailconf->{'CONFIG'}{'ACCOUNT'}{PASSWORD};
+
+    # print Dumper(\%mailconf);
     
     ############################################################
     # ldap address book
     ############################################################ 
 
     print "Accessing Belwue addressbook via ldap\n";
-    my ($ldap) = &bind_belwue_admin($ref_mailconf);
+    my ($ldap) = &bind_belwue_admin($ref_belwue_mailconf);
     my $mesg = $ldap->search(
-                   base   => $ref_mailconf->{'CONNECT'}{BASE},
-                   scope => $ref_mailconf->{'CONNECT'}{SCOPE},
-                   filter => $ref_mailconf->{'CONNECT'}{FILTER},
+                   base   => $ref_belwue_mailconf->{'CONNECT'}{BASE},
+                   scope => $ref_belwue_mailconf->{'CONNECT'}{SCOPE},
+                   filter => $ref_belwue_mailconf->{'CONNECT'}{FILTER},
                         );
 
     my $max = $mesg->count; 
@@ -411,15 +475,15 @@ sub belwue_maildata_fetch {
     # downloading
     ############################################################ 
     print "Downloading Objects page:\n";
-    system("mkdir -p $ref_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}");
-    system("mkdir -p $ref_mailconf->{'DOWNLOAD_FILES'}{'DATA_DIR'}");
+    system("mkdir -p $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}");
+    system("mkdir -p $ref_belwue_mailconf->{'RESULT_FILES'}{'DATA_DIR'}");
 
     # download object list
     my $download_objects_command="wget -q --http-user=admin ".
-         "--http-password=$ref_mailconf->{'CONNECT'}{PASSWORD} ".
-         "--output-document=$ref_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}/objects.html ".
-         "\"$ref_mailconf->{'CONNECT'}{ADMINURL}/$ref_mailconf->{'CONNECT'}{BASESIMPLE}".
-         "/ObjectList.html?domainName=$ref_mailconf->{'CONNECT'}{BASESIMPLE}\"";
+         "--http-password=$ref_belwue_mailconf->{'CONNECT'}{PASSWORD} ".
+         "--output-document=$ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}/objects.html ".
+         "\"$ref_belwue_mailconf->{'CONNECT'}{ADMINURL}/$ref_belwue_mailconf->{'CONNECT'}{BASESIMPLE}".
+         "/ObjectList.html?domainName=$ref_belwue_mailconf->{'CONNECT'}{BASESIMPLE}\"";
 
    if($Conf::log_level>=2){
        print "\nWGET: $download_objects_command\n\n";
@@ -432,7 +496,7 @@ sub belwue_maildata_fetch {
     ############################################################
 
     # file to parse
-    my $html_doc = $ref_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}."/objects.html";
+    my $html_doc = $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}."/objects.html";
     print "   * Parsing $html_doc\n";
 
     # list of headers
@@ -468,10 +532,10 @@ sub belwue_maildata_fetch {
             # downloading maillist data
             ############################################################
             my $download_list_command="wget -q --http-user=admin ".
-                "--http-password=$ref_mailconf->{'CONNECT'}{PASSWORD} ".
-                "--output-document=$ref_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}/$object.html ".
-                "\"$ref_mailconf->{'CONNECT'}{ADMINURL}/$ref_mailconf->{'CONNECT'}{BASESIMPLE}".
-                "/Subscribers.html?InCluster=1&domainName=$ref_mailconf->{'CONNECT'}{BASESIMPLE}".
+                "--http-password=$ref_belwue_mailconf->{'CONNECT'}{PASSWORD} ".
+                "--output-document=$ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}/$object.html ".
+                "\"$ref_belwue_mailconf->{'CONNECT'}{ADMINURL}/$ref_belwue_mailconf->{'CONNECT'}{BASESIMPLE}".
+                "/Subscribers.html?InCluster=1&domainName=$ref_belwue_mailconf->{'CONNECT'}{BASESIMPLE}".
                 "&&listName=$object\"";
             if($Conf::log_level>=2){
                 print "\nWGET: $download_list_command\n\n";
@@ -482,7 +546,7 @@ sub belwue_maildata_fetch {
             ############################################################
             # parsing maillist data
             ############################################################
-            my $html_doc = $ref_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}."/".$object.".html";
+            my $html_doc = $ref_belwue_mailconf->{'DOWNLOAD_FILES'}{'DOWNLOAD_DIR'}."/".$object.".html";
             print "   * Parsing $html_doc\n";
 
             # list of headers
@@ -529,9 +593,9 @@ sub belwue_maildata_fetch {
     ############################################################
     # printout data/write data into files
     ############################################################
-    open (BOX,   ">$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILBOXES'}");
-    open (ALIAS, ">$ref_mailconf->{'DOWNLOAD_FILES'}{'ALIASES'}");
-    open (LIST,  ">$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILLISTS'}");
+    open (BOX,   ">$ref_belwue_mailconf->{'RESULT_FILES'}{'MAILBOXES'}");
+    open (ALIAS, ">$ref_belwue_mailconf->{'RESULT_FILES'}{'ALIASES'}");
+    open (LIST,  ">$ref_belwue_mailconf->{'RESULT_FILES'}{'MAILLISTS'}");
 
     # MAILBOXES
     @{ $belwue{'LISTS'}{'MAILBOXES'} } = sort @{ $belwue{'LISTS'}{'MAILBOXES'} };
@@ -582,16 +646,16 @@ sub belwue_maildata_fetch {
 
 
 sub belwue_maildata_check {
-    my ($school,$mailtype,$mailconf,$ref_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
+    my ($school,$mailtype,$mailconf,$ref_belwue_mailconf,$ref_mail,$ref_sophomorix_config)=@_;
     my %action=();
     my @belwue_tmp=();
 
-    system("mkdir -p $ref_mailconf->{'PWD'}{'FIRSTPWD_DIR'}");
+    system("mkdir -p $ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}");
 
 
     # MAILBOXES
     ############################################################
-    open (BOX, "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILBOXES'}");
+    open (BOX, "<$ref_belwue_mailconf->{'RESULT_FILES'}{'MAILBOXES'}");
     while (<BOX>){
         my ($user)=split(/;/);
         $action{'MAILBOXES'}{$user}{'BELWUE'}="EXISTS";
@@ -646,12 +710,12 @@ sub belwue_maildata_check {
 
     # write the files
     # ADD
-    system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
+    system("mkdir -p $ref_belwue_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
 
     my @password_chars=&get_passwd_charlist();
     
     if ( $#{ $action{'ACTIONLIST'}{'ADD'} }>-1 ){
-        open (ADD,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES_ADD'}");
+        open (ADD,">$ref_belwue_mailconf->{'UPLOAD_FILES'}{'MAILBOXES_ADD'}");
     print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
     foreach my $user (@{ $action{'ACTIONLIST'}{'ADD'} }){
         my $alias="";
@@ -663,7 +727,7 @@ sub belwue_maildata_check {
 
 
         my $plain_password;
-        my $pwd_file=$ref_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
+        my $pwd_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
         if ( -f $pwd_file ){
             $plain_password=`cat $pwd_file`;
             open (PWD,"<$pwd_file");
@@ -697,8 +761,8 @@ sub belwue_maildata_check {
 	 }
 
     # DELETE
-    system("mkdir -p $mailconf{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
-    open (DELETE,">$mailconf{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}");
+    system("mkdir -p $ref_belwue_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}");
+    open (DELETE,">$ref_belwue_mailconf->{'UPLOAD_FILES'}{'MAILBOXES_DELETE'}");
     foreach my $user (@{ $action{'ACTIONLIST'}{'DELETE'} }){
         print DELETE $user."\n";
     }
@@ -710,7 +774,7 @@ sub belwue_maildata_check {
     my %belwue_maillist_tmp=();
     my @belwue_maillist_tmp=();    
 
-    open (LIST, "<$ref_mailconf->{'DOWNLOAD_FILES'}{'MAILLISTS'}");
+    open (LIST, "<$ref_belwue_mailconf->{'RESULT_FILES'}{'MAILLISTS'}");
     while (<LIST>){
         #print "$_";
         chomp();
@@ -776,15 +840,20 @@ sub belwue_maildata_check {
     # write the files
 
     # ADD_MAILLIST
-    foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
+print Dumper($ref_belwue_mailconf);
+  
+   foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
         # filename ADD_MAILLIST_name.txt
         my $upload_file="ADD_MAILLIST_".$school.".belwue.".$maillist.".txt";
-        my $upload_file_abs=$ref_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}."/".$upload_file;
+        my $upload_file_abs=$ref_belwue_mailconf->{'UPLOAD_FILES'}{'UPLOAD_DIR'}."/".$upload_file;
 	print "ADD $upload_file to upload dir\n";
         open (ADD_MAILLIST,">$upload_file_abs");
         foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
-            print "   * $member\n";
-            print ADD_MAILLIST "$member\n";
+            # replace domain
+            my ($user,$domain)=split(/\@/,$member);
+            my $member_mod=$user."\@".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+            print "   * $member_mod\n";
+            print ADD_MAILLIST "$member_mod\n";
         }
         close('ADD_MAILLIST');
 
