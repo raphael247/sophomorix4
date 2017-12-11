@@ -188,33 +188,88 @@ progress-Objekt ausgeben: starte hook script
 
 ------------------------------------------------------------
 
-weiter mail:
+TODO: weiter mail:
 
-upload files erzeugen für belwue
-info files
-aliase fehlen noch
+* aliase testen fehlen noch
+
+
+* external members für maillinglisten in dateien schreiben, die hinzugenommen werden
+
+* --> TODO: AD_get_quota:
+      <user>{'MAIL'}{MAILLISTMEMBER=TRUE/FALSE}
+
+     ??? wie limitiert man mail auf einige rolen, benutzer, gruppen (maillist_users)
+     in belwue.conf
+     MAILBOX_FOR: all
+       -> schon umgestzt
+     MAILBOX_FOR: maillist-members
+       -> alle user, die in einer maillist sind
+
+Erst nach Migration Testbar:
+   upload files erzeugen für belwue
+   (maillisten auswerten (members), upload file nur bei Anpassung
+
+   info files
+
 
 PWD_LENGTH=10 aus belwue_conf nutzen oder nicht???
 
-maillisten auswerten
-
-options
 
 
-??? wie limitiert man mail auf einige rolen, benutzer, gruppen (maillist_users)
-   MAIL_FOR: all
-   MAIL_FOR: maillist-members
-   MAIL_FOR: role1,role2
-   MAIL_FOR: role1,role2
-
-   external members für maillinglisten in dateien schreiben, die hinzugenommen werden
 
 
-     -> alle user, die in einer maillist sind
+------------------------------
+sophomorix-group
+          -class
+	  -project
+  How to display multiple quota in a single line?
+    -> cancel that, use only yes or no (---)
+    -> add number of users and groups
+    -i -p/-c name: Spalten für quota breiter
+    linuxmuster-global umbenennen
 
-   belwue.conf ?? (positivliste)
-   belwue_mail_roles=teacher, student
-   belwue_mail_groups
+sophomorix-group ->
+wie projekte behandeln bezüglich
+    - mailaliase
+    - maillist
+    - addquota
+    - addmailquota
+--> geht das simple (AD_get_quota liest auch sophomorix-group ein)?
+--> Konfigurierbar in sophomorix.ini??
+--> SOPHOMORIX_ATTRIBUTE_GROUPS=PROJECTS
+--> SOPHOMORIX_ATTRIBUTE_GROUPS=PROJECTS_AND_GROUPS
+
+AD_get_quota genutzt von:
+sophomorix-mail, sophomorix-quota
+1) auch sophomorix-group finden (statt nur projects): Konfig
+2) zusatzattribut sophomorixType speichern
+3) projectlisting/grouplisting nutzt dieses Attribut
+--> Im hash alle als 'GROUP' statt 'PROJECTS' speichern
+    sophomorix-mail, sophomorix-quota anpassen
+
+tool bei sophomorix:user
+
+AD_get_quota
+
+
+AD_group_create:
+
+sophomorix-group             project
+---                          share dir, ACL, ...
+---                          auto memberships
+by gadm/hand                 by attributes, maxmenbers, joinable, ...
+
+addquota/addmailquota        dito
+(yes/no)                 
+maillist/mailalias           dito
+
+------------------------------
+
+
+
+
+
+
 sophomorix-mail
 * sorgt dafür dass
   * mailaccounts da sind
@@ -273,7 +328,8 @@ TEACHERUSER=root
    B) scp upload
    C)...
 
-
+Ende Mail
+------------------------------------------------------------
 
 
 
@@ -495,6 +551,7 @@ Undefined subroutine &Sophomorix::SophomorixAPI::fetch_error_string called at /u
 
 ###########################################################
 Entwicklertreffen:
+
 
 Mailserver.
 wird per ssh mit eingerichtet
@@ -740,15 +797,6 @@ wäre wohl besser deren defaultmembers im AD bei der Gruppe zu speichern
 
 
 Attribute Quota als Multivalue name:wert
-
-sophomorix-group
-          -class
-	  -project
-  How to display multiple quota in a single line?
-    -> cancel that, use only yes or no (---)
-    -> add number of users and groups
-    -i -p/-c name: Spalten für quota breiter
-    linuxmuster-global umbenennen
 
 
 Moodle Testzugriff Stefan

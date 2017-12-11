@@ -6192,7 +6192,7 @@ sub AD_group_create {
                                 ]
                             );
            &AD_debug_logdump($result,2,(caller(0))[3]);
-        }else {
+        } else {
             my $result = $ldap->add( $dn,
                                 attr => [
                                     cn   => $cn,
