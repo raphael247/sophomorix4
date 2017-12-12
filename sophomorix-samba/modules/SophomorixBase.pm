@@ -1597,10 +1597,14 @@ sub config_sophomorix_read {
             $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$school;
         # mailconf
         if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} ne "none"){
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONFDIR'}=
+                $DevelConf::path_conf_sophomorix."/".$school."/".
+                $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'};
             $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'}=
                 $DevelConf::path_conf_sophomorix."/".$school."/".
                 $school.".".$sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'}.".conf";
         } else {
+            $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONFDIR'}="none";
             $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'}="none";
         }
     }

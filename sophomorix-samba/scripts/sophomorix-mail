@@ -156,6 +156,11 @@ Download and parse only (no analyzing):
 Analyze the download only (no download/parsing):
   --analyze-belwue-data
 
+Additional members not in the same maildomain:
+  One member per line in
+  /etc/linuxmuster/sophomorix/<school>/belwue/<maillist-name>.txt
+  These are added at the end of the maillist
+
 Please see the sophomorix-mail(8) man pages for full documentation
 ');
    print "\n";
@@ -349,6 +354,9 @@ sub belwue_maildata_config {
         $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'SERVER'}.
         ":9010/DomainAdmin";
     $ref_belwue_mailconf->{'CONNECT'}{'PASSWORD'}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'PASSWORD'};
+
+    # config dir (maillist appendices)
+    $ref_belwue_mailconf->{'CONFIG_DIR'}=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'MAILCONFDIR'};
 
     # logindata dir
     $ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
@@ -792,24 +800,29 @@ sub belwue_maildata_check {
     }
 
     # KEEP (take care about aliases)
+    print "\n";
+    print "ACTION ALIASES:\n";
     if ( $#{ $action{'ACTIONLIST'}{'KEEP'} }>-1 ){
         open (ALIAS_ADD,">$ref_belwue_mailconf->{'UPLOAD'}{'ALIAS_ADD'}");
         open (ALIAS_DELETE,">$ref_belwue_mailconf->{'UPLOAD'}{'ALIAS_DELETE'}");
         foreach my $user (@{ $action{'ACTIONLIST'}{'KEEP'} }){
-            print "KEEP: ".$user."\n";
             if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
                 # user has wrong alias
                 my $alias_AD=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
                 my $alias_belwue=$action{'ALIASES'}{$user}{'BELWUE'};
-                print "   $user must have alias $alias_AD  and has $alias_belwue\n";
                 if ( $alias_belwue ne $alias_AD){
-                     print "   $user has wrong alias $alias_belwue\n";
-                     print ALIAS_ADD "ADD alias ".$alias_AD.
-                                     " to user ".$user." (wrong alias ".
-                                     $alias_belwue." , should be ".$alias_AD.")\n";
-                     print ALIAS_DELETE "DELETE alias ".$alias_belwue.
-                                        " of user ".$user." (wrong alias ".
-                                        $alias_belwue." , should be ".$alias_AD.")\n";
+                     # add
+                     my $add_string="ADD alias ".$alias_AD.
+                                    " to user ".$user." (wrong alias ".
+                                    $alias_belwue." , should be ".$alias_AD.")\n";
+                     print ALIAS_ADD $add_string;
+                     print "   ".$add_string;
+                     # delete
+                     my $del_string="DELETE alias ".$alias_belwue.
+                                    " of user ".$user." (wrong alias ".
+                                    $alias_belwue." , should be ".$alias_AD.")\n";
+                     print ALIAS_DELETE $del_string;
+                     print "   ".$del_string;
                 }
             }
             
@@ -817,17 +830,22 @@ sub belwue_maildata_check {
             if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "FALSE" and 
                 exists $action{'ALIASES'}{$user}{'BELWUE'}){
                 my $alias_belwue=$action{'ALIASES'}{$user}{'BELWUE'};
-                print "   $user must have NO alias, but has alias $alias_belwue\n";
-                print ALIAS_DELETE "DELETE alias ".$alias_belwue.
-                                   " of user ".$user." (no alias configured)\n";
+                # delete
+                my $del_string="DELETE alias ".$alias_belwue.
+                               " of user ".$user." (no alias configured)\n";
+                print ALIAS_DELETE $del_string;
+                print "   ".$del_string;
             }
 
             # user has no alias, but must have one
             if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE" and 
                 not exists $action{'ALIASES'}{$user}{'BELWUE'}){
                 my $alias_AD=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
-                print ALIAS_ADD "ADD alias ".$alias_AD.
-                                " to user ".$user." (alias configured but missing)\n";
+                # add
+                my $add_string="ADD alias ".$alias_AD.
+                               " to user ".$user." (alias configured but missing)\n";
+                print ALIAS_ADD $add_string;
+                print "   ".$add_string;
             }
         }
         close(ALIAS_ADD);
@@ -934,6 +952,20 @@ sub belwue_maildata_check {
             my $member_mod=$user."\@".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
             print "   * $member_mod\n";
             print MAILLIST_ADD "$member_mod\n";
+        }
+        my $appendix_file=$ref_belwue_mailconf->{'CONFIG_DIR'}."/".$maillist.".txt";
+        if (-f $appendix_file ){
+	    #print "HERE:  $appendix_file \n";
+            open(APPENDIX,"<$appendix_file");
+            while(<APPENDIX>){
+                my $line=$_;
+                chomp($line);
+                $line=~s/ //g; # remove whitespace
+                if ($line ne ""){
+                    print MAILLIST_ADD $line."\n";
+                }
+            }
+            close(APPENDIX);
         }
         close('MAILLIST_ADD');
 
