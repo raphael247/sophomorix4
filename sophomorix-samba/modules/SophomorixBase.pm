@@ -1242,18 +1242,21 @@ sub _console_print_mail_full {
         # Walk through users
         print "Mailaccounts:\n";
         foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
-            my $alias="Alias: FALSE";
+            my $alias="ALIAS=F";
+            my $maillistmember="MAILLISTMEMBER=".substr($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLISTMEMBER'},0,1);
             if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
-                $alias=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+                $alias="ALIAS=".$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
             }
             my $user_string="  * ".
-                            $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'mail'}.
+                            $user.
                             " (".
                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}.
-                            ") ".
+                            ", ".
                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}.
                             " MiB, ".
                             $alias.
+                            ", ".
+                            $maillistmember.
                             ")\n";
   
 	    print $user_string;
