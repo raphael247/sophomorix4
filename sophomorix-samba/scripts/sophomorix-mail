@@ -339,6 +339,13 @@ sub belwue_maildata_config {
           -handle_trailing_comment => 1,
         );
 
+    # check some options
+    if ($ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} ne "all" and
+        $ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} ne "maillistmembers"){
+        print "\nERROR: Unknown option for MAILBOX_CREATE: $ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'}\n\n";
+        exit;
+    }
+
     # calculate connect data
     $ref_belwue_mailconf->{'CONNECT'}{'BASE'}="CN=".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
     $ref_belwue_mailconf->{'CONNECT'}{'BASESIMPLE'}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
