@@ -700,20 +700,48 @@ sub belwue_maildata_check {
     # mailaccounts
     # Walk through AD users, decide ADD/KEEP
     foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
-        if (exists $action{'MAILBOXES'}{$user}){
-            $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
-            $action{'MAILBOXES'}{$user}{'ACTION'}="KEEP";
-        } else {
-            $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
-            $action{'MAILBOXES'}{$user}{'ACTION'}="ADD";
+        if ($ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} eq "all"){
+            # all
+            if (exists $action{'MAILBOXES'}{$user}){
+		#print "$user KEEP\n";
+                $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
+                $action{'MAILBOXES'}{$user}{'ACTION'}="KEEP";
+            } else {
+		#print "$user ADD\n";
+                $action{'MAILBOXES'}{$user}{'ACTION'}="ADD";
+                $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
+            }
+        } elsif ($ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} eq "maillistmembers"){
+            # maillistmembers
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLISTMEMBER'} eq "TRUE"){
+                if (exists $action{'MAILBOXES'}{$user}){
+   		    #print "$user KEEP\n";
+                    $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
+                    $action{'MAILBOXES'}{$user}{'ACTION'}="KEEP";
+                } else {
+  		    #print "$user ADD\n";
+                    $action{'MAILBOXES'}{$user}{'AD'}="EXISTS";
+                    $action{'MAILBOXES'}{$user}{'ACTION'}="ADD";
+                }
+	    } else {
+                # mark user as unneeded
+                $action{'MAILBOXES'}{$user}{'ACTION'}="NO_MAILBOX";
+            }
         }
     }
     
     # Walk through belwue users, decide DELETE
     foreach my $belwue_user (@belwue_tmp){
         if (not exists $ref_mail->{'QUOTA'}{'USERS'}{$belwue_user}){
+            # DELETE if NONEXISTING
             $action{'MAILBOXES'}{$belwue_user}{'ACTION'}="DELETE";
-        }
+	} elsif ( $ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} eq "maillistmembers" ){
+            # DELETE if user is not MAILLISTMEMBER=TRUE
+            if ( $ref_mail->{'QUOTA'}{'USERS'}{$belwue_user}{'MAIL'}{'MAILLISTMEMBER'} eq "FALSE" ){
+                $action{'MAILBOXES'}{$belwue_user}{'ACTION'}="DELETE";
+            }
+
+	}
     }
 
     # create walk through lists ADD/KEEP/DELETE
@@ -721,26 +749,41 @@ sub belwue_maildata_check {
     print "ACTION MAILBOXES:\n";
     foreach my $user (keys %{ $action{'MAILBOXES'} } ){
         if ($action{'MAILBOXES'}{$user}{'ACTION'} eq "KEEP"){
-            print "   KEEP:   $user\n";
+            print "   KEEP:        $user\n";
             push @{ $action{'ACTIONLIST'}{'KEEP'} }, $user;
         } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "DELETE"){
-            print "   DELETE: $user\n";
+            print "   DELETE:      $user\n";
             push @{ $action{'ACTIONLIST'}{'DELETE'} }, $user;
         } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "ADD"){
-            print "   ADD:    $user\n";
+            print "   ADD:         $user\n";
             push @{ $action{'ACTIONLIST'}{'ADD'} }, $user;
+        } elsif ($action{'MAILBOXES'}{$user}{'ACTION'} eq "NO_MAILBOX"){
+            print "   NO_MAILBOX:  $user\n";
+            push @{ $action{'ACTIONLIST'}{'NO_MAILBOX'} }, $user;
         } else {
             print "##########################unknown #######:    $user\n";
         }
     }
 
     # sort the result lists for ADD/KEEP/DELETE
-    @{ $action{'ACTIONLIST'}{'KEEP'} } = sort @{ $action{'ACTIONLIST'}{'KEEP'} };
-    @{ $action{'ACTIONLIST'}{'DELETE'} } = sort @{ $action{'ACTIONLIST'}{'DELETE'} };
-    @{ $action{'ACTIONLIST'}{'ADD'} } = sort @{ $action{'ACTIONLIST'}{'ADD'} };
+    if ( $#{ $action{'ACTIONLIST'}{'KEEP'} }>0 ){
+        @{ $action{'ACTIONLIST'}{'KEEP'} } = sort @{ $action{'ACTIONLIST'}{'KEEP'} };
+    }
+    if ( $#{ $action{'ACTIONLIST'}{'DELETE'} }>0 ){
+        @{ $action{'ACTIONLIST'}{'DELETE'} } = sort @{ $action{'ACTIONLIST'}{'DELETE'} };
+    }
+
+    if ( $#{ $action{'ACTIONLIST'}{'ADD'} }>0 ){
+        @{ $action{'ACTIONLIST'}{'ADD'} } = sort @{ $action{'ACTIONLIST'}{'ADD'} };
+    }
+    if ( $#{ $action{'ACTIONLIST'}{'NO_MAILBOX'} }>0 ){
+        @{ $action{'ACTIONLIST'}{'NO_MAILBOX'} } = sort @{ $action{'ACTIONLIST'}{'NO_MAILBOX'} };
+    }
 
     # write the MAILBOX files
+    # delete previous files    
     system("mkdir -p $ref_belwue_mailconf->{'UPLOAD'}{'DIR'}");
+    system("rm -f $ref_belwue_mailconf->{'UPLOAD'}{'DIR'}/*");
     my @password_chars=&get_passwd_charlist();
 
     # ADD
@@ -937,8 +980,6 @@ sub belwue_maildata_check {
         } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "ADD"){
             print "   ADD:    $maillist\n";
             push @{ $action{'ACTIONLIST'}{'MAILLIST_ADD'} }, $maillist;
-            # create file with users
-
         } else {
             print "##########################unknown #######:    $maillist\n";
         }
