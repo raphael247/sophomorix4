@@ -340,15 +340,14 @@ sub belwue_maildata_config {
     $ref_belwue_mailconf->{'CONNECT'}{'SCOPE'}="sub";
     $ref_belwue_mailconf->{'CONNECT'}{'FILTER'}="(cn=*)";
     $ref_belwue_mailconf->{'CONNECT'}{'HOST'}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'PROTOCOL'}."://".
-                                     $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'SERVER'}.":".
-                                     $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'PORT'};
-
+        $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'SERVER'}.":".
+        $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'PORT'};
     $ref_belwue_mailconf->{'CONNECT'}{'ADMINUSER'}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'ADMINUSER'}.
-                                          "@".
-                                          $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+        "@".
+        $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
     $ref_belwue_mailconf->{'CONNECT'}{'ADMINURL'}="https://".
-                                         $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'SERVER'}.
-                                         ":9010/DomainAdmin";
+        $ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'SERVER'}.
+        ":9010/DomainAdmin";
     $ref_belwue_mailconf->{'CONNECT'}{'PASSWORD'}=$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'PASSWORD'};
 
     # logindata dir
@@ -375,9 +374,13 @@ sub belwue_maildata_config {
     $ref_belwue_mailconf->{'UPLOAD'}{'DIR'}=$ref_sophomorix_config->{'INI'}{'PATHS'}{'MAIL'}.
         "/belwue/".$school."/".$school.".belwue.uploads";
     $ref_belwue_mailconf->{'UPLOAD'}{'MAILBOXES_ADD'}=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}.
-        "/ADD_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+        "/MAILBOXES_ADD_".$school.".belwue.multimailboxes-utf8.txt";
+    $ref_belwue_mailconf->{'UPLOAD'}{'ALIAS_ADD'}=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}.
+        "/ALIASES_ADD_".$school.".belwue.txt";
+    $ref_belwue_mailconf->{'UPLOAD'}{'ALIAS_DELETE'}=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}.
+        "/ALIASES_DELETE_".$school.".belwue.txt";
     $ref_belwue_mailconf->{'UPLOAD'}{'MAILBOXES_DELETE'}=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}.
-        "/DELETE_MAILBOXES_".$school.".belwue.multimailboxes-utf8.txt";
+        "/MAILBOXES_DELETE_".$school.".belwue.multimailboxes-utf8.txt";
 
     if ($config==1){
         &json_dump({json => $json,
@@ -448,7 +451,7 @@ sub belwue_maildata_fetch {
     &unbind_belwue_admin($ldap); 
 
     ############################################################
-    # downloading
+    # downloading objects
     ############################################################ 
     print "Downloading/parsing Objects page:\n";
     system("mkdir -p $ref_belwue_mailconf->{'DOWNLOAD'}{'DIR'}");
@@ -468,7 +471,7 @@ sub belwue_maildata_fetch {
     &wget_return($return,"Objects");
 
     ############################################################
-    # parsing
+    # parsing objects
     ############################################################
     # file to parse
     print "   * Parsing $ref_belwue_mailconf->{'DOWNLOAD'}{'OBJECTS'}\n";
@@ -577,6 +580,7 @@ sub belwue_maildata_fetch {
     open (LIST,  ">$ref_belwue_mailconf->{'RESULT'}{'MAILLISTS'}");
 
     # MAILBOXES
+    ##################################################
     @{ $belwue{'LISTS'}{'MAILBOXES'} } = sort @{ $belwue{'LISTS'}{'MAILBOXES'} };
     print "MultiMailboxes:\n";
     my $num_mbox=1;
@@ -592,6 +596,7 @@ sub belwue_maildata_fetch {
     }
 
     # MAILLISTS
+    ##################################################
     @{ $belwue{'LISTS'}{'MAILLISTS'} } = sort @{ $belwue{'LISTS'}{'MAILLISTS'} };
     my $maillist_num=$#{ $belwue{'LISTS'}{'MAILLISTS'} }+1;
     print "Mailing Lists:\n";
@@ -616,6 +621,7 @@ sub belwue_maildata_fetch {
     }
 
     # ALIASES
+    ##################################################
     @{ $belwue{'LISTS'}{'ALIASES'} } = sort @{ $belwue{'LISTS'}{'ALIASES'} };
     print "Mail Aliase:\n";
     my $mailalias_num=$#{ $belwue{'LISTS'}{'ALIASES'} };
@@ -652,6 +658,20 @@ sub belwue_maildata_check {
 
     system("mkdir -p $ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}");
 
+    
+    ############################################################
+    # ALIASES
+    ############################################################
+    # create belwue list
+    open (ALIAS, "<$ref_belwue_mailconf->{'RESULT'}{'ALIASES'}");
+    while (<ALIAS>){
+        chomp();
+        my ($alias,$user)=split(/:/);
+        $action{'ALIASES'}{$user}{'BELWUE'}=$alias;
+    }
+    close(ALIAS);
+
+    ############################################################
     # MAILBOXES
     ############################################################
     open (BOX, "<$ref_belwue_mailconf->{'RESULT'}{'MAILBOXES'}");
@@ -704,12 +724,11 @@ sub belwue_maildata_check {
     @{ $action{'ACTIONLIST'}{'DELETE'} } = sort @{ $action{'ACTIONLIST'}{'DELETE'} };
     @{ $action{'ACTIONLIST'}{'ADD'} } = sort @{ $action{'ACTIONLIST'}{'ADD'} };
 
-    # write the files
-    # ADD
+    # write the MAILBOX files
     system("mkdir -p $ref_belwue_mailconf->{'UPLOAD'}{'DIR'}");
-
     my @password_chars=&get_passwd_charlist();
-    
+
+    # ADD
     if ( $#{ $action{'ACTIONLIST'}{'ADD'} }>-1 ){
         open (ADD,">$ref_belwue_mailconf->{'UPLOAD'}{'MAILBOXES_ADD'}");
         print ADD "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
@@ -772,29 +791,75 @@ sub belwue_maildata_check {
         close(ADD);
     }
 
-    # DELETE
-    system("mkdir -p $ref_belwue_mailconf->{'UPLOAD'}{'DIR'}");
-    open (DELETE,">$ref_belwue_mailconf->{'UPLOAD'}{'MAILBOXES_DELETE'}");
-    foreach my $user (@{ $action{'ACTIONLIST'}{'DELETE'} }){
-        print DELETE $user."\n";
-        # delete cached firstpassword/logindata, when user disappears in AD
-        my $pwd_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
-        my $login_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".txt";
-        if ( -f $pwd_file ){
-            system("rm $pwd_file");
+    # KEEP (take care about aliases)
+    if ( $#{ $action{'ACTIONLIST'}{'KEEP'} }>-1 ){
+        open (ALIAS_ADD,">$ref_belwue_mailconf->{'UPLOAD'}{'ALIAS_ADD'}");
+        open (ALIAS_DELETE,">$ref_belwue_mailconf->{'UPLOAD'}{'ALIAS_DELETE'}");
+        foreach my $user (@{ $action{'ACTIONLIST'}{'KEEP'} }){
+            print "KEEP: ".$user."\n";
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
+                # user has wrong alias
+                my $alias_AD=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+                my $alias_belwue=$action{'ALIASES'}{$user}{'BELWUE'};
+                print "   $user must have alias $alias_AD  and has $alias_belwue\n";
+                if ( $alias_belwue ne $alias_AD){
+                     print "   $user has wrong alias $alias_belwue\n";
+                     print ALIAS_ADD "ADD alias ".$alias_AD.
+                                     " to user ".$user." (wrong alias ".
+                                     $alias_belwue." , should be ".$alias_AD.")\n";
+                     print ALIAS_DELETE "DELETE alias ".$alias_belwue.
+                                        " of user ".$user." (wrong alias ".
+                                        $alias_belwue." , should be ".$alias_AD.")\n";
+                }
+            }
+            
+            # user should NOT have alias, but its there
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "FALSE" and 
+                exists $action{'ALIASES'}{$user}{'BELWUE'}){
+                my $alias_belwue=$action{'ALIASES'}{$user}{'BELWUE'};
+                print "   $user must have NO alias, but has alias $alias_belwue\n";
+                print ALIAS_DELETE "DELETE alias ".$alias_belwue.
+                                   " of user ".$user." (no alias configured)\n";
+            }
+
+            # user has no alias, but must have one
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE" and 
+                not exists $action{'ALIASES'}{$user}{'BELWUE'}){
+                my $alias_AD=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
+                print ALIAS_ADD "ADD alias ".$alias_AD.
+                                " to user ".$user." (alias configured but missing)\n";
+            }
         }
-        if ( -f $login_file ){
-            system("rm $login_file");
-        }
+        close(ALIAS_ADD);
+        close(ALIAS_DELETE);
     }
-    close(DELETE);
+
+    # DELETE
+    if ( $#{ $action{'ACTIONLIST'}{'DELETE'} }>-1 ){
+        open (DELETE,">$ref_belwue_mailconf->{'UPLOAD'}{'MAILBOXES_DELETE'}");
+        foreach my $user (@{ $action{'ACTIONLIST'}{'DELETE'} }){
+            print DELETE $user."\n";
+            # delete cached firstpassword/logindata, when user disappears in AD
+            my $pwd_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".pwd";
+            my $login_file=$ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}."/".$user.".txt";
+            if ( -f $pwd_file ){
+                system("rm $pwd_file");
+            }
+            if ( -f $login_file ){
+                system("rm $login_file");
+            }
+        }
+        close(DELETE);
+    }
 
 
+    ############################################################
     # MAILLISTS
     ############################################################
     my %belwue_maillist_tmp=();
     my @belwue_maillist_tmp=();    
 
+    # create belwue list
     open (LIST, "<$ref_belwue_mailconf->{'RESULT'}{'MAILLISTS'}");
     while (<LIST>){
         chomp();
@@ -837,16 +902,16 @@ sub belwue_maildata_check {
     foreach my $maillist (keys %{ $action{'MAILLISTS'} } ){
         if ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "KEEP"){
             print "   KEEP:   $maillist\n";
-            push @{ $action{'ACTIONLIST'}{'KEEP_MAILLIST'} }, $maillist;
+            push @{ $action{'ACTIONLIST'}{'MAILLIST_KEEP'} }, $maillist;
         } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "DELETE"){
             print "   DELETE: $maillist\n";
-            push @{ $action{'ACTIONLIST'}{'DELETE_MAILLIST'} }, $maillist;
+            push @{ $action{'ACTIONLIST'}{'MAILLIST_DELETE'} }, $maillist;
         } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "UPDATE"){
             print "   UPDATE: $maillist\n";
-            push @{ $action{'ACTIONLIST'}{'UPDATE_MAILLIST'} }, $maillist;
+            push @{ $action{'ACTIONLIST'}{'MAILLIST_UPDATE'} }, $maillist;
         } elsif ($action{'MAILLISTS'}{$maillist}{'ACTION'} eq "ADD"){
             print "   ADD:    $maillist\n";
-            push @{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }, $maillist;
+            push @{ $action{'ACTIONLIST'}{'MAILLIST_ADD'} }, $maillist;
             # create file with users
 
         } else {
@@ -854,39 +919,39 @@ sub belwue_maildata_check {
         }
     }
     
-    # write the files
-
-    # ADD_MAILLIST
+    # write the MAILLIST files
+    # MAILLIST_ADD
     print "\n";
-    foreach my $maillist (@{ $action{'ACTIONLIST'}{'ADD_MAILLIST'} }){
-        # filename ADD_MAILLIST_name.txt
-        my $upload_file="ADD_MAILLIST_".$school.".belwue.".$maillist.".txt";
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'MAILLIST_ADD'} }){
+        # filename MAILLIST_ADD_name.txt
+        my $upload_file="MAILLIST_ADD_".$school.".belwue.".$maillist.".txt";
         my $upload_file_abs=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}."/".$upload_file;
 	print "ADD $upload_file to upload dir\n";
-        open (ADD_MAILLIST,">$upload_file_abs");
+        open (MAILLIST_ADD,">$upload_file_abs");
         foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
             # replace domain
             my ($user,$domain)=split(/\@/,$member);
             my $member_mod=$user."\@".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
             print "   * $member_mod\n";
-            print ADD_MAILLIST "$member_mod\n";
+            print MAILLIST_ADD "$member_mod\n";
         }
-        close('ADD_MAILLIST');
+        close('MAILLIST_ADD');
 
     }
 
-    # KEEP_MAILLIST
+    # MAILLIST_KEEP
     # nothing to do, maillist and members are kept as is
 
-    # UPDATE_MAILLIST
-    foreach my $maillist (@{ $action{'ACTIONLIST'}{'UPDATE_MAILLIST'} }){
-         # filename UPDATE_MAILLIST_name.txt
+    # MAILLIST_UPDATE
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'MAILLIST_UPDATE'} }){
+         # filename MAILLIST_UPDATE_name.txt
     }
 
-    # DELETE_MAILLIST
-    foreach my $maillist (@{ $action{'ACTIONLIST'}{'DELETE_MAILLIST'} }){
-         # filename DELETE_MAILLIST_name.txt
+    # MAILLIST_DELETE
+    foreach my $maillist (@{ $action{'ACTIONLIST'}{'MAILLIST_DELETE'} }){
+         # filename MAILLIST_DELETE_name.txt
     }
+
 
     # sophomorix-gruppe sollte auch eine maillist anlegen
     # (zusammenlegen von hausmeister, teachers, zu kollegium )
