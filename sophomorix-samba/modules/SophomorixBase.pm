@@ -1240,14 +1240,19 @@ sub _console_print_mail_full {
         # there are users
         ############################################################
         # Walk through users
-        print "Mailaccounts:\n";
+        print "Mailaccounts: (MAILLISTMEMBERS: *)\n";
         foreach my $user (@{ $ref_mail->{'LISTS'}{'USER_by_SCHOOL'}{$school} }){
-            my $alias="ALIAS=F";
-            my $maillistmember="MAILLISTMEMBER=".substr($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLISTMEMBER'},0,1);
+            my $alias="ALIAS=FALSE";
+            my $maillistmember_string;
+            if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLISTMEMBER'} eq "TRUE"){
+                $maillistmember_string="*"; # *=TRUE
+            } else {
+                $maillistmember_string="-"; #-=FALSE
+            }
             if ($ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIAS'} eq "TRUE"){
                 $alias="ALIAS=".$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'ALIASNAME'};
             }
-            my $user_string="  * ".
+            my $user_string="  ".$maillistmember_string." ".
                             $user.
                             " (".
                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'displayName'}.
@@ -1255,8 +1260,6 @@ sub _console_print_mail_full {
                             $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}.
                             " MiB, ".
                             $alias.
-                            ", ".
-                            $maillistmember.
                             ")\n";
   
 	    print $user_string;
