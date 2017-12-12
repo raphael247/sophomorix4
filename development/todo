@@ -190,18 +190,42 @@ progress-Objekt ausgeben: starte hook script
 
 TODO: weiter mail:
 
+Bug in -projext -i -p p_project 
+  --> sollte auch ohne p_  tun
+
+teachergroup teachers sollte fix sein
+
+OK: maillist-memberships mitloggen (AD_get quota)
+   $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLIS_MEMBERSHIPS'}
+anzeigen mit 
+sophomorix-mail -i -u oe23
+sophomorix-quota -iv -u oe23
+
+sollte nur den einen user zeigen
+
+evtl. beides(mail,quota) bei sophomorix-user -u -iv ???
+--> oder Hinweis am Ende
+
+AD_get_quota ectl auf 1 user limitieren mit Option
+(nur 1 user lesen, Rest gleich)
+
+
+
+extrauser in files fehlen im output,
+sind aber in der Datei
+
 Erst nach Migration Testbar:
-   upload files erzeugen für belwue
-   (maillisten auswerten (members), upload file nur bei Anpassung
+   upload files erzeugen für belwue:
+   MAILLIST_UPDATE_<school>.belwue.<maillist-name>.txt
+   --> create UPDATE file only if membership changes
+   --> do not create an ADD file
+
+   --> sollte automatisiert werden, wegen Lehrerbeitritt
 
    info files
 
 
 PWD_LENGTH=10 aus belwue_conf nutzen oder nicht???
-
-
-
-
 
 ------------------------------
 sophomorix-group
@@ -247,71 +271,6 @@ by gadm/hand                 by attributes, maxmenbers, joinable, ...
 addquota/addmailquota        dito
 (yes/no)                 
 maillist/mailalias           dito
-
-------------------------------
-
-
-
-
-
-
-sophomorix-mail
-* sorgt dafür dass
-  * mailaccounts da sind
-  * mailinglisten da sind
-Egal wo Mail gehostet wird, gleiches prinzipielles vorgehen:
-1) OK: AD-Abfrage: 
-   * wer ist in welcher Gruppe
-   --> JSON
-Individueller Teil:
-2) school.ini:
-   welche Art wird benutzt
-   [mail]
-       MAILTYPE = belwue
-       MAILTYPE = mailman
-       .....
-       --> sucht automatisch nach einer Datei <MAILTYPE>.ini im schulordner
-
-   Abfrage Maildienst
-   A) Belwue über webinterface
-   B) ...
-3) Erstellen von Resultatdateien
-   - zu erstellende Dateien (bewlue, Mailman, ....)
-
-   belwue:
-    mailaccounts in UTF8
-     OK: login -> samaccount
-     OK: Realname (Vor/Nach) -> displayName  (Vorname Nachname) --> OHNE KOMMA
-     OK: Type MultiMailbox -> fix
-     password -> zufallspassword Kriterien in belwue.ini Sonderzeichen beachten!
-     storage -> 512M MAILQUOTA -> CALC mit einem M dahinter
-     alias -> so wie erzeugt in MAIL->ALIAS (OK: falls alias=true)
-
-belwue.ini erstellen:
-
-PASSWORD=*****               # zum login con admin@domain.de besser ADMINPASSWORD
-PASSWORDKUNDENINFO=****      # eigentlich ungeutzt
-PWD_LENGTH=10
-
-BASE=bszleo.de               # die domain hier eintragen
-  ADMINURL=https://mbox1.belwue.de:9010/DomainAdmin # sollte gleich sein
-  ADMINUSER=admin@domain.de    # domain aus BASE nehmen hier nur ADMINUSER=admin
-  SERVER=mbox1.belwue.de       # eigentlich gleich
-  PORT=636                     # gleich  
-  PROTOCOL=ldaps               # gleich
-
-
-# zum kopieren der logindaten
-TEACHERSERVERDIR=/data/lehrershare/LehrerInnen
-TEACHERSERVER=10.175.1.10
-TEACHERUSER=root
-
-
-
-4) synchronisation
-   A) Belwue mit links und passwort der admin interfaces
-   B) scp upload
-   C)...
 
 Ende Mail
 ------------------------------------------------------------
