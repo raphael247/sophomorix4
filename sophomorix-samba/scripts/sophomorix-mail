@@ -77,6 +77,8 @@ $Conf::log_level=1;
 
 my $help=0;
 my $info=0;
+my $belwue_info=0;
+
 my $json=0;
 my $config=0;
 my $school="";
@@ -91,6 +93,7 @@ my $analyze_belwue_data=0;
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "belwue-info" => \$belwue_info,
            "config" => \$config,
            "download-belwue-data" => \$download_belwue_data,
            "analyze-belwue-data" => \$analyze_belwue_data,
@@ -145,7 +148,8 @@ Options
 
 Show the mailaccounts and maillists that should be created 
   -i  / --info
-
+  --belwue--info --json --analyze-belwue-data 
+    (show the same information after modifications by --analyze-belwue-data)
 
 Belwue options:
 
@@ -258,6 +262,17 @@ foreach my $school (@sharelist){
                 $ref_mail,
                 \%sophomorix_config);
         }
+        if ($belwue_info==1){
+            &json_dump({json => $json,
+                        jsoninfo => "MAIL",
+                        jsoncomment => "sophomorix mail after belwue",
+                        object_name => $school,
+                        log_level => $Conf::log_level,
+                        hash_ref=>$ref_mail,
+                        sophomorix_config=>\%sophomorix_config,
+                      });
+        }
+        exit;
     } else {
         print "\n\nERROR: $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} not known\n";
         exit;
@@ -989,18 +1004,17 @@ sub belwue_maildata_check {
     # MAILLIST_ADD
     print "\n";
     foreach my $maillist (@{ $action{'ACTIONLIST'}{'MAILLIST_ADD'} }){
-        # filename MAILLIST_ADD_name.txt
-        my $upload_file="MAILLIST_ADD_".$school.".belwue.".$maillist.".txt";
-        my $upload_file_abs=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}."/".$upload_file;
-	print "ADD $upload_file to upload dir\n";
-        open (MAILLIST_ADD,">$upload_file_abs");
+        my @member_mod=(); # modified and appendixed list
+
+        # add domain modified members
         foreach my $member ( @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} } ){
             # replace domain
             my ($user,$domain)=split(/\@/,$member);
             my $member_mod=$user."\@".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
-            print "   * $member_mod\n";
-            print MAILLIST_ADD "$member_mod\n";
+            push @member_mod, $member_mod;
         }
+ 
+        # add appendix members (if file exists)
         my $appendix_file=$ref_belwue_mailconf->{'CONFIG_DIR'}."/".$maillist.".txt";
         if (-f $appendix_file ){
 	    #print "HERE:  $appendix_file \n";
@@ -1010,13 +1024,32 @@ sub belwue_maildata_check {
                 chomp($line);
                 $line=~s/ //g; # remove whitespace
                 if ($line ne ""){
-                    print MAILLIST_ADD $line."\n";
+                push @member_mod, $line;
                 }
             }
             close(APPENDIX);
         }
-        close('MAILLIST_ADD');
 
+        # mod the list address
+        my $list_mod=$maillist."\@".$ref_belwue_mailconf->{'CONFIG'}{'ACCOUNT'}{'BASE'};
+	$ref_mail->{'MAILLIST'}{$maillist}{'mail'}=$list_mod;
+
+        # replace list in the hash for further use
+        @{ $ref_mail->{'MAILLIST'}{$maillist}{'LIST'} }=@member_mod;
+        
+
+        # write the file:
+        # filename MAILLIST_ADD_name.txt
+        my $upload_file="MAILLIST_ADD_".$school.".belwue.".$maillist.".txt";
+        my $upload_file_abs=$ref_belwue_mailconf->{'UPLOAD'}{'DIR'}."/".$upload_file;
+	print "ADD $upload_file to upload dir\n";
+        open (MAILLIST_ADD,">$upload_file_abs");
+        foreach my $member (@member_mod){
+            print "   * $member\n";
+            print MAILLIST_ADD $member."\n";
+        }
+        print "\n";
+        close('MAILLIST_ADD');
     }
 
     # MAILLIST_KEEP
@@ -1036,6 +1069,7 @@ sub belwue_maildata_check {
     # sophomorix-gruppe sollte auch eine maillist anlegen
     # (zusammenlegen von hausmeister, teachers, zu kollegium )
 
+    #print Dumper( $ref_mail->{'MAILLIST'} );
 
 
     my $ref_action=\%action;
