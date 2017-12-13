@@ -1698,6 +1698,21 @@ sub config_sophomorix_read {
                     # field6
                     $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_6'}=
                         $sophomorix_config{'INI'}{$section}{'FIELD_6'};
+                    # force group
+                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUP'}=
+                        $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
+                    # forced groupname
+                    if (defined $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'}){
+#                        if ($school eq $DevelConf::name_default_school){
+                            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'}=
+                                $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
+#                        } else {
+#                            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'}=
+#                                $school."-".$sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
+#                        }
+                    } else {
+                        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'}="FALSE";
+                    }
                     # MANMEMBEROF
                     my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBEROF'});
                     foreach my $manmember (@manmember){

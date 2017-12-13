@@ -1478,7 +1478,7 @@ sub analyze_user_line {
             $field6,
            )=split(/;/,$line);
 
-        my ($class_valid,$class,$error_strg_class)=&check_class($class_raw);
+        my ($class_valid,$class,$error_strg_class)=&check_class($class_raw,$filename);
         if ($class_valid==0){
             print REPORT "\nERROR in $line\n";
             print REPORT "   * Class $class_raw not valid ($error_strg_class)\n";
@@ -1520,7 +1520,7 @@ sub analyze_user_line {
         my $unid="";
         my $login="";
         # field5
-        my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_5};
+        my $field5_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'};
         if ($field5_key eq "LOGIN"){
             if (defined $field6){
                 $login=&check_login($field5);
@@ -1531,7 +1531,7 @@ sub analyze_user_line {
             }
         }
         # field6
-        my $field6_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{FIELD_6};
+        my $field6_key=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_6'};
         if ($field6_key eq "LOGIN"){
             if (defined $field6){
                 $login=&check_login($field6);
@@ -1632,7 +1632,7 @@ sub analyze_user_line {
 sub check_class {
     my $class_valid=1;
     my $error_strg="";
-    my ($class)=@_;
+    my ($class,$filename)=@_;
     $class=&remove_whitespace($class);
     # convert to small letters
     $class=~tr/A-Z/a-z/; 
@@ -1651,10 +1651,9 @@ sub check_class {
         $class_valid=0;
     }
 
-    if ($class eq "lehrer" or 
-        $class eq "Lehrer"
-       ){
-        $class=$DevelConf::teacher;
+    # test if groupname must be forced
+    if ($sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUP'} eq "TRUE"){
+        $class=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'};
     }
     return ($class_valid,$class,$error_strg);
 }

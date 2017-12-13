@@ -21,6 +21,36 @@ ini Dateien:
 	key-value=key1=value1,key2=value2,... 
 ------------------------------------------------------------
 
+###########################################################
+Nächstes Entwicklertreffen:
+
+scripte im Schulkontext aufrufen:
+  - wie soll das geschehen?
+    Option --school für jedes script?
+  Beispiel Belwue.conf passwort
+  --> sophomorix-mail --config zeigt passwörter aller Schulen --> json
+      (reduktion auf schule mit --school ?)
+  --> sophomorix-check: versetungen andere Schulen erkennen
+  Lösung ???:
+  sophomorix-check liest Daten aller Schulen, merkt sich (RAM) und benutzt das intern, 
+  gibt mit --json --school <name>aber nur einen Teil aus ?
+
+Mail:
+
+mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
+--> bleibt das immer so?
+--> bei Verwendung z.B. belwue-mail:
+    sophomorix liest <xyz>@linuxmuster.lan und modifiziert das mit BASE in belwue.conf
+    --> modfizierte Werte werden genutzt um maillisten-member zu schreiben (upload-Datei)
+    --> Attribute 'mail' werden NICHT angepasst (momentaner Zustand)
+
+
+Server Firewall, ... Einträge werden in default-school gemacht.
+OK so? Oder besser global-Bereich? 
+
+############################################################
+
+
 AK:
 Win 10, wie sichtbar, wer angemeldet ist.
 
@@ -151,6 +181,8 @@ Bugs:
 sophomorix-school --mount GLOBAL/global/linuxmuster-global
 tut nicht.
 
+sophomorix-check -ij --> <name>.devices.csv findet sich doppelt, einmal leer
+
 sophomorix-device:
 Listet auch nicht-sophomorix nodes --> verbessern
 wie werden die Einträge gemacht (devices.csv)
@@ -194,6 +226,7 @@ Bug in -projext -i -p p_project
   --> sollte auch ohne p_  tun
 
 teachergroup teachers sollte fix sein
+--> konfigurierbar
 
 OK: maillist-memberships mitloggen (AD_get quota)
    $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLIS_MEMBERSHIPS'}
@@ -493,28 +526,10 @@ Undefined subroutine &Sophomorix::SophomorixAPI::fetch_error_string called at /u
 
 
 
-###########################################################
-Entwicklertreffen:
 
-scripte im Schulkontext aufrufen:
-  - wie soll das geschehen?
-    Option --school für jedes script?
-  Beispiel Belwue.conf passwort
-  --> sophomorix-mail --config zeigt passwörter aller Schulen --> json
-      (reduktion auf schule mit --school ?)
-  --> sophomorix-check: versetungen andere Schulen erkennen
-  Lösung ???:
-  sophomorix-check liest Daten aller Schulen, merkt sich (RAM) und benutzt das intern, 
-  gibt mit --json --school <name>aber nur einen Teil aus ?
+Info:
 
-Mailserver.
-wird per ssh mit eingerichtet
-  --mailserver IP
-    --> wenn ja mailserver setup 
-    --> Paket: linuxmuster-mail
-besteht aus (Docker):
--dovecut
-
+Mail:
 -mailman extra dazu
 
 Docker:
@@ -834,10 +849,6 @@ Ersetzungen:
    URLMAIL
 
 Mail:
-2 Alternativen?:
- -> belwue mail(zusatzpaket sophomorix-belwue-mail)
-    zusätzlicher Admin?
-    
  -> Eigene Mail, aber was (Anbindung an AD, Mailinglisten, Aliase)
     - Docker mit postfix, dovecot: fürjeden user mailadresse
     - Mailinglisten mit mailman (von AD userlisten holen)
