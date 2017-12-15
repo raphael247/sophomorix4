@@ -19,6 +19,7 @@ Password for 'https://jeffbeck@github.com': ########
 ###########################################################
 Nächstes Entwicklertreffen:
 
+------------------------------
 devices.txt
 Unterscheiden von:
   servers (Die von thomas angelegten DNS-Einträge für firewall,server, ....)
@@ -30,8 +31,10 @@ Unterscheiden von:
   ... ipdevice?
   ... router?
 
+------------------------------
 Umgang mit PullRequests, Issues, usw. bei der LML7-Entwicklung
 
+------------------------------
 scripte im Schulkontext aufrufen:
   - wie soll das geschehen?
     Option --school für jedes script?
@@ -42,7 +45,7 @@ scripte im Schulkontext aufrufen:
   Lösung ???:
   sophomorix-check liest Daten aller Schulen, merkt sich (RAM) und benutzt das intern, 
   gibt mit --json --school <name>aber nur einen Teil aus ?
-
+------------------------------
 Mail:
 
 mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
@@ -52,7 +55,32 @@ mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
     --> modfizierte Werte werden genutzt um maillisten-member zu schreiben (upload-Datei)
     --> Attribute 'mail' werden NICHT angepasst (momentaner Zustand)
 
-
+------------------------------
+HOOKS for sophomorix-add -update -kill
+- Entwicklertreffen: Pfad abstimmen, weitere scripte, die einen hook brauchen?
+- muss pro Schule konfiguierbar
+- schule übersichtlich halte, daher Unterverzeichniss hooks
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-add.d/ 
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-update.d/ 
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-kill.d/
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-device.d/ ??? 
+ODER in Global für alle schulen
+  # alles was man da findet, das mit .hook (zwischengespeicherte scripte ausnehmen) endet 
+  UND executable ist, wird ausgeführt 
+  - reihenfolge acibetisch, als 01-script vor 02-script
+   ini:
+[HOOK]
+   HOOK_PATH= /etc/linuxmuster/sophomorix
+   HOOK_SUB_PATH= hooks
+   ADD_HOOK_DIR=sophomorix-add.d
+   UPDATE_HOOK_DIR=sophomorix-update.d
+   KILL_HOOK_DIR=sophomorix-kill.d
+Umsetung:
+  config einlesen
+  verzeichnis lesen, executable, sub run_hook("ADD_HOOK");
+  -> PROGRESSION-JSON für jedes script (script 1/3)
+  -> Rückgabewert auslesen, bei 0 OK, sonst 1
+  -> progress-Objekt ausgeben: starte hook script
 
 ############################################################
 
@@ -198,32 +226,7 @@ create testusers.py
 wie ermittelt ob command succesful war?
 --> json auswerten
 
-extraclasses-Datei, gibts die schon
-
-   ini:
-[HOOK]
-   HOOK_PATH= /etc/linuxmuster/sophomorix
-   dann:school/global
-   ADD_HOOK_DIR=sophomorix-add.d
-   UPDATE_HOOK_DIR=sophomorix-update.d
-   KILL_HOOK_DIR=sophomorix-kill.d
-
---> TODO: einlesen in Config
-   sub run_hook("ADD_HOOK");
-   -> verzeichnis lesen
--> schauen ob executable, ascibetisch ordnen
--> mit abs_path aufrufen
-   -> PROGRESSION-JSON für jedes script (script 1/3)
-   
-sophomorix-add hook:
-sophomorix-update hook:
-sophomorix-kill hook:
-Rückgabewert auslesen, bei 0 OK, sonst 1
-progress-Objekt ausgeben: starte hook script
-
-
-
-
+extraclasses-Datei, gibts die schon?
 ------------------------------------------------------------
 
 TODO: weiter mail:
@@ -232,7 +235,7 @@ TODO: weiter mail:
 OK: maillist-memberships mitloggen (AD_get quota)
    $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLIS_MEMBERSHIPS'}
 
-Zusatzoption .v bei user (oder -vv)
+Zusatzoption -v bei user (oder -vv)
 quota/mail hash einlesen (scriptintern)
 userinfo hash ergänzen
 und Zusatzinfos anzeigen anzeigen mit 
