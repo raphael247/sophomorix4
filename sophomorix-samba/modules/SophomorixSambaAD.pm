@@ -4371,7 +4371,8 @@ sub AD_get_quota {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # USER quota (sophomorix user)
-    my $filter2="(&(objectClass=user) (sophomorixRole=*))";
+#    my $filter2="(&(objectClass=user) (sophomorixRole=*))"; # all sophomorix users
+    my $filter2="(&(objectClass=user) (| (sophomorixRole=student) (sophomorixRole=teacher) ) )";
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',

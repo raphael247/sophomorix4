@@ -234,6 +234,22 @@ wie ermittelt ob command succesful war?
 extraclasses-Datei, gibts die schon?
 ------------------------------------------------------------
 
+TODO: 
+
+quota: 
+OK admins aus sophomorix-quota herausnehmen
+-> kein quota berechnen, nicht anzeigen
+
+setzen der admin quota auf werte aus sophomorix.ini
+school/globalbinduser: 0
+school/globaladmin: 1000 MB, 1000MB oder unbegrenzt?
+Es gilt das bei user gesetzte quota 
+--> siehe sophomorix-quota --developer-set-quota
+    --> setzt einzelquota
+sophomorix-admin -i -a globadm
+so umbauen, dass es auch Einzelquota für admins setzen kann
+
+
 TODO: weiter mail:
 
 ----------
@@ -247,7 +263,6 @@ und Zusatzinfos anzeigen anzeigen mit
 sophomorix-mail -iv -u oe23
 sophomorix-quota -iv -u oe23
    BUG: obige Aufrufe sollten nur den einen user zeigen
-
 evtl. beides(mail,quota) bei sophomorix-user -u -iv ???
 --> oder Hinweis am Ende
 
