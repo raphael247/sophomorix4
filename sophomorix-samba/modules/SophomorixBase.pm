@@ -983,7 +983,7 @@ sub console_print_mail_user {
     my $ref_mail = $arg_ref->{ref_mail};
     my $ref_sophomorix_config = $arg_ref->{ref_sophomorix_config};
     my $user = $arg_ref->{user};
-#    my $school = $arg_ref->{school};
+    my $log_level=$arg_ref->{log_level};
     my $line="+------------------------------------------".
               "------------------------------------+\n";
     my $role=$ref_mail->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
@@ -1006,7 +1006,6 @@ sub console_print_mail_user {
             printf "%30s: %-40s\n","* MAILLIST",$list;
         }
     }
-    #print $line;
 }
 
 
@@ -1016,7 +1015,6 @@ sub console_print_mailquota_user {
     my $ref_quota = $arg_ref->{ref_quota};
     my $ref_sophomorix_config = $arg_ref->{ref_sophomorix_config};
     my $user = $arg_ref->{user};
-    my $school = $arg_ref->{school};
     my $log_level=$arg_ref->{log_level};
     my $line="+------------------------------------------".
               "------------------------------------+\n";
@@ -1152,9 +1150,6 @@ sub console_print_mailquota_user {
                $mailquota_class_display,
                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSTRING'};
     }
-
-
-
 }
 
 
@@ -1164,7 +1159,6 @@ sub console_print_quota_user {
     my $ref_quota = $arg_ref->{ref_quota};
     my $ref_sophomorix_config = $arg_ref->{ref_sophomorix_config};
     my $user = $arg_ref->{user};
-    my $school = $arg_ref->{school};
     my $log_level = $arg_ref->{log_level};
     my $line="+------------------------------------------".
               "------------------------------------+\n";
@@ -1174,13 +1168,9 @@ sub console_print_quota_user {
         next;
     } 
 
-    # skip if user (given by option) is not in this school 
-    if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school}{$user}){
-        next;
-    }
-
     # create shortcut vars
     my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
+    my $school=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixSchoolname'};
 
     # print user end/share begin line
     if($log_level==1){
@@ -1329,145 +1319,6 @@ sub console_print_quota_user {
                    $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSTRING'};
         }
     } # end of share walk
-
-
-
-
-
-
-    # ############################################################
-    # # MailQuota
-    # my $mailquota_school_default=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'SCHOOLDEFAULT'};
-    # my $mailquota_user_display;
-    # my $mailquota_user_comment;
-    # if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'}){
-    #     $mailquota_user_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'};
-    # 	$mailquota_user_comment=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'COMMENT'};
-    # } else {
-    #     $mailquota_user_display="---";
-    #     $mailquota_user_comment="---";
-    # }
-    # my $mailquota_class_display;
-    # my $mailquota_class_comment;
-    # if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'}){
-    #     $mailquota_class_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'};
-    #     $mailquota_class_comment=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'COMMENT'};
-    # } else {
-    #     $mailquota_class_display="---";
-    #     $mailquota_class_comment="comment";
-    # }
-
-    # my $mailcalc_display;
-    # if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
-    #     # append asterisk
-    #     $mailcalc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}."*";
-    # } else {
-    #     # append space
-    #     $mailcalc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}." ";
-    # }
-
-
-
-
-
-    # # printout
-    # if($log_level>=2){
-    #     # print extensive information
-    #     print $line;
-    #     printf "| %-77s|\n","MailQuota for user ".$user." in MiB (Mebibyte):";
-    #     printf "|%10s %-67s|\n",
-    #            $mailquota_school_default,
-    #            " (A) default MailQuota for sophomorixRole \'".$role."\'";
-    #     if ($mailquota_class_display ne "---"){
-    #         printf "|%10s %-67s|\n",
-    #                $mailquota_class_display,
-    #                " (B) Quota at the users class \'".
-    #                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
-    #                "\': Overrides (A)";
-    #         printf "|%10s %-67s|\n",
-    #                " ",
-    #                " Comment: \'".
-    #                $mailquota_class_comment.
-    #                "\'";
-    #     } else {
-    #         printf "|%10s %-67s|\n",
-    #                $mailquota_class_display,
-    #                " (B) No Quota at the users class \'".
-    #                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
-    #                "\'";
-    #     }
-
-    #     foreach my $project ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
-    #         my @reason=();
-    #         my $membership_string="";
-    #         foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
-    #             push @reason,$reason;
-    #         }
-    #         @reason = sort @reason;
-    #         $membership_string=join(",",@reason);
-    # 	    if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'}){
-    # 		my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'};
-    #             printf "|%10s %-67s|\n",
-    #                    "+ ".
-    #                    $add,
-    #                    " AddMailQuota, member in project \'".
-    #                    $project.
-    #                    "\' (".$membership_string.")";
-    #             printf "|%10s %-67s|\n",
-    #                    "",
-    #                    " Comment: \'".
-    #                    $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'COMMENT'}.
-    #                    "\'";
-    # 	    } else {
-    #             printf "|%10s %-67s|\n",
-    #                    "0",
-    #                    " No AddMailQuota, member in project \'".
-    #                    $project."\' (".$membership_string.")";
-    # 	    }
-    #     }
-    #     if ($mailquota_user_display eq "---"){
-    #         printf "|%10s %-67s|\n",
-    #                $mailquota_user_display,
-    #                " (C) No MailQuota at the user Object \'".
-    #                $user.
-    #                "\'";
-    #     } else {
-    #         printf "|%10s %-67s|\n",
-    #                $mailquota_user_display,
-    #                " (C) MailQuota at the user will override all above settings";
-    #         printf "|%10s %-67s|\n",
-    #                " ",
-    #                " Comment: \'".
-    #                $mailquota_user_comment.
-    #                "\'";
-    #     }
-
-    #     # show calc 
-    #     if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
-    #         printf "|%11s%-67s|\n",
-    #                $mailcalc_display,
-    #                " MAILCALC must be set (old MAILCALC is ".
-    #                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}.
-    #                " MiB)";
-    #     } else {
-    #         printf "|%11s%-67s|\n",
-    #                $mailcalc_display,
-    #                " MAILCALC was already set to ".
-    #                $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}.
-    #                " MiB";
-    #     }
-    #     print $line;
-    # } else {
-    #     # print single line
-    # 	printf "| %-25s| %-7s|%6s|%5s |%5s | %-18s|\n",
-    #            "$user($role:$mailquota_school_default)",
-    #            "**MQ**",
-    #            $mailcalc_display,
-    #            $mailquota_user_display,
-    #            $mailquota_class_display,
-    #            $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSTRING'};
-    # }
-    #print "HERE QUOTA_USER END\n\n\n";
 }
 
 

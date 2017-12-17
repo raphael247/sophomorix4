@@ -253,29 +253,20 @@ so umbauen, dass es auch Einzelquota für admins setzen kann
 TODO: weiter mail:
 
 ----------
-OK: maillist-memberships mitloggen (AD_get quota)
-   $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLIS_MEMBERSHIPS'}
-
-Zusatzoption -v bei user (oder -vv)
-quota/mail hash einlesen (scriptintern)
-userinfo hash ergänzen
-und Zusatzinfos anzeigen anzeigen mit 
-sophomorix-mail -iv -u oe23
+OK: sophomorix-mail -iv -u oe23
 
 sophomorix-quota -iv -u oe23
    OK: obige Aufrufe sollten nur den einen user zeigen
-evtl. beides(mail,quota) bei sophomorix-user -u -iv ???
+
+TODO: evtl. beides(mail,quota) bei sophomorix-user -u -iv ???
+--> check this
 --> oder Hinweis am Ende
 
-
-AD_get_quota ectl auf 1 user limitieren mit Option
+performance???
+AD_get_quota evtl auf 1 user limitieren mit Option
 (nur 1 user lesen, Rest gleich)
 ----------
 
-
-
-extrauser in files fehlen im output,
-sind aber in der Datei
 
 Erst nach Migration Testbar:
    upload files erzeugen für belwue:

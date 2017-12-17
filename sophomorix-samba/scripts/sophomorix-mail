@@ -228,9 +228,8 @@ if ($info==1 and $user eq ""){
                               ref_sophomorix_config=>\%sophomorix_config,
                             });
     &console_print_mailquota_user({user => $user,
-                                   log_level => 2,
+                                   log_level => 2, # always show maildata as a block
                                    ref_quota=>$ref_mail,
-                                 #  school=>$school_share,
                                    ref_sophomorix_config=>\%sophomorix_config,
                                  });
 

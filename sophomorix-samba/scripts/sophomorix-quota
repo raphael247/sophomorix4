@@ -385,16 +385,18 @@ if ($info==1 and $json>0){
         ############################################################
         # Walk through users
         foreach my $user (@userlist){
+            # skip if user (given by option) is not in this school 
+            if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school}{$user}){
+                next;
+            }
             &console_print_quota_user({user => $user,
                                        log_level => $Conf::log_level,
                                        ref_quota=>$ref_quota,
-                                       school=>$school_share,
                                        ref_sophomorix_config=>\%sophomorix_config,
                                      });
             &console_print_mailquota_user({user => $user,
                                            log_level => $Conf::log_level,
                                            ref_quota=>$ref_quota,
-                                           school=>$school_share,
                                            ref_sophomorix_config=>\%sophomorix_config,
                                          });
             if($Conf::log_level==1){
