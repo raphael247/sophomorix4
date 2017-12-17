@@ -258,6 +258,9 @@ OK: sophomorix-mail -iv -u oe23
 sophomorix-quota -iv -u oe23
    OK: obige Aufrufe sollten nur den einen user zeigen
 
+TODO: * at end of Calc
+--> wird auch unnötig angezeigt, checken
+
 TODO: evtl. beides(mail,quota) bei sophomorix-user -u -iv ???
 --> check this
 --> oder Hinweis am Ende
@@ -454,13 +457,6 @@ AD attribute
 webui
    * sophomorixWebuiDashboard (voerst single lassen
    * sophomorixWebuiDashboardCalculated (vorerst weglassen)
-mailquota:
-    OK: sophomorixMailQuota             individueler Wert für user/gruppe
-    OK: sophomorixMailQuotaCalculated   berechnet für dovecot (oder andere )
-        NUR beim user
-
-
-
 
 tests aller quota (4 angaben bei allen gruppen)
 
@@ -626,7 +622,11 @@ sophomorix-school --check
 Schulkonsolen-konfiguration
 (SK=Schulkonsole(eine von vielen), Webui=Ajenti, ...):
 
+TODO: kurzverfahren aufschreiben
+
 Ziele:
+- posivivliste
+  (bei misconfiguration lieber nicht anzeigen)
 - auch weitere schulkonsolen managebar
 - Individuelle modulkonfiguration ermöglichen
 - SK-debian-Paket soll (ohne sophomorix-update)
