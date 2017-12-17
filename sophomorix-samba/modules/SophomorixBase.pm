@@ -981,7 +981,7 @@ sub console_print_quota_user {
     my $ref_quota = $arg_ref->{ref_quota};
     my $ref_sophomorix_config = $arg_ref->{ref_sophomorix_config};
     my $user = $arg_ref->{user};
-    my $school_share = $arg_ref->{school_share};
+    my $school = $arg_ref->{school};
     my $line="+------------------------------------------".
               "------------------------------------+\n";
     #print "\n\n\nHERE QUOTA_USER START\n";
@@ -991,8 +991,7 @@ sub console_print_quota_user {
     } 
 
     # skip if user (given by option) is not in this school 
-    if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school_share}{$user}){
-        #print "skipping $user, not in $school_share\n";
+    if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school}{$user}){
         next;
     }
 
@@ -1004,7 +1003,7 @@ sub console_print_quota_user {
         #print $line;
     } else {
         print $line;
-        printf "| %-77s|\n", $user." in ".$school_share;
+        printf "| %-77s|\n", $user." in ".$school;
     }
 
     ############################################################
@@ -1014,10 +1013,10 @@ sub console_print_quota_user {
         my $school_default;
         my $share_display;
 	if ($share eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
-            $school_default=$ref_sophomorix_config->{'ROLES'}{$school_share}{$role}{'quota_default_global'};
+            $school_default=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
 	    $share_display="GLOBAL";
-	} elsif ($share eq $school_share){
-            $school_default=$ref_sophomorix_config->{'ROLES'}{$school_share}{$role}{'quota_default_school'};
+	} elsif ($share eq $school){
+            $school_default=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
 	    $share_display=$share;
         } else {
             $school_default="---";                    
