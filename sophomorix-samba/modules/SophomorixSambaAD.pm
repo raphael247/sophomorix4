@@ -4408,6 +4408,8 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$dn}=$sam;
         $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$sam}=$dn;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school}{$sam}=$dn;
+        $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sophomorixSchoolname_by_sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixAdminFile'}=$file;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
@@ -4522,7 +4524,7 @@ sub AD_get_quota {
         if ($maillist eq "TRUE"){
             $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
-            $quota{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$sam}{'EXISTS'}="TRUE";
+            $quota{'QUOTA'}{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$sam}{'EXISTS'}="TRUE";
         }
 
         # mailquota
@@ -4664,7 +4666,7 @@ sub AD_get_quota {
         if ($maillist eq "TRUE"){
             $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
-            $quota{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$sam}{'EXISTS'}="TRUE";
+            $quota{'QUOTA'}{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$sam}{'EXISTS'}="TRUE";
         }
 
         # addmailquota

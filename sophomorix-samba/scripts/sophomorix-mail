@@ -972,7 +972,7 @@ sub belwue_maildata_check {
 
     # Walk through belwue maillist, decide DELETE
     foreach my $belwue_maillist (@belwue_maillist_tmp){
-        if (not exists $ref_mail->{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$belwue_maillist}){
+        if (not exists $ref_mail->{'QUOTA'}{'LOOKUP'}{'MAILLISTS_by_SCHOOL'}{$school}{$belwue_maillist}){
             $action{'MAILLISTS'}{$belwue_maillist}{'ACTION'}="DELETE";
             #print "  * Maillist: $belwue_maillist DELETE\n";
         }

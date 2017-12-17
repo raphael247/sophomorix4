@@ -249,8 +249,10 @@ if ($school ne "" and  $default_quota ne ""){
 
 # --user user1,user2
 my @userlist=();
+my %userlist=();
 if ($user ne ""){
     @userlist=split(/,/,$user);
+    $userlist{$user}="seen";
 }
 
 
@@ -323,10 +325,29 @@ if ($info==1 and $json>0){
              "------+------+-------------------+\n";
     my $line2="+------------------------------------------".
               "------------------------------------+\n";
+
+    # if users are given but no schoollist: limit schoollist to the users schools
+    if ($user ne "" and $school eq ""){
+        my %schools_to_show=();
+        my @schools_to_show=();
+        foreach my $user (@userlist){
+            my $school=$ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sophomorixSchoolname_by_sAMAccountName'}
+                {$user}{'sophomorixSchoolname'};
+            $schools_to_show{$school}="show";
+        }
+        # create the school list
+        foreach my $sch (keys %schools_to_show) {
+            push @schools_to_show, $sch; # its unique already
+        }
+        @schools_to_show = sort @schools_to_show;
+        # replace schoollist
+        @sharelist=@schools_to_show;
+    }
+    
     foreach my $school_share (@sharelist){
         if ($user eq ""){
-            # use ALL sophomorix users
             if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
+                # use no users, when option is not a school share
                 @userlist=();
 	    } else {
 	        # all users of school
@@ -367,8 +388,11 @@ if ($info==1 and $json>0){
                 next;
             } 
 
-            # ????? skip user not in this school????
-            # there are only the users of the school selected ????
+            # skip if user (given by option) is not in this school 
+            if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school_share}{$user}){
+                #print "skipping $user, not in $school_share\n";
+                next;
+            }
 
             # create shortcut vars
             my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
