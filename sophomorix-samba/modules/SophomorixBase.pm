@@ -63,6 +63,7 @@ $Data::Dumper::Terse = 1;
             remove_whitespace
             json_progress_print
             json_dump
+            console_print_quota_user
             get_homedirectory
             get_sharedirectory
             get_group_basename
@@ -971,6 +972,310 @@ sub _console_print_project_full {
         }
 	print "\n";
     }
+}
+
+
+
+sub console_print_quota_user {
+    my ($arg_ref) = @_;
+    my $ref_quota = $arg_ref->{ref_quota};
+    my $ref_sophomorix_config = $arg_ref->{ref_sophomorix_config};
+    my $user = $arg_ref->{user};
+    my $school_share = $arg_ref->{school_share};
+    my $line="+------------------------------------------".
+              "------------------------------------+\n";
+    #print "\n\n\nHERE QUOTA_USER START\n";
+    if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
+        print "  WARNING: User $user not found!\n";
+        next;
+    } 
+
+    # skip if user (given by option) is not in this school 
+    if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school_share}{$user}){
+        #print "skipping $user, not in $school_share\n";
+        next;
+    }
+
+    # create shortcut vars
+    my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
+
+    # print user end/share begin line
+    if($Conf::log_level==1){
+        #print $line;
+    } else {
+        print $line;
+        printf "| %-77s|\n", $user." in ".$school_share;
+    }
+
+    ############################################################
+    # Walk through all shares
+    foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
+        # get values for display
+        my $school_default;
+        my $share_display;
+	if ($share eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
+            $school_default=$ref_sophomorix_config->{'ROLES'}{$school_share}{$role}{'quota_default_global'};
+	    $share_display="GLOBAL";
+	} elsif ($share eq $school_share){
+            $school_default=$ref_sophomorix_config->{'ROLES'}{$school_share}{$role}{'quota_default_school'};
+	    $share_display=$share;
+        } else {
+            $school_default="---";                    
+	    $share_display=$share;
+        }
+  	if ($share eq $DevelConf::name_default_school){
+            $share_display="DEFLT";
+	}
+
+        # get the users quota or --- for display
+        my $quota_user_display;
+        my $quota_user_comment;
+        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}
+                                {$share}{'sophomorixQuota'}){
+	    $quota_user_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}
+                                            {$share}{'sophomorixQuota'};
+	    $quota_user_comment=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}
+	                                    {$share}{'COMMENT'};
+	} else {
+            $quota_user_display="---";
+            $quota_user_comment="---";
+        }
+        my $quota_class_display;
+        my $quota_class_comment;
+        if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+                                {'sophomorixQuota'}{$share}{'VALUE'}){
+	    $quota_class_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+	                                     {'sophomorixQuota'}{$share}{'VALUE'};
+	    $quota_class_comment=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}
+	                                     {'sophomorixQuota'}{$share}{'COMMENT'};
+
+        } else {
+            $quota_class_display="---";
+            $quota_class_comment="---";
+        }
+
+        my $calc_display;
+        if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
+            # append asterisk
+            $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'}."*";
+        } else {
+                # append space
+                $calc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'}." ";
+        }
+
+        # printout
+        if($Conf::log_level>=2){
+            # print extensive information
+            print $line;
+            printf "| %-77s|\n",$share." share for user ".$user." in MiB (Mebibyte):";
+            printf "|%10s %-67s|\n",
+                $school_default,
+                " (A) default Quota for sophomorixRole \'".$role."\'";
+            if ($quota_class_display ne "---"){
+                printf "|%10s %-67s|\n",
+                       "",
+                       " (B) Quota at the users class \'".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                       "\': Overrides (A)";
+                printf "|%10s %-67s|\n",
+                       $quota_class_display,
+                       " Comment: \'".
+                       $quota_class_comment.
+                       "\'";
+    	    } else {
+                printf "|%10s %-67s|\n",
+                       $quota_class_display,
+                       " (B) No Quota at the users class \'".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                       "\'";
+            }
+            foreach my $project ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+                my @reason=();
+                my $membership_string="";
+                foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
+                    push @reason,$reason;
+                }
+                @reason = sort @reason;
+                $membership_string=join(",",@reason);
+		if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'}){
+		    my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'};
+                    printf "|%10s %-67s|\n","+ ".$add,
+                           " AddQuota, member in project \'".$project."\' (".$membership_string.")";
+                    printf "|%10s %-67s|\n","",
+                           " Comment: \'".
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'COMMENT'}.
+                           "\'";
+		} else {
+                    printf "|%10s %-67s|\n","0",
+                           " No AddQuota, member in project \'".
+                           $project."\' (".$membership_string.")";
+		}
+            }
+            if ($quota_user_display eq "---"){
+                printf "|%10s %-67s|\n",$quota_user_display," (C) No Quota at the user Object \'".$user."\'";
+            } else {
+                printf "|%10s %-67s|\n",$quota_user_display," (C) Quota at the user will override all above settings";
+                printf "|%10s %-67s|\n"," "," Comment: \'".$quota_user_comment."\'";
+            }
+
+            # show calc 
+            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
+                printf "|%11s%-67s|\n",
+                       $calc_display,
+                       " CALC must be set for ".$user." on ".$share;
+            } else {
+                printf "|%11s%-67s|\n",
+                       $calc_display,
+                       " CALC was already set for ".$user." on ".$share;
+                my $mib=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}/1024;
+                printf "|%11s%-67s|\n",
+                       "",
+                       " SMB share quota was set to ".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}." Bytes (".
+                       $mib.
+                       " MiB)";
+            }
+	} else {
+            # print single line
+	    printf "| %-25s| %-7s|%6s|%5s |%5s | %-18s|\n",
+                   "$user($role:$school_default)",
+                   $share_display,
+                   $calc_display,
+                   $quota_user_display,
+                   $quota_class_display,
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSTRING'};
+        }
+    } # end of share walk
+
+    ############################################################
+    # MailQuota
+    my $mailquota_school_default=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'SCHOOLDEFAULT'};
+    my $mailquota_user_display;
+    my $mailquota_user_comment;
+    if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'}){
+        $mailquota_user_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'};
+	$mailquota_user_comment=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'COMMENT'};
+    } else {
+        $mailquota_user_display="---";
+        $mailquota_user_comment="---";
+    }
+    my $mailquota_class_display;
+    my $mailquota_class_comment;
+    if (defined $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'}){
+        $mailquota_class_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'VALUE'};
+        $mailquota_class_comment=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sophomorixMailQuota'}{'COMMENT'};
+    } else {
+        $mailquota_class_display="---";
+        $mailquota_class_comment="comment";
+    }
+
+    my $mailcalc_display;
+    if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+        # append asterisk
+        $mailcalc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}."*";
+    } else {
+        # append space
+        $mailcalc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'}." ";
+    }
+
+    # printout
+    if($Conf::log_level>=2){
+        # print extensive information
+        print $line;
+        printf "| %-77s|\n","MailQuota for user ".$user." in MiB (Mebibyte):";
+        printf "|%10s %-67s|\n",
+               $mailquota_school_default,
+               " (A) default MailQuota for sophomorixRole \'".$role."\'";
+        if ($mailquota_class_display ne "---"){
+            printf "|%10s %-67s|\n",
+                   $mailquota_class_display,
+                   " (B) Quota at the users class \'".
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                   "\': Overrides (A)";
+            printf "|%10s %-67s|\n",
+                   " ",
+                   " Comment: \'".
+                   $mailquota_class_comment.
+                   "\'";
+        } else {
+            printf "|%10s %-67s|\n",
+                   $mailquota_class_display,
+                   " (B) No Quota at the users class \'".
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLASS'}{'sAMAccountName'}.
+                   "\'";
+        }
+
+        foreach my $project ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+            my @reason=();
+            my $membership_string="";
+            foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'REASON'} }) {
+                push @reason,$reason;
+            }
+            @reason = sort @reason;
+            $membership_string=join(",",@reason);
+	    if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'}){
+		my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'};
+                printf "|%10s %-67s|\n",
+                       "+ ".
+                       $add,
+                       " AddMailQuota, member in project \'".
+                       $project.
+                       "\' (".$membership_string.")";
+                printf "|%10s %-67s|\n",
+                       "",
+                       " Comment: \'".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'COMMENT'}.
+                       "\'";
+	    } else {
+                printf "|%10s %-67s|\n",
+                       "0",
+                       " No AddMailQuota, member in project \'".
+                       $project."\' (".$membership_string.")";
+	    }
+        }
+        if ($mailquota_user_display eq "---"){
+            printf "|%10s %-67s|\n",
+                   $mailquota_user_display,
+                   " (C) No MailQuota at the user Object \'".
+                   $user.
+                   "\'";
+        } else {
+            printf "|%10s %-67s|\n",
+                   $mailquota_user_display,
+                   " (C) MailQuota at the user will override all above settings";
+            printf "|%10s %-67s|\n",
+                   " ",
+                   " Comment: \'".
+                   $mailquota_user_comment.
+                   "\'";
+        }
+
+        # show calc 
+        if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+            printf "|%11s%-67s|\n",
+                   $mailcalc_display,
+                   " MAILCALC must be set (old MAILCALC is ".
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}.
+                   " MiB)";
+        } else {
+            printf "|%11s%-67s|\n",
+                   $mailcalc_display,
+                   " MAILCALC was already set to ".
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}.
+                   " MiB";
+        }
+        print $line;
+    } else {
+        # print single line
+	printf "| %-25s| %-7s|%6s|%5s |%5s | %-18s|\n",
+               "$user($role:$mailquota_school_default)",
+               "**MQ**",
+               $mailcalc_display,
+               $mailquota_user_display,
+               $mailquota_class_display,
+               $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSTRING'};
+    }
+    #print "HERE QUOTA_USER END\n\n\n";
 }
 
 
