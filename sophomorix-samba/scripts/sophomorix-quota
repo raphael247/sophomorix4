@@ -38,6 +38,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  console_print_quota_user
+                                 console_print_mailquota_user
                                  remove_from_list    
                                  json_dump
                                  );
@@ -390,6 +391,12 @@ if ($info==1 and $json>0){
                                        school=>$school_share,
                                        ref_sophomorix_config=>\%sophomorix_config,
                                      });
+            &console_print_mailquota_user({user => $user,
+                                           log_level => $Conf::log_level,
+                                           ref_quota=>$ref_quota,
+                                           school=>$school_share,
+                                           ref_sophomorix_config=>\%sophomorix_config,
+                                         });
             if($Conf::log_level==1){
                 # print line after user
                 print $line;
