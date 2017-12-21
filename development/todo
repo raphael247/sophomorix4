@@ -19,6 +19,15 @@ Password for 'https://jeffbeck@github.com': ########
 ###########################################################
 Nächstes Entwicklertreffen:
 
+.ini-Dateien Vereinheitlichen:
+
+Wie wird eine on/off konfiguriert?
+
+TRUE/FALSE   # mein Favorit
+on/off
+yes/no
+1/0
+
 ------------------------------
 devices.txt
 Unterscheiden von:
@@ -337,6 +346,211 @@ Ende Mail
 NEXT/Todo:
 
 
+------------------------------------------------------------
+sophomorix-ui (oder sophomorix-webui)
+Allgemeiner Name für ds script wäre besser
+
+Ziele:
+- posivivliste
+  (bei komischer konfiguration lieber nix anzeigen)
+- auch weitere 'schulkonsolen' managebar
+  -> gleiches Prinzip 
+- Individuelle modulkonfiguration ermöglichen
+  per uer
+- SK-debian-Paket soll (ohne sophomorix-update)
+  - neues modul forcen können
+  - neues modul auswählbar machen können 
+
+AD attribute
+
+Folgende webui Attribute gibts (beim user)
+   * sophomorixWebuiDashboard (voerst single-value lassen)
+   * SophomorixWebuiPermissions 
+     * multi-value
+     * Einzelusereinstellungen
+     * gesetzt mit sophomorix-user
+   * SophomorixWebuiPermissionsCalculated 
+     * multi-value
+     * Resultat der Auswertung
+     * von sophomorix-ui geschrieben
+     * bei Schulkonsolenanmeldung ausgewertet für Anzeige
+
+Auswertung (=Berechnung des Attributes SophomorixWebuiPermissionsCalculated für jeden user)
+
+
+################   Kurzablauf: <webui> ist als variable zu sehen
+
+sophomorix-ui startet
+
+ 1) "Default des Developers":
+    auslesen der Konfigurationsdatei im <webui>-paket
+    Dort steht in welcher Rolle welches Modul angezeigt wird: 
+    Vorschlag (Modul filemanager):
+     [filemnager]
+         student=FALSE
+         teacher=TRUE
+         administrator=FALSE # false is the default
+         TRUE_ENTRY=.......   # Line for SophomorixWebuiPermissionsCalculated
+         FALSE_ENTRY.......   # Line for SophomorixWebuiPermissionsCalculated
+         (WARN_students=TRUE)
+         ...
+
+    Das wäre schön erweiterbar, falls es z.B. 
+       * abhängigkeiten der Module geben sollte usw.
+       * Warnung falls einen Schüler ein bestimmtes Modul freigeschaltet würde:
+         WARN_students=TRUE
+       * ...
+    Hier wär auch der beste Platz für die webui-Konfiguration selbst:
+       EXECUTABLE_PATH=.... /filemanager.py
+
+
+ 2) Schul-konfiguration in school.ini
+    (die sections gibts schon, statt TRUE,FALSE evtl. auch yes/no 0/1, ...)   
+  
+    [role.student]
+        webui=xx:TRUE,yy:FALSE
+    [role.teacher]
+        webui=xx:TRUE,yy:FALSE
+
+    Nur erwähnte Module erfahren eine Änderung gegenüber "Default des Developers"
+
+ 3) Individuelle Usereinstellugen im Attribut SophomorixWebuiPermissions
+    sofern im Multivalue-attribut SophomorixWebuiPermissions etwas steht, wird dies umgesetzt
+    (kann auch leer sein, dann keinerlei Änderungen)
+    Attributinhalt (Multi-Value):
+     filemanager:TRUE
+     quotamanager:FALSE
+     ...
+
+ 4) Für jeden user wird dann das multi-value Attribut SophomorixWebuiPermissionsCalculated
+    aktualisiert (falls notwendig)
+    Inhalt: So wie in TRUE_ENTRY=, FALSE_ENTRY=
+
+    Nicht erwähnte Module verbirgt die Schulkonsole (geht das???)
+    --> Dann müsste man nur die erlaubte Zeilen schreiben
+
+Anmerkungen:
+
+So wie jetzt bräuchte man für jede Schulkonsole neue Attribute.
+
+Zu überlegen wäre folgendes:
+
+WENN die Attribute so aussähen:
+
+   bei 3)
+     webui:filemanager:TRUE
+     webui:quotamanager:FALSE
+   bei 4)
+     webui:$TRUE_ENTRY
+
+DANN müsste jede UI selber rausfinden, welche Entries in SophomorixWebuiPermissionsCalculated für sie gelten.
+ABER: es wären für neue UI's keine neuen Attribute im AD erforderlich
+Geht das???
+
+################   Kurzablauf: ENDE
+
+
+Konfigurationsablauf:
+1) Pfad zur Konfigurationsdatei </pfad/festlegen/<Webui>.conf>
+  - Diese Datei ist im Schulkonsolenpaket, von Entwickler verwaltet
+  ? ini-Formatv oder eigenes Format
+  -- hier kann man (als Entwickler neue module hinzufügen/anzeigen lassen)
+
+2) school.ini: Rollenweise Konfiguration
+[role.student]
+	webui_show=modulname1,modulname2
+	webui_block=modulname1,modulname2
+[role.teacher]
+	webui_show=modulname1,modulname2
+	webui_block=modulname1,modulname2
+[role.administrator]
+	webui_show=modulname1,modulname2
+	webui_block=modulname1,modulname2
+
+
+------
+
+Script sophomorix-sk (schulkonsole??)
+
+Aufruf:
+sophomorix-sk --info
+  zeigt in jeder Schule, welche module wie konfiguriert sind
+sophomorix-sk --ui <Webui>
+              --school <schule>
+              --role <student|teacher|administrator>
+  konfiguriert für die sk <Webui> in der Schule <schule> für
+  alle user der Rolle <student|teacher|administrator> die zu
+  <Webui> gehörenden Attribute im AD.
+
+  A) liest die Paket-Konfiguration der SK ein <Webui>
+  B) modifiziert die Einstellungen entsprechend der school.ini
+  C) schreibt die attribute für alle user neu
+      ? Dauer
+      ? später auf eine Schule einschränkbar
+      ? später auf eine Rolle einschränkbar
+      ? evtl. nur die Differenzen schreiben
+
+
+
+Weitere Schulkonsole (z.B. 'miniui') hinzufügen wäre simple:
+-----
+A) Felder im AD schema anlegen sophomorix-miniui (multivalue)
+B) Pfad zur neuen SK-Konfigurationsdatei
+   -> config.developer
+   -> Attributnamen der Zielattribute Konfigurieren
+   
+C) Neue parameter in school.ini zulassen:
+
+Konfiguration bei der Rolle, z.B.
+[role.student]
+	miniui_show=modulname1,modulname2
+	miniui_block=modulname1,modulname2
+	
+Todo:
+1) default schulkonsolennamen festlegen(Groß/klein beachten): Webui
+   ---> so ÜBERALL verwenden
+        (Dateinamen, Optionsnamen, Attribute, ...)
+2) Attibute im Schema anpassen:
+   ---> Sophomorix-Webui-Dashboard            singlevalue
+   ---> Sophomorix-(Webui)-User-Permissions   multivalue -> todo
+        wird je nach Rolle befüllt, 1 Zeile 1 Value
+
+Fragen:
+1) Was kommt in dieses Attribut, und wie findet sophomorix den Inhalt:
+   Sophomorix-Webui-Dashboard            singlevalue
+   -> Zusatz-Paket-konfigurationsdatei???
+2) Brauchen andere schulkonsolen auch dieses Attribut??
+
+
+
+
+Alt: 
+
+ - Beispiel Konfigurationsdatei des Pakets (je modul 1 Zeile)
+    A) DEFAULT module werden angezeigt, wenn der admin sie nicht sperrt
+       (z.B. neue, getestete module herausbringen)
+       DEFAULT|<modulname>|<Zeile>
+       (Beispiel: DEFAULT|auth-users|sidebar.view:/view/auth-users:true)
+    B) MUST module werden angezeigt und können nicht gesperrt werden
+       (z.B. selbstausperren verhindern)
+       MUST|<modulname>|<Zeile>
+    C) MAY module können angezeigt werden, wenn der admin das konfiguriert
+       (z.B. module testen)
+       MAY|<modulname>|<Zeile>
+
+    * <modulname> ist der name unter dem dieses Modul in der
+      school.ini, bei Optionen usw. angesprochen werden kann.
+      (Vorschlag: keine Leerzeichen, kleinbuchstaben)
+
+
+
+------------------------------------------------------------
+
+
+
+
+
+
 Tests auf 17.10 linuxmuster.local/lan -> parameter testen 
 
 apt install emacs sshpass make nfs-common
@@ -452,11 +666,6 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 * wie geht das/geht das mit ldap-modify?
 
 
-
-AD attribute
-webui
-   * sophomorixWebuiDashboard (voerst single lassen
-   * sophomorixWebuiDashboardCalculated (vorerst weglassen)
 
 tests aller quota (4 angaben bei allen gruppen)
 
@@ -577,7 +786,7 @@ nicenstein
    1 Mailserver für alle schulen, gleiche maildomain (vorerst)
 
 
-sophomorix-webui user permissions, genauer
+
 sophomorix-school --check
    - sophomorix schaut, ob diese Schule existiert
    - Woran erkennbar?
@@ -624,97 +833,7 @@ Schulkonsolen-konfiguration
 
 TODO: kurzverfahren aufschreiben
 
-Ziele:
-- posivivliste
-  (bei misconfiguration lieber nicht anzeigen)
-- auch weitere schulkonsolen managebar
-- Individuelle modulkonfiguration ermöglichen
-- SK-debian-Paket soll (ohne sophomorix-update)
-  - neues modul forcen können
-  - neues modul auswählbar machen können 
-
 Umsetzung:
-1) Pfad zur Konfigurationsdatei </pfad/festlegen/<Webui>.conf>
-  - Diese Datei ist im Schulkonsolenpaket, von Entwickler verwaltet
-
-  - Beispiel Konfigurationsdatei des Pakets (je modul 1 Zeile)
-    A) DEFAULT module werden angezeigt, wenn der admin sie nicht sperrt
-       (z.B. neue, getestete module herausbringen)
-       DEFAULT|<modulname>|<Zeile>
-       (Beispiel: DEFAULT|auth-users|sidebar.view:/view/auth-users:true)
-    B) MUST module werden angezeigt und können nicht gesperrt werden
-       (z.B. selbstausperren verhindern)
-       MUST|<modulname>|<Zeile>
-    C) MAY module können angezeigt werden, wenn der admin das konfiguriert
-       (z.B. module testen)
-       MAY|<modulname>|<Zeile>
-
-    * <modulname> ist der name unter dem dieses Modul in der
-      school.ini, bei Optionen usw. angesprochen werden kann.
-      (Vorschlag: keine Leerzeichen, kleinbuchstaben)
-
-
-3) Sperren/Blockieren der Module bei der Rolle in der school.ini
-[role.student]
-	webui_show=modulname1,modulname2
-	webui_block=modulname1,modulname2
-[role.teacher]
-	webui_show=modulname1,modulname2
-	webui_block=modulname1,modulname2
-[role.administrator]
-	webui_show=modulname1,modulname2
-	webui_block=modulname1,modulname2
-
-
-Script sophomorix-sk (schulkonsole??)
-
-Aufruf:
-sophomorix-sk --info
-  zeigt in jeder Schule, welche module wie konfiguriert sind
-sophomorix-sk --ui <Webui>
-              --school <schule>
-              --role <student|teacher|administrator>
-  konfiguriert für die sk <Webui> in der Schule <schule> für
-  alle user der Rolle <student|teacher|administrator> die zu
-  <Webui> gehörenden Attribute im AD.
-
-  A) liest die Paket-Konfiguration der SK ein <Webui>
-  B) modifiziert die Einstellungen entsprechend der school.ini
-  C) schreibt die attribute für alle user neu
-      ? Dauer
-      ? später auf eine Schule einschränkbar
-      ? später auf eine Rolle einschränkbar
-      ? evtl. nur die Differenzen schreiben
-
-
-
-Weitere Schulkonsole (z.B. 'miniui') hinzufügen wäre simple:
-A) Felder im AD schema anlegen sophomorix-miniui (multivalue)
-B) Pfad zur neuen SK-Konfigurationsdatei
-   -> config.developer
-   -> Attributnamen der Zielattribute Konfigurieren
-   
-C) Neue parameter in school.ini zulassen:
-
-Konfiguration bei der Rolle, z.B.
-[role.student]
-	miniui_show=modulname1,modulname2
-	miniui_block=modulname1,modulname2
-	
-Todo:
-1) default schulkonsolennamen festlegen(Groß/klein beachten): Webui
-   ---> so ÜBERALL verwenden
-        (Dateinamen, Optionsnamen, Attribute, ...)
-2) Attibute im Schema anpassen:
-   ---> Sophomorix-Webui-Dashboard            singlevalue
-   ---> Sophomorix-(Webui)-User-Permissions   multivalue -> todo
-        wird je nach Rolle befüllt, 1 Zeile 1 Value
-
-Fragen:
-1) Was kommt in dieses Attribut, und wie findet sophomorix den Inhalt:
-   Sophomorix-Webui-Dashboard            singlevalue
-   -> Zusatz-Paket-konfigurationsdatei???
-2) Brauchen andere schulkonsolen auch dieses Attribut??
 
 
 ------------------------------------------------------------
@@ -786,8 +905,6 @@ wäre wohl besser deren defaultmembers im AD bei der Gruppe zu speichern
 ------------------------------------------------------------
 
 
-Attribute Quota als Multivalue name:wert
-
 
 Moodle Testzugriff Stefan
 Arbeitskreis
@@ -799,7 +916,6 @@ confidential: nicht schulweise
 sondern Mitgied in Gruppe
 
 sophomorix-device return json (import von Thomas auch)
- WebUI rechte via Sophomorix (LDAP)
 
 CUPS via Samba
 wer macht das?
@@ -3458,7 +3574,7 @@ add/move/kill
      - kill user markes with K
 
 sophomorix-kill:
-  list of groups tha will never be Killed
+  list of groups that will never be killed
   - attic
   - teachers
   - students
@@ -3476,7 +3592,7 @@ Attributes for a group
 
 sophomorix-useradd
   - replace default password 'linux' with 'LinuxMuster!'
-  - maybe put all options for adding users  to sophomorix-add
+  --> sophomorix.ini
 
 sophomorix-add:   
 call sophomorix-print correctly 
