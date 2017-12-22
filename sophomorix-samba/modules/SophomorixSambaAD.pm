@@ -4571,7 +4571,7 @@ sub AD_get_quota {
                 push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
                 # set maillist membership at user
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLISTMEMBER'}="TRUE";
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLIST_MEMBERSHIPS'}{$sam}="member";
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLIST_MEMBERSHIPS'}{$sam}=$entry->get_value('mail');
             }
 
             # save alias=TRUE at user if class requests alias
@@ -4731,7 +4731,7 @@ sub AD_get_quota {
                     push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
                     # set maillist membership at user
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLISTMEMBER'}="TRUE";
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLIST_MEMBERSHIPS'}{$sam}="member";
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLIST_MEMBERSHIPS'}{$sam}=$entry->get_value('mail');
                 }
 
                 # save alias=TRUE at user if class requests alias

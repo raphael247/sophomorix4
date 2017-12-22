@@ -1003,7 +1003,7 @@ sub console_print_mail_user {
     printf "%30s: %-40s\n","Calculated maillist membership",$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLISTMEMBER'};
     if ( $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLISTMEMBER'} eq "TRUE" ){
         foreach my $list (keys %{ $ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLIST_MEMBERSHIPS'} } ) {
-            printf "%30s: %-40s\n","* MAILLIST",$list;
+            printf "%30s: %-40s\n","* MAILLIST",$ref_mail->{'QUOTA'}{'USERS'}{$user}{'MAIL'}{'MAILLIST_MEMBERSHIPS'}{$list};
         }
     }
 }
