@@ -1084,18 +1084,18 @@ sub console_print_mailquota_user {
         foreach my $group ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
             my @reason=();
             my $membership_string="";
-            foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'REASON'} }) {
+            foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'REASON'} }) {
                 push @reason,$reason;
             }
             @reason = sort @reason;
             $membership_string=join(",",@reason);
-	    if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixAddMailQuota'}{'VALUE'}){
-		my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixAddMailQuota'}{'VALUE'};
+	    if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddMailQuota'}{'VALUE'}){
+		my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddMailQuota'}{'VALUE'};
                 printf "|%10s %-67s|\n",
                        "+ ".
                        $add,
                        " AddMailQuota, member in ".
-                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixType'}.
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixType'}.
                        " \'".
                        $group.
                        "\' (".
@@ -1104,13 +1104,13 @@ sub console_print_mailquota_user {
                 printf "|%10s %-67s|\n",
                        "",
                        " Comment: \'".
-                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixAddMailQuota'}{'COMMENT'}.
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddMailQuota'}{'COMMENT'}.
                        "\'";
 	    } else {
                 printf "|%10s %-67s|\n",
                        "0",
                        " No AddMailQuota, member in ".
-                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixType'}.
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixType'}.
                        " \'".
                        $group.
                        "\' (".
@@ -1160,7 +1160,7 @@ sub console_print_mailquota_user {
                $mailcalc_display,
                $mailquota_user_display,
                $mailquota_class_display,
-               $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSTRING'};
+               $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'GROUPSTRING'};
     }
 }
 
@@ -1276,28 +1276,28 @@ sub console_print_quota_user {
             foreach my $group ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
                 my @reason=();
                 my $membership_string="";
-                foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'REASON'} }) {
+                foreach my $reason (keys %{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'REASON'} }) {
                     push @reason,$reason;
                 }
                 @reason = sort @reason;
                 $membership_string=join(",",@reason);
-		if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'}){
-		    my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'};
+		if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'}){
+		    my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'};
                     printf "|%10s %-67s|\n","+ ".$add,
                            " AddQuota, member in ".
-                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixType'}.
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixType'}.
                            " \'".
                            $group.
                            "\' (".
                            $membership_string.")";
                     printf "|%10s %-67s|\n","",
                            " Comment: \'".
-                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixAddQuota'}{$share}{'COMMENT'}.
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddQuota'}{$share}{'COMMENT'}.
                            "\'";
 		} else {
                     printf "|%10s %-67s|\n","0",
                            " No AddQuota, member in ".
-                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$group}{'sophomorixType'}.
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixType'}.
                            " \'".
                            $group.
                            "\' (".
@@ -1336,7 +1336,7 @@ sub console_print_quota_user {
                    $calc_display,
                    $quota_user_display,
                    $quota_class_display,
-                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSTRING'};
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'GROUPSTRING'};
         }
     } # end of share walk
 }

@@ -4363,8 +4363,8 @@ sub AD_get_quota {
     # LISTS->USER_by_SCHOOL-><school>->@users  # list which users have quota on this school
     # LISTS->CLASS_by_SHARE-><share>->@users  # list which classes have quota on the share
     # LISTS->CLASS_by_SCHOOL-><school>->@users  # list which classes have quota on this school
-    # LISTS->PROJECT_by_SHARE-><share>->@users  # list which projects have quota on the share
-    # LISTS->PROJECT_by_SCHOOL-><school>->@users  # list which projects have quota on this school
+    # LISTS->GROUPS_by_SHARE-><share>->@users  # list which groups have quota on the share
+    # LISTS->GROUPS_by_SCHOOL-><school>->@users  # list which groups have quota on this school
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -4599,12 +4599,7 @@ sub AD_get_quota {
 	}
     } # end CLASS
 
-# old: project
-#    my $filter3="(&".
-#	" (objectClass=group)".
-#               " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'PROJECT'}.")".
-#               ")";
-    # PROJECT/GROUP quota 
+    # GROUP quota 
     my $filter3="(&".
 	" (objectClass=group) (| ".
                " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'PROJECT'}.")".
@@ -4625,25 +4620,25 @@ sub AD_get_quota {
                              'sophomorixMailList',
                              'sophomorixMailAlias',
                             ]);
-    my $max_project = $mesg->count; 
+    my $max_group = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
-        "$max_project sophomorix projects found in AD");
-    # walk through all projects/sophomorix-groups
-    # create project/sophomorix-groups LOOKUP table
-    for( my $index = 0 ; $index < $max_project ; $index++) {
+        "$max_group sophomorix projects/sophomorix-groups found in AD");
+    # walk through all GROUPS
+    # create GROUPS LOOKUP table
+    for( my $index = 0 ; $index < $max_group ; $index++) {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $school=$entry->get_value('sophomorixSchoolname');
 	my @member = $entry->get_value('member');
-        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$dn}=$sam;
-        $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'DN_by_sAMAccountName'}{$sam}=$dn;
-	push @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam} }, @member;
+        $quota{'QUOTA'}{'LOOKUP'}{'GROUPS'}{'sAMAccountName_by_DN'}{$dn}=$sam;
+        $quota{'QUOTA'}{'LOOKUP'}{'GROUPS'}{'DN_by_sAMAccountName'}{$sam}=$dn;
+	push @{ $quota{'QUOTA'}{'LOOKUP'}{'GROUPS'}{'MEMBER'}{$sam} }, @member;
     }
 
-    # walk through all projects/sophomorix-groups
+    # walk through all GROUPS
     # this time, update user quota
-    for( my $index = 0 ; $index < $max_project ; $index++) {
+    for( my $index = 0 ; $index < $max_group ; $index++) {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
@@ -4659,12 +4654,12 @@ sub AD_get_quota {
 	my $count=0;
 	my %seen=();
 
-        # save stuff about projects/sophomorix-groups
+        # save stuff about GROUPS
   	$quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixSchoolname'}=$school;
         $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixType'}=$type;
-	push @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }, $sam; 
+	push @{ $quota{'LISTS'}{'GROUPS_by_SCHOOL'}{$school} }, $sam; 
 
-        # save maillist stuff about projects/sophomorix-groups
+        # save maillist stuff about GROUPS
         $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixMailList'}=$maillist;
         $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixMailAlias'}=$mailalias;
         $quota{'QUOTA'}{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');
@@ -4680,7 +4675,7 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
         # remember nondefault mailquota
         if ($addmailquota_value ne "---" or $addmailquota_comment ne "---"){
-  	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'} }, $addmailquota;
+  	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'} }, $addmailquota;
         }                
 
         # addquota
@@ -4690,18 +4685,18 @@ sub AD_get_quota {
             $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
             # remember nondefault quota
             if ($value ne "---" or $comment ne "---"){
-  	        push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} }, $addquota;
+  	        push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddQuota'} }, $addquota;
             }                
-	    push @{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }, $sam; 
+	    push @{ $quota{'LISTS'}{'GROUPS_by_SHARE'}{$share} }, $sam; 
         }
-        if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} ){
+        if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddQuota'} ){
             # sort list if its there (otherwise empty list is created)
-            @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} }= sort
-	        @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} };
+            @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddQuota'} }= sort
+	        @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddQuota'} };
         }
 
 	my $count_initial_member=$#member+1;
-	# @addquota contains addquota info of the project
+	# @addquota contains addquota info of the group
         foreach my $member (@member){
 	    if (exists $seen{$member}){
 		print "skipping (seen already): $member\n";
@@ -4711,19 +4706,19 @@ sub AD_get_quota {
 	    }
 	    $count++;
 	    
-	    # walk through all members: (user,class,project)
+	    # walk through all members: (user,class,groups)
 	    if (exists $quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member}){
                 ########################################
                 # member is a user
                 my $sam_user=$quota{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_DN'}{$member};
-                #print "$sam_user is a member-USER of project $sam\n";
-                # save data about project at user
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
+                #print "$sam_user is a member-USER of group $sam\n";
+                # save data about GROUP at user
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'sophomorixType'}=$type;
                 if ($count>$count_initial_member){
                     # appended memberships		
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
                 } else {
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'REASON'}{'USER'}="TRUE";
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'REASON'}{'USER'}="TRUE";
                 }
 
                 # save member in maillist if requested 
@@ -4743,14 +4738,14 @@ sub AD_get_quota {
 
                 # save mailquota info at user
                 my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
-                $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
+                $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
 
 	        # save quota info at user
 	        foreach my $addquota (@addquota){
 	            my ($share,$value,$comment)=split(/:/,$addquota);
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
 		    # remember share for later listing
 		    push @{ $quota{'QUOTA'}{'USERS'}{$sam_user}{'SHARELIST'} }, $share;
 	        }
@@ -4758,43 +4753,43 @@ sub AD_get_quota {
                 ########################################		
                 # member is a class (adminclass,teacherclass)
                 my $sam_class=$quota{'QUOTA'}{'LOOKUP'}{'CLASS'}{'sAMAccountName_by_DN'}{$member};
-                #print "$sam_class is a member-CLASS of project $sam\n";
+                #print "$sam_class is a member-CLASS of group $sam\n";
 		# save quota info at each user of member-CLASS
 		foreach my $user (keys %{ $quota{'QUOTA'}{'LOOKUP'}{'MEMBERS_by_CLASS'}{$sam_class} }) {
-                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixType'}=$type;
+                    $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'sophomorixType'}=$type;
                     if ($count>$count_initial_member){
                         # appended memberships		
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
+                        $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
                     } else {
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'REASON'}{'CLASS'}="TRUE";
+                        $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'REASON'}{'CLASS'}="TRUE";
                     }
 
                     # save mailquota info at user
                     my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
-                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
-                    $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
+                    $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
+                    $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
 
 	            # save quota info at user
 	            foreach my $addquota (@addquota){
 	                my ($share,$value,$comment)=split(/:/,$addquota);
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
-                        $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
+                        $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
+                        $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
 		        # remember share for later listing
 		        push @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }, $share;
                         # remember on which share have which users quota settings
 	    	        push @{ $quota{'LISTS'}{'USER_by_SHARE'}{$share}}, $user;                
 	            }
 		}
-	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member}){
+	    } elsif (exists $quota{'QUOTA'}{'LOOKUP'}{'GROUPS'}{'sAMAccountName_by_DN'}{$member}){
 		########################################
-		# member is a project
-                my $sam_project=$quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'sAMAccountName_by_DN'}{$member};
-                #print "$sam_project is a member-PROJECT of project $sam\n";
-		# append the members of the project so that this foreach-loop will analyse it, too
-	        push @member, @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam_project} };
+		# member is a GROUP
+                my $sam_group=$quota{'QUOTA'}{'LOOKUP'}{'GROUPS'}{'sAMAccountName_by_DN'}{$member};
+                #print "$sam_group is a member-GROUP of GROUP $sam\n";
+		# append the members of the group so that this foreach-loop will analyse it, too
+	        push @member, @{ $quota{'QUOTA'}{'LOOKUP'}{'GROUPS'}{'MEMBER'}{$sam_group} };
 	    }
 	}
-    } # end PROJECT quota
+    } # end GROUP quota
 
 
     ############################################################
@@ -4807,9 +4802,9 @@ sub AD_get_quota {
 	@{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }= 
             sort @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} };
 
-        # create alphabetical projectlist (is unique alredy)
-        foreach my $project (keys %{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'} }) {
-            push @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'}}, $project; 
+        # create alphabetical group list (is unique alredy)
+        foreach my $group (keys %{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'} }) {
+            push @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'}}, $group; 
         }
         if (exists $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'}){
 	    @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }= 
@@ -4817,25 +4812,25 @@ sub AD_get_quota {
 	}
 
         ############################################################
-        # sum up AddMailQuota from projects for each share
+        # sum up AddMailQuota from GROUPS for each share
         my $mailcalc=1;
-        my $mailproject_sum=0;
-        my $mailproject_string="---";
-         foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
-             if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'}){
-                 if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'} ne "---"){
-                     my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'};
-                     $mailproject_sum=$mailproject_sum+$add;
-                     if ($mailproject_string eq "---"){
-                         $mailproject_string=$add;
+        my $mail_group_sum=0;
+        my $mail_group_string="---";
+         foreach my $group ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
+             if (exists $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddMailQuota'}{'VALUE'}){
+                 if ($quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddMailQuota'}{'VALUE'} ne "---"){
+                     my $add=$quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddMailQuota'}{'VALUE'};
+                     $mail_group_sum=$mail_group_sum+$add;
+                     if ($mail_group_string eq "---"){
+                         $mail_group_string=$add;
                      } else {
-                         $mailproject_string=$mailproject_string."+".$add;
+                         $mail_group_string=$mail_group_string."+".$add;
                      }
                  }
              }
         }
-        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSTRING'}=$mailproject_string;
-        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'PROJECTSUM'}=$mailproject_sum;
+        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'GROUPSTRING'}=$mail_group_string;
+        $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'GROUPSUM'}=$mail_group_sum;
 
         ############################################################
         # add everything up (mailquota)
@@ -4847,7 +4842,7 @@ sub AD_get_quota {
             } elsif (exists $quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'SCHOOLDEFAULT'}){
                 $base=$quota{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'SCHOOLDEFAULT'};
             }
-            $mailcalc=$base+$mailproject_sum;
+            $mailcalc=$base+$mail_group_sum;
         } else {
             $mailcalc=$quota{'QUOTA'}{'USERS'}{$user}{'sophomorixMailQuota'}{'VALUE'}
         }
@@ -4879,11 +4874,11 @@ sub AD_get_quota {
 
 
         ############################################################
-        # sum up AddQuota from projects for each share
+        # sum up AddQuota from GROUPS for each share
         my $calc=1;
         foreach my $share ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }) {
-            my $project_sum=0;
-            my $project_string="---";
+            my $group_sum=0;
+            my $group_string="---";
             my $quota_user;
   	    if (defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'}){
 	         $quota_user=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'};
@@ -4896,23 +4891,23 @@ sub AD_get_quota {
 	    } else {
                 $quota_class="---";
             }
-            # save the quota values of a project for later use
-            foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
-                if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'}){
-                    if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'} ne "---"){
-                        my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'};
-                        $project_sum=$project_sum+$add;
-                        if ($project_string eq "---"){
-                            $project_string=$add;
+            # save the quota values of a GROUP for later use
+            foreach my $group ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
+                if (exists $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'}){
+                    if ($quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'} ne "---"){
+                        my $add=$quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$group}{'sophomorixAddQuota'}{$share}{'VALUE'};
+                        $group_sum=$group_sum+$add;
+                        if ($group_string eq "---"){
+                            $group_string=$add;
                         } else {
-                            $project_string=$project_string."+".$add;
+                            $group_string=$group_string."+".$add;
                         }
                     }
                 }
-            } # end project
+            } # end group
 
-            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSTRING'}=$project_string;
-            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'PROJECTSUM'}=$project_sum;
+            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'GROUPSTRING'}=$group_string;
+            $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'GROUPSUM'}=$group_sum;
 
             ############################################################
             # add everything up (quota)
@@ -4926,7 +4921,7 @@ sub AD_get_quota {
                     $base=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'SHAREDEFAULT'};
                 }
                 # add addquota
-                $calc=$base+$project_sum;
+                $calc=$base+$group_sum;
             } else {
                 # override with quota from user attribute
                 $calc=$quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'sophomorixQuota'};
@@ -5013,19 +5008,19 @@ sub AD_get_quota {
 	@{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} }= 
             sort @{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} };
     }
-    foreach my $share (keys %{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'} }) {
+    foreach my $share (keys %{ $quota{'LISTS'}{'GROUPS_by_SCHOOL'} }) {
         # uniquefi and sort users
-	@{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} }= 
-            uniq(@{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} });
-	@{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} }= 
-            sort @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$share} };
+	@{ $quota{'LISTS'}{'GROUPS_by_SCHOOL'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'GROUPS_by_SCHOOL'}{$share} });
+	@{ $quota{'LISTS'}{'GROUPS_by_SCHOOL'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'GROUPS_by_SCHOOL'}{$share} };
     }
-    foreach my $share (keys %{ $quota{'LISTS'}{'PROJECT_by_SHARE'} }) {
+    foreach my $share (keys %{ $quota{'LISTS'}{'GROUPS_by_SHARE'} }) {
         # uniquefi and sort users
-	@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }= 
-            uniq(@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} });
-	@{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} }= 
-            sort @{ $quota{'LISTS'}{'PROJECT_by_SHARE'}{$share} };
+	@{ $quota{'LISTS'}{'GROUPS_by_SHARE'}{$share} }= 
+            uniq(@{ $quota{'LISTS'}{'GROUPS_by_SHARE'}{$share} });
+	@{ $quota{'LISTS'}{'GROUPS_by_SHARE'}{$share} }= 
+            sort @{ $quota{'LISTS'}{'GROUPS_by_SHARE'}{$share} };
     }
     # sort maillist stuff
     foreach my $school (keys %{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'} }) {

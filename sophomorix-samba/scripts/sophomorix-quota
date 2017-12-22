@@ -284,12 +284,12 @@ if ($show_nondefault==1){
 	        print "  CLASS: $class --> $mailquota (MAILQUOTA)\n";
 	    }            
         }
-        foreach my $project ( @{ $ref_quota->{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }){
+        foreach my $project ( @{ $ref_quota->{'LISTS'}{'GROUPS_by_SCHOOL'}{$school} }){
             #print "PROJECT: $project\n";
-            foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$project}{'sophomorixAddQuota'} }){
+            foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$project}{'sophomorixAddQuota'} }){
 	        print "  PROJECT: $project --> $quota\n";
 	    }
-            foreach my $mailquota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$project}{'sophomorixAddMailQuota'} }){
+            foreach my $mailquota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$project}{'sophomorixAddMailQuota'} }){
 	        print "  PROJECT: $project --> $mailquota (MAILQUOTA)\n";
 	    }
         }
