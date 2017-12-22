@@ -197,9 +197,11 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
 
-# append p_ if omitted
-unless ($project =~ m/^p\_/) { 
-    $project="p_".$project;
+if ($project ne ""){
+    # append p_ if omitted
+    unless ($project =~ m/^p\_/) { 
+        $project="p_".$project;
+    }
 }
 
 
@@ -280,8 +282,6 @@ Please see the sophomorix-project(8) man pages for full documentation
    print "\n";
    exit;
 }
-
-
 
 
 

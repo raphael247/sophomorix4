@@ -5280,7 +5280,7 @@ sub AD_get_groups_v {
     # search for all sophomorix groups
     # Setting the filters
     my $filter="(objectclass=group)"; 
-    print "Filter: $filter\n";
+    # print "Filter: $filter\n";
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
