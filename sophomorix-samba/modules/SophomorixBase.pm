@@ -489,7 +489,7 @@ sub _console_print_classes_overview {
 
 sub _console_print_groups_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line="+-------------------+--+--+--+----------------------------------------------+\n";
+    my $line="+-------------------+--+---+-+-+--+--+--+------------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -504,18 +504,37 @@ sub _console_print_groups_overview {
             next;
         }
         print $line;
-        print "| Group Name        | m| t| s| Group Description                            |\n";
+        print "| Group Name        |AQ|AMQ|A|L| m| t| s| Group Description                  |\n";
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }){
-            printf "| %-18s|%2s|%2s|%2s| %-45s|\n",
+            my $AMQ;
+            if ($ref_groups_v->{'GROUPS'}{$group}{'sophomorixAddMailQuota'} eq "---:---:"){
+                $AMQ=" - "; # unmodified
+            } else {
+                $AMQ=" * "; # modified
+            }
+            my $AQ=0;
+            foreach my $addquota ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAddQuota'} }){
+                my ($share,$value,$comment)=split(/:/,$addquota);
+		if ($value ne "---" or $comment ne "---"){
+                    $AQ++;
+                }
+            }
+
+            printf "| %-18s|%2s|%3s|%1s|%1s|%2s|%2s|%2s| %-35s|\n",
                 $group,
+                $AQ,
+                $AMQ,
+                substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailAlias'},0,1),
+                substr($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailList'},0,1),
                 $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'TOTAL'},
                 $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'teacher'},
                 $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'student'},
 	        $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
-        print "m=member-entries  t=teachers  s=students\n";
+        print "AQ=AddQuota  AMQ=AddMailQuota A=MailAlias   L=MaiList\n";
+        print " m=member-entries             t=teachers    s=students\n";
     }
 }
 
@@ -559,7 +578,7 @@ sub _console_print_managementgroups_overview {
 
 sub _console_print_projects_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line = "+----------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
+    my $line = "+---------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -590,7 +609,7 @@ sub _console_print_projects_overview {
                     $AQ++;
                 }
             }
-            printf "| %-21s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s\n",
+            printf "| %-20s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s\n",
                     $group,
                     $AQ,
                     $AMQ,
