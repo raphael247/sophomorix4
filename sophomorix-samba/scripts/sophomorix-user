@@ -198,13 +198,14 @@ my $testopt=GetOptions(
 my %sophomorix_result=&result_sophomorix_init("sophomorix-user");
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt,\%sophomorix_result,$json);
-#&check_connections();
+
+
+# Scriptname ermitteln
+my @list = split(/\//,$0);
+my $scriptname = pop @list;
 
 # --help
 if ($help==1) {
-   # Scriptname ermitteln
-   my @list = split(/\//,$0);
-   my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
 sophomorix-user edits the sophomorix user database.
@@ -383,32 +384,14 @@ if ($user ne "" and $info==1){
                 hash_ref => $ref_users,
                 sophomorix_config => \%sophomorix_config,
                });
+    # print more info stuff
+    print "More info with:\n"; 
+    if ($Conf::log_level==1){
+        print "   $scriptname -iv -u $user\n";
+    }
+    print "   sophomorix-quota -iv -u $user\n";
+    print "   sophomorix-mail -iv -u $user\n";
     exit;
-    # my $filter="(&(objectclass=user) $user_filter  $school_filter)"; 
-    # if($Conf::log_level>=2){
-    #     print "Filter: $filter\n";
-    # }
-    # my $mesg = $ldap->search(
-    #                   base   => $root_dse,
-    #                   scope => 'sub',
-    #                   filter => $filter,
-    #                   attr => ['cn','unicodePwd']
-    # 	);
-    # my $number = $mesg->count;
-    # if ($number==0){
-    #     print "\n";
-    #     print "No results found in this search\n";
-    # } else {
-    #     my $count=0;
-    #     foreach my $entry ($mesg->all_entries) {
-    #         $count++; 
-    #         my $sam = $entry->get_value ('sAMAccountName');
-    #         print "\n";
-    #         &print_title("User $count: $sam");
-    #         $entry->dump; 
-    #     }
-    # }
-    # exit;
 } elsif ($list_teachers_by_year==1){
     print "... still to do!\n";
     #&list_teachers_by_year();
