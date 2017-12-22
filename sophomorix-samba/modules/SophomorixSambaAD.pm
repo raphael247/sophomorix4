@@ -4809,11 +4809,11 @@ sub AD_get_quota {
 
         # create alphabetical projectlist (is unique alredy)
         foreach my $project (keys %{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'} }) {
-            push @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'}}, $project; 
+            push @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'}}, $project; 
         }
-        if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'}){
-	    @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }= 
-                sort @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} };
+        if (exists $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'}){
+	    @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }= 
+                sort @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} };
 	}
 
         ############################################################
@@ -4821,7 +4821,7 @@ sub AD_get_quota {
         my $mailcalc=1;
         my $mailproject_sum=0;
         my $mailproject_string="---";
-         foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+         foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
              if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'}){
                  if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'} ne "---"){
                      my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddMailQuota'}{'VALUE'};
@@ -4897,7 +4897,7 @@ sub AD_get_quota {
                 $quota_class="---";
             }
             # save the quota values of a project for later use
-            foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'PROJECTLIST'} }) {
+            foreach my $project ( @{ $quota{'QUOTA'}{'USERS'}{$user}{'GROUPLIST'} }) {
                 if (exists $quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'}){
                     if ($quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'} ne "---"){
                         my $add=$quota{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'};
