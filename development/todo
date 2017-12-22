@@ -19,6 +19,16 @@ Password for 'https://jeffbeck@github.com': ########
 ###########################################################
 Nächstes Entwicklertreffen:
 
+-------------------------------
+Loginnamenerstellung:
+bei mms (Massive-Multischool) gibts doppelung von loginnamen
+Lösungen:
+  - schalter bei sophomorix.conf
+    TEACHER_LOGIN_PREFIX=yes/no
+    --> setzt vor lehrerlogins den prefix der Schule (default-school nicht)
+Default ist: kein prefix
+
+-------------------------------
 .ini-Dateien Vereinheitlichen:
 
 Wie wird eine on/off konfiguriert?
@@ -262,6 +272,12 @@ so umbauen, dass es auch Einzelquota für admins setzen kann
 TODO: weiter mail:
 
 ----------
+sophomorix-user -u <loginname>
+- soll auch history anzeigen
+- falls user nicht existiert, history anzeigen
+  - login testen vor neuanlegen
+
+
 OK: sophomorix-mail -iv -u oe23
 
 sophomorix-quota -iv -u oe23
