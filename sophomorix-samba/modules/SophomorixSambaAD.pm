@@ -4654,15 +4654,15 @@ sub AD_get_quota {
 	my $count=0;
 	my %seen=();
 
-        # save stuff about projects
-  	$quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixSchoolname'}=$school;
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixType'}=$type;
+        # save stuff about projects/sophomorix-groups
+  	$quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixSchoolname'}=$school;
+        $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixType'}=$type;
 	push @{ $quota{'LISTS'}{'PROJECT_by_SCHOOL'}{$school} }, $sam; 
 
-        # save maillist stuff about projects
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'}=$maillist;
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailAlias'}=$mailalias;
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'mail'}=$entry->get_value('mail');
+        # save maillist stuff about projects/sophomorix-groups
+        $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixMailList'}=$maillist;
+        $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixMailAlias'}=$mailalias;
+        $quota{'QUOTA'}{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');
         if ($maillist eq "TRUE"){
             $quota{'MAILLIST'}{$sam}{'mail'}=$entry->get_value('mail');
             push @{ $quota{'LISTS'}{'MAILLISTS_by_SCHOOL'}{$school} },$sam;
@@ -4671,8 +4671,8 @@ sub AD_get_quota {
 
         # addmailquota
         my ($addmailquota_value,$addmailquota_comment)=split(/:/,$addmailquota);
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
-        $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
+        $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'VALUE'}=$addmailquota_value;
+        $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}{'COMMENT'}=$addmailquota_comment;
         # remember nondefault mailquota
         if ($addmailquota_value ne "---" or $addmailquota_comment ne "---"){
   	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddMailQuota'} }, $addmailquota;
@@ -4681,8 +4681,8 @@ sub AD_get_quota {
         # addquota
 	foreach my $addquota (@addquota){
 	    my ($share,$value,$comment)=split(/:/,$addquota);
-            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
-            $quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
+            $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'VALUE'}=$value;
+            $quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixAddQuota'}{$share}{'COMMENT'}=$comment;
             # remember nondefault quota
             if ($value ne "---" or $comment ne "---"){
   	        push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'PROJECT'}{$sam}{'sophomorixAddQuota'} }, $addquota;
@@ -4722,7 +4722,7 @@ sub AD_get_quota {
                 }
 
                 # save member in maillist if requested 
-                if ($quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailList'} eq "TRUE"){
+                if ($quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixMailList'} eq "TRUE"){
                     push @{ $quota{'MAILLIST'}{$sam}{LIST} },$quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'mail'};
                     # set maillist membership at user
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'MAILLISTMEMBER'}="TRUE";
@@ -4730,7 +4730,7 @@ sub AD_get_quota {
                 }
 
                 # save alias=TRUE at user if class requests alias
-                if ($quota{'QUOTA'}{'PROJECTS'}{$sam}{'sophomorixMailAlias'} eq "TRUE"){
+                if ($quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixMailAlias'} eq "TRUE"){
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'ALIAS'}="TRUE";
                 } else {
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'MAIL'}{'ALIAS'}="FALSE";
