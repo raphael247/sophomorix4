@@ -75,6 +75,7 @@ $Data::Dumper::Terse = 1;
             AD_get_print_data
             AD_class_fetch
             AD_project_fetch
+            AD_group_fetch
             AD_dn_fetch_multivalue
             AD_project_sync_members
             AD_object_move
@@ -4371,7 +4372,6 @@ sub AD_get_quota {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # USER quota (sophomorix user)
-#    my $filter2="(&(objectClass=user) (sophomorixRole=*))"; # all sophomorix users
     my $filter2="(&(objectClass=user) (| (sophomorixRole=student) (sophomorixRole=teacher) ) )";
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -4599,12 +4599,17 @@ sub AD_get_quota {
 	}
     } # end CLASS
 
-
-    # PROJECT quota 
+# old: project
+#    my $filter3="(&".
+#	" (objectClass=group)".
+#               " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'PROJECT'}.")".
+#               ")";
+    # PROJECT/GROUP quota 
     my $filter3="(&".
-	" (objectClass=group)".
+	" (objectClass=group) (| ".
                " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'PROJECT'}.")".
-               ")";
+               " (sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'GROUP'}.")".
+               " ) )";
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
@@ -4623,8 +4628,8 @@ sub AD_get_quota {
     my $max_project = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
         "$max_project sophomorix projects found in AD");
-    # walk through all projects
-    # create project LOOKUP table
+    # walk through all projects/sophomorix-groups
+    # create project/sophomorix-groups LOOKUP table
     for( my $index = 0 ; $index < $max_project ; $index++) {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
@@ -4636,7 +4641,7 @@ sub AD_get_quota {
 	push @{ $quota{'QUOTA'}{'LOOKUP'}{'PROJECT'}{'MEMBER'}{$sam} }, @member;
     }
 
-    # walk through all projects
+    # walk through all projects/sophomorix-groups
     # this time, update user quota
     for( my $index = 0 ; $index < $max_project ; $index++) {
         my $entry = $mesg->entry($index);
@@ -5594,6 +5599,31 @@ sub AD_class_fetch {
 
 
 
+sub AD_group_fetch {
+    my ($ldap,$root_dse,$group) = @_;
+    my $dn="";
+    my $sam_account=""; # the search result i.e. p_abt3
+    my $school_AD="";
+
+    my $filter="(&(objectClass=group)(sophomorixType=sophomorix-group)(sAMAccountName=".$group."))";
+    print "Filter: $filter\n";
+    my $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                         );
+    my $max_group = $mesg->count; 
+    for( my $index = 0 ; $index < $max_group ; $index++) {
+        my $entry = $mesg->entry($index);
+        $dn=$entry->dn();
+	$school_AD = $entry->get_value('sophomorixSchoolname');
+    }
+    print "$dn\n";
+    return ($dn,$max_group,$school_AD);
+}
+
+
+
 sub AD_project_fetch {
     my ($ldap,$root_dse,$pro,$school,$info) = @_;
     my $dn="";
@@ -6202,6 +6232,33 @@ sub AD_group_create {
                                 ]
                             );
            &AD_debug_logdump($result,2,(caller(0))[3]);
+	} elsif ($type eq "sophomorix-group"){
+            my $result = $ldap->add( $dn,
+                                attr => [
+                                    cn   => $cn,
+                                    description => $description,
+                                    sAMAccountName => $group,
+                                    mail => $mail,
+                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixType => $type, 
+                                    sophomorixSchoolname => $school, 
+                                    sophomorixStatus => $status,
+                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                                        "$school:---:---:"],
+                                    sophomorixAddMailQuota => ["---:---:"],
+                                    sophomorixQuota => "---",
+                                    sophomorixMailQuota => "---",
+                                    sophomorixMaxMembers => "0",
+                                    sophomorixMailAlias => "FALSE",
+                                    sophomorixMailList => "FALSE",
+                                    sophomorixJoinable => $joinable,
+                                    sophomorixHidden => "FALSE",
+                                    gidNumber => $gidnumber_wish,
+                                    objectclass => ['top',
+                                                      'group' ],
+                                ]
+                            );
+            &AD_debug_logdump($result,2,(caller(0))[3]);
         } else {
             my $result = $ldap->add( $dn,
                                 attr => [

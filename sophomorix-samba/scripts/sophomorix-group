@@ -39,6 +39,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_unbind_admin
                                  AD_get_name_tokened
                                  AD_group_create
+                                 AD_group_update
+                                 AD_group_fetch
                                  AD_group_kill
                                  AD_group_addmember
                                  AD_group_removemember
@@ -77,6 +79,12 @@ my $creategroup="";
 my $addgroup="";
 my $removegroup="";
 
+my $description;
+my $addquota;
+my $addmailquota;
+my $mailalias;
+my $maillist;
+
 my $skiplock=0;
 
 # Parsen der Optionen
@@ -94,6 +102,11 @@ my $testopt=GetOptions(
            "removemember=s" => \$removemember,
            "addgroup=s" => \$addgroup,
            "removegroup=s" => \$removegroup,
+           "description=s" => \$description,
+           "addquota=s" => \$addquota,
+           "addmailquota=s" => \$addmailquota,
+           "mailalias!" => \$mailalias,
+           "maillist!" => \$maillist,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-group");
@@ -296,6 +309,82 @@ if ($addgroup ne ""){
                          addgroup => $addgroup,
                        });   
 }
+
+
+
+
+
+# get dn if project exists and continue
+############################################################
+my ($dn_group,$count,$school_AD)=&AD_group_fetch($ldap,$root_dse,$group);
+
+# --description <strg>
+if (defined $description){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_group,
+		      school=>$school_AD,
+                      type=>"sophomotix-group",
+                      description=>$description,
+                      sophomorix_config=>\%sophomorix_config,
+                    });
+}
+
+
+# --addquota <strg>
+if (defined $addquota){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_group,
+		      school=>$school_AD,
+                      type=>"sophomotix-group",
+                      addquota=>$addquota,
+                      sophomorix_config=>\%sophomorix_config,
+                    });
+}
+
+
+# --addmailquota <strg>
+if (defined $addmailquota){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_group,
+		      school=>$school_AD,
+                      type=>"sophomotix-group",
+                      addmailquota=>$addmailquota,
+                      sophomorix_config=>\%sophomorix_config,
+                    });
+}
+
+
+# --mailalias/nomailalias
+if (defined $mailalias){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_group,
+		      school=>$school_AD,
+                      type=>"sophomotix-group",
+                      mailalias=>$mailalias,
+                      sophomorix_config=>\%sophomorix_config,
+                    });
+}
+
+# --maillist/--nomaillist
+if (defined $maillist){
+    &AD_group_update({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      dn=>$dn_group,
+		      school=>$school_AD,
+                      type=>"sophomotix-group",
+                      maillist=>$maillist,
+                      sophomorix_config=>\%sophomorix_config,
+                    });
+}
+
+
+
+
+
 
 &AD_unbind_admin($ldap);
 

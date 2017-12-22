@@ -1093,9 +1093,13 @@ sub console_print_mailquota_user {
                 printf "|%10s %-67s|\n",
                        "+ ".
                        $add,
-                       " AddMailQuota, member in project \'".
+                       " AddMailQuota, member in ".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixType'}.
+                       " \'".
                        $project.
-                       "\' (".$membership_string.")";
+                       "\' (".
+                       $membership_string.
+                       ")";
                 printf "|%10s %-67s|\n",
                        "",
                        " Comment: \'".
@@ -1104,8 +1108,13 @@ sub console_print_mailquota_user {
 	    } else {
                 printf "|%10s %-67s|\n",
                        "0",
-                       " No AddMailQuota, member in project \'".
-                       $project."\' (".$membership_string.")";
+                       " No AddMailQuota, member in ".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixType'}.
+                       " \'".
+                       $project.
+                       "\' (".
+                       $membership_string.
+                       ")";
 	    }
         }
         if ($mailquota_user_display eq "---"){
@@ -1167,7 +1176,6 @@ sub console_print_quota_user {
         print "  WARNING: User $user not found!\n";
         next;
     } 
-
     # create shortcut vars
     my $role=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
     my $school=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'sophomorixSchoolname'};
@@ -1273,15 +1281,24 @@ sub console_print_quota_user {
 		if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'}){
 		    my $add=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'VALUE'};
                     printf "|%10s %-67s|\n","+ ".$add,
-                           " AddQuota, member in project \'".$project."\' (".$membership_string.")";
+                           " AddQuota, member in ".
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixType'}.
+                           " \'".
+                           $project.
+                           "\' (".
+                           $membership_string.")";
                     printf "|%10s %-67s|\n","",
                            " Comment: \'".
                            $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixAddQuota'}{$share}{'COMMENT'}.
                            "\'";
 		} else {
                     printf "|%10s %-67s|\n","0",
-                           " No AddQuota, member in project \'".
-                           $project."\' (".$membership_string.")";
+                           " No AddQuota, member in ".
+                           $ref_quota->{'QUOTA'}{'USERS'}{$user}{'PROJECT'}{$project}{'sophomorixType'}.
+                           " \'".
+                           $project.
+                           "\' (".
+                           $membership_string.")";
 		}
             }
             if ($quota_user_display eq "---"){
