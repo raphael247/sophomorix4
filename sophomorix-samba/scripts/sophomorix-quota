@@ -202,7 +202,6 @@ if ($school ne ""){
 }
 
 
-
 # options that need only a sharename
 # --list/-L
 if ($list==1){
@@ -346,6 +345,7 @@ if ($info==1 and $json>0){
         @sharelist=@schools_to_show;
     }
     
+
     foreach my $school_share (@sharelist){
         if ($user eq ""){
             if (not exists $ref_quota->{'LISTS'}{'USER_by_SCHOOL'}{$school_share}){
@@ -386,7 +386,7 @@ if ($info==1 and $json>0){
         # Walk through users
         foreach my $user (@userlist){
             # skip if user (given by option) is not in this school 
-            if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school}{$user}){
+            if (not exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sAMAccountName_by_sophomorixSchoolname'}{$school_share}{$user}){
                 next;
             }
             &console_print_quota_user({user => $user,
