@@ -840,11 +840,24 @@ sub _console_print_group_full {
         printf "%23s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
         printf "%23s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
         printf "%23s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
+        print $line;
+
         # sophomorix attributes
         printf "%23s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
         printf "%23s: %-40s\n","sophomorixType",$ref_groups->{'GROUPS'}{$group}{'sophomorixType'};
+        print $line;
+
         # sophomorix mail attributes
         printf "%23s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
+        printf "%23s: %-40s\n","sophomorixAddMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixAddMailQuota'};
+        printf "%23s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
+        printf "%23s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
+        print $line;
+
+        # sophomorix quota attributes
+        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixAddQuota'} } ){
+            printf "%23s: %-40s\n","sophomorixAddQuota",$item;
+	}
 
         # memberships
         print $line;
@@ -902,27 +915,27 @@ sub _console_print_project_full {
         print $line1;
 
         # attributes
-        printf "%31s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
-        printf "%31s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
-        printf "%31s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
+        printf "%23s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
+        printf "%23s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
+        printf "%23s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
         print $line;
         # sophomorix attributes
-        printf "%31s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
-        printf "%31s: %-40s\n","sophomorixHidden",$ref_groups->{'GROUPS'}{$group}{'sophomorixHidden'};
-        printf "%31s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
-        printf "%31s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
-        printf "%31s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
+        printf "%23s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
+        printf "%23s: %-40s\n","sophomorixHidden",$ref_groups->{'GROUPS'}{$group}{'sophomorixHidden'};
+        printf "%23s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
+        printf "%23s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
+        printf "%23s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
         printf "%23s: %-40s\n","sophomorixType",$ref_groups->{'GROUPS'}{$group}{'sophomorixType'};
         print $line;
         # sophomorix mail attributes
-        printf "%31s: %-40s\n","sophomorixAddMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixAddMailQuota'};
-        printf "%31s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
-        printf "%31s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
-        printf "%31s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
+        printf "%23s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
+        printf "%23s: %-40s\n","sophomorixAddMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixAddMailQuota'};
+        printf "%23s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
+        printf "%23s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
         print $line;
         # sophomorix quota attributes
         foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixAddQuota'} } ){
-            printf "%31s: %-40s\n","sophomorixAddQuota",$item;
+            printf "%23s: %-40s\n","sophomorixAddQuota",$item;
 	}
 
         # members
