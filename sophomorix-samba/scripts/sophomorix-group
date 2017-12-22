@@ -135,16 +135,24 @@ Options:
   -vv / --verbose --verbose
   -i  / --info
 
-  --create --group name
-  --create --group name  --school <school>
+  --create --group <name>
+  --create --group <name>  --school <school>
 
   --kill --group --group <name>
 
-  --addmember <user>
-  --removemember <user>
+  --addmember <user> --group <name>
+  --removemember <user> --group <name>
 
-  --addgroup group
-  --removegroup group
+  --addgroup group --group <name>
+  --removegroup group --group <name>
+
+  --description \'multiple words possible\' --group <name>
+
+  --addquota <share1>:<quota1 in MiB>:<comment1>,<share2>:<quota2 in MiB>:<comment2>,... --group <name>
+  --addmailquota <mailquota in MiB>:<Comment> --group <name>
+
+  --mailalias --group <name>, --nomailalias --group <name>
+  --maillist --group <name>, --nomaillist --group <name>
 
 Examples:
   Add/remove a user to/from a group:
@@ -369,6 +377,7 @@ if (defined $mailalias){
                     });
 }
 
+
 # --maillist/--nomaillist
 if (defined $maillist){
     &AD_group_update({ldap=>$ldap,
@@ -380,9 +389,6 @@ if (defined $maillist){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
-
-
-
 
 
 
