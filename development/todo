@@ -36,23 +36,10 @@ wie werden die Einträge gemacht (devices.csv)
 --> ist bei default-school drin, sollte nach global?
 
 
-Bug:
-beim locken
-#### sophomorix locked (/usr/sbin/sophomorix-add, PID: 2389)              ####
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-#### try again later ...                                                  ####
-Undefined subroutine &Sophomorix::SophomorixAPI::fetch_error_string called at /usr/share/perl5/Sophomorix/SophomorixBase.pm line 1532.
-
-
 sophomorix-user -u <loginname>
 - soll auch history anzeigen
 - falls user nicht existiert, history anzeigen
   - login testen vor neuanlegen
-
 
 
 
@@ -123,16 +110,6 @@ schüler -> klasse -> schulstudents -> SCHOOLS
 Klassenarbeiten mit Moodle
 gibts was umzusetzen??
 
---------------------
-VirtualBox:
-Host-only Netzwerk: neu anlegen, IP ist die des Wirts in diesem Host-only Netz
-importieren:
-- Namen ändern, Ort anpassen, vdi als Plattenabbild
-- FW booten
-- vom wirt via vboxnet2 auf die innenseite der FW pingen: ping 10.0.0.254
-- Server booten:
-
-
 
 
 paket signieren, pgp-schlüssel
@@ -145,9 +122,8 @@ rename samaccountname-> not supported
   4) alter löschen
 
 
-     
    
-Loggen an 17.10. 
+Loggen ab 17.10. 
 ??? samba_sid mitloggen?
 
 ############################################################
@@ -168,9 +144,6 @@ Es gilt das bei user gesetzte quota
     --> setzt einzelquota
 sophomorix-admin -i -a globadm
 so umbauen, dass es auch Einzelquota für admins setzen kann
-
-
-TODO: weiter mail:
 
 ----------
 performance???
