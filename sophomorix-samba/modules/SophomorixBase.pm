@@ -1621,33 +1621,33 @@ sub _console_print_admins_v {
 
 
 sub _console_print_shares {
-    my ($ref_school,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my ($ref_share,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $count_share=0;
     my $count_school=0;
     my $line="+----------------------------------------------------------------------------+\n"; 
 
-    foreach my $share ( @{ $ref_school->{'LISTS'}{'SCHOOLS'} } ){
+    foreach my $share ( @{ $ref_share->{'LISTS'}{'SHARES'} } ){
         $count_share++;
         print "$line";
-        printf "| %2s) SMB-Share: %-60s |\n",$count_share,$share." (Type: ".$ref_school->{'SCHOOLS'}{$share}{'TYPE'}.")";
+        printf "| %2s) SMB-Share: %-60s|\n",$count_share,$share." (Type: ".$ref_share->{'SHARES'}{$share}{'TYPE'}.")";
         print "$line";
 
-        if ($ref_school->{'SCHOOLS'}{$share}{'TYPE'} eq "SCHOOL"){
+        if ($ref_share->{'SHARES'}{$share}{'TYPE'} eq "SCHOOL"){
             print"Configuration files: (*: exists, -:nonexisting)\n";
-            foreach my $file ( @{ $ref_school->{'SCHOOLS'}{$share}{'FILELIST'} } ){
-                print "   ".$ref_school->{'SCHOOLS'}{$share}{'FILE'}{$file}{'EXISTSDISPLAY'}." ".$file."\n";
+            foreach my $file ( @{ $ref_share->{'SHARES'}{$share}{'FILELIST'} } ){
+                print "   ".$ref_share->{'SHARES'}{$share}{'FILE'}{$file}{'EXISTSDISPLAY'}." ".$file."\n";
             }
             print "SMB-share for school $share:\n";
         }
 
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'EXISTSDISPLAY'},
+        printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTSDISPLAY'},
                                   "SMB-share $share";
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'MSDFSDISPLAY'},
-                                  "msdfs root = ".$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'MSDFS'};
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'},
-                                  "aquota.user exists = ".$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'};
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'},
-                                  "smbcquotas -F => ".$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'};
+        printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFSDISPLAY'},
+                                  "msdfs root = ".$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFS'};
+        printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'},
+                                  "aquota.user exists = ".$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'};
+        printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'},
+                                  "smbcquotas -F => ".$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'};
 
         print "\n";
     }

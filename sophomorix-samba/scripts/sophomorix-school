@@ -80,7 +80,6 @@ my $school="";
 my $create=0;
 my $recreate_all_schools=0;
 my $kill=0;
-my $test_schools=0;
 
 my $mount="";
 my $umount="";
@@ -105,7 +104,6 @@ my $testopt=GetOptions(
            "create|c" => \$create,
            "recreate-all-schools" => \$recreate_all_schools,
            "kill" => \$kill,
-           "test-schools" => \$test_schools,
            "school=s" => \$school,
            "mount=s" => \$mount,
            "umount=s" => \$umount,
@@ -190,7 +188,7 @@ if ($lock==1) {
 # ============================================================
 # --info
 if ($info==1){
-    my $ref_school_v=&AD_get_shares_v({ldap=>$ldap,
+    my $ref_share_v=&AD_get_shares_v({ldap=>$ldap,
                                        root_dse=>$root_dse,
                                        root_dns=>$root_dns,
                                        smb_admin_pass=>$smb_admin_pass,
@@ -202,61 +200,9 @@ if ($info==1){
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
                 log_level => $Conf::log_level,
-                hash_ref => $ref_school_v,
+                hash_ref => $ref_share_v,
                 sophomorix_config => \%sophomorix_config,
                });
-    exit;
-}
-
-
-# ============================================================
-# testing schools
-# ============================================================
-# --test-schools
-if ($test_schools==1){
-    print "\n";
-    &print_title("Testing schools");
-    my @schools= ($sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'},
-                  @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} });
-    foreach my $school (@schools) {
-        print "\n";
-        print "   * Testing school $school\n";
-	# share test
-	if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
-	    print "         OK: SMB-share $school exists\n ";
-            &_smb_msdfs($school);
-            # write acces test
-
-	    # delete access test
-
-            # aquota.user test
-            &_smbclient_testfile($school,"aquota.user");
-	    # quotainfo test
-	    &_smbcquotas_testshare($school);
-
-	    # quota set test
-
-	    # quota unset test
-	
-        } else {
-	    print "     NOT OK: SMB-share $school is missing\n ";
-        }
-    }
-    print "\n";
-    &print_title("Testing shares that are not schools");
-    foreach my $share ( @{ $sophomorix_config{'LISTS'}{'SHARES'} } ) {
-        if (exists $sophomorix_config{'SCHOOLS'}{$share} ) {
-            # skip
-        } else {
-	    print "   * Testing share $share\n";
-            # show msdfs
-            &_smb_msdfs($share);
-            # aquota.user test
-            &_smbclient_testfile($share,"aquota.user");
-  	    # quotainfo test
-	    &_smbcquotas_testshare($share);
-	}
-    }
     exit;
 }
 

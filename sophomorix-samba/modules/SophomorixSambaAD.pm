@@ -5485,7 +5485,7 @@ sub AD_get_shares_v {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    my %schools=();
+    my %shares=();
 
     # helper lists
     my @other=();   # other shares
@@ -5493,7 +5493,7 @@ sub AD_get_shares_v {
 
     # add all schools to lists
     foreach my $school ( @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} } ) {
-        $schools{'SCHOOLS'}{$school}{'TYPE'}="SCHOOL";
+        $shares{'SHARES'}{$school}{'TYPE'}="SCHOOL";
         push @schools, $school;
     }
 
@@ -5501,14 +5501,14 @@ sub AD_get_shares_v {
     foreach my $share ( @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} } ) {
         if (exists $ref_sophomorix_config->{'SCHOOLS'}{$share} ) {
             # school
-            $schools{'SCHOOLS'}{$share}{'TYPE'}="SCHOOL";
+            $shares{'SHARES'}{$share}{'TYPE'}="SCHOOL";
             push @schools, $share;
         } elsif ($share eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
             # push not in a list, prepended later
-            $schools{'SCHOOLS'}{$share}{'TYPE'}="GLOBAL";
+            $shares{'SHARES'}{$share}{'TYPE'}="GLOBAL";
         } else {
             # other
-            $schools{'SCHOOLS'}{$share}{'TYPE'}="OTHER_SHARE";
+            $shares{'SHARES'}{$share}{'TYPE'}="OTHER_SHARE";
             push @other, $share;
         }
     }
@@ -5520,59 +5520,70 @@ sub AD_get_shares_v {
     # create list: global,schools,other shares
     my @shares=($ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},@schools,@other);
 
-    foreach my $school ( @shares ) {
-        $schools{'SCHOOLS'}{$school}{'CONFIGURED'}="TRUE";
-        push @{ $schools{'LISTS'}{'SCHOOLS'} },$school;
+    foreach my $share ( @shares ) {
+        push @{ $shares{'LISTS'}{'SHARES'} },$share;
 
-        # add some stuff
-        $schools{'SCHOOLS'}{$school}{'OU_TOP'}=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'OU_TOP'};
 
         # files
-        if ($schools{'SCHOOLS'}{$school}{'TYPE'} eq "SCHOOL"){
+        if ($shares{'SHARES'}{$share}{'TYPE'} eq "SCHOOL"){
             # SCHOOL
-            @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} }=@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} };
-            foreach my $file ( @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} } ){
+            push @{ $shares{'LISTS'}{'SCHOOLS'} },$share;
+            # add some stuff
+            $shares{'SHARES'}{$share}{'OU_TOP'}=$ref_sophomorix_config->{'SCHOOLS'}{$share}{'OU_TOP'};
+            @{ $shares{'SHARES'}{$share}{'FILELIST'} }=@{ $ref_sophomorix_config->{'SCHOOLS'}{$share}{'FILELIST'} };
+            foreach my $file ( @{ $shares{'SHARES'}{$share}{'FILELIST'} } ){
                 if (-e $file ){
-                    $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="TRUE";
-                    $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="*";
+                    $shares{'SHARES'}{$share}{'FILE'}{$file}{'EXISTS'}="TRUE";
+                    $shares{'SHARES'}{$share}{'FILE'}{$file}{'EXISTSDISPLAY'}="*";
                 } else {
-                    $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="FALSE";
-                   $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="-";
-                }
+                    $shares{'SHARES'}{$share}{'FILE'}{$file}{'EXISTS'}="FALSE";
+                   $shares{'SHARES'}{$share}{'FILE'}{$file}{'EXISTSDISPLAY'}="-";
+                } 
             }
-        } 
+        } elsif ($shares{'SHARES'}{$share}{'TYPE'} eq "OTHER_SHARE"){
+            push @{ $shares{'LISTS'}{'OTHER_SHARES'} },$share;
+        } elsif ($shares{'SHARES'}{$share}{'TYPE'} eq "GLOBAL"){
+            push @{ $shares{'LISTS'}{'GLOBAL'} },$share;
+        }
+
 
         # TESTS
         # SMB-SHARE
-        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}){
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'}="TRUE";
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTSDISPLAY'}="OK";
+        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}){
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTS'}="TRUE";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTSDISPLAY'}="OK";
         } else {
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'}="FALSE";
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTSDISPLAY'}="NONEXISTING";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTS'}="FALSE";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTSDISPLAY'}="NONEXISTING";
         }
         # MSDFS entry
-        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'}){
-            my $msdfs=$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'};
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFS'}=$msdfs;
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFSDISPLAY'}="???";
+        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'}){
+            my $msdfs=$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'};
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFS'}=$msdfs;
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFSDISPLAY'}="???";
 	} else {
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFSDISPLAY'}="NOT OK";
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFS'}="not configured. probably yes";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFSDISPLAY'}="NOT OK";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFS'}="not configured. probably yes";
 
         }
         # test aquota.user file on share
-        &AD_smbclient_testfile($root_dns,$smb_admin_pass,$school,"aquota.user",$ref_sophomorix_config,\%schools);
+        &AD_smbclient_testfile($root_dns,$smb_admin_pass,$share,"aquota.user",$ref_sophomorix_config,\%shares);
         # test quota
-        if ( $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'} eq "TRUE"){
-            &AD_smbcquotas_testshare($root_dns,$smb_admin_pass,$school,$ref_sophomorix_config,\%schools);
+        if ( $shares{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTS'} eq "TRUE"){
+            &AD_smbcquotas_testshare($root_dns,$smb_admin_pass,$share,$ref_sophomorix_config,\%shares);
         } else {
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
-            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NO SHARE";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
+            $shares{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NO SHARE";
         }
-
     }
-    return \%schools;
+    
+    # sort some shares
+    @{ $shares{'LISTS'}{'OTHER_SHARES'} } = sort @{ $shares{'LISTS'}{'OTHER_SHARES'} };
+    @{ $shares{'LISTS'}{'GLOBAL'} } = sort @{ $shares{'LISTS'}{'GLOBAL'} };
+    @{ $shares{'LISTS'}{'SHARES'} } = sort @{ $shares{'LISTS'}{'SHARES'} };
+    @{ $shares{'LISTS'}{'SCHOOLS'} } = sort @{ $shares{'LISTS'}{'SCHOOLS'} };
+
+    return \%shares;
 }
 
 
@@ -7066,11 +7077,11 @@ sub AD_smbclient_testfile {
     }
     
     if ($file_exists==1){
-        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="TRUE";
-        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="OK";
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="TRUE";
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="OK";
     }  else {
-        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="FALSE";
-        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="NONEXISTING";
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="FALSE";
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="NONEXISTING";
     }
 }
 
@@ -7086,11 +7097,11 @@ sub AD_smbcquotas_testshare {
         #print "$smbcquotas_command\n";
         my $return_quota=system("$smbcquotas_command > /dev/null");
         if ($return_quota==0){
-            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";
-            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="OK";
+            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";
+            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="OK";
 	}  else {
-            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
-            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NOT OK";
+            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
+            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NOT OK";
 	}
 }
 
