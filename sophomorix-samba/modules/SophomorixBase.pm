@@ -1626,7 +1626,12 @@ sub _console_print_shares {
     my $count_school=0;
     my $line="+----------------------------------------------------------------------------+\n"; 
 
-    foreach my $share ( @{ $ref_share->{'LISTS'}{'SHARES'} } ){
+    # order shares before listing
+    my @shares=(@{ $ref_share->{'LISTS'}{'GLOBAL'} },
+                @{ $ref_share->{'LISTS'}{'SCHOOLS'} },
+                @{ $ref_share->{'LISTS'}{'OTHER_SHARES'} });
+
+    foreach my $share ( @shares ){
         $count_share++;
         print "$line";
         printf "| %2s) SMB-Share: %-60s|\n",$count_share,$share." (Type: ".$ref_share->{'SHARES'}{$share}{'TYPE'}.")";
@@ -1639,7 +1644,6 @@ sub _console_print_shares {
             }
             print "SMB-share for school $share:\n";
         }
-
         printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'EXISTSDISPLAY'},
                                   "SMB-share $share";
         printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'MSDFSDISPLAY'},
@@ -1648,7 +1652,6 @@ sub _console_print_shares {
                                   "aquota.user exists = ".$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'};
         printf "% 13s : %-50s \n",$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'},
                                   "smbcquotas -F => ".$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'};
-
         print "\n";
     }
 }
