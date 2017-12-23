@@ -40,7 +40,35 @@ wie werden die Einträge gemacht (devices.csv)
 --> ist bei default-school drin, sollte nach global?
 
 
+Bug:
+beim locken
+#### sophomorix locked (/usr/sbin/sophomorix-add, PID: 2389)              ####
+Process with PID 2389 is still running
+Process with PID 2389 is still running
+Process with PID 2389 is still running
+Process with PID 2389 is still running
+Process with PID 2389 is still running
+#### try again later ...                                                  ####
+Undefined subroutine &Sophomorix::SophomorixAPI::fetch_error_string called at /usr/share/perl5/Sophomorix/SophomorixBase.pm line 1532.
+
+
+sophomorix-user:
+-> funktionen die suchen dann noch sophomorix -user -s "del R"?
+
+
 extraclasses-Datei, gibts die schon?
+
+
+ACL:
+
+ordner share,program
+OK 1) parallel zu management,students,teachers in jeder Schule und global
+Todo   2) dann paket
+Todo   3)anschließend ntacl abernten
+
+* Tests für project acl
+* nichtlöschbar fehlt noch
+* examgroup fehlt noch, examuser, ...
 
 
 
@@ -91,8 +119,6 @@ importieren:
 - FW booten
 - vom wirt via vboxnet2 auf die innenseite der FW pingen: ping 10.0.0.254
 - Server booten:
-
-
 
 
 
@@ -458,17 +484,6 @@ session2project
 
 
 
-searchFlags (0=public, 128=confidential)
-
-ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchflags --option="dsdb:schema update allowed=yes" -b "cn=schema,CN=configuration,DC=...,DC=..."
-
-* ist leider etwas umständlich
-* überlebt einen reboot
-* wird global verändert (alle Schulen)?
-* wie geht das/geht das mit ldap-modify?
-
-
-
 tests aller quota (4 angaben bei allen gruppen)
 
 testen ob bei developersetquota auch comments gehen,
@@ -484,16 +499,6 @@ Kommentare: a-9a-zA-Z
 
 
 
-ACL:
-
-ordner share,program
-OK 1) parallel zu management,students,teachers in jeder Schule und global
-Todo   2) dann paket
-Todo   3)anschließend ntacl abernten
-
-* Tests für project acl
-* nichtlöschbar fehlt noch
-* examgroup fehlt noch, examuser, ...
 
 
 SMB-shares
@@ -540,17 +545,6 @@ check if confidential attribute is hidden
 deploy confidential attribute further
 
 
-
-Bug:
-beim locken
-#### sophomorix locked (/usr/sbin/sophomorix-add, PID: 2389)              ####
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-Process with PID 2389 is still running
-#### try again later ...                                                  ####
-Undefined subroutine &Sophomorix::SophomorixAPI::fetch_error_string called at /usr/share/perl5/Sophomorix/SophomorixBase.pm line 1532.
 
 
 

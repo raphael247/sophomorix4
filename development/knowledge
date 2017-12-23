@@ -1,0 +1,13 @@
+
+############################################################
+SEARCH FLAGS setzen:
+
+searchFlags (0=public, 128=confidential)
+
+ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchflags --option="dsdb:schema update allowed=yes" -b "cn=schema,CN=configuration,DC=...,DC=..."
+
+* ist leider etwas umständlich
+* überlebt einen reboot
+* wird global verändert (alle Schulen)?
+* wie geht das/geht das mit ldap-modify?
+############################################################
