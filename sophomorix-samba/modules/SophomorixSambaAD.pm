@@ -3594,7 +3594,8 @@ sub AD_get_AD {
         # sophomorixType teacherclass from ldap
         my $filter="(&(objectClass=group)(|(sophomorixType=".
            $ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINS'}.") (sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ALLADMINS'}.")))";
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ALLADMINS'}.") (sophomorixType=".
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'POWERGROUP'}.")))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
@@ -3711,8 +3712,8 @@ sub AD_get_AD {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
             my $role=$entry->get_value('sophomorixRole');
-            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminClass'}=
-                $entry->get_value('sophomorixAdminClass');
+            my $adminclass=$entry->get_value('sophomorixAdminClass');
+            $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminClass'}=$adminclass;
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}=
                 $entry->get_value('sophomorixFirstnameASCII');
             $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}=
@@ -3811,12 +3812,11 @@ sub AD_get_AD {
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam;
 
-            my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
+            my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$adminclass};
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_sophomorixType'}{$type} }, $sam;  
-
         }
         # sorting some lists
 #        my $unneeded1=$#{ $AD{'LISTS'}{'student'} }; # make list computer nonempty        

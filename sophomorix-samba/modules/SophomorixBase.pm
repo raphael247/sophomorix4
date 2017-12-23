@@ -3087,9 +3087,7 @@ sub log_script_start {
 
         if ($try_count==$max_try_count){
             &print_title("try again later ...");
-            my $string = &Sophomorix::SophomorixAPI::fetch_error_string(42);
-            &print_title($string);
-            exit 42;
+            exit;
         } else {
             sleep 1;
         }
