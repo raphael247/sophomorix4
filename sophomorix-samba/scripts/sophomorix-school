@@ -61,6 +61,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
                                  AD_get_AD
+                                 AD_get_schools_v
                                  AD_dns_get
                                  AD_get_passwd
                                  AD_object_search
@@ -193,6 +194,21 @@ if ($info==1){
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         print "   * $school\n";
     }
+
+    my $ref_school_v=&AD_get_schools_v({ldap=>$ldap,
+                                       root_dse=>$root_dse,
+                                       root_dns=>$root_dns,
+                                       sophomorix_config=>\%sophomorix_config,
+                                     });
+    my $jsoninfo="SCHOOLS";
+    my $jsoncomment="All Schools";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_school_v,
+                sophomorix_config => \%sophomorix_config,
+               });
     exit;
 }
 

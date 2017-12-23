@@ -1621,9 +1621,19 @@ sub _console_print_admins_v {
 
 
 sub _console_print_schools {
-    my ($ref_mail,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my ($ref_school,$school_opt,$log_level,$ref_sophomorix_config)=@_;
 
+    foreach my $school ( @{ $ref_school->{'LISTS'}{'SCHOOLS'} } ){
+        &print_title("School $school:");
+        print"Configuration files: (*: exists, -:nonexisting)\n";
+        foreach my $file ( @{ $ref_school->{'SCHOOLS'}{$school}{'FILELIST'} } ){
+            print "   ".$ref_school->{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}." ".$file."\n";
+        }
+        print "\n";
+    }
 }
+
+
 
 sub _console_print_mail_full {
     my ($ref_mail,$school_opt,$log_level,$ref_sophomorix_config)=@_;

@@ -70,6 +70,7 @@ $Data::Dumper::Terse = 1;
             AD_get_quota
             AD_get_users_v
             AD_get_groups_v
+            AD_get_schools_v
             AD_get_full_userdata
             AD_get_full_groupdata
             AD_get_print_data
@@ -5471,6 +5472,43 @@ sub AD_get_users_v {
         }
     }
     return \%users;
+}
+
+
+
+sub AD_get_schools_v {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my %schools=();
+    foreach my $school (keys %{$ref_sophomorix_config->{'SCHOOLS'}}) {
+        $schools{'SCHOOLS'}{$school}{'CONFIGURED'}="TRUE";
+        push @{ $schools{'LISTS'}{'SCHOOLS'} },$school;
+
+        # add some stuff
+        $schools{'SCHOOLS'}{$school}{'OU_TOP'}=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'OU_TOP'};
+
+        # files
+        @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} }=@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} };
+        foreach my $file ( @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} } ){
+            if (-e $file ){
+                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="TRUE";
+                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="*";
+            } else {
+                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="FALSE";
+                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="-";
+            }
+        }
+
+        # Tests ???
+
+    }
+    # sort some lists
+    @{ $schools{'LISTS'}{'SCHOOLS'} } = sort @{ $schools{'LISTS'}{'SCHOOLS'} };
+    return \%schools;
 }
 
 
