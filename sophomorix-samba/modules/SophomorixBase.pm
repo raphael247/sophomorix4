@@ -311,6 +311,8 @@ sub json_dump {
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "MAIL"){
             &_console_print_mail_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "SCHOOLS"){
+            &_console_print_schools($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -1618,6 +1620,11 @@ sub _console_print_admins_v {
 
 
 
+sub _console_print_schools {
+    my ($ref_mail,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+
+}
+
 sub _console_print_mail_full {
     my ($ref_mail,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $line1="#####################################################################\n";
@@ -2221,6 +2228,11 @@ sub config_sophomorix_read {
     $sophomorix_config{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'}=[ \@managementgrouplist ];
 
     # sorting some lists
+    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+        @{ $sophomorix_config{'SCHOOLS'}{$school}{'FILELIST'} } = 
+            sort @{ $sophomorix_config{'SCHOOLS'}{$school}{'FILELIST'} };
+    }
+
     @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
     @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} } = sort @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} };
     @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} } = sort @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} };
@@ -2458,7 +2470,7 @@ sub load_school_ini {
                     my ($group)=&Sophomorix::SophomorixSambaAD::AD_get_name_tokened($member,$school,"group");
                     push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} }, $group;
                 }
-	} elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
+	} elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./ or $section=~m/^classfile\./){ 
             ##### file.* section ########################################################################
 	    my ($string,$name,$extension)=split(/\./,$section);
             my $filename;
@@ -2507,24 +2519,29 @@ sub load_school_ini {
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'FILETYPE'}="users";
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PREFIX'}=$prefix;
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'POSTFIX'}=$postfix;
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS'}=
-                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
+                push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             } elsif ($name eq "devices"){
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'FILETYPE'}="devices";
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'}=$school;
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'OU_TOP'}=$ou_top;
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'PREFIX'}=$prefix;
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'POSTFIX'}=$postfix;
-                $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'PATH_ABS'}=
-                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
+#                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             } elsif ($name eq "extraclasses"){
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'}=$school;
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'OU_TOP'}=$ou_top;
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'FILETYPE'}="classes";
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PREFIX'}=$prefix;
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'POSTFIX'}=$postfix;
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS'}=
-                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
+#                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+                push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             }
 
             # test filterscript
