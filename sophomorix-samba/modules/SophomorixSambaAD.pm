@@ -70,7 +70,7 @@ $Data::Dumper::Terse = 1;
             AD_get_quota
             AD_get_users_v
             AD_get_groups_v
-            AD_get_schools_v
+            AD_get_shares_v
             AD_get_full_userdata
             AD_get_full_groupdata
             AD_get_print_data
@@ -5477,7 +5477,7 @@ sub AD_get_users_v {
 
 
 
-sub AD_get_schools_v {
+sub AD_get_shares_v {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -5486,7 +5486,41 @@ sub AD_get_schools_v {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my %schools=();
-    foreach my $school (keys %{$ref_sophomorix_config->{'SCHOOLS'}}) {
+
+    # helper lists
+    my @other=();   # other shares
+    my @schools=(); # schools
+
+    # add all schools to lists
+    foreach my $school ( @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} } ) {
+        $schools{'SCHOOLS'}{$school}{'TYPE'}="SCHOOL";
+        push @schools, $school;
+    }
+
+    # add all shares to lists
+    foreach my $share ( @{ $ref_sophomorix_config->{'LISTS'}{'SHARES'} } ) {
+        if (exists $ref_sophomorix_config->{'SCHOOLS'}{$share} ) {
+            # school
+            $schools{'SCHOOLS'}{$share}{'TYPE'}="SCHOOL";
+            push @schools, $share;
+        } elsif ($share eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
+            # push not in a list, prepended later
+            $schools{'SCHOOLS'}{$share}{'TYPE'}="GLOBAL";
+        } else {
+            # other
+            $schools{'SCHOOLS'}{$share}{'TYPE'}="OTHER_SHARE";
+            push @other, $share;
+        }
+    }
+
+    # uniquifi the schools
+    @schools = uniq(@schools);
+    @schools = sort @schools;
+
+    # create list: global,schools,other shares
+    my @shares=($ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'},@schools,@other);
+
+    foreach my $school ( @shares ) {
         $schools{'SCHOOLS'}{$school}{'CONFIGURED'}="TRUE";
         push @{ $schools{'LISTS'}{'SCHOOLS'} },$school;
 
@@ -5494,18 +5528,21 @@ sub AD_get_schools_v {
         $schools{'SCHOOLS'}{$school}{'OU_TOP'}=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'OU_TOP'};
 
         # files
-        @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} }=@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} };
-        foreach my $file ( @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} } ){
-            if (-e $file ){
-                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="TRUE";
-                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="*";
-            } else {
-                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="FALSE";
-                $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="-";
+        if ($schools{'SCHOOLS'}{$school}{'TYPE'} eq "SCHOOL"){
+            # SCHOOL
+            @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} }=@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} };
+            foreach my $file ( @{ $schools{'SCHOOLS'}{$school}{'FILELIST'} } ){
+                if (-e $file ){
+                    $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="TRUE";
+                    $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="*";
+                } else {
+                    $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTS'}="FALSE";
+                   $schools{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}="-";
+                }
             }
-        }
+        } 
 
-        # Tests ???
+        # TESTS
         # SMB-SHARE
         if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}){
             $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'}="TRUE";
@@ -5526,7 +5563,7 @@ sub AD_get_schools_v {
         }
         # test aquota.user file on share
         &AD_smbclient_testfile($root_dns,$smb_admin_pass,$school,"aquota.user",$ref_sophomorix_config,\%schools);
-
+        # test quota
         if ( $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'} eq "TRUE"){
             &AD_smbcquotas_testshare($root_dns,$smb_admin_pass,$school,$ref_sophomorix_config,\%schools);
         } else {
@@ -5535,8 +5572,6 @@ sub AD_get_schools_v {
         }
 
     }
-    # sort some lists
-    @{ $schools{'LISTS'}{'SCHOOLS'} } = sort @{ $schools{'LISTS'}{'SCHOOLS'} };
     return \%schools;
 }
 

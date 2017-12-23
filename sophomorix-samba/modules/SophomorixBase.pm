@@ -311,8 +311,8 @@ sub json_dump {
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "MAIL"){
             &_console_print_mail_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
-        } elsif ($jsoninfo eq "SCHOOLS"){
-            &_console_print_schools($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "SHARES"){
+            &_console_print_shares($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -1620,24 +1620,34 @@ sub _console_print_admins_v {
 
 
 
-sub _console_print_schools {
+sub _console_print_shares {
     my ($ref_school,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $count_share=0;
+    my $count_school=0;
+    my $line="+----------------------------------------------------------------------------+\n"; 
 
-    foreach my $school ( @{ $ref_school->{'LISTS'}{'SCHOOLS'} } ){
-        &print_title("School $school:");
-        print"Configuration files: (*: exists, -:nonexisting)\n";
-        foreach my $file ( @{ $ref_school->{'SCHOOLS'}{$school}{'FILELIST'} } ){
-            print "   ".$ref_school->{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}." ".$file."\n";
+    foreach my $share ( @{ $ref_school->{'LISTS'}{'SCHOOLS'} } ){
+        $count_share++;
+        print "$line";
+        printf "| %2s) SMB-Share: %-60s |\n",$count_share,$share." (Type: ".$ref_school->{'SCHOOLS'}{$share}{'TYPE'}.")";
+        print "$line";
+
+        if ($ref_school->{'SCHOOLS'}{$share}{'TYPE'} eq "SCHOOL"){
+            print"Configuration files: (*: exists, -:nonexisting)\n";
+            foreach my $file ( @{ $ref_school->{'SCHOOLS'}{$share}{'FILELIST'} } ){
+                print "   ".$ref_school->{'SCHOOLS'}{$share}{'FILE'}{$file}{'EXISTSDISPLAY'}." ".$file."\n";
+            }
+            print "SMB-share for school $share:\n";
         }
-        print "SMB-share for school $school:\n";
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTSDISPLAY'},
-                                  "SMB-share $school";
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFSDISPLAY'},
-                                  "msdfs root = ".$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFS'};
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'},
-                                  "aquota.user exists = ".$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'AQUOTAUSER'};
-        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'},
-                                  "smbcquotas -F => ".$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTAS'};
+
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'EXISTSDISPLAY'},
+                                  "SMB-share $share";
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'MSDFSDISPLAY'},
+                                  "msdfs root = ".$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'MSDFS'};
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'},
+                                  "aquota.user exists = ".$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'};
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'},
+                                  "smbcquotas -F => ".$ref_school->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'};
 
         print "\n";
     }

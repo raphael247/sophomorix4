@@ -61,7 +61,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
                                  AD_get_AD
-                                 AD_get_schools_v
+                                 AD_get_shares_v
                                  AD_dns_get
                                  AD_get_passwd
                                  AD_object_search
@@ -190,14 +190,14 @@ if ($lock==1) {
 # ============================================================
 # --info
 if ($info==1){
-    my $ref_school_v=&AD_get_schools_v({ldap=>$ldap,
+    my $ref_school_v=&AD_get_shares_v({ldap=>$ldap,
                                        root_dse=>$root_dse,
                                        root_dns=>$root_dns,
                                        smb_admin_pass=>$smb_admin_pass,
                                        sophomorix_config=>\%sophomorix_config,
                                      });
-    my $jsoninfo="SCHOOLS";
-    my $jsoncomment="All Schools";
+    my $jsoninfo="SHARES";
+    my $jsoncomment="All Shares";
     &json_dump({json => $json,
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
