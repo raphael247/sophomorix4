@@ -11,3 +11,108 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 * wird global verändert (alle Schulen)?
 * wie geht das/geht das mit ldap-modify?
 ############################################################
+
+
+############################################################
+quota einrichten:
+
+Reihenfolge:
+
+1) apt install quota
+
+2) Die Partition des share mit quota optionen mounten:
+   Hierauf kommts an: jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group
+   z.B. in /etc/fstab
+
+   /dev/mapper/srv-default--school on \n
+      /srv/samba/schools/default-school \n
+      type ext4 (rw,relatime,errors=remount-ro,data=ordered,jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group)
+
+
+   umount /srv/samba/schools/default-school
+   mount -a
+
+3) 
+    quotacheck -cvua    (create verbose userquota all-filesystems)
+    quotacheck -cvuga    (create verbose userquota groupquota all-filesystems)
+
+
+    - davor evtl alte aquota.user löschen mit:
+      lsattr /srv/samba/schools/default-school/aquota.user
+      --> ----i--A-----e--   immutable bit gesetzt
+      chattr /srv/samba/schools/default-school/aquota.user
+      rm -rf /srv/samba/schools/default-school/aquota.user
+      oder vorher
+      quotaoff -a
+
+4) Dafür sorgen dass auota.user/aquota.group upgedated werden:
+   quotaon /srv/samba/schools/default-school
+
+5)  Filesystemquota auf Linuxseite testen:
+
+    repquota -au
+    repquota -aus    (s=human readable)
+
+    --> was muss man tun, damit usernamen aufgelöst werden ????
+
+5) /usr/bin/smbcquotas -L //localhost/all -U administrator%'Muster!'
+
+--> smbcquotas examples
+    The smbcquotas program manipulates NT Quotas on SMB file shares.
+    /usr/bin/smbcquotas -U administrator%Muster! //linuxmuster.local/bsz 
+
+############ Achtung: das scheint nur zu tun, wenn das smb-share einer Partition entspricht
+(aquota.user in )
+
+Beispiel:
+ net conf list
+[all]
+	path = /
+	guest ok = yes
+	read only = no
+und 
+/dev/mapper/xenialserver--vg-root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered,jqfmt=vfsv0,usrjquota=aquota.user,grpjquota=aquota.group)
+
+#############
+############################################################
+
+
+
+############################################################
+CSV-Tags entfernen:
+grep '\$Id\$' -ir ./
+############################################################
+
+
+############################################################
+userAccountControl
+---------------------------
+enabled/disabled
+Passwort change ja, nein
+Passwort expires
+
+was braucht man davon
+
+enabled Account: 512, so wird jetzt hardcoded ein user angelegt
+disabled Account: 514, 
+
+samba-tool user disable <username>
+
+stellt auf 514 um, wie hier beschrieben:
+
+http://www.selfadsi.de/ads-attributes/user-userAccountControl.htm
+
+samba-tool user enable <username> stellt wieder auf 512 zurück
+
+Umsetzen:
+1) userAccountControl (dezimal) lesen
+2) Binär umwandeln
+3) schauen welche Bits gesetzt sind
+4) Daraus gewünschte Einstellungen erkennen (enabled, password expires, ...)
+5) prüfen ob was verändert werden muss:
+     - enablen/disabeln je nach sophomorixStatus und dazugehörige Zeiten
+     - passwort expires, ... falls in school.conf so konfiguriert
+6) in sophomorix.update schreiben
+7) mit sophomorix-update umsetzen
+
+############################################################
