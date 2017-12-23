@@ -4718,7 +4718,7 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'sophomorixType'}=$type;
                 if ($count>$count_initial_member){
                     # appended memberships		
-                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
+                    $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'REASON'}{'GROUP'}="TRUE";
                 } else {
                     $quota{'QUOTA'}{'USERS'}{$sam_user}{'GROUPS'}{$sam}{'REASON'}{'USER'}="TRUE";
                 }
@@ -4761,7 +4761,7 @@ sub AD_get_quota {
                     $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'sophomorixType'}=$type;
                     if ($count>$count_initial_member){
                         # appended memberships		
-                        $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'REASON'}{'PROJECT'}="TRUE";
+                        $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'REASON'}{'GROUP'}="TRUE";
                     } else {
                         $quota{'QUOTA'}{'USERS'}{$user}{'GROUPS'}{$sam}{'REASON'}{'CLASS'}="TRUE";
                     }
