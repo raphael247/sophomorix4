@@ -90,6 +90,7 @@ $Data::Dumper::Terse = 1;
             AD_repdir_using_file
             AD_examuser_create
             AD_examuser_kill
+            AD_smbclient_testfile
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -5481,6 +5482,7 @@ sub AD_get_schools_v {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my %schools=();
@@ -5504,6 +5506,33 @@ sub AD_get_schools_v {
         }
 
         # Tests ???
+        # SMB-SHARE
+        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}){
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'}="TRUE";
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTSDISPLAY'}="OK";
+        } else {
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'}="FALSE";
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTSDISPLAY'}="NONEXISTING";
+        }
+        # MSDFS entry
+        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'}){
+            my $msdfs=$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'};
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFS'}=$msdfs;
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFSDISPLAY'}="???";
+	} else {
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFSDISPLAY'}="NOT OK";
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFS'}="not configured. probably yes";
+
+        }
+        # test aquota.user file on share
+        &AD_smbclient_testfile($root_dns,$smb_admin_pass,$school,"aquota.user",$ref_sophomorix_config,\%schools);
+
+        if ( $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTS'} eq "TRUE"){
+            &AD_smbcquotas_testshare($root_dns,$smb_admin_pass,$school,$ref_sophomorix_config,\%schools);
+        } else {
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
+            $schools{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NO SHARE";
+        }
 
     }
     # sort some lists
@@ -6977,6 +7006,57 @@ sub AD_examuser_kill {
         print "   * User $examuser nonexisting ($count results)\n";
         return;
     }
+}
+
+
+
+sub AD_smbclient_testfile {
+    # tests if a file exists on a share
+    my ($root_dns,$smb_admin_pass,$share,$testfile,$ref_sophomorix_config,$ref_schools)=@_;
+    my $file_exists=0;
+    my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+        " -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
+        " //$root_dns/$share -c 'ls'";
+    my $stdout=`$smbclient_command 2> /dev/null`;
+    my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    my @lines=split(/\n/,$stdout);
+    foreach my $line (@lines){
+        my ($unused,$file,@unused)=split(/\s+/,$line);
+	if (defined $file){
+	    if ($file eq $testfile){
+		$file_exists=1;
+		last;
+	    }
+	}
+    }
+    
+    if ($file_exists==1){
+        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="TRUE";
+        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="OK";
+    }  else {
+        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="FALSE";
+        $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="NONEXISTING";
+    }
+}
+
+
+
+sub AD_smbcquotas_testshare {
+    my ($root_dns,$smb_admin_pass,$share,$ref_sophomorix_config,$ref_schools)=@_;
+    my $smbcquotas_command=
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " -U ".$DevelConf::sophomorix_file_admin."%'".
+        $smb_admin_pass."'".
+        " -F //$root_dns/$share";
+        #print "$smbcquotas_command\n";
+        my $return_quota=system("$smbcquotas_command > /dev/null");
+        if ($return_quota==0){
+            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";
+            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="OK";
+	}  else {
+            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
+            $ref_schools->{'SCHOOLS'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NOT OK";
+	}
 }
 
 

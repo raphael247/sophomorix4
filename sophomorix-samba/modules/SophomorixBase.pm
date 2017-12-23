@@ -1629,6 +1629,16 @@ sub _console_print_schools {
         foreach my $file ( @{ $ref_school->{'SCHOOLS'}{$school}{'FILELIST'} } ){
             print "   ".$ref_school->{'SCHOOLS'}{$school}{'FILE'}{$file}{'EXISTSDISPLAY'}." ".$file."\n";
         }
+        print "SMB-share for school $school:\n";
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'EXISTSDISPLAY'},
+                                  "SMB-share $school";
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFSDISPLAY'},
+                                  "msdfs root = ".$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'MSDFS'};
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'},
+                                  "aquota.user exists = ".$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'AQUOTAUSER'};
+        printf "% 13s : %-50s \n",$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'},
+                                  "smbcquotas -F => ".$ref_school->{'SCHOOLS'}{$school}{'SMB_SHARE'}{'SMBCQUOTAS'};
+
         print "\n";
     }
 }

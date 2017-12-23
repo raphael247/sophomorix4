@@ -190,14 +190,10 @@ if ($lock==1) {
 # ============================================================
 # --info
 if ($info==1){
-    print "The following schools exist:\n";
-    foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
-        print "   * $school\n";
-    }
-
     my $ref_school_v=&AD_get_schools_v({ldap=>$ldap,
                                        root_dse=>$root_dse,
                                        root_dns=>$root_dns,
+                                       smb_admin_pass=>$smb_admin_pass,
                                        sophomorix_config=>\%sophomorix_config,
                                      });
     my $jsoninfo="SCHOOLS";
@@ -405,7 +401,7 @@ sub _smbcquotas_testshare {
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
         " -F //$root_dns/$share";
-        #print "$smbcquotas_command\n";
+        print "$smbcquotas_command\n";
         my $return_quota=system("$smbcquotas_command > /dev/null");
         if ($return_quota==0){
 	    print "      OK: smbcquotas -F returned $return_quota\n ";
