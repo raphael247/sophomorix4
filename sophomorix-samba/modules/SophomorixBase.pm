@@ -103,14 +103,21 @@ sub print_title {
 # mount/umount school
 ######################################################################
 sub mount_school {
+    # mountpoint=filesystem directory
+    # 
     my ($share,$root_dns,$smb_admin_pass,$ref_sophomorix_config)=@_;
-    &print_title("Mounting school $share");
-    my $smb_unc="//".$root_dns."/".$share;
+    &print_title("Mounting school $share $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}");
+    my $smb_unc;
     my $mountpoint;
     if ($share eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'} or
-        $share eq $DevelConf::AD_global_ou){
+        $share eq $DevelConf::AD_global_ou or
+        $share eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
+        # global share (global/GLOBAL/linuxmuster-global will work)
+        $smb_unc="//".$root_dns."/".$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
         $mountpoint=$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'MOUNTPOINT'};
     } else {
+        # school share
+        $smb_unc="//".$root_dns."/".$share;
         $mountpoint=$ref_sophomorix_config->{'SCHOOLS'}{$share}{'MOUNTPOINT'};
     }
     if ( not defined $mountpoint){
