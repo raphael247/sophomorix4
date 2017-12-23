@@ -236,6 +236,14 @@ if ($info==1 and $group ne ""){
 # --create --group <name>
 ############################################################
 if ($create==1 and $group ne ""){
+    # avoid names beginning with p_
+    if ($group =~ m/^p\_/){
+        print "\n";
+        print "ERROR: Not creating group $group\n";
+        print "       group names beginning with p_ are reserved for projects\n";
+        print "\n";
+        exit;
+    }
     &AD_school_create({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
