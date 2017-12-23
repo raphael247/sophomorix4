@@ -2019,9 +2019,6 @@ sub config_sophomorix_read {
 
     ##################################################
     # SCHOOLS  
-    # load the master once
-    #my $ref_master=&read_master_ini($DevelConf::path_conf_master_school,$ref_result);
-
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
@@ -2470,18 +2467,25 @@ sub check_config_ini {
         ( -file => $configfile, 
           -handle_trailing_comment => 1,
         );
-
     # walk through all settings in the fonfig
     foreach my $section ( keys %config ) {
         foreach my $parameter ( keys %{$config{$section}} ) {
             #print "Verifying if parameter $parameter is valid in section $section\n";
             if (exists $ref_school->{$section}{$parameter}){
-                #print "parameter $parameter is valid OK\n";
+                #print "parameter $section -> $parameter is valid OK\n";
                 # overwrite  $ref_school
                 $ref_school->{$section}{$parameter}=$config{$section}{$parameter};
             } else {
 		print " * ERROR: ".$parameter." is NOT valid in section ".$section."\n";
-                &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$parameter." is NOT valid in section ".$section." of ".$configfile."!");
+                &result_sophomorix_add($ref_result,
+                                       "ERROR",-1,
+                                       $ref_parameter,
+                                       $parameter.
+                                       " is NOT valid in section ".
+                                       $section.
+                                       " of ".
+                                       $configfile.
+                                       "!");
                 #print "   * WARNING: $parameter is NOT valid in section $section\n";
             }
         }
@@ -2570,7 +2574,6 @@ sub load_school_ini {
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'POSTFIX'}=$postfix;
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
-#                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
                 push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             } elsif ($name eq "extraclasses"){
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'}=$school;
@@ -2580,65 +2583,54 @@ sub load_school_ini {
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'POSTFIX'}=$postfix;
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
-#                    $DevelConf::path_conf_sophomorix."/".$school."/".$filename;
                 push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             }
 
-            # test filterscript
-            if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}){
-                # save unchecked filter script for error messages
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
-                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
-	        my $filter_script=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
-                if ($filter_script eq "---"){
-                    #$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
- 	        } elsif (-f $filter_script and -x $filter_script and $filter_script=~m/^\//){
-                    # configured value is a file and executable
-                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
-                } else {
-                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
-#                    print "   * ERROR: $filter_script \n";
-#                    print "        must be:\n";
-#                    print "          - an executable file\n";
-#                    print "          - an absolute path\n";
-                    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
-                        "FILTERSCRIPT=".$filter_script." -> FILTERSCRIPT must be an absolute path to an executable script");
-                    #exit;
+            # test filterscript for userfiles
+            if ($string eq "userfile"){
+                if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}){
+                    # save unchecked filter script for error messages
+                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
+                        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
+	            my $filter_script=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
+                    if ($filter_script eq "---"){
+                        #$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
+ 	            } elsif (-f $filter_script and -x $filter_script and $filter_script=~m/^\//){
+                        # configured value is a file and executable
+                        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
+                    } else {
+                        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
+                        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                            "FILTERSCRIPT=".$filter_script." -> FILTERSCRIPT must be an absolute path to an executable script");
+                    }
                 }
-            }
-
-            # test encoding
-            if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING}){
-                my $enc=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING};
-                if (exists $ref_sophomorix_config->{'ENCODINGS'}{$enc} or 
-                    $enc eq "auto"){
-                    # OK 
-                    #$ref_sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING}=$enc;
-                } else {
-                    $ref_sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING}="ERROR_ENCODING";
-                    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
-                          "ENCODING ".$enc." not listed by 'iconv --list' and not 'auto'");
-                    #return;
-                    #print "   * ERROR: ENCODING $enc not listed by \"iconv --list\" and not \"auto\"\n";
-                    #exit;
+                # test encoding
+                if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING}){
+                    my $enc=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING};
+                    if (exists $ref_sophomorix_config->{'ENCODINGS'}{$enc} or 
+                        $enc eq "auto"){
+                    } else {
+                        $ref_sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING}="ERROR_ENCODING";
+                        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                              "ENCODING ".$enc." not listed by 'iconv --list' and not 'auto'");
+                    }
                 }
-            }
-
-            # test if encoding force is yes/no
-            if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}){
-                if($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "yes" or
-                   $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "no" ){
-                    # OK
-                } else {
-                    #print "   * ERROR: ENCODING_FORCE=".
-                    #      $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
-                    #      " accepts only \"yes\" or \"no\"\n";
-                    &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
-                          "ENCODING_FORCE=".
-                          $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
-                          " -> ENCODING_FORCE accepts only 'yes' or 'no'");
-                    #return;
-		    #exit;
+                # test if encoding force is yes/no
+                if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}){
+                    if($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "yes" or
+                       $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "no" ){
+                       # OK
+                    } else {
+                        #print "   * ERROR: ENCODING_FORCE=".
+                        #      $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
+                        #      " accepts only \"yes\" or \"no\"\n";
+                        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                            "ENCODING_FORCE=".
+                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
+                            " -> ENCODING_FORCE accepts only 'yes' or 'no'");
+                        #return;
+		        #exit;
+                    }
                 }
             }
 	} elsif ($section=~m/^classfile\./){ 
@@ -2647,19 +2639,7 @@ sub load_school_ini {
             ##### role.* section ########################################################################
 	    my ($string,$name)=split(/\./,$section);
 	    my $role=$name; # student, ...
-#            my $rolename; # <school>-student
-#            if ($school eq $DevelConf::name_default_school){
-#                $rolename=$name;
-#            } else {
-#                $rolename=$school."-".$name;
-#            }
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-#                if($Conf::log_level>=3){
-#                    print "   * ROLE $rolename: $parameter ---> <".
-#                          $ref_modmaster->{$section}{$parameter}.">\n";
-#                }
-#                $ref_sophomorix_config->{'ROLES'}{$rolename}{$parameter}=
-#                    $ref_modmaster->{$section}{$parameter};
                 if($Conf::log_level>=3){
                     print "   * ROLE $role: $parameter ---> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
