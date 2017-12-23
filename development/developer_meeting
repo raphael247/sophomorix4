@@ -1,0 +1,125 @@
+###########################################################
+Nächstes Entwicklertreffen:
+-------------------------------
+mehrfachlogin möglich? erlauben? kontrolle?
+-------------------------------
+
+-------------------------------
+Loginnamenerstellung:
+bei mms (Massive-Multischool) gibts doppelung von loginnamen
+Lösungen:
+  - schalter bei sophomorix.conf
+    TEACHER_LOGIN_PREFIX=yes/no
+    --> setzt vor lehrerlogins den prefix der Schule (default-school nicht)
+Default ist: kein prefix
+
+-------------------------------
+.ini-Dateien Vereinheitlichen:
+
+Wie wird eine on/off konfiguriert?
+
+TRUE/FALSE   # mein Favorit
+on/off
+yes/no
+1/0
+
+------------------------------
+devices.txt
+Unterscheiden von:
+  servers (Die von thomas angelegten DNS-Einträge für firewall,server, ....)
+    Server Firewall, ... Einträge werden in default-school gemacht.
+    OK so? Oder besser global-Bereich? 
+  classroom-teachercomputer
+  classroom-studentcomputer
+  faculty-teachercomputer
+  ... ipdevice?
+  ... router?
+
+------------------------------
+Umgang mit PullRequests, Issues, usw. bei der LML7-Entwicklung
+
+------------------------------
+scripte im Schulkontext aufrufen:
+  - wie soll das geschehen?
+    Option --school für jedes script?
+  Beispiel Belwue.conf passwort
+  --> sophomorix-mail --config zeigt passwörter aller Schulen --> json
+      (reduktion auf schule mit --school ?)
+  --> sophomorix-check: versetungen andere Schulen erkennen
+  Lösung ???:
+  sophomorix-check liest Daten aller Schulen, merkt sich (RAM) und benutzt das intern, 
+  gibt mit --json --school <name>aber nur einen Teil aus ?
+------------------------------
+Mail:
+
+mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
+--> bleibt das immer so?
+--> bei Verwendung z.B. belwue-mail:
+    sophomorix liest <xyz>@linuxmuster.lan und modifiziert das mit BASE in belwue.conf
+    --> modfizierte Werte werden genutzt um maillisten-member zu schreiben (upload-Datei)
+    --> Attribute 'mail' werden NICHT angepasst (momentaner Zustand)
+--> F.: sollte upgedated werden, da z.B. von dokuwiki genutzt, bei ldap-Anbindung
+    (Aber auf was? wo konfiguriert?)
+    --? offitielles mail-attribut updaten
+    --? für dovecot eigenes attribut sophomorixMailIntra?
+--> F.: weitere attribute Mail aktive oder nicht? Gibts das?
+
+------------------------------
+HOOKS for sophomorix-add -update -kill
+- Entwicklertreffen: Pfad abstimmen, weitere scripte, die einen hook brauchen?
+- muss pro Schule konfiguierbar
+- schule übersichtlich halte, daher Unterverzeichniss hooks
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-add.d/ 
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-update.d/ 
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-kill.d/
+- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-device.d/ ??? 
+ODER in Global für alle schulen
+  # alles was man da findet, das mit .hook (zwischengespeicherte scripte ausnehmen) endet 
+  UND executable ist, wird ausgeführt 
+  - reihenfolge acibetisch, als 01-script vor 02-script
+   ini:
+[HOOK]
+   HOOK_PATH= /etc/linuxmuster/sophomorix
+   HOOK_SUB_PATH= hooks
+   ADD_HOOK_DIR=sophomorix-add.d
+   UPDATE_HOOK_DIR=sophomorix-update.d
+   KILL_HOOK_DIR=sophomorix-kill.d
+Umsetung:
+  config einlesen
+  verzeichnis lesen, executable, sub run_hook("ADD_HOOK");
+  -> PROGRESSION-JSON für jedes script (script 1/3)
+  -> Rückgabewert auslesen, bei 0 OK, sonst 1
+  -> progress-Objekt ausgeben: starte hook script
+
+############################################################
+
+
+
+
+Ofene Fragen:
+------------------------------------------------------------
+wo sollen Gruppen hin, die 
+von sophomorix-group angelegt werden
+
+bisher in OU=Projects (passt gut, projecte am p_ unterscheidbar)
+
+(Custom wurde in Essen erwähnt, aber es sind echte sophomorix Gruppen)
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+Farbiger Konsoleprintout?
+- durch Trennung in JSON möglich (muss nicht mehr geparsed werden)
+- Vorschlag:
+  Fehler, Nicht OK: rot
+  Schulen: gelb
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+Password creation
+
+PWD_LENGTH=10 aus belwue_conf nutzen oder nicht???
+oder die von 
+
+------------------------------------------------------------

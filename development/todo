@@ -14,102 +14,40 @@ git push https-origin xenial
 Username for 'https://github.com': ########
 Password for 'https://jeffbeck@github.com': ########
 
+############################################################
+Todo:
+############################################################
+
+when 
+ 1) a user is in sophomorix.update
+ 2) and it is set to killable:  sophomorixx-user -K -u gal42
+ 3) sophomorix-check again
+ 4) then it cannot be killed, only updated
+    --> is this ok so?
+    --> should the user appear in both update and kill?
 
 
-###########################################################
-Nächstes Entwicklertreffen:
--------------------------------
-mehrfachlogin möglich? erlauben? kontrolle?
--------------------------------
+--------------------
+Bugs:
+sophomorix-school --mount GLOBAL/global/linuxmuster-global
+tut nicht.
 
--------------------------------
-Loginnamenerstellung:
-bei mms (Massive-Multischool) gibts doppelung von loginnamen
-Lösungen:
-  - schalter bei sophomorix.conf
-    TEACHER_LOGIN_PREFIX=yes/no
-    --> setzt vor lehrerlogins den prefix der Schule (default-school nicht)
-Default ist: kein prefix
+sophomorix-check -ij --> <name>.devices.csv findet sich doppelt, einmal leer
 
--------------------------------
-.ini-Dateien Vereinheitlichen:
+sophomorix-device:
+Listet auch nicht-sophomorix nodes --> verbessern
+wie werden die Einträge gemacht (devices.csv)
+--> ist bei default-school drin, sollte nach global?
 
-Wie wird eine on/off konfiguriert?
 
-TRUE/FALSE   # mein Favorit
-on/off
-yes/no
-1/0
+extraclasses-Datei, gibts die schon?
 
-------------------------------
-devices.txt
-Unterscheiden von:
-  servers (Die von thomas angelegten DNS-Einträge für firewall,server, ....)
-    Server Firewall, ... Einträge werden in default-school gemacht.
-    OK so? Oder besser global-Bereich? 
-  classroom-teachercomputer
-  classroom-studentcomputer
-  faculty-teachercomputer
-  ... ipdevice?
-  ... router?
 
-------------------------------
-Umgang mit PullRequests, Issues, usw. bei der LML7-Entwicklung
-
-------------------------------
-scripte im Schulkontext aufrufen:
-  - wie soll das geschehen?
-    Option --school für jedes script?
-  Beispiel Belwue.conf passwort
-  --> sophomorix-mail --config zeigt passwörter aller Schulen --> json
-      (reduktion auf schule mit --school ?)
-  --> sophomorix-check: versetungen andere Schulen erkennen
-  Lösung ???:
-  sophomorix-check liest Daten aller Schulen, merkt sich (RAM) und benutzt das intern, 
-  gibt mit --json --school <name>aber nur einen Teil aus ?
-------------------------------
-Mail:
-
-mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
---> bleibt das immer so?
---> bei Verwendung z.B. belwue-mail:
-    sophomorix liest <xyz>@linuxmuster.lan und modifiziert das mit BASE in belwue.conf
-    --> modfizierte Werte werden genutzt um maillisten-member zu schreiben (upload-Datei)
-    --> Attribute 'mail' werden NICHT angepasst (momentaner Zustand)
---> F.: sollte upgedated werden, da z.B. von dokuwiki genutzt, bei ldap-Anbindung
-    (Aber auf was? wo konfiguriert?)
-    --? offitielles mail-attribut updaten
-    --? für dovecot eigenes attribut sophomorixMailIntra?
---> F.: weitere attribute Mail aktive oder nicht? Gibts das?
-
-------------------------------
-HOOKS for sophomorix-add -update -kill
-- Entwicklertreffen: Pfad abstimmen, weitere scripte, die einen hook brauchen?
-- muss pro Schule konfiguierbar
-- schule übersichtlich halte, daher Unterverzeichniss hooks
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-add.d/ 
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-update.d/ 
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-kill.d/
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-device.d/ ??? 
-ODER in Global für alle schulen
-  # alles was man da findet, das mit .hook (zwischengespeicherte scripte ausnehmen) endet 
-  UND executable ist, wird ausgeführt 
-  - reihenfolge acibetisch, als 01-script vor 02-script
-   ini:
-[HOOK]
-   HOOK_PATH= /etc/linuxmuster/sophomorix
-   HOOK_SUB_PATH= hooks
-   ADD_HOOK_DIR=sophomorix-add.d
-   UPDATE_HOOK_DIR=sophomorix-update.d
-   KILL_HOOK_DIR=sophomorix-kill.d
-Umsetung:
-  config einlesen
-  verzeichnis lesen, executable, sub run_hook("ADD_HOOK");
-  -> PROGRESSION-JSON für jedes script (script 1/3)
-  -> Rückgabewert auslesen, bei 0 OK, sonst 1
-  -> progress-Objekt ausgeben: starte hook script
 
 ############################################################
+Todo END
+############################################################
+
 
 
 AK:
@@ -133,20 +71,14 @@ Umgang mit Tauschlaufwerken:
 - schülerhome nur ro als Lehrer
 - Button um Lehrer am schuljahresende aus allen Klassen zu entfernen
 
-Nextcloud:
 
 ------------------------------------------------------------
-Essen-Tagung
+2017 Essen-Tagung
 firewall: wie für einzelne user ssh nach außen zulassen
 Funktionsgruppe ssh allow?
 
-wo sollen sophomorix-group hin: nach custom
-
 doku: Gruppenkonzept Hirarchie
 schüler -> klasse -> schulstudents -> SCHOOLS
-Prefix-schule: dort wo notwendig
- Klassenobjekt:ja, Verzeichnis Nein
- name global (ausnahme Sharename)
 
 Klassenarbeiten mit Moodle
 gibts was umzusetzen??
@@ -165,95 +97,25 @@ importieren:
 
 
 
-Ideen/Todo:
-- linuxmuster-prepare umbenennen in turnkey (wie bei anderen appliances)
-- loginprompt-farbe je server (server: rot)
-- linuxmuster-setup
-  extra script zum docker setup, und andere
-- Passwortabfragen:
-  Unterscheiden ob Passwort VERGEBEN wird ODER
-  Passwort zum Zugriff auf Docker, ... BENÖTIGT wird
-- user name nicht wiederverwenden
-- Docker-container hash
-  liste mit hashes auf die upgedated werden kann
-  (nach überprüfung on der neue Docker container tut)
-
-
-- default reverse proxy beim docker
-
-Docker:
-
-/srv/li../docker
-docker stats
-docker container ls
-
-
-Firewall:
-https://10.0.0.254/
-root --> Muster!
-
-
 paket signieren, pgp-schlüssel
 
-   Schulungsangebot
+rename samaccountname-> not supported
+- Evtl. in mehreren Schritten:
+  1) neuer Account anlegen
+  2) passwordcopy
+  3) alter expiren lassen
+  4) alter löschen
 
-   kurze technische Übersicht für Händler
-   samba4
-   ...
-   Bugreports hier
-   Quellcode dort
-   Support, ...
 
-   subnetting pro schule
-
-   github wiki:
-   Q&A
-   rename samaccountname-> not supported
      
    
-Logging(alt) ist ersetzt: 
-/var/log/sophomorix/user-modify.log
-update_unids::01.01.1970::<login>::<last>;<first>;04.12.1997::->::<last>;<first>;01.01.1970::-10uid
-new-unid::01.01.1970::<login>::<last>;<first>;26.04.1996::->::<last>;<first>;01.01.1970::-10uid
-auto-teach-in::06.09.2013::kog::Koenig;Michuela;01.01.1970::->::Koenig;Michaela;01.01.1970::
-
-/var/log/sophomorix/user-modify-archive.log
-user archived::04.09.2013::<login>::<uid>::<Last>::first::
-4 Jahre-->  13000 Entries, davon 4000 new-unid, 2000 Exam, 300 Computer
-
-Migration: Log-Daten konvertieren ?
-
+Loggen an 17.10. 
 ??? samba_sid mitloggen?
 
+############################################################
+BUGS:
+############################################################
 
-BUG:
-
-when 
- 1)a user is in sophomorix.update
- 2) and it is set to killable:  sophomorixx-user -K -u gal42
- 3) sophomorix-check again
- 4) then it cannot be killed, only updated
-    --> is this ok so?
-    --> should the user appear in both update and kill?
-
-
---------------------
-Bugs:
-sophomorix-school --mount GLOBAL/global/linuxmuster-global
-tut nicht.
-
-sophomorix-check -ij --> <name>.devices.csv findet sich doppelt, einmal leer
-
-sophomorix-device:
-Listet auch nicht-sophomorix nodes --> verbessern
-wie werden die Einträge gemacht (devices.csv)
---> ist bei default-school drin, sollte nach global?
-
-create testusers.py
-wie ermittelt ob command succesful war?
---> json auswerten
-
-extraclasses-Datei, gibts die schon?
 ------------------------------------------------------------
 
 TODO: 
@@ -294,23 +156,15 @@ Erst nach Migration Testbar:
 
    --> sollte automatisiert werden, wegen Lehrerbeitritt
 
-   info files
-
-
-PWD_LENGTH=10 aus belwue_conf nutzen oder nicht???
-
 ------------------------------
 
 sophomorix-group ->
-wie projekte behandeln bezüglich
+OK: wie projekte behandeln bezüglich
     - mailaliase
     - maillist
     - addquota
     - addmailquota
 --> geht das simple (AD_get_quota liest auch sophomorix-group ein)?
---> Konfigurierbar in sophomorix.ini??
---> SOPHOMORIX_ATTRIBUTE_GROUPS=PROJECTS
---> SOPHOMORIX_ATTRIBUTE_GROUPS=PROJECTS_AND_GROUPS
 
 AD_get_quota genutzt von:
 sophomorix-mail, sophomorix-quota
@@ -320,7 +174,7 @@ sophomorix-mail, sophomorix-quota
 --> OK: Im hash alle als 'GROUPS' statt 'PROJECTS' speichern
     OK: sophomorix-mail, sophomorix-quota anpassen
 
-todo: REASON in AD_get_quota not correct?
+TODO: REASON in AD_get_quota not correct?
 
 Ende Mail
 ------------------------------------------------------------
