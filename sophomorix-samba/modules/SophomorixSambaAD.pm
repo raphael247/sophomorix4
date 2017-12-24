@@ -5129,19 +5129,18 @@ sub AD_get_full_userdata {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my @userlist=split(/,/,$userlist);
     my $filter;
+    my %users=();
+
     if ($#userlist==0){
         $filter="(& (sophomorixRole=*) (sAMAccountName=".$userlist[0]."))"; 
     } else {
         $filter="(& (sophomorixRole=*) (|";
         foreach my $user (@userlist){
-           $filter=$filter." (sAMAccountName=".$user.")";
-
+            $filter=$filter." (sAMAccountName=".$user.")";
         } 
         $filter=$filter." ))";
     }
-
     #print "$filter\n";
-    my %users=();
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
@@ -5207,7 +5206,6 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'uidNumber'}=$entry->get_value('uidNumber');
         $users{'USERS'}{$sam}{'unixHomeDirectory'}=$entry->get_value('unixHomeDirectory');
         $users{'USERS'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
-
         # password from file
         if (exists $ref_sophomorix_config->{'LOOKUP'}{'ALLADMINS'}{$entry->get_value('sophomorixRole')}){
             # check for password file
@@ -5227,9 +5225,64 @@ sub AD_get_full_userdata {
     if ($max>0){
         @{ $users{'LISTS'}{'USERS'} } = sort @{ $users{'LISTS'}{'USERS'} };
     }    
-    if ($max==0){
-        print "0 users found\n";
+
+    # read logfiles
+    foreach my $user (@userlist){
+        my $anything_found=0;
+        my $log_add=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	    $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_ADD'};
+        my $log_update=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	    $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_UPDATE'};
+        my $log_kill=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
+	    $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_KILL'};
+
+        # ADD
+        if (-f $log_add){
+            open(ADD,"<$log_add");
+            while (<ADD>) {
+                my ($add,$login,$last,$first,$group,$role,$school,$date,$epoch,$unid) = split(/::/);
+                if ($login eq $user){
+                    $anything_found++;
+                    $users{'LOOKUP'}{'LOGUSERS'}{$user}{'FOUND'}="TRUE";
+                    #push @{ $users{'LISTS'}{'LOGUSERS'} }, $user;
+                    if (not exists $users{'USERS'}{$user}{'sAMAccountName'}){
+                        push @{ $users{'LISTS'}{'DELETED_USERS'} }, $user;
+                    }
+                    my $logline="ADD:  $date  $login ($last, $first) in $group as $role";
+                    push @{ $users{'USERS'}{$user}{'HISTORY'}{'ADDLIST'} },$logline ;
+                }
+            }
+            close(ADD);
+        }
+
+        # KILL
+        if (-f $log_kill){
+            open(KILL,"<$log_kill");
+            while (<KILL>) {
+                my ($kill,$login,$last,$first,$group,$role,$school,$date,$epoch,$unid) = split(/::/);
+                if ($login eq $user){
+                    $anything_found++;
+                    $users{'LOOKUP'}{'LOGUSERS'}{$user}{'FOUND'}="TRUE";
+                    #push @{ $users{'LISTS'}{'LOGUSERS'} }, $user;
+                    if (not exists $users{'USERS'}{$user}{'sAMAccountName'}){
+                        push @{ $users{'LISTS'}{'DELETED_USERS'} }, $user;
+                    }
+                    my $logline="KILL: $date  $login ($last, $first) in $group as $role";
+                    push @{ $users{'USERS'}{$user}{'HISTORY'}{'KILLLIST'} },$logline ;
+                }
+            }
+            close(KILL);
+        }
+        if ($anything_found==0){
+            push @{ $users{'LISTS'}{'UNKNOWN_USERS'} }, $user;
+        }
+
     }
+
+    if ($max==0){
+        print "0 users found in AD\n";
+    }
+    @{ $users{'LISTS'}{'DELETED_USERS'} } = uniq(@{ $users{'LISTS'}{'DELETED_USERS'} });
     return \%users;
 }
 

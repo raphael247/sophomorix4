@@ -1386,19 +1386,41 @@ sub console_print_quota_user {
 
 sub _console_print_user_full {
     my ($ref_users,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-#    my $line="-----------------------------:--------------------------------------------------\n";
     my $line1="################################################################################\n";
     my $line= "--------------------------------------------------------------------------------\n";
-    my $user_count=0;
-    if ($ref_users->{'COUNTER'}{'TOTAL'}==0){
-        print "0 users can be displayed\n";
-        return;
+
+    # UNKNOWN_USERS
+    foreach my $user (@{ $ref_users->{'LISTS'}{'UNKNOWN_USERS'} }){
+        print "\n";
+        print $line1;
+        print "Nothing known about user: $user\n";
+        print $line1;
     }
+
+    # DELETED_USERS
+    my $user_count_deleted=0;
+    my $user_count_deleted_max=$#{ $ref_users->{'LISTS'}{'DELETED_USERS'} }+1;
+    foreach my $user (@{ $ref_users->{'LISTS'}{'DELETED_USERS'} }){
+        $user_count_deleted++;
+        print "\n";
+        print $line1;
+        print "Deleted user $user_count_deleted/$user_count_deleted_max: $user\n";
+        print $line1;
+        foreach my $logline (@{ $ref_users->{'USERS'}{$user}{'HISTORY'}{'ADDLIST'} }){
+            print $logline."\n";
+        }
+        foreach my $logline (@{ $ref_users->{'USERS'}{$user}{'HISTORY'}{'KILLLIST'} }){
+            print $logline."\n";
+        }
+    }
+
+    # USERS in AD
+    my $user_count=0;
     foreach my $user (@{ $ref_users->{'LISTS'}{'USERS'} }){
         $user_count++;
         print "\n";
         print $line1;
-        print "User $user_count/$ref_users->{'COUNTER'}{'TOTAL'}: ",
+        print "User $user_count/$ref_users->{'COUNTER'}{'TOTAL'} in AD: ",
               "$user in school $ref_users->{'USERS'}{$user}{'sophomorixSchoolname'}\n";
         print "$ref_users->{'USERS'}{$user}{'dn'}\n";
         print $line1;
@@ -1491,7 +1513,6 @@ sub _console_print_user_full {
 
             printf "%19s: %-50s\n","codePage",$ref_users->{'USERS'}{$user}{'codePage'};
             printf "%19s: %-50s\n","countryCode",$ref_users->{'USERS'}{$user}{'countryCode'};
-            #printf "%19s: %-50s\n","",$ref_users->{'USERS'}{$user}{''};
 	}
 
         # unix stuff:
