@@ -197,7 +197,7 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
 
-if ($project ne "" and $create==0){
+if ($project ne "" and $create==0 and $kill==0){
     # append p_ if omitted
     unless ($project =~ m/^p\_/) { 
         $project="p_".$project;
