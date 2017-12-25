@@ -47,6 +47,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_dns_get
                                  AD_get_user
+                                 AD_get_ui
                                  AD_get_quota
                                  AD_user_kill
                                  AD_unbind_admin
@@ -126,10 +127,30 @@ Please see the sophomorix-ui(8) man pages for full documentation
    exit;
 }
 
-
-
-
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+
+
+my $ref_ui=&AD_get_ui({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       sophomorix_config=>\%sophomorix_config,
+                     });
+
+
+if ($info==1){
+    &json_dump({json => $json,
+                jsoninfo => "UI",
+                jsoncomment => "sophomorix ui",
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref=>$ref_ui,
+                sophomorix_config=>\%sophomorix_config,
+              });
+    exit;
+}
+
+
+
 # ===========================================================================
 # Start
 # ===========================================================================

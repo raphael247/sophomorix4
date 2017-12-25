@@ -67,6 +67,7 @@ $Data::Dumper::Terse = 1;
             AD_school_create
             AD_object_search
             AD_get_AD
+            AD_get_ui
             AD_get_quota
             AD_get_users_v
             AD_get_groups_v
@@ -4351,6 +4352,56 @@ sub AD_get_AD {
     }
 
     return(\%AD);
+}
+
+sub AD_get_ui {
+    my %ui=();
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $filter2="(&(objectClass=user) (| ".
+                "(sophomorixRole=student) ".
+                "(sophomorixRole=teacher)".
+                " (sophomorixRole=schooladministrator) ".
+                "(sophomorixRole=globaladministrator)) )";
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter2,
+                   attrs => ['sAMAccountName',
+                             'sophomorixSchoolname',
+                             'sophomorixRole',
+                             'sophomorixAdminFile',
+                             'mail',
+                             'displayName',
+                             'sophomorixSurnameASCII',
+                             'sophomorixFirstnameASCII',
+                             'memberOf',
+                             'sophomorixQuota',
+                             'sophomorixMailQuota',
+                             'SophomorixWebuiPermissionsCalculated',
+                            ]);
+    my $max_user = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title(
+        "$max_user user found in AD");
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+	my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        my $role=$entry->get_value('sophomorixRole');
+        my $school=$entry->get_value('sophomorixSchoolname');
+        my @webui = $entry->get_value('SophomorixWebuiPermissionsCalculated');
+        $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
+        foreach my $webui (@webui){
+            push @{ $ui{'UI'}{'USERS'}{$sam}{'SophomorixWebuiPermissionsCalculated'} }, $webui;
+        }
+
+
+    }
+
+    return(\%ui);
 }
 
 

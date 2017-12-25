@@ -320,6 +320,8 @@ sub json_dump {
             &_console_print_mail_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "SHARES"){
             &_console_print_shares($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "UI"){
+            &_console_print_ui($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -1682,6 +1684,16 @@ sub _console_print_shares {
                                   "smbcquotas -F => ".$ref_share->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'};
         print "\n";
     }
+}
+
+
+
+sub _console_print_ui {
+    my ($ref_share,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $count_share=0;
+    my $count_school=0;
+    my $line="+----------------------------------------------------------------------------+\n"; 
+    print $line;
 }
 
 
