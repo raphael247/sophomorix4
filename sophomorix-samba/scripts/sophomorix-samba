@@ -140,23 +140,10 @@ if ($restart==1){
 
 
 
-# --schema-load
-if ($schema_load==1){
-    print "\nLoading sophomorix schema into ldap\n\n";
-    my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
-    &samba_stop();
-    my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
-    print "$command\n";
-    system($command);
-    &samba_start();
-}
-
-
-
 # --restore-samba
 if ($restore_samba ne ""){
-    print "\nRestoring samba databases with suffix -$restore_samba\n\n";
     &samba_stop();
+    print "\nRestoring samba databases with suffix -$restore_samba\n\n";
     my @ldb_files = &get_ldb_files();
     print "##### restoring ldb files: #####\n";
     foreach my $ldb (@ldb_files){
@@ -172,16 +159,31 @@ if ($restore_samba ne ""){
         system($command);
     } 
     &samba_start();
+    exit;
+}
+
+
+
+# --schema-load
+if ($schema_load==1){
+    &samba_stop();
+    print "\nLoading sophomorix schema into ldap\n\n";
+    my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
+    my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
+    print "$command\n";
+    system($command);
+    &samba_start();
+    exit;
 }
 
 
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
-my $root_dns=&AD_dns_get($root_dse);
-my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
-my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
-                                     $DevelConf::secret_file_sophomorix_file_admin);
+#my $root_dns=&AD_dns_get($root_dse);
+#my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+#my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+#                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
@@ -273,13 +275,17 @@ if ($edit_searchflags ne ""){
 ############################################################
 
 sub samba_stop {
-    system("/bin/systemctl stop samba-ad-dc");
+    my $command="/bin/systemctl stop samba-ad-dc";
+    print "\nStopping samba with command $command\n\n";
+    system($command);
 }
 
 
 
 sub samba_start {
-    system("/bin/systemctl start samba-ad-dc");
+    my $command="/bin/systemctl start samba-ad-dc";
+    print "\nStarting samba with command $command\n\n";
+    system($command);
 }
 
 
