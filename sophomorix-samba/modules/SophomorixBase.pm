@@ -1704,20 +1704,19 @@ sub _console_print_ui {
     my $line="+----------------------------------------------------------------------------+\n";
     my @school_list;
     if ($school_opt eq ""){
-        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+        # prepend global as school
+        @school_list=($ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'},
+                      @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} });
     } else {
         @school_list=($school_opt);
     }
 
-    # what about global?
     my @rolelist=("globaladministrator","schooladministrator","teacher","student");
 
     foreach my $school (@school_list){
         print "\n";
         &print_title("School $school:");
         foreach my $role (@rolelist){
-
-
             if ($#{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
                 print $line;
                 printf "| %-70s|\n", $school." --> sophomorixRole: ".$role;
