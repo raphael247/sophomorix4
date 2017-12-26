@@ -4361,10 +4361,15 @@ sub AD_get_ui {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    # read new permissions defaults from ui-package
+    # todo ???
+
+
     my $filter2="(&(objectClass=user) (| ".
                 "(sophomorixRole=student) ".
-                "(sophomorixRole=teacher)".
-                " (sophomorixRole=schooladministrator) ".
+                "(sophomorixRole=teacher) ".
+                "(sophomorixRole=schooladministrator) ".
                 "(sophomorixRole=globaladministrator)) )";
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -4384,22 +4389,32 @@ sub AD_get_ui {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
+        my $role=$entry->get_value('sophomorixRole');
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
         my @webui = $entry->get_value('sophomorixWebuiPermissions');
         my @webui_calc = $entry->get_value('sophomorixWebuiPermissionsCalculated');
 
         # saving
         $ui{'UI'}{'USERS'}{$sam}{'dn'}=$dn;
-        $ui{'UI'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
-        $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
-
+        $ui{'UI'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+        $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
-
+        push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
+        # old webui permissions
         foreach my $webui (@webui){
             push @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissions'} }, $webui;
         }
         foreach my $webui_calc (@webui_calc){
-            push @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
+            push @{ $ui{'UI'}{'USERS'}{$sam}{'OLD'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
         }
+
+        # calculate new ui permissions
+        # push @{ $ui{'UI'}{'USERS'}{$sam}{'NEW'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
+        # take permissions from from package, according to role ???
+ 
+        # modify permisions by school values from school.ini
+
+        # modify by user permissions
 
 
     }
@@ -5545,7 +5560,7 @@ sub AD_get_users_v {
     my $max = $mesg->count;
 
     ##################################################
-    # walk through all results
+    # walk through all users/computers
     # save results in lists
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);

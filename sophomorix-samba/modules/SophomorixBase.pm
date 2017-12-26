@@ -1699,11 +1699,40 @@ sub _console_print_shares {
 
 
 sub _console_print_ui {
-    my ($ref_share,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my ($ref_ui,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $count_share=0;
-    my $count_school=0;
-    my $line="+----------------------------------------------------------------------------+\n"; 
-    print $line;
+    my $line="+----------------------------------------------------------------------------+\n";
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    # what about global?
+    my @rolelist=("globaladministrator","schooladministrator","teacher","student");
+
+    foreach my $school (@school_list){
+        print "\n";
+        &print_title("School $school:");
+        foreach my $role (@rolelist){
+
+
+            if ($#{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
+                print $line;
+                printf "| %-70s|\n", $school." --> sophomorixRole: ".$role;
+                print $line;
+                foreach my $user ( @{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
+                    print " $user ($ref_ui->{'UI'}{'USERS'}{$user}{'displayName'}, $role):\n"; 
+                    print " sophomorixWebuiPermissionsCalculated:\n";
+                    foreach my $item ( @{ $ref_ui->{'UI'}{'USERS'}{$user}{'OLD'}{'sophomorixWebuiPermissionsCalculated'} } ){
+                        print "    $item\n";
+	            }
+                print $line;
+                }
+	    }
+        }
+    } # end $school
 }
 
 
