@@ -4373,14 +4373,8 @@ sub AD_get_ui {
                    attrs => ['sAMAccountName',
                              'sophomorixSchoolname',
                              'sophomorixRole',
-                             'sophomorixAdminFile',
-                             'mail',
                              'displayName',
-                             'sophomorixSurnameASCII',
-                             'sophomorixFirstnameASCII',
-                             'memberOf',
-                             'sophomorixQuota',
-                             'sophomorixMailQuota',
+                             'SophomorixWebuiPermissions',
                              'SophomorixWebuiPermissionsCalculated',
                             ]);
     my $max_user = $mesg->count; 
@@ -4390,12 +4384,21 @@ sub AD_get_ui {
         my $entry = $mesg->entry($index);
 	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
-        my $role=$entry->get_value('sophomorixRole');
-        my $school=$entry->get_value('sophomorixSchoolname');
-        my @webui = $entry->get_value('SophomorixWebuiPermissionsCalculated');
-        $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
+        my @webui = $entry->get_value('sophomorixWebuiPermissions');
+        my @webui_calc = $entry->get_value('sophomorixWebuiPermissionsCalculated');
+
+        # saving
+        $ui{'UI'}{'USERS'}{$sam}{'dn'}=$dn;
+        $ui{'UI'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+        $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+
+        $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+
         foreach my $webui (@webui){
-            push @{ $ui{'UI'}{'USERS'}{$sam}{'SophomorixWebuiPermissionsCalculated'} }, $webui;
+            push @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissions'} }, $webui;
+        }
+        foreach my $webui_calc (@webui_calc){
+            push @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
         }
 
 
@@ -5218,6 +5221,10 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
         $users{'USERS'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
         $users{'USERS'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
+        @{ $users{'USERS'}{$sam}{'sophomorixWebuiPermissions'} } = 
+             sort $entry->get_value('sophomorixWebuiPermissions');
+        @{ $users{'USERS'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } = 
+             sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
 
         $users{'USERS'}{$sam}{'sn'}=$entry->get_value('sn');
         $users{'USERS'}{$sam}{'givenName'}=$entry->get_value('givenName');

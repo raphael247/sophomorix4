@@ -1477,6 +1477,16 @@ sub _console_print_user_full {
         foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixQuota'} } ){
             printf "%29s: %-40s\n","sophomorixQuota",$item;
 	}
+
+        print $line;
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixWebuiPermissions'} } ){
+            printf "%29s: %-40s\n","sophomorixWebuiPermissions",$item;
+	}
+        print "sophomorixWebuiPermissionsCalculated:\n";
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixWebuiPermissionsCalculated'} } ){
+            print "   $item\n";
+	}
+
         print $line;
         foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'memberOf'} } ){
             print "memberOf: $item\n";
