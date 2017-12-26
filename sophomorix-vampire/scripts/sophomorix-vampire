@@ -19,6 +19,7 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
+use JSON;
 
 use File::Basename qw( basename
                        dirname
@@ -54,6 +55,7 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $json=0;
 
 # default
 my $datadir="/root/linuxmuster6";
@@ -196,7 +198,7 @@ Configuring:
    exit;
 }
 
-&log_script_start(\@arguments);
+#&log_script_start(\@arguments,\%sophomorix_result);
 
 ##################################################
 # Testing files in the dump
@@ -1002,8 +1004,12 @@ if ($verify_gid==1){
 #my ($ldap,$root_dse) = &AD_bind_admin();
 #&AD_unbind_admin($ldap);
 
-&log_script_end(\@arguments);
+#&log_script_end(\@arguments);
 
+
+############################################################
+# sub
+############################################################
 
 
 sub convert_date {
