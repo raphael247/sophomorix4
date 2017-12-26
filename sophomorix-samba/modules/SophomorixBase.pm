@@ -2168,10 +2168,10 @@ sub config_sophomorix_read {
                 # save in lookup table
                 $sophomorix_config{'INI'}{$section}{'KEEPGROUP_LOOKUP'}{$group}="keepgroup";
             }
-        } elsif ($section=~m/^administrator\./){ 
+        } elsif ($section=~m/^schooladministrator\./){ 
             # remember in lists
             my ($string,$name)=split(/\./,$section);
-	    push @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+	    push @{ $sophomorix_config{'LISTS'}{'SCHOOLADMINISTRATORS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
 	    push @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
             $sophomorix_config{'LOOKUP'}{'ADMINISTRATORS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
@@ -2341,11 +2341,18 @@ sub config_sophomorix_read {
             sort @{ $sophomorix_config{'SCHOOLS'}{$school}{'FILELIST'} };
     }
 
-    @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
-    @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} } = sort @{ $sophomorix_config{'LISTS'}{'ADMINISTRATORS'} };
-    @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} } = sort @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} };
-    @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} } = sort @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} };
-
+    if ($#{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }>0 ){
+        @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+    }
+    if ($#{ $sophomorix_config{'LISTS'}{'SCHOOLADMINISTRATORS'} }>0 ){
+        @{ $sophomorix_config{'LISTS'}{'SCHOOLADMINISTRATORS'} } = sort @{ $sophomorix_config{'LISTS'}{'SCHOOLADMINISTRATORS'} };
+    }
+    if ($#{ $sophomorix_config{'LISTS'}{'BINDUSERS'} }>0 ){
+        @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} } = sort @{ $sophomorix_config{'LISTS'}{'BINDUSERS'} };
+    }
+    if ($#{ $sophomorix_config{'LISTS'}{'ALLADMINS'} }>0 ){
+        @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} } = sort @{ $sophomorix_config{'LISTS'}{'ALLADMINS'} };
+    }
     return %sophomorix_config; 
 }
 
