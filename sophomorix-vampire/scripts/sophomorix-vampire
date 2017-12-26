@@ -464,12 +464,18 @@ if ($create_class_script==1){
     # sorting lines and assembling them
     @command_list_create = sort @command_list_create;
     @command_list_modify = sort @command_list_modify;
-    my @command_list=("#!/bin/sh",
-                     "# Create Classes",
+    my @command_list=("# Create Classes",
                       @command_list_create,
                      "# Modify Classes", 
                       @command_list_modify);
+    my $count_command=0;
+    my $max_count_command=$#command_list+1;
     foreach my $command (@command_list){
+        $count_command++;
+        print CLASSSCRIPT "#!/bin/sh\n";
+        print CLASSSCRIPT "echo \"\"\n";
+        print CLASSSCRIPT "echo \"progress  $count_command/$max_count_command\"\n";
+        print CLASSSCRIPT "echo \"\"\n";
         print CLASSSCRIPT "$command\n";
     }
     close(CLASS);
