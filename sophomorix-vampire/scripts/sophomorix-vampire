@@ -418,21 +418,21 @@ if ($create_class_script==1){
             # --join/--nojoin
             $command_modify = $command_modify.$join;
 
-            # --quota
-            if ($line{'quota'} eq "quota"){
-                $quota=" --quota \"---\"";
-            } else {
-                $quota=" --quota $line{'quota'}";
-            }
-            $command_modify = $command_modify.$quota;
+#            # --quota
+#            if ($line{'quota'} eq "quota"){
+#                $quota=" --quota \"---\"";
+#            } else {
+#                $quota=" --quota $line{'quota'}";
+#            }
+#            $command_modify = $command_modify.$quota;
 
-            # --mailquota
-            if ($line{'mailquota'} eq "-1"){
-                $mailquota=" --mailquota \"-1\"";
-            } else {
-                $mailquota=" --mailquota $line{'mailquota'}";
-            }
-            $command_modify = $command_modify.$mailquota;
+#            # --mailquota
+#            if ($line{'mailquota'} eq "-1"){
+#                $mailquota=" --mailquota \"-1\"";
+#            } else {
+#                $mailquota=" --mailquota $line{'mailquota'}";
+#            }
+#            $command_modify = $command_modify.$mailquota;
 
             # --mailalias
             if ($line{'mailalias'} eq "t"){
