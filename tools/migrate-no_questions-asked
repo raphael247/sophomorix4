@@ -1,0 +1,15 @@
+#!/bin/sh
+sophomorix-vampire --datadir ../sophomorix-dump --analyze
+
+sophomorix-vampire --datadir ../sophomorix-dump --create-class-script
+
+/root/sophomorix-vampire-classes.sh
+
+samba-tool domain passwordsettings set --complexity=off
+samba-tool domain passwordsettings set --min-pwd-length=3
+
+sophomorix-vampire --datadir ../sophomorix-dump --create-add-file
+cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+
+sophomorix-add -i
+
