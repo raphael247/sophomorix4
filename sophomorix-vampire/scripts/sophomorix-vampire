@@ -256,6 +256,8 @@ if ($missig_files_count > 0){
 if ($overwriting_files_count > 0){
     if ($restore_config_files==1){ 
         print "$overwriting_files_count file(s) were overwritten!\n";
+        &teachers_rewrite("/etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp",
+                          "/etc/linuxmuster/sophomorix/default-school/teachers.csv")
     } else {
         print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
     }
@@ -1018,6 +1020,34 @@ if ($verify_gid==1){
 ############################################################
 
 
+sub teachers_rewrite {
+    my ($in,$out)=@_;
+    print "\n";
+    print "### Writing $out\n";
+    open(IN,"<$in") || die "Cannot create $in \n";
+    open(OUT,">$out") || die "Cannot create $out \n";
+    while(<IN>){
+        my $line=$_;
+        chomp($line);
+        my (@items)=split(/;/,$line);
+        $items[1]=~s/^\s+//g;# remove leading whitespace
+        $items[1]=~s/\s+$//g;# remove trailing whitespace
+        $items[2]=~s/^\s+//g;# remove leading whitespace
+        $items[2]=~s/\s+$//g;# remove trailing whitespace
+        $items[3]=~s/^\s+//g;# remove leading whitespace
+        $items[3]=~s/\s+$//g;# remove trailing whitespace
+        $items[4]=~s/^\s+//g;# remove leading whitespace
+        $items[4]=~s/\s+$//g;# remove trailing whitespace
+
+        my $new_line="teachers;".$items[1].";".$items[2].";".$items[3].";".$items[4].";\n";
+        print OUT "$new_line";
+    }
+    close(IN);
+    close(OUT);
+}
+
+
+
 sub convert_date {
     my ($olddate) = @_;
     my ($date,$time)=split(/ /,$olddate);
@@ -1033,6 +1063,8 @@ sub convert_date {
     my $newdate=$year.$month.$day.$hour.$minute.$second.".0Z";
     return $newdate;
 }
+
+
 
 sub read_classes_map {
     my %classes_map=();
