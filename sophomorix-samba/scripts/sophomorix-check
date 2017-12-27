@@ -1906,7 +1906,7 @@ sub get_encoding {
     my $enc_force=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE};
     my $enc_checked=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED};
     &print_title("Encoding results for  $filename");
-    print "   * ENCODING:          $enc\n";
+    print "   * ENCODING:          $enc (configured)\n";
     print "   * ENCODING_FORCE:    $enc_force\n";
     print "   * ENCODING_CHECKED:  $enc_checked\n";
 
@@ -1932,7 +1932,8 @@ sub get_encoding {
     } elsif ($enc ne "auto" and $enc_force eq "no"){
         # auto mismatch configure
         print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
-        print "   * Set ENCODING_FORCE to \"yes\" if you know better than sophomorix\n";
+        print "   * Set A) ENCODING_FORCE to \"yes\" if you know better than sophomorix\n";
+        print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
         exit;
     } elsif ($enc ne "auto" and $enc_force eq "yes"){
         $enc_used=$enc;
