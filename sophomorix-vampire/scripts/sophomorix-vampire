@@ -812,12 +812,12 @@ if ($create_project_script==1){
         # --description
         $command = $command." --description ".$data{$pro}{'longname'};
 
-        # --addquota
-        if ($data{$pro}{'addquota'} eq "quota"){
-            $command = $command." --addquota ---";
-        } else {
-            $command = $command." --addquota ".$data{$pro}{'addquota'};
-        }
+        # # --addquota
+        # if ($data{$pro}{'addquota'} eq "quota"){
+        #     $command = $command." --addquota ---";
+        # } else {
+        #     $command = $command." --addquota ".$data{$pro}{'addquota'};
+        # }
 
         # --status
         $command = $command." --status ".$data{$pro}{'sophomorixstatus'};
