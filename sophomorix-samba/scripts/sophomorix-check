@@ -1465,6 +1465,13 @@ sub analyze_user_line {
     } else {
         my $line_raw=$line;
         chomp($line);
+        my $semikolon_count=$line=~tr/;//;
+        if ($semikolon_count<4){
+            print "\n";
+            print "   ERROR: Not 4 Semicolons in $line\n";
+            print "          File corrupt: $file_abs\n\n";
+            exit;
+        }
         $line=&remove_whitespace($line);
         # add trailing ; if not there
         if (not $line=~m/;$/){
@@ -1979,6 +1986,17 @@ sub analyze_encoding {
                 #$special_char_lines{$count}=$line;
             }
         }
+
+        my $line=$_;
+        chomp($line);
+        my $semikolon_count=$line=~tr/;//;
+        if ($semikolon_count<4){
+            print "\n";
+            print "   ERROR: Not 4 Semicolons in $line\n";
+            print "          File corrupt: $file\n\n";
+            exit;
+        }
+
         my ($class,$lastname,$firstname,$date) = split(/;/);
 
         # firstname
