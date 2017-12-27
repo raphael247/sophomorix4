@@ -6386,6 +6386,12 @@ sub AD_group_create {
         $group_ou=$sub_ou;
     } elsif ($file eq "none"){
         $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
+    } elsif ($file eq $ref_sophomorix_config->{'INI'}{'VARS'}{'VAMPIRE_FILENAME'}){
+        if ($type eq "teacherclass"){
+            $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{'teachers.csv'}{'GROUP_OU'};
+        } elsif ($type eq "adminclass"){
+            $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{'students.csv'}{'GROUP_OU'};
+        }
     } else {
         $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
     }
@@ -6393,7 +6399,6 @@ sub AD_group_create {
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$group.",".$target_branch;
     my $mail = $group."\@".$root_dns;
-
 
     if (defined $dn_wish){
         # override DN
