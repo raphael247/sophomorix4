@@ -24,16 +24,33 @@ yes/no
 1/0
 
 ------------------------------
-devices.txt
+devices.csv
+
+migration:
+devices.csv wird mofifiziert:
+   ; ergänzt auf 12 Stück, nach letztem Feld auch ;
+leere pxe option ---> 0 (umwandeln)
+
+
+Bisher:
+  jeder Eintrag hat die sophomorixRole computer
+
 Unterscheiden von:
-  servers (Die von thomas angelegten DNS-Einträge für firewall,server, ....)
-    Server Firewall, ... Einträge werden in default-school gemacht.
-    OK so? Oder besser global-Bereich? 
+  server (Die von thomas angelegten DNS-Einträge für firewall,server, ....)
+   server 
+   Firewall, 
+   ... Einträge werden in default-school gemacht.
+       OK so? Oder besser global-Bereich? 
   classroom-teachercomputer
   classroom-studentcomputer
-  faculty-teachercomputer
+  faculty-teachercomputer (Lehrerzimmerrechner)
   ... ipdevice?
   ... router?
+  ... staffcomputer (Hausmeister)
+
+--> setup: legt als sophomorixRole 'server' an
+--> migration: alle werden 'computer' (devices.csv mofification)
+--> später: andere sophomorixRole Einstellbar in Schulkonsole 
 
 ------------------------------
 Umgang mit PullRequests, Issues, usw. bei der LML7-Entwicklung
