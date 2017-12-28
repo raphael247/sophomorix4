@@ -445,7 +445,8 @@ sub _console_print_devices {
 
 sub _console_print_classes_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line="+--------------------+--+--+--+---+--+-+-+-+-+-+--------------------------------+\n";
+    my $line  ="+--------------------+--+--+--+---+--+-+-+-+-+-+--------------------------------+\n";
+    my $line2 ="+-------------------------------------------------------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -476,7 +477,7 @@ sub _console_print_classes_overview {
                     $Q++;
                 }
             }
-            printf "| %-19s|%2s|%2s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-30s\n",
+            printf "| %-19s|%2s|%2s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s|\n",
                     $group,
                     $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'teacher'},
                     $ref_groups_v->{'GROUPS'}{$group}{'member_COUNT'}{'student'},
@@ -491,6 +492,10 @@ sub _console_print_classes_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
+        my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }+1;
+        printf "| %-78s|\n", $max_count." adminclass/teacherclass in ".$school;
+        print $line2;
+
         print "t=teachers  s=students   Q=Quota   MQ=MailQuota  MM=MaxMembers\n";
         print "H=Hidden    A=MailAlias  L=MaiList  S=Status      J=Joinable \n";
     }
@@ -500,7 +505,8 @@ sub _console_print_classes_overview {
 
 sub _console_print_groups_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line="+-------------------+--+---+-+-+--+--+--+------------------------------------+\n";
+    my $line="+-------------------+--+---+-+-+--+--+--+---------------------------------------+\n";
+    my $line2 = "+-------------------------------------------------------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -515,7 +521,7 @@ sub _console_print_groups_overview {
             next;
         }
         print $line;
-        print "| Group Name        |AQ|AMQ|A|L| m| t| s| Group Description                  |\n";
+        print "| Group Name        |AQ|AMQ|A|L| m| t| s| Group Description                     |\n";
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }){
             my $AMQ;
@@ -532,7 +538,7 @@ sub _console_print_groups_overview {
                 }
             }
 
-            printf "| %-18s|%2s|%3s|%1s|%1s|%2s|%2s|%2s| %-35s|\n",
+            printf "| %-18s|%2s|%3s|%1s|%1s|%2s|%2s|%2s| %-38s|\n",
                 $group,
                 $AQ,
                 $AMQ,
@@ -544,6 +550,9 @@ sub _console_print_groups_overview {
 	        $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
+        my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }+1;
+        printf "| %-78s|\n", $max_count." projects in ".$school;
+        print $line2;
         print "AQ=AddQuota  AMQ=AddMailQuota A=MailAlias   L=MaiList\n";
         print " m=member-entries             t=teachers    s=students\n";
     }
@@ -589,7 +598,8 @@ sub _console_print_managementgroups_overview {
 
 sub _console_print_projects_overview {
     my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    my $line = "+---------------------+--+---+--+-+-+-+-+-+---------------------------------+\n";
+    my $line = "+-----------------------+--+---+--+-+-+-+-+-+-----------------------------------+\n";
+    my $line2 = "+-------------------------------------------------------------------------------+\n";
     my @school_list;
     if ($school_opt eq "" or $school_opt eq "---"){
         @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
@@ -604,7 +614,7 @@ sub _console_print_projects_overview {
             next;
         }
         print $line;
-        print "| Project Name         |AQ|AMQ|MM|H|A|L|S|J| Project Description             |\n";
+        print "| Project Name          |AQ|AMQ|MM|H|A|L|S|J| Project Description               |\n";
         print $line;
         foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'project'} }){
             my $AMQ;
@@ -620,7 +630,7 @@ sub _console_print_projects_overview {
                     $AQ++;
                 }
             }
-            printf "| %-20s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-31s\n",
+            printf "| %-22s|%2s|%3s|%2s|%1s|%1s|%1s|%1s|%1s| %-34s|\n",
                     $group,
                     $AQ,
                     $AMQ,
@@ -633,6 +643,9 @@ sub _console_print_projects_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
+        my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'project'} }+1;
+        printf "| %-78s|\n", $max_count." projects in ".$school;
+        print $line2;
         print "AQ=AddQuota  AMQ=AddMailQuota  J=Joinable  MM=MaxMembers\n";
         print " A=MailAlias   L=MaiList       S=Status     H=Hidden\n";
     }
