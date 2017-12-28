@@ -212,38 +212,39 @@ if ($info==1) {
     my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
     my $name_utf8_new=$surname_utf8_new.", ".$firstname_utf8_new;
     # Printout
+    print "Update user $count: $login\n";
     if ($unid_new ne "---"){
-        print "$login.sophomorixUnid:           $unid_old  --> $unid_new:\n";
+        print " $login.sophomorixUnid:           $unid_old  --> $unid_new:\n";
     }
     if ($surname_ascii_new ne "---"){
-        print "$login.sophomorixSurnameASCII:   $surname_ascii_old  --> $surname_ascii_new\n";
+        print " $login.sophomorixSurnameASCII:   $surname_ascii_old  --> $surname_ascii_new\n";
     }
     if ($firstname_ascii_new ne "---"){
-        print "$login.sophomorixFirstnameASCII: $firstname_ascii_old  --> $firstname_ascii_new\n";
+        print " $login.sophomorixFirstnameASCII: $firstname_ascii_old  --> $firstname_ascii_new\n";
     }
     if ($birthdate_new ne "---"){
-        print "$login.sophomorixBirthdate:      $birthdate_old  --> $birthdate_new\n";
+        print " $login.sophomorixBirthdate:      $birthdate_old  --> $birthdate_new\n";
     }
     if ($surname_utf8_new ne "---"){
-        print "$login.sn:                       $surname_utf8_old  --> $surname_utf8_new\n";
+        print " $login.sn:                       $surname_utf8_old  --> $surname_utf8_new\n";
     }
     if ($firstname_utf8_new ne "---"){
-        print "$login.givenName:                $firstname_utf8_old  --> $firstname_utf8_new\n";
+        print " $login.givenName:                $firstname_utf8_old  --> $firstname_utf8_new\n";
     }
     if ($filename_new ne "---"){
-        print "$login.sophomorixAdminFile:      $filename_old  --> $filename_new\n";
+        print " $login.sophomorixAdminFile:      $filename_old  --> $filename_new\n";
     }
     if ($status_new ne "---"){
-        print "$login.sophomorixStatus:         $status_old  --> $status_new\n";
+        print " $login.sophomorixStatus:         $status_old  --> $status_new\n";
     }
     if ($role_new ne "---"){
-        print "$login.sophomorixRole:           $role_old  --> $role_new\n";
+        print " $login.sophomorixRole:           $role_old  --> $role_new\n";
     }
     if ($class_new ne "---"){
-        print "$login.sophomorixAdminClass:     $class_old  --> $class_new\n";
+        print " $login.sophomorixAdminClass:     $class_old  --> $class_new\n";
     }
     if ($school_new ne "---"){
-        print "$login.sophomorixSchoolname:     $school_old  --> $school_new\n";
+        print " $login.sophomorixSchoolname:     $school_old  --> $school_new\n";
     }
     &print_line;
     }
