@@ -169,7 +169,7 @@ if ($info==1) {
     my $count=0;
     # Ausgabe der loeschbaren user
     print "\nThe following users can be killed:\n\n";
-    printf "%-14s%-19s%-40s%-5s\n",
+    printf "%-14s%-12s%-47s%-5s\n",
            "Loginname",
            "AdminClass",
            "Identifier",
@@ -212,7 +212,7 @@ if ($info==1) {
        )=split(/::/,$line);
        my $group_token=&AD_get_name_tokened($linux_gruppe_to_kill,$school,"---");
 
-       printf "%-14s%-19s%-40s%-5s\n",
+       printf "%-14s%-12s%-47s%-5s\n",
               $login_name_to_kill,
               $group_token,
               $identifier_to_kill,

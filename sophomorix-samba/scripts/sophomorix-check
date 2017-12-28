@@ -738,6 +738,7 @@ foreach my $sam ( keys %{$ref_AD->{'sAMAccountName'}} ) {
         # write to sophomorix.kill or sophomorix.nochange
         &test_RK_kill($sam,\$kill);
         if ($kill>0){
+print "HERE: $sam\n";
             # write to sophomorix.kill
             my $kill_line=$ref_AD->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
                           $sam."::".
@@ -942,20 +943,12 @@ sub test_DL_RA_update{
             ${$update_ref}++;
             # 2) put user in kill file
             print "    ----> $sam is put into kill file\n";
-            # calculation school name
-            my $school;
-            if ($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'} eq 
-                $DevelConf::name_default_school){
-                $school="---";
-	    } else {
-                $school=$ref_AD->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
-            }
             # creating the line
             my $kill_line=
                 $ref_AD->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
                 $sam."::".
                 $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
-                $school."::\n";               
+                $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
             print KILL $kill_line;
         } elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and 
             $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D"){
