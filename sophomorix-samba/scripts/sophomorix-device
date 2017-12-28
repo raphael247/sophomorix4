@@ -1559,18 +1559,18 @@ sub analyze_device_line {
             $pxe,
             $option)=split(/;/,$line);
 
-        $room=&check_room($room);
-        $host=&check_host($host);
-        $hwk=&check_hwk($hwk);
-        $mac=&check_mac($mac);
-        $ip=&check_ip($ip);
-        $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host);
-        $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host);
+        $room=&check_room($room,$line);
+        $host=&check_host($host,$line);
+        $hwk=&check_hwk($hwk,$line);
+        $mac=&check_mac($mac,$line);
+        $ip=&check_ip($ip,$line);
+        $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line);
+        $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
 #        print "   UNUSED:  $unused\n";
 #        print "   SYSADM:  $sysadmin_field\n";
-        $account_flag=&check_account_flag($account_flag);
-        $pxe=&check_pxe($pxe);
-        $option=&check_option($option);
+        $account_flag=&check_account_flag($account_flag,$line);
+        $pxe=&check_pxe($pxe,$line);
+        $option=&check_option($option,$line);
 
         # use tokened names 
         my $host_token=&AD_get_name_tokened($host,$school,"examaccount");
@@ -1638,13 +1638,15 @@ sub analyze_device_line {
 
 
 sub check_room {
-    my ($room) = @_;
+    my ($room,$line) = @_;
     if($Conf::log_level>=3){
         print "   ROOM:    $room\n";
     }
     # allow a-z0-9-_ lowercase
     if ( $room=~/[^A-Za-z0-9\-]/ ) {
-        print "\nERROR: $room contains invalid characters\n\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "  ERROR: $room contains invalid characters\n\n";
         exit 1;
     } else {
 
@@ -1655,13 +1657,15 @@ sub check_room {
 
 
 sub check_host {
-    my ($host) = @_;
+    my ($host,$line) = @_;
     if($Conf::log_level>=3){
         print "   HOST:    $host\n";
     }
     # allow a-z0-9-  , convert to lowercase later
     if ( $host=~/[^A-Za-z0-9\-]/ ) {
-        print "\nERROR: $host contains invalid characters\n\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "  ERROR: $host contains invalid characters\n\n";
         exit 1;
     } else {
         $host=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
@@ -1674,13 +1678,15 @@ sub check_host {
 
 
 sub check_hwk {
-    my ($hwk) = @_;
+    my ($hwk,$line) = @_;
     if($Conf::log_level>=3){
         print "   HWK:     $hwk\n";
     }
     # allow A-Za-z0-9   
     if ( $hwk=~/[^A-Za-z0-9\-_]/ ) {
-        print "\nERROR: $hwk contains invalid characters\n\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "ERROR: $hwk contains invalid characters\n\n";
         exit 1;
     } else {
 
@@ -1691,7 +1697,7 @@ sub check_hwk {
 
 
 sub check_mac {
-    my ($old_mac) = @_;
+    my ($old_mac,$line) = @_;
     if($Conf::log_level>=3){
        print "   MAC:     $old_mac\n";
     }
@@ -1709,7 +1715,9 @@ sub check_mac {
 
     # correct
     if (exists $mac_seen{$new_mac}){
-        print "\nERROR: MAC $new_mac is double!\n\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "  ERROR: MAC >$new_mac< is double!\n\n";
         exit 1;
     } else {
         $mac_seen{$new_mac}="seen";
@@ -1724,7 +1732,7 @@ sub check_mac {
 
 
 sub check_ip {
-    my ($ip) = @_;
+    my ($ip,$line) = @_;
     if($Conf::log_level>=3){
         print "   IP:      $ip";
     }
@@ -1734,7 +1742,9 @@ sub check_ip {
         print " ($dots_in_string dots)\n";
     }
     if ($dots_in_string!=3){
-        print "\nERROR: ->$ip<- does not contain 3 dots\n\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "  ERROR: >$ip< does not contain 3 dots\n\n";
         exit 1;        
     }
     
@@ -1765,7 +1775,7 @@ sub check_ip {
 
 
 sub check_ms_software_key {
-    my ($ms_software_key,$name,$host) = @_;
+    my ($ms_software_key,$name,$host,$line) = @_;
     if (exists $ms_key_ok{$ms_software_key}){
         # skip tests, when tagged as 'no key'
         return $ms_software_key;
@@ -1780,7 +1790,9 @@ sub check_ms_software_key {
     }
     if ($minus_in_string!=4){
         if($Conf::log_level>=2){
-            print "\nWARNING $host: <$ms_software_key> $name: Not containing 4 minus signs\n\n";
+            print "\n";
+            print "LINE: $line\n";
+            print "  WARNING $host: <$ms_software_key> $name: Not containing 4 minus signs\n\n";
         }
     }
 
@@ -1791,7 +1803,9 @@ sub check_ms_software_key {
         }
         if (length($part)!=5 ) {
             if($Conf::log_level>=2){
-                print "\nWARNING $host: <$ms_software_key> Not a $name:\n";
+                print "\n";
+                print "LINE: $line\n";
+                print "  WARNING $host: <$ms_software_key> Not a $name:\n";
                 print "   * Part: $part (Length ".length($part)." : Not 5 chacters long)\n\n";
             }
         } 
@@ -1802,7 +1816,7 @@ sub check_ms_software_key {
 
 
 sub check_account_flag {
-    my ($account_flag) = @_;
+    my ($account_flag,$line) = @_;
     if ($account_flag eq 0){
         # ok
         $account_flag="0";
@@ -1818,7 +1832,7 @@ sub check_account_flag {
 
 
 sub check_pxe {
-    my ($pxe) = @_;
+    my ($pxe,$line) = @_;
     if($Conf::log_level>=3){
         print "   PXE:     $pxe\n";
     }
@@ -1827,7 +1841,9 @@ sub check_pxe {
         return $pxe;
     }
     if ( not exists $pxe{$pxe} ) {
-        print "\nERROR: ->$pxe<- is invalid Option in pxe field\n\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "  ERROR: >$pxe< is invalid Option in pxe field\n\n";
         exit 1;
     }
     return $pxe;
@@ -1836,13 +1852,15 @@ sub check_pxe {
 
 
 sub check_option {
-    my ($option) = @_;
+    my ($option,$line) = @_;
     if (not defined $option){
         $option="";
         # ??? warning ???
     }
     if($Conf::log_level>=3){
-        print "   OPTION:     $option\n";
+        print "\n";
+        print "LINE: $line\n";
+        print "  OPTION: >$option<\n";
     }
     return $option;
 }
