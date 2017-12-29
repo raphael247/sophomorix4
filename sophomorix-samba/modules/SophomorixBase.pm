@@ -1421,11 +1421,9 @@ sub _console_print_user_full {
         print $line1;
         print "Deleted user $user_count_deleted/$user_count_deleted_max: $user\n";
         print $line1;
-        foreach my $logline (@{ $ref_users->{'USERS'}{$user}{'HISTORY'}{'ADDLIST'} }){
-            print $logline."\n";
-        }
-        foreach my $logline (@{ $ref_users->{'USERS'}{$user}{'HISTORY'}{'KILLLIST'} }){
-            print $logline."\n";
+        print "LOGFILES ($ref_users->{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'} Entries):\n";
+        foreach my $epoch (@{ $ref_users->{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }){
+            print "  ".$ref_users->{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}."\n";
         }
     }
 

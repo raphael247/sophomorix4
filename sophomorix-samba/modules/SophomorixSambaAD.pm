@@ -5329,12 +5329,14 @@ sub AD_get_full_userdata {
                 if ($login eq $user){
                     $anything_found++;
                     $users{'LOOKUP'}{'LOGUSERS'}{$user}{'FOUND'}="TRUE";
-                    #push @{ $users{'LISTS'}{'LOGUSERS'} }, $user;
                     if (not exists $users{'USERS'}{$user}{'sAMAccountName'}){
                         push @{ $users{'LISTS'}{'DELETED_USERS'} }, $user;
                     }
-                    my $logline="ADD:  $date  $login ($last, $first) in $group as $role";
-                    push @{ $users{'USERS'}{$user}{'HISTORY'}{'ADDLIST'} },$logline ;
+                    my $human_date=&Sophomorix::SophomorixBase::ymdhms_to_date($date);
+                    my $logline="ADD:  $human_date  $login ($last, $first) in $group as $role";
+                    # ordered by epoch
+                    push @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} },$epoch ;
+                    $users{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}=$logline;
                 }
             }
             close(ADD);
@@ -5348,12 +5350,14 @@ sub AD_get_full_userdata {
                 if ($login eq $user){
                     $anything_found++;
                     $users{'LOOKUP'}{'LOGUSERS'}{$user}{'FOUND'}="TRUE";
-                    #push @{ $users{'LISTS'}{'LOGUSERS'} }, $user;
                     if (not exists $users{'USERS'}{$user}{'sAMAccountName'}){
                         push @{ $users{'LISTS'}{'DELETED_USERS'} }, $user;
                     }
-                    my $logline="KILL: $date  $login ($last, $first) in $group as $role";
-                    push @{ $users{'USERS'}{$user}{'HISTORY'}{'KILLLIST'} },$logline ;
+                    my $human_date=&Sophomorix::SophomorixBase::ymdhms_to_date($date);
+                    my $logline="KILL: $human_date  $login ($last, $first) in $group as $role";
+                    # ordered by epoch
+                    push @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} },$epoch ;
+                    $users{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}=$logline;
                 }
             }
             close(KILL);
@@ -5361,7 +5365,13 @@ sub AD_get_full_userdata {
         if ($anything_found==0){
             push @{ $users{'LISTS'}{'UNKNOWN_USERS'} }, $user;
         }
-
+        # order epoch entries
+        if ($#{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }>0){
+	    @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }=sort @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} };
+            $users{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'}=$#{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }+1;
+        } else {
+            $users{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'}=0;
+        }
     }
 
     if ($max==0){
