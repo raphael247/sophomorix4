@@ -1,36 +1,85 @@
 #!/bin/sh
-sophomorix-vampire --datadir ../sophomorix-dump --analyze
 
-sophomorix-vampire --datadir ../sophomorix-dump --create-class-script
 
-/root/sophomorix-vampire-classes.sh
+
+STDOUT=/tmp/LOGDIR
+STDERR=/tmp/ERRORDIR
+rm -rf $STDOUT
+rm -rf $STDERR
+mkdir -p $STDOUT
+mkdir -p $STDERR
+
+# delete later ????
+rm -rf /var/log/sophomorix/userlog/
+
+echo "--analyze"
+sophomorix-vampire --datadir ../sophomorix-dump --analyze 1> $STDOUT/file-01.log 2> $STDERR/file-01.err
+cat $STDERR/file-01.err
+
+echo "--create-class-script"
+sophomorix-vampire --datadir ../sophomorix-dump --create-class-script 1> $STDOUT/file-02.log 2> $STDERR/file-02.err
+cat $STDERR/file-02.err
+
+
+echo "/root/sophomorix-vampire-classes.sh"
+/root/sophomorix-vampire-classes.sh 1> $STDOUT/file-03.log 2> $STDERR/file-03.err
+cat $STDERR/file-03.err
+
 
 samba-tool domain passwordsettings set --complexity=off
 samba-tool domain passwordsettings set --min-pwd-length=2
 
-sophomorix-vampire --datadir ../sophomorix-dump --create-add-file
+
+echo "--create-add-file"
+sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> $STDOUT/file-04.log 2> $STDERR/file-04.err
 cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+cat $STDERR/file-04.err
 
-sophomorix-add 
+echo "sophomorix-add"
+sophomorix-add 1> $STDOUT/file-05.log 2> $STDERR/file-05.err
+cat $STDERR/file-05.err
 
-sophomorix-vampire --datadir ../sophomorix-dump --import-user-password-hashes
+exit
+
+
+
+echo "--import-user-password-hashes"
+sophomorix-vampire --datadir ../sophomorix-dump --import-user-password-hashes 1> $STDOUT/file-06.log 2> $STDERR/file-06.err
+cat $STDERR/file-06.err
 
 samba-tool domain passwordsettings set --complexity=default
 samba-tool domain passwordsettings set --min-pwd-length=default
 
 
-sophomorix-vampire --datadir ../sophomorix-dump --create-class-adminadd-script
-/root/sophomorix-vampire-classes-adminadd.sh
+echo "--create-class-adminadd-script"
+sophomorix-vampire --datadir ../sophomorix-dump --create-class-adminadd-script 1> $STDOUT/file-07.log 2> $STDERR/file-07.err
+cat $STDERR/file-07.err
 
-sophomorix-vampire --datadir ../sophomorix-dump --create-project-script
+echo "/root/sophomorix-vampire-classes-adminadd.sh"
+/root/sophomorix-vampire-classes-adminadd.sh 1> $STDOUT/file-08.log 2> $STDERR/file-08.err
+cat $STDERR/file-08.err
 
-/root/sophomorix-vampire-projects.sh
+echo "--create-project-script"
+sophomorix-vampire --datadir ../sophomorix-dump --create-project-script 1> $STDOUT/file-09.log 2> $STDERR/file-09.err
+cat $STDERR/file-09.err
+
+echo "/root/sophomorix-vampire-projects.sh"
+/root/sophomorix-vampire-projects.sh 1> $STDOUT/file-10.log 2> $STDERR/file-10.err
+cat $STDERR/file-10.err
 
 
-sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files
+echo "--restore-config-files"
+sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files 1> $STDOUT/file-11.log 2> $STDERR/file-11.err
+cat $STDERR/file-11.err
 
-sophomorix-check
+echo "sophomorix-check"
+sophomorix-check 1> $STDOUT/file-12.log 2> $STDERR/file-12.err
+cat $STDERR/file-12.err
 
-sophomorix-update
+echo "sophomorix-update"
+sophomorix-update 1> $STDOUT/file-13.log 2> $STDERR/file-13.err
+cat $STDERR/file-13.err
 
-sophomorix-device
+echo "sophomorix-device"
+sophomorix-device 1> $STDOUT/file-14.log 2> $STDERR/file-14.err
+cat $STDERR/file-14.err
