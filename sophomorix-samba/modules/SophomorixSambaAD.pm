@@ -1682,7 +1682,6 @@ sub AD_user_create {
                                                  });
     }
 
-
     ######################################################################
     # memberships of created user
     ######################################################################
@@ -3826,6 +3825,7 @@ sub AD_get_AD {
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam;
 
             my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$adminclass};
+	    print "HERE: $type $adminclass\n";
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
@@ -4365,6 +4365,8 @@ sub AD_get_AD {
 
     return(\%AD);
 }
+
+
 
 sub AD_get_ui {
     my %ui=();

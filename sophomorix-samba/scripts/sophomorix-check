@@ -738,7 +738,6 @@ foreach my $sam ( keys %{$ref_AD->{'sAMAccountName'}} ) {
         # write to sophomorix.kill or sophomorix.nochange
         &test_RK_kill($sam,\$kill);
         if ($kill>0){
-print "HERE: $sam\n";
             # write to sophomorix.kill
             my $kill_line=$ref_AD->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
                           $sam."::".
