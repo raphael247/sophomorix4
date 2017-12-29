@@ -5334,7 +5334,6 @@ sub AD_get_full_userdata {
                     }
                     my $human_date=&Sophomorix::SophomorixBase::ymdhms_to_date($date);
                     my $logline="ADD:  $human_date  $login ($last, $first) in $group as $role";
-                    # ordered by epoch
                     push @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} },$epoch ;
                     $users{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}=$logline;
                 }
@@ -5355,7 +5354,6 @@ sub AD_get_full_userdata {
                     }
                     my $human_date=&Sophomorix::SophomorixBase::ymdhms_to_date($date);
                     my $logline="KILL: $human_date  $login ($last, $first) in $group as $role";
-                    # ordered by epoch
                     push @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} },$epoch ;
                     $users{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}=$logline;
                 }

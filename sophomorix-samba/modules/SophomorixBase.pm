@@ -1546,6 +1546,14 @@ sub _console_print_user_full {
             printf "%19s: %-50s\n","primaryGroupID",$ref_users->{'USERS'}{$user}{'primaryGroupID'};
             print $line;
 	}
+        if ($log_level>=2 and $ref_users->{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'}>0){
+            print "LOGFILES ($ref_users->{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'} Entries):\n";
+            foreach my $epoch (@{ $ref_users->{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }){
+                print "  ".$ref_users->{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}."\n";
+            }
+        } else {
+            print "LOGFILES: $ref_users->{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'} Entries\n";
+        }
     }
 }
 
