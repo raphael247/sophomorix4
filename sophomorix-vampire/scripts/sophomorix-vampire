@@ -515,6 +515,7 @@ if ($create_add_file==1){
         } else {
             my %line=();
             my $role="";
+            my $file="";
             my $creationdate="---";
             my $tolerationdate="---";
             my $deactivationdate="---";
@@ -528,13 +529,16 @@ if ($create_add_file==1){
             }
             if ($line{"homedirectory"}=~m/\/home\/teachers\//){
                 $role="teacher";
+                $file="teachers.csv";
             } elsif ($line{"homedirectory"}=~m/\/home\/students\//){
                 $role="student";
+                $file="students.csv";
             } elsif ($line{"homedirectory"}=~m/\/home\/administrators\//){
                 $role="administrator";
                 $skip_line=1;
             } elsif ($line{"homedirectory"}=~m/\/home\/attic\//){
                 $role="student";
+                $file="students.csv";
             } elsif ($line{"homedirectory"}=~m/\/home\/workstations\//){
                 $skip_line=1;
             } else {
@@ -577,7 +581,7 @@ if ($create_add_file==1){
             my $unicodePwd=`/usr/sbin/sophomorix-vampire-pwdconvert $line{"sambantpassword"}`;
             chomp($unicodePwd);
             # create_line
-            my $line= "vampire.csv"."::".
+            my $line= $file."::".
                       $class."::".
                       $line{"surname"}.";".
                       $line{"firstname"}.";".
