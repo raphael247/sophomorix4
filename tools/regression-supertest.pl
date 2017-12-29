@@ -143,6 +143,8 @@ sub reset_smb {
     sleep 5;
     # resetting passwords
     system("sshpass -p \"Muster!\" samba-tool user setpassword Administrator");
+    system("samba-tool domain passwordsettings set --complexity=default");
+    system("samba-tool domain passwordsettings set --min-pwd-length=default");
     print "... done resetting samba for test\n";
     &printline();
 }
