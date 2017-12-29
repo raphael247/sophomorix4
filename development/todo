@@ -23,6 +23,32 @@ Migration: see file ./migration
 
 sophomorix-check:
 Use of uninitialized value $type in hash element at /usr/share/perl5/Sophomorix/SophomorixSambaAD.pm line 3832.
+--> Ursache:
+  user smv wurde in die Grupe smv gemoved
+
+Bug: Die user scheinen nicht members irgendwo zu sein
+
+Useless use of bitwise and (&) in void context at /usr/sbin/sophomorix-vampire line 259.
+
+remove concept of vampire.csv completely
+
+Bug: sophomorix-user -u bz -ivj zeugt nicht denn 1 add-Eintrag
+
+AD_get_AD scheint langsam
+wird aufgerufen in:
+  * sophomorix-device
+  * sophomorix-repair
+  * sophomorix-check
+
+und in SophomorixSamba_AD ????
+
+--> auftrennen in 3 einzelne sub, performanceoptimiert?
+
+
+performance:
+
+sophomorix-add merkt sich welche Klassen schon angelegt wurde und wiederholt das nicht mehr
+
 
 
 sophomorix user -i -u <login> ()
