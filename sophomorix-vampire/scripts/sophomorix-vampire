@@ -6,13 +6,11 @@
 
 # modules
 use strict;
-#use Quota;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
-#use IMAP::Admin;
-#use DBI;
+use Time::Local;
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -262,6 +260,8 @@ if ($overwriting_files_count > 0){
 			 "/etc/linuxmuster/sophomorix/default-school/devices.csv");
         &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
 			 "/etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
+        &killog_rewrite("/var/log/sophomorix/user-modify-archive.log.migrated.orig",
+			 "/var/log/sophomorix/user-modify-archive.log.migrated");
     } else {
         print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
     }
@@ -1026,6 +1026,89 @@ if ($verify_gid==1){
 ############################################################
 # sub
 ############################################################
+
+sub killog_rewrite {
+    my ($in,$out)=@_;
+
+    print "\n";
+    print "### Writing $out\n";
+    open(IN,"<$in") || die "Cannot create $in \n";
+    open(OUT,">$out") || die "Cannot create $out \n";
+    while(<IN>){
+        my $line=$_;
+        my $new_line;
+        chomp($line);
+
+        $line=~s/^\s+//g;# remove leading whitespace
+        if(/^\#/){
+             # keep comment lines
+             $new_line=$line."\n";
+        } elsif ($line eq ""){
+             # keep empty lines
+             $new_line=$line."\n";
+        } else {
+            my (@items)=split(/::/,$line);
+            my ($day,$month,$year)=split(/\./,$items[1]);
+            my $epoch=timelocal(0, 0, 0, $day , ($month-1), $year);
+            if ($items[0] eq "user archived" 
+                and $year > 2016 
+                and $items[4] ne "Computer"
+                and $items[4] ne "Account"){
+                my $date_ad=$year.$month.$day."000000.0Z";
+                $new_line="KILL::".$items[2]."::".
+                      $items[4]."::".
+                      $items[5]."::".
+                      "---::".
+                      "---::".
+                      "---::".
+                      $date_ad."::".
+                      $epoch."::".
+                      "---::---::".
+                      "\n";
+                print OUT "$new_line";
+            }
+        }
+    }
+    close(IN);
+    close(OUT);
+
+    # prepend old log to existing log
+    my $killog="/var/log/sophomorix/userlog/user-kill.log";
+    my $killog_tmp=$killog.".tmp";
+    my @oldlines=();
+    my %oldlines=();
+    open(TMPLOG,">$killog_tmp");
+
+    # read old killog lines and remember them
+    if (-f $killog){
+        open(LOG,"<$killog") || die "Cannot open $killog\n";
+        while(<LOG>){
+            push @oldlines,$_;
+            $oldlines{$_}="old";    
+        }
+        close(LOG);
+    }
+
+    # first write very old migrated lines if not done already
+    open(OUT,"<$out") || die "Cannot create $out \n";
+    while(<OUT>){
+        if (not exists $oldlines{$_}){
+            print TMPLOG "$_";
+        }
+    }
+    close(OUT);
+
+    # write old lines (newer tha migrated lines) 
+    foreach my $line (@oldlines){
+        print TMPLOG "$line";
+    }
+    close(TMPLOG);
+
+    # copy modified log obver log
+    system("cp $killog_tmp $killog");
+}
+
+
 
 sub extrastudents_rewrite {
     my ($in,$out)=@_;
