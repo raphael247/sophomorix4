@@ -5320,7 +5320,6 @@ sub AD_get_full_userdata {
 	    $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_UPDATE'};
         my $log_kill=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
 	    $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_KILL'};
-
         # ADD
         if (-f $log_add){
             open(ADD,"<$log_add");
@@ -5368,7 +5367,7 @@ sub AD_get_full_userdata {
 	    @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }=sort @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} };
             $users{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'}=$#{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }+1;
         } else {
-            $users{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'}=0;
+            $users{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'}=$#{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} }+1;
         }
     }
 
