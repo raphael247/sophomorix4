@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 rm -rf /tmp/LOGDIR
 rm -rf /tmp/ERRORDIR
@@ -9,16 +9,17 @@ mkdir -p /tmp/ERRORDIR
 rm -rf /var/log/sophomorix/userlog/
 
 echo "--analyze"
-sophomorix-vampire --datadir ../sophomorix-dump --analyze 1> /tmp/LOGDIR/file-01.log 2> /tmp/ERRORDIR/file-01.err
+time sophomorix-vampire --datadir ../sophomorix-dump --analyze 1> /tmp/LOGDIR/file-01.log 2> /tmp/ERRORDIR/file-01.err
 cat /tmp/ERRORDIR/file-01.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
+
 echo "--create-class-script"
-sophomorix-vampire --datadir ../sophomorix-dump --create-class-script 1> /tmp/LOGDIR/file-02.log 2> /tmp/ERRORDIR/file-02.err
+time sophomorix-vampire --datadir ../sophomorix-dump --create-class-script 1> /tmp/LOGDIR/file-02.log 2> /tmp/ERRORDIR/file-02.err
 cat /tmp/ERRORDIR/file-02.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 
 echo "/root/sophomorix-vampire-classes.sh"
-/root/sophomorix-vampire-classes.sh 1> /tmp/LOGDIR/file-03.log 2> /tmp/ERRORDIR/file-03.err
+time /root/sophomorix-vampire-classes.sh 1> /tmp/LOGDIR/file-03.log 2> /tmp/ERRORDIR/file-03.err
 cat /tmp/ERRORDIR/file-03.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 
@@ -27,12 +28,12 @@ samba-tool domain passwordsettings set --min-pwd-length=2
 
 
 echo "--create-add-file"
-sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> /tmp/LOGDIR/file-04.log 2> /tmp/ERRORDIR/file-04.err
+time sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> /tmp/LOGDIR/file-04.log 2> /tmp/ERRORDIR/file-04.err
 cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
 cat /tmp/ERRORDIR/file-04.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "sophomorix-add"
-sophomorix-add 1> /tmp/LOGDIR/file-05.log 2> /tmp/ERRORDIR/file-05.err
+time sophomorix-add 1> /tmp/LOGDIR/file-05.log 2> /tmp/ERRORDIR/file-05.err
 cat /tmp/ERRORDIR/file-05.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 
@@ -41,7 +42,7 @@ exit
 
 
 echo "--import-user-password-hashes"
-sophomorix-vampire --datadir ../sophomorix-dump --import-user-password-hashes 1> /tmp/LOGDIR/file-06.log 2> /tmp/ERRORDIR/file-06.err
+time sophomorix-vampire --datadir ../sophomorix-dump --import-user-password-hashes 1> /tmp/LOGDIR/file-06.log 2> /tmp/ERRORDIR/file-06.err
 cat /tmp/ERRORDIR/file-06.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 samba-tool domain passwordsettings set --complexity=default
@@ -49,34 +50,34 @@ samba-tool domain passwordsettings set --min-pwd-length=default
 
 
 echo "--create-class-adminadd-script"
-sophomorix-vampire --datadir ../sophomorix-dump --create-class-adminadd-script 1> /tmp/LOGDIR/file-07.log 2> /tmp/ERRORDIR/file-07.err
+time sophomorix-vampire --datadir ../sophomorix-dump --create-class-adminadd-script 1> /tmp/LOGDIR/file-07.log 2> /tmp/ERRORDIR/file-07.err
 cat /tmp/ERRORDIR/file-07.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "/root/sophomorix-vampire-classes-adminadd.sh"
-/root/sophomorix-vampire-classes-adminadd.sh 1> /tmp/LOGDIR/file-08.log 2> /tmp/ERRORDIR/file-08.err
+time /root/sophomorix-vampire-classes-adminadd.sh 1> /tmp/LOGDIR/file-08.log 2> /tmp/ERRORDIR/file-08.err
 cat /tmp/ERRORDIR/file-08.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "--create-project-script"
-sophomorix-vampire --datadir ../sophomorix-dump --create-project-script 1> /tmp/LOGDIR/file-09.log 2> /tmp/ERRORDIR/file-09.err
+time sophomorix-vampire --datadir ../sophomorix-dump --create-project-script 1> /tmp/LOGDIR/file-09.log 2> /tmp/ERRORDIR/file-09.err
 cat /tmp/ERRORDIR/file-09.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "/root/sophomorix-vampire-projects.sh"
-/root/sophomorix-vampire-projects.sh 1> /tmp/LOGDIR/file-10.log 2> /tmp/ERRORDIR/file-10.err
+time /root/sophomorix-vampire-projects.sh 1> /tmp/LOGDIR/file-10.log 2> /tmp/ERRORDIR/file-10.err
 cat /tmp/ERRORDIR/file-10.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 
 echo "--restore-config-files"
-sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files 1> /tmp/LOGDIR/file-11.log 2> /tmp/ERRORDIR/file-11.err
+time sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files 1> /tmp/LOGDIR/file-11.log 2> /tmp/ERRORDIR/file-11.err
 cat /tmp/ERRORDIR/file-11.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "sophomorix-check"
-sophomorix-check 1> /tmp/LOGDIR/file-12.log 2> /tmp/ERRORDIR/file-12.err
+time sophomorix-check 1> /tmp/LOGDIR/file-12.log 2> /tmp/ERRORDIR/file-12.err
 cat /tmp/ERRORDIR/file-12.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "sophomorix-update"
-sophomorix-update 1> /tmp/LOGDIR/file-13.log 2> /tmp/ERRORDIR/file-13.err
+time sophomorix-update 1> /tmp/LOGDIR/file-13.log 2> /tmp/ERRORDIR/file-13.err
 cat /tmp/ERRORDIR/file-13.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo "sophomorix-device"
-sophomorix-device 1> /tmp/LOGDIR/file-14.log 2> /tmp/ERRORDIR/file-14.err
+time sophomorix-device 1> /tmp/LOGDIR/file-14.log 2> /tmp/ERRORDIR/file-14.err
 cat /tmp/ERRORDIR/file-14.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
