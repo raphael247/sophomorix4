@@ -5360,7 +5360,7 @@ sub AD_get_full_userdata {
             }
             close(KILL);
         }
-        if ($anything_found==0){
+        if ($anything_found==0 and not exists $users{'USERS'}{$user}){
             push @{ $users{'LISTS'}{'UNKNOWN_USERS'} }, $user;
         }
         # order epoch entries
