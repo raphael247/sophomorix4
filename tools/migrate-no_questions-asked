@@ -8,16 +8,17 @@ mkdir -p /tmp/ERRORDIR
 # delete later ????
 #rm -rf /var/log/sophomorix/userlog/
 
+# 0 min
 echo "--analyze"
 time sophomorix-vampire --datadir ../sophomorix-dump --analyze 1> /tmp/LOGDIR/file-01.log 2> /tmp/ERRORDIR/file-01.err
 cat /tmp/ERRORDIR/file-01.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-
+# 0 min
 echo "--create-class-script"
 time sophomorix-vampire --datadir ../sophomorix-dump --create-class-script 1> /tmp/LOGDIR/file-02.log 2> /tmp/ERRORDIR/file-02.err
 cat /tmp/ERRORDIR/file-02.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-
+# 36 min
 echo "/root/sophomorix-vampire-classes.sh"
 time /root/sophomorix-vampire-classes.sh 1> /tmp/LOGDIR/file-03.log 2> /tmp/ERRORDIR/file-03.err
 cat /tmp/ERRORDIR/file-03.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
@@ -27,15 +28,16 @@ samba-tool domain passwordsettings set --complexity=off
 samba-tool domain passwordsettings set --min-pwd-length=2
 
 
+# 1 min
 echo "--create-add-file"
 time sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> /tmp/LOGDIR/file-04.log 2> /tmp/ERRORDIR/file-04.err
 cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
 cat /tmp/ERRORDIR/file-04.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
+# xx min
 echo "sophomorix-add"
 time sophomorix-add 1> /tmp/LOGDIR/file-05.log 2> /tmp/ERRORDIR/file-05.err
 cat /tmp/ERRORDIR/file-05.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
-
 
 
 # 8 min
