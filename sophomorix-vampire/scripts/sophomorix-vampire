@@ -260,6 +260,8 @@ if ($overwriting_files_count > 0){
                           "/etc/linuxmuster/sophomorix/default-school/teachers.csv");
         &devices_rewrite("/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
 			 "/etc/linuxmuster/sophomorix/default-school/devices.csv");
+        &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
+			 "/etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
     } else {
         print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
     }
@@ -1024,6 +1026,49 @@ if ($verify_gid==1){
 ############################################################
 # sub
 ############################################################
+
+sub extrastudents_rewrite {
+    my ($in,$out)=@_;
+    my %classes_map=&read_classes_map();
+
+    print "\n";
+    print "### Writing $out\n";
+    open(IN,"<$in") || die "Cannot create $in \n";
+    open(OUT,">$out") || die "Cannot create $out \n";
+    while(<IN>){
+        my $line=$_;
+        my $new_line;
+        chomp($line);
+
+        $line=~s/^\s+//g;# remove leading whitespace
+        if(/^\#/){
+             # keep comment lines
+             $new_line=$line."\n";
+        } elsif ($line eq ""){
+             # keep empty lines
+             $new_line=$line."\n";
+        } else {
+        my (@items)=split(/;/,$line);
+
+        # rename groups according to classes_map
+        if (exists $classes_map{$items[0]}){
+            $items[0]=$classes_map{$items[0]}; 
+        }
+        $new_line=$items[0].";".
+                  $items[1].";".
+                  $items[2].";".
+                  $items[3].";".
+                  $items[4].";".
+                  "\n";
+        }
+        print OUT "$new_line";
+    }
+    close(IN);
+    close(OUT);
+}
+
+
+
 
 
 sub devices_rewrite {
