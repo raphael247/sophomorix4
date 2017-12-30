@@ -424,7 +424,6 @@ open (NOCHANGE, ">$nochange_file");
 my $error_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.error";
 open (ERRORFILE, ">$error_file");
 
-
 # ============================================================
 # analyzing encoding of all filtered user files in tmp
 # ============================================================
@@ -1106,6 +1105,20 @@ sub test_user_update {
         ${$new_class_ref}="---";
     } else {
         # update
+        # exit if new group is a user
+        if (exists $ref_AD->{'sAMAccountName'}{$adminclass}){
+            print "\n";
+  	    print "ERROR: User \"$sam\" is configured be moved from class \"".
+                  $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}.
+                  "\" to \"".
+                  $adminclass.
+                  "\"\n";
+            print "  BUT: The target class \"$adminclass\" is a user (not a group)\n";
+            print "  You must:\n";
+            print "     A) map the groupname \"$adminclass\" to another name\n";
+            print "     B) Edit the groupname of \"$sam\" in the file ${$new_filename_ref}\n";
+            exit;
+        }
         ${$update_ref}++;
         # ${$new_class_ref}=$adminclass; # with prefix
         ${$new_class_ref}=$Match{'ACTION'}{$line_new}{'class'}; # without prefix
@@ -1649,8 +1662,8 @@ sub check_class {
         $error_strg="$class begins not with a-z or 0-9";
         $class_valid=0;
     }
-
-    # test if groupname must be forced
+    
+    # test if groupname must be forced (i.e. teachers)
     if ($sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUP'} eq "TRUE"){
         $class=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'};
     }
