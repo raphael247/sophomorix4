@@ -257,9 +257,9 @@ if ($overwriting_files_count > 0){
     if ($restore_config_files==1){ 
         print "$overwriting_files_count file(s) were overwritten!\n";
         &teachers_rewrite("/etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp",
-                          "/etc/linuxmuster/sophomorix/default-school/teachers.csv")
+                          "/etc/linuxmuster/sophomorix/default-school/teachers.csv");
         &devices_rewrite("/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
-                          "/etc/linuxmuster/sophomorix/default-school/devices.csv")
+			 "/etc/linuxmuster/sophomorix/default-school/devices.csv");
     } else {
         print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
     }
