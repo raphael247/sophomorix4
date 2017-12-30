@@ -1230,7 +1230,6 @@ sub console_print_quota_user {
     my $log_level = $arg_ref->{log_level};
     my $line="+------------------------------------------".
               "------------------------------------+\n";
-    #print "\n\n\nHERE QUOTA_USER START\n";
     if (not exists $ref_quota->{'QUOTA'}{'USERS'}{$user}){
         print "  WARNING: User $user not found!\n";
         next;

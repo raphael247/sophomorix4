@@ -1033,7 +1033,6 @@ sub belwue_maildata_check {
         # add appendix members (if file exists)
         my $appendix_file=$ref_belwue_mailconf->{'CONFIG_DIR'}."/".$maillist.".txt";
         if (-f $appendix_file ){
-	    #print "HERE:  $appendix_file \n";
             open(APPENDIX,"<$appendix_file");
             while(<APPENDIX>){
                 my $line=$_;
