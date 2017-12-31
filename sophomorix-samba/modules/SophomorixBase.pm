@@ -2071,9 +2071,6 @@ sub config_sophomorix_read {
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
     # Adding some defaults: ????? better to move the defaults to an external file ?????
-    my $vampire_file = $sophomorix_config{'INI'}{'VARS'}{'VAMPIRE_FILENAME'};
-    $sophomorix_config{'FILES'}{'USER_FILE'}{$vampire_file}{'sophomorixType'}=
-        $sophomorix_config{'INI'}{'VARS'}{'VAMPIRE_GROUP_TYPE'};
     # default school
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'CONF_FILE'}=
         $DevelConf::path_conf_sophomorix."/".$DevelConf::name_default_school."/school.conf"; 

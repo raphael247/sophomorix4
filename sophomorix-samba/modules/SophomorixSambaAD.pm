@@ -1489,18 +1489,6 @@ sub AD_user_create {
         $class_ou=$ref_sophomorix_config->{'INI'}{'binduser.school'}{'SUB_OU'};
         $dn_class=$ref_sophomorix_config->{'SCHOOLS'}{$school}{ADMINS}{OU};
 	$dn="cn=".$login.",".$dn_class;
-    } elsif ($file eq $ref_sophomorix_config->{'INI'}{'VARS'}{'VAMPIRE_FILENAME'}){
-        # migration
-        if ($role eq "teacher"){
-            $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{'teachers.csv'}{'GROUP_OU'};
-            $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-            $dn="CN=".$login.",".$dn_class;
-        } elsif ($role eq "student"){
-            $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{'students.csv'}{'GROUP_OU'};
-            $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
-            $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-            $dn="CN=".$login.",".$dn_class;
-        }
     } else {
         # from file
         $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
@@ -6504,12 +6492,6 @@ sub AD_group_create {
         $group_ou=$sub_ou;
     } elsif ($file eq "none"){
         $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
-    } elsif ($file eq $ref_sophomorix_config->{'INI'}{'VARS'}{'VAMPIRE_FILENAME'}){
-        if ($type eq "teacherclass"){
-            $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{'teachers.csv'}{'GROUP_OU'};
-        } elsif ($type eq "adminclass"){
-            $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{'students.csv'}{'GROUP_OU'};
-        }
     } else {
         $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
     }
