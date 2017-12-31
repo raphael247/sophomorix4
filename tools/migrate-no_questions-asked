@@ -82,12 +82,13 @@ echo "/root/sophomorix-vampire-projects.sh"
 time /root/sophomorix-vampire-projects.sh 1> /tmp/LOGDIR/file-10.log 2> /tmp/ERRORDIR/file-10.err
 cat /tmp/ERRORDIR/file-10.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-
 # 1 min
 echo ""
 echo "--restore-config-files"
 time sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files 1> /tmp/LOGDIR/file-11.log 2> /tmp/ERRORDIR/file-11.err
 cat /tmp/ERRORDIR/file-11.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+
 
 # 0 min
 echo ""
@@ -97,12 +98,24 @@ cat /tmp/ERRORDIR/file-12.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Ser
 
 # 0 min
 echo ""
-echo "sophomorix-update"
-time sophomorix-update 1> /tmp/LOGDIR/file-13.log 2> /tmp/ERRORDIR/file-13.err
+echo "sophomorix-add"
+time sophomorix-add 1> /tmp/LOGDIR/file-13.log 2> /tmp/ERRORDIR/file-13.err
 cat /tmp/ERRORDIR/file-13.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+# 0 min
+echo ""
+echo "sophomorix-update"
+time sophomorix-update 1> /tmp/LOGDIR/file-14.log 2> /tmp/ERRORDIR/file-14.err
+cat /tmp/ERRORDIR/file-14.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+# 1 min / 45 users
+echo ""
+echo "sophomorix-kill"
+time sophomorix-kill 1> /tmp/LOGDIR/file-15.log 2> /tmp/ERRORDIR/file-15.err
+cat /tmp/ERRORDIR/file-15.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 # 7 min
 echo ""
 echo "sophomorix-device"
-time sophomorix-device 1> /tmp/LOGDIR/file-14.log 2> /tmp/ERRORDIR/file-14.err
-cat /tmp/ERRORDIR/file-14.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+time sophomorix-device 1> /tmp/LOGDIR/file-16.log 2> /tmp/ERRORDIR/file-16.err
+cat /tmp/ERRORDIR/file-16.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
