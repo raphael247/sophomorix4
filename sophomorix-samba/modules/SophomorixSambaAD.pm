@@ -4368,7 +4368,6 @@ sub AD_get_AD {
 
 
 
-
 sub AD_get_AD_for_check {
     my %AD=();
     my ($arg_ref) = @_;
@@ -4376,41 +4375,6 @@ sub AD_get_AD_for_check {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-
-    my $users = $arg_ref->{users};
-    if (not defined $users){$users="FALSE"};
-
-    my $adminclasses = $arg_ref->{adminclasses};
-    if (not defined $adminclasses){$adminclasses="FALSE"};
-
-    my $teacherclasses = $arg_ref->{teacherclasses};
-    if (not defined $teacherclasses){$teacherclasses="FALSE"};
-
-    my $administratorclasses = $arg_ref->{administratorclasses};
-    if (not defined $administratorclasses){$administratorclasses="FALSE"};
-
-    my $projects = $arg_ref->{projects};
-    if (not defined $projects){$projects="FALSE"};
-
-    my $computers = $arg_ref->{computers};
-    if (not defined $computers){$computers="FALSE"};
-
-    my $rooms = $arg_ref->{rooms};
-    if (not defined $rooms){$rooms="FALSE"};
-
-    my $management = $arg_ref->{management};
-    if (not defined $management){$management="FALSE"};
-
-    # make sure adminclass lists exist, when users are added
-    if($users eq "TRUE"){
-        $adminclasses="TRUE";
-        $teacherclasses="TRUE";
-        $projects="TRUE";
-    }
-    # make sure room lists exist, when computers are added
-    if($computers eq "TRUE"){
-        $rooms="TRUE";
-    }
 
     ############################################################
     # SEARCH FOR ALL
@@ -4466,17 +4430,36 @@ sub AD_get_AD_for_check {
                $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
                $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
 
-               $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=
+               my $identifier_ascii=
                    $entry->get_value('sophomorixSurnameASCII').
                    ";".
                    $entry->get_value('sophomorixFirstnameASCII').
                    ";".
                    $entry->get_value('sophomorixBirthdate');
+               $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+
+               my $identifier_utf8=
+                   $entry->get_value('sn').
+                   ";".
+                   $entry->get_value('givenName').
+                   ";".
+                   $entry->get_value('sophomorixBirthdate');
                # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
-               
+               # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
-
-
+               # LOOKUP
+               $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
+               $AD{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
+               $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+               $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
+               if ($entry->get_value('sophomorixUnid') ne "---"){
+                   # no lookup for unid '---'
+                   $AD{'LOOKUP'}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
+                   # $AD{'LOOKUP'}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                   #     $identifier_utf8;
+                   $AD{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       $identifier_ascii;
+               }
            }
        } elsif (defined $entry->get_value('sophomorixType')){
            $type=$entry->get_value('sophomorixType');
@@ -4488,14 +4471,8 @@ sub AD_get_AD_for_check {
        $AD{'FORBIDDEN'}{$sam}=$sopho;
        #print "$sopho: $sam\n"; 
     }
+
     &Sophomorix::SophomorixBase::print_title("Query AD (stop)");
-
-    
-    #print Dumper(\%AD);
-
-    ### exit here later
-####################################################################################################
-
     return(\%AD);
 }
 

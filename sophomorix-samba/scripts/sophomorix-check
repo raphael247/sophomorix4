@@ -535,54 +535,24 @@ if ($follow ne ""){
 # ============================================================
 &print_title("Searching AD for users ...");
 # fetch system data
-my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-                           root_dse=>$root_dse,
-                           root_dns=>$root_dns,
-                           computers=>"FALSE",
-                           rooms=>"FALSE",
-                           administratorclasses=>"TRUE",
-                           users=>"TRUE",
-                           dnszones=>"FALSE",
-                           dnsnodes=>"FALSE",
-                           sophomorix_config=>\%sophomorix_config,
-             });
+# my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+#                            root_dse=>$root_dse,
+#                            root_dns=>$root_dns,
+#                            computers=>"FALSE",
+#                            rooms=>"FALSE",
+#                            administratorclasses=>"TRUE",
+#                            users=>"TRUE",
+#                            dnszones=>"FALSE",
+#                            dnsnodes=>"FALSE",
+#                            sophomorix_config=>\%sophomorix_config,
+#              });
 
 
 my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                      root_dse=>$root_dse,
                                      root_dns=>$root_dns,
-                                     computers=>"FALSE",
-                                     rooms=>"FALSE",
-                                     administratorclasses=>"TRUE",
-                                     users=>"TRUE",
                                      sophomorix_config=>\%sophomorix_config,
                                    });
-
-print Dumper($ref_AD->{'sAMAccountName'}{'bz'});
-print Dumper($ref_AD_check->{'sAMAccountName'}{'bz'});
-
-
-
-my $deb_count1=0; 
-foreach my $sam ( keys %{ $ref_AD_check->{'sAMAccountName'} } ) { 
-    $deb_count1++;
-    if (not exists $ref_AD->{'sAMAccountName'}{$sam}){
-        print "NOT in OLD $sam \n";
-    }
-}
-
-
-my $deb_count2=0; 
-foreach my $sam ( keys %{ $ref_AD->{'sAMAccountName'} } ) { 
-    $deb_count2++;
-    if (not exists $ref_AD_check->{'sAMAccountName'}{$sam}){
-        print "NOT in CHECK $sam \n";
-    }
-}
-
-print "$deb_count2  und in CHECK $deb_count1\n";
-
-#exit;
 
 
 # --dump-AD
@@ -591,7 +561,7 @@ if ($dump_AD==1){
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
                 log_level => $Conf::log_level,
-                hash_ref=>$ref_AD,
+                hash_ref=>$ref_AD_check,
                 sophomorix_config=>\%sophomorix_config,
               });
 }
@@ -1284,7 +1254,7 @@ sub write_add_file {
 # UTF8 match
 ################################################################################
 sub populate_ad_dynamic_identifiers_utf8 {
-    foreach my $identifier_utf8 (keys %{$ref_AD->{'LOOKUP'}{'user_BY_identifier_utf8'}} ) { 
+    foreach my $identifier_utf8 (keys %{$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_utf8'}} ) { 
         $Match{'ad_dynamic_identifiers_utf8'}{$identifier_utf8}="ad, not matched";
     } 
 }
@@ -1322,8 +1292,8 @@ sub show_dynamic_identifiers_ascii {
             print "ad_dynamic_identifiers_ascii:\n";
             foreach my $id (@ad_ids){
                 my $status=
-                print "   * $id ($ref_AD->{'LOOKUP'}{'user_BY_identifier_ascii'}{$id} in AD,",
-                      " status $ref_AD->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$id})\n";
+                print "   * $id ($ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$id} in AD,",
+                      " status $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$id})\n";
             }    
         }
         return 1;
@@ -1333,7 +1303,7 @@ sub show_dynamic_identifiers_ascii {
 
 
 sub populate_ad_dynamic_identifiers_ascii {
-    foreach my $identifier_ascii (keys %{$ref_AD->{'LOOKUP'}{'user_BY_identifier_ascii'}} ) { 
+    foreach my $identifier_ascii (keys %{$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}} ) { 
         $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii}="ad, not matched";
     } 
 }
@@ -1370,7 +1340,7 @@ sub find_migration_ascii_approx_matches {
             }
             if ($edit_distance <= $max_edit_distance){
                 # APPROX MATCH
-                my $sam=$ref_AD->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
+                my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
                 print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
                 delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
                 # save match to delete this match from list
@@ -1384,7 +1354,7 @@ sub find_migration_ascii_approx_matches {
                 $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
                 $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
                 $Match{'ACTION'}{$line_new}{'status'}=
-                    $ref_AD->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                 # reverse action_BY_sAMAccountName
                 $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
             }
@@ -1405,9 +1375,9 @@ sub find_migration_ascii_matches {
     foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
         $line_count++;
         my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-        if ( exists $ref_AD->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
+        if ( exists $ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
             # MATCH
-            my $sam=$ref_AD->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii};
+            my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii};
             if($Conf::log_level>=2){
                 print "    MATCH: $identifier_ascii to $sam\n";
             }
@@ -1419,7 +1389,7 @@ sub find_migration_ascii_matches {
             $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
             $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
             $Match{'ACTION'}{$line_new}{'status'}=
-                $ref_AD->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
             # reverse action_BY_sAMAccountName
             $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
 
@@ -1456,15 +1426,15 @@ sub find_migration_unid_matches {
         $line_count++;
         if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
             # finding a unid match 
-            if ( exists $ref_AD->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} and
-                 $ref_AD->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
+            if ( exists $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} and
+                 $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
                ){
                 # MATCH
-                my $sam=$ref_AD->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
-                my $role=$ref_AD->{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam};
+                my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
+                my $role=$ref_AD_check->{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam};
                 # fetch the identifier from AD with same unid
                 my $identifier_ascii_from_AD=
-		    $ref_AD->{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
+		    $ref_AD_check->{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
                 if($Conf::log_level>=2){
                     print " $filename:",
                           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
@@ -1485,7 +1455,7 @@ sub find_migration_unid_matches {
                 $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
                 $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
                 $Match{'ACTION'}{$line_new}{'status'}=
-                    $ref_AD->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                 # reverse action_BY_sAMAccountName
                 $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
 
