@@ -581,20 +581,6 @@ if ($dump_login_avoid==1){
 }
 
 
-
-my $ref_forbidden_logins=&get_forbidden_logins($ldap,$root_dse);
-# --dump-forbidden-logins
-if ($dump_forbidden_logins==1){
-    &json_dump({json => $json,
-                jsoninfo => "LOGIN_FORBIDDEN",
-                jsoncomment => "Forbidden logins",
-                log_level => $Conf::log_level,
-                hash_ref=>$ref_forbidden_logins,
-                sophomorix_config=>\%sophomorix_config,
-              });
-}
-
-
 # ============================================================
 # Find Matches: Walk thhrough all files and identifiers in %users_file
 # ============================================================
@@ -1219,7 +1205,7 @@ sub write_add_file {
     my $login=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
                                  $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
                                  $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
-                                 $ref_forbidden_logins, # forbidden logins
+                                 $ref_AD_check, # forbidden logins
                                  $ref_login_avoid, # logins to avoid
                                  \%sophomorix_config);
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".

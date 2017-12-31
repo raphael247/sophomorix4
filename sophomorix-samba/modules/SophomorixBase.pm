@@ -3427,6 +3427,7 @@ sub get_login_avoid {
 
 
 sub create_test_login {
+    # $ref_AD_check --> $ref_forbidden_logins
     my ($identifier_ascii,$file,$login_wish,$ref_forbidden_logins,$ref_login_avoid,$ref_sophomorix_config)=@_;
     my ($surname_login,$firstname_login,$birthdate)=split(";", $identifier_ascii);
     my $login_check_ok; # the approved login name

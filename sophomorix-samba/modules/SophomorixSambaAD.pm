@@ -4408,10 +4408,10 @@ sub AD_get_AD_for_check {
        #my $objectclass=$entry->get_value('objectClass');
        my $role;
        my $type;
-       my $sopho;
+       my $forbidden_warn;
        if (defined $entry->get_value('sophomorixRole')){
            $role=$entry->get_value('sophomorixRole');
-           $sopho="USER";
+           $forbidden_warn="$sam forbidden, $sam is a sophomorix user";
            if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'} or
                $role eq $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}
               ){
@@ -4463,13 +4463,13 @@ sub AD_get_AD_for_check {
            }
        } elsif (defined $entry->get_value('sophomorixType')){
            $type=$entry->get_value('sophomorixType');
-           $sopho="GROUP";
+           $forbidden_warn="$sam forbidden, $sam is a sophomorix group";
        } else {
-           $sopho="NONSOPHOMORIX";
+           $forbidden_warn="$sam forbidden, $sam is a non-sophomorix user";
        }
 
-       $AD{'FORBIDDEN'}{$sam}=$sopho;
-       #print "$sopho: $sam\n"; 
+       $AD{'FORBIDDEN'}{$sam}=$forbidden_warn;
+       #print "$forbidden_warn: $sam\n"; 
     }
 
     &Sophomorix::SophomorixBase::print_title("Query AD (stop)");
