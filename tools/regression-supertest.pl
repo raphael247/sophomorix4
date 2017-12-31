@@ -134,8 +134,16 @@ sub reset_smb {
     system("rm -f /etc/linuxmuster/sophomorix/uni/uni.teachers.csv");
     system("rm -f /etc/linuxmuster/sophomorix/uni/uni.students.csv");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv.orig");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv.orig");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv.orig");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv");
+    system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv.orig");
     system("sophomorix-samba --restore-samba ohne-user");
     system("sophomorix-samba --schema-load");
 #    system("sophomorix-samba --restore-samba ohne-user");
