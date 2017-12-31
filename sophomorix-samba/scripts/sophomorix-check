@@ -443,6 +443,7 @@ my $count=0;
 # ============================================================
 system("mkdir -p $DevelConf::path_conf_tmp");
 
+&print_title("Analyzing user files ...");
 foreach my $user_file (@filelist){
     my $filename = basename($user_file);
     # fetching some config data
@@ -531,7 +532,7 @@ if ($follow ne ""){
 # ============================================================
 # asking AD for users
 # ============================================================
-&print_title("Asking the system for users ...");
+&print_title("Searching AD for users ...");
 # fetch system data
 my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            root_dse=>$root_dse,
@@ -545,6 +546,9 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            dnsnodes=>"FALSE",
                            sophomorix_config=>\%sophomorix_config,
              });
+
+
+
 # --dump-AD
 if ($dump_AD==1){
     &json_dump({json => $json,
@@ -585,7 +589,6 @@ if ($dump_forbidden_logins==1){
 }
 
 
-
 # ============================================================
 # Find Matches: Walk thhrough all files and identifiers in %users_file
 # ============================================================
@@ -603,6 +606,7 @@ if ($dump_forbidden_logins==1){
 &populate_ad_dynamic_identifiers_ascii();
 
 # find exact matches
+&print_title("Finding exact user matches ...");
 &find_migration_unid_matches();
 &find_migration_ascii_matches();
 
@@ -861,7 +865,9 @@ sub test_UEAS_T_update{
            ){
             # update to T if not matched to a user in files
             if (not exists $Match{'action_BY_sAMAccountName'}{$sam}){
-                print "   * $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
+                if($Conf::log_level>=2){
+                    print "   * $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
+	        }
                 ${$new_status_ref}="T";
                 ${$update_ref}++;
             }
@@ -872,8 +878,10 @@ sub test_UEAS_T_update{
 sub test_T_DA_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
     if ( $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"){
-        print "* Testing $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
-               " TolerationDate: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}\n";
+        if($Conf::log_level>=2){
+            print "* Testing $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
+                  " TolerationDate: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}\n";
+        }
         my $file=$ref_AD->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
         my $toleration_date_epoch=&ymdhms_to_epoch($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'});
         my $toleration_time_days;
@@ -884,29 +892,38 @@ sub test_T_DA_update{
             $toleration_time_days=1000;
         }
         my $toleration_end_epoch=$toleration_date_epoch+86400*$toleration_time_days;
-        print "    Toleration end: $toleration_end_epoch ($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}",
-              " +  $toleration_time_days days)\n";
-        print "    Today:          $time_stamp_epoch\n";
+        if($Conf::log_level>=2){
+            print "    Toleration end: $toleration_end_epoch ($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}",
+                  " +  $toleration_time_days days)\n";
+            print "    Today:          $time_stamp_epoch\n";
+        }
         if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
             $time_stamp_epoch > $toleration_end_epoch){
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
-            print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+            if($Conf::log_level>=2){
+                print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+            }
             ${$new_status_ref}="D";
             ${$update_ref}++;
 	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam}){
             # update to A if 
             #     - matched to a user in files
-            print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
+            if($Conf::log_level>=2){
+                print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
+            }
             ${$new_status_ref}="A";
             ${$update_ref}++;
 	} else {
             # do nothing
-            print "    ----> Toleration end not reached\n";
+            if($Conf::log_level>=2){
+                print "    ----> Toleration end not reached\n";
+            }
         }
     }
 }
+
 
 
 sub test_DL_RA_update{
@@ -914,8 +931,10 @@ sub test_DL_RA_update{
     if ( $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D" or
         $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "L"
        ){
-        print "* Testing $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
-              " DeactivationDate: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}\n";
+        if($Conf::log_level>=2){
+            print "* Testing $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
+                  " DeactivationDate: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}\n";
+        }
         my $file=$ref_AD->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
         my $deactivation_date_epoch=&ymdhms_to_epoch($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'});
         my $deactivation_time_days;
@@ -926,9 +945,11 @@ sub test_DL_RA_update{
             $deactivation_time_days=1000;
         }
         my $deactivation_end_epoch=$deactivation_date_epoch+86400*$deactivation_time_days;
-        print "    Deactivation end: $deactivation_end_epoch ($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}",
-              " + $deactivation_time_days days)\n";
-        print "    Today:            $time_stamp_epoch\n";
+        if($Conf::log_level>=2){
+            print "    Deactivation end: $deactivation_end_epoch ($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}",
+                  " + $deactivation_time_days days)\n";
+            print "    Today:            $time_stamp_epoch\n";
+        }
         ########################################
         if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
             $time_stamp_epoch > $deactivation_end_epoch){
@@ -936,11 +957,15 @@ sub test_DL_RA_update{
             #     - not matched to a user in files
             #     - and deactivation time expired
             # 1) update status to R
-            print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> R\n";
+            if($Conf::log_level>=2){
+                print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> R\n";
+	    }
             ${$new_status_ref}="R";
             ${$update_ref}++;
             # 2) put user in kill file
-            print "    ----> $sam is put into kill file\n";
+            if($Conf::log_level>=2){
+                print "    ----> $sam is put into kill file\n";
+	    }
             # creating the line
             my $kill_line=
                 $ref_AD->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
@@ -953,15 +978,20 @@ sub test_DL_RA_update{
             # update to A if 
             #     - matched to a user in files
             #     - old status is D (not for status L)
-            print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
+            if($Conf::log_level>=2){
+                print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
+	    }
             ${$new_status_ref}="A";
             ${$update_ref}++;
         ########################################
 	} else {
-            print "    ----> Deactivation end not reached\n";
+            if($Conf::log_level>=2){
+                print "    ----> Deactivation end not reached\n";
+  	    }
         }
      }
 }
+
 
 
 sub test_R_A_update{
@@ -971,11 +1001,14 @@ sub test_R_A_update{
        ){
         # update R to A if 
         #     - matched to a user in files
-        print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
+        if($Conf::log_level>=2){
+            print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
+	}
         ${$new_status_ref}="A";
         ${$update_ref}++;
     }
 }
+
 
 
 sub test_RK_kill{
@@ -984,7 +1017,9 @@ sub test_RK_kill{
          ($ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and not exists $Match{'action_BY_sAMAccountName'}{$sam})
        ){
         # kill if status is  R or K
-        print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> sophomorix.kill\n";
+        if($Conf::log_level>=2){
+            print "    ----> $sam: $ref_AD->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> sophomorix.kill\n";
+        }
         ${$kill_ref}++;
     }
 }
@@ -1422,12 +1457,14 @@ sub find_migration_unid_matches {
                 # NO MATCH
                 $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
                 $not_matched_count++;
-                print " $filename:",
-                      "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                      "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                      "$identifier_ascii\n";
-                print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
-                      " not found in AD\n";
+                if($Conf::log_level>=2){
+                    print " $filename:",
+                          "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                          "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                          "$identifier_ascii\n";
+                    print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
+                          " not found in AD\n";
+                }
             }
         } else {
             $no_unid_count++;

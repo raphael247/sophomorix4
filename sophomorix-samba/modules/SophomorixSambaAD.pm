@@ -6765,6 +6765,7 @@ sub AD_group_removemember {
 sub  get_forbidden_logins{
     my ($ldap,$root_dse) = @_;
     my %forbidden_logins= ();
+    &Sophomorix::SophomorixBase::print_title("Get forbidden logins");
     # add to list manually
     $forbidden_logins{'FORBIDDEN'}{'root'}="forbidden by Hand";
     $forbidden_logins{'FORBIDDEN'}{'root1'}="forbidden by Hand";
