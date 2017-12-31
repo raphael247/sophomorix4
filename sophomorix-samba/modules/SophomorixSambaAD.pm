@@ -67,6 +67,7 @@ $Data::Dumper::Terse = 1;
             AD_school_create
             AD_object_search
             AD_get_AD
+            AD_get_AD_for_check
             AD_get_ui
             AD_get_quota
             AD_get_users_v
@@ -4367,6 +4368,139 @@ sub AD_get_AD {
 
 
 
+
+sub AD_get_AD_for_check {
+    my %AD=();
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my $users = $arg_ref->{users};
+    if (not defined $users){$users="FALSE"};
+
+    my $adminclasses = $arg_ref->{adminclasses};
+    if (not defined $adminclasses){$adminclasses="FALSE"};
+
+    my $teacherclasses = $arg_ref->{teacherclasses};
+    if (not defined $teacherclasses){$teacherclasses="FALSE"};
+
+    my $administratorclasses = $arg_ref->{administratorclasses};
+    if (not defined $administratorclasses){$administratorclasses="FALSE"};
+
+    my $projects = $arg_ref->{projects};
+    if (not defined $projects){$projects="FALSE"};
+
+    my $computers = $arg_ref->{computers};
+    if (not defined $computers){$computers="FALSE"};
+
+    my $rooms = $arg_ref->{rooms};
+    if (not defined $rooms){$rooms="FALSE"};
+
+    my $management = $arg_ref->{management};
+    if (not defined $management){$management="FALSE"};
+
+    # make sure adminclass lists exist, when users are added
+    if($users eq "TRUE"){
+        $adminclasses="TRUE";
+        $teacherclasses="TRUE";
+        $projects="TRUE";
+    }
+    # make sure room lists exist, when computers are added
+    if($computers eq "TRUE"){
+        $rooms="TRUE";
+    }
+
+    ############################################################
+    # SEARCH FOR ALL
+    &Sophomorix::SophomorixBase::print_title("Query AD (start)");
+    my $filter="(| (objectClass=user) (objectClass=group) (objectClass=computer) )";
+    my $mesg8 = $ldap->search( # perform a search
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attrs => ['sAMAccountName',
+                                'sophomorixSchoolname',
+                                'sophomorixStatus',
+                                'sophomorixUnid',
+                                'sophomorixSurnameASCII',
+                                'sophomorixFirstnameASCII',
+                                'sophomorixBirthdate',
+                                'sn',
+                                'givenName',
+                                'sophomorixAdminFile',
+                                'sophomorixAdminClass',
+                                'sophomorixRole',
+                                'sophomorixType',
+                                'sophomorixTolerationDate',
+                                'sophomorixDeactivationDate',
+                                'objectClass',
+                               ]);
+    my $max = $mesg8->count; 
+    for( my $index = 0 ; $index < $max ; $index++) {
+       my $entry = $mesg8->entry($index);
+       my $sam=$entry->get_value('sAMAccountName');
+       #my $objectclass=$entry->get_value('objectClass');
+       my $role;
+       my $type;
+       my $sopho;
+       if (defined $entry->get_value('sophomorixRole')){
+           $role=$entry->get_value('sophomorixRole');
+           $sopho="USER";
+           if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'} or
+               $role eq $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}
+              ){
+               # save needed stuff             
+               $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
+               $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
+               $AD{'sAMAccountName'}{$sam}{'sn'}=$entry->get_value('sn');
+               $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
+
+               $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=
+                   $entry->get_value('sophomorixSurnameASCII').
+                   ";".
+                   $entry->get_value('sophomorixFirstnameASCII').
+                   ";".
+                   $entry->get_value('sophomorixBirthdate');
+               # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
+               
+
+
+
+           }
+       } elsif (defined $entry->get_value('sophomorixType')){
+           $type=$entry->get_value('sophomorixType');
+           $sopho="GROUP";
+       } else {
+           $sopho="NONSOPHOMORIX";
+       }
+
+       $AD{'FORBIDDEN'}{$sam}=$sopho;
+       #print "$sopho: $sam\n"; 
+    }
+    &Sophomorix::SophomorixBase::print_title("Query AD (stop)");
+
+    
+    #print Dumper(\%AD);
+
+    ### exit here later
+####################################################################################################
+
+    return(\%AD);
+}
+
+
+
 sub AD_get_ui {
     my %ui=();
     my ($arg_ref) = @_;
@@ -6773,6 +6907,7 @@ sub  get_forbidden_logins{
     $forbidden_logins{'FORBIDDEN'}{'root3'}="forbidden by Hand";
     $forbidden_logins{'FORBIDDEN'}{'root4'}="forbidden by Hand";
 
+    # this takes time
     # users from ldap 
     $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
