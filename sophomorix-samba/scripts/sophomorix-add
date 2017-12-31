@@ -80,10 +80,11 @@ my $role="unknown";
 
 my @users_for_quota=();
 
-# ou's that have been created in this script
+# ou's that have been created while the script is running
 my %school_created=();
 $school_created{$school}="created";
-
+# groups that have been created while the script is running
+my %group_created=();
 
 ############################################################
 # options
@@ -383,32 +384,38 @@ while(<SOPHOMORIXADD>){
                            sophomorix_config=>\%sophomorix_config,
                            sophomorix_result=>\%sophomorix_result,
                          });
-        # remember ou
+        # remember school
         $school_created{$school}="already created";
     } else {
-        print "   * OU $school already created\n";
+        print "   * school $school already created\n";
     }
     my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
     my $login_token=&AD_get_name_tokened($login_check_ok,$school,$role);
 
-   &AD_group_create({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     root_dns=>$root_dns,
-                     group=>$group_token,
-                     group_basename=>$class_group,
-                     school=>$school,
-                     status=>"P",
-                     type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{sophomorixType},
-                     joinable=>"TRUE",
-                     description=>$group_token,
-                     creationdate=>$time_stamp_AD,
-                     gidnumber_wish=>$gidnumber_wish,
-                     file=>$file,
-                     smb_admin_pass=>$smb_admin_pass,
-                     sophomorix_config=>\%sophomorix_config,
-                     sophomorix_result=>\%sophomorix_result,
-                   });
+    if (not exists $group_created{$school}{$class_group}){
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          group=>$group_token,
+                          group_basename=>$class_group,
+                          school=>$school,
+                          status=>"P",
+                          type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{sophomorixType},
+                          joinable=>"TRUE",
+                          description=>$group_token,
+                          creationdate=>$time_stamp_AD,
+                          gidnumber_wish=>$gidnumber_wish,
+                          file=>$file,
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
+                          sophomorix_result=>\%sophomorix_result,
+                        });
+        # remember group
+        $group_created{$school}{$class_group}="already created";
+    } else {
+        print "   * group $class_group in school $school already created\n";
 
+    }
     &AD_user_create({ldap=>$ldap,
                      root_dse=>$root_dse, 
                      root_dns=>$root_dns, 
