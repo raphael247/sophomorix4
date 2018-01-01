@@ -62,7 +62,6 @@ $Data::Dumper::Terse = 1;
             AD_group_list
             AD_get_schoolname
             AD_get_name_tokened
-            get_forbidden_logins
             AD_ou_create
             AD_school_create
             AD_object_search
@@ -4364,6 +4363,14 @@ sub AD_get_AD_for_check {
     my $root_dns = $arg_ref->{root_dns};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
+    # forbidden login names
+    $AD{'FORBIDDEN'}{'root'}="forbidden by Hand";
+    $AD{'FORBIDDEN'}{'linbo'}="forbidden by Hand";
+    $AD{'FORBIDDEN'}{'opsi'}="forbidden by Hand";
+    $AD{'FORBIDDEN'}{'container'}="forbidden by Hand";
+    $AD{'FORBIDDEN'}{'mail'}="forbidden by Hand";
+    $AD{'FORBIDDEN'}{'webui'}="forbidden by Hand";
+
     ############################################################
     # SEARCH FOR ALL
     &Sophomorix::SophomorixBase::print_title("Query AD (start)");
@@ -6854,86 +6861,6 @@ sub AD_group_removemember {
 }
 
 
-
-sub  get_forbidden_logins{
-    my ($ldap,$root_dse) = @_;
-    my %forbidden_logins= ();
-    &Sophomorix::SophomorixBase::print_title("Get forbidden logins");
-    # add to list manually
-    $forbidden_logins{'FORBIDDEN'}{'root'}="forbidden by Hand";
-    $forbidden_logins{'FORBIDDEN'}{'root1'}="forbidden by Hand";
-    $forbidden_logins{'FORBIDDEN'}{'root2'}="forbidden by Hand";
-    $forbidden_logins{'FORBIDDEN'}{'root3'}="forbidden by Hand";
-    $forbidden_logins{'FORBIDDEN'}{'root4'}="forbidden by Hand";
-
-    # this takes time
-    # users from ldap 
-    $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
-                   scope => 'sub',
-                   filter => '(objectClass=user)',
-                   attr => ['sAMAccountName']
-                         );
-    my $max_user = $mesg->count; 
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        my @values = $entry->get_value( 'sAMAccountName' );
-        foreach my $login (@values){
-            $forbidden_logins{'FORBIDDEN'}{$login}="AD (user $login exists already)";
-        }
-    }
-
-    ## users in /etc/passwd
-    #if (-e "/etc/passwd"){
-    #    open(PASS, "/etc/passwd");
-    #    while(<PASS>) {
-    #        my ($login)=split(/:/);
-    #        $forbidden_logins{$login}="login $login exists in /etc/passwd";
-    #    }
-    #    close(PASS);
-    #}
-
-    # future groups in students.csv
-    #my $schueler_file=$DevelConf::path_conf_user."/schueler.txt";
-    #if (-e "$schueler_file"){
-    #    open(STUDENTS, "$schueler_file");
-    #    while(<STUDENTS>) {
-    #        my ($group)=split(/;/);
-    #        chomp($group);
-    #        if ($group ne ""){
-    #            $forbidden_logins{$group}="future group $group in schueler.txt";
-    # 	    }
-    #     }
-    #     close(STUDENTS);
-    #}
-
-    # groups from ldap
-    $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
-                   scope => 'sub',
-                   filter => '(objectClass=group)',
-                   attr => ['sAMAccountName']
-                         );
-    my $max_group = $mesg->count; 
-    for( my $index = 0 ; $index < $max_group ; $index++) {
-        my $entry = $mesg->entry($index);
-        my @values = $entry->get_value( 'sAMAccountName' );
-        foreach my $group (@values){
-            $forbidden_logins{'FORBIDDEN'}{$group}="AD (group $group exists already)";
-        }
-    }
-
-    ## groups in /etc/group
-    #if (-e "/etc/group"){
-    #    open(GROUP, "/etc/group");
-    #    while(<GROUP>) {
-    #        my ($group)=split(/:/);
-    #        $forbidden_logins{$group}="group $group exists in /etc/group";
-    #    }
-    #    close(GROUP);
-    #}
-    return \%forbidden_logins;
-}
 
 
 

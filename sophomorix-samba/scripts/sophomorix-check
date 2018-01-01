@@ -67,7 +67,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_AD_for_check
                                  AD_dns_get
                                  AD_object_search
-                                 get_forbidden_logins
                                     );
 
 my @arguments = @ARGV;
@@ -207,7 +206,6 @@ my $dump_matches=0;
 my $dump_files=0;
 my $dump_AD=0;
 my $dump_login_avoid=0;
-my $dump_forbidden_logins=0;
 
 my $list_files=0;
 my $lock=0;
@@ -231,7 +229,6 @@ my $testopt=GetOptions(
            "dump-AD" => \$dump_AD,
            "dump-login-avoid" => \$dump_login_avoid,
            "dump-matches" => \$dump_matches,
-           "dump-forbidden-logins" => \$dump_forbidden_logins,
            "list-files" => \$list_files,
            "analyze-encoding=s" => \$analyze_encoding,
            "follow=s" => \$follow,
