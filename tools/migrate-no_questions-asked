@@ -20,7 +20,7 @@ echo "--create-class-script"
 time sophomorix-vampire --datadir ../sophomorix-dump --create-class-script 1> /tmp/LOGDIR/file-02.log 2> /tmp/ERRORDIR/file-02.err
 cat /tmp/ERRORDIR/file-02.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-# 37 min
+# 36 min
 echo ""
 echo "/root/sophomorix-vampire-classes.sh"
 time /root/sophomorix-vampire-classes.sh 1> /tmp/LOGDIR/file-03.log 2> /tmp/ERRORDIR/file-03.err
@@ -38,7 +38,7 @@ time sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> /tmp/L
 cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
 cat /tmp/ERRORDIR/file-04.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-# 191 min
+# 110 min
 echo ""
 echo "sophomorix-add"
 time sophomorix-add 1> /tmp/LOGDIR/file-05.log 2> /tmp/ERRORDIR/file-05.err
@@ -76,7 +76,7 @@ echo "--create-project-script"
 time sophomorix-vampire --datadir ../sophomorix-dump --create-project-script 1> /tmp/LOGDIR/file-09.log 2> /tmp/ERRORDIR/file-09.err
 cat /tmp/ERRORDIR/file-09.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-# 18 min
+# 17 min
 echo ""
 echo "/root/sophomorix-vampire-projects.sh"
 time /root/sophomorix-vampire-projects.sh 1> /tmp/LOGDIR/file-10.log 2> /tmp/ERRORDIR/file-10.err
