@@ -1500,10 +1500,15 @@ sub analyze_user_line {
         my $line_raw=$line;
         chomp($line);
         my $semikolon_count=$line=~tr/;//;
-        if ($semikolon_count<4){
+        if ($semikolon_count<3){
             print "\n";
-            print "   ERROR: Not 4 Semicolons in $line\n";
-            print "          File corrupt: $file_abs\n\n";
+            if ($injected eq "yes"){
+               print "ERROR: Not 3 semicolons in option: $line\n";
+               print "       Example: --injectlie \"students.csv:7a;Darwin;Charles;12.02.1809;\"\n";
+            } else {
+               print "ERROR: Not 3 semicolons in $line\n";
+               print " File: $file_abs\n";
+            }
             exit;
         }
         $line=&remove_whitespace($line);
@@ -2025,13 +2030,17 @@ sub analyze_encoding {
         my $line=$_;
         chomp($line);
         my $semikolon_count=$line=~tr/;//;
-        if ($semikolon_count<4){
+        if ($semikolon_count<3){
             print "\n";
-            print "   ERROR: Not 4 Semicolons in $line\n";
+            print "   ERROR: Not 3 Semicolons in $line\n";
             print "          File corrupt: $file\n\n";
             exit;
         }
-
+ 
+        # add trailing ; if not there
+        if (not $line=~m/;$/){
+            $line=$line.";";
+        }
         my ($class,$lastname,$firstname,$date) = split(/;/);
 
         # firstname
