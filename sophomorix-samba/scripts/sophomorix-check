@@ -435,7 +435,6 @@ foreach my  $user_file (@filelist){
 
 
 
-my $count=0;
 # ============================================================
 # reading and checking all filtered user files
 # ============================================================
@@ -443,6 +442,7 @@ system("mkdir -p $DevelConf::path_conf_tmp");
 
 &print_title("Analyzing user files ...");
 foreach my $user_file (@filelist){
+    my $count=0; # reset line counter
     my $filename = basename($user_file);
     # fetching some config data
     $school=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SCHOOL'};
@@ -474,6 +474,7 @@ foreach my $user_file (@filelist){
 # injecing lines given by option
 # ============================================================
 &print_title("Reading injected lines ...");
+my $count=0;
 foreach my $inject (@injectlines){
     print "    * $inject\n";
     my ($filename,$line)=split(/:/,$inject,2); # split in 2 parts
