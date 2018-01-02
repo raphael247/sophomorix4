@@ -2202,7 +2202,7 @@ sub config_sophomorix_read {
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
             $sophomorix_config{'LOOKUP'}{'ALLADMINS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
-        } elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
+        } elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./ or $section=~m/^classfile\./){ 
             my ($string,$name,$extension)=split(/\./,$section);
             foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
                 my $filename;
@@ -2262,6 +2262,20 @@ sub config_sophomorix_read {
                         $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
                         push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
                     }
+                } elsif ($string eq "classfile"){
+                    # role
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'sophomorixRole'}=
+                        $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+                    # field5
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_5'}=
+                        $sophomorix_config{'INI'}{$section}{'FIELD_5'};
+                    # field6
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_6'}=
+                        $sophomorix_config{'INI'}{$section}{'FIELD_6'};
+                    # force group
+                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FORCE_GROUP'}=
+                        $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
+
                 } elsif ($string eq "devicefile"){
                     # role
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'}=
@@ -2647,8 +2661,6 @@ sub load_school_ini {
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
                     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
             } elsif ($string eq "classfile"){
-
-
                 # add some redundant stuff for convenience
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}=
                     $DevelConf::path_conf_tmp."/".$filename.".utf8";
@@ -2657,7 +2669,6 @@ sub load_school_ini {
                 # save unchecked filter script for error messages
                 $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
                     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT};
-
             }
 
             if ($name eq "students" or
