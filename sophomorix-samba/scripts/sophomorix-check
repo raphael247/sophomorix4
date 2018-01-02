@@ -8,6 +8,8 @@
 use strict;
 #use Quota;
 use Getopt::Long;
+#use Time::localtime;
+use Time::Local;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
@@ -523,11 +525,47 @@ foreach my $class_file (@class_filelist){
          die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
     open(REPORT,">$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
          die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!"; 
-#    print REPORT "Office Report for: $class_file\n"; 
-#    print REPORT "Date_Time:         $time_stamp_file\n";
+    print REPORT "Office Report for: $class_file\n"; 
+    print REPORT "Date_Time:         $time_stamp_file\n";
  
     while(<CLASSES>){
-#print "$_";
+        chomp();
+        s/^ //g; # remove spaces oat beginning of line
+        if(/^\#/){ # ignore commented lines
+            next;
+	}
+        if($_ eq ""){
+            next;
+        }
+        print "$_\n";
+  
+        my ($course,
+            $course_basename,
+            $course_count,
+            $course_date,
+            $course_comment,
+            $course_password,
+            $course_enddate)=split(/;/);
+        my ($end_day, $end_month, $end_year)=split(/\./, $course_enddate);
+
+        if ($course_count=~/[^0-9]/){
+            print "\nERROR: Number of users $course_count contains non numbers\n";
+            print "   LINE: $_\n";
+            print "   FILE: $class_file\n";
+            exit;
+        }
+
+        # check if end date is reached
+        my $course_enddate_epoch=timelocal(0, 0, 0, $end_day, $end_month-1, $end_year);
+        print "EPOCH now:        $sophomorix_config{'UNIX'}{'EPOCH'}\n";
+        print "EPOCH course end: $course_enddate_epoch\n";
+        if ($course_enddate_epoch>=$sophomorix_config{'UNIX'}{'EPOCH'}){
+            # create lines
+            for( my $index = 1 ; $index<=$course_count  ; $index++) {
+                print "    user $index/$course_count: \n";
+            }
+        }
+
 #        $count++;
 #        my $line=$_;
 #        &analyze_user_line($line,$class_file,$filename,$school,$count,$enc_used,"no");
@@ -1870,8 +1908,8 @@ sub reading_firstnames {
              die "Error: $! $file_abs not found!"; 
         while (<DATAFILE>){
             chomp();
-            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
-            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            s/^ //g; # remove spaces oat beginning of line
+            if(/^\#/){ # ignore commented lines
                next;
 	    }
             if($_ eq ""){
