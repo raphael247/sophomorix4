@@ -573,7 +573,7 @@ foreach my $class_file (@class_filelist){
                 } else {
                     $num_string=$index;
                 }
-                my $line=$course.";".$course_comment.";"."vor".";".$course_date.";".$course_basename.$num_string;
+                my $line=$course.";".$num_string.";".$course_comment.";".$course_date.";".$course_basename.$num_string;
                 print "    user $num_string/$course_count: $line\n";
                 my $enc_used="UTF8";
                 &analyze_user_line($line,$class_file,$filename,$school,$count,$enc_used,"no","CLASS_FILE");
