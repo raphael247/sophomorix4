@@ -3491,7 +3491,6 @@ sub create_test_login {
         ############################################################
         # check wish login
         $login_char_length = length $login_wish;
-	print "HERE: $login_wish\n";
         if (not $login_wish=~m/^[a-z0-9-_]+$/){
             # put in result hash ?????
             print "\n";
