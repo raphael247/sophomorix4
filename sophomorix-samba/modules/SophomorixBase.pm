@@ -3397,6 +3397,7 @@ sub log_user_kill {
 
 
 sub get_login_avoid {
+    # avoid logins of recently killed users
     my ($ref_sophomorix_config)=@_;
     my %login_avoid=();
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
@@ -3425,7 +3426,14 @@ sub get_login_avoid {
 
 sub create_test_login {
     # $ref_AD_check --> $ref_forbidden_logins
-    my ($identifier_ascii,$file,$login_wish,$ref_forbidden_logins,$ref_login_avoid,$ref_sophomorix_config)=@_;
+    my ($identifier_ascii,
+        $file,
+        $login_wish,
+        $ref_forbidden_logins,
+        $ref_login_avoid,
+        $line_num,
+        $ref_users_file,
+        $ref_sophomorix_config)=@_;
     my ($surname_login,$firstname_login,$birthdate)=split(";", $identifier_ascii);
     my $login_check_ok; # the approved login name
 
@@ -3482,17 +3490,37 @@ sub create_test_login {
     } else {
         ############################################################
         # check wish login
+        $login_char_length = length $login_wish;
+	print "HERE: $login_wish\n";
         if (not $login_wish=~m/^[a-z0-9-_]+$/){
             # put in result hash ?????
             print "\n";
-	    print "   ERROR: $login_wish contains invalid characters ...\n"; 
+	    print "   ERROR: $login_wish contains invalid characters for a login name!\n"; 
+	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+	    print "          ($file LINE $line_num)\n";
             print "          Allowed characters are: a-z0-9-_\n\n";
+            exit;
+        } elsif ($login_char_length<2){
+            print "\n";
+	    print "   ERROR: $login_wish ist to short for a login name!\n";
+	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+	    print "          ($file LINE $line_num)\n";
+            print "          Minimum characters for login names are 2\n\n";
+            exit;
+        } elsif (not $login_wish=~m/^[a-z]+/){
+            print "\n";
+	    print "   ERROR: $login_wish does not begin with a-z\n";
+	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+	    print "          ($file LINE $line_num)\n";
+            print "          Login names must begin with a-z\n\n";
             exit;
         } elsif (exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}){
             # forbidden login
             # put in result hash ?????
 	    print "\n"; 
 	    print "   ERROR: $login_wish FOR $identifier_ascii FORBIDDEN ($file)\n"; 
+	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+	    print "          ($file LINE $line_num)\n";
 	    print "          REASON: $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}\n"; 
             exit;
         } elsif (exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}){
@@ -3500,6 +3528,8 @@ sub create_test_login {
             my $days=int($ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}{'UNUSED'}/86400);
             # put in result hash ?????
 	    print "\n   WARNING: $login_wish was used $days days ago (Not recommended to reuse $login_wish already)\n\n"; 
+	    print "        LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+	    print "              ($file LINE $line_num)\n";
         }
         $login_check_ok=$login_wish;
     }

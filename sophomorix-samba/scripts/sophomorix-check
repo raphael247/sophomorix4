@@ -1205,6 +1205,8 @@ sub write_add_file {
                                  $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
                                  $ref_AD_check, # forbidden logins
                                  $ref_login_avoid, # logins to avoid
+                                 $Match{'ACTION'}{$line_new}{'line_count'},
+                                 \%users_file,
                                  \%sophomorix_config);
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
                  $Match{'ACTION'}{$line_new}{'class'}."::".
