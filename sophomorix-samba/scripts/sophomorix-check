@@ -256,7 +256,9 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-
+my @class_filelist=&filelist_fetch({filetype=>"classes",
+                                    sophomorix_config=>\%sophomorix_config,
+                                  });
 
 # --help
 if ($help==1) {
@@ -339,19 +341,24 @@ if ($info==1) {
     foreach my $file (@filelist){
         print "   * $file\n";
     }
+    foreach my $file (@class_filelist){
+        print "   * $file\n";
+    }
     exit;
 }
 
 
 # --list-files
 if ($list_files==1) {
-
-       &print_title("Reading the following user files:");
-       foreach my $file (@filelist){
-           print "   * $file\n";
-       }
-       exit;
-   }
+    &print_title("Reading the following user files:");
+    foreach my $file (@filelist){
+        print "   * $file\n";
+    }
+    foreach my $file (@class_filelist){
+        print "   * $file\n";
+    }
+    exit;
+}
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
@@ -497,6 +504,38 @@ foreach my $inject (@injectlines){
         print "        WARNING: $filename is not valid on this ",
               "server (skipping this line)\n";
     }
+}
+
+# ============================================================
+# reading extraclasses.csv
+# ============================================================
+&print_title("Reading class files ...");
+foreach my $class_file (@class_filelist){
+    my $count=0; # reset line counter
+    my $filename = basename($class_file);
+    # fetching some config data
+    $school=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'};
+
+    #my $enc_used=&get_encoding($filename);
+    open(CLASSES,"$class_file") || 
+         die "ERROR: $class_file not found!";  
+    open(CLASSESUTF8,">$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
+         die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
+    open(REPORT,">$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
+         die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!"; 
+#    print REPORT "Office Report for: $class_file\n"; 
+#    print REPORT "Date_Time:         $time_stamp_file\n";
+ 
+    while(<CLASSES>){
+#print "$_";
+#        $count++;
+#        my $line=$_;
+#        &analyze_user_line($line,$class_file,$filename,$school,$count,$enc_used,"no");
+    }
+
+    close(CLASSES);
+    close(CLASSESUTF8);
+    close(REPORT);
 }
 
 

@@ -2646,6 +2646,18 @@ sub load_school_ini {
                 # save unchecked filter script for error messages
                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
                     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
+            } elsif ($string eq "classfile"){
+
+
+                # add some redundant stuff for convenience
+                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}=
+                    $DevelConf::path_conf_tmp."/".$filename.".utf8";
+                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
+                    $ref_sophomorix_config->{'INI'}{'PATHS'}{'REPORT_OFFICE'}."/report.office.".$filename;
+                # save unchecked filter script for error messages
+                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
+                    $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT};
+
             }
 
             if ($name eq "students" or
