@@ -205,6 +205,8 @@ install-sophomorix-samba:
 # config templates
 	@install -d -m755 -oroot -groot $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/belwue.template.ini $(DEVELCONF)/config-templates
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/webui.template.ini $(DEVELCONF)/config-templates
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/another_ui.template.ini $(DEVELCONF)/config-templates
 # repdir files
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.linux $(DEVELCONF)/devel/repdir

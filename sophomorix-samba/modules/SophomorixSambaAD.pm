@@ -4475,6 +4475,7 @@ sub AD_get_AD_for_check {
 
 sub AD_get_ui {
     my %ui=();
+    my $ref_ui=\%ui;
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -4484,6 +4485,23 @@ sub AD_get_ui {
     # read new permissions defaults from ui-package
     # todo ???
 
+    foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
+        # reading config
+        my $path_abs=$ref_sophomorix_config->{'INI'}{'UI'}{$ui};
+        if (-f $path_abs){
+            print "HERE: $ui --> $path_abs\n";
+            tie %{ $ref_ui->{'CONFIG'}{$ui} }, 'Config::IniFiles',
+                ( -file => $path_abs, 
+                  -handle_trailing_comment => 1,
+                );
+        } else {
+            print "\n";
+            print "ERROR: UI config file not found:\n";
+            print "       $path_abs\n";
+            print "\n";
+            exit;
+        }
+    }
 
     my $filter2="(&(objectClass=user) (| ".
                 "(sophomorixRole=student) ".
