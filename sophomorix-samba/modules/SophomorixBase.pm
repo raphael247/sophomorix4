@@ -2768,6 +2768,23 @@ sub load_school_ini {
                 }
                 $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
+		if (exists $ref_sophomorix_config->{'INI'}{'UI'}{$parameter}){
+                    # Parameter is an UI
+                    my @entries=split(/,/,$ref_modmaster->{$section}{$parameter});
+                    foreach my $entry (@entries){
+                        my ($module,$switch)=split(/:/,$entry);
+                        if ($switch eq "TRUE"){
+                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'TRUE'} }, $module;
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'TRUE'}{$module}="TRUE";
+                        } elsif ($switch eq "FALSE"){
+                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'FALSE'} }, $module;
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'FALSE'}{$module}="FALSE";
+                        } else {
+                            print "\nERROR: $switch must be TRUE/FALSE in school $school, role $role for $parameter\n\n";
+                            exit;
+                        }
+                    }
+                }    
             }
 	} elsif ($section=~m/^type\./){ 
             ##### type.* section ########################################################################

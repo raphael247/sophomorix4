@@ -238,6 +238,13 @@ Auswertung (=Berechnung des Attributes SophomorixWebuiPermissionsCalculated für
 
 sophomorix-ui startet
 
+NEUES UI: What must be done?
+1) sophomorix.ini, section [UI] -> name=/abs/path
+2) entries at each role.* to allow override in school.conf.master
+   name=
+
+todo: exit $switch must be TRUE/FALSE with more info
+
 # todo
 
  1) "Default des Developers":
@@ -249,13 +256,12 @@ sophomorix-ui startet
          teacher=TRUE
          administrator=FALSE # false is the default
          TRUE_ENTRY=.......   # Line for SophomorixWebuiPermissionsCalculated
-         FALSE_ENTRY.......   # Line for SophomorixWebuiPermissionsCalculated
          (WARN_students=TRUE)
          ...
 
-    Das wäre schön erweiterbar, falls es z.B. 
+    Das ist guterweiterbar, falls es z.B. 
        * abhängigkeiten der Module geben sollte usw.
-       * Warnung falls einen Schüler ein bestimmtes Modul freigeschaltet würde:
+       * Warnung falls einem Schüler ein bestimmtes Modul freigeschaltet würde:
          WARN_students=TRUE
        * ...
     Hier wär auch der beste Platz für die webui-Konfiguration selbst:
