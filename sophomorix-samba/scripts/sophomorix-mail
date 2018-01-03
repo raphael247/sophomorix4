@@ -240,6 +240,14 @@ if ($info==1 and $user eq ""){
 ################################################################################
 # continue with the calculated mail from $ref_mail
 ################################################################################
+
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+# ===========================================================================
+# Start
+# ===========================================================================
+&log_script_start(\@arguments,\%sophomorix_result);
+
+
 #my %mailconf=();
 
 # setting up mailconf
@@ -294,13 +302,6 @@ foreach my $school (@sharelist){
     }
 }
 
-
-
-&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-# ===========================================================================
-# Start
-# ===========================================================================
-&log_script_start(\@arguments,\%sophomorix_result);
 
 
 &AD_unbind_admin($ldap);
