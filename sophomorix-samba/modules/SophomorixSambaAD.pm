@@ -4482,16 +4482,17 @@ sub AD_get_ui {
     my $root_dns = $arg_ref->{root_dns};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    # read new permissions defaults from ui-package
+    ############################################################
+    # read new permissions defaults from all packages
     foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
-        # reading config
+        # reading package config
         my $path_abs=$ref_sophomorix_config->{'INI'}{'UI'}{$ui};
         if (-f $path_abs){
             tie %{ $ref_ui->{'CONFIG'}{$ui} }, 'Config::IniFiles',
                 ( -file => $path_abs, 
                   -handle_trailing_comment => 1,
                 );
-            # do some checks
+            # create CONFIG_PACKAGE entries (only TRUE entries)
             foreach my $module (keys %{ $ref_ui->{'CONFIG'}{$ui} }) {
                 foreach my $keyname (keys %{ $ref_ui->{'CONFIG'}{$ui}{$module} }) {
                     #print "Test key name \"$keyname\" in $module in $ui\n";
@@ -4499,6 +4500,10 @@ sub AD_get_ui {
                         # nothing to test
                     } elsif (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$keyname}) {
                         # OK
+                        if ($ref_ui->{'CONFIG'}{$ui}{$module}{$keyname} eq "TRUE"){
+                            # save the true modules in: ui->module->role=TRUE
+                            $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$keyname}="TRUE";
+                        }
                         #print "   OK: $keyname is a valid sophomorixRole\n";
                     } else {
                         print "\nERROR: $keyname (UI: $ui, module: $module) is not a sophomorixRole\n\n";
@@ -4514,6 +4519,10 @@ sub AD_get_ui {
             exit;
         }
     }
+
+    # create CONFIG_SCHOOL
+    
+
 
     my $filter2="(&(objectClass=user) (| ".
                 "(sophomorixRole=student) ".

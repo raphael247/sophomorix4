@@ -3441,7 +3441,7 @@ sub get_login_avoid {
         chomp();
         my ($type,$login,$last,$first,$class,$role,$school,$time_AD,$epoch,$homedel,$unid)=split(/::/);
         my $unused_sec=$ref_sophomorix_config->{'UNIX'}{'EPOCH'}-$epoch;
-        #print "$login unused for $unused_sec seconds (Min. limit for reuse is $reuse_limit)\n";
+        #print "$login unused for $unused_sec seconds (Min. limit for re-use is $reuse_limit)\n";
         if ($unused_sec<$reuse_limit){
             $login_avoid{'AVOID_LOGINS'}{$login}{'UNUSED'}=$unused_sec;
         }
@@ -3554,7 +3554,7 @@ sub create_test_login {
             # non reusable login
             my $days=int($ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}{'UNUSED'}/86400);
             # put in result hash ?????
-	    print "\n   WARNING: $login_wish was used $days days ago (Not recommended to reuse $login_wish already)\n\n"; 
+	    print "\n   WARNING: $login_wish was used $days days ago (Not recommended to re-use $login_wish already)\n\n"; 
 	    print "        LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "              ($file LINE $line_num)\n";
         }
