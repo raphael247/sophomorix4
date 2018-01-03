@@ -4520,10 +4520,6 @@ sub AD_get_ui {
         }
     }
 
-    # create CONFIG_SCHOOL
-    
-
-
     my $filter2="(&(objectClass=user) (| ".
                 "(sophomorixRole=student) ".
                 "(sophomorixRole=teacher) ".
@@ -4558,14 +4554,52 @@ sub AD_get_ui {
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
         push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
-        # old webui permissions
-        foreach my $webui (@webui){
-            push @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissions'} }, $webui;
-        }
-        foreach my $webui_calc (@webui_calc){
-            push @{ $ui{'UI'}{'USERS'}{$sam}{'OLD'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
-        }
 
+        # read sophomorixWebuiPermissions
+        foreach my $multi_attr (@webui){
+	    my ($ui,$module,$switch)=split(/:/,$multi_attr);
+ 
+            # test ui
+            if (not exists $ref_sophomorix_config->{'INI'}{'UI'}{$ui}){
+                print "\n";
+                print "ERROR: $ui is not an UI\n";
+                print "       sophomorixWebuiPermissions: $multi_attr\n";
+                print "       at user $sam in school $schoolname\n\n";
+                print "\n";
+                exit;
+            }
+            
+            # test modulemane
+            if (not exists $ref_ui->{'CONFIG'}{$ui}{$module}){
+                print "\n";
+                print "ERROR: $module is not an module of UI $ui\n";
+                print "       sophomorixWebuiPermissions: $multi_attr\n";
+                print "       at user $sam in school $schoolname\n\n";
+                print "\n";
+                exit;
+            }
+
+            # test switch, if ok save setting
+            if ($switch eq "TRUE"){
+	        $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'TRUE'}{$module}="TRUE";
+            } elsif ($switch eq "FALSE"){
+	        $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'FALSE'}{$module}="FALSE";
+            } else {
+                print "\n";
+                print "ERROR: switch $switch must be TRUE or FALSE\n";
+                print "       sophomorixWebuiPermissions: $multi_attr\n";
+                print "       at user $sam in school $schoolname\n\n";
+                print "\n";
+                exit;
+            }
+        }
+#        foreach my $webui_calc (@webui_calc){
+#            push @{ $ui{'UI'}{'USERS'}{$sam}{'OLD'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
+#        }
+
+
+
+        
         # calculate new ui permissions
         # push @{ $ui{'UI'}{'USERS'}{$sam}{'NEW'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
         # take permissions from from package, according to role ???
