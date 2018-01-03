@@ -2178,6 +2178,11 @@ sub config_sophomorix_read {
     foreach my $section  (keys %{$sophomorix_config{'INI'}}) {
         if ($section eq "SCHOOLS"){
             # do something
+        } elsif ($section eq "ROLE"){
+            # create LOOKUP for ROLES
+            foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE'}}) {
+                $sophomorix_config{'LOOKUP'}{'ROLES'}{$sophomorix_config{'INI'}{'ROLE'}{$keyname}}=$keyname;
+            }
         } elsif ($section eq "SYNC_MEMBER"){
             my @keepgroup=&ini_list($sophomorix_config{'INI'}{$section}{'KEEPGROUP'});
 	    foreach my $group (@keepgroup) {

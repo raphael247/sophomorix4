@@ -4483,17 +4483,29 @@ sub AD_get_ui {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # read new permissions defaults from ui-package
-    # todo ???
-
     foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
         # reading config
         my $path_abs=$ref_sophomorix_config->{'INI'}{'UI'}{$ui};
         if (-f $path_abs){
-            print "HERE: $ui --> $path_abs\n";
             tie %{ $ref_ui->{'CONFIG'}{$ui} }, 'Config::IniFiles',
                 ( -file => $path_abs, 
                   -handle_trailing_comment => 1,
                 );
+            # do some checks
+            foreach my $module (keys %{ $ref_ui->{'CONFIG'}{$ui} }) {
+                foreach my $keyname (keys %{ $ref_ui->{'CONFIG'}{$ui}{$module} }) {
+                    #print "Test key name \"$keyname\" in $module in $ui\n";
+                    if ($keyname eq "TRUE_ENTRY"){
+                        # nothing to test
+                    } elsif (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$keyname}) {
+                        # OK
+                        #print "   OK: $keyname is a valid sophomorixRole\n";
+                    } else {
+                        print "\nERROR: $keyname (UI: $ui, module: $module) is not a sophomorixRole\n\n";
+                        exit;
+                    }
+                }
+            } 
         } else {
             print "\n";
             print "ERROR: UI config file not found:\n";
