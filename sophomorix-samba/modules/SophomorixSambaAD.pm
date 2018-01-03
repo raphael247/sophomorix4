@@ -4593,13 +4593,62 @@ sub AD_get_ui {
                 exit;
             }
         }
-#        foreach my $webui_calc (@webui_calc){
-#            push @{ $ui{'UI'}{'USERS'}{$sam}{'OLD'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
-#        }
 
+        # calculating modules to show
+        foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
+            foreach my $module (keys %{ $ref_ui->{'CONFIG'}{$ui} }) {
+                my $set_switch="FALSE"; # in case role is never mentioned
+                my @reason=();
+                # check package default
+                if (exists $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$role}){
+                    # only TRUE modules in this hash
+                    $set_switch="TRUE";
+                    push @reason,"PACKAGE_DEFAULT=TRUE";
+                }
 
+                # school setting for role
+                # TRUE
+                if (exists $ref_sophomorix_config->{'ROLES'}{$schoolname}{$role}{'UI'}{$ui}{'TRUE'}{$module}){
+                    $set_switch="TRUE";
+                    push @reason,"SCHOOL_DEFAULT($role)=TRUE";
+                }
+                # FALSE wins over TRUE
+                if (exists $ref_sophomorix_config->{'ROLES'}{$schoolname}{$role}{'UI'}{$ui}{'FALSE'}{$module}){
+                    $set_switch="FALSE";
+                    push @reason,"SCHOOL_DEFAULT($role)=FALSE";
+                }
 
-        
+                # user setting
+                # TRUE
+                if (exists $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'TRUE'}{$module}){
+                    $set_switch="TRUE";
+                    push @reason,"USER=TRUE";
+                }
+                # FALSE wins over TRUE
+                if (exists $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'FALSE'}{$module}){
+                    $set_switch="FALSE";
+                    push @reason,"USER=FALSE";
+                }
+                my $reasonlist=join(", ",@reason);
+                $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'CALC'}{$module}{'SWITCH'}=$set_switch;
+                $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'CALC'}{$module}{'REASON'}=$reasonlist;
+                # create list for SophomorixWebuiPermissionsCalculated
+                if ($set_switch eq "TRUE"){
+                    $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'CALCTRUE'}{$module}{'REASON'}=$reasonlist;
+                    if ($ref_sophomorix_config->{'INI'}{'UI_CONFIG'}{'CALCULATED_PREFIX'} eq "TRUE"){
+                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ui.":".$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+                    } else {
+                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+                    }
+                }
+            }
+        }
+
+        print "user $sam: sophomorixWebuiPermissionsCalculated:\n";
+        foreach my $entry ( @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} } ){
+            print "   * $entry \n";
+        }      
+
         # calculate new ui permissions
         # push @{ $ui{'UI'}{'USERS'}{$sam}{'NEW'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
         # take permissions from from package, according to role ???
