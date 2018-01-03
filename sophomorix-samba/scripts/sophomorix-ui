@@ -91,7 +91,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
-           "school|share|s=s" => \$school,
+           "school=s" => \$school,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-ui");
@@ -129,6 +129,25 @@ Please see the sophomorix-ui(8) man pages for full documentation
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 
 
+# create schoollist from options
+# --school <school>
+my @schoollist=();
+if ($school ne ""){
+#    if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
+    if (exists $sophomorix_config{'SCHOOLS'}{$school}){
+	push @schoollist,$school;
+    } else {
+        print "\nERROR: $school is not a SMB-share!\n\n";
+	exit;
+    }
+} else {
+    # without option use only school shares
+    @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
+}
+
+
+
+
 my $ref_ui=&AD_get_ui({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
@@ -154,6 +173,28 @@ if ($info==1){
 # Start
 # ===========================================================================
 &log_script_start(\@arguments,\%sophomorix_result);
+
+foreach my $school (@schoollist){
+    &Sophomorix::SophomorixBase::print_title("Setting ui attribute  for school $school:");
+    my @roles=("schooladministrator","teacher","student");
+    foreach my $role (@roles){
+        foreach my $user (@{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} }){
+            &AD_user_update({ldap=>$ldap,
+                             root_dse=>$root_dse,
+                             dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
+                             user=>$user,
+                             webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCTRUELIST'},
+                             user_count=>"4",
+                             max_user_count=>"-",
+#                             time_stamp_AD=> $time_stamp_AD,
+                             json=>$json,
+                             sophomorix_config=>\%sophomorix_config,
+                             sophomorix_result=>\%sophomorix_result,
+                           });
+        }
+    }
+}
+
 
 
 &AD_unbind_admin($ldap);

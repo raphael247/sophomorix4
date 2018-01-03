@@ -1913,6 +1913,7 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $webui_permissions = $arg_ref->{webui_permissions};
+    my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
     my $school = $arg_ref->{school};
     my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $role = $arg_ref->{role};
@@ -2265,6 +2266,7 @@ sub AD_user_update {
         print "   sophomorixWebuiDashboard:   $webui_dashboard\n";
         $update_log_string=$update_log_string."sophomorixWebuiDashboard=".$webui_dashboard.",";
     }
+
     if (defined $webui_permissions){
         my @webui_permissions=split(/,/,$webui_permissions);
         @webui_permissions = reverse @webui_permissions;
@@ -2273,6 +2275,18 @@ sub AD_user_update {
         my $mesg = $ldap->modify($dn,replace => {'sophomorixWebuiPermissions' => \@webui_permissions }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+
+    if ( defined $ref_webui_permissions_calculated ){
+	print "   * Setting sophomorixWebuiPermissionsCalculated to:}\n";
+        foreach my $entry (@{ $ref_webui_permissions_calculated }){
+            print "      $entry\n";
+        }
+        #$update_log_string=$update_log_string."sophomorixQuota=".@quota_new.",";
+        my $mesg = $ldap->modify($dn,
+            replace => { sophomorixWebuiPermissionsCalculated => $ref_webui_permissions_calculated }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    } 
+
 
     if ($json>=1){
         # prepare json object
@@ -4643,23 +4657,7 @@ sub AD_get_ui {
                 }
             }
         }
-
-        print "user $sam: sophomorixWebuiPermissionsCalculated:\n";
-        foreach my $entry ( @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} } ){
-            print "   * $entry \n";
-        }      
-
-        # calculate new ui permissions
-        # push @{ $ui{'UI'}{'USERS'}{$sam}{'NEW'}{'sophomorixWebuiPermissionsCalculated'} }, $webui_calc;
-        # take permissions from from package, according to role ???
- 
-        # modify permisions by school values from school.ini
-
-        # modify by user permissions
-
-
     }
-
     return(\%ui);
 }
 
