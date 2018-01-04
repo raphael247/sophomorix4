@@ -2189,7 +2189,7 @@ sub config_sophomorix_read {
                 # save in lookup table
                 $sophomorix_config{'INI'}{$section}{'KEEPGROUP_LOOKUP'}{$group}="keepgroup";
             }
-        } elsif ($section=~m/^schooladministrator\./){ 
+        } elsif ($section=~m/^administrator\./){ 
             # remember in lists
             my ($string,$name)=split(/\./,$section);
 	    push @{ $sophomorix_config{'LISTS'}{'SCHOOLADMINISTRATORS'} },$sophomorix_config{'INI'}{$section}{'USER_ROLE'};
