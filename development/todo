@@ -41,13 +41,6 @@ sophomorix-check 3s
 sophomorix-user -iv braucht 5s (könnte schneller gehen???)
 ------------------------------------------------------------
 
-------------------------------------------------------------
-Performance:
-sophomorix-ui für 3500 user: 
-MIT  update: 72   sekunden
-OHNE update:  1,8 sekunden
-------------------------------------------------------------
-
 Login-creation
 raumnamen vermeiden???
 Bei hinzufügen eines user s in ein gruppe, testen, ob die von richtigen typ ist
@@ -123,7 +116,7 @@ ACL:
 ordner share,program
 OK 1) parallel zu management,students,teachers in jeder Schule und global
 Todo   2) dann paket
-Todo   3)anschließend ntacl abernten
+Todo   3) anschließend ntacl abernten
 
 * Tests für project acl
 * nichtlöschbar fehlt noch
@@ -216,8 +209,19 @@ NEXT/Todo:
 
 
 ------------------------------------------------------------
-sophomorix-ui (oder sophomorix-webui)
-Allgemeiner Name für ds script wäre besser
+sophomorix-ui
+
+
+# todo
+# sophomorix-user -u xxx --add-webui-permissions "webui:upload:TRUE" test names
+
+
+
+in die Tests einbauen:
+- sophomorix-test-5
+sophomorix-test-1 --mod
+
+
 
 Ziele:
 - posivivliste
@@ -249,6 +253,18 @@ Auswertung (=Berechnung des Attributes SophomorixWebuiPermissionsCalculated für
 
 ################   Kurzablauf: <webui> ist als variable zu sehen
 
+
+------------------------------------------------------------
+Performance:
+sophomorix-ui für 3500 user: 
+MIT  update: 72   sekunden
+OHNE update:  1,8 sekunden
+(bei 2 entries bleibts bei 1,8 sekunden)
+------------------------------------------------------------
+
+
+
+
 sophomorix-ui startet
 
 NEUES UI: What must be done?
@@ -258,8 +274,6 @@ NEUES UI: What must be done?
 3) cosmetic: ignore some options in /abs/path/to/<module>.ini
    in SophomorixSamba::AD_get_ui
 
-
-# todo
 
  1) "Default des Developers":
     auslesen der Konfigurationsdatei im <webui>-paket

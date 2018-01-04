@@ -1734,13 +1734,13 @@ sub _console_print_ui {
 
     foreach my $school (@school_list){
         print "\n";
-        &print_title("School $school:");
+        &print_title("SophomorixWebuiPermissionsCalculated updates in school $school:");
         foreach my $role (@rolelist){
-            if ($#{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} } >-1){
+            if ($#{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} } >-1){
                 print $line;
                 printf "| %-70s|\n", $school." --> sophomorixRole: ".$role;
                 print $line;
-                foreach my $user ( @{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} } ){
+                foreach my $user ( @{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} } ){
                     print " $user ($ref_ui->{'UI'}{'USERS'}{$user}{'displayName'}, $role):\n"; 
                     print " sophomorixWebuiPermissionsCalculated: (new)\n";
                     foreach my $item ( @{ $ref_ui->{'UI'}{'USERS'}{$user}{'CALCTRUELIST'} } ){

@@ -2277,7 +2277,7 @@ sub AD_user_update {
     }
 
     if ( defined $ref_webui_permissions_calculated ){
-	print "   * Setting sophomorixWebuiPermissionsCalculated to:}\n";
+	print "   * Setting sophomorixWebuiPermissionsCalculated to:\n";
         foreach my $entry (@{ $ref_webui_permissions_calculated }){
             print "      $entry\n";
         }
@@ -4387,7 +4387,7 @@ sub AD_get_AD_for_check {
 
     ############################################################
     # SEARCH FOR ALL
-    &Sophomorix::SophomorixBase::print_title("Query AD (start)");
+    &Sophomorix::SophomorixBase::print_title("Query AD (begin)");
     my $filter="(| (objectClass=user) (objectClass=group) (objectClass=computer) )";
     my $mesg8 = $ldap->search( # perform a search
                       base   => $root_dse,
@@ -4481,7 +4481,7 @@ sub AD_get_AD_for_check {
        #print "$forbidden_warn: $sam\n"; 
     }
 
-    &Sophomorix::SophomorixBase::print_title("Query AD (stop)");
+    &Sophomorix::SophomorixBase::print_title("Query AD (end)");
     return(\%AD);
 }
 
@@ -4498,6 +4498,7 @@ sub AD_get_ui {
 
     ############################################################
     # read new permissions defaults from all packages
+    &Sophomorix::SophomorixBase::print_title("Query AD (begin)");
     foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
         # reading package config
         my $path_abs=$ref_sophomorix_config->{'INI'}{'UI'}{$ui};
@@ -4570,13 +4571,12 @@ sub AD_get_ui {
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$schoolname;
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
-        push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
-        push @{ $ui{'LISTS'}{'USERS'} },$sam;
+        # push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
+        # push @{ $ui{'LISTS'}{'USERS'} },$sam;
 
         # read sophomorixWebuiPermissions
         foreach my $multi_attr (@webui){
 	    my ($ui,$module,$switch)=split(/:/,$multi_attr);
- 
             # test ui
             if (not exists $ref_sophomorix_config->{'INI'}{'UI'}{$ui}){
                 print "\n";
@@ -4586,7 +4586,6 @@ sub AD_get_ui {
                 print "\n";
                 exit;
             }
-            
             # test modulemane
             if (not exists $ref_ui->{'CONFIG'}{$ui}{$module}){
                 print "\n";
@@ -4596,7 +4595,6 @@ sub AD_get_ui {
                 print "\n";
                 exit;
             }
-
             # test switch, if ok save setting
             if ($switch eq "TRUE"){
 	        $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'TRUE'}{$module}="TRUE";
@@ -4655,12 +4653,10 @@ sub AD_get_ui {
                     $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'CALCTRUE'}{$module}{'REASON'}=$reasonlist;
                     if ($ref_sophomorix_config->{'INI'}{'UI_CONFIG'}{'CALCULATED_PREFIX'} eq "TRUE"){
                         my $item=$ui.":".$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};                 
-#       push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ui.":".$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
                         push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
                         $ui{'UI'}{'USERS'}{$sam}{'CALC_TRUE_ENTRIES'}{$item}="new";
                     } else {
                         my $tem=$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
-#                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
                         push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
                         $ui{'UI'}{'USERS'}{$sam}{'CALC_TRUE_ENTRIES'}{$item}="new";
                     }
@@ -4684,11 +4680,14 @@ sub AD_get_ui {
                 $ui{'UI'}{'USERS'}{$sam}{'UI_UPDATE'}="FALSE";
             }
         }
-        # create update user lists
-        # ???????????????????? instead of other user lists
-        # ????? check
 
+        # create update user lists
+        if ($ui{'UI'}{'USERS'}{$sam}{'UI_UPDATE'} eq "TRUE"){
+            push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
+            push @{ $ui{'LISTS_UPDATE'}{'USERS'} },$sam;
+        }
     }
+    &Sophomorix::SophomorixBase::print_title("Query AD (end)");
     return(\%ui);
 }
 

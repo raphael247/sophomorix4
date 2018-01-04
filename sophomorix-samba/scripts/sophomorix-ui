@@ -179,15 +179,15 @@ if ($school ne ""){
     # walk through all schools, count by schools
     # count users
     foreach my $school (@schoollist){
-        if (exists $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}){
-	    print "$ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}\n";
+        if (exists $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school}){
+	    print "$ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school}\n";
 	    $max_user_count=$max_user_count
 		            +$#{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} }
                             +1;
         }
     }
     if ($max_user_count==0){
-        print "\n0 users found in schools $school\n\n";
+        print "\n0 SophomorixWebuiPermissionsCalculated updates in schools $school\n\n";
     }
     foreach my $school (@schoollist){
         &Sophomorix::SophomorixBase::print_title("Setting ui attribute for school $school:");
@@ -208,8 +208,8 @@ if ($school ne ""){
     }
 } else {
     # walk through all users
-    $max_user_count=$#{ $ref_ui->{'LISTS'}{'USERS'} }+1;
-    foreach my $user (@{ $ref_ui->{'LISTS'}{'USERS'} }){
+    $max_user_count=$#{ $ref_ui->{'LISTS_UPDATE'}{'USERS'} }+1;
+    foreach my $user (@{ $ref_ui->{'LISTS_UPDATE'}{'USERS'} }){
         $user_count++;
         &AD_user_update({ldap=>$ldap,
                          root_dse=>$root_dse,
