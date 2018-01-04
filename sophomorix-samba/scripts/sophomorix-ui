@@ -133,15 +133,14 @@ Please see the sophomorix-ui(8) man pages for full documentation
 # --school <school>
 my @schoollist=();
 if ($school ne ""){
-#    if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
     if (exists $sophomorix_config{'SCHOOLS'}{$school}){
 	push @schoollist,$school;
     } else {
-        print "\nERROR: $school is not a SMB-share!\n\n";
+        print "\nERROR: $school is not a school!\n\n";
 	exit;
     }
 } else {
-    # without option use only school shares
+    # without option use all schools
     @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 }
 
@@ -174,26 +173,69 @@ if ($info==1){
 # ===========================================================================
 &log_script_start(\@arguments,\%sophomorix_result);
 
-foreach my $school (@schoollist){
-    &Sophomorix::SophomorixBase::print_title("Setting ui attribute  for school $school:");
-    my @roles=("schooladministrator","teacher","student");
-    foreach my $role (@roles){
-        foreach my $user (@{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}{$role} }){
+my $max_user_count=0;
+my $user_count=0;
+if ($school ne ""){
+    # walk through all schools, count by schools
+    # count users
+    foreach my $school (@schoollist){
+        if (exists $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}){
+	    print "$ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school}\n";
+	    $max_user_count=$max_user_count
+		            +$#{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} }
+                            +1;
+        }
+    }
+    if ($max_user_count==0){
+        print "\n0 users found in schools $school\n\n";
+    }
+    foreach my $school (@schoollist){
+        &Sophomorix::SophomorixBase::print_title("Setting ui attribute for school $school:");
+        foreach my $user (@{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} }){
+            $user_count++;
             &AD_user_update({ldap=>$ldap,
                              root_dse=>$root_dse,
                              dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
                              user=>$user,
                              webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCTRUELIST'},
-                             user_count=>"4",
-                             max_user_count=>"-",
-#                             time_stamp_AD=> $time_stamp_AD,
+                             user_count=>$user_count,
+                             max_user_count=>$max_user_count,
                              json=>$json,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,
                            });
         }
     }
+} else {
+    # walk through all users
+    $max_user_count=$#{ $ref_ui->{'LISTS'}{'USERS'} }+1;
+    foreach my $user (@{ $ref_ui->{'LISTS'}{'USERS'} }){
+        $user_count++;
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
+                         user=>$user,
+                         webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCTRUELIST'},
+                         user_count=>$user_count,
+                         max_user_count=>$max_user_count,
+                         json=>$json,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                       });
+
+    }
 }
+
+
+&result_sophomorix_add_summary({
+                     NAME=>"UPDATED UI", 
+                     RESULT=>$user_count, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => "user ui updated", 
+                     DESCRIPTION_PRE => " user ui updated", 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
 
 
 

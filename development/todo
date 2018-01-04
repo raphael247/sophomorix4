@@ -244,16 +244,6 @@ NEUES UI: What must be done?
    name=
 
 
-todo:
-
-gesamt-userzähler(liste anlegen in %ui) und progressobjekt besser
-userliste, liste je schule
-bei mehreren Schulen aufsummieren
-
-nicht zwischen rolen unterscheiden (wozu?)
-
-evtl. schon bei AD_user_create die Liste anlegen
-
 
 # todo
 
@@ -269,7 +259,7 @@ evtl. schon bei AD_user_create die Liste anlegen
          (WARN_students=TRUE)
          ...
 
-    Das ist guterweiterbar, falls es z.B. 
+       * gut erweiterbar, falls es z.B. 
        * abhängigkeiten der Module geben sollte usw.
        * Warnung falls einem Schüler ein bestimmtes Modul freigeschaltet würde:
          WARN_students=TRUE
@@ -292,16 +282,16 @@ evtl. schon bei AD_user_create die Liste anlegen
     sofern im Multivalue-attribut SophomorixWebuiPermissions etwas steht, wird dies umgesetzt
     (kann auch leer sein, dann keinerlei Änderungen)
     Attributinhalt (Multi-Value):
-     filemanager:TRUE
-     quotamanager:FALSE
+     webui:filemanager:TRUE
+     webui:quotamanager:FALSE
      ...
 
  4) Für jeden user wird dann das multi-value Attribut SophomorixWebuiPermissionsCalculated
     aktualisiert (falls notwendig)
-    Inhalt: So wie in TRUE_ENTRY=, FALSE_ENTRY=
+    Inhalt: Nur der Wert vom keyname TRUE_ENTRY
 
-    Nicht erwähnte Module verbirgt die Schulkonsole (OK so)
-    --> Dann müsste man nur die erlaubte Zeilen schreiben
+    Nicht erwähnte Module verbirgt die Schulkonsole
+
 
 Anmerkungen:
 
