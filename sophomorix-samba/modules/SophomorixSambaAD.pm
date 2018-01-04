@@ -4654,13 +4654,40 @@ sub AD_get_ui {
                 if ($set_switch eq "TRUE"){
                     $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'CALCTRUE'}{$module}{'REASON'}=$reasonlist;
                     if ($ref_sophomorix_config->{'INI'}{'UI_CONFIG'}{'CALCULATED_PREFIX'} eq "TRUE"){
-                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ui.":".$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+                        my $item=$ui.":".$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};                 
+#       push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ui.":".$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
+                        $ui{'UI'}{'USERS'}{$sam}{'CALC_TRUE_ENTRIES'}{$item}="new";
                     } else {
-                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+                        my $tem=$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+#                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$ref_ui->{'CONFIG'}{$ui}{$module}{'TRUE_ENTRY'};
+                        push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
+                        $ui{'UI'}{'USERS'}{$sam}{'CALC_TRUE_ENTRIES'}{$item}="new";
                     }
                 }
             }
         }
+
+        # calculate if SophomorixWebuiPermissionsCalculated must be updated
+        $ui{'UI'}{'USERS'}{$sam}{'UI_UPDATE'}="TRUE"; # first set to true
+        if ( $#{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} }==$#webui_calc ){
+            my $count_true=0;
+            foreach my $item (@webui_calc){
+                if (exists $ui{'UI'}{'USERS'}{$sam}{'CALC_TRUE_ENTRIES'}{$item}){
+                    # This attribute is there
+                    $count_true++;
+                }
+            }
+            my $num=$#webui_calc+1;
+            if ($count_true==$num){
+                # num entries equal num matches: No update
+                $ui{'UI'}{'USERS'}{$sam}{'UI_UPDATE'}="FALSE";
+            }
+        }
+        # create update user lists
+        # ???????????????????? instead of other user lists
+        # ????? check
+
     }
     return(\%ui);
 }
