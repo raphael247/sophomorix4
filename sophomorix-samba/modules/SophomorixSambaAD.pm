@@ -4509,19 +4509,22 @@ sub AD_get_ui {
             # create CONFIG_PACKAGE entries (only TRUE entries)
             foreach my $module (keys %{ $ref_ui->{'CONFIG'}{$ui} }) {
                 foreach my $keyname (keys %{ $ref_ui->{'CONFIG'}{$ui}{$module} }) {
-                    #print "Test key name \"$keyname\" in $module in $ui\n";
                     if ($keyname eq "TRUE_ENTRY"){
-                        # nothing to test
-                    } elsif (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$keyname}) {
-                        # OK
-                        if ($ref_ui->{'CONFIG'}{$ui}{$module}{$keyname} eq "TRUE"){
-                            # save the true modules in: ui->module->role=TRUE
-                            $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$keyname}="TRUE";
-                        }
-                        #print "   OK: $keyname is a valid sophomorixRole\n";
+                        # this is a known option, which could be processed
+                    } elsif ($keyname=~m/^role\./) {
+                        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$keyname}) {
+                            # OK
+                            if ($ref_ui->{'CONFIG'}{$ui}{$module}{$keyname} eq "TRUE"){
+                                # save the true modules in: ui->module->role=TRUE
+                                $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$keyname}="TRUE";
+                            } else {
+                                print "\nERROR: $keyname (UI: $ui, module: $module) is not a sophomorixRole\n\n";
+                                exit;
+                            }
+			}
                     } else {
-                        print "\nERROR: $keyname (UI: $ui, module: $module) is not a sophomorixRole\n\n";
-                        exit;
+                        # ignore these options
+                        print "Skipping keyname $keyname (UI: $ui, Module: $module)\n";
                     }
                 }
             } 

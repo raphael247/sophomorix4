@@ -239,10 +239,11 @@ Auswertung (=Berechnung des Attributes SophomorixWebuiPermissionsCalculated für
 sophomorix-ui startet
 
 NEUES UI: What must be done?
-1) sophomorix.ini, section [UI] -> name=/abs/path
+1) sophomorix.ini, section [UI] -> name=/abs/path/to/<module>.ini
 2) entries at each role.* to allow override in school.conf.master
    name=
-
+3) cosmetic: ignore some options in /abs/path/to/<module>.ini
+   in SophomorixSamba::AD_get_ui
 
 
 # todo
@@ -252,9 +253,10 @@ NEUES UI: What must be done?
     Dort steht in welcher Rolle welches Modul angezeigt wird: 
     Vorschlag (Modul filemanager):
      [filemanager]
-         student=FALSE
-         teacher=TRUE
-         administrator=FALSE # false is the default
+         role.student=FALSE
+         role.teacher=TRUE
+         role.schooladministrator=FALSE # false is the default
+         role.globaladministrator=FALSE # false is the default
          TRUE_ENTRY=.......   # Line for SophomorixWebuiPermissionsCalculated
          (WARN_students=TRUE)
          ...
