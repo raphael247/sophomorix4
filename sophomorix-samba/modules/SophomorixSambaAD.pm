@@ -5749,7 +5749,12 @@ sub AD_get_users_v {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $school = $arg_ref->{school};
+    my $admins_only = $arg_ref->{admins_only};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    if (not defined $admins_only){
+	$admins_only="FALSE";
+    }
 
     my %users=();
     # set back global counters
@@ -5790,7 +5795,16 @@ sub AD_get_users_v {
     ##################################################
     # search for all users and computers
     # Setting the filters
-    my $filter="( |(objectclass=user) (objectclass=computer) )"; 
+    my $filter;
+    if ($admins_only eq "TRUE"){
+        $filter="(&(objectClass=user) (| ".
+                "(sophomorixRole=schoolbinduser) ".
+                "(sophomorixRole=globalbinduser) ".
+                "(sophomorixRole=schooladministrator) ".
+                "(sophomorixRole=globaladministrator)) )";
+    } else {
+        $filter="( |(objectclass=user) (objectclass=computer) )"; 
+    }
     # print "Filter: $filter\n";
     my $mesg = $ldap->search(
                       base   => $root_dse,
