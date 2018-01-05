@@ -20,6 +20,9 @@ Todo:
 
 Migration: see file ./migration
 
+sophomorix-repair:
+  - option extraclass ??
+  - integration in adminclass ??
 
 AD_get_AD scheint langsam
 wird aufgerufen in:
@@ -98,6 +101,34 @@ FIELD3: used to number the users: increasing later adds more user (keep basename
 
 ------------------------------------------------------------
 -> change to ini format?
+
+Super wäre, wenn FIRSTNAME,LASTNAME konfogurierbar wären
+ (updatebar)
+user müssten dann aber per loginname zusammengführt werden, nicht per identifier (aufwand)
+
+[groupname]
+        ENDDATE=  (wird hier analisiert)
+        USER_NUMBER=24
+automatisch:
+        FIRSTPASSWORD=(nicht mehr änderbar, könnte auch Zufallspasswort sein)
+        CREATIONDATE= (könnte auch automatischgesetzt werden)
+        BASENAME (nicht mehr änderbar, oder doch? alte user löschen/neue anlegen)
+                 oder =groupname
+per sophomorix-class
+	COMMENT=...(Für <groupname>)
+
+
+ODER:
+
+[BASENAME]
+    GROUPNAME=(bei ändern wird neue gruppe erzeugt und die user verschoben, alte verwaist/glöscht)
+    GROUPCOMMENT=(Für <groupname>)
+    USERCOMMENT=(Für <groupname>)
+    ENDDATE=  (wird hier analisiert)
+    USER_NUMBER=24
+    FIRSTPASSWORD=(nicht mehr änderbar, könnte auch Zufallspasswort sein)
+    CREATIONDATE= (könnte auch automatischgesetzt werden)
+
 
 what should be changeable?
 - number of users (remove/add at once, no toleration)
