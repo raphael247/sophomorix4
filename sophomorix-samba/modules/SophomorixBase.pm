@@ -456,13 +456,15 @@ sub _console_print_classes_overview {
     }
 
     foreach my $school (@school_list){
-        print "\n";
+        my $string;
         if ($class_type eq "class"){
-             &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type} $class_type (admin-/extra-/teacherclass) in school $school:");
+            $string=$class_type." (admin-/extra-/teacherclass) in school ".$school.":";
 	} else {
-             &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type} $class_type in school $school:");
+	    $string=$class_type." in school ".$school.":";
 	}
 
+        print "\n";
+        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type} $string");
         if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type}==0){
             next;
         }
@@ -498,7 +500,6 @@ sub _console_print_classes_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
-        
         if ($class_type eq "class"){
             my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }+1;
             printf "| %-78s|\n", $max_count." admin-/extra-/teacherclass in ".$school;
@@ -506,9 +507,7 @@ sub _console_print_classes_overview {
             my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{$class_type} }+1;
             printf "| %-78s|\n", $max_count." $class_type in ".$school;
         }
-
         print $line2;
-
         print "t=teachers  s=students   Q=Quota   MQ=MailQuota  MM=MaxMembers\n";
         print "H=Hidden    A=MailAlias  L=MaiList  S=Status      J=Joinable \n";
     }

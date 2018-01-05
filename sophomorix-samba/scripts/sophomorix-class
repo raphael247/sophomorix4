@@ -82,6 +82,7 @@ my $class="";
 
 # classtype
 my $class_type="adminclass"; # default is adminclass
+my $adminclass=0;
 my $teacherclass=0;
 my $extraclass=0;
 my $all=0;
@@ -122,6 +123,7 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "class|c=s" => \$class,
            "all" => \$all,
+           "adminclass" => \$adminclass,
            "teacherclass" => \$teacherclass,
            "extraclass" => \$extraclass,
            "create" => \$create,
@@ -161,12 +163,15 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
 
-# calculate $class_type (default: adminclass)
+# calculate $class_type
 if ($teacherclass==1){
     $class_type="teacherclass";
 }
 if ($extraclass==1){
     $class_type="extraclass";
+}
+if ($adminclass==1){
+    $class_type="adminclass";
 }
 if ($all==1){
     $class_type="class";
@@ -187,7 +192,11 @@ Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
-  -i  / --info
+
+  -i  / --info          (Default: displays adminclass only)
+  -i --teacherclass     (displays teacherclass)
+  -i -extraclass        (displays extraclass)
+  -i all                (displays adminclass/teacherclass/extraclass)
 
 Changing an admin-/extra-/teacherclass:
   -c <class>, / --class <class> 
