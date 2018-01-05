@@ -456,7 +456,7 @@ sub _console_print_classes_overview {
 
     foreach my $school (@school_list){
         print "\n";
-        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'} classes (adminclass, teacherclass) in school $school:");
+        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'} classes (admin-/extra-/teacherclass) in school $school:");
         if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'}==0){
             next;
         }
@@ -493,7 +493,7 @@ sub _console_print_classes_overview {
         }
         print $line;
         my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }+1;
-        printf "| %-78s|\n", $max_count." adminclass/teacherclass in ".$school;
+        printf "| %-78s|\n", $max_count." admin-/extra-/teacherclass in ".$school;
         print $line2;
 
         print "t=teachers  s=students   Q=Quota   MQ=MailQuota  MM=MaxMembers\n";

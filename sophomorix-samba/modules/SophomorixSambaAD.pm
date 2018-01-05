@@ -5653,6 +5653,7 @@ sub AD_get_groups_v {
         # set back school counters
         $groups{'COUNTER'}{$school}{'by_type'}{'project'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'adminclass'}=0;
+        $groups{'COUNTER'}{$school}{'by_type'}{'extraclass'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'teacherclass'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'class'}=0;
         $groups{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'}=0;
@@ -5728,7 +5729,7 @@ sub AD_get_groups_v {
             $groups{'COUNTER'}{$schoolname}{'status_by_type'}{$type}{$status}++;
             $groups{'COUNTER'}{$schoolname}{'by_type'}{$type}++;
             push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{$type} },$sam;
-            if ($type eq "adminclass" or $type eq "teacherclass"){
+            if ($type eq "adminclass" or $type eq "teacherclass" or $type eq "extraclass"){
                 $groups{'COUNTER'}{$schoolname}{'by_type'}{'class'}++;
                 push @{ $groups{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$schoolname}{'class'} },$sam;
             }

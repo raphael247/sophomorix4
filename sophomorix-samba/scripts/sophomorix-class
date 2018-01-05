@@ -165,8 +165,8 @@ Options
   -vv / --verbose --verbose
   -i  / --info
 
-Changing an adminclass:
-  -c adminclass, / --class adminclass 
+Changing an admin-/extra-/teacherclass:
+  -c <class>, / --class <class> 
   (can set values also for the group teachers with --class teachers)
     --description \'multiple words possible\'
     --quota <share1>:<quota1 in MiB>:<comment1>,<share2>:<quota2 in MiB>:<comment2>,...
@@ -183,7 +183,7 @@ Changing an adminclass:
     --removeadmins user1,user2,user3, ...
 
 This is for migration/testing/fixing only:
-  --create --class <adminclass> --gidnumber <num>
+  --create --class <class> --gidnumber <num>
   --creationdate <20150529093330.0Z> (only for migration)
   --set-gidnumber <num>
   --members user1,user2,user3, ... 
@@ -191,7 +191,7 @@ This is for migration/testing/fixing only:
   --removemembers user1,user2,user3, ...
 
 Be careful with this command:
-  --kill --class <adminclass>
+  --kill --class <class>
 
 
 Please see the sophomorix-class(8) man pages for full documentation
