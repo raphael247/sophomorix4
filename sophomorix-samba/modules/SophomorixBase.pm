@@ -3083,14 +3083,14 @@ sub filelist_fetch {
     my ($arg_ref) = @_;
     my $filetype = $arg_ref->{filetype};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-    my $file_key;
+    my $file_type;
 
     if ($filetype eq "devices"){
-	$file_key="DEVICE_FILE";
+	$file_type="DEVICE_FILE";
     } elsif ($filetype eq "classes"){
-	$file_key="CLASS_FILE";
+	$file_type="CLASS_FILE";
     } elsif ($filetype eq "users"){
-	$file_key="USER_FILE";
+	$file_type="USER_FILE";
     } else {
         print "ERROR: unknown filetype $filetype\n";
         exit;
@@ -3100,9 +3100,9 @@ sub filelist_fetch {
     if($Conf::log_level>=2){
         &print_title("Testing the following files for handling:");
     }
-    foreach my $file (keys %{$ref_sophomorix_config->{'FILES'}{$file_key}}) {
-        my $abs_path=$ref_sophomorix_config->{'FILES'}{$file_key}{$file}{'PATH_ABS'};
-        my $filetype_real=$ref_sophomorix_config->{'FILES'}{$file_key}{$file}{'FILETYPE'};
+    foreach my $file (keys %{$ref_sophomorix_config->{'FILES'}{$file_type}}) {
+        my $abs_path=$ref_sophomorix_config->{'FILES'}{$file_type}{$file}{'PATH_ABS'};
+        my $filetype_real=$ref_sophomorix_config->{'FILES'}{$file_type}{$file}{'FILETYPE'};
         if (not defined $abs_path){next}; # i.e. vampire.csvFILES
         
         if (-e $abs_path and $filetype_real eq $filetype){

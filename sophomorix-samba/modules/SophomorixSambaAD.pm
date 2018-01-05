@@ -6668,7 +6668,11 @@ sub AD_group_create {
     } elsif ($file eq "none"){
         $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
     } else {
-        $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+        if (exists $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'}){
+            $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+        } elsif (exists $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$file}{'GROUP_OU'}){
+            $group_ou=$ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$file}{'GROUP_OU'};
+        }
     }
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;

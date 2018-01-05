@@ -342,12 +342,27 @@ while(<SOPHOMORIXADD>){
     }
 
     # Plain password
+    my $random_pwd;
+    if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}){
+        $random_pwd=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'};
+    } elsif (exists $sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'RANDOM_PWD'}){
+        $random_pwd=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'RANDOM_PWD'};
+    }
+    my $pwd_length;
+    if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}){
+        $pwd_length=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'};
+    } elsif (exists $sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'PWD_LENGTH'}){
+        $pwd_length=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'PWD_LENGTH'};
+    }
+
     if ($password_wish eq "---") {
         $sophomorix_first_password=&get_plain_password(
                         $role,
                         $file,
-                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
-                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
+#                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, # yes|no
+#                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
+                        $random_pwd, # yes|no
+                        $pwd_length, # length of random pwd
                         @password_chars);
     } else {
         $sophomorix_first_password=$password_wish;
@@ -391,6 +406,13 @@ while(<SOPHOMORIXADD>){
     my $group_token=&AD_get_name_tokened($class_group,$school,"adminclass");
     my $login_token=&AD_get_name_tokened($login_check_ok,$school,$role);
 
+    my $type;
+    if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'sophomorixType'}){
+        $type=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'sophomorixType'};
+    } elsif (exists $sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'sophomorixType'}){
+        $type=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'sophomorixType'};
+    }
+
     if (not exists $group_created{$school}{$class_group}){
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
@@ -399,7 +421,7 @@ while(<SOPHOMORIXADD>){
                           group_basename=>$class_group,
                           school=>$school,
                           status=>"P",
-                          type=>$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'sophomorixType'},
+                          type=>$type,
                           joinable=>"TRUE",
                           description=>$group_token,
                           creationdate=>$time_stamp_AD,
@@ -434,7 +456,7 @@ while(<SOPHOMORIXADD>){
                      uidnumber_wish=>$uidnumber_wish,
                      gidnumber_wish=>$gidnumber_wish,
                      role=>$role,
-                     type=>"adminclass",
+                     type=>$type,
                      school=>$school,
                      creationdate=>$creationdate,
                      tolerationdate=>$tolerationdate,
