@@ -278,6 +278,7 @@ sub json_dump {
     my $json = $arg_ref->{json};
     my $log_level = $arg_ref->{log_level};
     my $hash_ref = $arg_ref->{hash_ref};
+    my $role = $arg_ref->{role};
     my $type = $arg_ref->{type};
     my $object_name = $arg_ref->{object_name};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -303,7 +304,7 @@ sub json_dump {
         } elsif ($jsoninfo eq "PROJECT"){
             &_console_print_project_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "CLASSES_OVERVIEW"){
-            &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type)
         } elsif ($jsoninfo eq "CLASS"){
             &_console_print_class_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
@@ -444,7 +445,7 @@ sub _console_print_devices {
 
 
 sub _console_print_classes_overview {
-    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my ($ref_groups_v,$school_opt,$log_level,$ref_sophomorix_config,$class_type)=@_;
     my $line  ="+--------------------+--+--+--+---+--+-+-+-+-+-+--------------------------------+\n";
     my $line2 ="+-------------------------------------------------------------------------------+\n";
     my @school_list;
@@ -456,14 +457,19 @@ sub _console_print_classes_overview {
 
     foreach my $school (@school_list){
         print "\n";
-        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'} classes (admin-/extra-/teacherclass) in school $school:");
-        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'class'}==0){
+        if ($class_type eq "class"){
+             &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type} $class_type (admin-/extra-/teacherclass) in school $school:");
+	} else {
+             &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type} $class_type in school $school:");
+	}
+
+        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{$class_type}==0){
             next;
         }
         print $line;
         print "| Class Name         | t| s| Q| MQ|MM|H|A|L|S|J| Class Description              |\n";
         print $line;
-        foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
+        foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{$class_type} }){
             my $MQ;
             if ($ref_groups_v->{'GROUPS'}{$group}{'sophomorixMailQuota'} eq "---:---:"){
                 $MQ=" - "; # unmodified
@@ -492,8 +498,15 @@ sub _console_print_classes_overview {
 	            $ref_groups_v->{'GROUPS'}{$group}{'description'};
         }
         print $line;
-        my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }+1;
-        printf "| %-78s|\n", $max_count." admin-/extra-/teacherclass in ".$school;
+        
+        if ($class_type eq "class"){
+            my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }+1;
+            printf "| %-78s|\n", $max_count." admin-/extra-/teacherclass in ".$school;
+        } else {
+            my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{$class_type} }+1;
+            printf "| %-78s|\n", $max_count." $class_type in ".$school;
+        }
+
         print $line2;
 
         print "t=teachers  s=students   Q=Quota   MQ=MailQuota  MM=MaxMembers\n";

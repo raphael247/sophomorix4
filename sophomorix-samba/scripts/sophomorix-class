@@ -79,6 +79,13 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $class="";
+
+# classtype
+my $class_type="adminclass"; # default is adminclass
+my $teacherclass=0;
+my $extraclass=0;
+my $all=0;
+
 my $create=0;
 my $gidnumber_wish="---"; # used on creation of class
 my $set_gidnumber; # used on update
@@ -114,6 +121,9 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "class|c=s" => \$class,
+           "all" => \$all,
+           "teacherclass" => \$teacherclass,
+           "extraclass" => \$extraclass,
            "create" => \$create,
            "gidnumber=i" => \$gidnumber_wish,
            "kill" => \$kill,
@@ -149,6 +159,20 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
+
+
+# calculate $class_type (default: adminclass)
+if ($teacherclass==1){
+    $class_type="teacherclass";
+}
+if ($extraclass==1){
+    $class_type="extraclass";
+}
+if ($all==1){
+    $class_type="class";
+}
+
+
 
 # --help
 if ($help==1) {
@@ -222,6 +246,7 @@ if ($info==1 and $class eq ""){
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
                 object_name => $school,
+                type => $class_type,
                 log_level => $Conf::log_level,
                 hash_ref => $ref_group_v,
                 sophomorix_config => \%sophomorix_config,
@@ -257,7 +282,12 @@ if ($info==1 and $class ne ""){
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
+
+
+
 &log_script_start(\@arguments,\%sophomorix_result);
+
+
 
 
 # --create --class <name>
@@ -272,7 +302,7 @@ if ($create==1 and $class ne ""){
                       sophomorix_config=>\%sophomorix_config,
                       sophomorix_result=>\%sophomorix_result,
                     });
-   my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
+   my $group_token=&AD_get_name_tokened($class,$school,$class_type);
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
                      root_dns=>$root_dns,
@@ -280,7 +310,7 @@ if ($create==1 and $class ne ""){
                      group=>$group_token,
                      group_basename=>$class,
                      description=>$group_token,
-                     type=>"adminclass",
+                     type=>$class_type,
                      status=>"P",
                      creationdate=>$time_stamp_AD,
 		     sub_ou=>"OU=".$class.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
@@ -296,14 +326,14 @@ if ($create==1 and $class ne ""){
 # --kill --class <name>
 ############################################################
 if ($kill==1 and $class ne ""){
-    my $group_token=&AD_get_name_tokened($class,$school,"adminclass");
+    my $group_token=&AD_get_name_tokened($class,$school,$class_type);
     &AD_group_kill({ldap=>$ldap,
                     root_dse=>$root_dse,
                     root_dns=>$root_dns,
                     group=>$group_token,
                     group=>$class,
                     smb_admin_pass=>$smb_admin_pass,
-                    type=>"adminclass",
+                    type=>$class_type,
                     sophomorix_config=>\%sophomorix_config,
                   });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -332,7 +362,7 @@ if (defined $description){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       description=>$description,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -344,7 +374,7 @@ if (defined $quota){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       quota=>$quota,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -356,7 +386,7 @@ if (defined $mailquota){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       mailquota=>$mailquota,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -368,7 +398,7 @@ if (defined $mailalias){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       mailalias=>$mailalias,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -380,7 +410,7 @@ if (defined $maillist){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       maillist=>$maillist,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -392,7 +422,7 @@ if (defined $status){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       status=>$status,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -404,7 +434,7 @@ if (defined $join){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       join=>$join,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -416,7 +446,7 @@ if (defined $hide){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       hide=>$hide,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -428,7 +458,7 @@ if (defined $maxmembers){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       maxmembers=>$maxmembers,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -440,7 +470,7 @@ if (defined $creationdate){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       creationdate=>$creationdate,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -452,7 +482,7 @@ if (defined $set_gidnumber){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       gidnumber=>$set_gidnumber,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -478,7 +508,7 @@ if (defined $members){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -494,7 +524,7 @@ if (defined $addmembers){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -509,7 +539,7 @@ if (defined $removemembers){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       members=>$members,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -527,7 +557,7 @@ if (defined $admins){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -543,7 +573,7 @@ if (defined $addadmins){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -558,7 +588,7 @@ if (defined $removeadmins){
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
-                      type=>"adminclass",
+                      type=>$class_type,
                       admins=>$admins,
                       sophomorix_config=>\%sophomorix_config,
                     });
@@ -574,7 +604,7 @@ if (defined $removeadmins){
 
 #     my ($group_type)=&pg_get_group_type($reset_class);
 
-#     if ($group_type ne "adminclass"
+#     if ($group_type ne $class_type
 #         and $group_type ne "hiddenclass"){
 #         print "\nWARNING: Type of ${reset_class}: $group_type\n";
 #         print   "         The option --reset-class can only be used\n",
