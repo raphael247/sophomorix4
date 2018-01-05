@@ -414,6 +414,7 @@ if ($analyze_encoding ne ""){
 # Start
 ################################################################################
 # cleaning up last check
+system("mkdir -p $sophomorix_config{'INI'}{'PATHS'}{'LOG'}")
 &print_title("Cleaning up last check");
 system("rm -f $DevelConf::path_conf_tmp/*.csv*");
 system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.*");
