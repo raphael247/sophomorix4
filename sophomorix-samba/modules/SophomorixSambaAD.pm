@@ -6649,7 +6649,6 @@ sub AD_group_create {
     if (not defined $joinable){
         $joinable="FALSE";    
     }
-
     if (not defined $cn){
         $cn=$group;    
     }
@@ -6735,7 +6734,7 @@ sub AD_group_create {
                                 ]
                             );
             &AD_debug_logdump($result,2,(caller(0))[3]);
-	} elsif ($type eq "adminclass" or $type eq "teacherclass"){
+	} elsif ($type eq "adminclass" or $type eq "teacherclass" or $type eq "extraclass"){
             my $result = $ldap->add( $dn,
                                 attr => [
                                     cn   => $cn,
@@ -6820,7 +6819,7 @@ sub AD_group_create {
         print "   * Group $group exists already ($count results)\n";
     }
 
-    if ($type eq "adminclass"){
+    if ($type eq "adminclass" or $type eq "extraclass"){
         # a group like 7a, 7b
         #print "Student class of the school: $group\n";
         my $token_students=&AD_get_name_tokened($DevelConf::student,$school,"adminclass");
