@@ -2780,7 +2780,10 @@ sub AD_get_name_tokened {
     # prepend <token> or not, depending on the users role/groups type 
     my ($name,$school,$role) = @_;
     my $name_tokened="";
-    if ($role eq "adminclass" or
+    if ($role eq "adminclass" or 
+        $role eq "extraclass" or 
+        $role eq "teacherclass" or
+        $role eq "all" or
         $role eq "room" or 
         $role eq "roomws" or
         $role eq "examaccount" or
@@ -6097,19 +6100,20 @@ sub AD_get_print_data {
 
 
 sub AD_class_fetch {
-    my ($ldap,$root_dse,$class,$school,$info) = @_;
+    my ($ldap,$root_dse,$class,$school,$class_type) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. class7a
     my $school_AD="";
-    my $adminclass="";  # the option i.e. 'class7*'
+    my $class_search="";  # the option i.e. 'class7*'
     if (defined $school){
-        $adminclass=&AD_get_name_tokened($class,$school,"adminclass");
+        $class_search=&AD_get_name_tokened($class,$school,$class_type);
     } else {
-        $adminclass=&AD_get_name_tokened($class,"---","adminclass");
+        $class_search=&AD_get_name_tokened($class,"---",$class_type);
     }
-
-   my $filter="(&(objectClass=group)(sophomorixType=adminclass)(cn=".$adminclass."))";
-
+    my $filter="(& (objectClass=group) ".
+                  "(cn=".$class_search.") ".
+                  "(|(sophomorixType=adminclass)(sophomorixType=teacherclass)(sophomorixType=extraclass))".
+               " )";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',

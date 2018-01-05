@@ -194,8 +194,9 @@ Options
   -vv / --verbose --verbose
 
   -i  / --info          (Default: displays adminclass only)
+  -i --adminclass       (displays adminclass)
   -i --teacherclass     (displays teacherclass)
-  -i -extraclass        (displays extraclass)
+  -i --extraclass       (displays extraclass)
   -i all                (displays adminclass/teacherclass/extraclass)
 
 Changing an admin-/extra-/teacherclass:
@@ -292,11 +293,7 @@ if ($info==1 and $class ne ""){
 # Programmbeginn
 # ===========================================================================
 
-
-
 &log_script_start(\@arguments,\%sophomorix_result);
-
-
 
 
 # --create --class <name>
@@ -351,7 +348,7 @@ if ($kill==1 and $class ne ""){
 
 # get dn if class exists and continue ($info=0)
 ############################################################
-my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$info);
+my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$class_type);
 
 if ($count>1){
     print "\n$count classes found.\n";
