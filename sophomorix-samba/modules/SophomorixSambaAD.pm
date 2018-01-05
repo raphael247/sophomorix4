@@ -1490,7 +1490,11 @@ sub AD_user_create {
 	$dn="cn=".$login.",".$dn_class;
     } else {
         # from file
-        $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+        if (exists $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'}){
+            $class_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
+        } else {
+            $class_ou=$ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$file}{'GROUP_OU'};
+        }
         $class_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
         $dn_class = $class_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
         $dn="CN=".$login.",".$dn_class;

@@ -2216,70 +2216,76 @@ sub config_sophomorix_read {
                 } else {
                     $filename = $school.".".$name.".".$extension;
                 }
-                if ($string eq "userfile"){
+                if ($string eq "userfile" or $string eq "classfile"){
+                    my $file_type;
+                    if ($string eq "userfile"){
+                        $file_type="USER_FILE";
+                    } elsif ($string eq "classfile"){
+                        $file_type="CLASS_FILE";
+                    }
                     # role
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixRole'}=
+                    $sophomorix_config{'FILES'}{$file_type}{$filename}{'sophomorixRole'}=
                         $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
                     # type
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'sophomorixType'}=
+                    $sophomorix_config{'FILES'}{$file_type}{$filename}{'sophomorixType'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
                     # GROUP_OU
 #                    $sophomorix_config{'INI'}{$section}{'GROUP_OU'}=
 #                        &remove_whitespace($sophomorix_config{'INI'}{$section}{'GROUP_OU'});
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'GROUP_OU'}=
+                    $sophomorix_config{'FILES'}{$file_type}{$filename}{'GROUP_OU'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
                     # field5
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_5'}=
+                    $sophomorix_config{'FILES'}{$file_type}{$filename}{'FIELD_5'}=
                         $sophomorix_config{'INI'}{$section}{'FIELD_5'};
                     # field6
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FIELD_6'}=
+                    $sophomorix_config{'FILES'}{$file_type}{$filename}{'FIELD_6'}=
                         $sophomorix_config{'INI'}{$section}{'FIELD_6'};
                     # force group
-                    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUP'}=
+                    $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUP'}=
                         $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
                     # forced groupname
                     if (defined $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'}){
 #                        if ($school eq $DevelConf::name_default_school){
-                            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'}=
+                            $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}=
                                 $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
 #                        } else {
-#                            $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'}=
+#                            $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}=
 #                                $school."-".$sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
 #                        }
                     } else {
-                        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORCE_GROUPNAME'}="FALSE";
+                        $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}="FALSE";
                     }
                     # MANMEMBEROF
                     my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBEROF'});
                     foreach my $manmember (@manmember){
                         $manmember=&replace_vars($manmember,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MANMEMBEROF'} }, $manmember; 
+                        push @{ $sophomorix_config{'FILES'}{$file_type}{$filename}{'MANMEMBEROF'} }, $manmember; 
                     }
                     # MEMBEROF
                     my @member=&ini_list($sophomorix_config{'INI'}{$section}{'MEMBEROF'});
                     foreach my $member (@member){
                         $member=&replace_vars($member,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'MEMBEROF'} }, $member; 
+                        push @{ $sophomorix_config{'FILES'}{$file_type}{$filename}{'MEMBEROF'} }, $member; 
                     }
                     # SOPHOMORIXMEMBEROF
                     my @s_member=&ini_list($sophomorix_config{'INI'}{$section}{'SOPHOMORIXMEMBEROF'});
                     foreach my $s_member (@s_member){
                         $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
-                        push @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
+                        push @{ $sophomorix_config{'FILES'}{$file_type}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
                     }
-                } elsif ($string eq "classfile"){
-                    # role
-                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'sophomorixRole'}=
-                        $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
-                    # field5
-                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_5'}=
-                        $sophomorix_config{'INI'}{$section}{'FIELD_5'};
-                    # field6
-                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_6'}=
-                        $sophomorix_config{'INI'}{$section}{'FIELD_6'};
-                    # force group
-                    $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FORCE_GROUP'}=
-                        $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
+                # } elsif ($string eq "classfile"){
+                #     # role
+                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'sophomorixRole'}=
+                #         $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
+                #     # field5
+                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_5'}=
+                #         $sophomorix_config{'INI'}{$section}{'FIELD_5'};
+                #     # field6
+                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_6'}=
+                #         $sophomorix_config{'INI'}{$section}{'FIELD_6'};
+                #     # force group
+                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FORCE_GROUP'}=
+                #         $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
 
                 } elsif ($string eq "devicefile"){
                     # role
@@ -2656,25 +2662,33 @@ sub load_school_ini {
                     $ref_modmaster->{$section}{$parameter};
             }
 
-            if ($string eq "userfile"){
+            if ($string eq "userfile" or $string eq "classfile"){
+                my $file_type;
+                if ($string eq "userfile"){
+                    $file_type="USER_FILE";
+                } elsif ($string eq "classfile"){
+                    $file_type="CLASS_FILE";
+                }
+
                 # add some redundant stuff for convenience
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_UTF8'}=
+                $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{'PATH_ABS_UTF8'}=
                     $DevelConf::path_conf_tmp."/".$filename.".utf8";
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
+                $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
                     $ref_sophomorix_config->{'INI'}{'PATHS'}{'REPORT_OFFICE'}."/report.office.".$filename;
                 # save unchecked filter script for error messages
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
-                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
-            } elsif ($string eq "classfile"){
-                # add some redundant stuff for convenience
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}=
-                    $DevelConf::path_conf_tmp."/".$filename.".utf8";
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
-                    $ref_sophomorix_config->{'INI'}{'PATHS'}{'REPORT_OFFICE'}."/report.office.".$filename;
-                # save unchecked filter script for error messages
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
-                    $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT};
+                $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{FILTERSCRIPT_CONFIGURED}=
+                    $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{FILTERSCRIPT};
             }
+            # } elsif ($string eq "classfile"){
+            #     # add some redundant stuff for convenience
+            #     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}=
+            #         $DevelConf::path_conf_tmp."/".$filename.".utf8";
+            #     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
+            #         $ref_sophomorix_config->{'INI'}{'PATHS'}{'REPORT_OFFICE'}."/report.office.".$filename;
+            #     # save unchecked filter script for error messages
+            #     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
+            #         $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT};
+            # }
 
             if ($name eq "students" or
                 $name eq "extrastudents"or
