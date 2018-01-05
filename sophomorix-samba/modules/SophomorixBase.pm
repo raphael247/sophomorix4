@@ -2652,15 +2652,15 @@ sub load_school_ini {
                 $postfix="-".$school;
                 $ou_top=$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
             }
-            # load parameters
-            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                if($Conf::log_level>=3){
-                    print "   * FILE $filename: $parameter ---> <".
-                          $ref_modmaster->{$section}{$parameter}.">\n";
-                }
-                $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{$parameter}=
-                    $ref_modmaster->{$section}{$parameter};
-            }
+            # # load parameters
+            # foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+            #     if($Conf::log_level>=3){
+            #         print "   * FILE $filename: $parameter ---> <".
+            #               $ref_modmaster->{$section}{$parameter}.">\n";
+            #     }
+            #     $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{$parameter}=
+            #         $ref_modmaster->{$section}{$parameter};
+            # }
 
             if ($string eq "userfile" or $string eq "classfile"){
                 my $file_type;
@@ -2669,6 +2669,17 @@ sub load_school_ini {
                 } elsif ($string eq "classfile"){
                     $file_type="CLASS_FILE";
                 }
+
+            # load parameters
+            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+                if($Conf::log_level>=3){
+                    print "   * FILE $filename: $parameter ---> <".
+                          $ref_modmaster->{$section}{$parameter}.">\n";
+                }
+                $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=
+                    $ref_modmaster->{$section}{$parameter};
+            }
+
 
                 # add some redundant stuff for convenience
                 $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{'PATH_ABS_UTF8'}=
