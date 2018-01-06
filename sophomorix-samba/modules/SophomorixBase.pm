@@ -2812,9 +2812,12 @@ sub load_school_ini {
                         my ($module,$switch)=split(/:/,$entry);
                         if ($switch eq "TRUE"){
                             push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'TRUE'} }, $module;
+                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'MODULE_LIST'} }, $module;
                             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'TRUE'}{$module}="TRUE";
+                          
                         } elsif ($switch eq "FALSE"){
                             push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'FALSE'} }, $module;
+                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'MODULE_LIST'} }, $module;
                             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'FALSE'}{$module}="FALSE";
                         } else {
                             print "\nERROR: $switch must be TRUE/FALSE in school $school, role $role for $parameter\n\n";

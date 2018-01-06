@@ -4508,36 +4508,31 @@ sub AD_get_ui {
     # read new permissions defaults from all packages
     &Sophomorix::SophomorixBase::print_title("Query AD (begin)");
     foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
-        # reading package config
+        # reading package config for each UI into CONFIG as is (i.e. role.student, ...., TRUE and FALSE Entries)
         my $path_abs=$ref_sophomorix_config->{'INI'}{'UI'}{$ui};
         if (-f $path_abs){
             tie %{ $ref_ui->{'CONFIG'}{$ui} }, 'Config::IniFiles',
                 ( -file => $path_abs, 
                   -handle_trailing_comment => 1,
                 );
-            # create CONFIG_PACKAGE entries (only TRUE entries)
+            # create CONFIG_PACKAGE entries (only correct role and TRUE entries from CONFIG)
             foreach my $module (keys %{ $ref_ui->{'CONFIG'}{$ui} }) {
                 foreach my $keyname (keys %{ $ref_ui->{'CONFIG'}{$ui}{$module} }) {
-		    print "HERE5: $keyname\n";
                     if ($keyname eq "TRUE_ENTRY"){
                         # this is a known option, which could be processed
                     } elsif ($keyname=~m/^role\./) {
                         my ($key,$role)=split(/\./,$keyname);
-		        print "Testing: $keyname $key $role\n";
                         if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$role}) {
-			    print "$role is a role\n";
-                            # OK
-
+                            # OK, role is a correct role
+                            if ($ref_ui->{'CONFIG'}{$ui}{$module}{'role.'.$role} eq "TRUE"){
+                                # save the true modules in: ui->module->role=TRUE
+                                $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$role}="TRUE";
+	  		    }
                         } else {
                             print "\nERROR: $role is not a sophomorixRole (UI: $ui, module: $module)\n\n";
                             exit;
                         }
 
-                        if ($ref_ui->{'CONFIG'}{$ui}{$module}{'role.'.$role} eq "TRUE"){
-                            # save the true modules in: ui->module->role=TRUE
-                            print "HEREHERE\n";
-                            $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$role}="TRUE";
-			}
                     } else {
                         # ignore these options
                         print "Skipping keyname $keyname (UI: $ui, Module: $module)\n";
@@ -4552,6 +4547,27 @@ sub AD_get_ui {
             exit;
         }
     }
+
+    # test module-names in  <school.>school.ini (for all ui and all roles)
+    foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
+        # Test if configured school modules are correct (ui is tested already ba scgool.conf.master)
+        foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+            foreach my $role (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'ROLES'} }) {
+                foreach my $module (@{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$ui}{'MODULE_LIST'} }){
+                    if (exists $ref_ui->{'CONFIG'}{$ui}{$module}){
+                        # This is an existing ui and an existing module
+                    } else {
+                        print "\n";
+                        print "ERROR: In UI $ui is no module $module available:\n";
+                        print "       Check config of school $school\n";
+                        print "\n";
+                        exit;
+                    }
+                }
+            }
+        }
+    }
+
 
     my $filter2="(&(objectClass=user) (| ".
                 "(sophomorixRole=student) ".
