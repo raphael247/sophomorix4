@@ -1648,6 +1648,7 @@ sub AD_user_create {
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
+                   sophomorixWebuiDashboard => "---", 
                    sophomorixExamMode => "---", 
                    userAccountControl => $user_account_control,
                    uidNumber => $uidnumber_wish,

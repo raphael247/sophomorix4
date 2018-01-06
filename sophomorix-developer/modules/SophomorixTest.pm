@@ -345,6 +345,7 @@ sub AD_test_object {
     my $s_comment = $arg_ref->{sophomorixComment};
     my $s_webui = $arg_ref->{sophomorixWebuiDashboard};
     my $s_user_permissions = $arg_ref->{sophomorixWebuiPermissions};
+    my $s_user_permissions_calculated = $arg_ref->{sophomorixWebuiPermissionsCalculated};
     my $s_admin_file = $arg_ref->{sophomorixAdminFile};
     my $s_unid = $arg_ref->{sophomorixUnid};
     my $s_exammode = $arg_ref->{sophomorixExamMode};
@@ -711,6 +712,11 @@ sub AD_test_object {
         ##################################################
         if (defined $s_user_permissions){
             &test_multivalue($s_user_permissions,"sophomorixWebuiPermissions",$entry,$sam_account);
+        }
+
+        ##################################################
+        if (defined $s_user_permissions_calculated){
+            &test_multivalue($s_user_permissions_calculated,"sophomorixWebuiPermissionsCalculated",$entry,$sam_account);
         }
 
         ##################################################
