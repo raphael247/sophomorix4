@@ -70,6 +70,7 @@ my $classes_map="/root/sophomorix-vampire-classes.map";
 my $create_class_script=0;
 my $class_script_input="/data/root/sophomorix-dump-viewdumps/classdata_view.sql";
 my $class_script_output="/root/sophomorix-vampire-classes.sh";
+my $extrakurse="/data/etc/sophomorix/user/extrakurse.txt";
 
 # --create-add-file
 my $create_add_file=0;
@@ -131,6 +132,7 @@ $sophomorix_add_input_sql=$datadir.$sophomorix_add_input_sql;
 $project_script_input=$datadir.$project_script_input;
 $project_script_input_sql=$datadir.$project_script_input_sql;
 $class_script_input=$datadir.$class_script_input;
+$extrakurse=$datadir.$extrakurse;
 $class_adminadd_script_input=$datadir.$class_adminadd_script_input;
 
 # --help
@@ -351,6 +353,36 @@ if ($create_class_script==1){
     my $line_number=0;
     my %line=();
     my %tags=();
+    my %extraclass=();
+
+    print "\n";
+    print "Analyzing $extrakurse\n";
+    open(EXTRAKURSE,"<$extrakurse") || die "ERROR: $!";
+    while(<EXTRAKURSE>){
+	my $line=$_;
+        chomp($line);
+        $line=~s/^\s+//g;# remove leading whitespace
+        if(/^\#/){
+             # ignore comment lines
+        } elsif ($line eq ""){
+             # ignore empty lines
+        } else {
+            print "$line\n";
+            my ($course,
+            $course_basename,
+            $course_count,
+            $course_date,
+            $course_comment,
+            $course_password,
+            $course_enddate)=split(/;/,$line);
+            my ($end_day, $end_month, $end_year)=split(/\./, $course_enddate);
+            $extraclass{$course}="extraclass";
+            print "    EXTRCLASS: <$course>\n";
+        }
+    }
+    close(EXTRAKURSE);
+
+    print "\n";
     print "Creating $class_script_output\n";
     open(CLASS,"<$class_script_input") || die "ERROR: $!";
     open(CLASSSCRIPT,">$class_script_output") || die "ERROR: $!";
@@ -414,11 +446,17 @@ if ($create_class_script==1){
             } else {
                 $class=$line{'gid'};
             }
-            my $command_create="sophomorix-class --create -c $class --gidnumber $line{'gidnumber'}";
+            # adminclass OR extraclass
+            my $class_type="--adminclass";
+            my $description=$line{'gid'}." migrated"; # use unmapped name
+            if (exists $extraclass{$class}){
+                $class_type="--extraclass";
+                $description="extrakurs ".$line{'gid'}." migrated"; # use unmapped name
+            }
+            my $command_create="sophomorix-class --create -c $class --gidnumber $line{'gidnumber'} $class_type";
             my $command_modify="sophomorix-class -c $class";
 
             # --description
-            my $description=$line{'gid'}." migrated"; # use unmapped name
             $command_modify = $command_modify." --description \"$description\"";
 
             # --join/--nojoin
