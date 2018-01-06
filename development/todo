@@ -100,7 +100,9 @@ FIELD2: basename for logincreation: Used on user creation, but not later!
 FIELD3: used to number the users: increasing later adds more user (keep basename so that they will fit)
 
 ------------------------------------------------------------
--> change to ini format?
+Was tun?
+
+A) change to ini format?
 
 Super wäre, wenn FIRSTNAME,LASTNAME konfogurierbar wären
  (updatebar)
@@ -121,9 +123,9 @@ per sophomorix-class
 ODER:
 
 [BASENAME]
-    GROUPNAME=(bei ändern wird neue gruppe erzeugt und die user verschoben, alte verwaist/glöscht)
-    GROUPCOMMENT=(Für <groupname>)
-    USERCOMMENT=(Für <groupname>)
+    GROUPNAME=(bei ändern wird neue gruppe erzeugt und die user verschoben, alte gruppe verwaist/glöscht)
+    GROUPCOMMENT=(Für die Gruppe <groupname>)
+    USERCOMMENT=(Für user)
     ENDDATE=  (wird hier analisiert)
     USER_NUMBER=24
     FIRSTPASSWORD=(nicht mehr änderbar, könnte auch Zufallspasswort sein)
@@ -136,9 +138,11 @@ what should be changeable?
 - comment
 - enddate
 
-- nicht mehr änderbar: basename, creationdate, (passwort)
-Eigentlich sollte die section aus dem Identifier bestehen:
-[kommentar.01.01.1970]
+
+B) durch sophomorix-extraclass ersetzen
+- klasse anlegen (geht schon), sophomorixToleration/Deactivation Date nutzen, 
+- useranzahl anlegen in der Klasse (STATUS W,waiting for termination)
+
 ------------------------------------------------------------
 
 
