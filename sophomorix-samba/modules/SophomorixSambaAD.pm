@@ -4579,6 +4579,10 @@ sub AD_get_ui {
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$schoolname;
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+        @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissions'} } = 
+             sort $entry->get_value('sophomorixWebuiPermissions');
+        @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } = 
+             sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
         # push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
         # push @{ $ui{'LISTS'}{'USERS'} },$sam;
 
