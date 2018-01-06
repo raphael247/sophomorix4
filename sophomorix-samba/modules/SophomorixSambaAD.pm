@@ -4518,18 +4518,25 @@ sub AD_get_ui {
             # create CONFIG_PACKAGE entries (only TRUE entries)
             foreach my $module (keys %{ $ref_ui->{'CONFIG'}{$ui} }) {
                 foreach my $keyname (keys %{ $ref_ui->{'CONFIG'}{$ui}{$module} }) {
+		    print "HERE5: $keyname\n";
                     if ($keyname eq "TRUE_ENTRY"){
                         # this is a known option, which could be processed
                     } elsif ($keyname=~m/^role\./) {
-                        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$keyname}) {
+                        my ($key,$role)=split(/\./,$keyname);
+		        print "Testing: $keyname $key $role\n";
+                        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$role}) {
+			    print "$role is a role\n";
                             # OK
-                            if ($ref_ui->{'CONFIG'}{$ui}{$module}{$keyname} eq "TRUE"){
-                                # save the true modules in: ui->module->role=TRUE
-                                $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$keyname}="TRUE";
-                            } else {
-                                print "\nERROR: $keyname (UI: $ui, module: $module) is not a sophomorixRole\n\n";
-                                exit;
-                            }
+
+                        } else {
+                            print "\nERROR: $role is not a sophomorixRole (UI: $ui, module: $module)\n\n";
+                            exit;
+                        }
+
+                        if ($ref_ui->{'CONFIG'}{$ui}{$module}{'role.'.$role} eq "TRUE"){
+                            # save the true modules in: ui->module->role=TRUE
+                            print "HEREHERE\n";
+                            $ref_ui->{'CONFIG_PACKAGE'}{$ui}{$module}{$role}="TRUE";
 			}
                     } else {
                         # ignore these options
@@ -4583,8 +4590,8 @@ sub AD_get_ui {
              sort $entry->get_value('sophomorixWebuiPermissions');
         @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } = 
              sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
-        # push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
-        # push @{ $ui{'LISTS'}{'USERS'} },$sam;
+        push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
+        push @{ $ui{'LISTS'}{'USERS'} },$sam;
 
         # read sophomorixWebuiPermissions
         foreach my $multi_attr (@webui){

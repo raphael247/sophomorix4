@@ -80,6 +80,7 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $school="";
+my $force=0;
 my $user="";
 $Conf::log_level=1;
 
@@ -92,6 +93,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "school=s" => \$school,
+           "force|f" => \$force,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-ui");
@@ -119,6 +121,11 @@ Options
   -h  / --help
   -v  / --verbose
   -vv / --verbose --verbose
+
+  -i  (show what would be updated)
+  --school <school1>,<school2>,...
+
+  --force  (update every user)
 
 Please see the sophomorix-ui(8) man pages for full documentation
 ');
@@ -167,6 +174,15 @@ if ($info==1){
 }
 
 
+# --force
+my $list_type="LISTS_UPDATE"; # use update lists
+if ($force==1){
+    # use lists with all users
+    $list_type="LISTS";
+}
+
+
+
 
 # ===========================================================================
 # Start
@@ -179,10 +195,10 @@ if ($school ne ""){
     # walk through all schools, count by schools
     # count users
     foreach my $school (@schoollist){
-        if (exists $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school}){
-	    print "$ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school}\n";
+        if (exists $ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school}){
+	    print "$ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school}\n";
 	    $max_user_count=$max_user_count
-		            +$#{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} }
+		            +$#{ $ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} }
                             +1;
         }
     }
@@ -191,7 +207,7 @@ if ($school ne ""){
     }
     foreach my $school (@schoollist){
         &Sophomorix::SophomorixBase::print_title("Setting ui attribute for school $school:");
-        foreach my $user (@{ $ref_ui->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$school} }){
+        foreach my $user (@{ $ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} }){
             $user_count++;
             &AD_user_update({ldap=>$ldap,
                              root_dse=>$root_dse,
@@ -208,8 +224,8 @@ if ($school ne ""){
     }
 } else {
     # walk through all users
-    $max_user_count=$#{ $ref_ui->{'LISTS_UPDATE'}{'USERS'} }+1;
-    foreach my $user (@{ $ref_ui->{'LISTS_UPDATE'}{'USERS'} }){
+    $max_user_count=$#{ $ref_ui->{$list_type}{'USERS'} }+1;
+    foreach my $user (@{ $ref_ui->{$list_type}{'USERS'} }){
         $user_count++;
         &AD_user_update({ldap=>$ldap,
                          root_dse=>$root_dse,
