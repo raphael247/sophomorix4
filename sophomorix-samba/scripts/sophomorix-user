@@ -256,6 +256,8 @@ Updating WebuiDashboard of a user:
   --user <user> --add-webui-permissions permission1,permission2,permission3, ...
   --user <user> --remove-webui-permissions permission1,permission2,permission3, ...
 
+  permissions1, ... must have the systax:  <ui>:<module>:<TRUE/FALSE>
+
 -> continue here
   --list-teachers-by-year
 
@@ -651,6 +653,10 @@ if ($user ne "" and defined $webui_dashboard){
 # webui-permissions
 # --webui-permissions permission1,permission2,permission3, ... 
 if (defined $webui_permissions and $user ne ""){
+   my @permissions=split(/,/,$webui_permissions);
+    foreach my $perm (@permissions){
+        &test_webui_permission($perm,\%sophomorix_config);
+    }
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -669,6 +675,9 @@ if (defined $webui_permissions and $user ne ""){
 # --add-webui-permissions permission1,permission2,permission3, ...
 if (defined $add_webui_permissions and $user ne ""){
     my @add_webui_permissions=split(/,/,$add_webui_permissions);
+    foreach my $perm (@add_webui_permissions){
+        &test_webui_permission($perm,\%sophomorix_config);
+    }
     my @old_webui_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixWebuiPermissions");
     my @webui_permissions = uniq(@old_webui_permissions,@add_webui_permissions); 
     my $webui_permissions=join(",",@webui_permissions);
@@ -1148,6 +1157,26 @@ if ($enable==1){
 ############################################################
 # subs
 ############################################################
+
+sub test_webui_permission {
+    my ($perm,$ref_sophomorix_config)=@_;
+    print "Testing $perm\n";
+    my ($ui,$module,$switch)=split(/:/,$perm);
+    if (not exists $ref_sophomorix_config->{'INI'}{'UI'}{$ui}){
+        print "\n";
+        print "ERROR in parameter $perm:\n";
+        print "      $ui is not an UI\n";
+        print "\n";
+        exit;
+    }   
+    if ($switch ne "TRUE" and $switch ne "FALSE"){
+        print "\n";
+        print "ERROR in parameter $perm:\n";
+        print "      $switch must be TRUE or FALSE\n";
+        print "\n";
+        exit;
+    }
+}
 
 # sub move_mailbox {
 #     my ($old,$new) = @_;
