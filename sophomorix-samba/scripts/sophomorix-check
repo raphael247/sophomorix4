@@ -452,6 +452,7 @@ system("mkdir -p $DevelConf::path_conf_tmp");
 
 &print_title("Analyzing user files ...");
 foreach my $user_file (@filelist){
+    my %lines_seen=();
     my $count=0; # reset line counter
     my $filename = basename($user_file);
     # fetching some config data
@@ -470,7 +471,8 @@ foreach my $user_file (@filelist){
     while(<USERS>){
         $count++;
         my $line=$_;
-        &analyze_user_line($line,$user_file,$filename,$school,$count,$enc_used,"no","USER_FILE");
+        
+        &analyze_user_line($line,$user_file,$filename,$school,$count,$enc_used,"no","USER_FILE",\%lines_seen);
     }
 
     close(USERS);
@@ -1579,7 +1581,7 @@ sub edit_distance {
 # checking stuff
 ################################################################################
 sub analyze_user_line {
-    my ($line,$file_abs,$filename,$school,$count,$enc_used,$injected,$type) = @_;
+    my ($line,$file_abs,$filename,$school,$count,$enc_used,$injected,$type,$ref_lines_seen) = @_;
     # $type is USER_FILE or CLASS_FILE
     if ($line=~m/^#/ or $line=~m/^\s*$/){
         # begins with #
@@ -1702,6 +1704,15 @@ sub analyze_user_line {
         # corrected line
         my $line_new=join(";", ($class,$last_utf8,$first_utf8,$birthdate,$unid));
         print USERSUTF8 $line_new."\n";
+
+        # ignore multiple lines of the same content (class and identifier, unid) 
+        if (not exists $ref_lines_seen->{'LINES'}{$line_new}){
+            # remember the line
+            $ref_lines_seen->{'LINES'}{$line_new}="seen";
+	} else {
+            # ignore this line
+            return;
+	}
 
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
