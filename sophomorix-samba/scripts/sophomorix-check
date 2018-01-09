@@ -2080,6 +2080,7 @@ sub analyze_encoding {
     # $file_tmp will be analyzed
     my $filename = basename($file);
     my $filename_tmp = basename($file_tmp);
+    my $nonstandard_name_count=0;
     # set all result counters to 0
     foreach my $enc (@encodings_to_check){
         $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=0;
@@ -2139,7 +2140,8 @@ sub analyze_encoding {
         $firstname=&remove_whitespace($firstname);
         my @firstnames=split(/[ ,-]/, $firstname); # split for double names
         foreach my $first (@firstnames){
-            if ($first=~/[^a-zA-Z\-]/) { 
+            if ($first=~/[^a-zA-Z\-]/) {
+                $nonstandard_name_count++; 
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;   
                 my $error_count=0; 
@@ -2196,6 +2198,7 @@ sub analyze_encoding {
         my @lastnames=split(/[ ,-]/, $lastname); # split for double names
         foreach my $last (@lastnames){
             if ($last=~/[^a-zA-Z\-]/) { 
+                $nonstandard_name_count++;
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;   
                 my $error_count=0; 
@@ -2258,9 +2261,18 @@ sub analyze_encoding {
             $encoding_check_results{$file}{'NAMES'}{'RESULT'}=$enc;
         }
     }
-    # save result in config hash
-    $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
-        $encoding_check_results{$file}{'NAMES'}{'RESULT'};
+
+    print "Nonstandard names: $nonstandard_name_count\n";
+
+    if ($nonstandard_name_count==0){
+        # none non ascii names encountered
+        $encoding_check_results{$file}{'NAMES'}{'RESULT'}="ASCII";
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="ASCII";
+    } else {
+        # save result in config hash
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
+            $encoding_check_results{$file}{'NAMES'}{'RESULT'};
+    }
     if($Conf::log_level>=2){
         print "$file_tmp --> $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n";
     }
