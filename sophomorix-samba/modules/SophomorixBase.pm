@@ -2158,6 +2158,14 @@ sub config_sophomorix_read {
             $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONFDIR'}="none";
             $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONF'}="none";
         }
+        # hooks
+        my $abs_hook_dir=$DevelConf::path_conf_sophomorix."/".$school."/".$sophomorix_config{'INI'}{'HOOKS'}{'SUBDIR'};
+        $sophomorix_config{'SCHOOLS'}{$school}{'HOOKS'}{'ADD_HOOK_DIR'}=
+            $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'ADD_HOOK_DIR'};
+        $sophomorix_config{'SCHOOLS'}{$school}{'HOOKS'}{'UPDATE_HOOK_DIR'}=
+            $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'UPDATE_HOOK_DIR'};
+        $sophomorix_config{'SCHOOLS'}{$school}{'HOOKS'}{'KILL_HOOK_DIR'}=
+            $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
     }
 
     # GLOBAL
@@ -2185,6 +2193,8 @@ sub config_sophomorix_read {
     ###############################################
     foreach my $section  (keys %{$sophomorix_config{'INI'}}) {
         if ($section eq "SCHOOLS"){
+            # do something
+        } elsif ($section eq "HOOKS"){
             # do something
         } elsif ($section eq "ROLE"){
             # create LOOKUP for ROLES
@@ -2883,6 +2893,8 @@ sub load_sophomorix_ini {
         }
     }
 }
+
+
 
 # working with the JSON result hash
 ######################################################################
