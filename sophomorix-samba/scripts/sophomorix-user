@@ -68,43 +68,6 @@ my @arguments = @ARGV;
 
 my $time_stamp_file=&time_stamp_file();
 my $time_stamp_AD=&time_stamp_AD();
-
-# use strict;
-# use Getopt::Long;
-# Getopt::Long::Configure ("bundling");
-# #use Schedule::at;
-# use String::Approx 'amatch';
-# use Sophomorix::SophomorixConfig;
-# use Sophomorix::SophomorixBase;
-# use Time::Local;
-# use Time::localtime;
-# use Term::ANSIColor qw(:constants); # farbiger Text RED, BLUE, ...
-# # nach jedem Printbefehl wieder auf Standardfarbe zurücksetzen
-# $Term::ANSIColor::AUTORESET = 1;
-# use IMAP::Admin;
-# use DBI;
-# use Net::LDAP;
-# use Date::Calc qw(check_date);
-# use Sophomorix::SophomorixPgLdap qw(show_modulename
-#                                     db_connect
-#                                     check_connections
-#                                     search_user
-#                                     list_teachers_by_year
-#                                     update_uid_ldap
-#                                     fetchdata_from_account
-#                                     forbidden_login_hash
-#                                     update_user_db_entry
-#                                     date_pg2perl
-#                                     user_deaktivieren
-#                                     user_reaktivieren     
-#                                     check_sophomorix_user
-#                                     set_sophomorix_passwd
-#                                     fetchstudents_from_adminclass
-#                                     db_connect
-#                                    );
-#my @arguments = @ARGV;
-
-
 my $today=`date +%d.%m.%Y`;
 chomp($today);
 
@@ -572,6 +535,7 @@ if ($count>1){
 }
 
 
+
 ############################################################
 # -user <user> --comment "Test for comment"
 if ($user ne "" and defined $comment){
@@ -649,7 +613,6 @@ if ($user ne "" and defined $webui_dashboard){
 
 
 
-
 # webui-permissions
 # --webui-permissions permission1,permission2,permission3, ... 
 if (defined $webui_permissions and $user ne ""){
@@ -670,6 +633,7 @@ if (defined $webui_permissions and $user ne ""){
                      sophomorix_result=>\%sophomorix_result,
                     });
 }
+
 
 
 # --add-webui-permissions permission1,permission2,permission3, ...
@@ -714,11 +678,6 @@ if (defined $remove_webui_permissions){
                      sophomorix_result=>\%sophomorix_result,
                     });
 }
-
-
-
-
-
 
 
 
@@ -778,26 +737,6 @@ if ($freeze==1){
 }
 
 
-# # --freeze
-# if ($freeze ne""){
-#     # check if it is really an account
-#     if (getpwnam("$freeze")){
-#         print "Freezing the account of $freeze:\n";
-# 	print "   - $freeze is a valid username.\n";
-#     } else {
-#         &log_script_exit("$freeze is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
-#     }
-#     # doing the freeze
-#     &update_user_db_entry($freeze, 
-#                           "Status=F",
-#        #                   "TolerationDate=",
-#        #                   "DeactivationDate="
-#                          );
-#     &user_deaktivieren($freeze);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
-# }
-
 
 # -P --user <user> / --permanent --user <user>
 if ($permanent==1){
@@ -817,6 +756,7 @@ if ($permanent==1){
 }
 
 
+
 # -T --user <user> / --tolerate --user <user>
 if ($tolerate==1){
     print "Tolerating the account of $user:\n";
@@ -834,25 +774,6 @@ if ($tolerate==1){
                    });
 }
 
-# # --permanent
-# if ($permanent ne""){
-#     # check if it is really an account
-#     if (getpwnam("$permanent")){
-#         print "Making the account of $permanent permanent:\n";
-# 	print "   - $permanent is a valid username.\n";
-#     } else {
-#         &log_script_exit("$permanent is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
-#     }
-#     # making the account permanent
-#     &update_user_db_entry($permanent, 
-#                           "Status=P",
-#     #                      "TolerationDate=",
-#     #                      "DeactivationDate="
-#                          );
-#     &user_reaktivieren($permanent);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
-# }
 
 
 # -R --user  <user> / --removable --user <user>
@@ -863,8 +784,6 @@ if ($removable==1){
                      dn=>$dn,
                      user=>$user,
                      status=>"R",
-#                     tolerationdate=> $tolerationdate=$DevelConf::default_date,
-#                     deactivationdate=> $deactivationdate=$DevelConf::default_date,
                      user_count=>"",
                      max_user_count=>"-",
                      time_stamp_AD=> $time_stamp_AD,
@@ -873,26 +792,6 @@ if ($removable==1){
                      sophomorix_result=>\%sophomorix_result,
                    });
 }
-
-
-# # --removable
-# if ($removable ne""){
-#     # check if it is really an account
-#     if (getpwnam("$removable")){
-#         print "Making the account of $removable removable by sophomorix-kill:\n";
-# 	print "   - $removable is a valid username.\n";
-#     } else {
-#         &log_script_exit("$removable is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
-#     }
-#     # doing the removable
-#     &update_user_db_entry($removable, 
-#                           "Status=R",
-#                           "TolerationDate=01.01.1970",
-#                           "DeactivationDate=01.01.1970");
-#     &user_deaktivieren($removable);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
-# }
 
 
 
@@ -913,25 +812,6 @@ if ($killable==1){
                    });
 }
 
-# # --killable
-# if ($killable ne""){
-#     # check if it is really an account
-#     if (&check_sophomorix_user("$killable")==1){
-#         print "Making the account of $killable killable by sophomorix-kill:\n";
-# 	print "   - $killable is a valid username.\n";
-#     } else {
-#         &log_script_exit("$killable is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
-#     }
-#     # doing the killable
-#     &update_user_db_entry($killable, 
-#                           "Status=K",
-#  #                         "TolerationDate=01.01.1970",
-#  #                         "DeactivationDate=01.01.1970"
-#                          );
-#     &user_deaktivieren($killable);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
-# }
 
 
 # -A --user <user> / --activate --user <user>
@@ -951,6 +831,8 @@ if ($activate==1){
                    });
 }
 
+
+
 # -S --user <user> / --selfactivate --user <user>
 if ($selfactivate==1){
     print "Selfctvating the account of $user:\n";
@@ -969,25 +851,6 @@ if ($selfactivate==1){
 }
 
 
-# # --activate
-# if ($activate ne""){
-#     # check if it is really an account
-#     if (getpwnam("$activate")){
-#         print "Actvating the account of $activate:\n";
-# 	print "   - $activate is a valid username.\n";
-#     } else {
-#         &log_script_exit("$activate is not a valid username",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
-#     }
-#     # activating the account
-#     &update_user_db_entry($activate, 
-#                           "Status=A",
-#                           "TolerationDate=$today",
-#                           "DeactivationDate=");
-#     &user_reaktivieren($activate);
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,$json);
-# }
-
 
 # -U --user <user> / --usable --user <user>
 if ($usable==1){
@@ -1005,6 +868,7 @@ if ($usable==1){
                      sophomorix_result=>\%sophomorix_result,
                    });
 }
+
 
 
 # -E --user <user> / --enable --user <user>
@@ -1177,23 +1041,3 @@ sub test_webui_permission {
         exit;
     }
 }
-
-# sub move_mailbox {
-#     my ($old,$new) = @_;
-
-#     &mta_stop();
-#     # stop: log out the users, start: needed for renaming
-#     &mda_restart();
-#     print "Waiting 4 Seconds for cyrus to accept connections ...\n";
-#     sleep 4;
-
-#     my $imap=&imap_connect("localhost",${DevelConf::imap_admin});
-#     &imap_rename_mailbox($imap,$old,$new);
-#     &imap_disconnect($imap);
-#     # mailboxes are in 
-
-
-#     &mta_start();
-# }
-
-

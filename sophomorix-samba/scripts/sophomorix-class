@@ -148,7 +148,6 @@ my $testopt=GetOptions(
            "addmembers=s" => \$addmembers,
            "removemembers=s" => \$removemembers,
 #           "reset-class=s" => \$reset_class,
-#           "hide!" => \$hide,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
@@ -264,6 +263,8 @@ if ($info==1 and $class eq ""){
    exit;
 }
 
+
+
 # --info --class <name>
 # list class(es) and exit
 if ($info==1 and $class ne ""){
@@ -294,6 +295,7 @@ if ($info==1 and $class ne ""){
 # ===========================================================================
 
 &log_script_start(\@arguments,\%sophomorix_result);
+
 
 
 # --create --class <name>
@@ -329,6 +331,8 @@ if ($create==1 and $class ne ""){
                   });
 }
 
+
+
 # --kill --class <name>
 ############################################################
 if ($kill==1 and $class ne ""){
@@ -346,6 +350,7 @@ if ($kill==1 and $class ne ""){
 }
 
 
+
 # get dn if class exists and continue ($info=0)
 ############################################################
 my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$class_type);
@@ -353,10 +358,12 @@ my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,
 if ($count>1){
     print "\n$count classes found.\n";
     print "Specify the school-token to choose a project\n\n";
-    &log_script_exit("Specify the school-token to choose a class",$count,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    &log_script_exit("Specify the school-token to choose a class",$count,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } elsif ($count==0){
     print "\nERROR retrieving class $class: $count class found.\n\n";
-    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 ##################################################
@@ -374,6 +381,8 @@ if (defined $description){
                     });
 }
 
+
+
 # --quota <strg>
 if (defined $quota){
     &AD_group_update({ldap=>$ldap,
@@ -385,6 +394,8 @@ if (defined $quota){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --mailquota <strg>
 if (defined $mailquota){
@@ -398,6 +409,8 @@ if (defined $mailquota){
                     });
 }
 
+
+
 # --mailalias/nomailalias
 if (defined $mailalias){
     &AD_group_update({ldap=>$ldap,
@@ -409,6 +422,8 @@ if (defined $mailalias){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --maillist/--nomaillist
 if (defined $maillist){
@@ -422,6 +437,8 @@ if (defined $maillist){
                     });
 }
 
+
+
 # --status <P>
 if (defined $status){
     &AD_group_update({ldap=>$ldap,
@@ -433,6 +450,8 @@ if (defined $status){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --join/--nojoin
 if (defined $join){
@@ -446,6 +465,8 @@ if (defined $join){
                     });
 }
 
+
+
 # --hide/--nohide
 if (defined $hide){
     &AD_group_update({ldap=>$ldap,
@@ -457,6 +478,8 @@ if (defined $hide){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --maxmembers <strg>
 if (defined $maxmembers){
@@ -470,6 +493,8 @@ if (defined $maxmembers){
                     });
 }
 
+
+
 # --creationdate <strg>
 if (defined $creationdate){
     &AD_group_update({ldap=>$ldap,
@@ -481,6 +506,8 @@ if (defined $creationdate){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --set-gidnumber <num>
 if (defined $set_gidnumber){
@@ -494,17 +521,7 @@ if (defined $set_gidnumber){
                     });
 }
 
-# # --hide
-# if ($hide ne "" and $class ne ""){
-#     if ($hide==0){
-#         print "Unhiding class $class\n";
-#         &update_class_db_entry($class,"Type=adminclass");
-#     }
-#     if ($hide==1){
-#         print "Hiding class $class\n";
-#         &update_class_db_entry($class,"Type=hiddenclass");
-#     }
-# }
+
 
 ##################################################
 # members
@@ -519,6 +536,8 @@ if (defined $members){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --addmembers <user1,user2>
 if (defined $addmembers){
@@ -535,6 +554,8 @@ if (defined $addmembers){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
  
 # --removemembers <user1,user2>
 if (defined $removemembers){
@@ -568,6 +589,8 @@ if (defined $admins){
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
+
+
 
 # --addadmins <user1,user2>
 if (defined $addadmins){
