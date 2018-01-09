@@ -2181,10 +2181,6 @@ sub config_sophomorix_read {
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'MOUNTPOINT'}=
         $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$DevelConf::name_default_school;
 
-
-    #print Dumper(%sophomorix_config);
-    #exit;
-
    # Working on the sections of sophomorix.ini
     ###############################################
     foreach my $section  (keys %{$sophomorix_config{'INI'}}) {
@@ -2257,13 +2253,8 @@ sub config_sophomorix_read {
                         $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
                     # forced groupname
                     if (defined $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'}){
-#                        if ($school eq $DevelConf::name_default_school){
-                            $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}=
-                                $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
-#                        } else {
-#                            $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}=
-#                                $school."-".$sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
-#                        }
+                        $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}=
+                            $sophomorix_config{'INI'}{$section}{'FORCE_GROUPNAME'};
                     } else {
                         $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}="FALSE";
                     }
@@ -2285,20 +2276,6 @@ sub config_sophomorix_read {
                         $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
                         push @{ $sophomorix_config{'FILES'}{$file_type}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
                     }
-                # } elsif ($string eq "classfile"){
-                #     # role
-                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'sophomorixRole'}=
-                #         $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
-                #     # field5
-                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_5'}=
-                #         $sophomorix_config{'INI'}{$section}{'FIELD_5'};
-                #     # field6
-                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FIELD_6'}=
-                #         $sophomorix_config{'INI'}{$section}{'FIELD_6'};
-                #     # force group
-                #     $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'FORCE_GROUP'}=
-                #         $sophomorix_config{'INI'}{$section}{'FORCE_GROUP'};
-
                 } elsif ($string eq "devicefile"){
                     # role
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'}=
