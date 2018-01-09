@@ -31,6 +31,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
+                                 run_hook_scripts
                                  );
 
 use Sophomorix::SophomorixSambaAD qw(
@@ -404,5 +405,7 @@ rename("$update_file_new","$update_file");
 
 
 &AD_unbind_admin($ldap);
+
+&run_hook_scripts("UPDATE_HOOK_DIR",\%sophomorix_result,\%sophomorix_config);
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
