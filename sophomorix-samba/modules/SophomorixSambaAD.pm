@@ -4615,20 +4615,26 @@ sub AD_get_ui {
             # test ui
             if (not exists $ref_sophomorix_config->{'INI'}{'UI'}{$ui}){
                 print "\n";
-                print "ERROR: $ui is not an UI\n";
-                print "       sophomorixWebuiPermissions: $multi_attr\n";
-                print "       at user $sam in school $schoolname\n\n";
+                print "WARNING: \"$ui\" is not an UI\n";
+                print "         sophomorixWebuiPermissions: \"$multi_attr\"\n";
+                print "         at user $sam in school $schoolname\n";
+                print "         The entry will be ignored\n";
+                print "         You can delete the entry with:\n";
+                print "         sophomorix-user --user $sam --remove-webui-permissions \"$multi_attr\"\n";
                 print "\n";
-                exit;
+                next;
             }
             # test modulemane
             if (not exists $ref_ui->{'CONFIG'}{$ui}{$module}){
                 print "\n";
-                print "ERROR: $module is not an module of UI $ui\n";
-                print "       sophomorixWebuiPermissions: $multi_attr\n";
-                print "       at user $sam in school $schoolname\n\n";
+                print "WARNING: \"$module\" is not an module of UI \"$ui\"\n";
+                print "         sophomorixWebuiPermissions: \"$multi_attr\"\n";
+                print "         at user $sam in school $schoolname\n\n";
+                print "         The entry will be ignored\n";
+                print "         You can delete the entry with:\n";
+                print "         sophomorix-user --user $sam --remove-webui-permissions \"$multi_attr\"\n";
                 print "\n";
-                exit;
+                next;
             }
             # test switch, if ok save setting
             if ($switch eq "TRUE"){
@@ -4637,11 +4643,14 @@ sub AD_get_ui {
 	        $ui{'UI'}{'USERS'}{$sam}{'UI'}{$ui}{'FALSE'}{$module}="FALSE";
             } else {
                 print "\n";
-                print "ERROR: switch $switch must be TRUE or FALSE\n";
-                print "       sophomorixWebuiPermissions: $multi_attr\n";
-                print "       at user $sam in school $schoolname\n\n";
+                print "WARNING: switch \"$switch\" must be \"TRUE\" or \"FALSE\"\n";
+                print "         sophomorixWebuiPermissions: \"$multi_attr\"\n";
+                print "         at user $sam in school $schoolname\n\n";
+                print "         The entry will be ignored\n";
+                print "         You can delete the entry with:\n";
+                print "         sophomorix-user --user $sam --remove-webui-permissions \"$multi_attr\"\n";
                 print "\n";
-                exit;
+                next;
             }
         }
 
