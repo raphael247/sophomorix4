@@ -6,7 +6,7 @@
 
 package Sophomorix::SophomorixBase;
 require Exporter;
-#use File::Basename;
+use File::Basename;
 #use Time::Local;
 #use Time::localtime;
 #use Quota;
@@ -2024,19 +2024,18 @@ sub read_lockfile {
 # run hooks scripts
 ######################################################################
 sub run_hook_scripts {
-    my ($hook,$ref_result,$ref_sophomorix_config)=@_;
-    &print_title("Running hook scripts $hook");
-
-    # global and schools
+    my ($hook,$ref_result,$ref_sophomorix_config,$doit)=@_;
+    if ($doit eq "TRUE"){
+        # DO run all scripts
+        &print_title("Running hook scripts $hook");
+    } else {
+        # Not running scripts, just do what WOULD be done
+        &print_title("TEST: Running hook scripts $hook");
+    }
+    # create list with global and schools
     my @list=($DevelConf::AD_global_ou,@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} });
-    
     my %exe=();
 
-    # run the global scripts
-
-
-    # run the school scripts
-#    foreach my $school ( @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} } ){
     foreach my $school ( @list ){
         my $hookdir;
         my $logdir;
@@ -2047,13 +2046,22 @@ sub run_hook_scripts {
             $hookdir=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'HOOKS'}{'DIR'}{$hook};
             $logdir=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'HOOKS'}{'LOGDIR'}{$hook};
         }
-        print "   * $school --> $hookdir\n";
+        if ($doit ne "TRUE"){
+            print "School $school: Looking for hook scripts in:\n";
+            print "  $hookdir\n";
+        }
         if (-d $hookdir){
             my @scriptlist=();
 	    opendir HOOK, $hookdir;
             foreach my $script (readdir HOOK){
                 if ($script eq "." or $script eq ".."){next};
                 my $path_abs=$hookdir."/".$script;
+                if ( not $script=~m/^[a-zA-Z0-9-_\.]+$/){
+                    if ($doit ne "TRUE"){
+                        print "Invalid characters: skipping hook script $script\n";
+                    }
+                    next;
+                }
                 if (-x $path_abs){
                     push @scriptlist, $path_abs;
                     $exe{$path_abs}{'EXECUTABLE'}="yes";
@@ -2065,18 +2073,29 @@ sub run_hook_scripts {
             my $executable_num=$#scriptlist+1;
             if ($executable_num>0){
                 foreach my $executable (@scriptlist){
-                    # 
-                    #my $command="$executable 1>>&2 ";
-
-                    my $command="ls -l /rxoot  >> $exe{$executable}{'LOGFILE'}.log 2>&1";
-                    print $command."\n";
-                    #system($command);
+                    # create the command an run it
+                    my $logfile=$exe{$executable}{'LOGFILE'}.".log";
+                    my $command="$executable >> $logfile 2>&1";
+                    if ($doit eq "TRUE"){
+                        print "Running: ".$command."\n";
+                        $dirname  = dirname($logfile);
+                        system("mkdir -p $dirname");
+                        # add timestamp ?????
+                        system("echo \"\n$hook -> DATE: ...\" >> $logfile");
+                        system($command);
+                    } else {
+                        print "I would run: ".$command."\n";
+                    }
                 }
             } else {
-                print "       * no executable script\n";
+                if ($doit ne "TRUE"){
+                    print "       * no executable script\n";
+                }
             }
         } else {
-            print "       * no hook dir $hookdir\n";
+            if ($doit ne "TRUE"){
+                print "  * no hook dir $hookdir\n";
+	    }
         }
     }
 
@@ -2249,14 +2268,21 @@ sub config_sophomorix_read {
 
     # hooks GLOBAL
     my $abs_hook_dir=$DevelConf::path_conf_sophomorix."/".$sophomorix_config{'INI'}{'HOOKS'}{'SUBDIR'};
-    $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'ADD_HOOK_DIR'}=
-        $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'DIR'}{'ADD_HOOK_DIR'};
+    $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'DIR'}{'ADD_HOOK_DIR'}=
+        $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'ADD_HOOK_DIR'};
+    $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'LOGDIR'}{'ADD_HOOK_DIR'}=
+        $sophomorix_config{'INI'}{'HOOKS'}{'LOGDIR'}."/".$sophomorix_config{'INI'}{'HOOKS'}{'ADD_HOOK_DIR'};
+
 
     $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'DIR'}{'UPDATE_HOOK_DIR'}=
         $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'UPDATE_HOOK_DIR'};
+    $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'LOGDIR'}{'UPDATE_HOOK_DIR'}=
+        $sophomorix_config{'INI'}{'HOOKS'}{'LOGDIR'}."/".$sophomorix_config{'INI'}{'HOOKS'}{'UPDATE_HOOK_DIR'};
 
     $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'DIR'}{'KILL_HOOK_DIR'}=
         $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
+    $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'LOGDIR'}{'KILL_HOOK_DIR'}=
+        $sophomorix_config{'INI'}{'HOOKS'}{'LOGDIR'}."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
 
     # SCHOOL
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=

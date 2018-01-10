@@ -48,6 +48,37 @@ Todo: sophomorix-repair
 
 weiter: HOOKS umsetzen
 
+Debugging tool:
+sophomorix-hook
+--add
+--update
+--kill
+--> show what would be done 
+
+datum in logfile:
+
+Rückgabewert ins JSON object zurückloggen
+
+in sophomorix-add/kill aufnehmen
+
+------------------------------------------------------------
+time zeugs:
+
+use sophomorix-config to save timestamps:
+in sub DATE (rename UNIX)
+--> EPOCH
+    TIMESTAMP_FILE
+    TIMESTAMP_AD
+replace in all scripts:
+my $time_stamp_file=&time_stamp_file();
+my $time_stamp_AD=&time_stamp_AD();
+my $time_stamp_epoch=time;
+
+--> check if time is not needed BEFORE reading sophomorix_config
+------------------------------------------------------------
+
+
+
 ------------------------------------------------------------
 Performance:
 sophomorix-check 3s
