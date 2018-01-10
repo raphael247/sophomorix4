@@ -73,8 +73,17 @@ replace in all scripts:
 my $time_stamp_file=&time_stamp_file();
 my $time_stamp_AD=&time_stamp_AD();
 my $time_stamp_epoch=time;
-
 --> check if time is not needed BEFORE reading sophomorix_config
+--> replace time conversions if possible
+
+log script start sollte Zeit auch aus sophomorix_config nehmen
+
+calc also the localtime for sophomorix_config
+
+Problem: local time and utc might be NOT 3600 seconds in difference
+--> Versuchen mit {'DATE'}{'LOCAL'} auszukommen
+später aufeinander aufbauen
+
 ------------------------------------------------------------
 
 

@@ -2137,8 +2137,34 @@ sub config_sophomorix_read {
 
     my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
                                                                 $DevelConf::secret_file_sophomorix_AD_admin);
-    # read epoch
-    $sophomorix_config{'UNIX'}{'EPOCH'}=time;
+    # UTC Time
+    # all UTC time values are derived from the same date call
+    { 
+        my $time_stamp_AD_utc=`date --utc '+%Y%m%d%H%M%S'`;
+        chomp($time_stamp_AD_utc);
+        $time_stamp_AD_utc=$time_stamp_AD_utc.".0Z";
+        my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD_utc;
+        my $time_stamp_file_utc=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
+        my $epoch_utc=timelocal($second, $minute, $hour, $day , ($month-1), $year);
+        $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_AD'}=$time_stamp_AD_utc;
+        $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_FILE'}=$time_stamp_file_utc;
+        $sophomorix_config{'DATE'}{'UTC'}{'EPOCH'}=$epoch_utc;
+    }
+
+    # LOCAL Time
+    # all LOCAL time values are derived from the same date call
+    {
+        my $time_stamp_AD=`date '+%Y%m%d%H%M%S'`;
+        chomp($time_stamp_AD);
+        $time_stamp_AD=$time_stamp_AD.".0Z";
+        my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD;
+        my $time_stamp_file=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
+        my $epoch=timelocal($second, $minute, $hour, $day , ($month-1), $year);
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}=$time_stamp_AD;
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}=$time_stamp_file;
+        $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}=$epoch;
+    }
+    #$sophomorix_config{'DATE'}{'EPOCH'}=time;
 
     # read available encodings from iconv --list
     my %encodings_set=();
@@ -3502,7 +3528,7 @@ sub log_user_add {
 
     my $log_line="ADD::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
                  $role."::".$school."::".$time_stamp_AD."::".
-                 $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}.
                  "::".$unid."::\n";
 
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
@@ -3529,7 +3555,7 @@ sub log_user_update {
     $update_log_string=~s/,$//g;# remove trailing ,
 
     my $log_line="UPDATE::".$sam."::".$unid."::".$time_stamp_AD."::".
-                 $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}.
                  "::".$update_log_string."::\n";
 
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
@@ -3560,7 +3586,7 @@ sub log_user_kill {
 
     my $log_line="KILL::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
                  $role."::".$school."::".$time_stamp_AD."::".
-                 $ref_sophomorix_config->{'UNIX'}{'EPOCH'}.
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}.
                  "::HOME_DELETED=".$home_delete_string."::".$unid."::\n";
 
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
@@ -3591,7 +3617,7 @@ sub get_login_avoid {
         #print $_;
         chomp();
         my ($type,$login,$last,$first,$class,$role,$school,$time_AD,$epoch,$homedel,$unid)=split(/::/);
-        my $unused_sec=$ref_sophomorix_config->{'UNIX'}{'EPOCH'}-$epoch;
+        my $unused_sec=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}-$epoch;
         #print "$login unused for $unused_sec seconds (Min. limit for re-use is $reuse_limit)\n";
         if ($unused_sec<$reuse_limit){
             $login_avoid{'AVOID_LOGINS'}{$login}{'UNUSED'}=$unused_sec;
