@@ -2080,8 +2080,11 @@ sub run_hook_scripts {
                         print "Running: ".$command."\n";
                         $dirname  = dirname($logfile);
                         system("mkdir -p $dirname");
-                        # add timestamp ?????
-                        system("echo \"\n$hook -> DATE: ...\" >> $logfile");
+                        my $string=$hook.
+                                   " -> DATE: ".
+                                   $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}.
+                                   " (LOCALTIME)";
+                        system("echo \"\n$string\" >> $logfile");
                         system($command);
                     } else {
                         print "I would run: ".$command."\n";
@@ -2100,6 +2103,7 @@ sub run_hook_scripts {
     }
 
 }
+
 
 
 # command execution 
