@@ -131,30 +131,16 @@ sophomorix-test-1 anpassen
 
 ------------------------------
 HOOKS for sophomorix-add -update -kill
-- Entwicklertreffen: Pfad abstimmen, weitere scripte, die einen hook brauchen?
-- muss pro Schule konfiguierbar
-- schule übersichtlich halte, daher Unterverzeichniss hooks
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-add.d/ 
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-update.d/ 
-- /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-kill.d/
+- Entwicklertreffen: Pfad abstimmen,
+- weitere scripte, die einen hook brauchen?
 - /etc/linuxmuster/sophomorix/<bsz>/hooks/sophomorix-device.d/ ??? 
-ODER in Global für alle schulen
-  # alles was man da findet, das mit .hook (zwischengespeicherte scripte ausnehmen) endet 
-  UND executable ist, wird ausgeführt 
-  - reihenfolge acibetisch, als 01-script vor 02-script
-   ini:
-[HOOK]
-   HOOK_PATH= /etc/linuxmuster/sophomorix
-   HOOK_SUB_PATH= hooks
-   ADD_HOOK_DIR=sophomorix-add.d
-   UPDATE_HOOK_DIR=sophomorix-update.d
-   KILL_HOOK_DIR=sophomorix-kill.d
-Umsetung:
-  config einlesen
   verzeichnis lesen, executable, sub run_hook("ADD_HOOK");
-  -> PROGRESSION-JSON für jedes script (script 1/3)
+
+A) Warten auf Scriptende?
+   Rückgabewert ins JSON object zurückloggen.
+   JSON PROGRESS OBJECT start/stop für jedes script (script 1/3)
   -> Rückgabewert auslesen, bei 0 OK, sonst 1
-  -> progress-Objekt ausgeben: starte hook script
+B) Im background starten?
 
 ############################################################
 
