@@ -2030,6 +2030,7 @@ sub run_hook_scripts {
         &print_title("Running hook scripts $hook");
     } else {
         # Not running scripts, just do what WOULD be done
+        print "\n";
         &print_title("TEST: Running hook scripts $hook");
     }
     # create list with global and schools
@@ -2047,6 +2048,8 @@ sub run_hook_scripts {
             $logdir=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'HOOKS'}{'LOGDIR'}{$hook};
         }
         if ($doit ne "TRUE"){
+            # TEST
+            print "\n";
             print "School $school: Looking for hook scripts in:\n";
             print "  $hookdir\n";
         }
@@ -2058,7 +2061,8 @@ sub run_hook_scripts {
                 my $path_abs=$hookdir."/".$script;
                 if ( not $script=~m/^[a-zA-Z0-9-_\.]+$/){
                     if ($doit ne "TRUE"){
-                        print "Invalid characters: skipping hook script $script\n";
+                        # TEST
+                        print "    * Invalid characters: skipping hook script $script\n";
                     }
                     next;
                 }
@@ -2087,17 +2091,19 @@ sub run_hook_scripts {
                         system("echo \"\n$string\" >> $logfile");
                         system($command);
                     } else {
-                        print "I would run: ".$command."\n";
+                        print "    * I would run: ".$command."\n";
                     }
                 }
             } else {
                 if ($doit ne "TRUE"){
-                    print "       * no executable script\n";
+                    # TEST
+                    print "    * no executable script\n";
                 }
             }
         } else {
             if ($doit ne "TRUE"){
-                print "  * no hook dir $hookdir\n";
+                # TEST
+                print "    * no hook dir $hookdir\n";
 	    }
         }
     }

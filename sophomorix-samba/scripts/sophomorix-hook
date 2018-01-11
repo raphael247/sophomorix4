@@ -1,0 +1,169 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-hook) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use Sophomorix::SophomorixBase qw(
+                                 check_options
+                                 read_smb_conf
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                    );
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+#    return \%master;
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 time_stamp_AD
+                                 time_stamp_file
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_auk_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_add_summary
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 run_hook_scripts
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_dns_get
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_object_search
+                                 AD_get_passwd
+                                    );
+
+
+my @arguments = @ARGV;
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+my $info=0;
+my $json=0;
+
+my $add=0;
+my $update=0;
+my $kill=0;
+my $run=0;
+
+my %smb_conf=();
+&read_smb_conf(\%smb_conf);
+#print Dumper( \%smb_conf );
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "info|i" => \$info,
+           "help|h" => \$help,
+           "add" => \$add,
+           "update" => \$update,
+           "kill" => \$kill,
+           "run" => \$run,
+          );
+
+
+
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-hook");
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt,\%sophomorix_result,$json);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+#my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+#                                     $DevelConf::secret_file_sophomorix_file_admin);
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-hook shows and starts the hook scripts
+
+Options
+  -h  / --help
+  --add            (show the scripts that are run after sophomorix-add)
+  --update         (show the scripts that are run after sophomorix-update)
+  --kill           (show the scripts that are run after sophomorix-kill)
+
+  --run --add      (run the scripts that are run after sophomorix-add)
+  --run --update   (run the scripts that are run after sophomorix-update)
+  --run --kill     (run the scripts that are run after sophomorix-kill)
+
+Please see the sophomorix-hook(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+
+# --add
+if ($add==1){
+    if ($run==1){
+        &run_hook_scripts("ADD_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+    } else {
+        &run_hook_scripts("ADD_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"FALSE");
+    }
+}
+
+
+
+# --update
+if ($update==1){
+    if ($run==1){
+        &run_hook_scripts("UPDATE_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+    } else {
+        &run_hook_scripts("UPDATE_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"FALSE");
+    }
+}
+
+
+
+# --kill
+if ($kill==1){
+    if ($run==1){
+        &run_hook_scripts("KILL_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+    } else {
+        &run_hook_scripts("KILL_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"FALSE");
+    }
+}
