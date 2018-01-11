@@ -406,6 +406,10 @@ rename("$update_file_new","$update_file");
 
 &AD_unbind_admin($ldap);
 
-&run_hook_scripts("UPDATE_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+if ($user_count>0){
+    &run_hook_scripts("UPDATE_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+} else {
+    print "No users updated -> No hook scripts run.\n";
+}
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);

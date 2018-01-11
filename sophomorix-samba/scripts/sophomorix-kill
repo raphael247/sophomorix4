@@ -31,6 +31,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
+                                 run_hook_scripts
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
@@ -157,11 +158,11 @@ if ($loginname ne "") {
 # ===========================================================================
 # Abbruch, wenn sophomorix.kill fehlt oder leer
 # ===========================================================================
-if (not (-s "$kill_file")
-    and $killuser eq "") {
-    exit;
+#if (not (-s "$kill_file")
+#    and $killuser eq "") {
+#    exit;
   #&log_script_exit("No users to kill!",1,1,0,\@arguments,\%sophomorix_result,$json);
-}
+#}
 
 
 # --info
@@ -348,6 +349,12 @@ rename("$kill_file_new","$kill_file");
 			       });
 
 &AD_unbind_admin($ldap);
+
+if ($user_count>0){
+    &run_hook_scripts("KILL_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+} else {
+    print "No users killed -> No hook scripts run.\n";
+}
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 

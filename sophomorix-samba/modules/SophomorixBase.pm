@@ -2027,11 +2027,11 @@ sub run_hook_scripts {
     my ($hook,$ref_result,$ref_sophomorix_config,$doit)=@_;
     if ($doit eq "TRUE"){
         # DO run all scripts
-        &print_title("Running hook scripts $hook");
+        &print_title("Running hook scripts $hook:");
     } else {
         # Not running scripts, just do what WOULD be done
         print "\n";
-        &print_title("TEST: Running hook scripts $hook");
+        &print_title("TEST: Running hook scripts $hook:");
     }
     # create list with global and schools
     my @list=($DevelConf::AD_global_ou,@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} });

@@ -32,6 +32,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
+                                 run_hook_scripts
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -265,9 +266,9 @@ if ($group ne "") {
 ################################################################################
 &log_script_start(\@arguments,\%sophomorix_result);
 # exit if there are no users to add
-if (not (-s "$add_file") ) {
-  &log_script_exit("No users to add!",1,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-}
+#if (not (-s "$add_file") ) {
+#  &log_script_exit("No users to add!",1,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+#}
 
 # create students and teachers
 my @password_chars=&get_passwd_charlist();
@@ -487,6 +488,13 @@ rename("$add_file_new","$add_file" );
 			       });
 
 &AD_unbind_admin($ldap);
+
+if ($user_count>0){
+    &run_hook_scripts("ADD_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
+} else {
+    print "No users added -> No hook scripts run.\n";
+}
+
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 ############################################################
