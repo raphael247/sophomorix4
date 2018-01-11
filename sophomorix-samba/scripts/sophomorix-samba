@@ -77,6 +77,7 @@ my $restore_samba="";
 my $schema_load=0;
 my $restart=0;
 my $stop=0;
+my $status=0;
 my $start=0;
 
 my $edit_searchflags="";
@@ -100,6 +101,7 @@ my $testopt=GetOptions(
            "schema-load" => \$schema_load,
            "start" => \$start,
            "stop" => \$stop,
+           "status" => \$status,
            "restart" => \$restart,
           );
 
@@ -124,6 +126,14 @@ if ($start==1){
 if ($stop==1){
     print "\nStopping samba\n\n";
     &samba_stop();
+    exit;
+}
+
+
+
+# --status
+if ($status==1){
+    &samba_status();
     exit;
 }
 
@@ -194,8 +204,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-add adds users from the file sophomorix.add to the sophomorix 
-database and the authentification system.
+sophomorix-samba helps managing samba 4
 
 Options
   -h  / --help
@@ -206,6 +215,7 @@ Options
   --restart                (restarts samba)
   --stop                   (stops samba)
   --start                  (starts samba)
+  --status                 (show samba status)
 
 If you forgot the suffix look here:
 # ls -l /var/lib/samba/private/*ldb*
@@ -221,7 +231,7 @@ Editing searchFlags of <attribute> with an editor (default is emacs):
        searchFlags: 0    -> public visible attribute
        searchFlags: 128  -> confidential attribute
 
-Please see the sophomorix-add(8) man pages for full documentation
+Please see the sophomorix-samba(8) man pages for full documentation
 ');
    print "\n";
    exit;
@@ -284,6 +294,14 @@ sub samba_stop {
 sub samba_start {
     my $command="/bin/systemctl start samba-ad-dc";
     print "\nStarting samba with command $command\n\n";
+    system($command);
+}
+
+
+
+sub samba_status {
+    my $command="/bin/systemctl status samba-ad-dc";
+    print "\nShowing samba status with command $command\n\n";
     system($command);
 }
 
