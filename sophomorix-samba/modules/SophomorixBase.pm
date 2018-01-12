@@ -2066,10 +2066,16 @@ sub run_hook_scripts {
                     }
                     next;
                 }
-                if (-x $path_abs){
+                if (-x $path_abs and -f $path_abs){
                     push @scriptlist, $path_abs;
                     $exe{$path_abs}{'EXECUTABLE'}="yes";
                     $exe{$path_abs}{'LOGFILE'}=$logdir."/".$script;
+                } else {
+                    if ($doit ne "TRUE"){
+                        # TEST
+                        print "    * Not an executable file: skipping $script\n";
+                    }
+
                 }
             }
             closedir(HOOK);
@@ -2078,8 +2084,15 @@ sub run_hook_scripts {
             if ($executable_num>0){
                 foreach my $executable (@scriptlist){
                     # create the command an run it
+                    my $optstring;
+                    if ($school eq $DevelConf::AD_global_ou){
+                        $optstring="";
+                    } else {
+                        $optstring=$school." ";
+                    }
+
                     my $logfile=$exe{$executable}{'LOGFILE'}.".log";
-                    my $command="$executable >> $logfile 2>&1";
+                    my $command="$executable $optstring>> $logfile 2>&1";
                     if ($doit eq "TRUE"){
                         print "Running: ".$command."\n";
                         $dirname  = dirname($logfile);
