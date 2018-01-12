@@ -5624,7 +5624,7 @@ sub AD_get_full_userdata {
         if (-f $log_add){
             open(ADD,"<$log_add");
             while (<ADD>) {
-                my ($add,$login,$last,$first,$group,$role,$school,$date,$epoch,$unid) = split(/::/);
+                my ($add,$epoch,$date,$school,$login,$last,$first,$group,$role,$unid) = split(/::/);
                 if ($login eq $user){
                     $anything_found++;
                     $users{'LOOKUP'}{'LOGUSERS'}{$user}{'FOUND'}="TRUE";

@@ -3549,10 +3549,9 @@ sub log_user_add {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    my $log_line="ADD::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
-                 $role."::".$school."::".$time_stamp_AD."::".
-                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}.
-                 "::".$unid."::\n";
+    my $log_line="ADD::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".$time_stamp_AD."::".
+                 $school."::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
+                 $role."::".$unid."::\n";
 
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
 	$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_ADD'};
