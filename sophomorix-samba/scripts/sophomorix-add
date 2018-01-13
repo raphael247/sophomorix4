@@ -15,8 +15,6 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_AD
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -52,10 +50,7 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-my $time_stamp_AD=&time_stamp_AD();
 my $user_count=0;
-
 my $identifier;
 my $surname_ascii;
 my $firstname_ascii;
@@ -123,7 +118,6 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 my $add_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
 my $add_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add.new";
-
 
 # --help
 if ($help==1) {
@@ -274,7 +268,7 @@ if ($group ne "") {
 my @password_chars=&get_passwd_charlist();
 
 # logging sophomorix.add
-&backup_auk_file($time_stamp_file,"add","before",\%sophomorix_config);
+&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"add","before",\%sophomorix_config);
 
 # calulate users to add
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.add | wc -l`;
@@ -373,7 +367,7 @@ while(<SOPHOMORIXADD>){
     }
     # creationdate
     if ($creationdate eq "---"){
-        $creationdate=$time_stamp_AD;
+        $creationdate=$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
     }
     # 0. rember login to set quota later
     push @users_for_quota, $login_check_ok;
@@ -392,7 +386,7 @@ while(<SOPHOMORIXADD>){
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            school=>$school,
-                           creationdate=>$time_stamp_AD,
+                           creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>\%sophomorix_config,
                            sophomorix_result=>\%sophomorix_result,
@@ -423,7 +417,7 @@ while(<SOPHOMORIXADD>){
                           type=>$type,
                           joinable=>"TRUE",
                           description=>$group_token,
-                          creationdate=>$time_stamp_AD,
+                          creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                           gidnumber_wish=>$gidnumber_wish,
                           file=>$file,
                           smb_admin_pass=>$smb_admin_pass,
@@ -472,7 +466,7 @@ while(<SOPHOMORIXADD>){
 close(SOPHOMORIXADD);
 close(STILLTOADD);
 
-&backup_auk_file($time_stamp_file,"add","after",\%sophomorix_config);
+&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"add","after",\%sophomorix_config);
 rename("$add_file_new","$add_file" );
 
 &result_sophomorix_add_summary({
