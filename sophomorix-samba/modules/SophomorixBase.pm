@@ -2092,7 +2092,7 @@ sub run_hook_scripts {
                     }
 
                     my $logfile=$exe{$executable}{'LOGFILE'}.".log";
-                    my $command="$executable $optstring>> $logfile 2>&1";
+                    my $command="$executable $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'} $optstring>> $logfile 2>&1";
                     if ($doit eq "TRUE"){
                         print "Running: ".$command."\n";
                         $dirname  = dirname($logfile);
@@ -3632,9 +3632,8 @@ sub get_login_avoid {
     }
     open (KILL,"<$logfile");
     while(<KILL>){
-        #print $_;
         chomp();
-        my ($type,$login,$last,$first,$class,$role,$school,$time_AD,$epoch,$homedel,$unid)=split(/::/);
+        my ($type,$epoch,$time_AD,$school,$login,$last,$first,$class,$role,$unid) = split(/::/);
         my $unused_sec=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}-$epoch;
         #print "$login unused for $unused_sec seconds (Min. limit for re-use is $reuse_limit)\n";
         if ($unused_sec<$reuse_limit){
