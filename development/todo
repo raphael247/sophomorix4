@@ -53,7 +53,7 @@ weiter: HOOKS umsetzen
 ? Background oder Rückgabe abwarten?
 
 sophomorix-kill/add:
-Test if its ok to run with 0 users the scripts (before scritp was terminated early)
+Test if its ok to run with 0 users the scripts (before script was terminated early)
 
 wohin wird geloggt
 
@@ -69,6 +69,16 @@ my $time_stamp_AD=&time_stamp_AD();
 my $time_stamp_epoch=time;
 --> check if time is not needed BEFORE reading sophomorix_config
 --> replace time conversions if possible
+
+Umgesetzt:
+sophomorix-add
+sophomorix-user
+
+OK: AD_user_update:
+    sophomorix_config übergibt schon die time_stamp_AD
+    time_stamp_AD braucht nicht mehr übergeben werden
+TODO: dito log_user_update
+TODO: und andere
 
 log script start sollte Zeit auch aus sophomorix_config nehmen
 

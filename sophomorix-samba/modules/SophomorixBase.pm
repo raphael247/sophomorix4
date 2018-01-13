@@ -2167,7 +2167,7 @@ sub config_sophomorix_read {
         chomp($time_stamp_AD_utc);
         $time_stamp_AD_utc=$time_stamp_AD_utc.".0Z";
         my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD_utc;
-        my $time_stamp_file_utc=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
+        my $time_stamp_file_utc=$year."-".$month."-".$day."_".$hour."-".$minute."-".$second;
         my $epoch_utc=timelocal($second, $minute, $hour, $day , ($month-1), $year);
         $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_AD'}=$time_stamp_AD_utc;
         $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_FILE'}=$time_stamp_file_utc;
@@ -2181,7 +2181,7 @@ sub config_sophomorix_read {
         chomp($time_stamp_AD);
         $time_stamp_AD=$time_stamp_AD.".0Z";
         my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD;
-        my $time_stamp_file=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
+        my $time_stamp_file=$year."-".$month."-".$day."_".$hour."-".$minute."-".$second;
         my $epoch=timelocal($second, $minute, $hour, $day , ($month-1), $year);
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}=$time_stamp_AD;
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}=$time_stamp_file;

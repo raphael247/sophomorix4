@@ -24,8 +24,6 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_AD
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -66,8 +64,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-my $time_stamp_AD=&time_stamp_AD();
 my $today=`date +%d.%m.%Y`;
 chomp($today);
 
@@ -547,7 +543,7 @@ if ($user ne "" and defined $comment){
                      comment=>$comment,
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -566,7 +562,7 @@ if ($user ne "" and defined $quota){
                      quota=>$quota,
                      user_count=>"1",
                      max_user_count=>"1",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -585,7 +581,7 @@ if ($user ne "" and defined $mailquota){
                      mailquota=>$mailquota,
                      user_count=>"1",
                      max_user_count=>"1",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -604,7 +600,7 @@ if ($user ne "" and defined $webui_dashboard){
                      webui_dashboard=>$webui_dashboard,
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -627,7 +623,7 @@ if (defined $webui_permissions and $user ne ""){
                      webui_permissions=>$webui_permissions,
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -652,7 +648,7 @@ if (defined $add_webui_permissions and $user ne ""){
                      webui_permissions=>$webui_permissions,
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -672,7 +668,7 @@ if (defined $remove_webui_permissions){
                      webui_permissions=>$webui_permissions,
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -691,7 +687,7 @@ if ($deactivate==1){
                      status=>"D",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -710,7 +706,7 @@ if ($lock==1){
                      status=>"L",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -729,7 +725,7 @@ if ($freeze==1){
                      status=>"F",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -748,7 +744,7 @@ if ($permanent==1){
                      status=>"P",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -767,7 +763,7 @@ if ($tolerate==1){
                      status=>"T",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -786,7 +782,7 @@ if ($removable==1){
                      status=>"R",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -805,7 +801,7 @@ if ($killable==1){
                      status=>"K",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -824,7 +820,7 @@ if ($activate==1){
                      status=>"A",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -843,7 +839,7 @@ if ($selfactivate==1){
                      status=>"S",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -862,7 +858,7 @@ if ($usable==1){
                      status=>"U",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -881,7 +877,7 @@ if ($enable==1){
                      status=>"E",
                      user_count=>"",
                      max_user_count=>"-",
-                     time_stamp_AD=> $time_stamp_AD,
+                     time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,

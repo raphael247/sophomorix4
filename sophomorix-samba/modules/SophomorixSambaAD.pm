@@ -1920,7 +1920,7 @@ sub AD_user_update {
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
     my $school = $arg_ref->{school};
-    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
+#    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
     my $uac_force = $arg_ref->{uac_force};
@@ -2160,7 +2160,7 @@ sub AD_user_update {
         } elsif  ($status eq "T"){
             # Status T
             $user_account_control=&_uac_enable_user($user_account_control_AD);
-            $toleration_date=$time_stamp_AD;
+            $toleration_date=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
             $deactivation_date=$DevelConf::default_date;
         } elsif  ($status eq "D" or
                   $status eq "F" or
@@ -2168,7 +2168,7 @@ sub AD_user_update {
             # Status D,F,L
             $user_account_control=&_uac_disable_user($user_account_control_AD);
             $toleration_date=$toleration_date_AD;
-            $deactivation_date=$time_stamp_AD;
+            $deactivation_date=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
         } elsif  ($status eq "K" or
                   $status eq "R"){
             # Status K,R
@@ -2306,7 +2306,7 @@ sub AD_user_update {
     }
     print "Logging user update\n";
     &Sophomorix::SophomorixBase::log_user_update({sAMAccountName=>$user,
-                                                  time_stamp_AD=>$time_stamp_AD,
+                                                  time_stamp_AD=>$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                                                   unid=>$unid_AD,
                                                   school_old=>$school_AD,
                                                   school_new=>$school,
