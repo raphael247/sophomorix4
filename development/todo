@@ -71,11 +71,17 @@ my $time_stamp_epoch=time;
 --> replace time conversions if possible
 
 Umgesetzt:
-sophomorix-add
-sophomorix-user
+
+
+
 $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
-grepen nach neuer Variable und schauen in welchen Funktionen sie vorkommt-> ersetzen.
+   grepen nach DIESER neuen Variable und schauen in welchen sub sie weitergegeben wird
+   stattdessen sophomorix-config weitergeben, dann in der sub time_stamp_AD ersetzen
 $time_stamp_epoch in sophomorix-check weg
+
+obsolete funktion ins dust-bin
+
+
 
 OK: AD_user_update:
     sophomorix_config übergibt schon die time_stamp_AD
@@ -83,10 +89,14 @@ OK: AD_user_update:
 TODO: dito log_user_update
 TODO: und andere
 
+my $time_stamp_file=&time_stamp_file(); ersetzen
+
+
 log script start sollte Zeit auch aus sophomorix_config nehmen
 
 Problem: local time and utc might be NOT 3600 seconds in difference
 --> Versuchen mit {'DATE'}{'LOCAL'} auszukommen
+UTC: ersetzen/auskommentieren
 später aufeinander aufbauen
 
 ------------------------------------------------------------
