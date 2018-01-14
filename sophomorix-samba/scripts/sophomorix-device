@@ -85,7 +85,6 @@ use File::Basename qw( basename
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_AD
                                  time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
@@ -146,7 +145,6 @@ my $json=0;
 my $list_files=0;
 my $no_sync=0;
 my $birthdate="1970-01-01";
-my $time_stamp_AD=&time_stamp_AD();
 my @password_chars=&get_passwd_charlist();
 my $sophomorix_first_password="";
 
@@ -1049,7 +1047,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #                     root_dse=>$root_dse,
     #                     root_dns=>$root_dns,
     #                     school=>$school,
-    #                     creationdate=>$time_stamp_AD,
+    #                     creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
     #                     sophomorix_config=>\%sophomorix_config,
     #                     sophomorix_result=>\%sophomorix_result,
     #                  });
@@ -1071,7 +1069,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #                      role=>"examaccount",
     #                      type=>"room",
     #                      school=>$school,
-    #                      creationdate=>$time_stamp_AD,
+    #                      creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
     #                      tolerationdate=>"---",
     #                      deactivationdate=>"---",
     #                      status=>"P",
@@ -1090,7 +1088,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     #                       school=>$school,
     #                       status=>"P",
     #                       type=>"room",
-    #                       creationdate=>$time_stamp_AD,
+    #                       creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
     #                      });
     #     # add examaccount to its room
     #     &AD_group_addmember({ldap => $ldap,
@@ -1170,7 +1168,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                                root_dse=>$root_dse,
                                root_dns=>$root_dns,
                                school=>$school,
-                               creationdate=>$time_stamp_AD,
+                               creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                                smb_admin_pass=>$smb_admin_pass,
                                sophomorix_config=>\%sophomorix_config,
                                sophomorix_result=>\%sophomorix_result,
@@ -1191,7 +1189,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 		             type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
                              school=>$school,
                              filename=>$filename,
-                             creationdate=>$time_stamp_AD,
+                             creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                              json=>$json,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,
@@ -1208,7 +1206,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           school=>$school,
                           status=>"P",
                           type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
-                          creationdate=>$time_stamp_AD,
+                          creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
 			  sub_ou=>"OU=".$room_basename.",".$sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'},
                           smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>\%sophomorix_config,

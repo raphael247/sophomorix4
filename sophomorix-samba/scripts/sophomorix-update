@@ -16,7 +16,6 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_AD
                                  time_stamp_file
                                  log_script_start
                                  log_script_end
@@ -47,7 +46,6 @@ use Sophomorix::SophomorixSambaAD qw(
 my @arguments = @ARGV;
 
 my $time_stamp_file=&time_stamp_file();
-my $time_stamp_AD=&time_stamp_AD();
 my $user_count=0;
 
 my $alte_klasse;
@@ -332,7 +330,7 @@ while(<USERUPDATE>){
                          unid=>$unid_new,
                          user_count=>$user_count,
                          max_user_count=>$max_user_count,
-                         time_stamp_AD=> $time_stamp_AD,
+                         time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                          json=>$json,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -370,7 +368,7 @@ while(<USERUPDATE>){
                        role_new=>$role_new,
                        filename_old=>$filename_old,
                        filename_new=>$filename_new,
-                       creationdate=>$time_stamp_AD, 
+                       creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
                        smb_admin_pass=>$smb_admin_pass,
                        sophomorix_config=>\%sophomorix_config,
                        sophomorix_result=>\%sophomorix_result,

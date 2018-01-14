@@ -34,7 +34,6 @@ $Data::Dumper::Terse = 1;
             testmount_school
             NTACL_set_file
             remove_from_list
-            time_stamp_AD
             time_stamp_file
             ymdhms_to_date
             ymdhms_to_epoch
@@ -1861,7 +1860,7 @@ sub remove_whitespace {
 # time stamps
 ######################################################################
 # use this timestamp for the sophomorix-schema in AD
-sub time_stamp_AD {
+sub obsolete_time_stamp_AD {
   # 2016-04-04 21:51:44
   #my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
   #chomp($timestamp);

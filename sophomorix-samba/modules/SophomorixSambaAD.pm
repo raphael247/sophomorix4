@@ -1920,7 +1920,6 @@ sub AD_user_update {
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
     my $school = $arg_ref->{school};
-#    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $role = $arg_ref->{role};
     my $examteacher = $arg_ref->{exammode};
     my $uac_force = $arg_ref->{uac_force};
