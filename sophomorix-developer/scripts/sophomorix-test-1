@@ -3809,7 +3809,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --webui-permissions one,two,three --user maiersa42");
+    &run_command("sophomorix-user $all_options --webui-permissions \"webui:student-filemanager:TRUE,webui:admin-filemanager:TRUE\" --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3844,7 +3844,7 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixWebuiPermissions => "one|two|three",
+                   sophomorixWebuiPermissions => "webui:student-filemanager:TRUE|webui:admin-filemanager:TRUE",
                    sophomorixWebuiPermissionsCalculated => "webui:module student-filemanager|webui:module myquota|webui:module whoami",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
@@ -3853,7 +3853,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --add-webui-permissions four,five --user maiersa42");
+    &run_command("sophomorix-user $all_options --add-webui-permissions \"webui:ausgedacht:TRUE,webui:auchausgedacht:TRUE\" --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3888,7 +3888,7 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixWebuiPermissions => "one|two|three|four|five",
+                   sophomorixWebuiPermissions => "webui:student-filemanager:TRUE|webui:admin-filemanager:TRUE|webui:ausgedacht:TRUE|webui:auchausgedacht:TRUE",
                    sophomorixWebuiPermissionsCalculated => "webui:module student-filemanager|webui:module myquota|webui:module whoami",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
@@ -3897,7 +3897,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --remove-webui-permissions one,two --user maiersa42");
+    &run_command("sophomorix-user $all_options --remove-webui-permissions \"webui:student-filemanager:TRUE,webui:admin-filemanager:TRUE\" --user maiersa42");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3932,7 +3932,7 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixWebuiPermissions => "three|four|five",
+                   sophomorixWebuiPermissions => "webui:ausgedacht:TRUE|webui:auchausgedacht:TRUE",
                    sophomorixWebuiPermissionsCalculated => "webui:module student-filemanager|webui:module myquota|webui:module whoami",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
@@ -3941,7 +3941,7 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options -U --user maiersa42 --remove-webui-permissions three,four,five --webui-dashboard \"---\" --comment \"created by sophomorix\"");
+    &run_command("sophomorix-user $all_options -U --user maiersa42 --remove-webui-permissions \"webui:ausgedacht:TRUE,webui:auchausgedacht:TRUE\" --webui-dashboard \"---\" --comment \"created by sophomorix\"");
     # Testing if maiersa42 is feft as before
     # maiersa42
     &AD_test_object({ldap=>$ldap,
