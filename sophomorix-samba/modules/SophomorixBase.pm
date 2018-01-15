@@ -34,7 +34,6 @@ $Data::Dumper::Terse = 1;
             testmount_school
             NTACL_set_file
             remove_from_list
-            time_stamp_file
             ymdhms_to_date
             ymdhms_to_epoch
             unlock_sophomorix
@@ -1887,7 +1886,7 @@ sub ymdhms_to_date {
 
 
 # use this timestamp for filenames
-sub time_stamp_file {
+sub obsolete_time_stamp_file {
    my $zeit = `date +%Y-%m-%d_%H-%M-%S`;
    chomp($zeit);
    return $zeit;
@@ -3768,9 +3767,11 @@ sub create_test_login {
 # optopn 4: cp should be correct
 #  what is this mv for: &backup_auk_file($zeit,"add","after","mv");
 sub backup_auk_file {
-    my ($time, $str, $str2,$ref_sophomorix_config) = @_;
+    my ($str,$str2,$ref_sophomorix_config) = @_;
     my $input=$ref_sophomorix_config->{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.".$str;
-    my $output=${DevelConf::path_log_user}."/".$time.".sophomorix.".$str."-".$str2;
+    my $output=${DevelConf::path_log_user}."/".
+        $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}.
+        ".sophomorix.".$str."-".$str2;
 
     # Verarbeitete Datei mit Zeitstempel versehen
     if (-e "${input}"){

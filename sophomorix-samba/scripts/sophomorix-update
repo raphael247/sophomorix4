@@ -258,7 +258,7 @@ if ($info==1) {
 
 
 # sophomorix.update mitloggen
-&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"update","before",\%sophomorix_config);
+&backup_auk_file("update","before",\%sophomorix_config);
 
 # calulate users to update
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.update | wc -l`;
@@ -381,7 +381,7 @@ close(NOCHUPDATE);
 
 
 # sophomorix.update mitloggen
-&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"update","after",\%sophomorix_config);
+&backup_auk_file("update","after",\%sophomorix_config);
 
 
 
