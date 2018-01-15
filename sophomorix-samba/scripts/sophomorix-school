@@ -28,7 +28,6 @@ use Sophomorix::SophomorixBase qw(
                                  mount_school
                                  umount_school
                                  testmount_school
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -68,8 +67,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-
 my $lock=0;
 my $unlock=0;
 
@@ -82,11 +79,7 @@ my $mount="";
 my $umount="";
 my $listmount=0;
 
-# ===========================================================================
-# Optionen verarbeiten
-# ==========================================================================
-
-# Variablen für Optionen
+# option vars
 $Conf::log_level=1;
 my $help=0;
 my $info=0;

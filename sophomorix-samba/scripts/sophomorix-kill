@@ -16,7 +16,6 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -43,7 +42,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
 my $user_count=0;
 
 my $identifier_to_kill="";
@@ -227,10 +225,8 @@ if ($info==1) {
 
 #my $imap=&imap_connect("localhost",${DevelConf::imap_admin});
 
-# sophomorix database sichern
-#&backup_user_database($time_stamp_file, "before-kill.sql");
-# sophomorix.kill mitloggen
-&backup_auk_file($time_stamp_file,"kill","before",\%sophomorix_config);
+# logging sophomorix.kill
+&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"kill","before",\%sophomorix_config);
 
 
 
@@ -316,7 +312,7 @@ if ($killuser ne ""){
 # Datei-Zustand (NACHHER) mitloggen 
 # ===========================================================================
 # sophomorix.kill mitloggen
-&backup_auk_file($time_stamp_file,"kill","after",\%sophomorix_config);
+&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"kill","after",\%sophomorix_config);
 
 # ===========================================================================
 # Falls nur getestet wird, darf die Datei nicht ersetzt werden

@@ -1202,7 +1202,7 @@ sub AD_session_manage {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
-    my $creationdate = $arg_ref->{creationdate};
+#    my $creationdate = $arg_ref->{creationdate};
     my $supervisor = $arg_ref->{supervisor};
     my $create = $arg_ref->{create};
     my $kill = $arg_ref->{kill};
@@ -1211,16 +1211,19 @@ sub AD_session_manage {
     my $developer_session = $arg_ref->{developer_session};
     my $new_participants = $arg_ref->{participants};
     my $ref_sessions = $arg_ref->{sessions_ref};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
+    
     # the updated session string
     my $session_string_new="";
     my $session_new="";        
-    if (defined $creationdate){
-        # create session with current timestamp
-        $session_new=$creationdate;
-    } else {
-        $creationdate="---";
-    }
+#    my $creationdate;
+#    if (defined $creationdate){
+#        # create session with current timestamp
+#        $session_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'};
+#    } else {
+#        $creationdate="---";
+#    }
 
     if (not defined $new_comment or $new_comment eq ""){
         $new_comment="---";
@@ -1240,13 +1243,14 @@ sub AD_session_manage {
             # creating sessions with arbitrary names for testing
             $session_new=$developer_session;
             $session_string_new=$developer_session.";".$new_comment.";".$new_participants.";";
-        } elsif ($creationdate ne "---"){
+        } else {
             # new session
             # this is the default
-            $session_new=$creationdate;
-            $session_string_new=$creationdate.";".$new_comment.";".$new_participants.";";
-        } else {
-            
+#            $session_new=$creationdate;
+#            $session_string_new=$creationdate.";".$new_comment.";".$new_participants.";";
+            $session_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'};
+            $session_string_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}.
+                                ";".$new_comment.";".$new_participants.";";
         }
     } elsif (defined $session and defined $new_participants and defined $new_comment){
         # modifying the session

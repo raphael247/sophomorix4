@@ -24,7 +24,6 @@ use Cwd 'abs_path';
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -62,8 +61,7 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-
+# option vars
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
@@ -87,7 +85,6 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-newfile");
 &check_options($testopt,\%sophomorix_result,$json);
 
 my $newfile=$ARGV[0];
-
 
 
 # --help
@@ -181,9 +178,12 @@ if ($name ne ""){
     # option --name ....
     if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
         $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'PATH_ABS'};
-        $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$name;
-        $newfile_log_filter=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$name.".filter";
-        $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$name;
+        $newfile_log=$DevelConf::path_log_newfiles."/".
+            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
+        $newfile_log_filter=$DevelConf::path_log_newfiles."/".
+            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".filter";
+        $etcfile_log=$DevelConf::path_log_etcfiles."/".
+            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
         $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'FILTERSCRIPT'};
     } else {
         # --name with wrong filename
@@ -195,9 +195,12 @@ if ($name ne ""){
 } elsif (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
     # valid filename
     $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'PATH_ABS'};
-    $newfile_log=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$basename;
-    $newfile_log_filter=$DevelConf::path_log_newfiles."/".$time_stamp_file."_".$basename.".filter";
-    $etcfile_log=$DevelConf::path_log_etcfiles."/".$time_stamp_file."_".$basename;
+    $newfile_log=$DevelConf::path_log_newfiles."/".
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
+    $newfile_log_filter=$DevelConf::path_log_newfiles."/".
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".filter";
+    $etcfile_log=$DevelConf::path_log_etcfiles."/".
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
     $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
 } else {
     # not valid filename

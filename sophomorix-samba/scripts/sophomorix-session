@@ -27,7 +27,6 @@ use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -69,15 +68,7 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-
-
-
-# ===========================================================================
-# Optionen verarbeiten
-# ==========================================================================
-
-# Variablen für Optionen
+# option vars
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
@@ -285,7 +276,6 @@ if ($create==1 and $supervisor ne ""){
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
                         supervisor=>$supervisor,
-                        creationdate=>$time_stamp_file,
                         participants=>$participants,
                         comment=>$comment,
                         create=>"TRUE",

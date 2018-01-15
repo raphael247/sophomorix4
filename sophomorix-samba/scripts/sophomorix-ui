@@ -20,7 +20,6 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -66,14 +65,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                     );
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-
-# ===========================================================================
-# Optionen verarbeiten
-# ==========================================================================
-# Variablen für Optionen
+# option vars
 $Conf::log_level=1;
-
 my $help=0;
 my $info=0;
 my $json=0;
@@ -81,8 +74,6 @@ my $school="";
 my $force=0;
 my $user="";
 $Conf::log_level=1;
-
-
 
 # Parsen der Optionen
 my $testopt=GetOptions(

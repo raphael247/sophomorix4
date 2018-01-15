@@ -16,7 +16,6 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  log_script_start
                                  log_script_end
                                  log_script_exit
@@ -45,7 +44,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                     );
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
 my $user_count=0;
 
 my $alte_klasse;
@@ -260,7 +258,7 @@ if ($info==1) {
 
 
 # sophomorix.update mitloggen
-&backup_auk_file($time_stamp_file,"update","before",\%sophomorix_config);
+&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"update","before",\%sophomorix_config);
 
 # calulate users to update
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.update | wc -l`;
@@ -383,7 +381,7 @@ close(NOCHUPDATE);
 
 
 # sophomorix.update mitloggen
-&backup_auk_file($time_stamp_file,"update","after",\%sophomorix_config);
+&backup_auk_file($sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'},"update","after",\%sophomorix_config);
 
 
 

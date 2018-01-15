@@ -29,7 +29,6 @@ use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  ymdhms_to_epoch
                                  unlock_sophomorix
                                  lock_sophomorix
@@ -72,7 +71,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
 my $time_stamp_epoch=time;
 my $user_count=0;
 
@@ -464,7 +462,7 @@ foreach my $user_file (@filelist){
     open(REPORT,">$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
          die "ERROR: $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!"; 
     print REPORT "Office Report for: $user_file\n"; 
-    print REPORT "Date_Time:         $time_stamp_file\n";
+    print REPORT "Date_Time:         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}\n";
  
     while(<USERS>){
         $count++;
@@ -527,7 +525,7 @@ foreach my $class_file (@class_filelist){
     open(REPORT,">$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
          die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!"; 
     print REPORT "Office Report for: $class_file\n"; 
-    print REPORT "Date_Time:         $time_stamp_file\n";
+    print REPORT "Date_Time:         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}\n";
  
     while(<CLASSES>){
         $count++;

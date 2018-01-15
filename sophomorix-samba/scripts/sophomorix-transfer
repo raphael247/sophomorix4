@@ -28,7 +28,6 @@ use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
-                                 time_stamp_file
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -78,13 +77,7 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_file=&time_stamp_file();
-
-# ===========================================================================
-# Optionen verarbeiten
-# ==========================================================================
-
-# Variablen für Optionen
+# option vars
 $Conf::log_level=1;
 
 my $debug_level=0; # for smbclient --debuglevel=$debug_level
@@ -396,8 +389,7 @@ if ($collect_copy_exam){
     my $subdir_mput;
     if (not defined $subdir){
         # use current date
-        my $time_stamp_file=&time_stamp_file();
-        $subdir_mput=$transfer."/".$time_stamp_file."-nosession/".$collect_copy_exam;
+        $subdir_mput=$transfer."/".$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."-nosession/".$collect_copy_exam;
         print "   * Subdir (no session): $subdir_mput\n";
     } else {
         # use subdir
