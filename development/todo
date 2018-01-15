@@ -76,6 +76,8 @@ Umgesetzt:
 
 $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
 $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}
+$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
+$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}
 
    grepen nach DIESER neuen Variable und schauen in welchen sub sie weitergegeben wird
    stattdessen sophomorix-config weitergeben, dann in der sub time_stamp_AD ersetzen
@@ -84,16 +86,34 @@ $time_stamp_epoch in sophomorix-check weg
 obsolete funktion ins dust-bin
 
 
+creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
+
 
 OK: AD_user_update:
     sophomorix_config übergibt schon die time_stamp_AD
     time_stamp_AD braucht nicht mehr übergeben werden
 TODO: dito log_user_update
 TODO: und andere
-backup_auk_file
+OK: backup_auk_file
 
 my $time_stamp_file=&time_stamp_file(); ersetzen
 
+OK: AD_school_create 
+  --> OK: AD_group_create
+  --> OK: AD_create_school_groups
+Todo: &AD_computer_create (immer aktuelles Datum)
+      &AD_user_update (immer aktuelles Datum)
+      &AD_user_move (immer aktuelles Datum)
+
+      &AD_user_create: !! muss noch mit alter Zeit gehen, migration !!!
+      &AD_user_kill (immer aktuelles Datum)
+
+      &AD_user_set_exam_mode (immer aktuelles Datum)
+      &AD_examuser_create (immer aktuelles Datum)
+      &AD_user_unset_exam_mode (immer aktuelles Datum)
+      &AD_examuser_kill (immer aktuelles Datum)
+
+      &log_user_update (immer aktuelles Datum)
 
 log script start sollte Zeit auch aus sophomorix_config nehmen
 

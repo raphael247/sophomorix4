@@ -1213,17 +1213,9 @@ sub AD_session_manage {
     my $ref_sessions = $arg_ref->{sessions_ref};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    
     # the updated session string
     my $session_string_new="";
     my $session_new="";        
-#    my $creationdate;
-#    if (defined $creationdate){
-#        # create session with current timestamp
-#        $session_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'};
-#    } else {
-#        $creationdate="---";
-#    }
 
     if (not defined $new_comment or $new_comment eq ""){
         $new_comment="---";
@@ -1246,8 +1238,6 @@ sub AD_session_manage {
         } else {
             # new session
             # this is the default
-#            $session_new=$creationdate;
-#            $session_string_new=$creationdate.";".$new_comment.";".$new_participants.";";
             $session_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'};
             $session_string_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}.
                                 ";".$new_comment.";".$new_participants.";";
@@ -2604,7 +2594,6 @@ sub AD_user_move {
                             root_dse=>$root_dse,
                             root_dns=>$root_dns,
                             school=>$school_new,
-                            creationdate=>$creationdate,
                             smb_admin_pass=>$smb_admin_pass,
                             sophomorix_config=>$ref_sophomorix_config,
                             sophomorix_result=>$ref_sophomorix_result,
@@ -2627,7 +2616,6 @@ sub AD_user_move {
                       joinable=>"TRUE",
                       status=>"P",
                       file=>$filename,
-                      creationdate=>$creationdate,
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>$ref_sophomorix_config,
                       sophomorix_result=>$ref_sophomorix_result,
@@ -2841,7 +2829,6 @@ sub AD_school_create {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $school = $arg_ref->{school};
-    my $creationdate = $arg_ref->{creationdate};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
@@ -2953,7 +2940,6 @@ sub AD_school_create {
                       description=>"The group that includes all schools",
                       type=>$ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SCHOOL_GROUP_TYPE'},
                       status=>"P",
-                      creationdate=>$creationdate,
                       joinable=>"FALSE",
                       hidden=>"FALSE",
                       smb_admin_pass=>$smb_admin_pass,
@@ -2981,7 +2967,6 @@ sub AD_school_create {
                       description=>"The school group of school ".$school,
                       type=>"school",
                       status=>"P",
-                      creationdate=>$creationdate,
                       joinable=>"FALSE",
                       hidden=>"FALSE",
                       smb_admin_pass=>$smb_admin_pass,
@@ -3013,7 +2998,7 @@ sub AD_school_create {
         print "   * Adding OU's for default groups in OU=$school ...\n";
     }
 
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
                              $school,$ref_sophomorix_config);
     ############################################################
     # adding groups to <schoolname>-group
@@ -3050,7 +3035,7 @@ sub AD_school_create {
         print "   * Adding OU's for default groups in OU=$school ...\n";
     }
 
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
                              $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
 
     # all groups created, add some memberships from GLOBAL
@@ -3071,10 +3056,10 @@ sub AD_school_create {
     }
 
     # school
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
                              $school,$ref_sophomorix_config);
     # global
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,
+    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
                              $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
 
     # creating fileystem at last, because groups are needed beforehand for the ACL's 
@@ -3102,7 +3087,7 @@ sub AD_school_create {
 
 
 sub AD_create_school_groups {
-    my ($ldap,$root_dse,$root_dns,$creationdate,$smb_admin_pass,$school,$ref_sophomorix_config) = @_;
+    my ($ldap,$root_dse,$root_dns,$smb_admin_pass,$school,$ref_sophomorix_config) = @_;
     if ($school eq $DevelConf::AD_global_ou){
         foreach my $dn (keys %{$ref_sophomorix_config->{$DevelConf::AD_global_ou}{'GROUP_CN'}}) {
             # create ou for group
@@ -3121,7 +3106,6 @@ sub AD_create_school_groups {
                               description=>$description,
                               type=>$type,
                               status=>"P",
-                              creationdate=>$creationdate,
                               joinable=>"TRUE",
                               hidden=>"FALSE",
                               smb_admin_pass=>$smb_admin_pass,
@@ -3147,7 +3131,6 @@ sub AD_create_school_groups {
                               description=>$description,
                               type=>$type,
                               status=>"P",
-                              creationdate=>$creationdate,
                               joinable=>"TRUE",
                               hidden=>"FALSE",
                               smb_admin_pass=>$smb_admin_pass,
@@ -6681,7 +6664,6 @@ sub AD_group_create {
     my $description = $arg_ref->{description};
     my $school = $arg_ref->{school};
     my $type = $arg_ref->{type};
-    my $creationdate = $arg_ref->{creationdate};
     my $status = $arg_ref->{status};
     my $joinable = $arg_ref->{joinable};
     my $gidnumber_wish = $arg_ref->{gidnumber_wish};
@@ -6744,7 +6726,7 @@ sub AD_group_create {
         print "   Unix-gidNumber:  $gidnumber_wish\n";
         print "   Type:            $type\n";
         print "   Joinable:        $joinable\n";
-        print "   Creationdate:    $creationdate\n";
+        print "   Creationdate:    $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}\n";
         print "   Description:     $description\n";
         print "   File:            $file\n";
         print "   School:          $school\n";
@@ -6760,7 +6742,7 @@ sub AD_group_create {
                                     description => $description,
                                     sAMAccountName => $group,
                                     mail => $mail,
-                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
                                     sophomorixStatus => $status,
@@ -6787,7 +6769,7 @@ sub AD_group_create {
                                     description => $description,
                                     sAMAccountName => $group,
                                     mail => $mail,
-                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
                                     sophomorixStatus => $status,
@@ -6814,7 +6796,7 @@ sub AD_group_create {
                                     description => $description,
                                     sAMAccountName => $group,
                                     mail => $mail,
-                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
                                     sophomorixStatus => $status,
@@ -6841,7 +6823,7 @@ sub AD_group_create {
                                     description => $description,
                                     sAMAccountName => $group,
                                     mail => $mail,
-                                    sophomorixCreationDate => $creationdate, 
+                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
                                     sophomorixType => $type, 
                                     sophomorixSchoolname => $school, 
                                     sophomorixStatus => $status,
