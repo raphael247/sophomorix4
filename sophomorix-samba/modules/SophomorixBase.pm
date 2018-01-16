@@ -3539,7 +3539,6 @@ sub log_user_add {
     my $sam = $arg_ref->{sAMAccountName};
     my $role = $arg_ref->{sophomorixRole};
     my $school = $arg_ref->{sophomorixSchoolname};
-    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $lastname = $arg_ref->{lastname};
     my $firstname = $arg_ref->{firstname};
     my $adminclass = $arg_ref->{adminclass};
@@ -3547,7 +3546,8 @@ sub log_user_add {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    my $log_line="ADD::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".$time_stamp_AD."::".
+    my $log_line="ADD::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}."::".
                  $school."::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
                  $role."::".$unid."::\n";
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
@@ -3568,7 +3568,6 @@ sub log_user_update {
     my $unid = $arg_ref->{unid};
     my $school_old = $arg_ref->{school_old};
     my $school_new = $arg_ref->{school_new};
-#    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $update_log_string = $arg_ref->{update_log_string};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -3594,7 +3593,6 @@ sub log_user_kill {
     my $sam = $arg_ref->{sAMAccountName};
     my $role = $arg_ref->{sophomorixRole};
     my $school = $arg_ref->{sophomorixSchoolname};
-    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $lastname = $arg_ref->{lastname};
     my $firstname = $arg_ref->{firstname};
     my $adminclass = $arg_ref->{adminclass};
@@ -3603,7 +3601,8 @@ sub log_user_kill {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    my $log_line="KILL::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".$time_stamp_AD."::".
+    my $log_line="KILL::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}."::".
                  $school."::".$sam."::".$lastname."::".$firstname."::".$adminclass."::".
                  $role."::".$unid."::HOME_DELETED=".$home_delete_string."::\n";
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".

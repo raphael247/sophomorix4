@@ -760,7 +760,6 @@ sub AD_user_kill {
     my $max_user_count = $arg_ref->{max_user_count};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
-    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
@@ -832,7 +831,6 @@ sub AD_user_kill {
             # log the killing of a user 
             &Sophomorix::SophomorixBase::log_user_kill({sAMAccountName=>$user,
                                                         sophomorixRole=>$role_AD, 
-                                                        time_stamp_AD=>$time_stamp_AD,
                                                         home_delete_string=>$home_delete_string,
                                                         sophomorixSchoolname=>$school_AD,
                                                         firstname=>$firstname_utf8_AD,    
@@ -1431,6 +1429,15 @@ sub AD_user_create {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
+    my $creationdate_ok;
+    if (defined $creationdate){
+        $creationdate_ok=$creationdate;
+    } else {
+        $creationdate_ok=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
+    }
+
+
+
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
           "Creating user $user_count/$max_user_count : $login (start)");
@@ -1558,7 +1565,7 @@ sub AD_user_create {
         print "   Login (check OK):   $login\n";
         print "   Password:           $sophomorix_first_password\n";
         # sophomorix stuff
-        print "   Creationdate:       $creationdate\n";
+        print "   Creationdate:       $creationdate_ok\n";
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
@@ -1643,7 +1650,7 @@ sub AD_user_create {
                    sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'MAILQUOTA'}{'CALCULATED_DEFAULT'},
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
-                   sophomorixCreationDate => $creationdate, 
+                   sophomorixCreationDate => $creationdate_ok, 
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
@@ -1662,7 +1669,6 @@ sub AD_user_create {
         # log the killing of a user 
         &Sophomorix::SophomorixBase::log_user_add({sAMAccountName=>$login,
                                                    sophomorixRole=>$role, 
-                                                   time_stamp_AD=>$creationdate,
                                                    #home_delete_string=>$home_delete_string,
                                                    sophomorixSchoolname=>$school,
                                                    firstname=>$firstname_utf8,    
@@ -2506,7 +2512,6 @@ sub AD_user_move {
     my $role_new = $arg_ref->{role_new};
     my $filename_old = $arg_ref->{filename_old};
     my $filename_new = $arg_ref->{filename_new};
-    my $creationdate = $arg_ref->{creationdate};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -2587,7 +2592,6 @@ sub AD_user_move {
         print "   filename:          $filename\n";
         print "   homeDirectory:     $homedirectory_new\n";
         print "   unixHomeDirectory: $unix_home_new\n";
-        print "   Creationdate:      $creationdate (if new group must be added)\n";
     }
 
     # make sure OU and tree exists
