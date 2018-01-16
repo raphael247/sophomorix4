@@ -3568,14 +3568,15 @@ sub log_user_update {
     my $unid = $arg_ref->{unid};
     my $school_old = $arg_ref->{school_old};
     my $school_new = $arg_ref->{school_new};
-    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
+#    my $time_stamp_AD = $arg_ref->{time_stamp_AD};
     my $update_log_string = $arg_ref->{update_log_string};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
     $update_log_string=~s/,$//g;# remove trailing ,
-    my $log_line="UPDATE::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".$time_stamp_AD."::".
-                  $school_old."::".$school_new."::".$sam."::".$unid."::".$update_log_string."::\n";
+    my $log_line="UPDATE::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}."::".
+                 $school_old."::".$school_new."::".$sam."::".$unid."::".$update_log_string."::\n";
     my $logfile=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
 	$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_UPDATE'};
 

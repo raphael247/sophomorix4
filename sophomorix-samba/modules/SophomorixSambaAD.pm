@@ -1098,6 +1098,13 @@ sub AD_computer_create {
     my $display_name=$name;
     my $smb_name=$name."\$";
 
+    my $creationdate_ok;
+    if (defined $creationdate){
+        $creationdate_ok=$creationdate;
+    } else {
+        $creationdate_ok=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
+    }
+
     # sophomorixDnsNodename
     my $s_dns_nodename=$name;
     $s_dns_nodename=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
@@ -1183,7 +1190,7 @@ sub AD_computer_create {
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
                    sophomorixAdminFile => $filename,
-                   sophomorixCreationDate => $creationdate, 
+                   sophomorixCreationDate => $creationdate_ok, 
                    sophomorixDnsNodename => $s_dns_nodename, 
                    userAccountControl => '4096',
                    instanceType => '4',
@@ -1346,7 +1353,6 @@ sub AD_user_set_exam_mode {
                      max_user_count=>$max_user_count,
                      exammode=>$supervisor,
                      uac_force=>"disable",
-                     time_stamp_AD=> $date_now,
                      json=>$json,
                      sophomorix_config=>$ref_sophomorix_config,
                      sophomorix_result=>$ref_sophomorix_result,
@@ -1384,7 +1390,6 @@ sub AD_user_unset_exam_mode {
                      max_user_count=>$max_user_count,
                      exammode=>"---",
                      uac_force=>"enable",
-                     time_stamp_AD=> $date_now,
                      json=>$json,
                      sophomorix_config=>$ref_sophomorix_config,
                      sophomorix_result=>$ref_sophomorix_result,
@@ -2299,7 +2304,6 @@ sub AD_user_update {
     }
     print "Logging user update\n";
     &Sophomorix::SophomorixBase::log_user_update({sAMAccountName=>$user,
-                                                  time_stamp_AD=>$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
                                                   unid=>$unid_AD,
                                                   school_old=>$school_AD,
                                                   school_new=>$school,
@@ -2374,7 +2378,6 @@ sub AD_user_setquota {
                                      quota_info=>$hard_limit, # what was set
                                      user_count=>$user_count,
                                      max_user_count=>$max_user_count,
-                                     time_stamp_AD=> $time_stamp_AD,
                                      json=>$json,
                                      sophomorix_config=>$ref_sophomorix_config,
                                      sophomorix_result=>$ref_sophomorix_result,
@@ -2637,7 +2640,6 @@ sub AD_user_move {
     print "Logging user move\n";
     my $update_log_string="\"GROUP:".$group_old."->".$group_new.",ROLE:".$role_old."->".$role_new."\"";
     &Sophomorix::SophomorixBase::log_user_update({sAMAccountName=>$user,
-                                                  time_stamp_AD=>$creationdate,
                                                   unid=>$unid,
                                                   school_old=>$school_old,
                                                   school_new=>$school_new,
