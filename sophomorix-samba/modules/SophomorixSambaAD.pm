@@ -1332,7 +1332,6 @@ sub AD_user_set_exam_mode {
     my $supervisor = $arg_ref->{supervisor};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
-    my $date_now = $arg_ref->{date_now};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -1369,7 +1368,6 @@ sub AD_user_unset_exam_mode {
     my $participant = $arg_ref->{participant};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
-    my $date_now = $arg_ref->{date_now};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -7172,7 +7170,6 @@ sub AD_examuser_create {
     my $subdir = $arg_ref->{subdir};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
-    my $date_now = $arg_ref->{date_now};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -7228,7 +7225,6 @@ sub AD_examuser_create {
     my $file="---";
     my $unid="---";
     my $status=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_STATUS'};
-    my $creationdate=$date_now;
     my $tolerationdate=$DevelConf::default_date;
     my $deactivationdate=$DevelConf::default_date;
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
@@ -7249,7 +7245,7 @@ sub AD_examuser_create {
         print "   Status:             $status\n";
         print "   Login (check OK):   $examuser\n";
         # sophomorix stuff
-        print "   Creationdate:       $creationdate\n";
+        print "   Creationdate:       $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}\n";
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
@@ -7302,7 +7298,7 @@ sub AD_examuser_create {
                    sophomorixRole => "examuser",
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school_AD,
-                   sophomorixCreationDate => $creationdate, 
+                   sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
@@ -7338,7 +7334,6 @@ sub AD_examuser_kill {
     my $participant = $arg_ref->{participant};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
-    my $date_now = $arg_ref->{date_now};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};

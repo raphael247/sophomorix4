@@ -1847,6 +1847,7 @@ sub remove_from_list {
 }
 
 
+
 sub remove_whitespace {
     my ($string)=@_;
     $string=~s/^\s+//g;# remove leading whitespace
@@ -1858,38 +1859,12 @@ sub remove_whitespace {
 
 # time stamps
 ######################################################################
-# use this timestamp for the sophomorix-schema in AD
-sub obsolete_time_stamp_AD {
-  # 2016-04-04 21:51:44
-  #my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
-  #chomp($timestamp);
-  # 
-  # 20160429115500+0100   (YYYYMMDDHHMM+0x00, x is timezonediff)
-  # 20160429115500Z       for GMT/UTC
-  # 20160502194807Z
-  my $timestamp = `date --utc '+%Y%m%d%H%M%S'`;
-  chomp($timestamp);
-  $timestamp=$timestamp.".0Z";
-  return $timestamp;
-}
-
-
-
 sub ymdhms_to_date {
     my ($string)=@_;
     my ($ymdhms,$timezone)=split(/\./,$string);
     my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$ymdhms;
     my $date=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
     return $date;
-}
-
-
-
-# use this timestamp for filenames
-sub obsolete_time_stamp_file {
-   my $zeit = `date +%Y-%m-%d_%H-%M-%S`;
-   chomp($zeit);
-   return $zeit;
 }
 
 

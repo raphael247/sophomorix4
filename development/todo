@@ -83,22 +83,12 @@ $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}
    stattdessen sophomorix-config weitergeben, dann in der sub time_stamp_AD ersetzen
 $time_stamp_epoch in sophomorix-check weg
 
-obsolete funktion ins dust-bin
-
-
 creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
 
 
-OK: AD_user_update:
-    sophomorix_config übergibt schon die time_stamp_AD
-    time_stamp_AD braucht nicht mehr übergeben werden
-TODO: dito log_user_update
-TODO: und andere
-OK: backup_auk_file
-
-my $time_stamp_file=&time_stamp_file(); ersetzen
-
-OK: AD_school_create 
+  --> OK: AD_user_update:
+  --> OK: backup_auk_file
+  --> OK: AD_school_create 
   --> OK: AD_group_create
   --> OK: AD_create_school_groups
   --> OK: &AD_computer_create (immer aktuelles Datum)
@@ -107,15 +97,20 @@ OK: AD_school_create
   --> OK: log_user_update (immer aktuelles Datum)
   --> OK: log_user_kill (immer aktuelles Datum)
   --> OK: &AD_user_move (immer aktuelles Datum)
-  --> &AD_user_kill (immer aktuelles Datum)
-  --> &AD_user_create: !! muss noch mit alter Zeit gehen, migration !!!
+  --> OK: &AD_user_kill (immer aktuelles Datum)
+  --> OK: &AD_user_create: !! muss noch mit alter Zeit gehen, migration !!!
+  --> OK: &AD_user_set_exam_mode (immer aktuelles Datum)
+  --> OK: &AD_user_unset_exam_mode (immer aktuelles Datum)
+  --> OK: &AD_examuser_create (immer aktuelles Datum)
+  --> OK: &AD_examuser_kill (immer aktuelles Datum)
 
-      &AD_user_set_exam_mode (immer aktuelles Datum)
-      &AD_examuser_create (immer aktuelles Datum)
-      &AD_user_unset_exam_mode (immer aktuelles Datum)
-      &AD_examuser_kill (immer aktuelles Datum)
-
+TODO:
 log script start sollte Zeit auch aus sophomorix_config nehmen
+
+keine anderen time funktionen mehr: time,localtime
+grep " time" -r ./
+grep localtime -r ./
+
 
 Problem: local time and utc might be NOT 3600 seconds in difference
 --> Versuchen mit {'DATE'}{'LOCAL'} auszukommen
