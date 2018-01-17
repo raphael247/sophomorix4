@@ -7,10 +7,6 @@
 package Sophomorix::SophomorixBase;
 require Exporter;
 use File::Basename;
-#use Time::Local;
-#use Time::localtime;
-#use Quota;
-#use Sys::Filesystem ();
 use Time::Local;
 use Config::IniFiles;
 #use Unicode::GCString;
@@ -3448,7 +3444,7 @@ sub log_script_exit {
         $ref_result,     # reference to result hash
         $json,
         $ref_parameter,  # replacement parameter list for error scripts
-        $ref_sophomorix_config);
+        $ref_sophomorix_config)=@_;
 
     # log script exit uses its own time (calculate how long a script was running)
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;

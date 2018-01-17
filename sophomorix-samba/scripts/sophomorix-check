@@ -70,7 +70,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-my $time_stamp_epoch=time;
 my $user_count=0;
 
 my $school="";
@@ -970,10 +969,10 @@ sub test_T_DA_update{
         if($Conf::log_level>=2){
             print "    Toleration end: $toleration_end_epoch ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}",
                   " +  $toleration_time_days days)\n";
-            print "    Today:          $time_stamp_epoch\n";
+            print "    Today:          $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
         if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-            $time_stamp_epoch > $toleration_end_epoch){
+            $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch){
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
@@ -1023,11 +1022,11 @@ sub test_DL_RA_update{
         if($Conf::log_level>=2){
             print "    Deactivation end: $deactivation_end_epoch ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}",
                   " + $deactivation_time_days days)\n";
-            print "    Today:            $time_stamp_epoch\n";
+            print "    Today:            $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
         ########################################
         if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-            $time_stamp_epoch > $deactivation_end_epoch){
+            $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch){
             # update to R/put in kill-file  if 
             #     - not matched to a user in files
             #     - and deactivation time expired

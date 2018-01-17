@@ -64,8 +64,6 @@ use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
-use Time::Local;
-use Time::localtime;
 use Term::ANSIColor qw(:constants); # farbiger Text RED, BLUE, ...
 # nach jedem Printbefehl wieder auf Standardfarbe zurücksetzen
 $Term::ANSIColor::AUTORESET = 1;
@@ -130,9 +128,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 
 my @arguments = @ARGV;
-
-my $today=`date +%d.%m.%Y`;
-chomp($today);
 
 # ===========================================================================
 # Optionen verarbeiten
