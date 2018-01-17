@@ -56,69 +56,7 @@ sophomorix-kill/add:
 Test if its ok to run with 0 users the scripts (before script was terminated early)
 
 wohin wird geloggt
-
 ------------------------------------------------------------
-time zeugs:
-
-OK sophomorix-config has timestamps:
-
-Todo:
-replace in all scripts:
-my $time_stamp_file=&time_stamp_file();
-my $time_stamp_AD=&time_stamp_AD();
-my $time_stamp_epoch=time;
---> check if time is not needed BEFORE reading sophomorix_config
---> replace time conversions if possible
-
-Umgesetzt:
-
-
-
-$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
-$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}
-$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
-$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}
-
-   grepen nach DIESER neuen Variable und schauen in welchen sub sie weitergegeben wird
-   stattdessen sophomorix-config weitergeben, dann in der sub time_stamp_AD ersetzen
-$time_stamp_epoch in sophomorix-check weg
-
-creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}
-
-
-  --> OK: AD_user_update:
-  --> OK: backup_auk_file
-  --> OK: AD_school_create 
-  --> OK: AD_group_create
-  --> OK: AD_create_school_groups
-  --> OK: &AD_computer_create (immer aktuelles Datum)
-  --> OK: &AD_user_update (immer aktuelles Datum)
-  --> OK: log_user_add (immer aktuelles Datum)
-  --> OK: log_user_update (immer aktuelles Datum)
-  --> OK: log_user_kill (immer aktuelles Datum)
-  --> OK: &AD_user_move (immer aktuelles Datum)
-  --> OK: &AD_user_kill (immer aktuelles Datum)
-  --> OK: &AD_user_create: !! muss noch mit alter Zeit gehen, migration !!!
-  --> OK: &AD_user_set_exam_mode (immer aktuelles Datum)
-  --> OK: &AD_user_unset_exam_mode (immer aktuelles Datum)
-  --> OK: &AD_examuser_create (immer aktuelles Datum)
-  --> OK: &AD_examuser_kill (immer aktuelles Datum)
-
-TODO:
-
-keine anderen time funktionen mehr: time,localtime
-grep " time" -r ./
-grep localtime -r ./
-my $time_stamp_epoch=time;
-
-
-Problem: local time and utc might be NOT 3600 seconds in difference
---> Versuchen mit {'DATE'}{'LOCAL'} auszukommen
-UTC: ersetzen/auskommentieren
-später aufeinander aufbauen
-
-------------------------------------------------------------
-
 
 
 ------------------------------------------------------------
@@ -2351,6 +2289,13 @@ Later:
 * schoolname: a-z and 0-9 only, maximum length (regex configurable?)
 * hwk groups in sophomorix-device
 * man pages
+* UTC time
+  - nicht erzeugt in config_sophomorix_read (nur lokale Zeit)
+  - falls  Zeit neu eingelesen wird, wie im auskommentierten Teil von config_sophomorix_read,
+    dann kann es sein, dass UTC und LOCAL nicht exakt 3600,7200s auseinanderliegen
+    a) man braucht UTC garnicht -> nix tun
+    b) man bracht UTC NICHT entsprechend LOCAL -> einkommentieren, neu einlesen
+    c) man bracht UTC genau entsprechend LOCAL -> von der localtime ableiten
 * sophomorixAdminClass 
   - used by rooms, classes, ... better name: 
       sophomorixGroup            the group name

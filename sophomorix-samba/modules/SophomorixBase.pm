@@ -2129,21 +2129,21 @@ sub config_sophomorix_read {
 
     my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
                                                                 $DevelConf::secret_file_sophomorix_AD_admin);
-    # UTC Time
-    # all UTC time values are derived from the same date call
-    { 
-        my $time_stamp_AD_utc=`date --utc '+%Y%m%d%H%M%S'`;
-        chomp($time_stamp_AD_utc);
-        $time_stamp_AD_utc=$time_stamp_AD_utc.".0Z";
-        my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD_utc;
-        my $time_stamp_file_utc=$year."-".$month."-".$day."_".$hour."-".$minute."-".$second;
-        my $time_stamp_log_utc=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
-        my $epoch_utc=timelocal($second, $minute, $hour, $day , ($month-1), $year);
-        $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_AD'}=$time_stamp_AD_utc;
-        $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_FILE'}=$time_stamp_file_utc;
-        $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_LOG'}=$time_stamp_log_utc;
-        $sophomorix_config{'DATE'}{'UTC'}{'EPOCH'}=$epoch_utc;
-    }
+    # # UTC Time
+    # # all UTC time values are derived from the same date call
+    # { 
+    #     my $time_stamp_AD_utc=`date --utc '+%Y%m%d%H%M%S'`;
+    #     chomp($time_stamp_AD_utc);
+    #     $time_stamp_AD_utc=$time_stamp_AD_utc.".0Z";
+    #     my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD_utc;
+    #     my $time_stamp_file_utc=$year."-".$month."-".$day."_".$hour."-".$minute."-".$second;
+    #     my $time_stamp_log_utc=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
+    #     my $epoch_utc=timelocal($second, $minute, $hour, $day , ($month-1), $year);
+    #     $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_AD'}=$time_stamp_AD_utc;
+    #     $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_FILE'}=$time_stamp_file_utc;
+    #     $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_LOG'}=$time_stamp_log_utc;
+    #     $sophomorix_config{'DATE'}{'UTC'}{'EPOCH'}=$epoch_utc;
+    # }
 
     # LOCAL Time
     # all LOCAL time values are derived from the same date call
