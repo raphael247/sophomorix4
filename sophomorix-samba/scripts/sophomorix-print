@@ -190,7 +190,7 @@ Please see the sophomorix-print(8) man pages for full documentation
    exit;
 }
 
-&log_script_start(@arguments);
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 system("mkdir -p $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}");
 

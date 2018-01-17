@@ -8,7 +8,6 @@
 use strict;
 #use Quota;
 use Getopt::Long;
-#use Time::localtime;
 use Time::Local;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
@@ -360,7 +359,7 @@ if ($list_files==1) {
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-&log_script_start(\@arguments,\%sophomorix_result);
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 # --analyze-encoding
 # analyze one file

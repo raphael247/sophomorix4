@@ -2141,9 +2141,11 @@ sub config_sophomorix_read {
         $time_stamp_AD_utc=$time_stamp_AD_utc.".0Z";
         my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD_utc;
         my $time_stamp_file_utc=$year."-".$month."-".$day."_".$hour."-".$minute."-".$second;
+        my $time_stamp_log_utc=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
         my $epoch_utc=timelocal($second, $minute, $hour, $day , ($month-1), $year);
         $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_AD'}=$time_stamp_AD_utc;
         $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_FILE'}=$time_stamp_file_utc;
+        $sophomorix_config{'DATE'}{'UTC'}{'TIMESTAMP_LOG'}=$time_stamp_log_utc;
         $sophomorix_config{'DATE'}{'UTC'}{'EPOCH'}=$epoch_utc;
     }
 
@@ -2155,10 +2157,12 @@ sub config_sophomorix_read {
         $time_stamp_AD=$time_stamp_AD.".0Z";
         my ($year,$month,$day,$hour,$minute,$second)=unpack 'A4 A2 A2 A2 A2 A2',$time_stamp_AD;
         my $time_stamp_file=$year."-".$month."-".$day."_".$hour."-".$minute."-".$second;
+        my $time_stamp_log=$year."-".$month."-".$day." ".$hour.":".$minute.":".$second;
         my $epoch=timelocal($second, $minute, $hour, $day , ($month-1), $year);
-        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}=$time_stamp_AD;
-        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}=$time_stamp_file;
-        $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}=$epoch;
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}=$time_stamp_AD; # date format in AD
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}=$time_stamp_file; # date format filenames
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_LOG'}=$time_stamp_log; # date format for loglines
+        $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}=$epoch; # date format for calculation
     }
     #$sophomorix_config{'DATE'}{'EPOCH'}=time;
 
@@ -3316,16 +3320,14 @@ sub quota_listing_session_participant {
 ######################################################################
 sub log_script_start {
     my $stolen=0;
-#    my @arguments = @_;
-    my ($ref_arguments,$ref_result) = @_;
-    my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
-    chomp($timestamp);
+    my ($ref_arguments,$ref_result,$ref_sophomorix_config) = @_;
+
     my $skiplock=0;
     # scripts that are locking the system
-    my $log="${timestamp}::start::  $0";
-    my $log_locked="${timestamp}::locked:: $0";
+    my $log=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_LOG'}."::start::  $0";
+    my $log_locked=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_LOG'}."::locked:: $0";
     my $count=0;
-#    foreach my $arg (@arguments){
+
     foreach my $arg ( @{ $ref_arguments}  ){ 
         $count++;
         # count numbers arguments beginning with 1
@@ -3373,7 +3375,6 @@ sub log_script_start {
             # locking process nonexisting
 	    print "PID $locking_pid not running anymore\n";
 	    print "   I'm stealing the lockfile\n";
-#            $stolen=&lock_sophomorix("steal",$locking_pid,@arguments);
             $stolen=&lock_sophomorix("steal",$locking_pid,$ref_arguments);
             last;
         } else {
@@ -3391,17 +3392,16 @@ sub log_script_start {
     if (exists ${DevelConf::lock_scripts}{$0} 
            and $stolen==0
            and $skiplock==0){
-#	&lock_sophomorix("lock",0,@arguments);
 	&lock_sophomorix("lock",0,$ref_arguments);
     }
     &print_title("$0 started ...");
-    #&nscd_stop();
 }
 
 
 
 sub log_script_end {
     my ($ref_arguments,$ref_result,$ref_sophomorix_config,$json) = @_;
+    # log script end uses its own time (calculate how long a script was running)
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::end  ::  $0";
@@ -3440,30 +3440,17 @@ sub log_script_end {
 
 
 sub log_script_exit {
-    # 1) what to print to the log file/console
-    # (unused when return =!0)
-    my $message=shift;
-    # 2) return 0: normal end, return=1 unexpected end
-    # search with this value in errors.lang 
-    my $return=shift;
-    # 3) unlock (unused)
-    my $unlock=shift;
-    # 4) skiplock (unused)
-    my $skiplock=shift;
+    my ($message,        # what to print to the log file/console
+        $return,         # return 0: normal end, return=1 unexpected end
+        $unlock,         # unlock (unused)
+        $skiplock,       # skiplock (unused)
+        $ref_arguments,  # arguments of calling script
+        $ref_result,     # reference to result hash
+        $json,
+        $ref_parameter,  # replacement parameter list for error scripts
+        $ref_sophomorix_config);
 
-#    my @arguments = @_;
-#    my ($ref_arguments,$ref_result,$json,$ref_parameter) = @_;
-    # 5) arguments of calling script
-    my $ref_arguments=shift;
-    # 6) reference to result hsh
-    my $ref_result=shift;
-    # 7) $json option
-    my $json=shift;
-    # 8) replacement parameter list for error scripts
-    my $ref_parameter=shift;
-    # 9) config
-    my $ref_sophomorix_config=shift;
-
+    # log script exit uses its own time (calculate how long a script was running)
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
     chomp($timestamp);
     my $log="${timestamp}::exit ::  $0";
