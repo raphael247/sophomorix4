@@ -66,7 +66,7 @@ Bei hinzufügen eines users in ein gruppe, testen, ob die von richtigen typ ist
 Bespiel computer soll in die Gruppe 7a, sollte nicht gehen
 
 
-
+------------------------------------------------------------
 sophomorix user -i -u <login> ()
 sophomorix-user -u (ohne weitere option -i sollte den user anzeigen)
 --> und auch andere scripte 
@@ -79,6 +79,50 @@ nach help einsetzen
 @argv analysieren?
 - if ($user ne "" and $#ARGV=1 (2 optionen sonst nix) ){$info=1}
 evtl. sich noch von verbose/school und so weiter nicht beeindrucken lassen
+
+siehe Beispiel in sohomorix-minitest
+Es folgnde typen von optionen
+
+sophomorix-scripte die Objekt modifizieren:
+EINTEILUNG in (JEDE Option muss irgendwo drin sein)
+* MODIFIER (können ALLE optionen modifizieren)
+   json
+   verbose
+   school (if not data object)
+* SYSTEM (diese optionen ändern was am system)
+
+* DATA_PRIMARY (THE Object with wich it is done)
+   school (in sophomorix-school)
+   user
+   group
+
+* ACTION (what to do, depends on Data object)
+   --nomaillist 
+
+
+DEFAULT_NONOPTION (was passiert wenn keine option angegeben ist)
+   --> help         (diese wird gesetzt: z.B. sophomorix-user)
+   --> oder leer    (bleibt so: z.B. sophomorix-check)
+DEFAULT_ONLYOPTION
+ (was passiert wenn NUR (Ausnahme MODIFIER)
+  EINE bestimmte option angegeben wird?
+   user --> info (zusätzlich)
+   (wenn außer MODOFIER )
+
+SYSTEM_CONFLICT (diese optionen dürfen nicht zusammen mit CHANGE auftreten)
+   help
+   info
+
+DEPENDENCIES
+   password user
+
+Fehler wenn eine Option nirgends in diesen Gruppe auftaucht
+
+
+------------------------------------------------------------
+
+
+
 
 
 
