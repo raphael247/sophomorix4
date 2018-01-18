@@ -85,39 +85,64 @@ Es folgnde typen von optionen
 
 sophomorix-scripte die Objekt modifizieren:
 EINTEILUNG in (JEDE Option muss irgendwo drin sein)
-* MODIFIER (können ALLE optionen modifizieren)
-   json
-   verbose
-   school (if not data object)
-* SYSTEM (diese optionen ändern was am system)
+** MODIFIER (können ALLE optionen modifizieren)
+   json="TRUE"
+   verbose="TRUE"
+   school="TRUE" (if not data object)
+** ACTION_STANDALONE (mussen alleine aufgerufen (außer Modifiers) werden, --help, --listteachers, ....)
+   {'help'}="TRUE"
+   {'listteachers'}="TRUE"
 
-* DATA_PRIMARY (THE Object with wich it is done)
-   school (in sophomorix-school)
-   user
-   group
+** ACTION_OBJECTDEP (müssen mit einem OBJECT aufgerufen werden
+  (z.B. in --user <user> --comment <comm>) die option --coment <comm>)
+   {'comment'}=USER  (comment brauch USER Object)
+   
+** OBJECT (stellte ein Object bereit: --user <user>, --class <class>)
+   # Optionen, die user-OBJECTs bereitstellen
+   {user}{'USER'}
+   {group}{'USER'}
+   {all}{CLASSTYPE}
+   {adminclass}{CLASSTYPE}
+   USER,CLASS,...
 
-* ACTION (what to do, depends on Data object)
-   --nomaillist 
+** CONFLICTING (schließen sich gegenseitig aus)
+  {'CONFLICTING'}{'PASSWORD'}{password}
+  {'CONFLICTING'}{'PASSWORD'}{randompassword}
+
+** ACTION_STANDALONE_PAIRS (do not)
+  {'oldlogon'}{'newlogin'}
+ACTION_OBJECT_PAIRS (need an object)
+  {'?'}{'?'}
 
 
-DEFAULT_NONOPTION (was passiert wenn keine option angegeben ist)
+** DEFAULT_NONOPTION (was passiert wenn keine option angegeben ist)
    --> help         (diese wird gesetzt: z.B. sophomorix-user)
-   --> oder leer    (bleibt so: z.B. sophomorix-check)
-DEFAULT_ONLYOPTION
+** DEFAULT_ONLYOPTION
  (was passiert wenn NUR (Ausnahme MODIFIER)
   EINE bestimmte option angegeben wird?
    user --> info (zusätzlich)
    (wenn außer MODOFIER )
 
-SYSTEM_CONFLICT (diese optionen dürfen nicht zusammen mit CHANGE auftreten)
-   help
-   info
 
-DEPENDENCIES
-   password user
+TESTEN:
+# nicht-MODIFIER ermitteln -> speichern, Zählen
+# keine Option außer MODIFIER -> DEFAULT_NONOPTION
+  --> return
+# zusatzoptionen außer MODIFIER: DEFAULT_ONLYOPTION
+  --> return
+# ACTION_STANDALONE ohne andere OPTIONEN (außer MODIFIER)
+  --> return
+# ACTION_STANDALONE_PAIRS ... (außer MODIFIER)
+  --> return
 
-Fehler wenn eine Option nirgends in diesen Gruppe auftaucht
-
+# objecte:
+# welche Objekte werden bereitgestellt:
+  OBJECT durchgehen
+# sind die objecte für ACTION_OBJECTDEP da
+  --> weiter
+# conflicting: alle Namen durchgehen
+  Conflicte testen
+  --> return
 
 ------------------------------------------------------------
 
