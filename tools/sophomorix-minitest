@@ -60,7 +60,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_create
                                  AD_group_addmember
                                  AD_get_name_tokened
-                                 get_forbidden_logins
                                  AD_login_test
                                  AD_get_AD
                                  AD_repdir_using_file
@@ -73,8 +72,23 @@ use Sophomorix::SophomorixSambaAD qw(
 $Conf::log_level=1;
 my $help=0;
 
+
+# OK:
+# sophomorix-minitest -l 22
+# sophomorix-minitest --length 22 -w 30 --info
+# 
+my %opt = ();
+my $testopt=GetOptions (\%opt, 'length|l=i', 
+                               'width|w=i',
+                               'info|i',
+                       );    
+
+
+print Dumper (\%opt);
+
+
 # Parsen der Optionen
-my $testopt=GetOptions(
+my $testopt2=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "help|h" => \$help
           );
