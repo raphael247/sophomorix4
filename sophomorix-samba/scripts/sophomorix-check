@@ -62,7 +62,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_schoolname
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
-                                 AD_get_AD
                                  AD_get_AD_for_check
                                  AD_dns_get
                                  AD_object_search
@@ -617,19 +616,6 @@ if ($follow ne ""){
 # ============================================================
 &print_title("Searching AD for users ...");
 # fetch system data
-# my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-#                            root_dse=>$root_dse,
-#                            root_dns=>$root_dns,
-#                            computers=>"FALSE",
-#                            rooms=>"FALSE",
-#                            administratorclasses=>"TRUE",
-#                            users=>"TRUE",
-#                            dnszones=>"FALSE",
-#                            dnsnodes=>"FALSE",
-#                            sophomorix_config=>\%sophomorix_config,
-#              });
-
-
 my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                      root_dse=>$root_dse,
                                      root_dns=>$root_dns,
