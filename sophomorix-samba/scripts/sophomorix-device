@@ -542,6 +542,9 @@ my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
 
 
 #print Dumper( $ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'} );
+#print Dumper( $ref_AD_device->{'objectclassOLD'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'} );
+
+
 #print Dumper($ref_AD_device_old->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'});
 #exit;
 
@@ -1613,7 +1616,7 @@ sub analyze_device_line {
         my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
         $devices_file{'dnsZone'}{$dns_zone}=$filename;
 
-	print "   * Zone: $dns_zone needed\n";
+#???	print "   * Zone: $dns_zone needed\n";
 
         # dnsNode
         $devices_file{'dnsNode'}{$host_token}=$ip;
