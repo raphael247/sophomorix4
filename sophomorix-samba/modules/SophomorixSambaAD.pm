@@ -5630,7 +5630,7 @@ sub AD_get_full_userdata {
         if (-f $log_kill){
             open(KILL,"<$log_kill");
             while (<KILL>) {
-                my ($kill,$epoch,$date,$school,$login,$last,$first,$group,$role,$unid) = split(/::/);
+                my ($kill,$epoch,$date,$school,$login,$last,$first,$group,$role,$unid,$info) = split(/::/);
                 if ($login eq $user){
                     $anything_found++;
                     $users{'LOOKUP'}{'LOGUSERS'}{$user}{'FOUND'}="TRUE";
@@ -5638,7 +5638,12 @@ sub AD_get_full_userdata {
                         push @{ $users{'LISTS'}{'DELETED_USERS'} }, $user;
                     }
                     my $human_date=&Sophomorix::SophomorixBase::ymdhms_to_date($date);
-                    my $logline="KILL: $human_date  $login ($last, $first) in $group as $role";
+                    my $logline;
+                    if ($info eq "MIGRATED"){
+                        $logline="KILL: $human_date  $login ($last, $first), MIGRATED";
+                    } else {
+                        $logline="KILL: $human_date  $login ($last, $first) in $group as $role";
+                    }
                     push @{ $users{'USERS'}{$user}{'HISTORY'}{'LIST_by_EPOCH'} },$epoch ;
                     $users{'USERS'}{$user}{'HISTORY'}{'EPOCH'}{$epoch}=$logline;
                 }
