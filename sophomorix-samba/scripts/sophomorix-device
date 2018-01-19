@@ -521,17 +521,17 @@ if ($dns_show==1 or $dns_kill==1){
 &print_title("Asking the system for Computers and DNS data ...");
 
 # fetch system data
-my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-                           root_dse=>$root_dse,
-                           root_dns=>$root_dns,
-                           computers=>"TRUE",
-                           rooms=>"TRUE",
-                           #examaccounts=>"TRUE",
-                           dnszones=>"TRUE",
-                           dnsnodes=>"TRUE",
-                           sophomorix_config=>\%sophomorix_config,
-             });
-my %AD= %$ref_AD; 
+my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  computers=>"TRUE",
+                                  rooms=>"TRUE",
+                                  #examaccounts=>"TRUE",
+                                  dnszones=>"TRUE",
+                                  dnsnodes=>"TRUE",
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+
 
 # /etc/linuxmuster/classroom
 # ?????????????????????????
@@ -543,7 +543,8 @@ if ($dump_AD==1){
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
-                hash_ref=>\%AD,
+#                hash_ref=>\%AD,
+                hash_ref=>$ref_AD_device,
                 sophomorix_config=>\%sophomorix_config,
                });
 }
@@ -768,7 +769,7 @@ foreach my $device_file (@filelist){
 ############################################################################
 
 # # ExamAccounts to kill
-# foreach my $examaccount (keys %{$AD{'objectclass'}{'user'}{'examaccount'}}) {
+# foreach my $examaccount (keys %{$ref_AD_device->{'objectclass'}{'user'}{'examaccount'}}) {
 #     if (not exists $devices_file{'device'}{$examaccount}){
 #         # host is not in file anymore
 #         &push_kill_examaccount($examaccount);
@@ -778,7 +779,7 @@ foreach my $device_file (@filelist){
 
 # # ExamAccounts to add
 # foreach my $examaccount (keys %{$devices_file{'device'}}) {
-#     if (not exists $AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
+#     if (not exists $ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
 #         # host is not in system
 #         # examaccounts only for classroom devices and 
 #         my $room=$devices_file{'device'}{$examaccount}{'ROOM'};
@@ -789,22 +790,22 @@ foreach my $device_file (@filelist){
 #         }
 #     } else {
 #         # device is not in correct room -> update (kill and add)
-#         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
+#         if ($ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
 #             $devices_file{'device'}{$examaccount}{'ROOM'}){
 #             if($Conf::log_level>=2){
 # 	        print "$examaccount: Changed room from ",
-#                       "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
+#                       "$ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
 #                       " to $devices_file{'device'}{$examaccount}{'ROOM'}\n";
 #             }
 #             &push_kill_examaccount($examaccount);
 #             &push_add_examaccount($examaccount);
 #         }
 #         # sophomorixAdminFile ist not correct
-#         if ($AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'} ne 
+#         if ($ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'} ne 
 #             $devices_file{'device'}{$examaccount}{'FILENAME'}){
 #             if($Conf::log_level>=2){
 # 	        print "$examaccount: Was moved from file ",
-#                       "$AD{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'}",
+#                       "$ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'}",
 #                       " to $devices_file{'device'}{$examaccount}{'FILENAME'}\n";
 #             }
 #             &push_kill_examaccount($examaccount);
@@ -817,7 +818,7 @@ foreach my $device_file (@filelist){
 
 
 # # ExamAccount rooms to kill
-# foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
+# foreach my $room (keys %{$ref_AD_device->{'objectclass'}{'group'}{'room'}}) {
 #     if (not exists $devices_file{'room'}{$room}){
 #         # host is not in file anymore
 #         &push_kill_examaccount_room($room);
@@ -826,7 +827,7 @@ foreach my $device_file (@filelist){
 
 
 # computer rooms to kill
-foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
+foreach my $room (keys %{$ref_AD_device->{'objectclass'}{'group'}{'room'}}) {
     if (not exists $devices_file{'room'}{$room}){
         # host is not in file anymore
         &push_kill_computer_room($room);
@@ -835,7 +836,7 @@ foreach my $room (keys %{$AD{'objectclass'}{'group'}{'room'}}) {
 
 
 # computers to kill
-foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
+foreach my $computer (keys %{$ref_AD_device->{'objectclass'}{'computer'}{'computer'}}) {
     if (not exists $devices_file{'computer'}{$computer}){
         # host is not in file anymore
         &push_kill_computer($computer);
@@ -845,7 +846,7 @@ foreach my $computer (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
 
 # computers to add
 foreach my $computer (keys %{$devices_file{'computer'}}) {
-    if (not exists $AD{'objectclass'}{'computer'}{'computer'}{$computer} ){
+    if (not exists $ref_AD_device->{'objectclass'}{'computer'}{'computer'}{$computer} ){
         # nonexisting --> add account
         &push_add_computer($computer);
     }
@@ -853,7 +854,7 @@ foreach my $computer (keys %{$devices_file{'computer'}}) {
 
 
 # dnsNodes to kill
-foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
+foreach my $dnsnode (keys %{$ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
     if (not exists $devices_file{'dnsNode'}{$dnsnode}){
         # host is not in file anymore
         &push_kill_dnsnode($dnsnode);
@@ -864,11 +865,11 @@ foreach my $dnsnode (keys %{$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_p
 
 # dnsNodes to add
 foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
-    if (not exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
+    if (not exists $ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
         # nonexisting --> add account
         &push_add_dnsnode($dnsnode);
-    } elsif (exists $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
-        my $ip_system=$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'IPv4'};
+    } elsif (exists $ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
+        my $ip_system=$ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'IPv4'};
         my $ip_file=$devices_file{'dnsNode'}{$dnsnode};
         if ($ip_system ne $ip_file){
             # recreate dns entry
@@ -886,7 +887,7 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 
 
 # dnsZones to kill
-foreach my $dnszone (keys %{$AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
+foreach my $dnszone (keys %{$ref_AD_device->{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
     if (not exists $devices_file{'dnsZone'}{$dnszone}){
         # dns node is not needed anymore, no host
         &push_kill_dnszone($dnszone);
@@ -897,7 +898,7 @@ foreach my $dnszone (keys %{$AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_p
 
 # dnsZones to add
 foreach my $dnszone (keys %{$devices_file{'dnsZone'}}) {
-    if (not exists $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dnszone} ){
+    if (not exists $ref_AD_device->{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dnszone} ){
         # nonexisting --> add dnszone
         &push_add_dnszone($dnszone);
     }
@@ -1220,9 +1221,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         &AD_dns_kill({ldap=>$ldap, 
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
-                      dns_zone=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'dnsZone'},
+                      dns_zone=>$ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'dnsZone'},
                       dns_node=>$dns_node,
-                      dns_ipv4=>$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'},
+                      dns_ipv4=>$ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'},
                       smb_pwd=>$smb_admin_pass,
                     });
         $dns_node_count++;
@@ -1292,7 +1293,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 # ===========================================================================
 if ($set_computer_passwords==1){
     print "Setting password for all Computer accounts:\n";
-    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+    my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            computers=>"TRUE",
@@ -1304,7 +1305,7 @@ if ($set_computer_passwords==1){
              });
 
     my $count=1;
-    foreach my $comp (keys %{$AD{'objectclass'}{'computer'}{'computer'}}) {
+    foreach my $comp (keys %{$ref_AD_device->{'objectclass'}{'computer'}{'computer'}}) {
         my $pw;
         if ($password ne ""){
             # password by option
