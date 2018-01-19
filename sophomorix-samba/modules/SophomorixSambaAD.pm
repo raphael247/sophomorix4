@@ -62,6 +62,7 @@ $Data::Dumper::Terse = 1;
             AD_object_search
             AD_get_AD
             AD_get_AD_for_check
+            AD_get_AD_for_device
             AD_get_ui
             AD_get_quota
             AD_get_users_v
@@ -1068,6 +1069,7 @@ sub AD_get_devices {
              });
     return $ref_AD
 }
+
 
 
 sub AD_computer_create {
@@ -4481,6 +4483,200 @@ sub AD_get_AD_for_check {
 
 
 
+sub AD_get_AD_for_device {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my %AD=();
+    &Sophomorix::SophomorixBase::print_title("Query AD for device (start)");
+    ############################################################
+    # sophomorix computers from ldap
+    {
+    my $filter="(&(objectClass=computer)(sophomorixRole=".
+       $ref_sophomorix_config->{'INI'}{'ROLE'}{'COMPUTER'}."))";
+    my $mesg = $ldap->search( # perform a search
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attrs => ['sAMAccountName',
+                                'sophomorixSchoolPrefix',
+                                'sophomorixSchoolname',
+                                'sophomorixAdminFile',
+                                'sophomorixAdminClass',
+                                'sophomorixRole',
+                                'sophomorixDnsNodename',
+                               ]);
+    my $max_user = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
+    $AD{'RESULT'}{'computer'}{'computer'}{'COUNT'}=$max_user;
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $prefix=$entry->get_value('sophomorixSchoolPrefix');
+        my $role=$entry->get_value('sophomorixRole');
+        my $sn=$entry->get_value('sophomorixSchoolname');
+        my $file=$entry->get_value('sophomorixAdminFile');
+        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixRole'}=$role;
+        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
+        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixDnsNodename'}=
+            $entry->get_value('sophomorixDnsNodename');
+        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminClass'}=
+            $entry->get_value('sophomorixAdminClass');
+        # lists
+        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+
+        #$AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
+        #$AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
+
+        #my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
+        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
+        #           {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
+        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, $sam;  
+    }
+    }
+    ############################################################
+    # sophomorix rooms from ldap
+    {
+    my $filter="(&(objectClass=group)(sophomorixType=".
+       $ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}."))";
+    $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                   attrs => ['sAMAccountName',
+                             'sophomorixStatus',
+                             'sophomorixSchoolname',
+                             'sophomorixType',
+                            ]);
+    my $max_room = $mesg->count; 
+    &Sophomorix::SophomorixBase::print_title("$max_room sophomorix Rooms found in AD");
+    $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=$max_room;
+    for( my $index = 0 ; $index < $max_room ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $type=$entry->get_value('sophomorixType');
+        my $stat=$entry->get_value('sophomorixStatus');
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
+        $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
+        $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
+        $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+        # lists
+        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+        #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
+    }
+    }
+
+    ############################################################
+    # sophomorix dnzones and default Zone from ldap from ldap
+    {
+        my $filter="(objectClass=dnsZone)";
+        my $base="DC=DomainDnsZones,".$root_dse;
+        $mesg = $ldap->search( # perform a search
+                       base   => $base,
+                       scope => 'sub',
+                       filter => $filter,
+                       attrs => ['name',
+                                 'dc',
+                                 'dnsZone',
+                                 'adminDescription',
+                                ]);
+        my $max_zone = $mesg->count; 
+        my $sopho_max_zone=$max_zone;
+        my $other_max_zone=0;
+        &Sophomorix::SophomorixBase::print_title("$max_zone dnsZones found");
+        for( my $index = 0 ; $index < $max_zone ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $zone=$entry->get_value('dc');
+            my $name=$entry->get_value('name');
+            my $desc=$entry->get_value('adminDescription');
+            if($Conf::log_level>=2){
+                print "   * ",$entry->get_value('dc'),"\n";
+            }
+            if (not defined $desc){$desc=""};
+            if ($desc=~ m/^${DevelConf::dns_zone_prefix_string}/ or
+                $name eq $root_dns){
+                # shophomorix dnsZone or default dnsZone
+                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
+                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
+                #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'sophomorixdnsZone'} }, $zone;
+            } else {
+                # other dnsZone
+		$sopho_max_zone=$sopho_max_zone-1;
+                $other_max_zone=$other_max_zone+1;
+                $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
+                $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
+                #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'otherdnsZone'} }, $zone;
+            }
+        }
+        #$AD{'RESULT'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
+        #$AD{'RESULT'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
+    }
+
+    ############################################################
+    # sophomorix dnsNodes from ldap (by dnsZone ????)
+    {
+        # go through all dnsZones
+        foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string} }) {
+            my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
+                &AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
+            my $base_hosts=$dn_dns_zone;
+            my $res   = Net::DNS::Resolver->new;
+            my $filter="(&(objectClass=dnsNode)(adminDescription=".
+                         $DevelConf::dns_node_prefix_string.
+                       "*))";
+            $mesg = $ldap->search( # perform a search
+                           base   => $base_hosts,
+                           scope => 'sub',
+                           filter => $filter,
+                           attrs => ['dc',
+                                     'dnsRecord',
+                                     'adminDescription',
+                                 ]);
+            my $max_node = $mesg->count; 
+            &Sophomorix::SophomorixBase::print_title(
+               "$max_node sophomorix dnsNodes found in AD");
+            for( my $index = 0 ; $index < $max_node ; $index++) {
+                my $entry = $mesg->entry($index);
+                my $dc=$entry->get_value('dc');
+                # get ip from dns, because in AD its binary (last 4 Bytes)
+
+                my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+                if ($ip eq "NXDOMAIN"){
+                    next;
+                }
+                my $record=$entry->get_value('dnsRecord');
+                my $desc=$entry->get_value('adminDescription');
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
+                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=$desc;
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
+                if($Conf::log_level>=2){
+                    print "   * $dc\n";
+                }
+            }
+            if (defined $dc){ 
+                $AD{'RESULT'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
+	    }
+        }
+
+
+
+    }
+
+    &Sophomorix::SophomorixBase::print_title("Query AD for device (end)");
+    return(\%AD);
+}
+
+
+ 
 sub AD_get_ui {
     my %ui=();
     my $ref_ui=\%ui;

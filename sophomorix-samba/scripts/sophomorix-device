@@ -115,6 +115,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_schoolname
                                  AD_get_name_tokened
                                  AD_get_AD
+                                 AD_get_AD_for_device
                                  AD_object_search
                                  AD_user_kill
                                  AD_computer_kill
@@ -520,18 +521,29 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 &print_title("Asking the system for Computers and DNS data ...");
 
-# fetch system data
-my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
-                                  root_dse=>$root_dse,
-                                  root_dns=>$root_dns,
-                                  computers=>"TRUE",
-                                  rooms=>"TRUE",
-                                  #examaccounts=>"TRUE",
-                                  dnszones=>"TRUE",
-                                  dnsnodes=>"TRUE",
-                                  sophomorix_config=>\%sophomorix_config,
-                                });
+my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                            root_dse=>$root_dse,
+                                            root_dns=>$root_dns,
+                                            sophomorix_config=>\%sophomorix_config,
+                                          });
 
+
+# fetch system data (OLD)
+#my ($ref_AD_device_old) = &AD_get_AD({ldap=>$ldap,
+#                                  root_dse=>$root_dse,
+#                                  root_dns=>$root_dns,
+#                                  computers=>"TRUE",
+#                                  rooms=>"TRUE",
+#                                  #examaccounts=>"TRUE",
+#                                  dnszones=>"TRUE",
+#                                  dnsnodes=>"TRUE",
+#                                  sophomorix_config=>\%sophomorix_config,
+#                                });
+
+
+#print Dumper( $ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'} );
+#print Dumper($ref_AD_device_old->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'});
+#exit;
 
 # /etc/linuxmuster/classroom
 # ?????????????????????????

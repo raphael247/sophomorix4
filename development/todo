@@ -43,15 +43,54 @@ und in SophomorixSamba_AD ????
 
 --> auftrennen in 3 einzelne sub, performanceoptimiert?
 OK: sophomorix-check
+
+PERFORMANCE:
 Todo: sophomorix-device
 After Migration: 
    6,2 Sekunden um zu prüfen
+   sophomorix-device -i 
+   10,6 sekunden (dito wie oben nur plus Ausgabe)
    Hash Kopie ersetzen mit ref
    --> 6,0 sekunden
+ 
+
+     AD_get_devices (in SophomorixSamba ganz löschen)
+     AD_get_AD
+
+beide ersetzen durch performantes
+
+AD_get_AD_for_devive (analog zu AD_get_AD_for_check)
 
 
+AD_get_AD macht:
 
-Todo: sophomorix-repair
+OK:computers:
+my $filter="(&(objectClass=computer)(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE'}{'COMPUTER'}."))";
+
+OK: rooms
+my $filter="(&(objectClass=group)(sophomorixType=".
+           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}."))";
+
+dnszones:
+my $base_zones="DC=DomainDnsZones,".$root_dse;
+my $filter_zone="(objectClass=dnsZone)";
+
+dnsnodes
+jede dnszone durchgehen --> für jeden Raum eine Schleife, suchen (vermeiden!!!)
+BESSER: kann man nicht alle dnsnodes abfragen und dann einsortieren
+
+Mit dem $ref_AD_device hash macht man folgendes:
+
+keys %{$ref_AD_device->{'objectclass'}{'group'}{'room'}}
+keys %{$ref_AD_device->{'objectclass'}{'computer'}{'computer'}}
+keys %{$ref_AD_device->{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string} 
+          --> darunter die dnsnodes
+
+Todo: sophomorix-repair, performance ohne AD_get_AD
+
+reduce the collected data, rooms you filter for rooms, then you do not need to save the type
+... more to reduce if it performs better
 
 
 
