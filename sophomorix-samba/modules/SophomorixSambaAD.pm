@@ -42,7 +42,6 @@ $Data::Dumper::Terse = 1;
             AD_user_setquota
             AD_get_user
             AD_get_group
-            AD_get_devices
             AD_computer_create
             AD_computer_kill
             AD_user_move
@@ -1048,26 +1047,6 @@ sub AD_group_kill {
        print "   * Group $group nonexisting ($count results)\n";
        return;
     }
-}
-
-
-
-sub AD_get_devices {
-    my ($arg_ref) = @_;
-    my $ldap = $arg_ref->{ldap};
-    my $root_dse = $arg_ref->{root_dse};
-    my $root_dns = $arg_ref->{root_dns};
-    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-                               root_dse=>$root_dse,
-                               root_dns=>$root_dns,
-                               computers=>"TRUE",
-                               rooms=>"TRUE",
-                               dnszones=>"TRUE",
-                               dnsnodes=>"TRUE",
-                               sophomorix_config=>$ref_sophomorix_config,
-             });
-    return $ref_AD
 }
 
 
@@ -4531,7 +4510,7 @@ sub AD_get_AD_for_device {
         #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
 
         #$AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
-        #$AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
+        $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
 
         #my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
         #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
@@ -4643,7 +4622,8 @@ sub AD_get_AD_for_device {
             my $dn=$entry->dn();
             my $dc=$entry->get_value('dc');
             my $desc=$entry->get_value('adminDescription');
-            #print "DN:    $dn\n";
+            # dnsZone could be extracted from DN
+            # print "DN:    $dn\n";
             #print "   DC: $dc\n";
             #print "   root_dns: $root_dns\n";
 
@@ -4660,6 +4640,9 @@ sub AD_get_AD_for_device {
             $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
             $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=
                 $entry->get_value('adminDescription');
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
+
+
         }
     }
 

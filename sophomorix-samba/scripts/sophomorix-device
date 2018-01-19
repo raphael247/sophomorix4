@@ -107,14 +107,12 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_user_create
-                                 AD_get_devices
                                  AD_computer_create
                                  AD_group_create
                                  AD_group_kill
                                  AD_group_addmember
                                  AD_get_schoolname
                                  AD_get_name_tokened
-                                 AD_get_AD
                                  AD_get_AD_for_device
                                  AD_object_search
                                  AD_user_kill
@@ -522,12 +520,10 @@ if ($dns_show==1 or $dns_kill==1){
 &print_title("Asking the system for Computers and DNS data ...");
 
 my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-                                            root_dse=>$root_dse,
-                                            root_dns=>$root_dns,
-                                            sophomorix_config=>\%sophomorix_config,
-                                          });
-
-
+                                             root_dse=>$root_dse,
+                                             root_dns=>$root_dns,
+                                             sophomorix_config=>\%sophomorix_config,
+                                           });
 # fetch system data (OLD)
 #my ($ref_AD_device_old) = &AD_get_AD({ldap=>$ldap,
 #                                  root_dse=>$root_dse,
@@ -696,13 +692,12 @@ if ($print==1){
 
 
 if ($info==1){
-    my $ref_devices=&AD_get_devices({ldap=>$ldap,
-                                 root_dse=>$root_dse,
-                                 root_dns=>$root_dns,
-                                 json=>$json,
-                                 sophomorix_config=>\%sophomorix_config,
-                               });
-#$ldap,$root_dse,$root_dns,$json,\%sophomorix_config);
+    my ($ref_devices) = &AD_get_AD_for_device({ldap=>$ldap,
+                                               root_dse=>$root_dse,
+                                               root_dns=>$root_dns,
+                                               sophomorix_config=>\%sophomorix_config,
+                                             });
+
     my $jsoninfo="DEVICES";
     my $jsoncomment="The sophomorix devices";
     &json_dump({json => $json,
@@ -1308,17 +1303,21 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 # ===========================================================================
 if ($set_computer_passwords==1){
     print "Setting password for all Computer accounts:\n";
-    my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
-                           root_dse=>$root_dse,
-                           root_dns=>$root_dns,
-                           computers=>"TRUE",
-                           #rooms=>"TRUE",
-                           #examaccounts=>"TRUE",
-                           dnszones=>"TRUE",
-                           dnsnodes=>"TRUE",
-                           sophomorix_config=>\%sophomorix_config,
-             });
-
+    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                 root_dse=>$root_dse,
+                                                 root_dns=>$root_dns,
+                                                 sophomorix_config=>\%sophomorix_config,
+                                               });
+    # my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
+    #                        root_dse=>$root_dse,
+    #                        root_dns=>$root_dns,
+    #                        computers=>"TRUE",
+    #                        #rooms=>"TRUE",
+    #                        #examaccounts=>"TRUE",
+    #                        dnszones=>"TRUE",
+    #                        dnsnodes=>"TRUE",
+    #                        sophomorix_config=>\%sophomorix_config,
+    #          });
     my $count=1;
     foreach my $comp (keys %{$ref_AD_device->{'objectclass'}{'computer'}{'computer'}}) {
         my $pw;
