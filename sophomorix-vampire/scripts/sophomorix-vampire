@@ -1093,15 +1093,16 @@ sub killog_rewrite {
                 and $items[4] ne "Computer"
                 and $items[4] ne "Account"){
                 my $date_ad=$year.$month.$day."000000.0Z";
-                $new_line="KILL::".$items[2]."::".
+                $new_line="KILL::".$epoch."::".
+                      $date_ad."::".
+                      "---::".
+                      $items[2]."::".
                       $items[4]."::".
                       $items[5]."::".
                       "---::".
                       "---::".
                       "---::".
-                      $date_ad."::".
-                      $epoch."::".
-                      "---::---::".
+                      "MIGRATED::".
                       "\n";
                 print OUT "$new_line";
             }
