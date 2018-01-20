@@ -3192,8 +3192,6 @@ sub AD_get_sessions {
             $filter=$filter."(sophomorixType=".$grouptype.")";
         }
         $filter=$filter." ) )";
-	#print "FILTER: $filter\n";
-
         my $mesg = $ldap->search( # perform a search
                           base   => $root_dse,
                           scope => 'sub',
