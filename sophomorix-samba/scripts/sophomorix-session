@@ -249,6 +249,7 @@ if ($kill_all_sessions==1){
                             kill=>"TRUE",
                             create=>"FALSE",
                             sessions_ref=>\%sessions,
+                            sophomorix_config=>\%sophomorix_config,
                         });
     }
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -264,6 +265,7 @@ if ($session ne "" and $kill==1){
                         kill=>"TRUE",
                         create=>"FALSE",
                         sessions_ref=>\%sessions,
+                        sophomorix_config=>\%sophomorix_config,
                     });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
@@ -281,6 +283,7 @@ if ($create==1 and $supervisor ne ""){
                         kill=>"FALSE",
                         developer_session=>$developer_session,
                         sessions_ref=>\%sessions,
+                        sophomorix_config=>\%sophomorix_config,
                     });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
@@ -298,6 +301,7 @@ if ($session ne "" and $participants ne ""){
                         session=>$session,
                         participants=>$participants,
                         sessions_ref=>\%sessions,
+                        sophomorix_config=>\%sophomorix_config,
                     });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
@@ -315,6 +319,7 @@ if ($session ne "" and $comment ne ""){
                         session=>$session,
                         comment=>$comment,
                         sessions_ref=>\%sessions,
+                        sophomorix_config=>\%sophomorix_config,
                     });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
@@ -336,6 +341,7 @@ if ($session ne "" and $add_participants ne ""){
                         session=>$session,
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
+                        sophomorix_config=>\%sophomorix_config,
                     });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
@@ -356,6 +362,7 @@ if ($session ne "" and $remove_participants ne ""){
                         session=>$session,
                         participants=>$participants_new,
                         sessions_ref=>\%sessions,
+                        sophomorix_config=>\%sophomorix_config,
                     });
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
