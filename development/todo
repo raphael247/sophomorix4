@@ -46,8 +46,27 @@ TODO Code cleanup
     * _console_print_devices
       schulweises auflisten der devices, evtl getrennt nach Rollen
 
-AD_get_sessions:
+AD_get_sessions: dauert 1,2 Sekunden um nur 3 sessions anzuzeigen
 nicht mehr AD_get_AD nutzen, sondern eigene sub AD_get_AD_for_sessions schreiben
+
+AD_get_AD wird in AD_get_sessions gebrauch für:
+- managementgroups
+
+
+NEU: nur 1 Abfrage statt für jede managementgoup eine:
+
+aus 
+
+foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
+
+OK: filter Aufbauen, sodass alle managementgroups gefunden werden
+
+Code cleanup:
+
+
+
+
+
 
 
 

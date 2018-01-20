@@ -3184,19 +3184,70 @@ sub AD_object_search {
 sub AD_get_sessions {
     my ($ldap,$root_dse,$root_dns,$json,$show_session,$smb_admin_pass,$ref_sophomorix_config)=@_;
     my %sessions=();
+    my %management=();
     my $session_count=0;
-    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-                               root_dse=>$root_dse,
-                               root_dns=>$root_dns,
-                               computers=>"FALSE",
-                               rooms=>"FALSE",
-                               management=>"TRUE",
-                               users=>"FALSE",
-                               dnszones=>"FALSE",
-                               dnsnodes=>"FALSE",
-                               sophomorix_config=>$ref_sophomorix_config,
-                  });
-#    my $filter="(&(objectClass=user)(sophomorixRole=*))";
+#    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
+#                               root_dse=>$root_dse,
+#                               root_dns=>$root_dns,
+#                               computers=>"FALSE",
+#                               rooms=>"FALSE",
+#                               management=>"TRUE",
+#                               users=>"FALSE",
+#                               dnszones=>"FALSE",
+#                               dnsnodes=>"FALSE",
+#                               sophomorix_config=>$ref_sophomorix_config,
+#                  });
+
+    #print Dumper($ref_AD->{'objectclass'}{'group'}{'internetaccess'});
+    {
+	my $filter="(& (objectClass=group) (| ";
+        foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
+            $filter=$filter."(sophomorixType=".$grouptype.")";
+        }
+        $filter=$filter." ) )";
+	#print "FILTER: $filter\n";
+
+        my $mesg = $ldap->search( # perform a search
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attrs => ['sAMAccountName',
+                                  'sophomorixSchoolname',
+                                  'sophomorixStatus',
+                                  'sophomorixType',
+                                  'member',
+                                 ]);
+        my $max_mangroups = $mesg->count;
+        &Sophomorix::SophomorixBase::print_title("$max_mangroups managementgroups found in AD");
+        for( my $index = 0 ; $index < $max_mangroups ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            #$management{'managementgroup'}{$type}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+            $management{'managementgroup'}{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            @{ $management{'managementgroup'}{$type}{$sam}{'member'} }=$entry->get_value('member');
+
+            # fetching members
+        #    my @members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"member");
+        #     foreach my $member (@members){
+        #         my ($cn,@rest)=split(/,/,$member);
+        #         my $user=$cn;
+        #         $user=~s/^CN=//;
+        #         #print "$sam: <$user> $cn  --- $member\n";
+        #         $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'members'}{$user}=$member;
+        #         push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'internetaccess'} }, $member;
+        #         push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'internetaccess'} }, $member;
+        #     }
+
+        }
+    } 
+       #print Dumper(\%management);
+
+#exit;
+
+    # 
     my $filter="(&(objectClass=user)(sophomorixSessions=*)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -3358,8 +3409,10 @@ sub AD_get_sessions {
                         $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                  {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
-                        foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
-                           if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}){
+#                        foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
+#                           if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}){
+                        foreach my $group (keys %{$management{'managementgroup'}{$grouptype}}) {
+                           if (exists $management{'managementgroup'}{$grouptype}{$group}{'members'}{$participant}){
                                 # if in the groups, set TRUE
                                 $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="TRUE";
                                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
