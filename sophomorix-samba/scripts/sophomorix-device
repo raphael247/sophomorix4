@@ -252,6 +252,9 @@ my @killing_dnszones=();
 my @adding_dnsnodes=();
 my @killing_dnsnodes=();
 
+my @adding_hardwareclasses=();
+
+
 my %pxe = qw(ml ok
             );
 
@@ -917,6 +920,19 @@ foreach my $dnszone (keys %{$devices_file{'dnsZone'}}) {
 }
 
 
+# hardwareclasses to create
+foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
+    print "HERE: $hwk\n";
+    if (not exists $ref_AD_device->{'hardwareclass'}{$hwk} ){
+       # nonexisting --> add dnszone
+	print "push add hwk $hwk\n";
+       &push_add_hardwareclass($hwk);
+    }
+}
+
+
+
+
 
 
 # --dump-files
@@ -1004,6 +1020,16 @@ if($no_sync==1){
     foreach my $dns_node (@adding_dnsnodes){
         print "ADD: $dns_node\n";
     }
+
+    # hardwareclasses
+    print "\n";
+    $count=$#adding_hardwareclasses+1;
+    &print_title("hardwareclasses that must be added: ($count)");
+    foreach my $hwk (@adding_hardwareclasses){
+        print "ADD: $hwk\n";
+    }
+
+
 
     print "\n--no-sync  finished. Nothing changed!\n";
     exit;
@@ -1300,6 +1326,34 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                         smb_pwd=>$smb_admin_pass,
                            });
         $dns_node_count++;
+    }
+
+    ############################################################
+    # Add hardwareclasses
+    print "\n";
+    &print_title("hardwareclasses to be added:");
+    my $hwk_count=0;
+    foreach my $hwk (@adding_hardwareclasses){
+        $hwk_count++;
+        #my $group_token=&AD_get_name_tokened($hwk,$school,"hardwareclass");
+        print "HERE: $hwk_count) ADD $hwk\n";
+
+         &AD_group_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$school,
+                           group=>$hwk,
+                           group_basename=>$hwk,
+                           description=>$hwk,
+                           type=>"hardwareclass",
+                           status=>"P",
+                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
+#                           gidnumber_wish=>$gidnumber_wish,
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
+
     }
 
     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -1601,6 +1655,8 @@ sub analyze_device_line {
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
         $devices_file{'device'}{$host_token}{'HWK'}=$hwk;
+        $devices_file{'hardwareclass'}{$hwk}{$host_token}=$ws_token_account;
+
         $devices_file{'device'}{$host_token}{'MAC'}=$mac;
         $devices_file{'device'}{$host_token}{'IPv4'}=$ip;
         $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;
@@ -1945,7 +2001,10 @@ sub push_kill_dnszone {
     push @killing_dnszones, $kill;
 }
 
-
+sub push_add_hardwareclass {
+    my ($add) = @_;
+    push @adding_hardwareclasses, $add;
+}
 
 # sub get_classrooms {
 #     &print_title("Fetching classrooms from $host_classrooms:");

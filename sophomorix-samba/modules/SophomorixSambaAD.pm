@@ -7076,6 +7076,33 @@ sub AD_group_create {
                                 ]
                             );
             &AD_debug_logdump($result,2,(caller(0))[3]);
+	} elsif ($type eq "hardwareclass"){
+            my $result = $ldap->add( $dn,
+                                attr => [
+                                    cn   => $cn,
+                                    description => $description,
+                                    sAMAccountName => $group,
+                                    mail => $mail,
+                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                                    sophomorixType => $type, 
+                                    sophomorixSchoolname => $school, 
+                                    sophomorixStatus => $status,
+                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                                        "$school:---:---:"],
+                                    sophomorixAddMailQuota => ["---:---:"],
+                                    sophomorixQuota => "---",
+                                    sophomorixMailQuota => "---",
+                                    sophomorixMaxMembers => "0",
+                                    sophomorixMailAlias => "FALSE",
+                                    sophomorixMailList => "FALSE",
+                                    sophomorixJoinable => $joinable,
+                                    sophomorixHidden => "FALSE",
+                                    gidNumber => $gidnumber_wish,
+                                    objectclass => ['top',
+                                                      'group' ],
+                                ]
+                            );
+            &AD_debug_logdump($result,2,(caller(0))[3]);
         } else {
             my $result = $ldap->add( $dn,
                                 attr => [
@@ -7172,6 +7199,8 @@ sub AD_group_create {
                                sophomorix_config=>$ref_sophomorix_config,
                                sophomorix_result=>$ref_sophomorix_result,
                              });
+    } elsif ($type eq "hardwareclass"){
+        # nothing to do so far
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     print "\n";
