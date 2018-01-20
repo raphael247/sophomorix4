@@ -3186,19 +3186,6 @@ sub AD_get_sessions {
     my %sessions=();
     my %management=();
     my $session_count=0;
-#    my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-#                               root_dse=>$root_dse,
-#                               root_dns=>$root_dns,
-#                               computers=>"FALSE",
-#                               rooms=>"FALSE",
-#                               management=>"TRUE",
-#                               users=>"FALSE",
-#                               dnszones=>"FALSE",
-#                               dnsnodes=>"FALSE",
-#                               sophomorix_config=>$ref_sophomorix_config,
-#                  });
-
-    #print Dumper($ref_AD->{'objectclass'}{'group'}{'internetaccess'});
     {
 	my $filter="(& (objectClass=group) (| ";
         foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
@@ -3227,9 +3214,10 @@ sub AD_get_sessions {
             my $schoolname=$entry->get_value('sophomorixSchoolname');
             #$management{'managementgroup'}{$type}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
             $management{'managementgroup'}{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # members
             @{ $management{'managementgroup'}{$type}{$sam}{'member'} }=$entry->get_value('member');
 
-            # fetching members
+            # fetching additional Data of members 
         #    my @members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"member");
         #     foreach my $member (@members){
         #         my ($cn,@rest)=split(/,/,$member);
@@ -3243,11 +3231,8 @@ sub AD_get_sessions {
 
         }
     } 
-       #print Dumper(\%management);
 
-#exit;
-
-    # 
+    # fetching the sessions
     my $filter="(&(objectClass=user)(sophomorixSessions=*)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
@@ -3363,7 +3348,6 @@ sub AD_get_sessions {
                                     });
                     }
 
-
                     # calculate smb_dir
                     my $smb_dir=$home_directory_AD;
                     $smb_dir=~s/\\/\//g;
@@ -3409,8 +3393,6 @@ sub AD_get_sessions {
                         $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
                         $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}
                                  {'PARTICIPANTS'}{$participant}{"group_".$grouptype}="FALSE";
-#                        foreach my $group (keys %{$ref_AD->{'objectclass'}{'group'}{$grouptype}}) {
-#                           if (exists $ref_AD->{'objectclass'}{'group'}{$grouptype}{$group}{'members'}{$participant}){
                         foreach my $group (keys %{$management{'managementgroup'}{$grouptype}}) {
                            if (exists $management{'managementgroup'}{$grouptype}{$group}{'members'}{$participant}){
                                 # if in the groups, set TRUE
