@@ -4497,14 +4497,12 @@ sub AD_get_AD_for_device {
         my $role=$entry->get_value('sophomorixRole');
         my $sn=$entry->get_value('sophomorixSchoolname');
         my $file=$entry->get_value('sophomorixAdminFile');
-        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
-        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixRole'}=$role;
-        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
-        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
-        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixDnsNodename'}=
-            $entry->get_value('sophomorixDnsNodename');
-        $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminClass'}=
-            $entry->get_value('sophomorixAdminClass');
+        $AD{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+        $AD{'computer'}{$sam}{'sophomorixRole'}=$role;
+        $AD{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
+        $AD{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+        $AD{'computer'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+        $AD{'computer'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
         # lists
         #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
         #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
@@ -4541,10 +4539,10 @@ sub AD_get_AD_for_device {
         my $type=$entry->get_value('sophomorixType');
         my $stat=$entry->get_value('sophomorixStatus');
         my $schoolname=$entry->get_value('sophomorixSchoolname');
-        $AD{'objectclass'}{'group'}{'room'}{$sam}{'room'}=$sam;
-        $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixStatus'}=$stat;
-        $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixType'}=$type;
-        $AD{'objectclass'}{'group'}{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+        $AD{'room'}{$sam}{'room'}=$sam;
+        $AD{'room'}{$sam}{'sophomorixStatus'}=$stat;
+        $AD{'room'}{$sam}{'sophomorixType'}=$type;
+        $AD{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
         # lists
         #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
         #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
@@ -4582,15 +4580,15 @@ sub AD_get_AD_for_device {
             if ($desc=~ m/^${DevelConf::dns_zone_prefix_string}/ or
                 $name eq $root_dns){
                 # shophomorix dnsZone or default dnsZone
-                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
-                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
+                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
+                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
                 #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'sophomorixdnsZone'} }, $zone;
             } else {
                 # other dnsZone
 		$sopho_max_zone=$sopho_max_zone-1;
                 $other_max_zone=$other_max_zone+1;
-                $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
-                $AD{'objectclass'}{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
+                $AD{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
+                $AD{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
                 #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'otherdnsZone'} }, $zone;
             }
         }
@@ -4632,13 +4630,13 @@ sub AD_get_AD_for_device {
                 next;
             }
 
-            $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
+            $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
             # down there the dns zone was calualted
-            #$AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
-            $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$root_dns;
+            #$AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
+            $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$root_dns;
 
-            $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
-            $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=
+            $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
+            $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=
                 $entry->get_value('adminDescription');
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
 
@@ -4649,7 +4647,7 @@ sub AD_get_AD_for_device {
     # OLD
     # {
     #     # go through all dnsZones OLD
-    #     foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string} }) {
+    #     foreach my $dns_zone (keys %{ $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string} }) {
     #         print "\nHERE1: $dns_zone\n";
     #         my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
     #             &AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);

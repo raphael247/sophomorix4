@@ -416,7 +416,7 @@ sub _console_print_devices {
             if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
                 $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
                 $hwc="";
-                $adminclass=$ref_devices->{'objectclass'}{'computer'}{'computer'}{$computer}{'sophomorixAdminClass'};
+                $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
             } else {
                 $computer="---";
                 $hwc="---";
@@ -426,7 +426,7 @@ sub _console_print_devices {
 
             printf "|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
                    $dns_node,
-                   $ref_devices->{'objectclass'}{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
+                   $ref_devices->{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
                    $computer,
                    $adminclass,
                    "not in AD";
@@ -434,7 +434,6 @@ sub _console_print_devices {
         }
         &print_line();
     #}
-
 }
 
 
