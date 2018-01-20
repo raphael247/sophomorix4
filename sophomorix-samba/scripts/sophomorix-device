@@ -703,17 +703,30 @@ if ($info==1){
                                                sophomorix_config=>\%sophomorix_config,
                                              });
 
-    my $jsoninfo="DEVICES";
-    my $jsoncomment="The sophomorix devices";
-    &json_dump({json => $json,
-                jsoninfo => $jsoninfo,
-                jsoncomment => $jsoncomment,
-                object_name => "",
-                log_level => $Conf::log_level,
-                hash_ref => $ref_devices,
-                sophomorix_config => \%sophomorix_config,
-               });
-
+    {
+        my $jsoninfo="DEVICES";
+        my $jsoncomment="The sophomorix devices";
+        &json_dump({json => $json,
+                    jsoninfo => $jsoninfo,
+                    jsoncomment => $jsoncomment,
+                    object_name => "",
+                    log_level => $Conf::log_level,
+                    hash_ref => $ref_devices,
+                    sophomorix_config => \%sophomorix_config,
+                   });
+    }
+    {
+        my $jsoninfo="HARDWARECLASSES";
+        my $jsoncomment="The sophomorix hardwareclasses";
+        &json_dump({json => $json,
+                    jsoninfo => $jsoninfo,
+                    jsoncomment => $jsoncomment,
+                    object_name => "",
+                    log_level => $Conf::log_level,
+                    hash_ref => $ref_devices,
+                    sophomorix_config => \%sophomorix_config,
+                  });
+    }
     exit;
 }
 # # ===========================================================================
@@ -922,7 +935,6 @@ foreach my $dnszone (keys %{$devices_file{'dnsZone'}}) {
 
 # hardwareclasses to create
 foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
-    print "HERE: $hwk\n";
     if (not exists $ref_AD_device->{'hardwareclass'}{$hwk} ){
        # nonexisting --> add dnszone
 	print "push add hwk $hwk\n";
@@ -1347,7 +1359,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                            description=>$hwk,
                            type=>"hardwareclass",
                            status=>"P",
-                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
+                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
 #                           gidnumber_wish=>$gidnumber_wish,
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>\%sophomorix_config,

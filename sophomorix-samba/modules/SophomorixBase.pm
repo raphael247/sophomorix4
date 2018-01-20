@@ -241,7 +241,7 @@ sub json_progress_print {
     if ($json==1){
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_progress );
-        if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
+        if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDRR"){
             print STDERR  "$utf8_pretty_printed";
         } else {
             print STDOUT  "$utf8_pretty_printed";
@@ -285,6 +285,8 @@ sub json_dump {
             &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "DEVICES"){
             &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "HARDWARECLASSES"){
+            &_console_print_hardwareclasses($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "ADMINS_V"){
             &_console_print_admins_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USERS_V"){
@@ -434,6 +436,15 @@ sub _console_print_devices {
         }
         &print_line();
     #}
+}
+
+
+
+sub _console_print_hardwareclasses {
+    my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
+        foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
+            print "   * HWK: $hwk exists in AD\n";
+        }
 }
 
 

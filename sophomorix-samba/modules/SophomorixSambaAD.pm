@@ -4550,37 +4550,40 @@ sub AD_get_AD_for_device {
     }
     }
     ############################################################
-    # sophomorix rooms from ldap
+    # sophomorix rooms/hardwareclasses from ldap
     {
-    my $filter="(&(objectClass=group)(sophomorixType=".
-       $ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}."))";
-    $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
-                   scope => 'sub',
-                   filter => $filter,
-                   attrs => ['sAMAccountName',
-                             'sophomorixStatus',
-                             'sophomorixSchoolname',
-                             'sophomorixType',
-                            ]);
-    my $max_room = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_room sophomorix Rooms found in AD");
-    $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=$max_room;
-    for( my $index = 0 ; $index < $max_room ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
-        my $type=$entry->get_value('sophomorixType');
-        my $stat=$entry->get_value('sophomorixStatus');
-        my $schoolname=$entry->get_value('sophomorixSchoolname');
-        $AD{'room'}{$sam}{'room'}=$sam;
-        $AD{'room'}{$sam}{'sophomorixStatus'}=$stat;
-        $AD{'room'}{$sam}{'sophomorixType'}=$type;
-        $AD{'room'}{$sam}{'sophomorixSchoolname'}=$schoolname;
-        # lists
-        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
-        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
-        #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
-    }
+        my $filter="(& (objectClass=group) (| ".
+                   "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}.") ".
+                   "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}.") ".
+                   ") )";
+
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => $filter,
+                       attrs => ['sAMAccountName',
+                                 'sophomorixStatus',
+                                 'sophomorixSchoolname',
+                                 'sophomorixType',
+                                ]);
+        my $max_room = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_room sophomorix rooms/hardwareclasses found in AD");
+        $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=$max_room;
+        for( my $index = 0 ; $index < $max_room ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            $AD{$type}{$sam}{'room'}=$sam;
+            $AD{$type}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{$type}{$sam}{'sophomorixType'}=$type;
+            $AD{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # lists
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+            #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
+        }
     }
 
     ############################################################
@@ -4730,6 +4733,7 @@ sub AD_get_AD_for_device {
     # 	    }
     #     }
     # }
+
 
     &Sophomorix::SophomorixBase::print_title("Query AD for device (end)");
     return(\%AD);
