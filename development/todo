@@ -35,21 +35,14 @@ sophomorix-repair:
 
 AD_get_AD scheint langsam
 wird aufgerufen in:
-  * sophomorix-device
   * sophomorix-repair
-  * sophomorix-check
+  * sophomorix-session
 
-und in SophomorixSamba_AD ????
-
---> auftrennen in 3 einzelne sub, performanceoptimiert?
-OK: sophomorix-check
-
-
+--> auftrennen in einzelne sub, performanceoptimiert?
 
 TODO Code cleanup
 
 - sophomorix-device: 
-    * gruppen anlegen je scriptlauf nur 1 mal, wie bei sophomorix-check
     * _console_print_devices
       schulweises auflisten der devices, evtl getrennt nach Rollen
 
@@ -71,7 +64,8 @@ sophomorix-user -iv braucht 5s (könnte schneller gehen???)
 ------------------------------------------------------------
 
 Login-creation
-raumnamen vermeiden???
+raumnamen/gruppen vermeiden???
+keine Ziffer anhängen
 
 Bei hinzufügen eines users in ein gruppe, testen, ob die von richtigen typ ist
 Bespiel computer soll in die Gruppe 7a, sollte nicht gehen

@@ -147,6 +147,8 @@ my $school="";
 my $prefix="";
 my %school_created=();
 $school_created{$school}="created";
+# rooms that have been created while the script is running
+my %room_created=();
 my $dump_files=0;
 my $dump_AD=0;
 my $print=0;
@@ -1199,21 +1201,27 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                            });
         $computer_count_create++;
         # make sure that the room exists
-        my $room_description=$room_basename." in ".$school;
-        &AD_group_create({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          group=>$room_saved,
-                          group_basename=>$room_basename,
-                          description=>$room_description,
-                          school=>$school,
-                          status=>"P",
-                          type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
-			  sub_ou=>"OU=".$room_basename.",".$sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'},
-                          smb_admin_pass=>$smb_admin_pass,
-                          sophomorix_config=>\%sophomorix_config,
-                          sophomorix_result=>\%sophomorix_result,
-                         });
+        if (not exists $room_created{$school}{$room_basename}){
+            my $room_description=$room_basename." in ".$school;
+            &AD_group_create({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              root_dns=>$root_dns,
+                              group=>$room_saved,
+                              group_basename=>$room_basename,
+                              description=>$room_description,
+                              school=>$school,
+                              status=>"P",
+                              type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
+    	      		      sub_ou=>"OU=".$room_basename.",".$sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'},
+                              smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>\%sophomorix_config,
+                              sophomorix_result=>\%sophomorix_result,
+                            });
+            # remember group
+            $room_created{$school}{$room_basename}="already created";
+        } else {
+            print "   * room $room_basename in school $school already created\n";
+        }
         # add computer to its room
         &AD_group_addmember({ldap => $ldap,
                              root_dse => $root_dse, 
