@@ -3461,7 +3461,7 @@ sub AD_get_sessions {
         }
     }
     $sessions{'SESSIONCOUNT'}=$session_count;
-
+    @{ $sessions{'SUPERVISOR_LIST'} }=uniq(@{ $sessions{'SUPERVISOR_LIST'} });
     &Sophomorix::SophomorixBase::print_title("$session_count running sessions found");
     return %sessions; 
 }
