@@ -992,7 +992,6 @@ foreach my $hwk (keys %{$ref_AD_device->{'hardwareclass'}}) {
     foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'} }) {
         # go through all members of hwk in AD
         if (not exists $devices_file{'hardwareclass'}{$hwk}{$member_AD}){
-            #print "HERE3: $member_AD not any more in $hwk\n";
 	    $killmembers_hardwareclasses{$member_AD}=$hwk;
         }
     }
@@ -1102,18 +1101,32 @@ if($no_sync==1){
         print "ADD: $hwk\n";
     }
     print "\n";
-    #$count=$#adding_hardwareclasses+1; ?????
-    &print_title("Hardwareclass memberships to add:");
-    foreach my $member (keys %addmembers_hardwareclasses){
-        print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
+    {
+        my @computers=();
+        foreach my $member (keys %addmembers_hardwareclasses){
+            push @computers, $member
+        }
+	@computers=sort @computers;
+        $count=$#computers+1;
+
+        &print_title("Hardwareclass memberships to add ($count):");
+        foreach my $member (@computers){
+            print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
+        }
     }
     print "\n";
-    #$count=$#_hardwareclasses+1;  ????
-    &print_title("Hardwareclass memberships to kill:");
-    foreach my $member (keys %killmembers_hardwareclasses){
-        print "KILL: $member from $killmembers_hardwareclasses{$member}\n";
+    {
+        my @computers=();
+        foreach my $member (keys %killmembers_hardwareclasses){
+            push @computers, $member
+        }
+	@computers=sort @computers;
+        $count=$#computers+1;
+        &print_title("Hardwareclass memberships to kill ($count):");
+        foreach my $member (@computers){
+            print "KILL: $member from $killmembers_hardwareclasses{$member}\n";
+        }
     }
-
 
     print "\n--no-sync  finished. Nothing changed!\n";
     exit;
