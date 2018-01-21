@@ -257,11 +257,12 @@ my @killing_dnsnodes=();
 my @adding_hardwareclasses=();
 my %adding_hardwareclasses=();
 
+my @killing_hardwareclasses=();
+my %killing_hardwareclasses=();
+
 my %addmembers_hardwareclasses=();
 my %killmembers_hardwareclasses=();
 
-my @killing_hardwareclasses=();
-my %killing_hardwareclasses=();
 
 my %pxe = qw(ml ok
             );
@@ -989,6 +990,12 @@ foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
 # hardwareclass members to kill
 foreach my $hwk (keys %{$ref_AD_device->{'hardwareclass'}}) {
     # go through all hwk in AD
+    # if the hwk is going to be deleted, skip removing users
+    if (exists $killing_hardwareclasses{$hwk}){
+        print "$hwk is going to be killed anyway, skip testing for members to be killed\n";
+        next;
+    }
+
     foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'} }) {
         # go through all members of hwk in AD
         if (not exists $devices_file{'hardwareclass'}{$hwk}{$member_AD}){
