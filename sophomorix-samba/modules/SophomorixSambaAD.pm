@@ -4586,13 +4586,16 @@ sub AD_get_AD_for_device {
             $AD{$type}{$sam}{'sophomorixStatus'}=$stat;
             $AD{$type}{$sam}{'sophomorixType'}=$type;
             $AD{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+
+            # hardwareclass memberships
             if ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}){
                 @{ $AD{$type}{$sam}{'member'} }=$entry->get_value('member');
-                foreach my $dn (@{ $AD{$type}{$sam}{'member_dn'} }){
+                foreach my $dn (@{ $AD{$type}{$sam}{'member'} }){
                     my @parts=split(",",$dn);
                     my ($unused,$memsam)=split("=",$parts[0]);
-		    print "HERE: $sam\n";
-                    push @{ $AD{$type}{$sam}{'member_sam'} },$memsam;
+		    #print "HERE2: $memsam is in $sam\n";
+                    #push @{ $AD{$type}{$sam}{'member_sam'} },$memsam;
+                    $AD{$type}{$sam}{'member_sAMAccountName'}{$memsam}="seen";
                 }
             }
 

@@ -254,6 +254,10 @@ my @killing_dnsnodes=();
 
 # hardwareclasses
 my @adding_hardwareclasses=();
+
+my %addmembers_hardwareclasses=();
+my %memberupdate_hardwareclass=(); # which hardwareclasses need memberupdate
+
 my @killing_hardwareclasses=();
 
 
@@ -960,6 +964,21 @@ foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
 
 
 
+# hardwareclass members to add
+foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
+    #print "Testing $hwk\n";
+    foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$hwk}}) {
+        #print "    Testing $member_file as member in $hwk\n";
+        if (not exists $ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'}{$member_file} ){
+	    $addmembers_hardwareclasses{$member_file}=$hwk;
+            $memberupdate_hardwareclass{$hwk}="add"
+        }
+    }
+}
+
+
+
+
 
 # --dump-files
 if ($dump_files==1){
@@ -1058,6 +1077,12 @@ if($no_sync==1){
     &print_title("Hardwareclasses that must be added: ($count)");
     foreach my $hwk (@adding_hardwareclasses){
         print "ADD: $hwk\n";
+    }
+    print "\n";
+    #$count=$#adding_hardwareclasses+1;
+    &print_title("Hardwareclass memberships to add:");
+    foreach my $member (keys %addmembers_hardwareclasses){
+        print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
     }
 
 
@@ -1358,7 +1383,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill hardwareclasses
     print "\n";
-    &print_title("Hardwareclasses  to be killed:");
+    &print_title("Hardwareclasses to be killed:");
     my $kill_hwk_count=1;
     foreach my $hwk (@killing_hardwareclasses){
         print "   * Killing Hardwareclass $hwk ...\n";
@@ -1395,6 +1420,22 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                            sophomorix_result=>\%sophomorix_result,
                          });
     }
+
+    ############################################################
+    # Add hardwareclass memberships
+    print "\n";
+    &print_title("Hardwareclass members to be added:");
+    my $hwk_count_addmember=0;
+    foreach my $member (keys %addmembers_hardwareclasses){
+        $hwk_count_addmember++;
+        print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
+        &AD_group_addmember({ldap => $ldap, 
+                             root_dse => $root_dse, 
+                             group => $addmembers_hardwareclasses{$member},
+                             addmember => $member,
+                           });   
+    }
+
 
     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
@@ -2048,11 +2089,13 @@ sub push_add_hardwareclass {
 }
 
 
-
 sub push_kill_hardwareclass {
     my ($kill) = @_;
     push @killing_hardwareclasses, $kill;
 }
+
+
+
 
 # sub get_classrooms {
 #     &print_title("Fetching classrooms from $host_classrooms:");
