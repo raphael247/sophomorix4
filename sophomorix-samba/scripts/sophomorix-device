@@ -111,6 +111,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_create
                                  AD_group_kill
                                  AD_group_addmember
+                                 AD_group_removemember
                                  AD_get_schoolname
                                  AD_get_name_tokened
                                  AD_get_AD_for_device
@@ -254,12 +255,13 @@ my @killing_dnsnodes=();
 
 # hardwareclasses
 my @adding_hardwareclasses=();
+my %adding_hardwareclasses=();
 
 my %addmembers_hardwareclasses=();
-my %memberupdate_hardwareclass=(); # which hardwareclasses need memberupdate
+my %killmembers_hardwareclasses=();
 
 my @killing_hardwareclasses=();
-
+my %killing_hardwareclasses=();
 
 my %pxe = qw(ml ok
             );
@@ -966,9 +968,9 @@ foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
 
 # hardwareclass members to add
 foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
-    # go through all hwk
+    # go through all hwk in files
     foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$hwk}}) {
-        # go through all members of hwk
+        # go through all members of hwk in files
         # skip if this device has no account
         # the data in $devices_file{'device'}{<device>} uses the small letter name
         my $member_smalletters=$devices_file{'hardwareclass'}{$hwk}{$member_file};
@@ -978,7 +980,20 @@ foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
 
         if (not exists $ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'}{$member_file}){
 	    $addmembers_hardwareclasses{$member_file}=$hwk;
-            $memberupdate_hardwareclass{$hwk}="add"
+        }
+    }
+}
+
+
+
+# hardwareclass members to kill
+foreach my $hwk (keys %{$ref_AD_device->{'hardwareclass'}}) {
+    # go through all hwk in AD
+    foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'} }) {
+        # go through all members of hwk in AD
+        if (not exists $devices_file{'hardwareclass'}{$hwk}{$member_AD}){
+            #print "HERE3: $member_AD not any more in $hwk\n";
+	    $killmembers_hardwareclasses{$member_AD}=$hwk;
         }
     }
 }
@@ -1087,10 +1102,16 @@ if($no_sync==1){
         print "ADD: $hwk\n";
     }
     print "\n";
-    #$count=$#adding_hardwareclasses+1;
+    #$count=$#adding_hardwareclasses+1; ?????
     &print_title("Hardwareclass memberships to add:");
     foreach my $member (keys %addmembers_hardwareclasses){
         print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
+    }
+    print "\n";
+    #$count=$#_hardwareclasses+1;  ????
+    &print_title("Hardwareclass memberships to kill:");
+    foreach my $member (keys %killmembers_hardwareclasses){
+        print "KILL: $member from $killmembers_hardwareclasses{$member}\n";
     }
 
 
@@ -1442,6 +1463,21 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              group => $addmembers_hardwareclasses{$member},
                              addmember => $member,
                            });   
+    }
+
+    ############################################################
+    # Kill hardwareclass memberships
+    print "\n";
+    &print_title("Hardwareclass members to be killed:");
+    my $hwk_count_killmember=0;
+    foreach my $member (keys %killmembers_hardwareclasses){
+        $hwk_count_killmember++;
+        print "KILL: $member from $killmembers_hardwareclasses{$member}\n";
+        &AD_group_removemember({ldap => $ldap, 
+                                root_dse => $root_dse, 
+                                group => $killmembers_hardwareclasses{$member},
+                                removemember => $member,
+                              });   
     }
 
 
@@ -2094,12 +2130,14 @@ sub push_kill_dnszone {
 sub push_add_hardwareclass {
     my ($add) = @_;
     push @adding_hardwareclasses, $add;
+    $adding_hardwareclasses{$add}="add";
 }
 
 
 sub push_kill_hardwareclass {
     my ($kill) = @_;
     push @killing_hardwareclasses, $kill;
+    $killing_hardwareclasses{$kill}="kill";
 }
 
 
