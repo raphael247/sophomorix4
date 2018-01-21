@@ -4571,6 +4571,7 @@ sub AD_get_AD_for_device {
                                  'sophomorixStatus',
                                  'sophomorixSchoolname',
                                  'sophomorixType',
+                                 'member',
                                 ]);
         my $max_room = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_room sophomorix rooms/hardwareclasses found in AD");
@@ -4585,6 +4586,16 @@ sub AD_get_AD_for_device {
             $AD{$type}{$sam}{'sophomorixStatus'}=$stat;
             $AD{$type}{$sam}{'sophomorixType'}=$type;
             $AD{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            if ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}){
+                @{ $AD{$type}{$sam}{'member'} }=$entry->get_value('member');
+                foreach my $dn (@{ $AD{$type}{$sam}{'member_dn'} }){
+                    my @parts=split(",",$dn);
+                    my ($unused,$memsam)=split("=",$parts[0]);
+		    print "HERE: $sam\n";
+                    push @{ $AD{$type}{$sam}{'member_sam'} },$memsam;
+                }
+            }
+
             # lists
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 

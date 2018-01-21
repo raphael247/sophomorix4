@@ -1695,7 +1695,7 @@ sub analyze_device_line {
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
         $devices_file{'device'}{$host_token}{'HWK'}=$hwk;
-        $devices_file{'hardwareclass'}{$hwk}{$host_token}=$ws_token_account;
+        $devices_file{'hardwareclass'}{$hwk}{$ws_token}=$host_token;
 
         $devices_file{'device'}{$host_token}{'MAC'}=$mac;
         $devices_file{'device'}{$host_token}{'IPv4'}=$ip;

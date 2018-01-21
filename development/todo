@@ -41,7 +41,18 @@ wird aufgerufen in:
     * _console_print_devices
       schulweises auflisten der devices, evtl getrennt nach Rollen
     * _console_print_hardwareclasses
-      hardwareclasses sind global
+      hardwareclasses sind global-> better display
+
+# add hwk memberships of each host to devices_file
+
+        # add computer to its room
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => $room_saved,
+                             addmember => $ws_saved,
+                            });   
+
+
 
 in file in hash laden auch die hardwareklassen dazu, gibts vielleicht schon
 in AD_get ... devices ... die hardwargruppen suchen,
