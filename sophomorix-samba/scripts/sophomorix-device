@@ -966,15 +966,23 @@ foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
 
 # hardwareclass members to add
 foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
-    #print "Testing $hwk\n";
+    # go through all hwk
     foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$hwk}}) {
-        #print "    Testing $member_file as member in $hwk\n";
-        if (not exists $ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'}{$member_file} ){
+        # go through all members of hwk
+        # skip if this device has no account
+        # the data in $devices_file{'device'}{<device>} uses the small letter name
+        my $member_smalletters=$devices_file{'hardwareclass'}{$hwk}{$member_file};
+        if ($devices_file{'device'}{$member_smalletters}{'ACCOUNT'} eq "FALSE"){
+            next;
+        }
+
+        if (not exists $ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'}{$member_file}){
 	    $addmembers_hardwareclasses{$member_file}=$hwk;
             $memberupdate_hardwareclass{$hwk}="add"
         }
     }
 }
+
 
 
 
