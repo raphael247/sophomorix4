@@ -1041,6 +1041,12 @@ sub AD_group_kill {
             my $command="samba-tool group delete ". $group;
             print "   # $command\n";
             system($command);
+	} elsif ($type eq "hardwareclass"){
+            ### hardwareclass #####################################
+            # just delete the group
+            my $command="samba-tool group delete ". $group;
+            print "   # $command\n";
+            system($command);
         }
         return;
     } else {
