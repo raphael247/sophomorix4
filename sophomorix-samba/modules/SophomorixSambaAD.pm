@@ -490,6 +490,7 @@ sub AD_repdir_using_file {
     my $teacherclass = $arg_ref->{teacherclass};
     my $teacher_home = $arg_ref->{teacher_home};
     my $adminclass = $arg_ref->{adminclass};
+    my $extraclass = $arg_ref->{extraclass};
     my $subdir = $arg_ref->{subdir};
     my $student_home = $arg_ref->{student_home};
 
@@ -523,6 +524,10 @@ sub AD_repdir_using_file {
 
         if (/\@\@ADMINCLASS\@\@/) {
             $group_type="adminclass";
+            $groupvar_seen++;
+        }
+        if (/\@\@EXTRACLASS\@\@/) {
+            $group_type="extraclass";
             $groupvar_seen++;
         }
         if (/\@\@TEACHERCLASS\@\@/) {
@@ -625,6 +630,8 @@ sub AD_repdir_using_file {
                 @groups=($teacherclass);
             } elsif (defined $adminclass){
                 @groups=($adminclass);
+            } elsif (defined $extraclass){
+                @groups=($extraclass);
             } elsif(defined $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'groups_BY_sophomorixType'}{$group_type}){
                 # there is a group list -> use it
                 @groups=@{ $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'groups_BY_sophomorixType'}{$group_type} };
@@ -645,10 +652,12 @@ sub AD_repdir_using_file {
                 $group_basename=&Sophomorix::SophomorixBase::get_group_basename($group,$school);
                 my $path_after_group=$path;
                 $path_after_group=~s/\@\@ADMINCLASS\@\@/$group_basename/;
+                $path_after_group=~s/\@\@EXTRACLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
                 $path_after_group=~s/\@\@PROJECT\@\@/$group_basename/;
                 my $path_after_group_smb=$path_smb;
                 $path_after_group_smb=~s/\@\@ADMINCLASS\@\@/$group_basename/;
+                $path_after_group_smb=~s/\@\@EXTRACLASS\@\@/$group_basename/;
                 $path_after_group_smb=~s/\@\@TEACHERCLASS\@\@/$group_basename/;
                 $path_after_group_smb=~s/\@\@PROJECT\@\@/$group_basename/;
                 if($Conf::log_level>=3){      
@@ -7192,14 +7201,25 @@ sub AD_group_create {
                              group => $ref_sophomorix_config->{'INI'}{'VARS'}{'HIERARCHY_PREFIX'}."-".$DevelConf::student,
                              addgroup => $token_students,
                            });
-        &AD_repdir_using_file({root_dns=>$root_dns,
-                               repdir_file=>"repdir.adminclass",
-                               school=>$school,
-                               adminclass=>$group,
-                               smb_admin_pass=>$smb_admin_pass,
-                               sophomorix_config=>$ref_sophomorix_config,
-                               sophomorix_result=>$ref_sophomorix_result,
-                             });
+        if ($type eq "adminclass"){
+            &AD_repdir_using_file({root_dns=>$root_dns,
+                                   repdir_file=>"repdir.adminclass",
+                                   school=>$school,
+                                   adminclass=>$group,
+                                   smb_admin_pass=>$smb_admin_pass,
+                                   sophomorix_config=>$ref_sophomorix_config,
+                                   sophomorix_result=>$ref_sophomorix_result,
+                                 });
+        } elsif ($type eq "extraclass") {
+            &AD_repdir_using_file({root_dns=>$root_dns,
+                                   repdir_file=>"repdir.extraclass",
+                                   school=>$school,
+                                   adminclass=>$group,
+                                   smb_admin_pass=>$smb_admin_pass,
+                                   sophomorix_config=>$ref_sophomorix_config,
+                                   sophomorix_result=>$ref_sophomorix_result,
+                                 });
+        }
     } elsif ($type eq "teacherclass"){
         # add <token>-teachers to all-teachers
         &AD_group_addmember({ldap => $ldap,

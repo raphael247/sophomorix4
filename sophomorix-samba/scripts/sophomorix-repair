@@ -76,6 +76,7 @@ my $schooladministrator_home=0;
 my $teacherclass=0;
 my $teacher_home=0;
 my $adminclass=0;
+my $extraclass=0;
 my $student_home=0;
 my $all=0;
 
@@ -100,6 +101,7 @@ my $testopt=GetOptions(
            "teacherclass" => \$teacherclass,
            "teacher-home" => \$teacher_home,
            "adminclass" => \$adminclass,
+           "extraclass" => \$extraclass,
            "student-home" => \$student_home,
            "all" => \$all,
           );
@@ -144,6 +146,7 @@ What to repair in the Filesystem:
   --teacherclass             (use repdir.teacherclass, repairs teacherclasses)
   --teacher-home             (use repdir.teacher_home, repairs homes of teachers)
   --adminclass               (use repdir.adminclass, repairs adminclasses)
+  --extraclass               (use repdir.extraclass, repairs extraclasses)
   --student-home             (use repdir.student_home, repairs homes of students)
 
   -- all                     (use all the above, top to bottom order)
@@ -209,6 +212,7 @@ if ($all==1) {
     $teacherclass=1;
     $teacher_home=1;
     $adminclass=1;
+    $extraclass=1;
     $student_home=1;
 }
 
@@ -332,6 +336,20 @@ if ($adminclass==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.adminclass",
+                         AD=>$ref_AD,
+                         smb_admin_pass=>$smb_admin_pass,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                        });
+}
+
+
+# --extraclass
+if ($extraclass==1) {
+   &AD_repdir_using_file({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         root_dns=>$root_dns,
+                         repdir_file=>"repdir.extraclass",
                          AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,

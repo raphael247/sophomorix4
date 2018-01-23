@@ -62,19 +62,38 @@ leere pxe option ---> 0 (umwandeln) OK so?
 Abstimmen:
  - hardwareclass gruppen kommen nach OU=Devices
  - hardwareclasses haben KEIN prefix (schulübergreifende hardwareclasses ermöglichen)
- - rooms,hardwareclasses (Drucker sind nicht dabei, da sie keinen computeraccount haben, OK so)
+ - rooms,hardwareclasses (Drucker sind nicht dabei, da sie keinen computeraccount haben, OK so???)
  - groß/kleinschreibung von computer/rooms
    Was in devices.csv steht klein forcen. Im AD dann wie von den win tools angelegt
+ - jedes device darf nur in EINER hardwareclass sein, ODER?
 
+Zur Info:
+
+Drucker sind IP-devices, 
+   -> nur dnsNode
+   -> bekommen also auch keinen computer-Account
+   -> sind also auch nicht in einer Gruppe mit dem Typ room oder hardwareclass
+   -> Im AD NICHT abfragbar welcher Drucker in welchem Raum steht
+   -> Ist das gut so?
+   -> Kann amn dnsNodes auch zu Gruppen zusammen fassen?
+   -> wie schaltet man Internet für IP devices ab, ohne dass man eine Gruppe hat?
+
+
+sophomorixRole und sophomorixType
 Bisher:
-  jeder Eintrag hat die sophomorixRole computer
+  jedes device hat die sophomorixRole computer
+  jede computergruppe hat den sophomorixType room
 
+sophomorixRole
 Unterscheiden von:
   server (Die von thomas angelegten DNS-Einträge für firewall,server, ....)
    server 
    Firewall, 
    ... Einträge werden in default-school gemacht.
-       OK so? Oder besser global-Bereich? 
+       OK so? Oder besser global-Bereich?
+   ... brauchen die ein Computer-Account?
+   ... oder nur IP-device?
+ 
   classroom-teachercomputer
   classroom-studentcomputer
   faculty-teachercomputer (Lehrerzimmerrechner)
@@ -82,8 +101,44 @@ Unterscheiden von:
   ... router?
   ... staffcomputer (Hausmeister)
 
-classrooms (Wie unterscheidet man classroom gruppen (rooms) von lehrerzimmer gruppen)
-Vorschlag: wenn alle PC vom passenden Typ sind, dann bekommt der Raum auch diesen Typ
+
+sophomorixType:
+   classroom: Unterricht 
+   facultyroom: Lehrerzimmer
+   staffroom: hausmeister
+   server: server
+   printer: Drucker
+   ...
+
+
+Problem: Abhängigkeiten
+  Ein classroom-teachercomputer kann NUR im classroom stehen usw.
+--> EINE Angabe zum device sollte reichen
+    Möglichkeiten:
+    1) sophomorixRole angeben -> sophomorixType wird ermittelt
+       (m.E. beste möglichkeit)
+       --> was macht man mit wiedersprüchen?
+           2 verscheidene compuer in derselben Klasse
+    2) sophomorixType angeben -> sophomorixRole wird ermittelt
+    3) aufsplitten der Datei devices.csv in
+       servers.csv
+       staff.csv
+       classroom.csv
+       faculty.csv
+       --> jeder Raum darf nur in 1er Datei vorkommen, sonst wiedersprüche
+       --> Analog zu students.csv, teachers.csv, ...
+       (Aber dort nur wegen der unterschiedlichen Erzeugung der Dateien)
+    --> was macht man mit wiedersprüchen?
+        --> Raum 'noroom'?
+
+
+Todo:
+   --> Satz von device-sophomorixRole festlegen
+   was soll die rolle können:
+     --> dns-Eintrag?
+     --> Raum-Zuordnung (bei IP device)
+     --> Computer-Account
+     --> Internetaccess (Drucker mit Internetzugang oder nicht)
 
 
 --> setup: legt als sophomorixRole 'server' an

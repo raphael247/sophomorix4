@@ -29,38 +29,31 @@ sophomorix-test-1
 sophomorix-test-5
 mit individuellen ui Einstellungen anpassen
 
+
 sophomorix-repair:
+  - extraclasses auch lesen, $type nutzen
   - option extraclass ??
   - integration in adminclass ??
+
+AD_class_fetch: mit variablen $ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'} siehet AD_get_AD
+(|(sophomorixType=adminclass)(sophomorixType=teacherclass)(sophomorixType=extraclass))".
 
 AD_get_AD scheint langsam
 wird aufgerufen in:
   * sophomorix-repair
 
+------------------------------------------------------------
 - sophomorix-device: 
     * _console_print_devices
       schulweises auflisten der devices, evtl getrennt nach Rollen
     * _console_print_hardwareclasses
       hardwareclasses sind global-> better display
 
-# add hwk memberships of each host to devices_file
-
-        # add computer to its room
-        &AD_group_addmember({ldap => $ldap,
-                             root_dse => $root_dse, 
-                             group => $room_saved,
-                             addmember => $ws_saved,
-                            });   
+  --info -d <device>  (allow lowecase/uppercase/$account to fing a device)
+------------------------------------------------------------
 
 
-
-in file in hash laden auch die hardwareklassen dazu, gibts vielleicht schon
-in AD_get ... devices ... die hardwargruppen suchen,
-eine liste der 
-
- members nicht identisch inhardwareklassen, updaten der hardwareclassen
-
-
+------------------------------------------------------------
 sophomorix-kill/add:
 Test if its ok to run with 0 users the scripts (before script was terminated early)
 ------------------------------------------------------------
@@ -2365,14 +2358,10 @@ Later:
   ...
 * sophomorix-school -i (show important data: admins?admin-mail?)
 * schoolname: a-z and 0-9 only, maximum length (regex configurable?)
-* hwk groups in sophomorix-device
 * man pages
 * AD_get_AD 
   Wird nur noch aufgerufen in 
   * sophomorix-repair
-  
-
-
 * UTC time
   - nicht erzeugt in config_sophomorix_read (nur lokale Zeit)
   - falls  Zeit neu eingelesen wird, wie im auskommentierten Teil von config_sophomorix_read,
@@ -2385,9 +2374,6 @@ Later:
       sophomorixGroup            the group name
       sophomorixExitGroup        the group name before moved to attic
       sophomorixGroupBasename    the name in students.csv, ... no schooltoken
-* AD_get_AD erzeugt listen. 
-  Diese sollten noch per Schleife asciibetisch sortiert werden
-* AD_get_AD liefert listen für ALLE sophomorixType (ouclass, usw ...) 
 * Festplattenquota
 * ACL_set_file in SophomorixBase.pm
   get LINUXMUSTER workgroup and others from smb.conf 
@@ -2396,7 +2382,7 @@ Later:
 * when creating an object (project, user, admin) always check beforehand if it already exists
   if it exist: exit without doing anything
   (see example code in sophomorix-admin --create <name is checked>)
-* Klassen per cronjob ntfernen, in denen
+* Klassen per cronjob entfernen, in denen
   A) kein user drin ist
   B) 450 Tage keine Änderung war
   Umsetzung: getested mit global-internet
@@ -3757,12 +3743,6 @@ Option (zum debuggen: --show-line students.csv:20
 todotodotodo:???????????????????????????????????????
 sophomorix-check:
 
-sind sn und givenName im AD falsch herum?
-sophomorixBirthdate wird korrekt gelesen?
-ist das OK? -> anderes Format
-sophomorixPrefix ist undef?
-AD_get_AD
-
 auch teacher ermitteln
 und andere Rollen (rollenliste bei der ldapsuche aus sophomorix.ini)
 speichern nach rollen,
@@ -3804,13 +3784,6 @@ Idee: Zeile für Zeile durchgehen und ermitteln was zu tun ist:
   -> toleration
   -> deactivation
   -> kill
-
-
-Problem: eine Zeile kann MEHRERE Zeilen verursachen, z.B. Versetzung UND Namenskorrektur
-??? Zusammenfassen in sophomorix-update (-move gibts dann nicht mehr???)
-Egal in welcher Reihenfolge, es sollte 
-
-
 
 
 Resultat für Encoding:
