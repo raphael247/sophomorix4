@@ -3534,9 +3534,14 @@ sub AD_get_AD {
 
     ##################################################
     if ($adminclasses eq "TRUE"){
-        # sophomorixType adminclass from ldap
-        my $filter="(&(objectClass=group)(sophomorixType=".
-           $ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}."))";
+        # sophomorixType adminclass/extraclass from ldap
+        my $filter="(& (objectClass=group) (| ".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'EXTRACLASS'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}.")".
+           " ) )";
+
+        
+        #print "FILTER: $filter\n";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
@@ -3549,17 +3554,17 @@ sub AD_get_AD {
         my $max_adminclass = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title(
             "$max_adminclass sophomorix adminclasses found in AD");
-        $AD{'RESULT'}{'group'}{'adminclass'}{'COUNT'}=$max_adminclass;
+        $AD{'RESULT'}{'group'}{'class'}{'COUNT'}=$max_adminclass;
         for( my $index = 0 ; $index < $max_adminclass ; $index++) {
             my $entry = $mesg->entry($index);
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
             my $schoolname=$entry->get_value('sophomorixSchoolname');
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'room'}=$sam;
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixStatus'}=$stat;
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixType'}=$type;
-            $AD{'objectclass'}{'group'}{'adminclass'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            $AD{'objectclass'}{'group'}{$type}{$sam}{'room'}=$sam;
+            $AD{'objectclass'}{'group'}{$type}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{'objectclass'}{'group'}{$type}{$sam}{'sophomorixType'}=$type;
+            $AD{'objectclass'}{'group'}{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # lists
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
@@ -3570,8 +3575,8 @@ sub AD_get_AD {
             $AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
         }
         # sorting some lists
-#        my $unneeded=$#{ $AD{'LISTS'}{'adminclass'} }; # make list computer empty to allow sort  
-#        @{ $AD{'LISTS'}{'adminclass'} } = sort @{ $AD{'LISTS'}{'adminclass'} }; 
+#        my $unneeded=$#{ $AD{'LISTS'}{$type} }; # make list computer empty to allow sort  
+#        @{ $AD{'LISTS'}{$type} } = sort @{ $AD{'LISTS'}{$type} }; 
     }
 
 
@@ -3841,6 +3846,9 @@ sub AD_get_AD {
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam;
 
             my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$adminclass};
+            if (not defined $type){
+                print "HERE: $adminclass without TYPE\n"
+            }
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
@@ -3943,11 +3951,18 @@ sub AD_get_AD {
             $AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
             $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
 
-            my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
-            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, $sam;  
 
+            my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
+            if (not defined $type){
+    	        print "\nWARNING: Group ".$entry->get_value('sophomorixAdminClass').
+                " without type (a device account without a group??)\n\n";
+            } else {
+                # there is a group for the user
+                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, 
+                $sam;  
+            }
         }
         # sorting some lists
 #        my $unneeded=$#{ $AD{'LISTS'}{'computer'} }; # make list computer empty to allow sort  

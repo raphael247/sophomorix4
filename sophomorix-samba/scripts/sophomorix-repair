@@ -177,20 +177,17 @@ my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
                            dnsnodes=>"TRUE",
                            sophomorix_config=>\%sophomorix_config,
              });
-my %AD= %$ref_AD; 
-
-
 
 # --dump-AD
 if ($dump_AD==1){
-print "dump \%AD \n";
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
                 log_level => $Conf::log_level,
-                hash_ref=>\%AD,
+                hash_ref=>$ref_AD,
                 sophomorix_config=>\%sophomorix_config,
               });
+    exit;
 }
 
 
@@ -222,7 +219,7 @@ if ($linux==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.linux",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -237,7 +234,7 @@ if ($global==1) {
                          root_dns=>$root_dns,
                          school=>$sophomorix_config{'INI'}{'VARS'}{'GLOBALSHARENAME'},
                          repdir_file=>"repdir.global",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -251,7 +248,7 @@ if ($school==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.school",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -265,7 +262,7 @@ if ($project==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.project",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -279,7 +276,7 @@ if ($globaladministrator_home==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.globaladministrator_home",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -293,7 +290,7 @@ if ($schooladministrator_home==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.schooladministrator_home",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -307,7 +304,7 @@ if ($teacherclass==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.teacherclass",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -321,7 +318,7 @@ if ($teacher_home==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.teacher_home",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -335,7 +332,7 @@ if ($adminclass==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.adminclass",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
@@ -349,7 +346,7 @@ if ($student_home==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.student_home",
-                         AD=>\%AD,
+                         AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,
                          sophomorix_result=>\%sophomorix_result,
