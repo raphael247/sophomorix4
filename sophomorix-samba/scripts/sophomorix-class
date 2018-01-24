@@ -62,8 +62,9 @@ my @arguments = @ARGV;
 my $class_type="adminclass"; # default is adminclass
 
 my %options=();
-$options{'gidnumber_wish'}="---";
-$options{'school'}="---";
+$options{'INFO'}{'STANDALONE'}="TRUE";
+$options{'INFO'}{'GROUP'}="TRUE";
+$options{'DEPENDS'}{'class'}="description,quota";
 
 my $testopt=GetOptions(\%options, 
                        "help|h",
@@ -101,6 +102,17 @@ my $testopt=GetOptions(\%options,
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
+
+# defaults
+if (not defined $options{'gidnumber_wish'}){
+    $options{'gidnumber_wish'}="---";
+}
+if (not defined $options{'school'}){
+    $options{'school'}="---";
+}
+
+print Dumper (\%options);
+
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$options{'json'});
@@ -144,7 +156,7 @@ Options
   -i --adminclass       (displays adminclass)
   -i --teacherclass     (displays teacherclass)
   -i --extraclass       (displays extraclass)
-  -i all                (displays adminclass/teacherclass/extraclass)
+  -i --all              (displays adminclass/teacherclass/extraclass)
 
 Changing an admin-/extra-/teacherclass:
   -c <class>, / --class <class> 

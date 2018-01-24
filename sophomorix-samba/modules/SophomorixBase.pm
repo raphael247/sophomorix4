@@ -80,6 +80,7 @@ sub print_line {
 }
 
 
+
 sub print_title {
    my ($a) = @_;
    if($Conf::log_level>=2){
@@ -4090,37 +4091,67 @@ sub get_group_basename {
 ######################################################################
 # error, when options are not given correctly
 sub check_options{
-   my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
-   # set some defaults
-   if (not defined $ref_options->{'verbose'}){
-       $Conf::log_level=1;
-       $ref_options->{'verbose'}=$Conf::log_level;
-   } else {
-       $Conf::log_level=$ref_options->{'verbose'}+1;
-       $ref_options->{'verbose'}=$Conf::log_level;
-   }
+    my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+    # set some defaults
+    if (not defined $ref_options->{'verbose'}){
+        $Conf::log_level=1;
+        $ref_options->{'verbose'}=$Conf::log_level;
+    } else {
+        $Conf::log_level=$ref_options->{'verbose'}+1;
+        $ref_options->{'verbose'}=$Conf::log_level;
+    }
 
-   if (not defined $ref_options->{'json'}){
-       $ref_options->{'json'}=0;
-   }
-   if (not defined $ref_options->{'info'}){
+    if (not defined $ref_options->{'json'}){
+        $ref_options->{'json'}=0;
+    }
+
+    foreach my $opt (keys %{ $ref_options }){
+        print "Checking option $opt $ref_options->{$opt}\n";
+        if ($opt eq "INFO"){
+           next;
+        }
+        if ($opt eq "DEPENDS"){
+
+           foreach my $target ( keys %{ $ref_options->{$opt} } ){
+               my $dependant=$ref_options->{$opt}{$target};
+               print "$dependant needs $target\n";
+               my @items=split(/,/,$dependant);
+               foreach my $item (@items){
+                   $ref_options->{'TREE'}{$item}=$target;
+               }
+           }
+        } elsif ($opt ne "verbose" and
+            $opt ne "help" and
+            $opt ne "json"
+           ){
+            print "   * remove Mofifiers\n";
+            $ref_options->{'ACTION_OPTIONS'}{$opt}=$ref_options->{$opt};
+        }
+    }
+
+
+    
+
+
+    if (not defined $ref_options->{'info'}){
        $ref_options->{'info'}=0;
-   }
+    }
 
-   print Dumper ($ref_options);
+    print Dumper ($ref_options);
 
-   if (not $parse_ergebnis==1){
-      my @list = split(/\//,$0);
-      my $scriptname = pop @list;
-      print "\nYou have made a mistake, when specifying options.\n"; 
-      print "See error message above. \n\n";
-      print "... $scriptname is terminating.\n\n";
-      exit;
-   } else {
-      if($Conf::log_level>=3){
-         print "All options  were recognized.\n";
-      }
-   }
+
+    if (not $parse_ergebnis==1){
+        my @list = split(/\//,$0);
+        my $scriptname = pop @list;
+        print "\nYou have made a mistake, when specifying options.\n"; 
+        print "See error message above. \n\n";
+        print "... $scriptname is terminating.\n\n";
+        exit;
+    } else {
+        if($Conf::log_level>=3){
+            print "All options  were recognized.\n";
+        }
+    }
 }
 
 # dns queries
