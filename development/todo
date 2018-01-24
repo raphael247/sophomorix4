@@ -81,13 +81,58 @@ my $testopt_new=GetOptions(\%options,
 &check_options($testopt,\%sophomorix_result,$json,\%options);
 
 
+performance
+
+sophomorix-user -ij
+
+2) sophomorix-search
+
+
+--> auf Schule einschränken 
+    --school schule
+
+    schulselektor, 
+
+    --> Listen dazu
+
+    Wichtig dropdown
+
+
+    user in einer gruppe
+
+    -- alle klassen einer Schule
+       (einschränkung projecte)
+    -- computer
+
+    --school einschränkung
+    
+  
+
+1) sophomorix-check : Ergebnis anzeigen
+
+--> 
+
+
 code_cleanup
 %options --> %option?
 Optionen, die default --- haben sind etwas ungeschickt
 
+# options that provide the object PASSWORD
+# These options provide a password, but you can use only one at a time
+$options{'OBJECT_SINGLE'}{'PASSWORD'}="password,randompassword"; 
+
+# options that provide the object USER
+# These options provide a user/userlist, you can use them together
+# class: take the users of a class
+$options{'OBJECT_MULTI'}{'USER'}="user,class";
+$options{'OBJECT_MULTI'}{'GROUP'}="project,extraclass,teacherclass";
+
 
 Vielleicht kann folgendes auch gescripted werden:
 unbenutzte optionen sollen undef sein
+
+
+
 
 Es bleibt immer gesetzte optionen
 
