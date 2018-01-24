@@ -10,13 +10,6 @@ use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
-
-#use Sophomorix::SophomorixConfig;
-#use Sophomorix::SophomorixBase;
-#use Sophomorix::SophomorixAPI;
-#use Sophomorix::SophomorixPgLdap;
-#use DBI;
-#use Net::LDAP;
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -65,53 +58,13 @@ use Sophomorix::SophomorixSambaAD qw(
                                     );
 my @arguments = @ARGV;
 
-# option vars
-#$Conf::log_level=1;
-#my $help=0;
-#my $info=0;
-#my $json=0;
-#my $class="";
-
 # classtype
 my $class_type="adminclass"; # default is adminclass
-#my $adminclass=0;
-#my $teacherclass=0;
-#my $extraclass=0;
-#my $all=0;
-
-#my $create=0;
-#my $gidnumber_wish="---"; # used on creation of class
-#my $set_gidnumber; # used on update
-#my $kill=0;
-#my $school="---";
-
-#my $description;
-#my $quota;
-#my $mailquota;
-#my $mailalias;
-#my $maillist;
-#my $status;
-#my $join;
-#my $hide;
-#my $maxmembers;
-#my $creationdate;
-
-#my $members;
-#my $addmembers;
-#my $removemembers;
-
-#my $admins;
-#my $addadmins;
-#my $removeadmins;
-
-my $reset_class="";
 
 my %options=();
-
-#$Conf::log_level=1;
-#$options{'verbose'}=$Conf::log_level;
 $options{'gidnumber_wish'}="---";
 $options{'school'}="---";
+
 my $testopt=GetOptions(\%options, 
                        "help|h",
                        "info|i",
@@ -145,42 +98,6 @@ my $testopt=GetOptions(\%options,
                        "removemembers=s",
                       );    
 
-
-# Parsen der Optionen
-my $testopt2=GetOptions(
-#           "help|h" => \$help,
-#           "info|i" => \$info,
-#           "json|j+" => \$json,
-#           "verbose|v+" => \$Conf::log_level,
-#           "class|c=s" => \$class,
-#           "all" => \$all,
-#           "adminclass" => \$adminclass,
-#           "teacherclass" => \$teacherclass,
-#           "extraclass" => \$extraclass,
-#           "create" => \$create,
-#           "gidnumber=i" => \$gidnumber_wish,
-#           "kill" => \$kill,
-#           "school=s" => \$school,
-#           "description=s" => \$description,
-#           "quota=s" => \$quota,
-#           "mailquota=s" => \$mailquota,
-#           "status=s" => \$status,
-#           "maxmembers=s" => \$maxmembers,
-#           "creationdate=s" => \$creationdate,
-#           "set-gidnumber=i" => \$set_gidnumber,
-#           "mailalias!" => \$mailalias,
-#           "maillist!" => \$maillist,
-#           "join!" => \$join,
-#           "hide!" => \$hide,
-#           "admins=s" => \$admins,
-#           "addadmins=s" => \$addadmins,
-#           "removeadmins=s" => \$removeadmins,
-#          "members=s" => \$members,
-#           "addmembers=s" => \$addmembers,
-#           "removemembers=s" => \$removemembers,
-#           "reset-class=s" => \$reset_class,
-          );
-
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
@@ -191,7 +108,6 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
-
 
 # calculate $class_type
 if (defined $options{'teacherclass'}){
@@ -273,7 +189,6 @@ Please see the sophomorix-class(8) man pages for full documentation
 # --info
 # show all class when no specific class is given
 if ($options{'info'}==1 and not defined $options{'class'}){
-#if ($info==1 and $class eq ""){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
@@ -300,7 +215,6 @@ if ($options{'info'}==1 and not defined $options{'class'}){
 
 # --info --class <name>
 # list class(es) and exit
-#if ($info==1 and $class ne ""){
 if ($options{'info'}==1 and defined $options{'class'}){
    my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
                                            root_dse=>$root_dse,
@@ -334,7 +248,6 @@ if ($options{'info'}==1 and defined $options{'class'}){
 
 # --create --class <name>
 ############################################################
-#if ($create==1 and $class ne ""){
 if (defined $options{'create'} and defined $options{'class'}){
    &AD_school_create({ldap=>$ldap,
                       root_dse=>$root_dse,
