@@ -66,88 +66,127 @@ use Sophomorix::SophomorixSambaAD qw(
 my @arguments = @ARGV;
 
 # option vars
-$Conf::log_level=1;
-my $help=0;
-my $info=0;
-my $json=0;
-my $class="";
+#$Conf::log_level=1;
+#my $help=0;
+#my $info=0;
+#my $json=0;
+#my $class="";
 
 # classtype
 my $class_type="adminclass"; # default is adminclass
-my $adminclass=0;
-my $teacherclass=0;
-my $extraclass=0;
-my $all=0;
+#my $adminclass=0;
+#my $teacherclass=0;
+#my $extraclass=0;
+#my $all=0;
 
-my $create=0;
-my $gidnumber_wish="---"; # used on creation of class
-my $set_gidnumber; # used on update
-my $kill=0;
-my $school="---";
+#my $create=0;
+#my $gidnumber_wish="---"; # used on creation of class
+#my $set_gidnumber; # used on update
+#my $kill=0;
+#my $school="---";
 
-my $description;
-my $quota;
-my $mailquota;
-my $mailalias;
-my $maillist;
-my $status;
-my $join;
-my $hide;
-my $maxmembers;
-my $creationdate;
+#my $description;
+#my $quota;
+#my $mailquota;
+#my $mailalias;
+#my $maillist;
+#my $status;
+#my $join;
+#my $hide;
+#my $maxmembers;
+#my $creationdate;
 
-my $members;
-my $addmembers;
-my $removemembers;
+#my $members;
+#my $addmembers;
+#my $removemembers;
 
-my $admins;
-my $addadmins;
-my $removeadmins;
+#my $admins;
+#my $addadmins;
+#my $removeadmins;
 
 my $reset_class="";
-$Conf::log_level=1;
+
+my %options=();
+
+#$Conf::log_level=1;
+#$options{'verbose'}=$Conf::log_level;
+$options{'gidnumber_wish'}="---";
+$options{'school'}="---";
+my $testopt=GetOptions(\%options, 
+                       "help|h",
+                       "info|i",
+                       "json|j+",
+                       "verbose|v+",
+                       "class|c=s",
+                       "all",
+                       "adminclass",
+                       "teacherclass",
+                       "extraclass",
+                       "create",
+                       "gidnumber=i",
+                       "kill",
+                       "school=s",
+                       "description=s",
+                       "quota=s",
+                       "mailquota=s",
+                       "status=s",
+                       "maxmembers=s",
+                       "creationdate=s",
+                       "set-gidnumber=i",
+                       "mailalias!",
+                       "maillist!",
+                       "join!",
+                       "hide!",
+                       "admins=s",
+                       "addadmins=s",
+                       "removeadmins=s",
+                       "members=s",
+                       "addmembers=s",
+                       "removemembers=s",
+                      );    
+
 
 # Parsen der Optionen
-my $testopt=GetOptions(
-           "help|h" => \$help,
-           "info|i" => \$info,
-           "json|j+" => \$json,
-           "verbose|v+" => \$Conf::log_level,
-           "class|c=s" => \$class,
-           "all" => \$all,
-           "adminclass" => \$adminclass,
-           "teacherclass" => \$teacherclass,
-           "extraclass" => \$extraclass,
-           "create" => \$create,
-           "gidnumber=i" => \$gidnumber_wish,
-           "kill" => \$kill,
-           "school=s" => \$school,
-           "description=s" => \$description,
-           "quota=s" => \$quota,
-           "mailquota=s" => \$mailquota,
-           "status=s" => \$status,
-           "maxmembers=s" => \$maxmembers,
-           "creationdate=s" => \$creationdate,
-           "set-gidnumber=i" => \$set_gidnumber,
-           "mailalias!" => \$mailalias,
-           "maillist!" => \$maillist,
-           "join!" => \$join,
-           "hide!" => \$hide,
-           "admins=s" => \$admins,
-           "addadmins=s" => \$addadmins,
-           "removeadmins=s" => \$removeadmins,
-          "members=s" => \$members,
-           "addmembers=s" => \$addmembers,
-           "removemembers=s" => \$removemembers,
+my $testopt2=GetOptions(
+#           "help|h" => \$help,
+#           "info|i" => \$info,
+#           "json|j+" => \$json,
+#           "verbose|v+" => \$Conf::log_level,
+#           "class|c=s" => \$class,
+#           "all" => \$all,
+#           "adminclass" => \$adminclass,
+#           "teacherclass" => \$teacherclass,
+#           "extraclass" => \$extraclass,
+#           "create" => \$create,
+#           "gidnumber=i" => \$gidnumber_wish,
+#           "kill" => \$kill,
+#           "school=s" => \$school,
+#           "description=s" => \$description,
+#           "quota=s" => \$quota,
+#           "mailquota=s" => \$mailquota,
+#           "status=s" => \$status,
+#           "maxmembers=s" => \$maxmembers,
+#           "creationdate=s" => \$creationdate,
+#           "set-gidnumber=i" => \$set_gidnumber,
+#           "mailalias!" => \$mailalias,
+#           "maillist!" => \$maillist,
+#           "join!" => \$join,
+#           "hide!" => \$hide,
+#           "admins=s" => \$admins,
+#           "addadmins=s" => \$addadmins,
+#           "removeadmins=s" => \$removeadmins,
+#          "members=s" => \$members,
+#           "addmembers=s" => \$addmembers,
+#           "removemembers=s" => \$removemembers,
 #           "reset-class=s" => \$reset_class,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
 # Prüfen, ob Optionen erkannt wurden
-&check_options($testopt,\%sophomorix_result,$json);
+&check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
 
 # Reading Configuration
-my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$options{'json'});
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
@@ -155,23 +194,24 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
 
 
 # calculate $class_type
-if ($teacherclass==1){
+if (defined $options{'teacherclass'}){
     $class_type="teacherclass";
 }
-if ($extraclass==1){
+if (defined $options{'extraclass'}){
     $class_type="extraclass";
 }
-if ($adminclass==1){
+if (defined $options{'adminclass'}){
     $class_type="adminclass";
 }
-if ($all==1){
+if (defined $options{'all'}){
     $class_type="class";
 }
 
 
 
 # --help
-if ($help==1) {
+#if ($help==1) {
+if (defined $options{'help'}) {
    # Scriptname ermitteln
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
@@ -232,23 +272,24 @@ Please see the sophomorix-class(8) man pages for full documentation
 
 # --info
 # show all class when no specific class is given
-if ($info==1 and $class eq ""){
+if ($options{'info'}==1 and not defined $options{'class'}){
+#if ($info==1 and $class eq ""){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
-                                   school=>$school,
+                                   school=>$options{'school'},
                                    sophomorix_config=>\%sophomorix_config,
                                  });
 
     #print Dumper($ref_group_v->{'LISTS'});
     my $jsoninfo="CLASSES_OVERVIEW";
     my $jsoncomment="All Groups";
-    &json_dump({json => $json,
+    &json_dump({json => $options{'json'},
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
-                object_name => $school,
+                object_name => $options{'school'},
                 type => $class_type,
-                log_level => $Conf::log_level,
+                log_level => $options{'verbose'},
                 hash_ref => $ref_group_v,
                 sophomorix_config => \%sophomorix_config,
                });
@@ -259,21 +300,22 @@ if ($info==1 and $class eq ""){
 
 # --info --class <name>
 # list class(es) and exit
-if ($info==1 and $class ne ""){
+#if ($info==1 and $class ne ""){
+if ($options{'info'}==1 and defined $options{'class'}){
    my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
                                            root_dse=>$root_dse,
                                            root_dns=>$root_dns,
-                                           grouplist=>$class,
+                                           grouplist=>$options{'class'},
                                            sophomorix_config=>\%sophomorix_config,
                                       });
     #print Dumper($ref_groups);
     my $jsoninfo="CLASS";
     my $jsoncomment="Class";
-    &json_dump({json => $json,
+    &json_dump({json => $options{'json'},
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
-                object_name => $school,
-                log_level => $Conf::log_level,
+                object_name => $options{'school'},
+                log_level => $options{'verbose'},
                 hash_ref => $ref_groups,
                 sophomorix_config => \%sophomorix_config,
                });
@@ -281,7 +323,7 @@ if ($info==1 and $class ne ""){
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$options{'json'});
 # ===========================================================================
 # Programmbeginn
 # ===========================================================================
@@ -292,29 +334,30 @@ if ($info==1 and $class ne ""){
 
 # --create --class <name>
 ############################################################
-if ($create==1 and $class ne ""){
+#if ($create==1 and $class ne ""){
+if (defined $options{'create'} and defined $options{'class'}){
    &AD_school_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
-                      school=>$school,
+                      school=>$options{'school'},
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
                       sophomorix_result=>\%sophomorix_result,
                     });
-   my $group_token=&AD_get_name_tokened($class,$school,$class_type);
+   my $group_token=&AD_get_name_tokened($options{'class'},$options{'school'},$class_type);
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
                      root_dns=>$root_dns,
-                     school=>$school,
+                     school=>$options{'school'},
                      group=>$group_token,
-                     group_basename=>$class,
+                     group_basename=>$options{'class'},
                      description=>$group_token,
                      type=>$class_type,
                      status=>"P",
-		     sub_ou=>"OU=".$class.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
+		     sub_ou=>"OU=".$options{'class'}.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
                      joinable=>"TRUE",
                      hidden=>"FALSE",
-                     gidnumber_wish=>$gidnumber_wish,
+                     gidnumber_wish=>$options{'gidnumber'},
                      smb_admin_pass=>$smb_admin_pass,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -325,18 +368,18 @@ if ($create==1 and $class ne ""){
 
 # --kill --class <name>
 ############################################################
-if ($kill==1 and $class ne ""){
-    my $group_token=&AD_get_name_tokened($class,$school,$class_type);
+if (defined $options{'kill'} and defined $options{'class'}){
+    my $group_token=&AD_get_name_tokened($options{'class'},$options{'school'},$class_type);
     &AD_group_kill({ldap=>$ldap,
                     root_dse=>$root_dse,
                     root_dns=>$root_dns,
                     group=>$group_token,
-                    group=>$class,
+                    group=>$options{'class'},
                     smb_admin_pass=>$smb_admin_pass,
                     type=>$class_type,
                     sophomorix_config=>\%sophomorix_config,
                   });
-    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 }
 
 
@@ -347,8 +390,8 @@ my ($dn_class,
     $count,
     $school_AD)=&AD_class_fetch($ldap,
                                 $root_dse,
-                                $class,
-                                $school,
+                                $options{'class'},
+                                $options{'school'},
                                 $class_type,
                                 \%sophomorix_config,
                                );
@@ -357,24 +400,24 @@ if ($count>1){
     print "\n$count classes found.\n";
     print "Specify the school-token to choose a project\n\n";
     &log_script_exit("Specify the school-token to choose a class",$count,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 } elsif ($count==0){
-    print "\nERROR retrieving class $class: $count class found.\n\n";
-    &log_script_exit("ERROR retrieving class $class: $count class found.",$count,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    print "\nERROR retrieving class $options{'class'}: $count class found.\n\n";
+    &log_script_exit("ERROR retrieving class $options{'class'}: $count class found.",$count,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 }
 
 ##################################################
 # ??? --sync_all_memberships for classes? ???
 
 # --description <strg>
-if (defined $description){
+if (defined $options{'description'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      description=>$description,
+                      description=>$options{'description'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -382,13 +425,13 @@ if (defined $description){
 
 
 # --quota <strg>
-if (defined $quota){
+if (defined $options{'quota'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      quota=>$quota,
+                      quota=>$options{'quota'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -396,13 +439,13 @@ if (defined $quota){
 
 
 # --mailquota <strg>
-if (defined $mailquota){
+if (defined $options{'mailquota'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      mailquota=>$mailquota,
+                      mailquota=>$options{'mailquota'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -410,13 +453,13 @@ if (defined $mailquota){
 
 
 # --mailalias/nomailalias
-if (defined $mailalias){
+if (defined $options{'mailalias'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      mailalias=>$mailalias,
+                      mailalias=>$options{'mailalias'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -424,13 +467,13 @@ if (defined $mailalias){
 
 
 # --maillist/--nomaillist
-if (defined $maillist){
+if (defined $options{'maillist'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      maillist=>$maillist,
+                      maillist=>$options{'maillist'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -438,13 +481,13 @@ if (defined $maillist){
 
 
 # --status <P>
-if (defined $status){
+if (defined $options{'status'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      status=>$status,
+                      status=>$options{'status'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -452,13 +495,13 @@ if (defined $status){
 
 
 # --join/--nojoin
-if (defined $join){
+if (defined $options{'join'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      join=>$join,
+                      join=>$options{'join'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -466,13 +509,13 @@ if (defined $join){
 
 
 # --hide/--nohide
-if (defined $hide){
+if (defined $options{'hide'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      hide=>$hide,
+                      hide=>$options{'hide'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -480,13 +523,13 @@ if (defined $hide){
 
 
 # --maxmembers <strg>
-if (defined $maxmembers){
+if (defined $options{'maxmembers'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      maxmembers=>$maxmembers,
+                      maxmembers=>$options{'maxmembers'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -494,13 +537,13 @@ if (defined $maxmembers){
 
 
 # --creationdate <strg>
-if (defined $creationdate){
+if (defined $options{'creationdate'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      creationdate=>$creationdate,
+                      creationdate=>$options{'creationdate'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -508,13 +551,13 @@ if (defined $creationdate){
 
 
 # --set-gidnumber <num>
-if (defined $set_gidnumber){
+if (defined $options{'set-gidnumber'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      gidnumber=>$set_gidnumber,
+                      gidnumber=>$options{'set-gidnumber'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -524,13 +567,13 @@ if (defined $set_gidnumber){
 ##################################################
 # members
 # --members <user1,user2>
-if (defined $members){
+if (defined $options{'members'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      members=>$members,
+                      members=>$options{'members'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -538,8 +581,8 @@ if (defined $members){
 
 
 # --addmembers <user1,user2>
-if (defined $addmembers){
-    my @addmembers=split(/,/,$addmembers);
+if (defined $options{'addmembers'}){
+    my @addmembers=split(/,/,$options{'addmembers'});
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
     my @members = uniq(@old_members,@addmembers); 
     my $members=join(",",@members);
@@ -556,9 +599,9 @@ if (defined $addmembers){
 
  
 # --removemembers <user1,user2>
-if (defined $removemembers){
+if (defined $options{'removemembers'}){
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
-    my @members = &remove_from_list($removemembers,@old_members);
+    my @members = &remove_from_list($options{'removemembers'},@old_members);
     my $members=join(",",@members);
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
@@ -577,13 +620,13 @@ if (defined $removemembers){
 # admins
 
 # --admins <user1,user2>
-if (defined $admins){
+if (defined $options{'admins'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_class,
 		      school=>$school_AD,
                       type=>$class_type,
-                      admins=>$admins,
+                      admins=>$options{'admins'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -591,8 +634,8 @@ if (defined $admins){
 
 
 # --addadmins <user1,user2>
-if (defined $addadmins){
-    my @addadmins=split(/,/,$addadmins);
+if (defined $options{'addadmins'}){
+    my @addadmins=split(/,/,$options{'addadmins'});
     my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixAdmins");
     my @admins = uniq(@old_admins,@addadmins); 
     my $admins=join(",",@admins);
@@ -607,9 +650,9 @@ if (defined $addadmins){
 }
 
 # --removeadmins <user1,user2>
-if (defined $removeadmins){
+if (defined $options{'removeadmins'}){
     my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixAdmins");
-    my @admins = &remove_from_list($removeadmins,@old_admins);
+    my @admins = &remove_from_list($options{'removeadmins'},@old_admins);
     my $admins=join(",",@admins);
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
@@ -626,7 +669,7 @@ if (defined $removeadmins){
 # if ($reset_class ne ""){
 #     if ($reset_class eq ${DevelConf::teacher}){
 #         &log_script_exit("ERROR: This option cannot be used with $reset_class",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
+#                          1,1,0,\@arguments,\%sophomorix_result,$options{'json'});
 #     }
 
 #     my ($group_type)=&pg_get_group_type($reset_class);
@@ -637,7 +680,7 @@ if (defined $removeadmins){
 #         print   "         The option --reset-class can only be used\n",
 #                 "         with type adminclass/hiddenclass\n\n";
 #         &log_script_exit("ERROR: option works only with admin/hiddenclass",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
+#                          1,1,0,\@arguments,\%sophomorix_result,$options{'json'});
 #     }
 
 #     print "Type: $group_type\n";
@@ -680,7 +723,7 @@ if (defined $removeadmins){
 # # Setting Quota if necessary
 # if ($Conf::use_quota eq "yes" 
 #     and $class ne "" 
-#     and (defined $quota or defined $mailquota)
+#     and (defined $options{'quota'} or defined $options{'mailquota'})
 #     ) {
 #     system("${DevelConf::path_sbin}/sophomorix-quota --class $class  --noninteractive");
 #     &nscd_stop();
@@ -702,7 +745,7 @@ if (defined $removeadmins){
 # Ende des Scripts
 # ===========================================================================
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 
 
 

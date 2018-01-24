@@ -72,11 +72,19 @@ sophomorix-user -u (ohne weitere option -i sollte den user anzeigen)
 Wie umsetzen?
 alles anderen optionen verarbeiten, als letztes --info ???
 
-nach help einsetzen
-%set_info($user,$verbose)
-@argv analysieren?
-- if ($user ne "" and $#ARGV=1 (2 optionen sonst nix) ){$info=1}
-evtl. sich noch von verbose/school und so weiter nicht beeindrucken lassen
+BEISPIEL: sophomorix-class
+my %options=();
+my $testopt_new=GetOptions(\%options, 
+                           "help|h",
+                           ...
+                          ); 
+&check_options($testopt,\%sophomorix_result,$json,\%options);
+
+
+code_cleanup
+%options --> %option?
+Optionen, die default --- haben sind etwas ungeschickt
+
 
 siehe Beispiel in sohomorix-minitest
 Es folgnde typen von optionen

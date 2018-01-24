@@ -4090,7 +4090,25 @@ sub get_group_basename {
 ######################################################################
 # error, when options are not given correctly
 sub check_options{
-   my ($parse_ergebnis) = @_;
+   my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+   # set some defaults
+   if (not defined $ref_options->{'verbose'}){
+       $Conf::log_level=1;
+       $ref_options->{'verbose'}=$Conf::log_level;
+   } else {
+       $Conf::log_level=$ref_options->{'verbose'}+1;
+       $ref_options->{'verbose'}=$Conf::log_level;
+   }
+
+   if (not defined $ref_options->{'json'}){
+       $ref_options->{'json'}=0;
+   }
+   if (not defined $ref_options->{'info'}){
+       $ref_options->{'info'}=0;
+   }
+
+   print Dumper ($ref_options);
+
    if (not $parse_ergebnis==1){
       my @list = split(/\//,$0);
       my $scriptname = pop @list;
