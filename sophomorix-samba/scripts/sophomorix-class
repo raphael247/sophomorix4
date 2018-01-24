@@ -343,7 +343,15 @@ if ($kill==1 and $class ne ""){
 
 # get dn if class exists and continue ($info=0)
 ############################################################
-my ($dn_class,$count,$school_AD)=&AD_class_fetch($ldap,$root_dse,$class,$school,$class_type);
+my ($dn_class,
+    $count,
+    $school_AD)=&AD_class_fetch($ldap,
+                                $root_dse,
+                                $class,
+                                $school,
+                                $class_type,
+                                \%sophomorix_config,
+                               );
 
 if ($count>1){
     print "\n$count classes found.\n";

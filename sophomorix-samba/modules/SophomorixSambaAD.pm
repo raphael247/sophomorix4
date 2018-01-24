@@ -3548,7 +3548,6 @@ sub AD_get_AD {
            "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'EXTRACLASS'}.")".
            "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}.")".
            " ) )";
-
         
         #print "FILTER: $filter\n";
         $mesg = $ldap->search( # perform a search
@@ -6432,7 +6431,7 @@ sub AD_get_print_data {
 
 
 sub AD_class_fetch {
-    my ($ldap,$root_dse,$class,$school,$class_type) = @_;
+    my ($ldap,$root_dse,$class,$school,$class_type,$ref_sophomorix_config) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. class7a
     my $school_AD="";
@@ -6442,10 +6441,13 @@ sub AD_class_fetch {
     } else {
         $class_search=&AD_get_name_tokened($class,"---",$class_type);
     }
-    my $filter="(& (objectClass=group) ".
-                  "(cn=".$class_search.") ".
-                  "(|(sophomorixType=adminclass)(sophomorixType=teacherclass)(sophomorixType=extraclass))".
-               " )";
+
+    my $filter="(& (objectClass=group) "."(cn=".$class_search.") ".
+       "(| ".
+       "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}.")".
+       "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'TEACHERCLASS'}.")".
+       "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'EXTRACLASS'}.")".
+       " ) )";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
