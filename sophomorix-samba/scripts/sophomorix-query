@@ -1,0 +1,124 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-query) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+#use IMAP::Admin;
+#use DBI;
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+
+use Sophomorix::SophomorixBase qw(
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                    );
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "help|h" => \$help
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+#&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-query is a performance optimised was to query AD for users, computers and groups.
+
+You can use wildcards (how?)
+
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+  -i  / --info
+  --filter: show the filter that is used
+
+Which Attribute to search for in a user/group/computer:
+--sam|sAMAccountName <string>
+--sn
+--given-name|givenName
+--anyname    (sAMAccountName,sn,givenName, ...)
+
+Limit the query for sophomorix users with a certain sophomorixRole:
+--student 
+--teacher 
+--computer
+
+Query for sophomorix groups with a certain sophomorixType:
+--adminclass 
+--extraclass
+--class              (adminclass|extraclass|teacherclass)
+--teacherclass
+--project
+--sophomorix-group
+
+
+Performance improvements:
+
+Limit the searchbase (this is faster):
+--schoolbase <school> (limit the searchbase to one school or global)
+  Maybe later:
+  --sub-projectbase (only works together with schoolbase)
+
+What attributes to give back:
+--samonly
+--basic  (default)
+--full
+
+
+Maybe:
+What to query (objectclass, should be implied with the options above):
+--oc-user      (an object with the objectclass user)
+--oc-group     (an object with the objectclass group)
+--oc-computer  (an object with the objectclass computer)
+--> Ist this faster?
+
+
+Please see the sophomorix-query(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+
+############################################################
+
+
+print "TEST\n";
+
+
+
+############################################################
+# END: Test code goes here
+############################################################
+
+&AD_unbind_admin($ldap);
+
