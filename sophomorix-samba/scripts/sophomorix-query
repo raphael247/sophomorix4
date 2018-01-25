@@ -59,24 +59,30 @@ Options
   -i  / --info
   --filter: show the filter that is used
 
-Which Attribute to search for in a user/group/computer:
---sam|sAMAccountName <string>
---sn
---given-name|givenName
---anyname    (sAMAccountName,sn,givenName, ...)
+Search attribute(s) to find a user/group/computer:
+(multiple options are connected with &)
+--sam|sAMAccountName <string> 
+--sn <string>
+--gn|givenName  <string>
+--anyname <string>      (All important name fieldssAMAccountName,sn,givenName, ...)
 
-Limit the query for sophomorix users with a certain sophomorixRole:
---student 
---teacher 
---computer
+Limit the query for sophomorix users to a certain sophomorixRole:
+(multiple options are connected with |)
+--student        (sophomorixRole=student)
+--teacher        (sophomorixRole=teacher)
+--computer       (sophomorixRole=teacger)
+... more Roles
 
-Query for sophomorix groups with a certain sophomorixType:
---adminclass 
---extraclass
---class              (adminclass|extraclass|teacherclass)
---teacherclass
---project
---sophomorix-group
+
+Limit the query for sophomorix groups to a certain sophomorixType:
+(multiple options are connected with |)
+--adminclass          (sophomorixType=adminclass)
+--extraclass          (sophomorixType=extraclass)
+--teacherclass        (sophomorixType=teacherclass)
+--class               (| (sophomorixType=adminclass)(sophomorixType=extraclass)(sophomorixType=teacherclass) )
+--project             (sophomorixType=project)
+--sophomorix-group    (sophomorixType=sophomorix-group)
+... more Types
 
 
 Performance improvements:
@@ -86,10 +92,26 @@ Limit the searchbase (this is faster):
   Maybe later:
   --sub-projectbase (only works together with schoolbase)
 
-What attributes to give back:
---samonly
---basic  (default)
---full
+
+What attributes to give back of a user:
+--samonly    (i. E. for dropdown menues)
+--basic      (default)
+--full       (all attributes)
+--members    (add members if object is a group)
+
+
+What attributes to give back of a group:
+--grp-samonly      (i. E. for dropdown menues)
+--grp-basic        (default)
+--grp-full         (all attributes)
+--grp-members      (add members if object is a group)
+
+
+What attributes to give back of a group:
+--comp-samonly    (i. E. for dropdown menues)
+--comp-basic      (default)
+--comp-full       (all attributes)
+--what more?
 
 
 Maybe:
@@ -98,6 +120,14 @@ What to query (objectclass, should be implied with the options above):
 --oc-group     (an object with the objectclass group)
 --oc-computer  (an object with the objectclass computer)
 --> Ist this faster?
+
+
+Examples:
+  Search for all adminclasses and extraclassses of a school for dropdown menue:
+  sophomorix-query --schoolbase <school> --extraclass --adminclass --samonly
+
+  Search for all users (with data for listing) in a group with the name <7a>:
+  sophomorix-query --schoolbase <school> --sam 7a --grp-samonly --group-members --full
 
 
 Please see the sophomorix-query(8) man pages for full documentation
