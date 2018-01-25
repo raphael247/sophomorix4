@@ -64,13 +64,13 @@ Search attribute(s) to find a user/group/computer:
 --sam|sAMAccountName <string> 
 --sn <string>
 --gn|givenName  <string>
---anyname <string>      (All important name fieldssAMAccountName,sn,givenName, ...)
+--anyname <string>      (All important name fields: sAMAccountName,sn,givenName, ...)
 
 Limit the query for sophomorix users to a certain sophomorixRole:
 (multiple options are connected with |)
 --student        (sophomorixRole=student)
 --teacher        (sophomorixRole=teacher)
---computer       (sophomorixRole=teacger)
+--computer       (sophomorixRole=computer)
 ... more Roles
 
 
@@ -93,21 +93,21 @@ Limit the searchbase (this is faster):
   --sub-projectbase (only works together with schoolbase)
 
 
-What attributes to give back of a user:
+What user attributes to return:
 --samonly    (i. E. for dropdown menues)
 --basic      (default)
 --full       (all attributes)
 --members    (add members if object is a group)
 
 
-What attributes to give back of a group:
+What group attributes to return:
 --grp-samonly      (i. E. for dropdown menues)
 --grp-basic        (default)
 --grp-full         (all attributes)
 --grp-members      (add members if object is a group)
 
 
-What attributes to give back of a group:
+What computer attributes to return:
 --comp-samonly    (i. E. for dropdown menues)
 --comp-basic      (default)
 --comp-full       (all attributes)
