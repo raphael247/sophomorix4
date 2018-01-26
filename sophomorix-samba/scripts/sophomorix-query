@@ -51,6 +51,9 @@ my $testopt=GetOptions(\%options,
                         "sophomorix-group",
                         "room",
                         "schoolbase=s",
+                        "samonly",
+                        "basic",
+                        "full",
     );
 
 if ($testopt==0){
@@ -186,6 +189,8 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 my $filter;
 my $base;
 my $scope;
+my $search_object="all";
+
 my $mesg;
 
 
@@ -243,27 +248,35 @@ if (defined $options{'student'} or
     $role_filter=$role_filter."(| ";
     if (defined $options{'student'}){
         $role_filter=$role_filter."(sophomorixRole=student)";
+        $search_object="user";
     }
     if (defined $options{'teacher'}){
         $role_filter=$role_filter."(sophomorixRole=teacher)";
+        $search_object="user";
     }
     if (defined $options{'examuser'}){
         $role_filter=$role_filter."(sophomorixRole=examuser)";
+        $search_object="user";
     }
     if (defined $options{'globaladministrator'}){
         $role_filter=$role_filter."(sophomorixRole=globaladministrator)";
+        $search_object="user";
     }
     if (defined $options{'schooladministrator'}){
         $role_filter=$role_filter."(sophomorixRole=schooladministrator)";
+        $search_object="user";
     }
     if (defined $options{'globalbinduser'}){
         $role_filter=$role_filter."(sophomorixRole=globalbinduser)";
+        $search_object="user";
     }
     if (defined $options{'schoolbinduser'}){
         $role_filter=$role_filter."(sophomorixRole=schoolbinduser)";
+        $search_object="user";
     }
     if (defined $options{'computer'}){
         $role_filter=$role_filter."(sophomorixRole=computer)";
+        $search_object="computer";
     }
     $role_filter=$role_filter." )";
 }
@@ -282,21 +295,27 @@ if (defined $options{'adminclass'} or
     $type_filter=$type_filter."(| ";
     if (defined $options{'adminclass'}){
         $type_filter=$type_filter."(sophomorixType=adminclass)";
+        $search_object="group";
     }
     if (defined $options{'extraclass'}){
         $type_filter=$type_filter."(sophomorixType=extraclass)";
+        $search_object="group";
     }
     if (defined $options{'teacherclass'}){
         $type_filter=$type_filter."(sophomorixType=)";
+        $search_object="group";
     }
     if (defined $options{'project'}){
         $type_filter=$type_filter."(sophomorixType=project)";
+        $search_object="group";
     }
     if (defined $options{'sophomorix-group'}){
         $type_filter=$type_filter."(sophomorixType=sophomorix-group)";
+        $search_object="group";
     }
     if (defined $options{'room'}){
         $type_filter=$type_filter."(sophomorixType=room)";
+        $search_object="group";
     }
     $type_filter=$type_filter." )";
 }
@@ -311,7 +330,15 @@ $filter="(& ".
         "".$type_filter."".
         " )";
 
-my $attrs=['sAMAccountName','sophomorixRole','sophomorixType'];
+
+
+
+
+my $all_attrs;
+my $attrs;
+my $grp_attrs;
+my $comp_attrs;
+
 
 
 
@@ -326,9 +353,10 @@ $mesg = $ldap->search( # perform a search
 
 # debugging
 print Dumper (\%options);
-print "BASE:   $base\n";
-print "SCOPE:  $scope\n";
-print "FILTER: $filter\n";
+print "BASE:       $base\n";
+print "SCOPE:      $scope\n";
+print "FILTER:     $filter\n";
+print "SEARCH FOR: $search_object\n";
 
         my $max = $mesg->count; 
         print "$max Results\n";
@@ -338,20 +366,86 @@ print "FILTER: $filter\n";
             my $sam=$entry->get_value('sAMAccountName');
             my $role=$entry->get_value('sophomorixRole');
             my $type=$entry->get_value('sophomorixType');
-            my $objectclass;
+            my $s_objectclass;
             if (defined $role){
                 if ($role eq "computer"){
-                    $objectclass="computer";
+                    $s_objectclass="computer";
                 } else {
-                    $objectclass="user";
+                    $s_objectclass="user";
                 }
             }
             if (defined $type){
-                    $objectclass="group";
+                    $s_objectclass="group";
             }
-            print "   * $sam (objectclass=$objectclass)\n";
+            print "   * $sam (sophomorix objectclass=$s_objectclass)\n";
 
         }
+
+
+
+
+# TODO ?????
+# search for abjectclass
+
+
+if ($search_object eq "user"){
+    # set list of search attributes, depending on options
+    if (defined $options{'samonly'}){
+        # user
+        $attrs=['sAMAccountName'];
+    } elsif (defined $options{'basic'}){
+        $attrs=['sAMAccountName',
+                'sophomorixRole'];
+    } elsif (defined $options{'full'}){
+        $attrs=['sAMAccountName',
+                'sophomorixRole'];
+    }
+
+
+
+
+    # do the search, include objectclass
+
+    # skip nonsophomorix-objects
+
+    # create json object
+
+} elsif ($search_object eq "group"){
+    # set list of search attributes, depending on options
+    if (defined $options{'grp-samonly'}){
+        # user
+        $attrs=['sAMAccountName'];
+    } elsif (defined $options{'grp-basic'}){
+        $attrs=['sAMAccountName',
+                'sophomorixType'];
+    } elsif (defined $options{'grp-full'}){
+        $attrs=['sAMAccountName',
+                'sophomorixType'];
+    }
+
+    # do the search, include objectclass
+
+    # skip nonsophomorix-objects
+
+    # create json object
+
+    # add members, if option is given
+
+} elsif ($search_object eq "computer"){
+    # set list of search attributes, depending on options
+
+    # do the search, include objectclass
+
+    # skip nonsophomorix-objects
+
+    # create json object
+
+
+} elsif ($search_object eq "all"){
+    # show non sophomorix users also
+}
+
+
 
 
 
