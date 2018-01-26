@@ -26,22 +26,34 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_unbind_admin
                                     );
 
-# Variablen für Optionen
-$Conf::log_level=1;
-my $help=0;
-
 # Parsen der Optionen
-my $testopt=GetOptions(
-           "verbose|v+" => \$Conf::log_level,
-           "help|h" => \$help
-          );
+my %options=();
+$Conf::log_level=1; # remove later
+my $testopt=GetOptions(\%options, 
+                        "sam|sAMAccountName=s",
+                        "sn=s",
+                        "gn|givenName=s",
+                        "anyname=s",
+                        "student",
+                        "teacher",
+                        "examuser",
+                        "globaladministrator",
+                        "schooladministrator",
+                        "globalbinduser",
+                        "schoolbinduser",
+                        "computer",
+    );
 
+if ($testopt==0){
+    print "Option Error";
+    exit;
+}
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 #&check_options($testopt);
 
 # --help
-if ($help==1) {
+if (defined $options{'help'}) {
    # Scriptname ermitteln
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
@@ -68,11 +80,14 @@ Search attribute(s) to find a user/group/computer:
 
 Limit the query for sophomorix users to a certain sophomorixRole:
 (multiple options are connected with |)
---student        (sophomorixRole=student)
---teacher        (sophomorixRole=teacher)
---computer       (sophomorixRole=computer)
-... more Roles
-
+--student               (sophomorixRole=student)
+--teacher               (sophomorixRole=teacher)
+--examuser              (sophomorixRole=examuser)
+--globaladministrator   (sophomorixRole=globaladministrator)
+--schooladministrator   (sophomorixRole=schooladministrator)
+--globalbinduser        (sophomorixRole=globalbinduser)
+--schoolbinduser        (sophomorixRole=schoolbinduser)
+--computer              (sophomorixRole=computer)
 
 Limit the query for sophomorix groups to a certain sophomorixType:
 (multiple options are connected with |)
@@ -142,7 +157,142 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 ############################################################
 
 
-print "TEST\n";
+
+
+my $filter;
+my $base;
+my $scope;
+my $mesg;
+
+
+
+
+
+$base=$root_dse;
+$scope="sub";
+
+# ( & (attr_filter) (role_filter) (type_filter) )
+
+
+$filter="(& ";
+
+############################################################
+# attribute filter
+my $attr_filter="";
+if (defined $options{'sam'} or 
+    defined $options{'sn'} or 
+    defined $options{'gn'}){
+    ###
+    $attr_filter=$attr_filter."(& ";
+    if (defined $options{'sam'}){
+        $attr_filter=$attr_filter."(sAMAccountName=".$options{'sam'}.")";
+    }
+    if (defined $options{'sn'}){
+        $attr_filter=$attr_filter."(sn=".$options{'sn'}.")";
+    }
+    if (defined $options{'gn'}){
+        $attr_filter=$attr_filter."(givenName=".$options{'gn'}.")";
+    }
+    $attr_filter=$attr_filter." )";
+}
+
+############################################################
+# role filter
+my $role_filter="";
+if (defined $options{'student'} or 
+    defined $options{'teacher'} or 
+    defined $options{'examuser'} or 
+    defined $options{'globaladministrator'} or 
+    defined $options{'schooladministrator'} or 
+    defined $options{'globalbinduser'} or 
+    defined $options{'schoolbinduser'} or 
+    defined $options{'computer'}){
+    ###
+    $role_filter=$role_filter."(| ";
+    if (defined $options{'student'}){
+        $role_filter=$role_filter."(sophomorixRole=student)";
+    }
+    if (defined $options{'teacher'}){
+        $role_filter=$role_filter."(sophomorixRole=teacher)";
+    }
+    if (defined $options{'examuser'}){
+        $role_filter=$role_filter."(sophomorixRole=examuser)";
+    }
+    if (defined $options{'globaladministrator'}){
+        $role_filter=$role_filter."(sophomorixRole=globaladministrator)";
+    }
+    if (defined $options{'schooladministrator'}){
+        $role_filter=$role_filter."(sophomorixRole=schooladministrator)";
+    }
+    if (defined $options{'globalbinduser'}){
+        $role_filter=$role_filter."(sophomorixRole=globalbinduser)";
+    }
+    if (defined $options{'schoolbinduser'}){
+        $role_filter=$role_filter."(sophomorixRole=schoolbinduser)";
+    }
+    if (defined $options{'computer'}){
+        $role_filter=$role_filter."(sophomorixRole=computer)";
+    }
+    $role_filter=$role_filter." )";
+}
+
+
+############################################################
+# type filter
+my $type_filter="";
+# if (defined $options{'} or 
+#     defined $options{''} or 
+#     defined $options{''}){
+#     ###
+#     $type_filter=$type_filter."(| ";
+#     if (defined $options{'student'}){
+#         $type_filter=$type_filter."(sophomorixType=student)";
+#     }
+#     if (defined $options{'teacher'}){
+#         $type_filter=$type_filter."(sophomorixType=teacher)";
+#     }
+#     if (defined $options{'computer'}){
+#         $type_filter=$type_filter."(sophomorixType=computer)";
+#     }
+#     $type_filter=$type_filter." )";
+# }
+
+
+
+############################################################
+$filter="(& ".
+        "".$attr_filter."".
+        "".$role_filter."".
+        "".$type_filter."".
+        " )";
+
+
+
+
+$mesg = $ldap->search( # perform a search
+                      base   => $base,
+                      scope => $scope,
+                      filter => $filter,
+                      attrs => ['sAMAccountName']
+                      );
+
+# debugging
+print Dumper (\%options);
+print "BASE:   $base\n";
+print "SCOPE:  $scope\n";
+print "FILTER: $filter\n";
+
+
+        my $max = $mesg->count; 
+        print "$max Results\n";
+        for( my $index = 0 ; $index < $max ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            print "   * $sam\n";
+
+        }
+
 
 
 
