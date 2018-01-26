@@ -30,6 +30,7 @@ use Sophomorix::SophomorixSambaAD qw(
 my %options=();
 $Conf::log_level=1; # remove later
 my $testopt=GetOptions(\%options, 
+                        "help|h",
                         "sam|sAMAccountName=s",
                         "sn=s",
                         "gn|givenName=s",
@@ -42,12 +43,30 @@ my $testopt=GetOptions(\%options,
                         "globalbinduser",
                         "schoolbinduser",
                         "computer",
+                        "adminclass",
+                        "extraclass",
+                        "teacherclass",
+                        "class",
+                        "project",
+                        "sophomorix-group",
+                        "room",
+                        "schoolbase=s",
     );
 
 if ($testopt==0){
     print "Option Error";
     exit;
 }
+
+
+if (defined $options{'class'}){
+    # find the group types
+    $options{'adminclass'}=1;
+    $options{'extraclass'}=1;
+    $options{'teacherclass'}=1;
+}
+
+
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 #&check_options($testopt);
@@ -61,7 +80,12 @@ if (defined $options{'help'}) {
    print('
 sophomorix-query is a performance optimised was to query AD for users, computers and groups.
 
-You can use wildcards (how?)
+Searches are case insensitive:
+  --sam GasT      will find Gast,GAST, .....
+
+If you use the following wildcardcharacters, put them in quotation marks:
+  --sam "g*"       finds all sAMAccountName that beginn with g
+
 
 
 Options
@@ -97,8 +121,7 @@ Limit the query for sophomorix groups to a certain sophomorixType:
 --class               (| (sophomorixType=adminclass)(sophomorixType=extraclass)(sophomorixType=teacherclass) )
 --project             (sophomorixType=project)
 --sophomorix-group    (sophomorixType=sophomorix-group)
-... more Types
-
+--room                (sophomorixType=room)
 
 Performance improvements:
 
@@ -167,8 +190,16 @@ my $mesg;
 
 
 
+if (defined $options{'schoolbase'}){
+    if ($options{'schoolbase'} eq "global"){
+        $base="OU=GLOBAL,".$root_dse;
+    } else {
+        $base="OU=".$options{'schoolbase'}.",OU=SCHOOLS,".$root_dse;
+    }
+} else {
+    $base=$root_dse;
+}
 
-$base=$root_dse;
 $scope="sub";
 
 # ( & (attr_filter) (role_filter) (type_filter) )
@@ -240,22 +271,34 @@ if (defined $options{'student'} or
 ############################################################
 # type filter
 my $type_filter="";
-# if (defined $options{'} or 
-#     defined $options{''} or 
-#     defined $options{''}){
-#     ###
-#     $type_filter=$type_filter."(| ";
-#     if (defined $options{'student'}){
-#         $type_filter=$type_filter."(sophomorixType=student)";
-#     }
-#     if (defined $options{'teacher'}){
-#         $type_filter=$type_filter."(sophomorixType=teacher)";
-#     }
-#     if (defined $options{'computer'}){
-#         $type_filter=$type_filter."(sophomorixType=computer)";
-#     }
-#     $type_filter=$type_filter." )";
-# }
+if (defined $options{'adminclass'} or 
+    defined $options{'extraclass'} or 
+    defined $options{'teacherclass'} or 
+    defined $options{'project'} or 
+    defined $options{'sophomorix-group'} or 
+    defined $options{'room'}){
+     ###
+    $type_filter=$type_filter."(| ";
+    if (defined $options{'adminclass'}){
+        $type_filter=$type_filter."(sophomorixType=adminclass)";
+    }
+    if (defined $options{'extraclass'}){
+        $type_filter=$type_filter."(sophomorixType=extraclass)";
+    }
+    if (defined $options{'teacherclass'}){
+        $type_filter=$type_filter."(sophomorixType=)";
+    }
+    if (defined $options{'project'}){
+        $type_filter=$type_filter."(sophomorixType=project)";
+    }
+    if (defined $options{'sophomorix-group'}){
+        $type_filter=$type_filter."(sophomorixType=sophomorix-group)";
+    }
+    if (defined $options{'room'}){
+        $type_filter=$type_filter."(sophomorixType=room)";
+    }
+    $type_filter=$type_filter." )";
+}
 
 
 
