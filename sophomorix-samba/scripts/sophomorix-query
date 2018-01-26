@@ -96,14 +96,15 @@ Options
   --filter: show the filter that is used
 
 Search attribute(s) to find a user/group/computer:
-(multiple options are connected with &)
+(multiple options are connected with & to narrow down the search)
 --sam|sAMAccountName <string> 
 --sn <string>
 --gn|givenName  <string>
+# Later
 --anyname <string>      (All important name fields: sAMAccountName,sn,givenName, ...)
 
 Limit the query for sophomorix users to a certain sophomorixRole:
-(multiple options are connected with |)
+(multiple options are connected with | to accumulate the results)
 --student               (sophomorixRole=student)
 --teacher               (sophomorixRole=teacher)
 --examuser              (sophomorixRole=examuser)
@@ -114,7 +115,7 @@ Limit the query for sophomorix users to a certain sophomorixRole:
 --computer              (sophomorixRole=computer)
 
 Limit the query for sophomorix groups to a certain sophomorixType:
-(multiple options are connected with |)
+(multiple options are connected with | to accumulate the results)
 --adminclass          (sophomorixType=adminclass)
 --extraclass          (sophomorixType=extraclass)
 --teacherclass        (sophomorixType=teacherclass)
@@ -127,7 +128,7 @@ Performance improvements:
 
 Limit the searchbase (this is faster):
 --schoolbase <school> (limit the searchbase to one school or global)
-  Maybe later:
+  # Later:
   --sub-projectbase (only works together with schoolbase)
 
 
@@ -303,20 +304,24 @@ if (defined $options{'adminclass'} or
 
 
 ############################################################
+# combine the filters
 $filter="(& ".
         "".$attr_filter."".
         "".$role_filter."".
         "".$type_filter."".
         " )";
 
+my $attrs=['sAMAccountName','sophomorixRole','sophomorixType'];
 
 
 
+############################################################
+# do the search
 $mesg = $ldap->search( # perform a search
                       base   => $base,
                       scope => $scope,
                       filter => $filter,
-                      attrs => ['sAMAccountName']
+                      attrs => $attrs,
                       );
 
 # debugging
@@ -325,14 +330,26 @@ print "BASE:   $base\n";
 print "SCOPE:  $scope\n";
 print "FILTER: $filter\n";
 
-
         my $max = $mesg->count; 
         print "$max Results\n";
         for( my $index = 0 ; $index < $max ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
             my $sam=$entry->get_value('sAMAccountName');
-            print "   * $sam\n";
+            my $role=$entry->get_value('sophomorixRole');
+            my $type=$entry->get_value('sophomorixType');
+            my $objectclass;
+            if (defined $role){
+                if ($role eq "computer"){
+                    $objectclass="computer";
+                } else {
+                    $objectclass="user";
+                }
+            }
+            if (defined $type){
+                    $objectclass="group";
+            }
+            print "   * $sam (objectclass=$objectclass)\n";
 
         }
 
