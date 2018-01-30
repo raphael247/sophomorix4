@@ -52,6 +52,13 @@ my $testopt=GetOptions(\%options,
                         "samonly",
                         "basic",
                         "full",
+                        "grp-samonly",
+                        "grp-basic",
+                        "grp-full",
+                        "grp-members",
+                        "comp-samonly",
+                        "comp-basic",
+                        "comp-full",
     );
 
 if ($testopt==0){
@@ -132,20 +139,16 @@ Limit the searchbase (this is faster):
   # Later:
   --sub-projectbase (only works together with schoolbase)
 
-
 What user attributes to return:
 --samonly    (i. E. for dropdown menues)
 --basic      (default)
 --full       (all attributes)
---members    (add members if object is a group)
-
 
 What group attributes to return:
 --grp-samonly      (i. E. for dropdown menues)
 --grp-basic        (default)
 --grp-full         (all attributes)
 --grp-members      (add members if object is a group)
-
 
 What computer attributes to return:
 --comp-samonly    (i. E. for dropdown menues)
@@ -405,6 +408,10 @@ if ($search_object eq "user"){
             'sophomorixType'];
 }
 
+if (defined $options{'grp-members'}){
+    push @{ $attrs },"member";
+}
+
 
 
 ############################################################
@@ -444,12 +451,31 @@ for( my $index = 0 ; $index < $max ; $index++) {
     my $sam=$entry->get_value('sAMAccountName');
     push @{ $search{'LISTS'}{$topkey} }, $sam; 
     foreach my $attribute ( @{ $attrs } ){
+        if ($attribute eq "member"){
+            next;
+        }
         $search{$topkey}{$sam}{$attribute}=$entry->get_value($attribute);    
     }
-    
+    # find group members
+    if (defined $options{'grp-members'}){
+        my @members = $entry->get_value('member');
+        foreach my $member (@members){
+            my ($usersam,@rest)=split(/,/,$member);
+            $usersam=~s/^CN=//;
+            #print "HERE: >$sam< $member\n";
+            $search{'MEMBERS'}{$sam}{$usersam}{'sAMAccountName'}=$usersam;
+            $search{'MEMBERS'}{$sam}{$usersam}{'dn'}=$member;
+            push @{ $search{'MEMBERLIST'}{$sam} }, $usersam;
+        }
+    }
+    if (exists $search{'MEMBERLIST'}{$sam}){
+        @{ $search{'MEMBERLIST'}{$sam} } = sort @{ $search{'MEMBERLIST'}{$sam} };
+    }
 }
 
-@{ $search{'LISTS'}{$topkey} } = sort @{ $search{'LISTS'}{$topkey} };
+if (exists $search{'LISTS'}{$topkey}){
+    @{ $search{'LISTS'}{$topkey} } = sort @{ $search{'LISTS'}{$topkey} };
+}
 
 # print JSON Object
 &json_printout(\%search);
