@@ -6,19 +6,16 @@
 
 # modules
 use strict;
-#use Quota;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
-#use IMAP::Admin;
-#use DBI;
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
-
+use JSON;
 use Sophomorix::SophomorixBase qw(
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -31,6 +28,7 @@ my %options=();
 $Conf::log_level=1; # remove later
 my $testopt=GetOptions(\%options, 
                         "help|h",
+                        "verbose|v+",
                         "sam|sAMAccountName=s",
                         "sn=s",
                         "gn|givenName=s",
@@ -183,8 +181,22 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 
 ############################################################
 
+my $all_attrs;
+my $attrs;
+my $grp_attrs;
+my $comp_attrs;
+my $objectclass_filter="";
+
+my $topkey;
+my $topcountkey;
 
 
+my $attr_filter="";
+my $role_filter="";
+my $type_filter="";
+
+my %search=();
+my $max;
 
 my $filter;
 my $base;
@@ -214,8 +226,7 @@ $scope="sub";
 $filter="(& ";
 
 ############################################################
-# attribute filter
-my $attr_filter="";
+# set the attribute filter
 if (defined $options{'sam'} or 
     defined $options{'sn'} or 
     defined $options{'gn'}){
@@ -234,8 +245,7 @@ if (defined $options{'sam'} or
 }
 
 ############################################################
-# role filter
-my $role_filter="";
+# set the role filter (combined with |)
 if (defined $options{'student'} or 
     defined $options{'teacher'} or 
     defined $options{'examuser'} or 
@@ -283,8 +293,7 @@ if (defined $options{'student'} or
 
 
 ############################################################
-# type filter
-my $type_filter="";
+# set the type filter (combined with |)
 if (defined $options{'adminclass'} or 
     defined $options{'extraclass'} or 
     defined $options{'teacherclass'} or 
@@ -322,76 +331,18 @@ if (defined $options{'adminclass'} or
 
 
 
-############################################################
-# combine the filters
-$filter="(& ".
-        "".$attr_filter."".
-        "".$role_filter."".
-        "".$type_filter."".
-        " )";
-
-
-
-
-
-my $all_attrs;
-my $attrs;
-my $grp_attrs;
-my $comp_attrs;
-
-
-
 
 ############################################################
-# do the search
-$mesg = $ldap->search( # perform a search
-                      base   => $base,
-                      scope => $scope,
-                      filter => $filter,
-                      attrs => $attrs,
-                      );
-
-# debugging
-print Dumper (\%options);
-print "BASE:       $base\n";
-print "SCOPE:      $scope\n";
-print "FILTER:     $filter\n";
-print "SEARCH FOR: $search_object\n";
-
-        my $max = $mesg->count; 
-        print "$max Results\n";
-        for( my $index = 0 ; $index < $max ; $index++) {
-            my $entry = $mesg->entry($index);
-            my $dn = $entry->dn();
-            my $sam=$entry->get_value('sAMAccountName');
-            my $role=$entry->get_value('sophomorixRole');
-            my $type=$entry->get_value('sophomorixType');
-            my $s_objectclass;
-            if (defined $role){
-                if ($role eq "computer"){
-                    $s_objectclass="computer";
-                } else {
-                    $s_objectclass="user";
-                }
-            }
-            if (defined $type){
-                    $s_objectclass="group";
-            }
-            print "   * $sam (sophomorix objectclass=$s_objectclass)\n";
-
-        }
-
-
-
-
-# TODO ?????
-# search for abjectclass
-
-
+# set attributes and object class to search for
 if ($search_object eq "user"){
+    $topkey="USER";
+    $topcountkey="USERCOUNT";
+    $objectclass_filter="(objectclass=user)";
+    # default
+    $attrs=['sAMAccountName',
+            'sophomorixRole'];
     # set list of search attributes, depending on options
     if (defined $options{'samonly'}){
-        # user
         $attrs=['sAMAccountName'];
     } elsif (defined $options{'basic'}){
         $attrs=['sAMAccountName',
@@ -400,18 +351,14 @@ if ($search_object eq "user"){
         $attrs=['sAMAccountName',
                 'sophomorixRole'];
     }
-
-
-
-
-    # do the search, include objectclass
-
-    # skip nonsophomorix-objects
-
-    # create json object
-
 } elsif ($search_object eq "group"){
+    $topkey="GROUP";
+    $topcountkey="GROUPCOUNT";
+    $objectclass_filter="(objectclass=group)";
     # set list of search attributes, depending on options
+    # default
+    $attrs=['sAMAccountName',
+            'sophomorixType'];
     if (defined $options{'grp-samonly'}){
         # user
         $attrs=['sAMAccountName'];
@@ -422,37 +369,93 @@ if ($search_object eq "user"){
         $attrs=['sAMAccountName',
                 'sophomorixType'];
     }
-
-    # do the search, include objectclass
-
-    # skip nonsophomorix-objects
-
-    # create json object
-
-    # add members, if option is given
-
 } elsif ($search_object eq "computer"){
+    $topkey="COMPUTER";
+    $topcountkey="COMPUTERCOUNT";
+    $objectclass_filter="(objectclass=computer)";
     # set list of search attributes, depending on options
-
-    # do the search, include objectclass
-
-    # skip nonsophomorix-objects
-
-    # create json object
-
-
+    # default
+    $attrs=['sAMAccountName',
+            'sophomorixType'];
+    if (defined $options{'comp-samonly'}){
+        # user
+        $attrs=['sAMAccountName'];
+    } elsif (defined $options{'comp-basic'}){
+        $attrs=['sAMAccountName',
+                'sophomorixType'];
+    } elsif (defined $options{'comp-full'}){
+        $attrs=['sAMAccountName',
+                'sophomorixType'];
+    }
 } elsif ($search_object eq "all"){
+    $topkey="ALL";
+    $topcountkey="ALLCOUNT";   
     # show non sophomorix users also
 }
 
 
 
-
-
+############################################################
+# combine the filters
+$filter="(& ".
+        "".$objectclass_filter."".
+        "".$attr_filter."".
+        "".$role_filter."".
+        "".$type_filter."".
+        " )";
 
 ############################################################
-# END: Test code goes here
-############################################################
+# do the search
+$mesg = $ldap->search( # perform a search
+               base   => $base,
+               scope => $scope,
+               filter => $filter,
+               attrs => $attrs,
+              );
+
+# debugging
+if (defined $options{'verbose'} and $options{'verbose'}==1){
+    print Dumper (\%options);
+    print "BASE:       $base\n";
+    print "SCOPE:      $scope\n";
+    print "FILTER:     $filter\n";
+    print "SEARCH FOR: $search_object\n";
+}
+
+$max = $mesg->count; 
+$search{$topcountkey}=$max; 
+for( my $index = 0 ; $index < $max ; $index++) {
+    my $entry = $mesg->entry($index);
+    my $dn = $entry->dn();
+    my $sam=$entry->get_value('sAMAccountName');
+    foreach my $attribute ( @{ $attrs } ){
+        $search{$topkey}{$sam}{$attribute}=$entry->get_value($attribute);    
+    }
+}
+
+
+&json_printout(\%search);
+
+
+
+
+
+
+
+
+
+
+
 
 &AD_unbind_admin($ldap);
 
+############################################################
+# sub
+############################################################
+sub json_printout {
+    my ($ref_search)=@_;
+    #print Dumper ($ref_search);
+    my $json_obj = JSON->new->allow_nonref;
+    my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_search );
+    print STDERR "$utf8_pretty_printed";
+}
