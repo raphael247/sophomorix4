@@ -150,16 +150,7 @@ What group attributes to return:
 What computer attributes to return:
 --comp-samonly    (i. E. for dropdown menues)
 --comp-basic      (default)
---comp-full       (all attributes)
---what more?
-
-
-Maybe:
-What to query (objectclass, should be implied with the options above):
---oc-user      (an object with the objectclass user)
---oc-group     (an object with the objectclass group)
---oc-computer  (an object with the objectclass computer)
---> Ist this faster?
+--comp-full       (all useful attributes)
 
 
 Examples:
@@ -324,7 +315,7 @@ if (defined $options{'adminclass'} or
     }
     if (defined $options{'room'}){
         $type_filter=$type_filter."(sophomorixType=room)";
-        $search_object="group";
+        $search_object="room";
     }
     $type_filter=$type_filter." )";
 }
@@ -333,7 +324,8 @@ if (defined $options{'adminclass'} or
 
 
 ############################################################
-# set attributes and object class to search for
+# set attributes 
+# and object class to search for
 if ($search_object eq "user"){
     $topkey="USER";
     $topcountkey="USERCOUNT";
@@ -354,6 +346,24 @@ if ($search_object eq "user"){
 } elsif ($search_object eq "group"){
     $topkey="GROUP";
     $topcountkey="GROUPCOUNT";
+    $objectclass_filter="(objectclass=group)";
+    # set list of search attributes, depending on options
+    # default
+    $attrs=['sAMAccountName',
+            'sophomorixType'];
+    if (defined $options{'grp-samonly'}){
+        # user
+        $attrs=['sAMAccountName'];
+    } elsif (defined $options{'grp-basic'}){
+        $attrs=['sAMAccountName',
+                'sophomorixType'];
+    } elsif (defined $options{'grp-full'}){
+        $attrs=['sAMAccountName',
+                'sophomorixType'];
+    }
+} elsif ($search_object eq "room"){
+    $topkey="ROOM";
+    $topcountkey="ROOMCOUNT";
     $objectclass_filter="(objectclass=group)";
     # set list of search attributes, depending on options
     # default
@@ -391,6 +401,8 @@ if ($search_object eq "user"){
     $topkey="ALL";
     $topcountkey="ALLCOUNT";   
     # show non sophomorix users also
+    $attrs=['sAMAccountName',
+            'sophomorixType'];
 }
 
 
@@ -413,6 +425,7 @@ $mesg = $ldap->search( # perform a search
                attrs => $attrs,
               );
 
+
 # debugging
 if (defined $options{'verbose'} and $options{'verbose'}==1){
     print Dumper (\%options);
@@ -422,27 +435,24 @@ if (defined $options{'verbose'} and $options{'verbose'}==1){
     print "SEARCH FOR: $search_object\n";
 }
 
+
 $max = $mesg->count; 
 $search{$topcountkey}=$max; 
 for( my $index = 0 ; $index < $max ; $index++) {
     my $entry = $mesg->entry($index);
     my $dn = $entry->dn();
     my $sam=$entry->get_value('sAMAccountName');
+    push @{ $search{'LISTS'}{$topkey} }, $sam; 
     foreach my $attribute ( @{ $attrs } ){
         $search{$topkey}{$sam}{$attribute}=$entry->get_value($attribute);    
     }
+    
 }
 
+@{ $search{'LISTS'}{$topkey} } = sort @{ $search{'LISTS'}{$topkey} };
 
+# print JSON Object
 &json_printout(\%search);
-
-
-
-
-
-
-
-
 
 
 
