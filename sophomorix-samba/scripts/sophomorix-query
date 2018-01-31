@@ -570,22 +570,19 @@ if (defined $options{'verbose'} and $options{'verbose'}==1){
 
 # go through results
 $max = $mesg->count; 
-$search{$top_count_key}=$max; 
+$search{'COUNTERS'}{$top_count_key}=$max; 
 for( my $index = 0 ; $index < $max ; $index++) {
     my $entry = $mesg->entry($index);
     my $dn = $entry->dn();
     my $sam=$entry->get_value('sAMAccountName');
     push @{ $search{'LISTS'}{$top_key} }, $sam;
-    # work on single value attributes 
+    # read single value attributes into %search 
     foreach my $attribute ( @{ $single_attrs } ){
         $search{$top_key}{$sam}{$attribute}=$entry->get_value($attribute);    
     }
-    # work on multi value attributes
+    # read multi value attributes into %search
     foreach my $attribute ( @{ $multi_attrs } ){
-        if ($attribute eq "member"){
-            # member is not needed
-            next;
-        }
+        if ($attribute eq "member"){next;}; # member is not needed at group, only to find members 
         @{ $search{$top_key}{$sam}{$attribute} }=$entry->get_value($attribute);
     }
 
@@ -614,7 +611,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
             # searching for something strange
             exit;
         }
-        $search{$top_count_key_members}{$sam}=$#members+1;;
+        $search{'COUNTERS'}{$top_count_key_members}{$sam}=$#members+1;;
         foreach my $member (@members){
             my ($usersam,@rest)=split(/,/,$member);
             $usersam=~s/^CN=//;
@@ -651,14 +648,15 @@ for( my $index = 0 ; $index < $max ; $index++) {
             }
         }
     }
-    if (defined $search{'LISTS'}{$top_list_key_members}{$sam}){
+    
+    if (defined $search{'LISTS'}{$top_list_key_members}){
         @{ $search{'LISTS'}{$top_list_key_members}{$sam} } = sort @{ $search{'LISTS'}{$top_list_key_members}{$sam} };
     }
 }
 
 
 
-if (exists $search{'LISTS'}{$top_key}){
+if ($#{ $search{'LISTS'}{$top_key} }>1){
     @{ $search{'LISTS'}{$top_key} } = sort @{ $search{'LISTS'}{$top_key} };
 }
 
