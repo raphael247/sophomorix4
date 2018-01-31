@@ -49,14 +49,14 @@ my $testopt=GetOptions(\%options,
                         "sophomorix-group",
                         "room",
                         "schoolbase=s",
-                        "samonly",
-                        "basic",
-                        "full",
-                        "grp-samonly",
-                        "grp-basic",
-                        "grp-full",
-                        "grp-members",
-                        "comp-samonly",
+                        "user-minimal",
+                        "user-basic",
+                        "user-full",
+                        "group-minimal",
+                        "group-basic",
+                        "group-full",
+                        "group-members",
+                        "comp-minimal",
                         "comp-basic",
                         "comp-full",
     );
@@ -140,28 +140,28 @@ Limit the searchbase (this is faster):
   --sub-projectbase (only works together with schoolbase)
 
 What user attributes to return:
---samonly    (i. E. for dropdown menues)
---basic      (default)
---full       (all attributes)
+--user-minimal    (i. E. for dropdown menues)
+--user-basic      (default)
+--user-full       (all attributes)
 
 What group attributes to return:
---grp-samonly      (i. E. for dropdown menues)
---grp-basic        (default)
---grp-full         (all attributes)
---grp-members      (add members if object is a group)
+--group-minimal      (i. E. for dropdown menues)
+--group-basic        (default)
+--group-full         (all attributes)
+--group-members      (add members if object is a group)
 
 What computer attributes to return:
---comp-samonly    (i. E. for dropdown menues)
+--comp-minimal    (i. E. for dropdown menues)
 --comp-basic      (default)
 --comp-full       (all useful attributes)
 
 
 Examples:
   Search for all adminclasses and extraclassses of a school for dropdown menue:
-  sophomorix-query --schoolbase <school> --extraclass --adminclass --samonly
+  sophomorix-query --schoolbase <school> --extraclass --adminclass --group-minimal
 
   Search for all users (with data for listing) in a group with the name <7a>:
-  sophomorix-query --schoolbase <school> --sam 7a --grp-samonly --group-members --full
+  sophomorix-query --schoolbase <school> --sam 7a --group-minimal --group-members --user-full
 
 
 Please see the sophomorix-query(8) man pages for full documentation
@@ -176,9 +176,11 @@ my ($ldap,$root_dse) = &AD_bind_admin();
 ############################################################
 
 my $all_attrs;
-my $attrs;
-my $grp_attrs;
-my $comp_attrs;
+
+my $single_attrs;
+my $multi_attrs;
+my $query_attrs;
+
 my $objectclass_filter="";
 
 my $topkey;
@@ -194,14 +196,16 @@ my $max;
 
 my $filter;
 my $base;
-my $scope;
+my $scope="sub";
 my $search_object="all";
 
 my $mesg;
 
 
 
-
+############################################################
+# set the search base
+############################################################
 if (defined $options{'schoolbase'}){
     if ($options{'schoolbase'} eq "global"){
         $base="OU=GLOBAL,".$root_dse;
@@ -212,15 +216,15 @@ if (defined $options{'schoolbase'}){
     $base=$root_dse;
 }
 
-$scope="sub";
-
-# ( & (attr_filter) (role_filter) (type_filter) )
-
-
-$filter="(& ";
 
 ############################################################
-# set the attribute filter
+# set the filter: ( & (attr_filter) (role_filter) (type_filter) ) 
+############################################################
+$filter="(& ";
+
+########################################
+# set the attribute search filter
+########################################
 if (defined $options{'sam'} or 
     defined $options{'sn'} or 
     defined $options{'gn'}){
@@ -238,8 +242,9 @@ if (defined $options{'sam'} or
     $attr_filter=$attr_filter." )";
 }
 
-############################################################
+########################################
 # set the role filter (combined with |)
+########################################
 if (defined $options{'student'} or 
     defined $options{'teacher'} or 
     defined $options{'examuser'} or 
@@ -286,8 +291,9 @@ if (defined $options{'student'} or
 }
 
 
-############################################################
+########################################
 # set the type filter (combined with |)
+########################################
 if (defined $options{'adminclass'} or 
     defined $options{'extraclass'} or 
     defined $options{'teacherclass'} or 
@@ -327,95 +333,228 @@ if (defined $options{'adminclass'} or
 
 
 ############################################################
-# set attributes 
-# and object class to search for
-if ($search_object eq "user"){
-    $topkey="USER";
-    $topcountkey="USERCOUNT";
-    $objectclass_filter="(objectclass=user)";
-    # default
-    $attrs=['sAMAccountName',
-            'sophomorixRole'];
-    # set list of search attributes, depending on options
-    if (defined $options{'samonly'}){
-        $attrs=['sAMAccountName'];
-    } elsif (defined $options{'basic'}){
-        $attrs=['sAMAccountName',
-                'sophomorixRole'];
-    } elsif (defined $options{'full'}){
-        $attrs=['sAMAccountName',
-                'sophomorixRole'];
-    }
-} elsif ($search_object eq "group"){
-    $topkey="GROUP";
-    $topcountkey="GROUPCOUNT";
-    $objectclass_filter="(objectclass=group)";
-    # set list of search attributes, depending on options
-    # default
-    $attrs=['sAMAccountName',
-            'sophomorixType'];
-    if (defined $options{'grp-samonly'}){
-        # user
-        $attrs=['sAMAccountName'];
-    } elsif (defined $options{'grp-basic'}){
-        $attrs=['sAMAccountName',
-                'sophomorixType'];
-    } elsif (defined $options{'grp-full'}){
-        $attrs=['sAMAccountName',
-                'sophomorixType'];
-    }
-} elsif ($search_object eq "room"){
-    $topkey="ROOM";
-    $topcountkey="ROOMCOUNT";
-    $objectclass_filter="(objectclass=group)";
-    # set list of search attributes, depending on options
-    # default
-    $attrs=['sAMAccountName',
-            'sophomorixType'];
-    if (defined $options{'grp-samonly'}){
-        # user
-        $attrs=['sAMAccountName'];
-    } elsif (defined $options{'grp-basic'}){
-        $attrs=['sAMAccountName',
-                'sophomorixType'];
-    } elsif (defined $options{'grp-full'}){
-        $attrs=['sAMAccountName',
-                'sophomorixType'];
-    }
-} elsif ($search_object eq "computer"){
-    $topkey="COMPUTER";
-    $topcountkey="COMPUTERCOUNT";
-    $objectclass_filter="(objectclass=computer)";
-    # set list of search attributes, depending on options
-    # default
-    $attrs=['sAMAccountName',
-            'sophomorixType'];
-    if (defined $options{'comp-samonly'}){
-        # user
-        $attrs=['sAMAccountName'];
-    } elsif (defined $options{'comp-basic'}){
-        $attrs=['sAMAccountName',
-                'sophomorixType'];
-    } elsif (defined $options{'comp-full'}){
-        $attrs=['sAMAccountName',
-                'sophomorixType'];
-    }
-} elsif ($search_object eq "all"){
-    $topkey="ALL";
-    $topcountkey="ALLCOUNT";   
-    # show non sophomorix users also
-    $attrs=['sAMAccountName',
-            'sophomorixType'];
-}
-
-if (defined $options{'grp-members'}){
-    push @{ $attrs },"member";
+# user attributes to display
+############################################################
+### default user attrs
+my $single_user_attrs=[
+      'sAMAccountName',
+      'sophomorixRole',
+    ];
+my $multi_user_attrs=[
+      'sophomorixQuota',
+    ];
+### override the user defaults
+if (defined $options{'user-minimal'}){
+    $single_user_attrs=[
+            'sAMAccountName',
+    ];
+    $multi_user_attrs=[
+    ];
+} elsif (defined $options{'user-basic'}){
+    # change nothing, use the default
+} elsif (defined $options{'user-full'}){
+    $single_user_attrs=[
+        'sAMAccountName',
+        'sophomorixRole',
+        'sn',
+    ];
+    $multi_user_attrs=[
+      'sophomorixQuota',
+      'memberOf',
+    ];
 }
 
 
 
 ############################################################
+# computer attributes to display
+############################################################
+### default computer attrs
+my $single_comp_attrs=[
+      'sAMAccountName',
+      'sophomorixRole',
+    ];
+my $multi_comp_attrs=[
+    ];
+### override the computer defaults
+if (defined $options{'comp-minimal'}){
+    $single_comp_attrs=[
+            'sAMAccountName',
+    ];
+    $multi_comp_attrs=[
+    ];
+} elsif (defined $options{'comp-basic'}){
+    # change nothing, use the default
+} elsif (defined $options{'comp-full'}){
+    $single_comp_attrs=[
+        'sAMAccountName',
+        'sophomorixRole',
+        'sn',
+    ];
+    $multi_comp_attrs=[
+      'sophomorixQuota',
+      'memberOf',
+    ];
+}
+
+
+############################################################
+# group attributes to display
+############################################################
+### default group attrs
+my $single_group_attrs=[
+      'sAMAccountName',
+      'sophomorixType',
+    ];
+my $multi_group_attrs=[
+    ];
+### override the group defaults
+if (defined $options{'group-minimal'}){
+    $single_group_attrs=[
+            'sAMAccountName',
+    ];
+    $multi_group_attrs=[
+    ];
+} elsif (defined $options{'group-basic'}){
+    # change nothing, use the default
+} elsif (defined $options{'group-full'}){
+    $single_group_attrs=[
+        'sAMAccountName',
+        'sophomorixRole',
+        'sn',
+    ];
+    $multi_group_attrs=[
+      'sophomorixQuota',
+      'memberOf',
+    ];
+}
+
+
+if (defined $options{'group-members'}){
+    push @{ $multi_group_attrs },"member";
+}
+
+
+
+
+if ($search_object eq "user"){
+    $topkey="USER";
+    $topcountkey="USERCOUNT";
+    $objectclass_filter="(objectclass=user)";
+    $single_attrs=$single_user_attrs;
+    $multi_attrs=$multi_user_attrs;
+} elsif ($search_object eq "group"){
+    $topkey="GROUP";
+    $topcountkey="GROUPCOUNT";
+    $objectclass_filter="(objectclass=group)";
+    $single_attrs=$single_group_attrs;
+    $multi_attrs=$multi_group_attrs;
+} elsif ($search_object eq "room"){
+    $topkey="ROOM";
+    $topcountkey="ROOMCOUNT";
+    $objectclass_filter="(objectclass=group)";
+    $single_attrs=$single_group_attrs;
+    $multi_attrs=$multi_group_attrs;
+} elsif ($search_object eq "computer"){
+    $topkey="COMPUTER";
+    $topcountkey="COMPUTERCOUNT";
+    $objectclass_filter="(objectclass=computer)";
+    $single_attrs=$single_comp_attrs;
+    $multi_attrs=$multi_comp_attrs;
+} elsif ($search_object eq "all"){
+    $topkey="ALL";
+    $topcountkey="ALLCOUNT";   
+}
+
+
+
+
+# # and object class to search for
+# if ($search_object eq "user"){
+#     $topkey="USER";
+#     $topcountkey="USERCOUNT";
+#     $objectclass_filter="(objectclass=user)";
+#     # default
+#     $attrs=['sAMAccountName',
+#             'sophomorixRole'];
+#     # set list of search attributes, depending on options
+#     if (defined $options{'user-minimal'}){
+#         $attrs=['sAMAccountName'];
+#     } elsif (defined $options{'user-basic'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixRole'];
+#     } elsif (defined $options{'user-full'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixRole'];
+#     }
+# } elsif ($search_object eq "group"){
+#     $topkey="GROUP";
+#     $topcountkey="GROUPCOUNT";
+#     $objectclass_filter="(objectclass=group)";
+#     # set list of search attributes, depending on options
+#     # default
+#     $attrs=['sAMAccountName',
+#             'sophomorixType'];
+#     if (defined $options{'group-minimal'}){
+#         # user
+#         $attrs=['sAMAccountName'];
+#     } elsif (defined $options{'group-basic'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixType'];
+#     } elsif (defined $options{'group-full'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixType'];
+#     }
+# } elsif ($search_object eq "room"){
+#     $topkey="ROOM";
+#     $topcountkey="ROOMCOUNT";
+#     $objectclass_filter="(objectclass=group)";
+#     # set list of search attributes, depending on options
+#     # default
+#     $attrs=['sAMAccountName',
+#             'sophomorixType'];
+#     if (defined $options{'group-minimal'}){
+#         # user
+#         $attrs=['sAMAccountName'];
+#     } elsif (defined $options{'group-basic'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixType'];
+#     } elsif (defined $options{'group-full'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixType'];
+#     }
+# } elsif ($search_object eq "computer"){
+#     $topkey="COMPUTER";
+#     $topcountkey="COMPUTERCOUNT";
+#     $objectclass_filter="(objectclass=computer)";
+#     # set list of search attributes, depending on options
+#     # default
+#     $attrs=['sAMAccountName',
+#             'sophomorixType'];
+#     if (defined $options{'comp-minimal'}){
+#         # user
+#         $attrs=['sAMAccountName'];
+#     } elsif (defined $options{'comp-basic'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixType'];
+#     } elsif (defined $options{'comp-full'}){
+#         $attrs=['sAMAccountName',
+#                 'sophomorixType'];
+#     }
+# } elsif ($search_object eq "all"){
+#     $topkey="ALL";
+#     $topcountkey="ALLCOUNT";   
+#     # show non sophomorix users also
+#     $attrs=['sAMAccountName',
+#             'sophomorixType'];
+# }
+
+
+
+
+############################################################
 # combine the filters
+############################################################
 $filter="(& ".
         "".$objectclass_filter."".
         "".$attr_filter."".
@@ -424,12 +563,19 @@ $filter="(& ".
         " )";
 
 ############################################################
+# combine the attribute lists
+############################################################
+@{ $query_attrs }=(@{ $single_attrs },@{ $multi_attrs });
+
+
+############################################################
 # do the search
+############################################################
 $mesg = $ldap->search( # perform a search
                base   => $base,
                scope => $scope,
                filter => $filter,
-               attrs => $attrs,
+               attrs => $query_attrs,
               );
 
 
@@ -450,26 +596,69 @@ for( my $index = 0 ; $index < $max ; $index++) {
     my $dn = $entry->dn();
     my $sam=$entry->get_value('sAMAccountName');
     push @{ $search{'LISTS'}{$topkey} }, $sam; 
-    foreach my $attribute ( @{ $attrs } ){
+    foreach my $attribute ( @{ $single_attrs } ){
         if ($attribute eq "member"){
+            # member is not needed
             next;
         }
         $search{$topkey}{$sam}{$attribute}=$entry->get_value($attribute);    
     }
     # find group members
-    if (defined $options{'grp-members'}){
+    my $topkey_members="";
+    my $topcountkey_members="";
+    my $toplistkey_members="";
+    if (defined $options{'group-members'}){
         my @members = $entry->get_value('member');
+        # decide if comuters or users are searched
+        if ($search_object eq "group"){
+            $topkey_members="MEMBERS";
+            $topcountkey_members="MEMBERCOUNT";
+            $toplistkey_members="MEMBERLIST";
+        } elsif ($search_object eq "room"){
+            $topkey_members="COMPUTERS";
+            $topcountkey_members="COMPUTERCOUNT";
+            $toplistkey_members="COMPUTERLIST";
+        } else {
+            exit;
+        }
         foreach my $member (@members){
             my ($usersam,@rest)=split(/,/,$member);
             $usersam=~s/^CN=//;
-            #print "HERE: >$sam< $member\n";
-            $search{'MEMBERS'}{$sam}{$usersam}{'sAMAccountName'}=$usersam;
-            $search{'MEMBERS'}{$sam}{$usersam}{'dn'}=$member;
-            push @{ $search{'MEMBERLIST'}{$sam} }, $usersam;
+            $search{$topkey_members}{$sam}{$usersam}{'sAMAccountName'}=$usersam;
+            $search{$topkey_members}{$sam}{$usersam}{'dn'}=$member;
+            push @{ $search{'LISTS'}{$toplistkey_members}{$sam} }, $usersam;
+            # query the members
+            my $base=$member;
+            my $scope="base";
+            my $filter="(sAMAccountName=".$usersam.")"; # cannot be empty
+print "$member\n";
+
+
+            if (defined $options{'verbose'} and $options{'verbose'}==1){
+                print "\n";
+                print "BASE:       $base\n";
+                print "SCOPE:      $scope\n";
+                print "FILTER:     $filter\n";
+                print "SEARCH FOR: @{ $single_attrs }\n";
+            }
+            my $mesg = $ldap->search( # perform a search
+                              base   => $base,
+                              scope => $scope,
+                              filter => $filter,
+#                              attrs => $single_attrs,
+                             );
+            my $max = $mesg->count; 
+            # only one result possible
+            my $entry = $mesg->entry(0);
+            #my $usam=$entry->get_value('sAMAccountName');
+            my $role=$entry->get_value('sophomorixRole');
+            # do this with all user attributes ????
+#            $search{$topkey_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute); 
+            $search{$topkey_members}{$sam}{$usersam}{'sophomorixRole'}=$entry->get_value('sophomorixRole'); 
         }
     }
-    if (exists $search{'MEMBERLIST'}{$sam}){
-        @{ $search{'MEMBERLIST'}{$sam} } = sort @{ $search{'MEMBERLIST'}{$sam} };
+    if (exists $search{'LISTS'}{$toplistkey_members}{$sam}){
+        @{ $search{'LISTS'}{$toplistkey_members}{$sam} } = sort @{ $search{'LISTS'}{$toplistkey_members}{$sam} };
     }
 }
 
