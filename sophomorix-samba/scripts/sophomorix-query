@@ -404,6 +404,7 @@ my $single_group_attrs=[
       'sophomorixType',
     ];
 my $multi_group_attrs=[
+      'sophomorixQuota',
     ];
 ### override the group defaults
 if (defined $options{'group-minimal'}){
@@ -524,13 +525,16 @@ for( my $index = 0 ; $index < $max ; $index++) {
     push @{ $search{'LISTS'}{$topkey} }, $sam;
     # work on single value attributes 
     foreach my $attribute ( @{ $single_attrs } ){
-#        if ($attribute eq "member"){
-#            # member is not needed
-#            next;
-#        }
         $search{$topkey}{$sam}{$attribute}=$entry->get_value($attribute);    
     }
     # work on multi value attributes
+    foreach my $attribute ( @{ $multi_attrs } ){
+        if ($attribute eq "member"){
+            # member is not needed
+            next;
+        }
+        @{ $search{$topkey}{$sam}{$attribute} }=$entry->get_value($attribute);
+    }
 
     # find group members (users/computers), if needed
     my $topkey_members="";
