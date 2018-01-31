@@ -352,12 +352,32 @@ if (defined $options{'user-minimal'}){
 } elsif (defined $options{'user-full'}){
     $single_user_attrs=[
         'sAMAccountName',
-        'sophomorixRole',
+        'displayName',
         'sn',
+        'givenName',
+        'sophomorixFirstnameASCII',
+        'sophomorixSurnameASCII',
+        'sophomorixBirthdate',
+        'sophomorixUnid',
+        'sophomorixAdminClass',
+        'sophomorixExitAdminClass',
+        'sophomorixSchoolname',
+        'sophomorixAdminFile',
+        'sophomorixComment',
+        'sophomorixFirstPassword',
+        'sophomorixExamMode',
+        'sophomorixRole',
+        'sophomorixStatus',
+        'sophomorixCreationDate',
+        'sophomorixTolerationDate',
+        'sophomorixDeactivationDate',
+        'mail',
+        'sophomorixMailQuota',
+        'sophomorixMailQuotaCalculated',
     ];
     $multi_user_attrs=[
       'sophomorixQuota',
-      'memberOf',
+      'sophomorixWebuiPermissionsCalculated',
     ];
 }
 
@@ -418,12 +438,31 @@ if (defined $options{'group-minimal'}){
 } elsif (defined $options{'group-full'}){
     $single_group_attrs=[
         'sAMAccountName',
-        'sophomorixRole',
-        'sn',
+        'cn',
+        'name',
+        'description',
+        'gidNumber',
+        'sophomorixCreationDate',
+        'sophomorixHidden',
+        'sophomorixJoinable',
+        'sophomorixMaxMembers',
+        'sophomorixStatus',
+        'sophomorixType',
+        'mail',
+        'sophomorixMailQuota',
+        'sophomorixAddMailQuota',
+        'sophomorixMailAlias',
+        'sophomorixMailList',
+        'sophomorixMailList',
+        'sophomorixSchoolname',
     ];
     $multi_group_attrs=[
       'sophomorixQuota',
-      'memberOf',
+      'sophomorixAddQuota',
+      'sophomorixAdmins',
+      'sophomorixMembers',
+      'sophomorixAdminGroups',
+      'sophomorixMemberGroups',
     ];
 }
 
@@ -536,7 +575,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
         @{ $search{$topkey}{$sam}{$attribute} }=$entry->get_value($attribute);
     }
 
-    # find group members (users/computers), if needed
+    # if needed: find group members (users/computers)
     my $topkey_members="";
     my $topcountkey_members="";
     my $toplistkey_members="";
@@ -547,18 +586,25 @@ for( my $index = 0 ; $index < $max ; $index++) {
             $topkey_members="MEMBERS";
             $topcountkey_members="MEMBERCOUNT";
             $toplistkey_members="MEMBERLIST";
+            @{ $query_attrs }=(@{ $single_user_attrs },@{ $multi_user_attrs });
+            $single_attrs=$single_user_attrs;
+            $multi_attrs=$multi_user_attrs;
         } elsif ($search_object eq "room"){
             $topkey_members="COMPUTERS";
             $topcountkey_members="COMPUTERCOUNT";
             $toplistkey_members="COMPUTERLIST";
+            @{ $query_attrs }=(@{ $single_comp_attrs },@{ $multi_comp_attrs });
+            $single_attrs=$single_comp_attrs;
+            $multi_attrs=$multi_comp_attrs;
         } else {
+            # searching for something strange
             exit;
         }
+        $search{$topcountkey_members}{$sam}=$#members+1;;
         foreach my $member (@members){
             my ($usersam,@rest)=split(/,/,$member);
             $usersam=~s/^CN=//;
             $search{$topkey_members}{$sam}{$usersam}{'sAMAccountName'}=$usersam;
-            $search{$topkey_members}{$sam}{$usersam}{'dn'}=$member;
             push @{ $search{'LISTS'}{$toplistkey_members}{$sam} }, $usersam;
             # query the members
             my $base=$member;
@@ -570,32 +616,39 @@ for( my $index = 0 ; $index < $max ; $index++) {
                 print "BASE:       $base\n";
                 print "SCOPE:      $scope\n";
                 print "FILTER:     $filter\n";
-                print "SEARCH FOR: @{ $single_attrs }\n";
             }
+
             my $mesg = $ldap->search( # perform a search
                               base   => $base,
                               scope => $scope,
                               filter => $filter,
-#                              attrs => $single_attrs,
+                              attrs => $query_attrs,
                              );
-            my $max = $mesg->count; 
-            # only one result possible
+            my $max = $mesg->count;
+            # fill the result hash 
+            # only one result possible (index=0):
             my $entry = $mesg->entry(0);
-            #my $usam=$entry->get_value('sAMAccountName');
-            my $role=$entry->get_value('sophomorixRole');
-            # do this with all user attributes ????
-#            $search{$topkey_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute); 
-            $search{$topkey_members}{$sam}{$usersam}{'sophomorixRole'}=$entry->get_value('sophomorixRole'); 
+            foreach my $attribute ( @{ $single_attrs } ){
+                $search{$topkey_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute);    
+            }
+            # work on multi value attributes
+            foreach my $attribute ( @{ $multi_attrs } ){
+                @{ $search{$topkey_members}{$sam}{$usersam}{$attribute} }=$entry->get_value($attribute);
+            }
         }
     }
-    if (exists $search{'LISTS'}{$toplistkey_members}{$sam}){
+    if (defined $search{'LISTS'}{$toplistkey_members}{$sam}){
         @{ $search{'LISTS'}{$toplistkey_members}{$sam} } = sort @{ $search{'LISTS'}{$toplistkey_members}{$sam} };
     }
 }
 
+
+
 if (exists $search{'LISTS'}{$topkey}){
     @{ $search{'LISTS'}{$topkey} } = sort @{ $search{'LISTS'}{$topkey} };
 }
+
+
 
 # print JSON Object
 &json_printout(\%search);
