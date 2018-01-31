@@ -590,6 +590,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
     my $top_key_members="";
     my $top_count_key_members="";
     my $top_list_key_members="";
+    my $filter_append;
     if (defined $options{'group-members'}){
         my @members = $entry->get_value('member');
         # decide if comuters or users are searched
@@ -600,6 +601,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
             @{ $query_attrs }=(@{ $single_user_attrs },@{ $multi_user_attrs });
             $single_attrs=$single_user_attrs;
             $multi_attrs=$multi_user_attrs;
+            $filter_append="";
         } elsif ($search_object eq "room"){
             $top_key_members="COMPUTERS";
             $top_count_key_members="COMPUTERCOUNT";
@@ -607,6 +609,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
             @{ $query_attrs }=(@{ $single_comp_attrs },@{ $multi_comp_attrs });
             $single_attrs=$single_comp_attrs;
             $multi_attrs=$multi_comp_attrs;
+            $filter_append="\$"; # sAMAccountName for computers are ended by $
         } else {
             # searching for something strange
             exit;
@@ -620,7 +623,8 @@ for( my $index = 0 ; $index < $max ; $index++) {
             # query the members
             my $base=$member;
             my $scope="base";
-            my $filter="(sAMAccountName=".$usersam.")"; # cannot be empty
+            
+            my $filter="(sAMAccountName=".$usersam.$filter_append.")"; # cannot be empty
 
             if (defined $options{'verbose'} and $options{'verbose'}==1){
                 print "\n";
@@ -637,14 +641,19 @@ for( my $index = 0 ; $index < $max ; $index++) {
                              );
             my $max = $mesg->count;
             # fill the result hash 
-            # only one result possible (index=0):
-            my $entry = $mesg->entry(0);
-            foreach my $attribute ( @{ $single_attrs } ){
-                $search{$top_key_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute);    
-            }
-            # work on multi value attributes
-            foreach my $attribute ( @{ $multi_attrs } ){
-                @{ $search{$top_key_members}{$sam}{$usersam}{$attribute} }=$entry->get_value($attribute);
+            # only none (ipdevice in room) OR one result possible (index=0):
+            if ($max==0){
+                next;
+            } else {
+                # the is one result
+                my $entry = $mesg->entry(0);
+                foreach my $attribute ( @{ $single_attrs } ){
+                    $search{$top_key_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute);    
+                }
+                # work on multi value attributes
+                foreach my $attribute ( @{ $multi_attrs } ){
+                    @{ $search{$top_key_members}{$sam}{$usersam}{$attribute} }=$entry->get_value($attribute);
+                }
             }
         }
     }
