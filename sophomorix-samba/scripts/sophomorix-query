@@ -180,8 +180,8 @@ my $query_attrs;
 
 my $objectclass_filter="";
 
-my $topkey;
-my $topcountkey;
+my $top_key;
+my $top_count_key;
 
 my $attr_filter="";
 my $role_filter="";
@@ -198,6 +198,7 @@ my %search=();
 my $max;
 my $mesg;
 
+my $json=1;
 
 
 ############################################################
@@ -374,6 +375,7 @@ if (defined $options{'user-minimal'}){
         'mail',
         'sophomorixMailQuota',
         'sophomorixMailQuotaCalculated',
+        'userAccountControl',
     ];
     $multi_user_attrs=[
       'sophomorixQuota',
@@ -407,9 +409,18 @@ if (defined $options{'comp-minimal'}){
         'sAMAccountName',
         'sophomorixRole',
         'sn',
+        'name',
+        'displayName',
+        'dNSHostName',
+        'sophomorixAdminClass',
+        'sophomorixAdminFile',
+        'sophomorixCreationDate',
+        'sophomorixDnsNodename',
+        'sophomorixSchoolname',
+        'sophomorixStatus',
+        'userAccountControl',
     ];
     $multi_comp_attrs=[
-      'sophomorixQuota',
       'memberOf',
     ];
 }
@@ -477,33 +488,33 @@ if (defined $options{'group-members'}){
 # find out which objectclass to search for
 ############################################################
 if ($search_object eq "user"){
-    $topkey="USER";
-    $topcountkey="USERCOUNT";
+    $top_key="USER";
+    $top_count_key="USERCOUNT";
     $objectclass_filter="(objectclass=user)";
     $single_attrs=$single_user_attrs;
     $multi_attrs=$multi_user_attrs;
 } elsif ($search_object eq "group"){
-    $topkey="GROUP";
-    $topcountkey="GROUPCOUNT";
+    $top_key="GROUP";
+    $top_count_key="GROUPCOUNT";
     $objectclass_filter="(objectclass=group)";
     $single_attrs=$single_group_attrs;
     $multi_attrs=$multi_group_attrs;
 } elsif ($search_object eq "room"){
-    $topkey="ROOM";
-    $topcountkey="ROOMCOUNT";
+    $top_key="ROOM";
+    $top_count_key="ROOMCOUNT";
     $objectclass_filter="(objectclass=group)";
     $single_attrs=$single_group_attrs;
     $multi_attrs=$multi_group_attrs;
 } elsif ($search_object eq "computer"){
-    $topkey="COMPUTER";
-    $topcountkey="COMPUTERCOUNT";
+    $top_key="COMPUTER";
+    $top_count_key="COMPUTERCOUNT";
     $objectclass_filter="(objectclass=computer)";
     $single_attrs=$single_comp_attrs;
     $multi_attrs=$multi_comp_attrs;
 } elsif ($search_object eq "all"){
     # this is the default
-    $topkey="ALL";
-    $topcountkey="ALLCOUNT";
+    $top_key="ALL";
+    $top_count_key="ALLCOUNT";
     $single_attrs=[
       'sAMAccountName',
       'sophomorixRole',
@@ -556,15 +567,15 @@ if (defined $options{'verbose'} and $options{'verbose'}==1){
 
 # go through results
 $max = $mesg->count; 
-$search{$topcountkey}=$max; 
+$search{$top_count_key}=$max; 
 for( my $index = 0 ; $index < $max ; $index++) {
     my $entry = $mesg->entry($index);
     my $dn = $entry->dn();
     my $sam=$entry->get_value('sAMAccountName');
-    push @{ $search{'LISTS'}{$topkey} }, $sam;
+    push @{ $search{'LISTS'}{$top_key} }, $sam;
     # work on single value attributes 
     foreach my $attribute ( @{ $single_attrs } ){
-        $search{$topkey}{$sam}{$attribute}=$entry->get_value($attribute);    
+        $search{$top_key}{$sam}{$attribute}=$entry->get_value($attribute);    
     }
     # work on multi value attributes
     foreach my $attribute ( @{ $multi_attrs } ){
@@ -572,27 +583,27 @@ for( my $index = 0 ; $index < $max ; $index++) {
             # member is not needed
             next;
         }
-        @{ $search{$topkey}{$sam}{$attribute} }=$entry->get_value($attribute);
+        @{ $search{$top_key}{$sam}{$attribute} }=$entry->get_value($attribute);
     }
 
     # if needed: find group members (users/computers)
-    my $topkey_members="";
-    my $topcountkey_members="";
-    my $toplistkey_members="";
+    my $top_key_members="";
+    my $top_count_key_members="";
+    my $top_list_key_members="";
     if (defined $options{'group-members'}){
         my @members = $entry->get_value('member');
         # decide if comuters or users are searched
         if ($search_object eq "group"){
-            $topkey_members="MEMBERS";
-            $topcountkey_members="MEMBERCOUNT";
-            $toplistkey_members="MEMBERLIST";
+            $top_key_members="MEMBERS";
+            $top_count_key_members="MEMBERCOUNT";
+            $top_list_key_members="MEMBERLIST";
             @{ $query_attrs }=(@{ $single_user_attrs },@{ $multi_user_attrs });
             $single_attrs=$single_user_attrs;
             $multi_attrs=$multi_user_attrs;
         } elsif ($search_object eq "room"){
-            $topkey_members="COMPUTERS";
-            $topcountkey_members="COMPUTERCOUNT";
-            $toplistkey_members="COMPUTERLIST";
+            $top_key_members="COMPUTERS";
+            $top_count_key_members="COMPUTERCOUNT";
+            $top_list_key_members="COMPUTERLIST";
             @{ $query_attrs }=(@{ $single_comp_attrs },@{ $multi_comp_attrs });
             $single_attrs=$single_comp_attrs;
             $multi_attrs=$multi_comp_attrs;
@@ -600,12 +611,12 @@ for( my $index = 0 ; $index < $max ; $index++) {
             # searching for something strange
             exit;
         }
-        $search{$topcountkey_members}{$sam}=$#members+1;;
+        $search{$top_count_key_members}{$sam}=$#members+1;;
         foreach my $member (@members){
             my ($usersam,@rest)=split(/,/,$member);
             $usersam=~s/^CN=//;
-            $search{$topkey_members}{$sam}{$usersam}{'sAMAccountName'}=$usersam;
-            push @{ $search{'LISTS'}{$toplistkey_members}{$sam} }, $usersam;
+            $search{$top_key_members}{$sam}{$usersam}{'sAMAccountName'}=$usersam;
+            push @{ $search{'LISTS'}{$top_list_key_members}{$sam} }, $usersam;
             # query the members
             my $base=$member;
             my $scope="base";
@@ -629,23 +640,23 @@ for( my $index = 0 ; $index < $max ; $index++) {
             # only one result possible (index=0):
             my $entry = $mesg->entry(0);
             foreach my $attribute ( @{ $single_attrs } ){
-                $search{$topkey_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute);    
+                $search{$top_key_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute);    
             }
             # work on multi value attributes
             foreach my $attribute ( @{ $multi_attrs } ){
-                @{ $search{$topkey_members}{$sam}{$usersam}{$attribute} }=$entry->get_value($attribute);
+                @{ $search{$top_key_members}{$sam}{$usersam}{$attribute} }=$entry->get_value($attribute);
             }
         }
     }
-    if (defined $search{'LISTS'}{$toplistkey_members}{$sam}){
-        @{ $search{'LISTS'}{$toplistkey_members}{$sam} } = sort @{ $search{'LISTS'}{$toplistkey_members}{$sam} };
+    if (defined $search{'LISTS'}{$top_list_key_members}{$sam}){
+        @{ $search{'LISTS'}{$top_list_key_members}{$sam} } = sort @{ $search{'LISTS'}{$top_list_key_members}{$sam} };
     }
 }
 
 
 
-if (exists $search{'LISTS'}{$topkey}){
-    @{ $search{'LISTS'}{$topkey} } = sort @{ $search{'LISTS'}{$topkey} };
+if (exists $search{'LISTS'}{$top_key}){
+    @{ $search{'LISTS'}{$top_key} } = sort @{ $search{'LISTS'}{$top_key} };
 }
 
 
