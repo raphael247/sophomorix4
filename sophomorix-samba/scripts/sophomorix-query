@@ -790,7 +790,7 @@ sub json_printout {
     if ($json==0){
         my $line="--------------------------------------------------\n";
         # GROUP
-        if (exists $ref_search->{'LISTS'}{'GROUP'}){
+        if ($#{ $ref_search->{'LISTS'}{'GROUP'} }>-1){
             my $counter=0;
             print $line;
             print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS:\n";
@@ -801,7 +801,7 @@ sub json_printout {
             print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS\n";
         }
         # ROOM
-        if (exists $ref_search->{'LISTS'}{'ROOM'}){
+        if ($#{ $ref_search->{'LISTS'}{'ROOM'} }>-1){
             my $counter=0;
             print $line;
             print "$ref_search->{'COUNTERS'}{'ROOM'} ROOMS:\n";
@@ -812,7 +812,7 @@ sub json_printout {
             print "$ref_search->{'COUNTERS'}{'ROOM'} ROOMS\n";
         }
         # USER
-        if (exists $ref_search->{'LISTS'}{'USER'}){
+        if ($#{ $ref_search->{'LISTS'}{'USER'} }>-1){
             my $counter=0;
             print $line;
             print "$ref_search->{'COUNTERS'}{'USER'} USERS:\n";
@@ -823,7 +823,7 @@ sub json_printout {
             print "$ref_search->{'COUNTERS'}{'USER'} USERS\n";
         }
         # COMPUTER
-        if (exists $ref_search->{'LISTS'}{'COMPUTER'}){
+        if ($#{ $ref_search->{'LISTS'}{'COMPUTER'} }>-1){
             my $counter=0;
             print $line;
             print "$ref_search->{'COUNTERS'}{'COMPUTER'} COMPUTERS:\n";
