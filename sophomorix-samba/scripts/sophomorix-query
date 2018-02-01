@@ -205,7 +205,7 @@ my $mesg;
 
 if (not defined $options{'json'}){
     # always use json output
-    $options{'json'}=1;
+    $options{'json'}=0;
 }
 
 ############################################################
@@ -590,7 +590,9 @@ for( my $index = 0 ; $index < $max ; $index++) {
                 last;
             } elsif ($oc eq "group"){
                 my $type=$entry->get_value('sophomorixType');
-                if ($type eq "room"){
+                if (not defined $type){
+                    $search_object_used="non-sophomorix";
+                } elsif ($type eq "room"){
                     $search_object_used="room";
                 } else {
                     $search_object_used="group";
@@ -707,6 +709,24 @@ if ($#{ $search{'LISTS'}{$top_key} }>1){
 }
 
 
+if ($#{ $search{'LISTS'}{'GROUP'} }>-1){
+    @{ $search{'LISTS'}{'GROUP'} } = sort @{ $search{'LISTS'}{'GROUP'} };
+    $search{'COUNTERS'}{'GROUP'}=$#{ $search{'LISTS'}{'GROUP'} }+1;
+}
+if ($#{ $search{'LISTS'}{'ROOM'} }>-1){
+    @{ $search{'LISTS'}{'ROOM'} } = sort @{ $search{'LISTS'}{'ROOM'} };
+    $search{'COUNTERS'}{'ROOM'}=$#{ $search{'LISTS'}{'ROOM'} }+1;
+}
+if ($#{ $search{'LISTS'}{'USER'} }>-1){
+    @{ $search{'LISTS'}{'USER'} } = sort @{ $search{'LISTS'}{'USER'} };
+    $search{'COUNTERS'}{'USER'}=$#{ $search{'LISTS'}{'USER'} }+1;
+}
+if ($#{ $search{'LISTS'}{'COMPUTER'} }>-1){
+    @{ $search{'LISTS'}{'COMPUTER'} } = sort @{ $search{'LISTS'}{'COMPUTER'} };
+    $search{'COUNTERS'}{'COMPUTER'}=$#{ $search{'LISTS'}{'COMPUTER'} }+1;
+}
+
+
 
 # print JSON Object
 &json_printout($options{'json'},\%search);
@@ -767,7 +787,53 @@ sub setup_json_return {
 
 sub json_printout {
     my ($json,$ref_search)=@_;
-    if ($json==1){
+    if ($json==0){
+        my $line="--------------------------------------------------\n";
+        # GROUP
+        if (exists $ref_search->{'LISTS'}{'GROUP'}){
+            my $counter=0;
+            print $line;
+            print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS:\n";
+            foreach my $group (@{ $ref_search->{'LISTS'}{'GROUP'} }){
+                $counter++;
+                printf "  %4s:  %-60s\n",$counter,$group;
+            }
+            print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS\n";
+        }
+        # ROOM
+        if (exists $ref_search->{'LISTS'}{'ROOM'}){
+            my $counter=0;
+            print $line;
+            print "$ref_search->{'COUNTERS'}{'ROOM'} ROOMS:\n";
+            foreach my $room (@{ $ref_search->{'LISTS'}{'ROOM'} }){
+                $counter++;
+                printf "  %4s:  %-60s\n",$counter,$room;
+            }
+            print "$ref_search->{'COUNTERS'}{'ROOM'} ROOMS\n";
+        }
+        # USER
+        if (exists $ref_search->{'LISTS'}{'USER'}){
+            my $counter=0;
+            print $line;
+            print "$ref_search->{'COUNTERS'}{'USER'} USERS:\n";
+            foreach my $user (@{ $ref_search->{'LISTS'}{'USER'} }){
+                $counter++;
+                printf "  %4s:  %-60s\n",$counter,$user;
+            }
+            print "$ref_search->{'COUNTERS'}{'USER'} USERS\n";
+        }
+        # COMPUTER
+        if (exists $ref_search->{'LISTS'}{'COMPUTER'}){
+            my $counter=0;
+            print $line;
+            print "$ref_search->{'COUNTERS'}{'COMPUTER'} COMPUTERS:\n";
+            foreach my $computer (@{ $ref_search->{'LISTS'}{'COMPUTER'} }){
+                $counter++;
+                printf "  %4s:  %-60s\n",$counter,$computer;
+            }
+            print "$ref_search->{'COUNTERS'}{'COMPUTER'} COMPUTERS\n";
+        }
+    } elsif ($json==1){
         # pretty output
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_search );
