@@ -162,7 +162,7 @@ Examples:
   sophomorix-query --schoolbase <school> --extraclass --adminclass --group-minimal
 
   Search for all users (with data for listing) in a group with the name <7a>:
-  sophomorix-query --schoolbase <school> --sam 7a --group-minimal --group-members --user-full
+  sophomorix-query --schoolbase <school> --sam 7a --class --group-minimal --group-members --user-full
 
 Please see the sophomorix-query(8) man pages for full documentation
 ');
@@ -343,6 +343,7 @@ my $single_user_attrs=[
     ];
 my $multi_user_attrs=[
       'sophomorixQuota',
+      'objectclass',
     ];
 ### override the user defaults
 if (defined $options{'user-minimal'}){
@@ -490,42 +491,50 @@ if (defined $options{'group-members'}){
 ############################################################
 # find out which objectclass to search for
 ############################################################
-if ($search_object eq "user"){
-    $top_key="USER";
-    $top_count_key="USERCOUNT";
-    $objectclass_filter="(objectclass=user)";
-    $single_attrs=$single_user_attrs;
-    $multi_attrs=$multi_user_attrs;
-} elsif ($search_object eq "group"){
-    $top_key="GROUP";
-    $top_count_key="GROUPCOUNT";
-    $objectclass_filter="(objectclass=group)";
-    $single_attrs=$single_group_attrs;
-    $multi_attrs=$multi_group_attrs;
-} elsif ($search_object eq "room"){
-    $top_key="ROOM";
-    $top_count_key="ROOMCOUNT";
-    $objectclass_filter="(objectclass=group)";
-    $single_attrs=$single_group_attrs;
-    $multi_attrs=$multi_group_attrs;
-} elsif ($search_object eq "computer"){
-    $top_key="COMPUTER";
-    $top_count_key="COMPUTERCOUNT";
-    $objectclass_filter="(objectclass=computer)";
-    $single_attrs=$single_comp_attrs;
-    $multi_attrs=$multi_comp_attrs;
-} elsif ($search_object eq "all"){
-    # this is the default
-    $top_key="ALL";
-    $top_count_key="ALLCOUNT";
-    $single_attrs=[
-      'sAMAccountName',
-      'sophomorixRole',
-      'sophomorixType',
-    ];
-    $multi_attrs=[
-    ];
-}
+($top_key,
+ $top_count_key,
+ $objectclass_filter,
+ $single_attrs,
+ $multi_attrs)=&setup_json_return($search_object);
+
+# if ($search_object eq "user"){
+#     $top_key="USER";
+#     $top_count_key="USERCOUNT";
+#     $objectclass_filter="(objectclass=user)";
+#     $single_attrs=$single_user_attrs;
+#     $multi_attrs=$multi_user_attrs;
+# } elsif ($search_object eq "group"){
+#     $top_key="GROUP";
+#     $top_count_key="GROUPCOUNT";
+#     $objectclass_filter="(objectclass=group)";
+#     $single_attrs=$single_group_attrs;
+#     $multi_attrs=$multi_group_attrs;
+# } elsif ($search_object eq "room"){
+#     $top_key="ROOM";
+#     $top_count_key="ROOMCOUNT";
+#     $objectclass_filter="(objectclass=group)";
+#     $single_attrs=$single_group_attrs;
+#     $multi_attrs=$multi_group_attrs;
+# } elsif ($search_object eq "computer"){
+#     $top_key="COMPUTER";
+#     $top_count_key="COMPUTERCOUNT";
+#     $objectclass_filter="(objectclass=computer)";
+#     $single_attrs=$single_comp_attrs;
+#     $multi_attrs=$multi_comp_attrs;
+# } elsif ($search_object eq "all"){
+#     # no objectclass filter
+#     # this is the default
+#     $top_key="ALL";
+#     $top_count_key="ALLCOUNT";
+#     $single_attrs=[
+#       'sAMAccountName',
+#       'sophomorixRole',
+#       'sophomorixType',
+#     ];
+#     $multi_attrs=[
+#       'objectclass',
+#     ];
+# }
 
 
 
@@ -552,12 +561,22 @@ $filter="(& ".
 # do the search
 ############################################################
 # search for the object
-$mesg = $ldap->search(
-               base   => $base,
-               scope => $scope,
-               filter => $filter,
-               attrs => $query_attrs,
-              );
+if ($search_object eq "all"){
+    $mesg = $ldap->search(
+                   base   => $base,
+                   scope => $scope,
+                   filter => $filter,
+                  # attrs => $query_attrs, # query all attributes
+                  );
+} else {
+    $mesg = $ldap->search(
+                   base   => $base,
+                   scope => $scope,
+                   filter => $filter,
+                   attrs => $query_attrs,
+                  );
+}
+
 
 # display debugging info
 if (defined $options{'verbose'} and $options{'verbose'}==1){
@@ -566,6 +585,13 @@ if (defined $options{'verbose'} and $options{'verbose'}==1){
     print "SCOPE:      $scope\n";
     print "FILTER:     $filter\n";
     print "SEARCH FOR: $search_object\n";
+    print "ATTRIBUTES:\n";
+    foreach my $attr (@{ $single_attrs }){
+        print "   * $attr (singlevalue)\n";
+    }
+    foreach my $attr (@{ $multi_attrs }){
+        print "   * $attr (multivalue)\n";
+    }
 }
 
 # go through results
@@ -575,6 +601,40 @@ for( my $index = 0 ; $index < $max ; $index++) {
     my $entry = $mesg->entry($index);
     my $dn = $entry->dn();
     my $sam=$entry->get_value('sAMAccountName');
+    my $search_object_used;
+    if ($search_object eq "all"){
+        # find out what is searched for
+        my @objectclass=$entry->get_value('objectclass');
+        print "HERE1: objectclass of $sam is  @objectclass\n";
+        foreach my $oc (@objectclass){
+            if ($oc eq "user"){
+                $search_object_used="user";
+                # continue, because it might also be a computer
+            } elsif ($oc eq "computer"){
+                $search_object_used="computer";
+                # that is enough
+                last;
+            } elsif ($oc eq "group"){
+                my $type=$entry->get_value('sophomorixType');
+                if ($type eq "room"){
+                    $search_object_used="room";
+                } else {
+                    $search_object_used="group";
+                }
+            }
+        }
+        # setup some stuff
+        ($top_key,
+         $top_count_key,
+         $objectclass_filter,
+         $single_attrs,
+         $multi_attrs)=&setup_json_return($search_object_used);
+
+        print "HERE2: $sam is a $search_object_used\n";
+    } else {
+        # use what is searched for
+        $search_object_used=$search_object;
+    }
     push @{ $search{'LISTS'}{$top_key} }, $sam;
     # read single value attributes into %search 
     foreach my $attribute ( @{ $single_attrs } ){
@@ -582,7 +642,12 @@ for( my $index = 0 ; $index < $max ; $index++) {
     }
     # read multi value attributes into %search
     foreach my $attribute ( @{ $multi_attrs } ){
-        if ($attribute eq "member"){next;}; # member is not needed at group, only to find members 
+        if ($attribute eq "member" or 
+            $attribute eq "objectclass"){
+            # member is not needed at group, only to find members 
+            # objectclass is onlx needed to decide which object has to be displayed
+            next;
+        }
         @{ $search{$top_key}{$sam}{$attribute} }=$entry->get_value($attribute);
     }
 
@@ -594,7 +659,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
     if (defined $options{'group-members'}){
         my @members = $entry->get_value('member');
         # decide if comuters or users are searched
-        if ($search_object eq "group"){
+        if ($search_object_used eq "group"){
             $top_key_members="MEMBERS";
             $top_count_key_members="MEMBERCOUNT";
             $top_list_key_members="MEMBERLIST";
@@ -602,7 +667,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
             $single_attrs=$single_user_attrs;
             $multi_attrs=$multi_user_attrs;
             $filter_append="";
-        } elsif ($search_object eq "room"){
+        } elsif ($search_object_used eq "room"){
             $top_key_members="COMPUTERS";
             $top_count_key_members="COMPUTERCOUNT";
             $top_list_key_members="COMPUTERLIST";
@@ -683,6 +748,51 @@ if ($#{ $search{'LISTS'}{$top_key} }>1){
 ############################################################
 # sub
 ############################################################
+sub setup_json_return {
+    my ($search_object)=@_;
+    if ($search_object eq "user"){
+        $top_key="USER";
+        $top_count_key="USERCOUNT";
+        $objectclass_filter="(objectclass=user)";
+        $single_attrs=$single_user_attrs;
+        $multi_attrs=$multi_user_attrs;
+    } elsif ($search_object eq "group"){
+        $top_key="GROUP";
+        $top_count_key="GROUPCOUNT";
+        $objectclass_filter="(objectclass=group)";
+        $single_attrs=$single_group_attrs;
+        $multi_attrs=$multi_group_attrs;
+    } elsif ($search_object eq "room"){
+        $top_key="ROOM";
+        $top_count_key="ROOMCOUNT";
+        $objectclass_filter="(objectclass=group)";
+        $single_attrs=$single_group_attrs;
+        $multi_attrs=$multi_group_attrs;
+    } elsif ($search_object eq "computer"){
+        $top_key="COMPUTER";
+        $top_count_key="COMPUTERCOUNT";
+        $objectclass_filter="(objectclass=computer)";
+        $single_attrs=$single_comp_attrs;
+        $multi_attrs=$multi_comp_attrs;
+    } elsif ($search_object eq "all"){
+        # no objectclass filter
+        # this is the default
+        $top_key="ALL";
+        $top_count_key="ALLCOUNT";
+        $objectclass_filter="";
+        $single_attrs=[
+          'sAMAccountName',
+          'sophomorixRole',
+          'sophomorixType',
+        ];
+        $multi_attrs=[
+          'objectclass',
+        ];
+    }
+    return ($top_key,$top_count_key,$objectclass_filter,$single_attrs,$multi_attrs);
+}
+
+
 sub json_printout {
     my ($json,$ref_search)=@_;
     if ($json==1){
