@@ -101,7 +101,8 @@ If you use the following wildcardcharacters, put them in quotation marks:
 Options
   -h  / --help
   -v  / --verbose
-  -vv / --verbose --verbose
+  show the search
+
   -i  / --info
   --filter: show the filter that is used
 
@@ -158,6 +159,9 @@ What computer attributes to return:
 --comp-full       (all useful attributes)
 
 Examples:
+  Search for all objects where the sAMAccountName begins with the letter j:
+  sophomorix-query --sam "j*"
+
   Search for all adminclasses and extraclassses of a school for dropdown menue:
   sophomorix-query --schoolbase <school> --extraclass --adminclass --group-minimal
 
@@ -497,45 +501,6 @@ if (defined $options{'group-members'}){
  $single_attrs,
  $multi_attrs)=&setup_json_return($search_object);
 
-# if ($search_object eq "user"){
-#     $top_key="USER";
-#     $top_count_key="USERCOUNT";
-#     $objectclass_filter="(objectclass=user)";
-#     $single_attrs=$single_user_attrs;
-#     $multi_attrs=$multi_user_attrs;
-# } elsif ($search_object eq "group"){
-#     $top_key="GROUP";
-#     $top_count_key="GROUPCOUNT";
-#     $objectclass_filter="(objectclass=group)";
-#     $single_attrs=$single_group_attrs;
-#     $multi_attrs=$multi_group_attrs;
-# } elsif ($search_object eq "room"){
-#     $top_key="ROOM";
-#     $top_count_key="ROOMCOUNT";
-#     $objectclass_filter="(objectclass=group)";
-#     $single_attrs=$single_group_attrs;
-#     $multi_attrs=$multi_group_attrs;
-# } elsif ($search_object eq "computer"){
-#     $top_key="COMPUTER";
-#     $top_count_key="COMPUTERCOUNT";
-#     $objectclass_filter="(objectclass=computer)";
-#     $single_attrs=$single_comp_attrs;
-#     $multi_attrs=$multi_comp_attrs;
-# } elsif ($search_object eq "all"){
-#     # no objectclass filter
-#     # this is the default
-#     $top_key="ALL";
-#     $top_count_key="ALLCOUNT";
-#     $single_attrs=[
-#       'sAMAccountName',
-#       'sophomorixRole',
-#       'sophomorixType',
-#     ];
-#     $multi_attrs=[
-#       'objectclass',
-#     ];
-# }
-
 
 
 ############################################################
@@ -580,18 +545,28 @@ if ($search_object eq "all"){
 
 # display debugging info
 if (defined $options{'verbose'} and $options{'verbose'}==1){
+    print "\n";
+    print "Option hash:\n";
     print Dumper (\%options);
-    print "BASE:       $base\n";
-    print "SCOPE:      $scope\n";
-    print "FILTER:     $filter\n";
-    print "SEARCH FOR: $search_object\n";
-    print "ATTRIBUTES:\n";
-    foreach my $attr (@{ $single_attrs }){
-        print "   * $attr (singlevalue)\n";
+    print "\n";
+    print "Search parameters:\n";
+    print "  BASE:       $base\n";
+    print "  SCOPE:      $scope\n";
+    print "  FILTER:     $filter\n";
+    print "  SEARCH FOR: $search_object\n";
+    print "  ATTRIBUTES:";
+    if ($search_object eq "all"){
+        print " ALL attributes\n";
+    } else {
+        print "\n";
+        foreach my $attr (@{ $single_attrs }){
+            print "     * $attr (singlevalue)\n";
+        }
+        foreach my $attr (@{ $multi_attrs }){
+            print "     * $attr (multivalue)\n";
+        }
     }
-    foreach my $attr (@{ $multi_attrs }){
-        print "   * $attr (multivalue)\n";
-    }
+    print "\n";
 }
 
 # go through results
@@ -605,7 +580,6 @@ for( my $index = 0 ; $index < $max ; $index++) {
     if ($search_object eq "all"){
         # find out what is searched for
         my @objectclass=$entry->get_value('objectclass');
-        print "HERE1: objectclass of $sam is  @objectclass\n";
         foreach my $oc (@objectclass){
             if ($oc eq "user"){
                 $search_object_used="user";
@@ -629,8 +603,6 @@ for( my $index = 0 ; $index < $max ; $index++) {
          $objectclass_filter,
          $single_attrs,
          $multi_attrs)=&setup_json_return($search_object_used);
-
-        print "HERE2: $sam is a $search_object_used\n";
     } else {
         # use what is searched for
         $search_object_used=$search_object;
