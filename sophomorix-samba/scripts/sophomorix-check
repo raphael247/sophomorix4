@@ -894,12 +894,8 @@ close(ERROR);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#my $linecount_add=`wc -l $add_file`;
-#chomp($linecount_add);
-#my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
 &result_sophomorix_add_summary({
                      NAME=>"ADD", 
-#                     RESULT=>$lc_add, 
                      RESULT=>$counters{'ADD'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users can be added in ".basename($add_file), 
@@ -908,12 +904,8 @@ close(ERROR);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#my $linecount_update=`wc -l $update_file`;
-#chomp($linecount_update);
-#my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
 &result_sophomorix_add_summary({
                      NAME=>"UPDATE", 
-#                     RESULT=>$lc_update, 
                      RESULT=>$counters{'UPDATE'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users can be updated in ".basename($update_file), 
@@ -922,12 +914,8 @@ close(ERROR);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#my $linecount_kill=`wc -l $kill_file`;
-#chomp($linecount_kill);
-#my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
 &result_sophomorix_add_summary({
                      NAME=>"KILL", 
-#                     RESULT=>$lc_kill, 
                      RESULT=>$counters{'KILL'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users can be killed in ".basename($kill_file), 
@@ -936,12 +924,8 @@ close(ERROR);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#my $linecount_nochange=`wc -l $nochange_file`;
-#chomp($linecount_nochange);
-#my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
 &result_sophomorix_add_summary({
                      NAME=>"NOCHANGE", 
-#                     RESULT=>$lc_nochange, 
                      RESULT=>$counters{'NOCHANGE'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users are not to be changed in ".basename($nochange_file), 
@@ -950,12 +934,8 @@ close(ERROR);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#my $linecount_error=`wc -l $error_file`;
-#chomp($linecount_error);
-#my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
 &result_sophomorix_add_summary({
                      NAME=>"ERROR", 
-#                     RESULT=>$lc_error, 
                      RESULT=>$counters{'ERROR'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users with errors in ".basename($error_file), 
@@ -964,14 +944,24 @@ close(ERROR);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-#print "ADD       $lc_add $counters{'ADD'}\n";
-#print "UPDATE    $lc_update $counters{'UPDATE'}\n";
-#print "KILL:     $lc_kill $counters{'KILL'}\n";
-#print "NOCHANGE: $lc_nochange $counters{'NOCHANGE'}\n";
-#print "ERROR: $lc_error $counters{'ERROR'}\n";
+# sort the result lists
+if ($#{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} }>0){
+    @{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} } = 
+        sort @{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} };
+}
+if ($#{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} }>0){
+    @{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} } = 
+        sort @{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} };
+}
+if ($#{ $sophomorix_result{'CHECK_RESULT'}{'KILLLIST'} }>0){
+    @{ $sophomorix_result{'CHECK_RESULT'}{'KILLLIST'} } = 
+        sort @{ $sophomorix_result{'CHECK_RESULT'}{'KILLLIST'} };
+}
+if ($#{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }>0){
+    @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} } = 
+        sort @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} };
+}
 
-# sort lists
-#if ($#{ $sophomorix_result{'LISTS'}{$top_key} }>1){
 
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);

@@ -738,22 +738,22 @@ for( my $index = 0 ; $index < $max ; $index++) {
 
 
 # sort and count some lists
-if ($#{ $search{'LISTS'}{$top_key} }>1){
+if ($#{ $search{'LISTS'}{$top_key} }>0){
     @{ $search{'LISTS'}{$top_key} } = sort @{ $search{'LISTS'}{$top_key} };
 }
-if ($#{ $search{'LISTS'}{'GROUP'} }>-1){
+if ($#{ $search{'LISTS'}{'GROUP'} }>0){
     @{ $search{'LISTS'}{'GROUP'} } = sort @{ $search{'LISTS'}{'GROUP'} };
     $search{'COUNTERS'}{'GROUP'}=$#{ $search{'LISTS'}{'GROUP'} }+1;
 }
-if ($#{ $search{'LISTS'}{'ROOM'} }>-1){
+if ($#{ $search{'LISTS'}{'ROOM'} }>0){
     @{ $search{'LISTS'}{'ROOM'} } = sort @{ $search{'LISTS'}{'ROOM'} };
     $search{'COUNTERS'}{'ROOM'}=$#{ $search{'LISTS'}{'ROOM'} }+1;
 }
-if ($#{ $search{'LISTS'}{'USER'} }>-1){
+if ($#{ $search{'LISTS'}{'USER'} }>0){
     @{ $search{'LISTS'}{'USER'} } = sort @{ $search{'LISTS'}{'USER'} };
     $search{'COUNTERS'}{'USER'}=$#{ $search{'LISTS'}{'USER'} }+1;
 }
-if ($#{ $search{'LISTS'}{'COMPUTER'} }>-1){
+if ($#{ $search{'LISTS'}{'COMPUTER'} }>0){
     @{ $search{'LISTS'}{'COMPUTER'} } = sort @{ $search{'LISTS'}{'COMPUTER'} };
     $search{'COUNTERS'}{'COMPUTER'}=$#{ $search{'LISTS'}{'COMPUTER'} }+1;
 }
