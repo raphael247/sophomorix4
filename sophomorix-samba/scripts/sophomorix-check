@@ -75,6 +75,12 @@ my $school="";
 my %users_file=();
 my %unid_seen=();
 
+my %counters=();
+$counters{'ADD'}=0;
+$counters{'UPDATE'}=0;
+$counters{'KILL'}=0;
+$counters{'NOCHANGE'}=0;
+
 # allowed numbers for days
 my %convert_day = qw(
      1     01          01    01
@@ -796,6 +802,52 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                         $new_school."::".
                         "\n";
         print UPDATE $update_line;
+        # create result
+        if ($new_unid ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'OLD'}=$old_unid;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'NEW'}=$new_unid;
+        }
+        if ($new_surname_ascii ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSurnameASCII'}{'OLD'}=$old_surname_ascii;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSurnameASCII'}{'NEW'}=$new_surname_ascii;
+        }
+        if ($new_firstname_ascii ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixFirstnameASCII'}{'OLD'}=$old_firstname_ascii;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixFirstnameASCII'}{'NEW'}=$new_firstname_ascii;
+        }
+        if ($new_birthdate ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixBirthdate'}{'OLD'}=$old_birthdate;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixBirthdate'}{'NEW'}=$new_birthdate;
+        }
+        if ($new_surname_utf8 ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sn'}{'OLD'}=$old_surname_utf8;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sn'}{'NEW'}=$new_surname_utf8;
+        }
+        if ($new_firstname_utf8 ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'givenName'}{'OLD'}=$old_firstname_utf8;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'givenName'}{'NEW'}=$new_firstname_utf8;
+        }
+        if ($new_filename ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminFile'}{'OLD'}=$old_filename;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminFile'}{'NEW'}=$new_filename;
+        }
+        if ($new_status ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixStatus'}{'OLD'}=$old_status;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixStatus'}{'NEW'}=$new_status;
+        }
+        if ($new_role ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixRole'}{'OLD'}=$old_role;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixRole'}{'NEW'}=$new_role;
+        }
+        if ($new_class ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminClass'}{'OLD'}=$old_class;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminClass'}{'NEW'}=$new_class;
+        }
+        if ($new_school ne "---"){
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'OLD'}=$old_school;
+            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'NEW'}=$new_school;
+        }
+        $counters{'UPDATE'}++;
     } else {
         # nothing to update 
         # write to sophomorix.kill or sophomorix.nochange
@@ -903,7 +955,10 @@ my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-
+print "ADD       $linecount_add $counters{'ADD'}\n";
+print "UPDATE    $linecount_update $counters{'UPDATE'}\n";
+print "KILL:     $linecount_kill $counters{'KILL'}\n";
+print "NOCHANGE: $linecount_error $counters{'NOCHANGE'}\n";
 
 
 &AD_unbind_admin($ldap);
@@ -1299,6 +1354,16 @@ sub write_add_file {
                  "\n";
     if ($login ne "---"){
         print ADD $add_line;
+        # create result
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminFile'}=$Match{'ACTION'}{$line_new}{'filename'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminClass'}=$Match{'ACTION'}{$line_new}{'class'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sn'}=$Match{'ACTION'}{$line_new}{'surname_utf8'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'givenName'}=$Match{'ACTION'}{$line_new}{'firstname_utf8'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixUnid'}=$Match{'ACTION'}{$line_new}{'unid'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixSchoolname'}=$Match{'ACTION'}{$line_new}{'school'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixRole'}=$Match{'ACTION'}{$line_new}{'role'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'identifier_ascii'}=$Match{'ACTION'}{$line_new}{'identifier_ascii'};
+        $counters{'ADD'}++;
     } else {
         print "\n   ERROR: Login for $line_new could no be created\n\n";
         exit;
