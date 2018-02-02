@@ -36,6 +36,7 @@ my $testopt=GetOptions(\%options,
                         "sn=s",
                         "gn|givenName=s",
                         "anyname=s",
+                        "custom=s",
                         "student",
                         "teacher",
                         "examuser",
@@ -111,8 +112,10 @@ Search attribute(s) to find a user/group/computer:
 --sam|sAMAccountName <string> 
 --sn <string>
 --gn|givenName  <string>
-# Later
+OR
 --anyname <string>      (All important name fields: sAMAccountName,sn,givenName, ...)
+OR
+--custom <string>       (The custom fields)
 
 Limit the query for sophomorix users to a certain sophomorixRole:
 (multiple options are connected with | to accumulate the results)
@@ -247,6 +250,35 @@ if (defined $options{'sam'} or
     }
     $attr_filter=$attr_filter." )";
 }
+
+
+if (defined $options{'anyname'}){
+    $attr_filter=$attr_filter."(| ";
+    $attr_filter=$attr_filter."(givenName=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(sn=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(description=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(sophomorixComment=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(sophomorixFirstnameASCII=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(sophomorixSurnameASCII=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter." )";
+} 
+
+
+if (defined $options{'custom'}){
+    $attr_filter=$attr_filter."(| ";
+    $attr_filter=$attr_filter."(sophomorixCustom1=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustom2=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustom3=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustom4=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustom5=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustomMulti1=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustomMulti2=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustomMulti3=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustomMulti4=".$options{'custom'}.")";
+    $attr_filter=$attr_filter."(sophomorixCustomMulti5=".$options{'custom'}.")";
+    $attr_filter=$attr_filter." )";
+} 
+
 
 ########################################
 # set the role filter (combined with |)
@@ -569,6 +601,7 @@ if (defined $options{'verbose'} and $options{'verbose'}==1){
     print "\n";
 }
 
+
 # go through results
 $max = $mesg->count; 
 $search{'COUNTERS'}{$top_count_key}=$max; 
@@ -704,11 +737,10 @@ for( my $index = 0 ; $index < $max ; $index++) {
 
 
 
+# sort and count some lists
 if ($#{ $search{'LISTS'}{$top_key} }>1){
     @{ $search{'LISTS'}{$top_key} } = sort @{ $search{'LISTS'}{$top_key} };
 }
-
-
 if ($#{ $search{'LISTS'}{'GROUP'} }>-1){
     @{ $search{'LISTS'}{'GROUP'} } = sort @{ $search{'LISTS'}{'GROUP'} };
     $search{'COUNTERS'}{'GROUP'}=$#{ $search{'LISTS'}{'GROUP'} }+1;
@@ -783,6 +815,7 @@ sub setup_json_return {
     }
     return ($top_key,$top_count_key,$objectclass_filter,$single_attrs,$multi_attrs);
 }
+
 
 
 sub json_printout {
