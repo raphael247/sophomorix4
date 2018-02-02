@@ -80,6 +80,7 @@ $counters{'ADD'}=0;
 $counters{'UPDATE'}=0;
 $counters{'KILL'}=0;
 $counters{'NOCHANGE'}=0;
+$counters{'ERROR'}=0;
 
 # allowed numbers for days
 my %convert_day = qw(
@@ -429,7 +430,7 @@ open (KILL, ">$kill_file");
 my $nochange_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.nochange";
 open (NOCHANGE, ">$nochange_file");
 my $error_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.error";
-open (ERRORFILE, ">$error_file");
+open (ERROR, ">$error_file");
 
 # ============================================================
 # analyzing encoding of all filtered user files in tmp
@@ -803,6 +804,7 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                         "\n";
         print UPDATE $update_line;
         # create result
+        push @{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} }, $sam;
         if ($new_unid ne "---"){
             $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'OLD'}=$old_unid;
             $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'NEW'}=$new_unid;
@@ -870,6 +872,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                               $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}."::".
                               "\n";
             print NOCHANGE $nochange_line;
+            #push @{ $sophomorix_result{'CHECK_RESULT'}{'NOCHANGELIST'} }, $sam;
+            $counters{'NOCHANGE'}++;
         }
     }
 }
@@ -878,7 +882,7 @@ close(ADD);
 close(UPDATE);
 close(KILL);
 close(NOCHANGE);
-#close(ERRORFILE);
+close(ERROR);
 
 
 ############################################################
@@ -890,12 +894,13 @@ close(NOCHANGE);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-my $linecount_add=`wc -l $add_file`;
-chomp($linecount_add);
-my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
+#my $linecount_add=`wc -l $add_file`;
+#chomp($linecount_add);
+#my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
 &result_sophomorix_add_summary({
                      NAME=>"ADD", 
-                     RESULT=>$lc_add, 
+#                     RESULT=>$lc_add, 
+                     RESULT=>$counters{'ADD'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users can be added in ".basename($add_file), 
                      DESCRIPTION_PRE => "users in ".basename($add_file), 
@@ -903,12 +908,13 @@ my ($lc_add,$tmp_add)=split(/\s/,$linecount_add);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-my $linecount_update=`wc -l $update_file`;
-chomp($linecount_update);
-my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
+#my $linecount_update=`wc -l $update_file`;
+#chomp($linecount_update);
+#my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
 &result_sophomorix_add_summary({
                      NAME=>"UPDATE", 
-                     RESULT=>$lc_update, 
+#                     RESULT=>$lc_update, 
+                     RESULT=>$counters{'UPDATE'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users can be updated in ".basename($update_file), 
                      DESCRIPTION_PRE => "users in ".basename($update_file), 
@@ -916,12 +922,13 @@ my ($lc_update,$tmp_update)=split(/\s/,$linecount_update);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-my $linecount_kill=`wc -l $kill_file`;
-chomp($linecount_kill);
-my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
+#my $linecount_kill=`wc -l $kill_file`;
+#chomp($linecount_kill);
+#my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
 &result_sophomorix_add_summary({
                      NAME=>"KILL", 
-                     RESULT=>$lc_kill, 
+#                     RESULT=>$lc_kill, 
+                     RESULT=>$counters{'KILL'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users can be killed in ".basename($kill_file), 
                      DESCRIPTION_PRE => "users in ".basename($kill_file), 
@@ -929,12 +936,13 @@ my ($lc_kill,$tmp_kill)=split(/\s/,$linecount_kill);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-my $linecount_nochange=`wc -l $nochange_file`;
-chomp($linecount_nochange);
-my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
+#my $linecount_nochange=`wc -l $nochange_file`;
+#chomp($linecount_nochange);
+#my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
 &result_sophomorix_add_summary({
                      NAME=>"NOCHANGE", 
-                     RESULT=>$lc_nochange, 
+#                     RESULT=>$lc_nochange, 
+                     RESULT=>$counters{'NOCHANGE'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users are not to be changed in ".basename($nochange_file), 
                      DESCRIPTION_PRE => "users in ".basename($nochange_file), 
@@ -942,12 +950,13 @@ my ($lc_nochange,$tmp_nochange)=split(/\s/,$linecount_nochange);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-my $linecount_error=`wc -l $error_file`;
-chomp($linecount_error);
-my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
+#my $linecount_error=`wc -l $error_file`;
+#chomp($linecount_error);
+#my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
 &result_sophomorix_add_summary({
-                     NAME=>"ERRORFILE", 
-                     RESULT=>$lc_error, 
+                     NAME=>"ERROR", 
+#                     RESULT=>$lc_error, 
+                     RESULT=>$counters{'ERROR'}, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "users with errors in ".basename($error_file), 
                      DESCRIPTION_PRE => "users in ".basename($error_file), 
@@ -955,11 +964,14 @@ my ($lc_error,$tmp_error)=split(/\s/,$linecount_error);
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-print "ADD       $linecount_add $counters{'ADD'}\n";
-print "UPDATE    $linecount_update $counters{'UPDATE'}\n";
-print "KILL:     $linecount_kill $counters{'KILL'}\n";
-print "NOCHANGE: $linecount_error $counters{'NOCHANGE'}\n";
+#print "ADD       $lc_add $counters{'ADD'}\n";
+#print "UPDATE    $lc_update $counters{'UPDATE'}\n";
+#print "KILL:     $lc_kill $counters{'KILL'}\n";
+#print "NOCHANGE: $lc_nochange $counters{'NOCHANGE'}\n";
+#print "ERROR: $lc_error $counters{'ERROR'}\n";
 
+# sort lists
+#if ($#{ $sophomorix_result{'LISTS'}{$top_key} }>1){
 
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -1088,6 +1100,16 @@ sub test_DL_RA_update{
                 $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
                 $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
             print KILL $kill_line;
+            # create result
+            push @{ $sophomorix_result{'CHECK_RESULT'}{'KILLLIST'} }, $sam;
+            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'IDENTIFIER_ASCII'}=
+               $ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
+            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sAMAccountName'}=$sam;
+            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixAdminClass'}=
+               $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixSchoolname'}=
+               $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+            $counters{'KILL'}++;
         } elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and 
             $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D"){
             # update to A if 
@@ -1355,6 +1377,7 @@ sub write_add_file {
     if ($login ne "---"){
         print ADD $add_line;
         # create result
+        push @{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} }, $login;
         $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminFile'}=$Match{'ACTION'}{$line_new}{'filename'};
         $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminClass'}=$Match{'ACTION'}{$line_new}{'class'};
         $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sn'}=$Match{'ACTION'}{$line_new}{'surname_utf8'};
@@ -1665,7 +1688,13 @@ sub analyze_user_line {
             print REPORT "\nERROR in $line\n";
             print REPORT "   * Class $class_raw not valid ($error_strg_class)\n";
             # ignore the line, as if it is not there
-            print ERRORFILE $filename.":".$line_raw;
+            print ERROR $filename.":".$line_raw;
+            my $line=$line_raw;
+            chomp($line);
+            push @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }, $filename.":".$line;
+            $sophomorix_result{'CHECK_RESULT'}{'ERROR'}{$filename.":".$line}{'REASON'}=
+                "Class $class_raw not valid ($error_strg_class)";
+            $counters{'ERROR'}++;
             return;
         }
 
@@ -1675,7 +1704,13 @@ sub analyze_user_line {
             print REPORT "\nERROR in $line\n";
             print REPORT "   * Surname $first_raw not valid ($error_strg_first)\n";
             # ignore the line, as if it is not there
-            print ERRORFILE $filename.":".$line_raw;
+            print ERROR $filename.":".$line_raw;
+            my $line=$line_raw;
+            chomp($line);
+            push @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }, $filename.":".$line;
+            $sophomorix_result{'CHECK_RESULT'}{'ERROR'}{$filename.":".$line}{'REASON'}=
+                "Surname $first_raw not valid ($error_strg_first)";
+            $counters{'ERROR'}++;
             return;
         }
 
@@ -1685,7 +1720,13 @@ sub analyze_user_line {
             print REPORT "\nERROR in $line\n";
             print REPORT "   * Surname $last_raw not valid ($error_strg_last)\n";
             # ignore the line, as if it is not there
-            print ERRORFILE $filename.":".$line_raw;
+            print ERROR $filename.":".$line_raw;
+            my $line=$line_raw;
+            chomp($line);
+            push @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }, $filename.":".$line;
+            $sophomorix_result{'CHECK_RESULT'}{'ERROR'}{$filename.":".$line}{'REASON'}=
+                "Surname $last_raw not valid ($error_strg_last)";
+            $counters{'ERROR'}++;
             return;
         }
 
@@ -1695,7 +1736,13 @@ sub analyze_user_line {
             print REPORT "\nERROR in $line\n";
             print REPORT "   * Birthdate $birthdate_raw not valid ($error_strg_birth)\n";
             # ignore the line, as if it is not there
-            print ERRORFILE $filename.":".$line_raw;
+            print ERROR $filename.":".$line_raw;
+            my $line=$line_raw;
+            chomp($line);
+            push @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }, $filename.":".$line;
+            $sophomorix_result{'CHECK_RESULT'}{'ERROR'}{$filename.":".$line}{'REASON'}=
+                "Birthdate $birthdate_raw not valid ($error_strg_birth)";
+            $counters{'ERROR'}++;
             return;
         }
 
