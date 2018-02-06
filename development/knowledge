@@ -127,4 +127,20 @@ importieren:
 - Namen ändern, Ort anpassen, vdi als Plattenabbild
 - FW booten
 - vom wirt via vboxnet2 auf die innenseite der FW pingen: ping 10.0.0.254
+
+firewall: 
+  booten, device LAn einrichten
+  172.16.0.254/12
+server: 
+  IP setzen: 172.16.0.1/12
+    - linuxmuster-prepare.py -s -u -n 172.16.0.1/12
+    - reboot
+  apt install emacs
+  emacs .bashrc 
+    - color prompt enablen
+    - farbe von 0;32 auf 0;33
+  apt install nfs-common
+  mount -t nfs 172.16.0.100://home/bz/github /mnt
+  
+
 ############################################################

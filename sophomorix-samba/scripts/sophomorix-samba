@@ -13,6 +13,7 @@ use Sophomorix::SophomorixConfig;
 use Sophomorix::SophomorixBase qw(
                                  check_options
                                  read_smb_conf
+                                 result_sophomorix_init
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                     );
@@ -23,22 +24,6 @@ $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
 #    return \%master;
 
-use Sophomorix::SophomorixBase qw(
-                                 print_line
-                                 print_title
-                                 unlock_sophomorix
-                                 lock_sophomorix
-                                 backup_auk_file
-                                 get_passwd_charlist
-                                 get_plain_password
-                                 check_options
-                                 config_sophomorix_read
-                                 result_sophomorix_init
-                                 result_sophomorix_add
-                                 result_sophomorix_add_summary
-                                 result_sophomorix_check_exit
-                                 result_sophomorix_print
-                                 );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
                                  AD_bind_admin
@@ -81,9 +66,6 @@ my $editor="emacs";
 my $samba_private="/var/lib/samba/private";
 my $samba_private_d="/var/lib/samba/private/sam.ldb.d";
 
-my %smb_conf=();
-&read_smb_conf(\%smb_conf);
-#print Dumper( \%smb_conf );
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -101,93 +83,6 @@ my $testopt=GetOptions(
           );
 
 
-
-
-my %sophomorix_result=&result_sophomorix_init("sophomorix-samba");
-# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
-&check_options($testopt,\%sophomorix_result,$json);
-
-# start and stop before connect-test 
-# --start
-if ($start==1){
-    print "\nStarting samba\n\n";
-    &samba_start();
-    exit;
-}
-
-
-
-# --stop
-if ($stop==1){
-    print "\nStopping samba\n\n";
-    &samba_stop();
-    exit;
-}
-
-
-
-# --status
-if ($status==1){
-    &samba_status();
-    exit;
-}
-
-
-
-# --restart
-if ($restart==1){
-    print "\nRestarting samba\n\n";
-    &samba_stop();
-    &samba_start();
-    exit;
-}
-
-
-
-# --restore-samba
-if ($restore_samba ne ""){
-    &samba_stop();
-    print "\nRestoring samba databases with suffix -$restore_samba\n\n";
-    my @ldb_files = &get_ldb_files();
-    print "##### restoring ldb files: #####\n";
-    foreach my $ldb (@ldb_files){
-        my $command="cp -v ${samba_private}/${ldb}-${restore_samba} ${samba_private}/${ldb} ";
-        #print "  $command\n";
-        system($command);
-    } 
-    my @ldb_files_d = &get_ldb_d_files();
-    print "##### restoring ldb files: #####\n";
-    foreach my $ldb_d (@ldb_files_d){
-        my $command="cp -v ${samba_private_d}/${ldb_d}-${restore_samba} ${samba_private_d}/${ldb_d} ";
-        #print "  $command\n";
-        system($command);
-    } 
-    &samba_start();
-    exit;
-}
-
-
-
-# --schema-load
-if ($schema_load==1){
-    &samba_stop();
-    print "\nLoading sophomorix schema into ldap\n\n";
-    my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
-    my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
-    print "$command\n";
-    system($command);
-    &samba_start();
-    exit;
-}
-
-
-
-# Reading Configuration
-my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
-#my $root_dns=&AD_dns_get($root_dse);
-#my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
-#my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
-#                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
@@ -233,6 +128,50 @@ Please see the sophomorix-samba(8) man pages for full documentation
 }
 
 
+
+
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-samba");
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt,\%sophomorix_result,$json);
+
+# start and stop before connect-test 
+# --start
+if ($start==1){
+    print "\nStarting samba\n\n";
+    &samba_start();
+    exit;
+}
+
+
+
+# --stop
+if ($stop==1){
+    print "\nStopping samba\n\n";
+    &samba_stop();
+    exit;
+}
+
+
+
+# --status
+if ($status==1){
+    &samba_status();
+    exit;
+}
+
+
+
+# --restart
+if ($restart==1){
+    print "\nRestarting samba\n\n";
+    &samba_stop();
+    &samba_start();
+    exit;
+}
+
+
+
 # --backup-samba
 if ($backup_samba ne ""){
     print "\nBacking up samba databases with suffix -$backup_samba\n\n";
@@ -255,6 +194,60 @@ if ($backup_samba ne ""){
 
 
 
+# --restore-samba
+if ($restore_samba ne ""){
+    &samba_stop();
+    print "\nRestoring samba databases with suffix -$restore_samba\n\n";
+    my @ldb_files = &get_ldb_files();
+    print "##### restoring ldb files: #####\n";
+    foreach my $ldb (@ldb_files){
+        my $command="cp -v ${samba_private}/${ldb}-${restore_samba} ${samba_private}/${ldb} ";
+        #print "  $command\n";
+        system($command);
+    } 
+    my @ldb_files_d = &get_ldb_d_files();
+    print "##### restoring ldb files: #####\n";
+    foreach my $ldb_d (@ldb_files_d){
+        my $command="cp -v ${samba_private_d}/${ldb_d}-${restore_samba} ${samba_private_d}/${ldb_d} ";
+        #print "  $command\n";
+        system($command);
+    } 
+    &samba_start();
+    exit;
+}
+
+
+
+# --schema-load
+if ($schema_load==1){
+    my %smb_conf=();
+    &read_smb_conf(\%smb_conf);
+    print Dumper( \%smb_conf );
+    if ($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'} eq "DC="){
+        print "\nERROR: Cannot load schema with a misconfigured smb.conf\n\n";
+    } else {
+        &samba_stop();
+        print "\nLoading sophomorix schema into ldap\n\n";
+        my $dn=$smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'};
+        my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
+        print "$command\n";
+        system($command);
+        &samba_start();
+    }
+    exit;
+}
+
+
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+#my $root_dns=&AD_dns_get($root_dse);
+#my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+#my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+#                                     $DevelConf::secret_file_sophomorix_file_admin);
+
+
+
 # --set-confidential / --set-nonconfidential /
 if ($edit_searchflags ne ""){
     my $attribute=$edit_searchflags;
@@ -271,7 +264,6 @@ if ($edit_searchflags ne ""){
 
 
 }
-
 
 
 ############################################################
