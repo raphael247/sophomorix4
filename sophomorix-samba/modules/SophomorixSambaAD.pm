@@ -434,10 +434,11 @@ sub AD_dns_kill {
     }
 
     # delete dnsNode
-    if ($dns_ipv4 ne "NXDOMAIN"){
+    if ($dns_ipv4 ne "NXDOMAIN" and $dns_ipv4 ne "NOERROR"){
         my $command="samba-tool dns delete $dns_server ".
                     "$dns_zone $dns_node $dns_type $dns_ipv4 ".
                     "--password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+        print "   * $command\n";
         system($command);
     }
 
