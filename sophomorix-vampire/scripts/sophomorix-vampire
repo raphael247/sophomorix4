@@ -253,20 +253,16 @@ print "\n";
 if ($missig_files_count > 0){
     print "ERROR:    $missig_files_count file(s) is missing in the dump!\n";
 }
-if ($overwriting_files_count > 0){
-    if ($restore_config_files==1){ 
-        print "$overwriting_files_count file(s) were overwritten!\n";
-        &teachers_rewrite("/etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp",
-                          "/etc/linuxmuster/sophomorix/default-school/teachers.csv");
-        &devices_rewrite("/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
-			 "/etc/linuxmuster/sophomorix/default-school/devices.csv");
-        &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
-			 "/etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
-        &killog_rewrite("/var/log/sophomorix/user-modify-archive.log.migrated.orig",
-			 "/var/log/sophomorix/user-modify-archive.log.migrated");
-    } else {
-        print "WARNING:  $overwriting_files_count file(s) would be overwritten!\n";
-    }
+if ($restore_config_files==1){ 
+    print "$overwriting_files_count file(s) were overwritten!\n";
+    &teachers_rewrite("/etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp",
+                      "/etc/linuxmuster/sophomorix/default-school/teachers.csv");
+    &devices_rewrite("/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
+                     "/etc/linuxmuster/sophomorix/default-school/devices.csv");
+    &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
+  		           "/etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
+    &killog_rewrite("/var/log/sophomorix/user-modify-archive.log.migrated.orig",
+		    "/var/log/sophomorix/user-modify-archive.log.migrated");
 }
 print "\n";
 
