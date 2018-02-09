@@ -1,5 +1,5 @@
 #!/bin/bash
-
+date
 rm -rf /tmp/LOGDIR
 rm -rf /tmp/ERRORDIR
 mkdir -p /tmp/LOGDIR
@@ -120,3 +120,5 @@ echo ""
 echo "sophomorix-device"
 time sophomorix-device 1> /tmp/LOGDIR/file-16.log 2> /tmp/ERRORDIR/file-16.err
 cat /tmp/ERRORDIR/file-16.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+date
