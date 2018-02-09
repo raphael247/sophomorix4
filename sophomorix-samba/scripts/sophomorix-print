@@ -241,7 +241,7 @@ if ($caller ne ""){
                  });
     if ($existing_AD eq "FALSE"){
         print "\nERROR: User $caller does not exist\n\n";
-        exit;
+        exit 88;
     }
     $caller_filename_part="-"."$caller";
 }
@@ -258,7 +258,7 @@ if ($caller_copy ne ""){
                  });
     if ($existing_AD eq "FALSE"){
         print "\nERROR: User $caller_copy does not exist\n\n";
-        exit;
+        exit 88;
     }
     $caller_filename_part="-"."$caller_copy";
 }
@@ -322,7 +322,7 @@ if ($template ne ""){
 # test existance of template file
 if (not -f $template_path_abs){
     print "\nERROR: Template does not exist: $template_path_abs\n\n";
-    exit;
+    exit 88;
 }
 
 &print_title("Basename of output files: $output_file_basename");
@@ -375,7 +375,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     # walk through classes
     if (not exists $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school}){
         print "\nERROR: School $school has no printout data\n\n";
-        exit;
+        exit 88;
     }
     my @classlist = @{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
     @classlist = sort @classlist;
@@ -410,7 +410,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
             $classes_seen{$class_item}="seen";
         } else {
             print "\nERROR: Class $class_item has no printout data in school $school\n\n";
-            exit;
+            exit 88;
         }
     }
 
@@ -441,7 +441,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
             push @{ $printdata{'LIST'} }, $ref_AD_print_data->{'LOOKUP_BY_sAMAccountName'}{$username};
         } else {
             print "\nERROR: User $username has no printout data in school $school\n\n";
-            exit;
+            exit 88;
         }
     }
 
@@ -473,7 +473,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
 
 } else {
     print "\nERROR: I don't know what to print\n\n";
-    exit;
+    exit 88;
 }
 
  
@@ -642,13 +642,13 @@ sub dataline_max_from_template_path {
     my $num = pop @strings; # the last but one gives the number
     if (not defined $num){
         print "\nERROR: template max number could not be determined from filname $filename\n\n";
-        exit;
+        exit 88;
     } elsif ($num < $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MIN_ITEM'}){
         print "\nERROR: template max number ($num) is not at least $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MIN_ITEM'}\n\n";
-        exit;
+        exit 88;
     } elsif ($num > $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MAX_ITEM'} ){
         print "\nERROR: template max number ($num) is larger than $sophomorix_config{'INI'}{'LATEX'}{'TEMPLATE_MAX_ITEM'}\n\n";
-        exit;
+        exit 88;
     }
     return $num;
 }

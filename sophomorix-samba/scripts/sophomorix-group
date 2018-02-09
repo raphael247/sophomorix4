@@ -237,7 +237,7 @@ if ($create==1 and $group ne ""){
         print "ERROR: Not creating group $group\n";
         print "       group names beginning with p_ are reserved for projects\n";
         print "\n";
-        exit;
+        exit 88;
     }
     &AD_school_create({ldap=>$ldap,
                        root_dse=>$root_dse,

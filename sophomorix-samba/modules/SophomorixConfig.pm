@@ -37,7 +37,7 @@ $Conf::lang="de";
 my $develconf="/usr/share/sophomorix/devel/sophomorix-devel.conf";
 if (not -e $develconf){
     print "ERROR: $develconf not found!\n";
-    exit;
+    exit 88;
 }
 
 # Einlesen der Konfigurationsdatei für Entwickler

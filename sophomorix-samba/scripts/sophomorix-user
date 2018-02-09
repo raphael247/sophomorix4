@@ -356,7 +356,7 @@ if ($user ne "" and $info==1){
 } elsif ($list_teachers_by_year==1){
     print "... still to do!\n";
     #&list_teachers_by_year();
-    exit;
+    exit 88;
 }
 
 
@@ -524,10 +524,10 @@ my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 if ($count>1){
     print "\n$count users found. Cannot modify more than one user!\n";
     print "Dont use * and stuff like this\n\n";
-    exit $count;
+    exit 88;
 } elsif ($count==0){
     print "\nERROR retrieving user $user: $count users found.\n\n";
-    exit $count;
+    exit 88;
 }
 
 
@@ -1009,13 +1009,13 @@ sub test_webui_permission {
         print "ERROR in parameter $perm:\n";
         print "      $ui is not an UI\n";
         print "\n";
-        exit;
+        exit 88;
     }   
     if ($switch ne "TRUE" and $switch ne "FALSE"){
         print "\n";
         print "ERROR in parameter $perm:\n";
         print "      $switch must be TRUE or FALSE\n";
         print "\n";
-        exit;
+        exit 88;
     }
 }

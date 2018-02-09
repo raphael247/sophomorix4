@@ -19,13 +19,33 @@ Todo:
 ############################################################
 
 17.10 Tests:
-- Migration testen
+- OK: Migration
+  --> Todo: BUG devices.csv wird nicht erzeugt, wenn total neuer gesetupter server
+         (beim 2.mal aufrufen tuts dann) 
+         sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files
 - quota und shares testen/anlegen
 
 17.10 update
 - compatibility zu 16.04 raus, 17.10 und 18.04 rein
 - SID anzeigen lassen
 - master branch umbenennen in bionic
+
+
+
+Todo: neue sub
+
+sub run_smb_script
+parameter: script (config-Verweis zu [EXECUTABLES])
+           optionstring
+           user
+           password
+--> Daraus erzeugen: 
+    je nach command wird ein Befehl zusammengebaut
+    1) Command:     <Executable> <optionstring> <login aus user/password>
+    2) Printstring: <Executable> <optionstring> <login aus user/****** statt password>
+    dann ausgeben des printstrings und ausführen des Command
+    (printstring: password abhängig von neu anzulegender variable [DEBUG] SHOW_SMB_PASSWORDS=TRUE)
+
 
 
 Migration: see file ./migration

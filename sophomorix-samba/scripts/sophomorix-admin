@@ -254,10 +254,10 @@ if ($kill ne ""){
     # ok without password
 } elsif ($pwd_option_count>1){
     print "\nERROR: Only one password option is allowed\n\n";
-    exit;
+    exit 88;
 } elsif ($pwd_option_count==0){
     print "\nERROR: A password option is needed\n\n";
-    exit;
+    exit 88;
 } 
 
 # avoid double create
@@ -273,11 +273,11 @@ if ($create_school_admin ne ""){
         # ok
     } else {
         print "\nERROR: Object $create_school_admin exists already in AD\n\n";
-        exit;
+        exit 88;
     }
     if ($school eq ""){
         print "\nERROR: Option --school is needed with option --create-school-admin\n\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -289,11 +289,11 @@ if ($create_global_admin ne ""){
         # ok
     } else {
         print "\nERROR: Object $create_global_admin exists already in AD\n\n";
-        exit;
+        exit 88;
     }
     if ($school ne ""){
         print "\nERROR: Option --school is useless with option --create-global-admin\n\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -308,11 +308,11 @@ if ($create_school_binduser ne ""){
         # ok
     } else {
         print "\nERROR: Object $create_school_binduser exists already in AD\n\n";
-        exit;
+        exit 88;
     }
     if ($school eq ""){
         print "\nERROR: Option --school is needed with option --create-school-binduser\n\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -324,11 +324,11 @@ if ($create_global_binduser ne ""){
         # ok
     } else {
         print "\nERROR: Object $create_global_binduser exists already in AD\n\n";
-        exit;
+        exit 88;
     }
     if ($school ne ""){
         print "\nERROR: Option --school is useless with option --create-global-binduser\n\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -337,7 +337,7 @@ if ($create_global_binduser ne ""){
 
 if ($create_count>1){
         print "\nERROR: You can only use one --create* option at a time\n\n";
-        exit;
+        exit 88;
 
 }
 
@@ -354,7 +354,7 @@ if ($create_school_admin ne "" and $school ne ""){
     } else {
         print "\nERROR: School $school is not a valid school for a school-admin on this server\n\n";
         &print_valid_schools;
-        exit;
+        exit 88;
     }
 
     my $group_token;
@@ -407,7 +407,7 @@ if ($create_school_admin ne "" and $school ne ""){
                   });
 } elsif ($create_school_admin ne "" and $school eq ""){
     print "\nERROR: Option --school <school> is needed to create the admin $create_school_admin\n\n";
-    exit;
+    exit 88;
 } 
 
 
@@ -470,7 +470,7 @@ if ($create_school_binduser ne "" and $school ne ""){
     } else {
         print "\nERROR: School $school is not a valid school for a school-binduser on this server\n\n";
         &print_valid_schools;
-        exit;
+        exit 88;
     }
 
     my $group_token;
@@ -526,7 +526,7 @@ if ($create_school_binduser ne "" and $school ne ""){
                   });
 } elsif ($create_school_binduser ne "" and $school eq ""){
     print "\nERROR: Option --school <school> is needed to create the binduser $create_school_binduser\n\n";
-    exit;
+    exit 88;
 } 
 
 
@@ -594,7 +594,7 @@ if ($kill ne ""){
 
     if ($existing_AD eq "FALSE"){
         print "\nERROR: User $kill does not exist\n\n";
-        exit;
+        exit 88;
     }
     if ($role_AD eq $sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'} or
         $role_AD eq $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'} or
@@ -619,7 +619,7 @@ if ($kill ne ""){
         }
     } else {
         print "\nERROR: User $kill is not an administrator created by sophomorix\n\n";
-        exit;
+        exit 88;
     }
 }
 

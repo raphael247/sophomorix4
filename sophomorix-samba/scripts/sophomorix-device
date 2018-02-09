@@ -1859,7 +1859,7 @@ sub check_room {
         print "\n";
         print "LINE: $line\n";
         print "  ERROR: $room contains invalid characters\n\n";
-        exit 1;
+        exit 88;
     } else {
 
     }
@@ -1878,7 +1878,7 @@ sub check_host {
         print "\n";
         print "LINE: $line\n";
         print "  ERROR: $host contains invalid characters\n\n";
-        exit 1;
+        exit 88;
     } else {
         $host=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
         # correct
@@ -1899,7 +1899,7 @@ sub check_hwk {
         print "\n";
         print "LINE: $line\n";
         print "ERROR: $hwk contains invalid characters\n\n";
-        exit 1;
+        exit 88;
     } else {
 
     }
@@ -1930,7 +1930,7 @@ sub check_mac {
         print "\n";
         print "LINE: $line\n";
         print "  ERROR: MAC >$new_mac< is double!\n\n";
-        exit 1;
+        exit 88;
     } else {
         $mac_seen{$new_mac}="seen";
     }
@@ -1957,7 +1957,7 @@ sub check_ip {
         print "\n";
         print "LINE: $line\n";
         print "  ERROR: >$ip< does not contain 3 dots\n\n";
-        exit 1;        
+        exit 88;        
     }
     
     # check for correct octets    
@@ -1968,7 +1968,7 @@ sub check_ip {
         }
         if ( int($octet) < 0 or int($octet) > 255) {
             print "\nERROR: ->$ip<- is invalid Option in ip octet\n\n";
-            exit 1;
+            exit 88;
         } else {
 
         }
@@ -1977,7 +1977,7 @@ sub check_ip {
     # check for double ip
     if (exists $ip_seen{$ip}){
         print "\nERROR: IP $ip is double!\n\n";
-        exit 1;
+        exit 88;
     } else {
         $ip_seen{$ip}="seen";
     }
@@ -2056,7 +2056,7 @@ sub check_pxe {
         print "\n";
         print "LINE: $line\n";
         print "  ERROR: >$pxe< is invalid Option in pxe field\n\n";
-        exit 1;
+        exit 88;
     }
     return $pxe;
 }

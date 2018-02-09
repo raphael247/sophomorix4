@@ -149,17 +149,17 @@ if ($info==1) {
 
 if (not defined $newfile){
     print "\n ERROR: You need to specify a file\n\n";
-    exit;
+    exit 88;
 }
 
 if (not -e  $newfile){
     print "\n ERROR: $newfile does not exist\n\n";
-    exit;
+    exit 88;
 }
 
 if (not -f  $newfile){
     print "\n ERROR: $newfile must be a file\n\n";
-    exit;
+    exit 88;
 }
 
 
@@ -189,7 +189,7 @@ if ($name ne ""){
         print "\nERROR: Your --name $name is not a valid filename on this server\n\n";
         print "   * Please use a valid filename so I can find out where to copy it.\n\n";
         &print_valid_filenames;
-        exit;
+        exit 88;
     }
 } elsif (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
     # valid filename
@@ -206,7 +206,7 @@ if ($name ne ""){
     print "\nERROR: Your filename $basename is not a valid filename on this server\n\n";
     print "   * Please rename the file accordingly so I can find out where to copy it.\n\n";
     &print_valid_filenames;
-    exit;
+    exit 88;
 }
 
 
@@ -229,7 +229,7 @@ if ($filter_only==1 and $filter_script ne "---"){
     exit;
 } elsif ($filter_only==1) {
     print "\nERROR: No filter script defined\n\n";
-    exit;
+    exit 88;
 }
 
 
@@ -266,7 +266,7 @@ if ($filter_script eq "---"){
     print "\nERROR: The configured Filter is not an executable script:\n";
     print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
     print "\n";
-    exit;
+    exit 88;
 } else {
     # filter script is executable, when in config hash -> run it
     # backup

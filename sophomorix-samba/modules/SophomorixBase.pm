@@ -118,7 +118,7 @@ sub mount_school {
     }
     if ( not defined $mountpoint){
         print "\nERROR: No mountpoint found for $share (Not a school?)\n\n";
-        exit;
+        exit 88;
     }
 
     # test if it is mounted already
@@ -1958,7 +1958,7 @@ sub lock_sophomorix {
            close(LOCK);
         } else {
            print "Cold not create lock file (file exists already!)\n";
-           exit;
+           exit 88;
         }
     } elsif ($type eq "steal"){
         # steal, only when existing with pid $pid
@@ -1972,7 +1972,7 @@ sub lock_sophomorix {
            return 1;
        } else {
            print "Coldnt steal lock file (file vanished! or pid changed)\n";
-           exit;
+           exit 88;
        }
     }
 }
@@ -2602,7 +2602,7 @@ sub read_lsbrelease {
     $release=$ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'};
     if ($distrib_id ne $allowed_distrib_id){
 	print "ERROR: sophomorix is best run on $allowed_distrib_id (You are using: $distrib_id)\n";
-        exit;
+        exit 88;
     }
     if ($release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_STABLE'} or
         $release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_UPCOMING'} or
@@ -2614,7 +2614,7 @@ sub read_lsbrelease {
 	print "       $ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_UPCOMING'} (UPCOMING)\n";
 	print "       $ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_EXPERIMENTAL'} (EXPERIMENTAL)\n";
         print "You have $distrib_id $release\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -2946,7 +2946,7 @@ sub load_school_ini {
                             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'FALSE'}{$module}="FALSE";
                         } else {
                             print "\nERROR: $switch must be TRUE/FALSE in school $school, role $role for $parameter\n\n";
-                            exit;
+                            exit 88;
                         }
                     }
                 }    
@@ -2990,7 +2990,7 @@ sub load_school_ini {
             &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
                 "Section ".$section." -> unknown, not processed");
             #print "ERROR: Section $section: unknown, not processed\n\n";
-            #exit;
+            #exit 88;
         }
     }
 }
@@ -3027,7 +3027,7 @@ sub load_sophomorix_ini {
             &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,"Section ".$section.": unknown, not processed");
             return;
             #print "ERROR: Section $section: unknown, not processed\n\n";
-            #exit;
+            #exit 88;
         }
     }
 }
@@ -3235,7 +3235,7 @@ sub filelist_fetch {
 	$file_type="USER_FILE";
     } else {
         print "ERROR: unknown filetype $filetype\n";
-        exit;
+        exit 88;
     }
 
     my @filelist=();
@@ -3390,7 +3390,7 @@ sub log_script_start {
 
         if ($try_count==$max_try_count){
             &print_title("try again later ...");
-            exit;
+            exit 88;
         } else {
             sleep 1;
         }
@@ -3687,21 +3687,21 @@ sub create_test_login {
 	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "          ($file LINE $line_num)\n";
             print "          Allowed characters are: a-z0-9-_\n\n";
-            exit;
+            exit 88;
         } elsif ($login_char_length<2){
             print "\n";
 	    print "   ERROR: $login_wish ist to short for a login name!\n";
 	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "          ($file LINE $line_num)\n";
             print "          Minimum characters for login names are 2\n\n";
-            exit;
+            exit 88;
         } elsif (not $login_wish=~m/^[a-z]+/){
             print "\n";
 	    print "   ERROR: $login_wish does not begin with a-z\n";
 	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "          ($file LINE $line_num)\n";
             print "          Login names must begin with a-z\n\n";
-            exit;
+            exit 88;
         } elsif (exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}){
             # forbidden login
             # put in result hash ?????
@@ -3710,7 +3710,7 @@ sub create_test_login {
 	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "          ($file LINE $line_num)\n";
 	    print "          REASON: $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}\n"; 
-            exit;
+            exit 88;
         } elsif (exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}){
             # non reusable login
             my $days=int($ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}{'UNUSED'}/86400);
@@ -3772,7 +3772,7 @@ sub NTACL_set_file {
         return;
     } elsif (not -r $ntacl_abs){ # -r: readable
         print "\nERROR: $ntacl_abs not found/readable\n\n";
-        exit;
+        exit 88;
     } 
     print "\n";
     &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (start)");
@@ -4146,7 +4146,7 @@ sub check_options{
         print "\nYou have made a mistake, when specifying options.\n"; 
         print "See error message above. \n\n";
         print "... $scriptname is terminating.\n\n";
-        exit;
+        exit 88;
     } else {
         if($Conf::log_level>=3){
             print "All options  were recognized.\n";

@@ -175,7 +175,7 @@ if ($school ne ""){
 	push @sharelist,$school;
     } else {
         print "\nERROR: $school is not a SMB-share!\n\n";
-	exit;
+	exit 88;
     }
 } else {
     # without option use only school shares
@@ -290,7 +290,7 @@ foreach my $school (@sharelist){
         exit;
     } else {
         print "\n\nERROR: $sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} not known\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -346,7 +346,7 @@ sub wget_return {
         print "   * Succesfully downloded html page for $object\n";
     } else {
         print "   * ERROR downloading $object: wget returned error code $return\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -366,7 +366,7 @@ sub belwue_maildata_config {
     if ($ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} ne "all" and
         $ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'} ne "maillistmembers"){
         print "\nERROR: Unknown option for MAILBOX_CREATE: $ref_belwue_mailconf->{'CONFIG'}{'CONFIG'}{'MAILBOX_CREATE'}\n\n";
-        exit;
+        exit 88;
     }
 
     # calculate connect data
@@ -691,7 +691,7 @@ sub belwue_maildata_check {
     my @belwue_tmp=();
     if (not -f $ref_belwue_mailconf->{'DOWNLOAD'}{'OBJECTS'} ){
         print "\nERROR: No previous belwue download found!\n\n";
-        exit;
+        exit 88;
     }
 
     system("mkdir -p $ref_belwue_mailconf->{'PWD'}{'FIRSTPWD_DIR'}");

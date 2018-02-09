@@ -360,17 +360,17 @@ if ($collect_copy_exam){
                         });
     if ($existing_AD ne "TRUE"){
         print "\nERROR: $collect_copy_exam does not exist\n\n";
-        exit 1;
+        exit 88;
     }
 
     if ( $role_AD ne $sophomorix_config{'INI'}{'EXAMMODE'}{'USER_ROLE'} ){
         print "\nERROR: $collect_copy_exam is not am examuser (sohomorixRole: $role_AD)\n\n";
-        exit 1;
+        exit 88;
     }
 
     if ( $exammode_AD eq "---" ){
         print "\nERROR: Cannot determine supervisror (sophomorixExamMode: $exammode_AD)\n\n";
-        exit 1;
+        exit 88;
     }
 
     print "   * Examuser:         $collect_copy_exam\n";

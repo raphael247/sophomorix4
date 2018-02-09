@@ -557,7 +557,7 @@ foreach my $class_file (@class_filelist){
             print "\nERROR: Number of users $course_count contains non numbers\n";
             print "   LINE: $_\n";
             print "   FILE: $class_file\n";
-            exit;
+            exit 88;
         }
         # exit if course is double ???
         # what about password ??? 
@@ -1279,7 +1279,7 @@ sub test_user_update {
             print "  You must:\n";
             print "     A) map the groupname \"$adminclass\" to another name\n";
             print "     B) Edit the groupname of \"$sam\" in the file ${$new_filename_ref}\n";
-            exit;
+            exit 88;
         }
         ${$update_ref}++;
         # ${$new_class_ref}=$adminclass; # with prefix
@@ -1379,7 +1379,7 @@ sub write_add_file {
         $counters{'ADD'}++;
     } else {
         print "\n   ERROR: Login for $line_new could no be created\n\n";
-        exit;
+        exit 88;
     }
 }
 
@@ -1658,7 +1658,7 @@ sub analyze_user_line {
                print "ERROR: Not 3 semicolons in $line\n";
                print " File: $file_abs\n";
             }
-            exit;
+            exit 88;
         }
         $line=&remove_whitespace($line);
         # add trailing ; if not there
@@ -1765,7 +1765,7 @@ sub analyze_user_line {
         }
         if ($unid ne "---" and exists $unid_seen{$filename}{$unid}){
             print "\nERROR: Unid $unid is double in $filename\n\n";
-            exit;
+            exit 88;
         } else {
             $unid_seen{$filename}{$unid}="seen";
         }
@@ -2135,11 +2135,11 @@ sub get_encoding {
     # misconfigured *.school.conf: exit
     if ($enc eq "ERROR_ENCODING"){
         print "   * Misconfigured ENCODING in configuration file, see \"iconv --list\"\n";
-        exit;
+        exit 88;
     }   
     if ($enc_force eq "ERROR_ENCODING_FORCE"){
         print "   * Misconfigured ENCODING_FORCE in configuration file\n";
-        exit;
+        exit 88;
     }   
  
     # auto setting
@@ -2148,7 +2148,7 @@ sub get_encoding {
         if ($enc_checked eq "unknown"){
             print "   * ENCODING could not be checked automatically\n";
             print "   * Set ENCODING to the desired value and ENCODING_FORCE to \"yes\"\n";
-            exit;
+            exit 88;
         }
         $enc_used=$enc_checked;
     } elsif ($enc ne "auto" and $enc_force eq "no"){
@@ -2156,7 +2156,7 @@ sub get_encoding {
         print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
         print "   * Set A) ENCODING_FORCE to \"yes\" if you know better than sophomorix\n";
         print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
-        exit;
+        exit 88;
     } elsif ($enc ne "auto" and $enc_force eq "yes"){
         $enc_used=$enc;
     }
@@ -2218,7 +2218,7 @@ sub analyze_encoding {
             print "\n";
             print "   ERROR: Not 3 Semicolons in $line\n";
             print "          File corrupt: $file\n\n";
-            exit;
+            exit 88;
         }
  
         # add trailing ; if not there

@@ -78,7 +78,7 @@ while (<SOURCE>){
     my $semicolons_per_line=tr/;//;
     if (not $semicolons_per_line==7){
         print "Number of Semicolons is $semicolons_per_line\n";
-        exit 1;
+        exit 88;
     }
 
     # use students of current year only
@@ -89,7 +89,7 @@ while (<SOURCE>){
 
     if (exists $unid_store{$unid}){
         print "########## $unid is double ##########\n";
-        exit 1;
+        exit 88;
     } else {
         $unid_store{$unid}="seen";
     }

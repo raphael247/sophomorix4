@@ -186,11 +186,11 @@ if ($info==1) {
 if ($set_exam_mode==1){
     if ($participants eq ""){
         print "\nERROR: you need to specify at least one participant\n\n";
-        exit;
+        exit 88;
     }
     if ($supervisor eq ""){
         print "\nERROR: you need to specify the supervisor\n\n";
-        exit;
+        exit 88;
     }
 
     my @participants=split(/,/,$participants);
@@ -241,7 +241,7 @@ if ($set_exam_mode==1){
 if ($unset_exam_mode==1){
     if ($participants eq ""){
         print "\nERROR: you need to specify at least one participant\n\n";
-        exit;
+        exit 88;
     }
 
     my @participants=split(/,/,$participants);

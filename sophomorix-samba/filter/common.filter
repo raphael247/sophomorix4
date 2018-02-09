@@ -26,13 +26,13 @@ if (defined $ARGV[1]){
 
 if ($source eq "---"){
     print "\nERROR: No source file given\n\n";
-    exit;
+    exit 88;
 }
 
 if ($target eq "---" and $filter_only==0){
     print "\nERROR: You must give a target or the option --filter-only\n";
     print "         --filter-only filters to stdout\n\n";
-    exit;
+    exit 88;
 
 }
 

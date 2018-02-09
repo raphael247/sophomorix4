@@ -323,8 +323,8 @@ if ($info==1 and $user ne "") {
 # --clone-from-user <user1> --clone-to-user <user2>
 if ( ($clone_from_user ne "" and $clone_to_user eq "") or
      ($clone_to_user ne "" and $clone_from_user eq "") ){
-    print "\nWARNING: --clone-from-user <user1> --clone-to-user <user2>\n\n";
-    exit;
+    print "\nERROR: --clone-from-user <user1> --clone-to-user <user2>\n\n";
+    exit 88;
 } elsif ($clone_from_user ne "" and $clone_to_user ne ""){
     &print_title("Cloning password-hash of $clone_from_user to $clone_to_user");
     my $unicodepwd= &AD_get_unicodepwd($clone_from_user,\%sophomorix_config);
@@ -507,13 +507,13 @@ if ($interactive==1){
 	    }
             exit 0;
          } else {
-             print "New passwords don't match!\n";
-             exit 10;
+             print "\nERROR: New passwords don't match!\n\n";
+             exit 88;
          }
      } else {
-         print "ERROR: I can set password interactively only for one user\n";
-         print "Unable to change password\n";
-         exit 0;
+         print "\nERROR: I can set password interactively only for one user\n";
+         print "Unable to change password\n\n";
+         exit 88;
      }
 
 }

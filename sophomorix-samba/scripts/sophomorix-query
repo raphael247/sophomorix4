@@ -69,7 +69,7 @@ my $testopt=GetOptions(\%options,
 
 if ($testopt==0){
     print "Option Error\n";
-    exit;
+    exit 88;
 }
 
 
@@ -684,7 +684,8 @@ for( my $index = 0 ; $index < $max ; $index++) {
             $filter_append="\$"; # sAMAccountName for computers are ended by $
         } else {
             # searching for something strange
-            exit;
+            print "\nERROR: Searching for strange stuff\n\n";
+            exit 88;
         }
         $search{'COUNTERS'}{$top_count_key_members}{$sam}=$#members+1;;
         foreach my $member (@members){
