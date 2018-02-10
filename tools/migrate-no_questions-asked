@@ -1,5 +1,5 @@
 #!/bin/bash
-date
+
 rm -rf /tmp/LOGDIR
 rm -rf /tmp/ERRORDIR
 mkdir -p /tmp/LOGDIR
@@ -7,6 +7,7 @@ mkdir -p /tmp/ERRORDIR
 
 # delete later ????
 #rm -rf /var/log/sophomorix/userlog/
+date
 
 # 0 min
 echo ""
@@ -38,14 +39,14 @@ time sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> /tmp/L
 cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
 cat /tmp/ERRORDIR/file-04.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
-# 70/110 min
+# 65/110 min
 echo ""
 echo "sophomorix-add"
 time sophomorix-add 1> /tmp/LOGDIR/file-05.log 2> /tmp/ERRORDIR/file-05.err
 cat /tmp/ERRORDIR/file-05.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 
-# 10/8 min
+# 9/8 min
 echo ""
 echo "--import-user-password-hashes"
 time sophomorix-vampire --datadir ../sophomorix-dump --import-user-password-hashes 1> /tmp/LOGDIR/file-06.log 2> /tmp/ERRORDIR/file-06.err
