@@ -4092,7 +4092,10 @@ sub get_group_basename {
 # error, when options are not given correctly
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
-    # set some defaults
+
+    ############################################################
+    # set default for --verbose
+    $ref_options->{'CONFIG'}{'CONFIGURED'}{'verbose'}="TRUE";
     if (not defined $ref_options->{'verbose'}){
         $Conf::log_level=1;
         $ref_options->{'verbose'}=$Conf::log_level;
@@ -4101,44 +4104,69 @@ sub check_options{
         $ref_options->{'verbose'}=$Conf::log_level;
     }
 
+    ############################################################
+    # set default for --json
+    $ref_options->{'CONFIG'}{'CONFIGURED'}{'json'}="TRUE";
     if (not defined $ref_options->{'json'}){
         $ref_options->{'json'}=0;
     }
 
-    foreach my $opt (keys %{ $ref_options }){
-        print "Checking option $opt $ref_options->{$opt}\n";
-        if ($opt eq "INFO"){
-           next;
-        }
-        if ($opt eq "DEPENDS"){
-
-           foreach my $target ( keys %{ $ref_options->{$opt} } ){
-               my $dependant=$ref_options->{$opt}{$target};
-               print "$dependant needs $target\n";
-               my @items=split(/,/,$dependant);
-               foreach my $item (@items){
-                   $ref_options->{'TREE'}{$item}=$target;
-               }
-           }
-        } elsif ($opt ne "verbose" and
-            $opt ne "help" and
-            $opt ne "json"
-           ){
-            print "   * remove Mofifiers\n";
-            $ref_options->{'ACTION_OPTIONS'}{$opt}=$ref_options->{$opt};
-        }
-    }
-
-
-    
-
-
+    ############################################################
+    # set default for --info
+    $ref_options->{'CONFIG'}{'CONFIGURED'}{'info'}="TRUE";
     if (not defined $ref_options->{'info'}){
        $ref_options->{'info'}=0;
     }
+   
+
+    ############################################################
+    # work on OBJECT_SINGLE
+    foreach my $object (keys %{ $ref_options->{'CONFIG'}{'OBJECT_SINGLE'} }){
+	my $option_string=$ref_options->{'CONFIG'}{'OBJECT_SINGLE'}{$object};
+	my @options=split(/,/,$option_string);
+	 foreach my $option (@options){
+             $ref_options->{'CONFIG'}{'CONFIGURED'}{$option}="TRUE";
+             print "OBJECT $object provided by option $option (SINGLE)";
+	 }
+    }
+ 
+    # foreach my $opt (keys %{ $ref_options->{'CONFIG'} }){
+    #     print "Checking option $opt $ref_options->{'CONFIG'}{$opt}\n";
+    #     if ($opt eq "INFO"){
+    #        next;
+    #     }
+    #     if ($opt eq "DEPENDS"){
+
+    #        foreach my $target ( keys %{ $ref_options{'CONFIG'}->{$opt} } ){
+    #            my $dependant=$ref_options{'CONFIG'}->{$opt}{$target};
+    #            print "$dependant needs $target\n";
+    #            my @items=split(/,/,$dependant);
+    #            foreach my $item (@items){
+    #                $ref_options->{'CONFIG'}{'TREE'}{$item}=$target;
+    #            }
+    #        }
+    #     } elsif ($opt ne "verbose" and
+    #         $opt ne "help" and
+    #         $opt ne "json"
+    #        ){
+    #         print "   * remove Mofifiers\n";
+    #         $ref_options->{'CONFIG'}{'ACTION_OPTIONS'}{$opt}=$ref_options->{'CONFIG'}{$opt};
+    #     }
+    # }
+
+
+    foreach my $opt_given (keys %{$ref_options}) {
+	if ($opt_given eq "CONFIG"){
+            next;
+	}
+	if (not exists $ref_options->{'CONFIG'}{'CONFIGURED'}{$opt_given}){
+	    print "\nWARNING OF UNCONFIGURED OPTION: $opt_given\n\n";
+        }
+    }
+
 
     print Dumper ($ref_options);
-
+    exit; # ??????????
 
     if (not $parse_ergebnis==1){
         my @list = split(/\//,$0);

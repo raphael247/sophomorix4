@@ -62,11 +62,14 @@ my @arguments = @ARGV;
 my $class_type="adminclass"; # default is adminclass
 
 my %options=();
-$options{'INFO'}{'STANDALONE'}="TRUE";
-$options{'INFO'}{'GROUP'}="TRUE";
-$options{'OBJECT_MULTI'}{'GROUP'}="class"; # option user ONE at a time
+#$options{'CONFIG'}{'INFO'}{'STANDALONE'}="TRUE";
+#$options{'CONFIG'}{'INFO'}{'GROUP'}="TRUE";
+#$options{'CONFIG'}{'OBJECT_MULTI'}{'GROUP'}="class"; # option user ONE at a time
 
-$options{'DEPENDS'}{'class'}="description,quota";
+#$options{'CONFIG'}{'DEPENDS'}{'class'}="description,quota";
+
+$options{'CONFIG'}{'OBJECT_SINGLE'}{'GROUP'}="class";
+
 
 my $testopt=GetOptions(\%options, 
                        "help|h",
