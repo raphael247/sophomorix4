@@ -62,13 +62,30 @@ my @arguments = @ARGV;
 my $class_type="adminclass"; # default is adminclass
 
 my %options=();
-#$options{'CONFIG'}{'INFO'}{'STANDALONE'}="TRUE";
-#$options{'CONFIG'}{'INFO'}{'GROUP'}="TRUE";
-#$options{'CONFIG'}{'OBJECT_MULTI'}{'GROUP'}="class"; # option user ONE at a time
-
-#$options{'CONFIG'}{'DEPENDS'}{'class'}="description,quota";
-
-$options{'CONFIG'}{'OBJECT_SINGLE'}{'GROUP'}="class";
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="all,".
+                                             "teacherclass,".
+                                             "adminclass,".
+                                             "extraclass,".
+                                             "class,";
+$options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
+$options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
+                                      "description,".
+                                      "quota,".
+                                      "mailquota,".
+                                      "status,".
+                                      "maxmembers,".
+                                      "creationdate,".
+                                      "set-gidnumber,".
+                                      "mailalias,".
+                                      "maillist,".
+                                      "join,".
+                                      "hide,".
+                                      "admins,".
+                                      "addadmins,".
+                                      "removeadmins,".
+                                      "members,".
+                                      "addmembers,".
+                                      "removemembers";
 
 
 my $testopt=GetOptions(\%options, 

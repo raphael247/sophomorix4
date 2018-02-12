@@ -4093,9 +4093,14 @@ sub get_group_basename {
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
 
+    my %tmp=();
+    ############################################################
+    # known options
+    # --help
+    $ref_options->{'CONFIGURED'}{'help'}="TRUE";
     ############################################################
     # set default for --verbose
-    $ref_options->{'CONFIG'}{'CONFIGURED'}{'verbose'}="TRUE";
+    $ref_options->{'CONFIGURED'}{'verbose'}="TRUE";
     if (not defined $ref_options->{'verbose'}){
         $Conf::log_level=1;
         $ref_options->{'verbose'}=$Conf::log_level;
@@ -4106,65 +4111,74 @@ sub check_options{
 
     ############################################################
     # set default for --json
-    $ref_options->{'CONFIG'}{'CONFIGURED'}{'json'}="TRUE";
+    $ref_options->{'CONFIGURED'}{'json'}="TRUE";
     if (not defined $ref_options->{'json'}){
         $ref_options->{'json'}=0;
     }
 
     ############################################################
     # set default for --info
-    $ref_options->{'CONFIG'}{'CONFIGURED'}{'info'}="TRUE";
+    $ref_options->{'CONFIGURED'}{'info'}="TRUE";
     if (not defined $ref_options->{'info'}){
        $ref_options->{'info'}=0;
     }
    
 
     ############################################################
-    # work on OBJECT_SINGLE
-    foreach my $object (keys %{ $ref_options->{'CONFIG'}{'OBJECT_SINGLE'} }){
-	my $option_string=$ref_options->{'CONFIG'}{'OBJECT_SINGLE'}{$object};
+    # work on ONE_OF
+    foreach my $object (keys %{ $ref_options->{'CONFIG'}{'ONE_OF'} }){
+	my $option_string=$ref_options->{'CONFIG'}{'ONE_OF'}{$object};
 	my @options=split(/,/,$option_string);
 	 foreach my $option (@options){
-             $ref_options->{'CONFIG'}{'CONFIGURED'}{$option}="TRUE";
-             print "OBJECT $object provided by option $option (SINGLE)";
+	     $tmp{'CONFIG'}{'ONE_OF'}{$object}{$option}="config";
+             $ref_options->{'CONFIGURED'}{$option}="TRUE";
+             #print "OBJECT $object provided by option $option (SINGLE)\n";
+	     $tmp{'PROVIDED'}{$object}{'ONE_OF'}{$option}="provided";
 	 }
     }
  
-    # foreach my $opt (keys %{ $ref_options->{'CONFIG'} }){
-    #     print "Checking option $opt $ref_options->{'CONFIG'}{$opt}\n";
-    #     if ($opt eq "INFO"){
-    #        next;
-    #     }
-    #     if ($opt eq "DEPENDS"){
+    ############################################################
+    # work on ACTION
+    foreach my $object (keys %{ $ref_options->{'CONFIG'}{'ACTION'} }){
+	my $option_string=$ref_options->{'CONFIG'}{'ACTION'}{$object};
+	my @options=split(/,/, $option_string);
+	 foreach my $option (@options){
+             $ref_options->{'CONFIGURED'}{$option}="TRUE";
+             print "ACTION $option needs object $object\n";
+	     foreach my $opt ( keys %{ $tmp{'PROVIDED'}{$object}{'ONE_OF'} } ){
+                 print "   * Option $option needs ONE_OF $opt\n";
+	         $ref_options->{'DEPENDENCIES'}{$option}{'ONE_OF'}{$opt}="one_of";
+	     }
+	     
+	 }
+    }
 
-    #        foreach my $target ( keys %{ $ref_options{'CONFIG'}->{$opt} } ){
-    #            my $dependant=$ref_options{'CONFIG'}->{$opt}{$target};
-    #            print "$dependant needs $target\n";
-    #            my @items=split(/,/,$dependant);
-    #            foreach my $item (@items){
-    #                $ref_options->{'CONFIG'}{'TREE'}{$item}=$target;
-    #            }
-    #        }
-    #     } elsif ($opt ne "verbose" and
-    #         $opt ne "help" and
-    #         $opt ne "json"
-    #        ){
-    #         print "   * remove Mofifiers\n";
-    #         $ref_options->{'CONFIG'}{'ACTION_OPTIONS'}{$opt}=$ref_options->{'CONFIG'}{$opt};
-    #     }
-    # }
+    ############################################################
+    # work option dependencies
+    foreach my $option (keys %{ $ref_options->{'CONFIG'}{'DEPENDS'} }){
+	my $dependant_string=$ref_options->{'CONFIG'}{'DEPENDS'}{$option};
+	my @dependants=split(/,/, $dependant_string);
+	foreach my $dependant (@dependants){
+            $ref_options->{'DEPENDENCIES'}{$option}{'ALWAYS'}{$dependant}="always";  
+	}
+    }
+    
+    
 
-
+    
     foreach my $opt_given (keys %{$ref_options}) {
-	if ($opt_given eq "CONFIG"){
+	if ($opt_given eq "CONFIG" or
+            $opt_given eq "CONFIGURED" or
+            $opt_given eq "DEPENDENCIES"){
             next;
 	}
-	if (not exists $ref_options->{'CONFIG'}{'CONFIGURED'}{$opt_given}){
+	if (not exists $ref_options->{'CONFIGURED'}{$opt_given}){
 	    print "\nWARNING OF UNCONFIGURED OPTION: $opt_given\n\n";
         }
     }
 
 
+    print Dumper (\%tmp);
     print Dumper ($ref_options);
     exit; # ??????????
 
