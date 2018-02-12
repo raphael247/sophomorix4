@@ -63,10 +63,13 @@ my $class_type="adminclass"; # default is adminclass
 
 my %options=();
 $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="all,".
-                                             "teacherclass,".
-                                             "adminclass,".
-                                             "extraclass,".
-                                             "class,";
+                                      "teacherclass,".
+                                      "adminclass,".
+                                      "extraclass,".
+                                      "class,";
+# ????? test
+$options{'CONFIG'}{'SOME_OF'}{'GROUP'}="test,more,any";
+
 $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
 $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "description,".

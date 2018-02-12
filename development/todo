@@ -147,6 +147,36 @@ code_cleanup
 %options --> %option?
 Optionen, die default --- haben sind etwas ungeschickt
 
+NEW BEGIN
+
+The object GROUP is provided by ONE OF the options class OR project
+(But ONLY ONE of them):
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class,project".
+
+The object GROUP can be assembled by ONE OR MORE of the options
+(But at least ONE of them):
+$options{'CONFIG'}{'SOME_OF'}{'GROUP'}="class,project".
+
+One option depends on others:
+(Option set needs options create AND new to work)
+   $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create,new";
+
+ACTIONS that need the object GROUP:
+
+$options{'CONFIG'}{'ACTION'}{'GROUP'}="create";
+
+   
+   todo:
+   $options{'CONFIG'}{'ADDINFO'}="class,adminclass";
+   if no ACTION option is given, AND
+      one of these ADDINFO options is given
+   --> set info=1 
+
+   exit if options are not combined properly
+
+   
+NEW END
+
 # options that provide the object PASSWORD
 # These options provide a password, but you can use only one at a time
 $options{'OBJECT_SINGLE'}{'PASSWORD'}="password,randompassword"; 

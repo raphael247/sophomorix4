@@ -4123,7 +4123,6 @@ sub check_options{
        $ref_options->{'info'}=0;
     }
    
-
     ############################################################
     # work on ONE_OF
     foreach my $object (keys %{ $ref_options->{'CONFIG'}{'ONE_OF'} }){
@@ -4134,6 +4133,19 @@ sub check_options{
              $ref_options->{'CONFIGURED'}{$option}="TRUE";
              #print "OBJECT $object provided by option $option (SINGLE)\n";
 	     $tmp{'PROVIDED'}{$object}{'ONE_OF'}{$option}="provided";
+	 }
+    }
+ 
+    ############################################################
+    # work on SOME_OF
+    foreach my $object (keys %{ $ref_options->{'CONFIG'}{'SOME_OF'} }){
+	my $option_string=$ref_options->{'CONFIG'}{'SOME_OF'}{$object};
+	my @options=split(/,/,$option_string);
+	 foreach my $option (@options){
+	     $tmp{'CONFIG'}{'SOME_OF'}{$object}{$option}="config";
+             $ref_options->{'CONFIGURED'}{$option}="TRUE";
+             #print "OBJECT $object provided by option $option (SINGLE)\n";
+	     $tmp{'PROVIDED'}{$object}{'SOME_OF'}{$option}="provided";
 	 }
     }
  
@@ -4149,7 +4161,10 @@ sub check_options{
                  print "   * Option $option needs ONE_OF $opt\n";
 	         $ref_options->{'DEPENDENCIES'}{$option}{'ONE_OF'}{$opt}="one_of";
 	     }
-	     
+	     foreach my $opt ( keys %{ $tmp{'PROVIDED'}{$object}{'SOME_OF'} } ){
+                 print "   * Option $option needs SOME_OF $opt\n";
+	         $ref_options->{'DEPENDENCIES'}{$option}{'SOME_OF'}{$opt}="one_of";
+	     }
 	 }
     }
 
