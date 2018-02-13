@@ -4092,6 +4092,18 @@ sub get_group_basename {
 # error, when options are not given correctly
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+    if (not $parse_ergebnis==1){
+        my @list = split(/\//,$0);
+        my $scriptname = pop @list;
+        print "\nYou have made a mistake, when specifying options.\n"; 
+        print "See error message above. \n\n";
+        print "... $scriptname is terminating.\n\n";
+        exit 88;
+    } else {
+        if($Conf::log_level>=3){
+            print "All options  were recognized.\n";
+        }
+    }
 
     my %tmp=();
     ############################################################
@@ -4101,6 +4113,7 @@ sub check_options{
     ############################################################
     # set default for --verbose
     $ref_options->{'CONFIGURED'}{'verbose'}="TRUE";
+    $ref_options->{'MODIFIER_OPTIONS'}{'verbose'}="TRUE";
     if (not defined $ref_options->{'verbose'}){
         $Conf::log_level=1;
         $ref_options->{'verbose'}=$Conf::log_level;
@@ -4112,6 +4125,7 @@ sub check_options{
     ############################################################
     # set default for --json
     $ref_options->{'CONFIGURED'}{'json'}="TRUE";
+    $ref_options->{'MODIFIER_OPTIONS'}{'json'}="TRUE";
     if (not defined $ref_options->{'json'}){
         $ref_options->{'json'}=0;
     }
@@ -4156,6 +4170,7 @@ sub check_options{
 	my @options=split(/,/, $option_string);
 	 foreach my $option (@options){
              $ref_options->{'CONFIGURED'}{$option}="TRUE";
+             $ref_options->{'ACTIONS'}{$option}="TRUE";
              print "ACTION $option needs object $object\n";
 	     foreach my $opt ( keys %{ $tmp{'PROVIDED'}{$object}{'ONE_OF'} } ){
                  print "   * Option $option needs ONE_OF $opt\n";
@@ -4178,37 +4193,60 @@ sub check_options{
 	}
     }
     
+
+    print Dumper (\%tmp);
+    print Dumper ($ref_options);
     
 
-    
+    my $action_count=0;
     foreach my $opt_given (keys %{$ref_options}) {
 	if ($opt_given eq "CONFIG" or
             $opt_given eq "CONFIGURED" or
+            $opt_given eq "ACTIONS" or
+            $opt_given eq "MODIFIER_OPTIONS" or
             $opt_given eq "DEPENDENCIES"){
             next;
 	}
 	if (not exists $ref_options->{'CONFIGURED'}{$opt_given}){
 	    print "\nWARNING OF UNCONFIGURED OPTION: $opt_given\n\n";
-        }
+	} elsif (exists $ref_options->{'MODIFIER_OPTIONS'}{$opt_given}){
+	    print "Option $opt_given is a modifier option\n";
+	} elsif (exists $ref_options->{'ACTIONS'}{$opt_given}){
+	    $action_count++;
+	    print "Option $opt_given is an ACTION  option\n";
+	    # do some dependency tests ???
+            foreach my $test (keys %{$ref_options->{'DEPENDENCIES'}{$opt_given} }) {
+	        print "Working on $test\n";
+                if ($test eq "ALWAYS"){
+		    foreach my $dep (keys 
+                        %{$ref_options->{'DEPENDENCIES'}{$opt_given}{'ALWAYS'} }) {
+			if (not exists $ref_options->{$dep}){
+                            print "\nERROR: Option --$dep needed ".
+                                  "by option --$opt_given\n\n";
+			    exit;
+			}
+                    }
+		} elsif ($test eq "ONE_OF"){
+                    # ?????
+		} elsif ($test eq "SOME_OF"){
+                    # ?????
+                }		    
+            }    
+        } else {
+	    print "Hmmh. do not know what to do with option $opt_given\n";
+	}
+    }
+    if ($action_count==0){
+        # no action defined, switch to info
+	print "* forcing info mode\n";
+        $ref_options->{'help'}=1;
     }
 
+    #print Dumper ($ref_options);
 
-    print Dumper (\%tmp);
-    print Dumper ($ref_options);
+
+    print "Option combinations successfully checked\n";
     exit; # ??????????
-
-    if (not $parse_ergebnis==1){
-        my @list = split(/\//,$0);
-        my $scriptname = pop @list;
-        print "\nYou have made a mistake, when specifying options.\n"; 
-        print "See error message above. \n\n";
-        print "... $scriptname is terminating.\n\n";
-        exit 88;
-    } else {
-        if($Conf::log_level>=3){
-            print "All options  were recognized.\n";
-        }
-    }
 }
 
 # dns queries
