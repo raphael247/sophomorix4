@@ -4227,7 +4227,26 @@ sub check_options{
 			}
                     }
 		} elsif ($test eq "ONE_OF"){
-                    # ?????
+		    my $count=0;
+                    foreach my $dep_opt (keys 
+                        %{$ref_options->{'DEPENDENCIES'}{$opt_given}{$test} }) {
+			if (exists $ref_options->{$dep_opt}){
+                            # dependant options given
+			    $count++;
+			}
+                    }
+		    if ($count==1){
+                        print "  * $test options tested succesfully ($count)\n";
+                    } else {
+			print "\n";
+                        print "ERROR: $opt_given needs ONE ($count found)".
+                              " of the following options:\n";
+                        foreach my $dep_opt (keys 
+			    %{$ref_options->{'DEPENDENCIES'}{$opt_given}{$test} }) {
+			    print "   * $dep_opt\n";
+			}
+			exit;
+		    }
 		} elsif ($test eq "SOME_OF"){
                     # ?????
                 }		    
