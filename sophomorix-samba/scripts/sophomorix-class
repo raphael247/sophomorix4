@@ -62,11 +62,11 @@ my @arguments = @ARGV;
 my $class_type="adminclass"; # default is adminclass
 
 my %options=();
-$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="all,".
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
+$options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
                                       "teacherclass,".
                                       "adminclass,".
-                                      "extraclass,".
-                                      "class,";
+                                      "extraclass,";
 # ????? test
 $options{'CONFIG'}{'SOME_OF'}{'GROUP'}="test,more,any";
 

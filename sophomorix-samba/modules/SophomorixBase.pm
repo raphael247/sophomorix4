@@ -4138,6 +4138,19 @@ sub check_options{
     }
    
     ############################################################
+    # work on MAYBE
+    foreach my $object (keys %{ $ref_options->{'CONFIG'}{'MAYBE'} }){
+	my $option_string=$ref_options->{'CONFIG'}{'MAYBE'}{$object};
+	my @options=split(/,/,$option_string);
+	 foreach my $option (@options){
+	     $tmp{'CONFIG'}{'MAYBE'}{$object}{$option}="config";
+             $ref_options->{'CONFIGURED'}{$option}="TRUE";
+             #print "OBJECT $object provided by option $option (SINGLE)\n";
+	     $tmp{'PROVIDED'}{$object}{'MAYBE'}{$option}="provided";
+	 }
+    }
+ 
+    ############################################################
     # work on ONE_OF
     foreach my $object (keys %{ $ref_options->{'CONFIG'}{'ONE_OF'} }){
 	my $option_string=$ref_options->{'CONFIG'}{'ONE_OF'}{$object};
@@ -4172,6 +4185,10 @@ sub check_options{
              $ref_options->{'CONFIGURED'}{$option}="TRUE";
              $ref_options->{'ACTIONS'}{$option}="TRUE";
              print "ACTION $option needs object $object\n";
+	     foreach my $opt ( keys %{ $tmp{'PROVIDED'}{$object}{'MAYBE'} } ){
+                 print "   * Option $option needs MAYBE $opt\n";
+	         $ref_options->{'DEPENDENCIES'}{$option}{'MAYBE'}{$opt}="maybe";
+	     }
 	     foreach my $opt ( keys %{ $tmp{'PROVIDED'}{$object}{'ONE_OF'} } ){
                  print "   * Option $option needs ONE_OF $opt\n";
 	         $ref_options->{'DEPENDENCIES'}{$option}{'ONE_OF'}{$opt}="one_of";
@@ -4226,6 +4243,8 @@ sub check_options{
 			    exit;
 			}
                     }
+		} elsif ($test eq "MAYBE"){
+		    # ???
 		} elsif ($test eq "ONE_OF"){
 		    my $count=0;
                     foreach my $dep_opt (keys 
