@@ -61,16 +61,11 @@ my @arguments = @ARGV;
 # classtype
 my $class_type="adminclass"; # default is adminclass
 
+############################################################
+# Option handling
+############################################################
 my %options=();
-$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
-$options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
-                                      "teacherclass,".
-                                      "adminclass,".
-                                      "extraclass,";
-# ????? test
-$options{'CONFIG'}{'SOME_OF'}{'GROUP'}="test,more,any";
-
-$options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
+# define possible action in a script and what OBJECT they need
 $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "description,".
                                       "quota,".
@@ -89,7 +84,15 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "members,".
                                       "addmembers,".
                                       "removemembers";
-
+# define which options deliver which object
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
+# define option that can modify which object
+$options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
+                                     "teacherclass,".
+                                     "adminclass,".
+                                     "extraclass,";
+# define more dependencies
+$options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
 
 my $testopt=GetOptions(\%options, 
                        "help|h",
