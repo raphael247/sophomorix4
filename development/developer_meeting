@@ -1,30 +1,55 @@
 ###########################################################
 Nächstes Entwicklertreffen:
 -------------------------------
+ACLS?
+-------------------------------
+
+-------------------------------
+17.10 Appliance
+- wie neue Schule enlegen?
+- lvm, filesystem, ....
+--> wo nachzulesen wie default-school share erstellt wird?
+-> scripten des schulanlegens, wer, wo?
+-------------------------------
+
+
+-------------------------------
 mehrfachlogin möglich? erlauben? kontrolle?
 -------------------------------
 
 -------------------------------
+loginnamenumbenennung ja/nein?
+-> incl. homebverschieben
+-> nur innerhalb der Schule, neuer loginname checken? (prefix, siehe unten)
+-------------------------------
+
+-------------------------------
 loginamenvermeidung:
-Reicht es die zu vermeiden:
+Reicht es die so gefundenen zu vermeiden:
 (| (objectClass=user) (objectClass=group) (objectClass=computer) )
 Oder solte man die vermeiden:
-(sAMAccountName=* )
+(sAMAccountName=* )  Von der performance her wahrscheinlich langsamer
 -------------------------------
 
 -------------------------------
 groß/kleinschreibung von usern,gruppen
 - unterscheidet AD diese Accounts?
+--> Festlegen, dass alls wunschlogins,computernamen, .... lowercase sind?
+    Ohne Ausname?
+    Achtung: es gibt per default Guest
+    Vorschlag: sophomorix legt nur lowercase an.
+               nicht sophomorix-Objekte werden nach lowercase verwandelt um clashes zu vermeiden
+	       Ausnahme: computer, siehe devices.csv
 -------------------------------
 
 -------------------------------
 alpha-Version, wann?
---> intension: migration testen
+--> intention: migration testen
 -------------------------------
 
 -------------------------------
 Loginnamenerstellung:
-bei mms (Massive-Multischool) gibts doppelung von loginnamen
+bei mms (Massive-Multischool) gibts doppelung von loginnamen (z.B. Lehrerkürzel)
 Lösungen:
   - schalter bei sophomorix.conf
     TEACHER_LOGIN_PREFIX=yes/no
@@ -40,6 +65,7 @@ TRUE/FALSE   # mein Favorit
 on/off
 yes/no
 1/0
+
 
 ------------------------------
 devices.csv
@@ -63,19 +89,21 @@ Abstimmen:
  - hardwareclass gruppen kommen nach OU=Devices
  - hardwareclasses haben KEIN prefix (schulübergreifende hardwareclasses ermöglichen)
  - rooms,hardwareclasses (Drucker sind nicht dabei, da sie keinen computeraccount haben, OK so???)
+   --> nur computer sind in den room-Gruppen (OK so?
+   --> keine Möglichkeit im AD rauszufinden in welchem Raum ein Drucker ist (nur in devices.csv)
  - groß/kleinschreibung von computer/rooms
    Was in devices.csv steht klein forcen. Im AD dann wie von den win tools angelegt
  - jedes device darf nur in EINER hardwareclass sein, ODER?
 
 Zur Info:
 
-Drucker, Server sind IP-devices, 
+Drucker, Server(IP only) sind IP-devices, 
    -> nur dnsNode
    -> bekommen also auch keinen computer-Account
    -> sind also auch nicht in einer Gruppe mit dem Typ room oder hardwareclass
    -> Im AD NICHT abfragbar welcher Drucker in welchem Raum steht
    -> Ist das gut so?
-   -> Kann amn dnsNodes auch zu Gruppen zusammen fassen?
+   -> Kann man dnsNodes auch zu Gruppen zusammen fassen?
    -> wie schaltet man Internet für IP devices ab (Drucker sollen z.B. nicht mehr ins Internet fürfen), ohne dass man eine Gruppe hat?
 
 
@@ -90,7 +118,7 @@ Unterscheiden von:
    server 
    Firewall, 
    ... Einträge werden in default-school gemacht.
-       OK so? Oder besser global-Bereich?
+       OK so? Oder besser global-Bereich? (bisher gibts denn glaub nicht)
    ... brauchen die ein Computer-Account?
    ... oder nur IP-device?
  
@@ -153,8 +181,12 @@ Todo:
 --> migration: alle werden 'computer' (devices.csv mofification)
 --> später: andere sophomorixRole Einstellbar in Schulkonsole 
 
+
+
 ------------------------------
 Umgang mit PullRequests, Issues, usw. bei der LML7-Entwicklung
+------------------------------
+
 
 ------------------------------
 Virusscan;
@@ -173,6 +205,10 @@ scripte im Schulkontext aufrufen:
   sophomorix-check liest Daten aller Schulen, merkt sich (RAM) und benutzt das intern, 
   gibt mit --json --school <name>aber nur einen Teil aus ?
 ------------------------------
+
+
+
+------------------------------
 Mail:
 
 mailadresse für sophomorix/system/... @wo? (local/lan oder domain.xyz.de)
@@ -189,6 +225,9 @@ mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
     --? offitielles mail-attribut updaten
     --? für dovecot eigenes attribut sophomorixMailIntra?
 --> F.: weitere attribute Mail aktive oder nicht? Gibts das?
+
+------------------------------
+
 
 ------------------------------
 sophomorix-ui:
@@ -223,7 +262,7 @@ B) Im background starten?
 
 
 
-Ofene Fragen:
+Offene Fragen:
 ------------------------------------------------------------
 wo sollen Gruppen hin, die 
 von sophomorix-group angelegt werden
@@ -240,6 +279,7 @@ Farbiger Konsoleprintout?
 - Vorschlag:
   Fehler, Nicht OK: rot
   Schulen: gelb
+  ...
 ------------------------------------------------------------
 
 
