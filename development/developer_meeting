@@ -11,36 +11,59 @@ ACLS?
 --> wo nachzulesen wie default-school share erstellt wird?
 -> scripten des schulanlegens, wer, wo?
 -------------------------------
+schultest:
+A) wenn /srv/samba/schools/<name> da, dann net conf addshare <name> dafür erstellen (macht sophomorix)
+B) \\Server/<name> da (remotes share)
+M liefert mehrzeiler, der
+   1) ist lvm frei
+   2) lvm create lvm abc
+   3) fstab eintrag default-school
+später script von T um lokales anzulegen
 
 
 -------------------------------
 mehrfachlogin möglich? erlauben? kontrolle?
 -------------------------------
+-> pro:    simple use (default)
+-> contra: passwordklau
+--> konfigurierbar ?
+--> auf default lassen
 
 -------------------------------
 loginnamenumbenennung ja/nein?
 -> incl. homebverschieben
 -> nur innerhalb der Schule, neuer loginname checken? (prefix, siehe unten)
 -------------------------------
+--> later or never
+
+Todo:
+password complexity level on off
+und wo das drin steht in sophomorix-check -ij im JSON object
+
 
 -------------------------------
 loginamenvermeidung:
 Reicht es die so gefundenen zu vermeiden:
 (| (objectClass=user) (objectClass=group) (objectClass=computer) )
-Oder solte man die vermeiden:
-(sAMAccountName=* )  Von der performance her wahrscheinlich langsamer
 -------------------------------
+--> OK so
+--> usernamen blacklisten verwenden (googeln --> )
+
 
 -------------------------------
 groß/kleinschreibung von usern,gruppen
 - unterscheidet AD diese Accounts?
 --> Festlegen, dass alls wunschlogins,computernamen, .... lowercase sind?
     Ohne Ausname?
-    Achtung: es gibt per default Guest
+    Achtung: es gibt per default Guest, Administrator
     Vorschlag: sophomorix legt nur lowercase an.
                nicht sophomorix-Objekte werden nach lowercase verwandelt um clashes zu vermeiden
 	       Ausnahme: computer, siehe devices.csv
 -------------------------------
+alles sophomorix-lowercase
+alles computer upercase
+
+
 
 -------------------------------
 alpha-Version, wann?
@@ -62,9 +85,11 @@ Default ist: kein prefix
 Wie wird eine on/off konfiguriert?
 
 TRUE/FALSE   # mein Favorit
-on/off
+on/off       # so gibts samba-tool zurück: samba-tool domain passwordsettings show  (Password complexity: on)
 yes/no
 1/0
+--> True,truE, alles erlaubt , json TRUE/FALSE
+
 
 
 ------------------------------
@@ -83,7 +108,8 @@ Idee: mailquota übernehmen
 
 devices.csv wird mofifiziert:
    ; ergänzt auf 12 Stück, nach letztem Feld auch ;
-leere pxe option ---> 0 (umwandeln) OK so?
+leere pxe option ---> 0 (umwandeln) OK!
+
 
 Abstimmen:
  - hardwareclass gruppen kommen nach OU=Devices
@@ -93,7 +119,10 @@ Abstimmen:
    --> keine Möglichkeit im AD rauszufinden in welchem Raum ein Drucker ist (nur in devices.csv)
  - groß/kleinschreibung von computer/rooms
    Was in devices.csv steht klein forcen. Im AD dann wie von den win tools angelegt
- - jedes device darf nur in EINER hardwareclass sein, ODER?
+- jedes device darf nur in EINER hardwareclass sein, ODER?
+
+--> sollten nach global
+
 
 Zur Info:
 
@@ -105,6 +134,8 @@ Drucker, Server(IP only) sind IP-devices,
    -> Ist das gut so?
    -> Kann man dnsNodes auch zu Gruppen zusammen fassen?
    -> wie schaltet man Internet für IP devices ab (Drucker sollen z.B. nicht mehr ins Internet fürfen), ohne dass man eine Gruppe hat?
+
+
 
 
 sophomorixRole und sophomorixType
@@ -134,6 +165,16 @@ Unterscheiden von:
   
   device -i
   mit /ohne computeraccount unterscheiden
+
+Devices.cvs
+ComputerAccount yes/no
+
+
+--> 2 Felder füllen
+    1. für Attribut comment (standard AD Feld 15) 
+    2. für Attribut sophomorixRole (Feld 9)
+
+
 
 
 
