@@ -389,7 +389,7 @@ sub _console_print_onesession {
               " ($ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'givenName'} ",
               "$ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'sn'})",
               " ExamMode: $exammode_string\n";
-        foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMUNTPODE'}{'MANAGEMENTGROUPLIST'} }){
+        foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
             printf "      %-16s%-20s\n",
                 $grouptype.":",
                 $ref_sessions->{'ID'}{$object_name}{'PARTICIPANTS'}{$participant}{'group_'.$grouptype};
