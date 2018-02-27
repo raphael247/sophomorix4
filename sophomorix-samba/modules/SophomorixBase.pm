@@ -4304,7 +4304,7 @@ sub check_options{
     if ($action_count==0){
         # no action defined, switch to info
 	print "* forcing info mode\n";
-        $ref_options->{'help'}=1;
+        $ref_options->{'info'}=1;
     }
 
     #print Dumper ($ref_options);
