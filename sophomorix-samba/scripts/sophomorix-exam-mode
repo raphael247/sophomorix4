@@ -152,7 +152,10 @@ Please see the sophomorix-exam-mode(8) man pages for full documentation
 if ($info==1) {
     # each sophomorix user (User with defined sophomorix Role), 
     # with sophomorixExamMode other than ---
-    my $filter="(&(objectClass=user)(sophomorixRole=*)(!(sophomorixExamMode=---)))";
+    #my $filter="(&(objectClass=user)(sophomorixRole=*)(!(sophomorixExamMode=---)))";
+    my $filter="(&(objectClass=user)".
+               "(| (sophomorixRole=student)(sophomorixRole=teacher)(sophomorixRole=examuser))".
+               "(!(sophomorixExamMode=---)))";
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
