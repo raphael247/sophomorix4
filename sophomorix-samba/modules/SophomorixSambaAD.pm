@@ -3202,7 +3202,7 @@ sub AD_get_sessions {
     my %sessions=();
     my %management=();
     my $session_count=0;
-    {
+    { # begin bock
 	my $filter="(& (objectClass=group) (| ";
         foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
             $filter=$filter."(sophomorixType=".$grouptype.")";
@@ -3229,22 +3229,15 @@ sub AD_get_sessions {
             #$management{'managementgroup'}{$type}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
             $management{'managementgroup'}{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
             # members
-            @{ $management{'managementgroup'}{$type}{$sam}{'member'} }=$entry->get_value('member');
-
-            # fetching additional Data of members 
-        #    my @members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"member");
-        #     foreach my $member (@members){
-        #         my ($cn,@rest)=split(/,/,$member);
-        #         my $user=$cn;
-        #         $user=~s/^CN=//;
-        #         #print "$sam: <$user> $cn  --- $member\n";
-        #         $AD{'objectclass'}{'group'}{'internetaccess'}{$sam}{'members'}{$user}=$member;
-        #         push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'internetaccess'} }, $member;
-        #         push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'internetaccess'} }, $member;
-        #     }
-
+            # creating member lookup table
+            my @man_members=$entry->get_value('member');
+            foreach my $member (@man_members){
+                my ($sam_user,@unused)=split(/,/,$member);
+                $sam_user=~s/^CN=//g; # remove leading CN=
+                $management{'managementgroup'}{$type}{$sam}{'members'}{$sam_user}=$member;
+            }
         }
-    } 
+    } # end block
 
     # fetching the sessions
     my $filter="(&(objectClass=user)(sophomorixSessions=*)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
@@ -3267,6 +3260,7 @@ sub AD_get_sessions {
     if($Conf::log_level>=2){
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users have sessions");
     }
+
     $AD{'RESULT'}{'supervisor'}{'student'}{'COUNT'}=$max_user;
 
     # walk through all supervisors
@@ -3337,6 +3331,7 @@ sub AD_get_sessions {
                     # skip user detection when participantlist is empty
                     next;
                 }
+
                 foreach $participant (@participants){
                     # get userinfo
                     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
@@ -3397,9 +3392,6 @@ sub AD_get_sessions {
                     $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'sophomorixRole'}=$role_AD;
                     push @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }, $participant; 
-
-                    # id exammode 
-
 
                     # test membership in managementgroups
                     foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
