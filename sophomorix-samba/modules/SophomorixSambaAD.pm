@@ -3341,7 +3341,14 @@ sub AD_get_sessions {
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       user=>$participant,
-                                    });
+				     });
+		    if ($existing_AD eq "FALSE"){
+ 		        print "WARNING: User $participant nonexisting but part of session $id\n";
+                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
+                        $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
+                             {$participant}{'user_existing'}=$existing_AD;
+                        next;
+		    }
                     if ($exammode_AD ne "---"){
                         # display exam-account
                         $participant=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
@@ -3411,10 +3418,14 @@ sub AD_get_sessions {
                 }
 
                 # sort some lists and count
-                @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} } = sort @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} };
+		if ( exists $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} ){
+                    @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} } = sort @{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} };
+                }
                 $sessions{'ID'}{$id}{'PARTICIPANT_COUNT'}=$#{ $sessions{'ID'}{$id}{'PARTICIPANT_LIST'} }+1;
-		@{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} } = 
-                    sort @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} };
+                if (exists $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'}){
+		    @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} } = 
+                        sort @{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} };
+                }
                 $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_COUNT'}=
                     $#{ $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANT_LIST'} }+1;
 
@@ -3433,16 +3444,23 @@ sub AD_get_sessions {
                                   root_dns=>$root_dns,
                                   user=>$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
                                 });
+
                     &Sophomorix::SophomorixBase::dir_listing_user($sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
                                                                   $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'SMBhomeDirectory'},
                                                                   $smb_admin_pass,
                                                                   \%sessions,
                                                                   $ref_sophomorix_config
                                                                  );
+
                     # participants
                     foreach my $participant (keys %{$sessions{'ID'}{$id}{'PARTICIPANTS'}}) {
                         # managementgroups
 
+#                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
+                        if ($sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'} eq "FALSE"){
+ 		            print "WARNING: $participant nonexisting (Skipping  dirlisting and quota)\n";
+                            next;
+			}
 
                         # transfer directory of participants 
                         &Sophomorix::SophomorixBase::dir_listing_user(
