@@ -96,7 +96,7 @@ help:
 	@echo '      show this help'
 	@echo ' '
 	@echo '   make | make all'
-	@echo '      make an installation of files to the local ubuntu xenial'
+	@echo '      make an installation of files to the local ubuntu bionic'
 	@echo ' '
 	@echo '   make install-virusscan'
 	@echo '      create a debian package'
@@ -108,12 +108,12 @@ help:
 	@echo '      create a debian package'
 	@echo ' '
 	@echo '   make deb'
-	@echo '      create a debian package for ubuntu xenial'
+	@echo '      create a debian package for ubuntu bionic'
 	@echo ' '
 
 
 deb:
-	### Prepare to build an ubuntu xenial package
+	### Prepare to build an ubuntu bionic package
 	@echo 'Did you do a dch -i ?'
 	@sleep 2
 	dpkg-buildpackage -tc -uc -us -sa -rfakeroot

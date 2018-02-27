@@ -1,6 +1,6 @@
 sophomorix4:
-sophomorix for Samba 4 on Ubuntu Server 64bit Xenial (aka Ubuntu 16.04)
+sophomorix for Samba 4 on Ubuntu Server 64bit Bionic Beaver (aka Ubuntu 18.04)
 
-The main development branch is 'xenial'
+The main development branch is 'bionic'
 (There is no branch 'master' in sophomorix4)
 
