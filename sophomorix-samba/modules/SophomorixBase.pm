@@ -2228,7 +2228,10 @@ sub config_sophomorix_read {
     ##################################################
     # sophomorix.conf 
     my $ref_master_sophomorix=&read_master_ini($DevelConf::path_conf_master_sophomorix,$ref_result);
-    my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,$DevelConf::file_conf_sophomorix,$ref_result);
+    my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,
+                                                   $DevelConf::file_conf_sophomorix,
+                                                   $ref_result,
+                                                   \%sophomorix_config);
     &load_sophomorix_ini($ref_modmaster_sophomorix,\%sophomorix_config,$ref_result);
 
     ##################################################
@@ -2256,7 +2259,7 @@ sub config_sophomorix_read {
         my $ref_master=&read_master_ini($DevelConf::path_conf_master_school,$ref_result);
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         # modify the master
-        my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result);
+        my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result,\%sophomorix_config);
         &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
         # mountpoint
         $sophomorix_config{'SCHOOLS'}{$school}{'MOUNTPOINT'}=
@@ -2710,7 +2713,7 @@ sub read_master_ini {
 
 
 sub check_config_ini {
-    my ($ref_school,$configfile,$ref_result)=@_;
+    my ($ref_school,$configfile,$ref_result,$ref_sophomorix_config)=@_;
     # take the master reference as school reference and overwrite it
     &print_title("Reading $configfile");
     if (not -e $configfile){
@@ -2719,6 +2722,7 @@ sub check_config_ini {
         #print "\nERROR: $configfile not found!\n\n";
         #exit;
     }
+    #print "Checking file $configfile\n";
     tie %config, 'Config::IniFiles',
         ( -file => $configfile, 
           -handle_trailing_comment => 1,
@@ -2729,10 +2733,28 @@ sub check_config_ini {
             #print "Verifying if parameter $parameter is valid in section $section\n";
             if (exists $ref_school->{$section}{$parameter}){
                 #print "parameter $section -> $parameter is valid OK\n";
-                # overwrite  $ref_school
-                $ref_school->{$section}{$parameter}=$config{$section}{$parameter};
+                #print "  HEREXX: $section = $ref_school->{$section}{$parameter}\n";
+                #print "  HEREYY: $section = $config{$section}{$parameter}\n";
+                if ($ref_school->{$section}{$parameter}=~m/\|/){
+                    # value syntax is <type>|<default>
+                    my ($opt_type,$opt_default)=split(/\|/,$ref_school->{$section}{$parameter});
+                    #print "$section is of type $opt_type, default is $opt_default\n";
+                    if ($opt_type eq "BOOLEAN"){
+                        # value in master is BOOLEAN|<default>
+                        # overwrite  $ref_school
+                        if ($opt_default eq "TRUE"){
+                            $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'};
+                        } elsif ($opt_default eq "FALSE"){
+                            $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_FALSE'};
+                        }
+                    }
+                } else {
+                    # overwrite  $ref_school
+                    $ref_school->{$section}{$parameter}=$config{$section}{$parameter};
+                }
+
             } else {
-		print " * ERROR: ".$parameter." is NOT valid in section ".$section."\n";
+		#print " * ERROR: ".$parameter." is NOT valid in section ".$section."\n";
                 &result_sophomorix_add($ref_result,
                                        "ERROR",-1,
                                        $ref_parameter,
@@ -2742,7 +2764,7 @@ sub check_config_ini {
                                        " of ".
                                        $configfile.
                                        "!");
-                #print "   * WARNING: $parameter is NOT valid in section $section\n";
+                print "   * WARNING: $parameter is NOT valid in section $section\n";
             }
         }
     }
@@ -2809,12 +2831,15 @@ sub load_school_ini {
 
             # load parameters
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                if($Conf::log_level>=3){
+#                if($Conf::log_level>=3){
                     print "   * FILE $filename: $parameter ---> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
-                }
+#                }
                 $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
+		$ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=&set_parameter(
+                    $ref_modmaster->{$section}{$parameter},
+                    $ref_sophomorix_config);
             }
 
 
@@ -2996,6 +3021,11 @@ sub load_school_ini {
 }
 
 
+sub set_parameter {
+    my ($value,$ref_sophomorix_config)=@_;
+    print "HERE: $value\n";
+    return $value;
+}
 
 sub load_sophomorix_ini {
     my ($ref_modmaster_sophomorix,$ref_sophomorix_config,$ref_result)=@_;
