@@ -132,20 +132,28 @@ firewall:
   booten, device LAn einrichten
   172.16.0.254/12
 server: 
+  in das richtige voboxnet host-only network bringen: vboxnet2
   IP setzen: 172.16.0.1/12
     - linuxmuster-prepare.py -s -u -n 172.16.0.1/12
     - reboot
+  apt update && apt -y dist-upgrade
   apt install emacs
   emacs .bashrc 
-    - color prompt enablen
-    - farbe von 0;32 auf 0;33
+    - color prompt enablen:
+      force_color_prompt=yes
+    - farbe von 01;32m auf 01;33m  (gelb)
   apt install nfs-common
   mount -t nfs 172.16.0.100://home/bz/github /mnt
 
+  -- snapshot machen
+
    linuxmuster-setup.py
    IP's wie oben
-   linuxmuster.local (wichtig für tests)
+   linuxmuster.local (statt linuxmuster.lan, wichtig für tests)
    danach die vom setup angelegten admins löschen
+
+   Zeile in devices.csv für nextcloud
+   server;nextcloud;nopxe;08:00:27:38:DF:01;172.16.0.5;;;;;1;0
 
 todo
 regression supertest anpassen:
