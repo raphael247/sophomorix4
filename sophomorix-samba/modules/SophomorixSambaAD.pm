@@ -5053,7 +5053,19 @@ sub AD_get_quota {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
+    my $smbcquotas = $arg_ref->{smbcquotas};
+    my $user_opt = $arg_ref->{user};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    # create userlist for smbcquotas query
+    my %smbcquotas_users=();
+    if ($user_opt ne ""){
+        my @smbcquotas_users=split(/,/,$user_opt);
+        foreach my $user (@smbcquotas_users){
+            $smbcquotas_users{$user}="query";
+        }
+    }
 
     # USER quota (sophomorix user)
     my $filter2="(&(objectClass=user) (| (sophomorixRole=student) (sophomorixRole=teacher) ) )";
@@ -5659,6 +5671,20 @@ sub AD_get_quota {
                 $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}="FALSE";
             }
 
+            # use smbcquotas
+            if ($smbcquotas==1){
+		if ( exists $smbcquotas_users{$user} or
+                     $user_opt eq ""
+                   ){
+                    my ($used,
+                        $soft,
+                        $hard)=&AD_smbcquotas_queryuser($root_dns,
+                                                        $smb_admin_pass,
+                                                        $user,
+                                                        $share,
+                                                        $ref_sophomorix_config)
+	        }
+            }
 	} # end share
     } # end user
     
@@ -5712,6 +5738,7 @@ sub AD_get_quota {
 	    @{ $quota{'MAILLIST'}{$maillist}{'LIST'} } = sort @{ $quota{'MAILLIST'}{$maillist}{'LIST'} };
         }
     }
+
     return(\%quota);
 }
 
@@ -7812,6 +7839,31 @@ sub AD_smbclient_testfile {
         $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSER'}="FALSE";
         $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'AQUOTAUSERDISPLAY'}="NONEXISTING";
     }
+}
+
+
+
+sub AD_smbcquotas_queryuser {
+    my ($root_dns,$smb_admin_pass,$user,$share,$ref_sophomorix_config)=@_;
+    print "Querying smbcquotas of user $user on share $share\n";
+    my $smbcquotas_command=
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " -U ".$DevelConf::sophomorix_file_admin."%'".
+        $smb_admin_pass."'".
+        " -u $user //$root_dns/$share";
+    my $string=`$smbcquotas_command`;
+    chomp($string);
+    $string=~s/ //g; # remove whitespace
+    my ($userstring,$quota)=split(/:/,$string);
+    my ($used,$soft,$hard)=split(/\//,$quota);
+    if($Conf::log_level>=3){
+        print "$smbcquotas_command\n";
+        print "   USER: <$userstring>\n";
+        print "   USED: <$used>\n";
+        print "   SOFT: <$soft>\n";
+        print "   HARD: <$hard>\n";
+    }
+    return($used,$soft,$hard);
 }
 
 

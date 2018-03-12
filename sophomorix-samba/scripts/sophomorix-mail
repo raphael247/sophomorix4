@@ -196,6 +196,8 @@ if ($user ne ""){
 my $ref_mail=&AD_get_quota({ldap=>$ldap,
                              root_dse=>$root_dse,
                              root_dns=>$root_dns,
+                             smbcquotas=>0,
+                             smb_admin_pass=>$smb_admin_pass,
                              sophomorix_config=>\%sophomorix_config,
                            });
 

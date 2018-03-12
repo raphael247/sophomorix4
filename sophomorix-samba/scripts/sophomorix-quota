@@ -77,6 +77,8 @@ $Conf::log_level=1;
 
 my $show_nondefault=0;
 
+my $smbcquotas=0;
+
 # smbcquotas options
 my $list=0;
 my $show=0;
@@ -104,6 +106,7 @@ my $testopt=GetOptions(
            "default-quota|FSQLIM=s" => \$default_quota,
            "set-quota-only" => \$set_quota_only,
            "set-mailquota-only" => \$set_mailquota_only,
+           "smbcquotas" => \$smbcquotas,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -145,6 +148,8 @@ Show sophomorix info about quota calculation
     -s <school>/<sharename> / --school <school>/<sharename> / --share <school>/<sharename>
   Limit the output to some users:
     -u / --user <user1>,<user2>,... 
+  Query the smbshare with smbcquotas for used space
+    --smbcquotas
   
 Setting the user Quota/MailQuota
   set Quota AND MailQuota
@@ -251,6 +256,9 @@ if ($user ne ""){
 my $ref_quota=&AD_get_quota({ldap=>$ldap,
                              root_dse=>$root_dse,
                              root_dns=>$root_dns,
+                             smbcquotas=>$smbcquotas,
+                             user=>$user,
+                             smb_admin_pass=>$smb_admin_pass,
                              sophomorix_config=>\%sophomorix_config,
                            });
 
