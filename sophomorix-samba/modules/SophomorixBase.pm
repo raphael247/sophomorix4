@@ -1215,13 +1215,13 @@ sub console_print_mailquota_user {
         if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
             printf "|%11s%-67s|\n",
                    $mailcalc_display,
-                   " MAILCALC must be set (old MAILCALC is ".
+                   " sophomorixMailQuotaCalculated must be set (current: ".
                    $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}.
                    " MiB)";
         } else {
             printf "|%11s%-67s|\n",
                    $mailcalc_display,
-                   " MAILCALC was already set to ".
+                   " sophomorixMailQuotaCalculated is ".
                    $ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'OLDCALC'}.
                    " MiB";
         }
