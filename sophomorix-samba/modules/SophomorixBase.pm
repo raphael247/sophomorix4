@@ -3694,7 +3694,9 @@ sub create_test_login {
             return "---";
         }
         # firstname+surname or surname+firstname
-        if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
+#        if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
+        if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq 
+                 $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'}){
             $login_part_2=substr($surname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
             $login_part_1=substr($firstname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'});
         } else {
@@ -3972,23 +3974,19 @@ sub get_passwd_charlist {
 
 
 sub get_plain_password {
-    my $role=shift;
-    my $file=shift;
-    my $random=shift;
-    my $length=shift;
-    my @password_chars=@_;
+    my ($role,$file,$random,$length,$ref_sophomorix_config,@password_chars)=@_;
     my $password="";
     my $i;
     if ($role eq "teacher") {
         # Teacher
-        if ( $random eq "yes") {
+        if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'}) {
 	    $password=&create_plain_password($length,@password_chars);
         } else {
             $password=$DevelConf::student_password_default;
 	}
     } elsif ($role eq "student") {
         # Student
-        if ($random  eq "yes") {
+        if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'}) {
 	    $password=&create_plain_password($length,@password_chars);
         } else {
             $password=$DevelConf::teacher_password_default;
@@ -4160,13 +4158,13 @@ sub check_options{
     # set default for --verbose
     $ref_options->{'CONFIGURED'}{'verbose'}="TRUE";
     $ref_options->{'MODIFIER_OPTIONS'}{'verbose'}="TRUE";
-    if (not defined $ref_options->{'verbose'}){
-        $Conf::log_level=1;
-        $ref_options->{'verbose'}=$Conf::log_level;
-    } else {
-        $Conf::log_level=$ref_options->{'verbose'}+1;
-        $ref_options->{'verbose'}=$Conf::log_level;
+    if (not defined $Conf::log_level){
+	$Conf::log_level=1;
     }
+    if (defined $ref_options->{'verbose'}){
+        $Conf::log_level=$ref_options->{'verbose'}+1;
+    }
+    $ref_options->{'verbose'}=$Conf::log_level;
 
     ############################################################
     # set default for --json
