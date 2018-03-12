@@ -13,6 +13,7 @@ use Net::LDAP;
 use Net::LDAP::Control::Sort;
 use List::MoreUtils qw(uniq);
 use File::Basename;
+use Math::Round;
 use Data::Dumper;
 
 # for smb://
@@ -5676,13 +5677,22 @@ sub AD_get_quota {
 		if ( exists $smbcquotas_users{$user} or
                      $user_opt eq ""
                    ){
-                    my ($used,
-                        $soft,
-                        $hard)=&AD_smbcquotas_queryuser($root_dns,
-                                                        $smb_admin_pass,
-                                                        $user,
-                                                        $share,
-                                                        $ref_sophomorix_config)
+                    # Add the smbcquotas result to the JSON object
+                    ($quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_KiB'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_KiB'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_KiB'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_MiB'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_MiB'},
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_MiB'},
+                   )=&AD_smbcquotas_queryuser(
+                        $root_dns,
+                        $smb_admin_pass,
+                        $user,
+                        $share,
+			$ref_sophomorix_config);
 	        }
             }
 	} # end share
@@ -7856,14 +7866,44 @@ sub AD_smbcquotas_queryuser {
     $string=~s/ //g; # remove whitespace
     my ($userstring,$quota)=split(/:/,$string);
     my ($used,$soft,$hard)=split(/\//,$quota);
+
+    # used
+    my $used_kib;
+    $used_kib=$used/1024;
+    $used_mib=round(10*$used_kib/1024)/10; # MiB rounded to one decimal
+
+    # soft
+    my $soft_kib;
+    my $soft_mib;
+    if ($soft eq "NOLIMIT"){
+        $soft="-1"; 
+        $soft_kib="-1"; 
+        $soft_mib="-1"; 
+    } else {
+        $soft_kib=$soft/1024;
+        $soft_mib=round(10*$soft_kib/1024)/10; # MiB rounded to one decimal
+    }
+
+    # hard
+    my $hard_kib;
+    my $hard_mib;
+    if ($hard eq "NOLIMIT"){
+        $hard="-1"; 
+        $hard_kib="-1"; 
+        $hard_mib="-1"; 
+    } else {
+        $hard_kib=$hard/1024;
+        $hard_mib=round(10*$hard_kib/1024)/10; # MiB rounded to one decimal
+    }
+
     if($Conf::log_level>=3){
         print "$smbcquotas_command\n";
         print "   USER: <$userstring>\n";
-        print "   USED: <$used>\n";
-        print "   SOFT: <$soft>\n";
-        print "   HARD: <$hard>\n";
+        print "   USED: <$used> <$used_kib>KiB\n";
+        print "   SOFT: <$soft> <$soft_kib>KiB\n";
+        print "   HARD: <$hard> <$hard_kib>KiB\n";
     }
-    return($used,$soft,$hard);
+    return($used,$soft,$hard,$used_kib,$soft_kib,$hard_kib,$used_mib,$soft_mib,$hard_mib);
 }
 
 
