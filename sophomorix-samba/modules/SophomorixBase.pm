@@ -2733,18 +2733,28 @@ sub check_config_ini {
             #print "Verifying if parameter $parameter is valid in section $section\n";
             if (exists $ref_school->{$section}{$parameter}){
                 #print "parameter $section -> $parameter is valid OK\n";
-                #print "  HEREXX: $section = $ref_school->{$section}{$parameter}\n";
-                #print "  HEREYY: $section = $config{$section}{$parameter}\n";
+                #print "  Master Value: $section = $ref_school->{$section}{$parameter}\n";
+                #print "  $configfile: $section = $config{$section}{$parameter}\n";
                 if ($ref_school->{$section}{$parameter}=~m/\|/){
                     # value syntax is <type>|<default>
                     my ($opt_type,$opt_default)=split(/\|/,$ref_school->{$section}{$parameter});
                     #print "$section is of type $opt_type, default is $opt_default\n";
                     if ($opt_type eq "BOOLEAN"){
                         # value in master is BOOLEAN|<default>
+                        my $opt_given=$config{$section}{$parameter};
+                        $opt_given=~tr/A-Z/a-z/; # make lowercase
                         # overwrite  $ref_school
-                        if ($opt_default eq "TRUE"){
+                        if ($opt_given eq "yes" or
+                            $opt_given eq "on" or
+                            $opt_given eq "true" or
+                            $opt_given eq "1"
+                           ){
                             $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'};
-                        } elsif ($opt_default eq "FALSE"){
+                        } elsif ($opt_given eq "no" or
+                                 $opt_given eq "off" or
+                                 $opt_given eq "false" or
+                                 $opt_given eq "0"
+                                ){
                             $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_FALSE'};
                         }
                     }
@@ -2765,6 +2775,20 @@ sub check_config_ini {
                                        $configfile.
                                        "!");
                 print "   * WARNING: $parameter is NOT valid in section $section\n";
+            }
+        }
+    }
+
+    # go through school config again. Set defaults from master
+    foreach my $section ( keys %{ $ref_school } ) {
+        foreach my $parameter ( keys %{ $ref_school->{$section} } ) {
+            if ($ref_school->{$section}{$parameter}=~m/\|/){
+                my ($opt_type,$opt_default)=split(/\|/,$ref_school->{$section}{$parameter});
+                if ($opt_default eq "TRUE"){
+                    $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'};
+                } elsif ($opt_default eq "FALSE"){
+                    $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_FALSE'};
+                }
             }
         }
     }
@@ -2831,15 +2855,12 @@ sub load_school_ini {
 
             # load parameters
             foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-#                if($Conf::log_level>=3){
+                if($Conf::log_level>=3){
                     print "   * FILE $filename: $parameter ---> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
-#                }
+                }
                 $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
-		$ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=&set_parameter(
-                    $ref_modmaster->{$section}{$parameter},
-                    $ref_sophomorix_config);
             }
 
 
@@ -3021,11 +3042,6 @@ sub load_school_ini {
 }
 
 
-sub set_parameter {
-    my ($value,$ref_sophomorix_config)=@_;
-    print "HERE: $value\n";
-    return $value;
-}
 
 sub load_sophomorix_ini {
     my ($ref_modmaster_sophomorix,$ref_sophomorix_config,$ref_result)=@_;
