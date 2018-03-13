@@ -4577,7 +4577,12 @@ sub AD_get_AD_for_device {
                                ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
-    $AD{'RESULT'}{'computer'}{'computer'}{'COUNT'}=$max_user;
+    $AD{'RESULT'}{'devices'}{'all'}{'COUNT'}=$max_user;
+    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'SERVER'}}{'COUNT'}=0;
+    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'PRINTER'}}{'COUNT'}=0;
+    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}}{'COUNT'}=0;
+    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'OTHER'}}{'COUNT'}=0;
+
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
@@ -4587,6 +4592,9 @@ sub AD_get_AD_for_device {
         my $file=$entry->get_value('sophomorixAdminFile');
         $AD{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
         $AD{'computer'}{$sam}{'sophomorixRole'}=$role;
+        # increase counter
+        $AD{'RESULT'}{'devices'}{$role}{'COUNT'}++;
+	print "HERE: $sam is of role $role\n";
         $AD{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
         $AD{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
         $AD{'computer'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
