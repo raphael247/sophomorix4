@@ -873,20 +873,20 @@ foreach my $room (keys %{$ref_AD_device->{'room'}}) {
 
 
 # computers to kill
-foreach my $computer (keys %{$ref_AD_device->{'computer'}}) {
-    if (not exists $devices_file{'computer'}{$computer}){
+foreach my $device (keys %{$ref_AD_device->{'device'}}) {
+    if (not exists $devices_file{'computer'}{$device}){
         # host is not in file anymore
-        &push_kill_computer($computer);
+        &push_kill_computer($device);
     }
 }
 
 
 
 # computers to add
-foreach my $computer (keys %{$devices_file{'computer'}}) {
-    if (not exists $ref_AD_device->{'computer'}{$computer} ){
+foreach my $device (keys %{$devices_file{'computer'}}) {
+    if (not exists $ref_AD_device->{'device'}{$device} ){
         # nonexisting --> add account
-        &push_add_computer($computer);
+        &push_add_computer($device);
     }
 }
 
@@ -1539,7 +1539,8 @@ if ($set_computer_passwords==1){
     #                        sophomorix_config=>\%sophomorix_config,
     #          });
     my $count=1;
-    foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
+
+    foreach my $comp (keys %{$ref_AD_device->{'device'}}) {
         my $pw;
         if ($password ne ""){
             # password by option
