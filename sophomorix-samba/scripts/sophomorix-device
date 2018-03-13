@@ -108,6 +108,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_unbind_admin
                                  AD_user_create
                                  AD_computer_create
+                                 AD_computer_update
                                  AD_group_create
                                  AD_group_kill
                                  AD_group_addmember
@@ -889,7 +890,7 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
     if (not exists $ref_AD_device->{'device'}{$device} ){
         # nonexisting --> add account
         &push_add_computer($device);
-        &push_update_computer($device); # update ????
+        #&push_update_computer($device); # update ????
     }
 }
 
@@ -900,13 +901,14 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
     if (exists $ref_AD_device->{'device'}{$device} ){
         my $update=0;
         # update
-        print "\n"; 
-        print "Test for update $device\n";
-        print "Files  9: $devices_file{'computer'}{$device}{'sophomorixRole'}\n";
-        print "AD     9: $ref_AD_device->{'device'}{$device}{'sophomorixRole'}\n";
-        print "Files 15: $devices_file{'computer'}{$device}{'sophomorixComment'}\n";
-        print "AD    15: $ref_AD_device->{'device'}{$device}{'sophomorixComment'}\n";
-        
+        if($Conf::log_level>=3){
+            print "\n"; 
+            print "Test for update $device\n";
+            print "Files  9: $devices_file{'computer'}{$device}{'sophomorixRole'}\n";
+            print "AD     9: $ref_AD_device->{'device'}{$device}{'sophomorixRole'}\n";
+            print "Files 15: $devices_file{'computer'}{$device}{'sophomorixComment'}\n";
+            print "AD    15: $ref_AD_device->{'device'}{$device}{'sophomorixComment'}\n";
+        }
         # sophomorixRole
         if ($devices_file{'computer'}{$device}{'sophomorixRole'} eq $ref_AD_device->{'device'}{$device}{'sophomorixRole'}){
             # no update if equal
@@ -1119,8 +1121,6 @@ if($no_sync==1){
     foreach my $ws (@updating_computers){
         print "UPDATE: $ws ($update_computer{$ws}{'COUNT'} attributes)\n";
     }
-    print Dumper(\%update_computer);
-
 
     # dnsZones
     print "\n";
@@ -1434,11 +1434,21 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Updating computers
     print "\n";
     my $max_computer_count_update=$#updating_computers+1;
-    &print_title("Adding $max_computer_count_update computers:");
+    &print_title("Updatinging $max_computer_count_update computers:");
     my $computer_count_update=1;
     foreach my $computer (@updating_computers){
-        print "Updating $computer\n";
-
+        &AD_computer_update({ldap=>$ldap,
+                             root_dse=>$root_dse,
+                             computer=>$computer,
+                             computer_count=>$computer_count_update,
+                             attrs_count=>$update_computer{$computer}{'COUNT'},
+                             replace=>\%update_computer,
+                             max_computer_count=>$max_computer_count_update,
+                             json=>$json,
+                             sophomorix_config=>\%sophomorix_config,
+                             sophomorix_result=>\%sophomorix_result,
+                           });
+        $computer_count_update++;
     }
 
     ############################################################

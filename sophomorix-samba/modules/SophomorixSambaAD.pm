@@ -45,6 +45,7 @@ $Data::Dumper::Terse = 1;
             AD_get_group
             AD_computer_create
             AD_computer_kill
+            AD_computer_update
             AD_user_move
             AD_user_kill
             AD_remove_sam_from_sophomorix_attributes
@@ -945,6 +946,54 @@ sub AD_computer_kill {
     } else {
         print "   * WARNING: $computer not found/to many items ($count_result results)\n";     
     }
+}
+
+
+
+sub AD_computer_update {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $computer = $arg_ref->{computer};
+    my $computer_count = $arg_ref->{computer_count};
+    my $attrs_count = $arg_ref->{attrs_count};
+    my $ref_replace = $arg_ref->{replace};
+    my $max_computer_count = $arg_ref->{max_computer_count};
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    print "\n";
+    &Sophomorix::SophomorixBase::print_title(
+          "Updating computer ${computer_count}/$max_computer_count: $computer ($attrs_count attributes) (start)");
+    # get dn
+    my $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => "sAMAccountName=$computer",
+                         );
+    my $max = $mesg->count; 
+    if ($max==1){
+        my $entry = $mesg->entry(0);
+        my $dn = $entry->dn();
+        print "   DN: $dn\n";
+        foreach my $attr (keys  %{ $ref_replace->{$computer}{'REPLACE'} }){
+            print "     Update $attr to \"$ref_replace->{$computer}{'REPLACE'}{$attr}\"\n";
+        }
+        # modify
+        my $mesg = $ldap->modify( $dn,
+                          replace => { %{ $ref_replace->{$computer}{'REPLACE'} } } 
+                         );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    } else {
+        print "\nNot updating, $max results found for computer $computer\n\n";
+        exit 88;
+    }
+
+
+#print Dumper($ref_replace);
+    &Sophomorix::SophomorixBase::print_title(
+          "Updating computer ${computer_count}/$max_computer_count: $computer (end)");
 }
 
 
