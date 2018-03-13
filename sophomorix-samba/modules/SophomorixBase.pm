@@ -408,7 +408,6 @@ sub _console_print_onesession {
 sub _console_print_devices {
     my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
     my $line ="+---------------+---------------+----------------+-----------+-----------------+\n";
-
     #if($log_level==1 and $object_name eq ""){
         # one device per line
         print $line;

@@ -242,6 +242,7 @@ my %ip_seen=();
 
 # Computers
 my @adding_computers=();
+my @updating_computers=();
 my @killing_computers=();
 my @killing_computer_rooms=();
 
@@ -263,6 +264,7 @@ my %killing_hardwareclasses=();
 my %addmembers_hardwareclasses=();
 my %killmembers_hardwareclasses=();
 
+my %update_computer=(); # device -> count
 
 my %pxe = qw(ml ok
             );
@@ -887,6 +889,52 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
     if (not exists $ref_AD_device->{'device'}{$device} ){
         # nonexisting --> add account
         &push_add_computer($device);
+        &push_update_computer($device); # update ????
+    }
+}
+
+
+
+# computers to update
+foreach my $device (keys %{$devices_file{'computer'}}) {
+    if (exists $ref_AD_device->{'device'}{$device} ){
+        my $update=0;
+        # update
+        print "\n"; 
+        print "Test for update $device\n";
+        print "Files  9: $devices_file{'computer'}{$device}{'sophomorixRole'}\n";
+        print "AD     9: $ref_AD_device->{'device'}{$device}{'sophomorixRole'}\n";
+        print "Files 15: $devices_file{'computer'}{$device}{'sophomorixComment'}\n";
+        print "AD    15: $ref_AD_device->{'device'}{$device}{'sophomorixComment'}\n";
+        
+        # sophomorixRole
+        if ($devices_file{'computer'}{$device}{'sophomorixRole'} eq $ref_AD_device->{'device'}{$device}{'sophomorixRole'}){
+            # no update if equal
+        } elsif ($devices_file{'computer'}{$device}{'sophomorixRole'} eq "" and
+                 $ref_AD_device->{'device'}{$device}{'sophomorixRole'} eq $sophomorix_config{'INI'}{'ROLE_DEVICE'}{'OTHER'}
+	    ){
+            # no update, both are on default value
+        } else {
+            $update_computer{$device}{'REPLACE'}{'sophomorixRole'}=$devices_file{'computer'}{$device}{'sophomorixRole'};
+            $update++;
+        }
+
+        # sophomorixComment
+        if ($devices_file{'computer'}{$device}{'sophomorixComment'} eq $ref_AD_device->{'device'}{$device}{'sophomorixComment'}){
+            # no update if equal
+        } elsif ($devices_file{'computer'}{$device}{'sophomorixComment'} eq "" and
+                 $ref_AD_device->{'device'}{$device}{'sophomorixComment'} eq "---"
+	    ){
+            # no update, both are on default value
+        } else {
+            $update_computer{$device}{'REPLACE'}{'sophomorixComment'}=$devices_file{'computer'}{$device}{'sophomorixComment'};
+            $update++;
+        }
+        
+        if ($update>0){
+            $update_computer{$device}{'COUNT'}=$update; # count how many attributes must be updated
+            &push_update_computer($device);
+        }
     }
 }
 
@@ -1064,6 +1112,15 @@ if($no_sync==1){
     foreach my $ws (@adding_computers){
         print "ADD: $ws\n";
     }
+    # updates of computer attributes
+    print "\n";
+    $count=$#updating_computers+1;
+    &print_title("Computers that must be updated: ($count)");
+    foreach my $ws (@updating_computers){
+        print "UPDATE: $ws ($update_computer{$ws}{'COUNT'} attributes)\n";
+    }
+    print Dumper(\%update_computer);
+
 
     # dnsZones
     print "\n";
@@ -1371,6 +1428,17 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              group => $room_saved,
                              addmember => $ws_saved,
                             });   
+    }
+
+    ############################################################
+    # Updating computers
+    print "\n";
+    my $max_computer_count_update=$#updating_computers+1;
+    &print_title("Adding $max_computer_count_update computers:");
+    my $computer_count_update=1;
+    foreach my $computer (@updating_computers){
+        print "Updating $computer\n";
+
     }
 
     ############################################################
@@ -1793,6 +1861,10 @@ sub analyze_device_line {
         $ip=&check_ip($ip,$line);
         $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line);
         $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
+
+        $sophomorix_role=&check_sophomorix_role($sophomorix_role,$line);
+
+
         $account_flag=&check_account_flag($account_flag,$line);
         $pxe=&check_pxe($pxe,$line);
         $option=&check_option($option,$line);
@@ -2062,6 +2134,26 @@ sub check_ms_software_key {
 
 
 
+sub check_sophomorix_role {
+    my ($role,$line) = @_;
+    if ($role eq ""){
+        $role=$sophomorix_config{'INI'}{'ROLE_DEVICE'}{'OTHER'};
+    } elsif (not exists $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$role}) {
+        print "\n";
+        print "LINE: $line\n";
+        print "  ERROR: >$role< is not a valid role\n";
+        print "     Valid roles for devices are:\n";
+        foreach my $keyname (keys %{$sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}} ) {
+            print "        $keyname\n";
+        }
+        print "\n";
+        exit 88;
+    }
+    return $role;
+}
+
+
+
 sub check_account_flag {
     my ($account_flag,$line) = @_;
     if ($account_flag eq 0){
@@ -2144,6 +2236,13 @@ sub push_kill_computer_room {
 sub push_add_computer {
     my ($add) = @_;
     push @adding_computers, $add;
+}
+
+
+
+sub push_update_computer {
+    my ($update) = @_;
+    push @updating_computers, $update;
 }
 
 
