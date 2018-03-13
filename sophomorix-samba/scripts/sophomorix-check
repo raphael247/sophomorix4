@@ -2143,21 +2143,21 @@ sub get_encoding {
     }   
  
     # auto setting
-    if ($enc eq "auto" and $enc_force eq "no"){
+    if ($enc eq "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
         # auto
         if ($enc_checked eq "unknown"){
             print "   * ENCODING could not be checked automatically\n";
-            print "   * Set ENCODING to the desired value and ENCODING_FORCE to \"yes\"\n";
+            print "   * Set ENCODING to the desired value and ENCODING_FORCE to \"True\"\n";
             exit 88;
         }
         $enc_used=$enc_checked;
-    } elsif ($enc ne "auto" and $enc_force eq "no"){
+    } elsif ($enc ne "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
         # auto mismatch configure
         print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
-        print "   * Set A) ENCODING_FORCE to \"yes\" if you know better than sophomorix\n";
+        print "   * Set A) ENCODING_FORCE to \"True\" if you know better than sophomorix\n";
         print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
         exit 88;
-    } elsif ($enc ne "auto" and $enc_force eq "yes"){
+    } elsif ($enc ne "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_TRUE'}){
         $enc_used=$enc;
     }
 

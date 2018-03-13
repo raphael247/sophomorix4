@@ -2968,19 +2968,17 @@ sub load_school_ini {
                 }
                 # test if encoding force is yes/no
                 if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}){
-                    if($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "yes" or
-                       $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq "no" ){
-                       # OK
+                    if($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq 
+                        $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or
+                        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE} eq 
+                        $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_FALSE'} 
+                      ){
+                        # OK
                     } else {
-                        #print "   * ERROR: ENCODING_FORCE=".
-                        #      $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
-                        #      " accepts only \"yes\" or \"no\"\n";
                         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
                             "ENCODING_FORCE=".
                             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE}.
-                            " -> ENCODING_FORCE accepts only 'yes' or 'no'");
-                        #return;
-		        #exit;
+                            " -> ENCODING_FORCE accepts only 'True' or 'False'");
                     }
                 }
             }
