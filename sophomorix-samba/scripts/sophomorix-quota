@@ -334,9 +334,14 @@ if ($info==1 and $json>0){
         my %schools_to_show=();
         my @schools_to_show=();
         foreach my $user (@userlist){
-            my $school=$ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sophomorixSchoolname_by_sAMAccountName'}
-                {$user}{'sophomorixSchoolname'};
-            $schools_to_show{$school}="show";
+            my $school;
+            if (exists $ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sophomorixSchoolname_by_sAMAccountName'}
+                {$user}{'sophomorixSchoolname'}
+               ){
+                $school=$ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'sophomorixSchoolname_by_sAMAccountName'}
+                    {$user}{'sophomorixSchoolname'};
+                $schools_to_show{$school}="show";
+            }
         }
         # create the school list
         foreach my $sch (keys %schools_to_show) {
