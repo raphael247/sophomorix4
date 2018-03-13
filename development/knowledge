@@ -79,6 +79,24 @@ und
 
 
 ############################################################
+adding a new role
+Add the role in sophomorix.ini under
+[ROLE]        # for objectclass users
+[ROLE_DEVICE] # for objectclass devices
+
+# find, where these roles are used, decide what to do there with the new role
+grep "'ROLE'" -r ./
+grep "'ROLE_DEVICE'" -r ./
+
+
+# find lookup tables for all roles, is is correct to alsouse the new role?
+grep "'ROLES'" -r ./ 
+grep "'ROLES_DEVICE'" -r ./ 
+
+############################################################
+
+
+############################################################
 CSV-Tags entfernen:
 grep '\$Id\$' -ir ./
 ############################################################

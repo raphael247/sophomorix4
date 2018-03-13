@@ -3936,7 +3936,7 @@ sub AD_get_AD {
     if ($computers eq "TRUE"){
         # sophomorix computers from ldap
         my $filter="(&(objectClass=computer)(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'COMPUTER'}."))";
+           $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}."))";
         my $mesg = $ldap->search( # perform a search
                           base   => $root_dse,
                           scope => 'sub',
@@ -4554,8 +4554,13 @@ sub AD_get_AD_for_device {
     ############################################################
     # sophomorix computers from ldap
     {
-    my $filter="(&(objectClass=computer)(sophomorixRole=".
-       $ref_sophomorix_config->{'INI'}{'ROLE'}{'COMPUTER'}."))";
+#    my $filter="(&(objectClass=computer)(sophomorixRole=".
+#       $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}."))";
+    my $filter="(&(objectClass=computer)(|(sophomorixRole=".
+        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'SERVER'}.")(sophomorixRole=".
+        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'PRINTER'}.")(sophomorixRole=".
+        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}.")(sophomorixRole=".
+        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'OTHER'}.")))";
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
                       scope => 'sub',
@@ -4728,7 +4733,7 @@ sub AD_get_AD_for_device {
             #print "   root_dns: $root_dns\n";
 
             my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
-            if ($ip eq "NXDOMAIN"){
+            if ($ip eq "NXDOMAIN" or $ip eq "NOERROR"){
                 next;
             }
 
@@ -5128,7 +5133,7 @@ sub AD_get_quota {
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
         # get MAILQUOTA SCHOOLDEFAULT for this role
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'SCHOOLDEFAULT'}=
-            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'mailquota_default'};
+            $ref_sophomorix_config->{'ROLES' }{$school}{$role}{'mailquota_default'};
 
         # save mail adress/alias
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLISTMEMBER'}="FALSE"; # may be set to TRUE later

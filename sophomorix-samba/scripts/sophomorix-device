@@ -352,7 +352,6 @@ Managing DNS:
 Dumping data:                     
   --dump-files -j                  (dump contents of user files)
   --dump-AD -j                     (dump AD data)
-  --dump-matches -j                (dump matched users)
 
 Obsolete: Managing italc:
           --italc-dir /path/to/dir  (create italc files in /path/to/dir:
@@ -1069,13 +1068,13 @@ if($no_sync==1){
     # dnsZones
     print "\n";
     $count=$#killing_dnszones+1;
-    &print_title("DNS-Zones that must be killed: ($count)");
+    &print_title("dnsZones that must be killed: ($count)");
     foreach my $dns_zone (@killing_dnszones){
         print "KILL: $dns_zone\n";
     }
     print "\n";
     $count=$#adding_dnszones+1;
-    &print_title("DNS-Zones that must be added: ($count)");
+    &print_title("dnsZones that must be added: ($count)");
     foreach my $dns_zone (@adding_dnszones){
         print "ADD: $dns_zone\n";
     }
@@ -1083,13 +1082,13 @@ if($no_sync==1){
     # dnsNodes
     print "\n";
     $count=$#killing_dnsnodes+1;
-    &print_title("DNS-Nodes that must be killed: ($count)");
+    &print_title("dnsNodes that must be killed: ($count)");
     foreach my $dns_node (@killing_dnsnodes){
         print "KILL: $dns_node\n";
     }
     print "\n";
     $count=$#adding_dnsnodes+1;
-    &print_title("DNS-Nodes that must be added: ($count)");
+    &print_title("dnsNodes that must be added: ($count)");
     foreach my $dns_node (@adding_dnsnodes){
         print "ADD: $dns_node\n";
     }
