@@ -3713,7 +3713,6 @@ sub create_test_login {
             return "---";
         }
         # firstname+surname or surname+firstname
-#        if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq "yes"){
         if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq 
                  $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'}){
             $login_part_2=substr($surname_login,0,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'});
