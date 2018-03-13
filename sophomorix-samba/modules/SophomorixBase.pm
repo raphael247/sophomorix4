@@ -1393,7 +1393,7 @@ sub console_print_quota_user {
                 printf "|%11s%-67s|\n",
                        $calc_display,
                        " CALC was already set for ".$user." on ".$share;
-                my $mib=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}/1024;
+                my $mib=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'QUOTASTATUS'}/1024/1024;
                 printf "|%11s%-67s|\n",
                        "",
                        " SMB share quota was set to ".
@@ -1409,7 +1409,7 @@ sub console_print_quota_user {
                        $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_MiB'}.
                        "  HARD=".
                        $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_MiB'}.
-                       "(in MiB)";
+                       " (in MiB)";
             }
 	} else {
             # print single line

@@ -2341,7 +2341,7 @@ sub AD_user_setquota {
 	$hard_bytes=-1;
 	$soft_bytes=-1;
     } else {
-        $hard_bytes=1024*$quota;
+        $hard_bytes=1024*1024*$quota; # bytes to MiB
         $soft_bytes=int(0.80*$hard_bytes/1024)*1024;
     }
 
