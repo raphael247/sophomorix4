@@ -898,6 +898,7 @@ sub AD_remove_sam_from_sophomorix_attributes {
 }
 
 
+
 sub AD_computer_kill {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -911,7 +912,7 @@ sub AD_computer_kill {
 
     &Sophomorix::SophomorixBase::print_title("Killing computer $computer ($computer_count):");
     my $dn="";
-    my $filter="(&(objectClass=computer)(sophomorixRole=computer)(sAMAccountName=".$computer."))";
+    my $filter="(&(objectClass=computer)(sAMAccountName=".$computer."))";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,
                    scope => 'sub',
