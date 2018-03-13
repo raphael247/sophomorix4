@@ -77,8 +77,6 @@ $Conf::log_level=1;
 
 my $show_nondefault=0;
 
-my $smbcquotas=0;
-
 # smbcquotas options
 my $list=0;
 my $show=0;
@@ -90,6 +88,9 @@ my $set_mailquota=1;
 
 my $set_quota_only=0;
 my $set_mailquota_only=0;
+my $set=0;
+
+my $smbcquotas=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -106,6 +107,7 @@ my $testopt=GetOptions(
            "default-quota|FSQLIM=s" => \$default_quota,
            "set-quota-only" => \$set_quota_only,
            "set-mailquota-only" => \$set_mailquota_only,
+           "set" => \$set,
            "smbcquotas" => \$smbcquotas,
           );
 
@@ -158,7 +160,9 @@ Setting the user Quota/MailQuota
     sophomorix-quota --set-quota-only
   set MailQuota only:
     sophomorix-quota --set-mailquota-only
-
+  set quota even if nothing has changed:
+    ... --set ...
+  
 Set a users quota manually (in AD AND on smbshare):
   sophomorix-quota --developer-setquota <share>:<num(MiB)> -u <user>
 
@@ -487,7 +491,9 @@ foreach my $school_share (@sharelist){
             print "   * User $user:\n";
             ############################################################
             # set user MailQuota
-            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE" or
+                $set==1
+               ){
                 $mail_user_count++;
                 my $mailquota_calc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'CALC'};
                 print "      * SET: sophomorixMailQuotaCalculated to $mailquota_calc MiB:\n";
@@ -525,7 +531,9 @@ foreach my $school_share (@sharelist){
             my $share_count=0;
             foreach my $share ( @{ $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARELIST'} }){
                 $share_count++;
-                if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE"){
+                if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'} eq "TRUE" or
+                    $set==1
+                   ){
                     my $quota=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'};
                     print "      * SET: $share to $quota MiB:\n";
                     if (not exists $user_updated{$user}){
