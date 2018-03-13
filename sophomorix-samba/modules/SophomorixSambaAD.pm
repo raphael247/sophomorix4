@@ -1076,6 +1076,7 @@ sub AD_computer_create {
     my $room = $arg_ref->{room};
     my $room_basename = $arg_ref->{room_basename};
     my $role = $arg_ref->{role};
+    my $sophomorix_comment = $arg_ref->{sophomorix_comment};
     my $computer_count = $arg_ref->{computer_count};
     my $max_computer_count = $arg_ref->{max_computer_count};
     my $school = $arg_ref->{school};
@@ -1094,6 +1095,11 @@ sub AD_computer_create {
         $creationdate_ok=$creationdate;
     } else {
         $creationdate_ok=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
+    }
+
+    # avoid error for empty attribute
+    if ($sophomorix_comment eq ""){
+        $sophomorix_comment="---";
     }
 
     # sophomorixDnsNodename
@@ -1177,7 +1183,8 @@ sub AD_computer_create {
 #                   sophomorixFirstPassword => $sophomorix_first_password, 
 #                   sophomorixFirstnameASCII => $firstname_ascii,
 #                   sophomorixSurnameASCII  => $surname_ascii,
-                   sophomorixRole => "computer",
+                   sophomorixRole => $role,
+                   sophomorixComment => $sophomorix_comment,
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
                    sophomorixAdminFile => $filename,

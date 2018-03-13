@@ -1299,6 +1299,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $room_basename=$devices_file{'computer'}{$computer}{'ROOM_BASENAME'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'COMPUTER'};
         my $filename=$devices_file{'computer'}{$computer}{'FILENAME'};
+        
         if (not exists $school_created{$school}){
             # create ou
             &AD_school_create({ldap=>$ldap,
@@ -1314,6 +1315,18 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         } else {
             print "   * OU $school already created\n";
         }
+
+        my $role;
+        if ($devices_file{'computer'}{$computer}{'sophomorixRole'} ne ""){
+            $role=$devices_file{'computer'}{$computer}{'sophomorixRole'};
+        } else {
+            $role=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'};
+        }
+        my $sophomorix_comment;
+        if ($devices_file{'computer'}{$computer}{'sophomorixComment'} ne ""){
+            $sophomorix_comment=$devices_file{'computer'}{$computer}{'sophomorixComment'};
+        }
+
         &AD_computer_create({ldap=>$ldap, 
                              root_dse=>$root_dse,
                              computer_count=>$computer_count_create,
@@ -1321,7 +1334,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              name=>$ws_saved,
                              room=>$room_saved,
                              room_basename=>$room_basename,
-                             role=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'},
+                             role=>$role,
+                             sophomorix_comment=>$sophomorix_comment,
 		             type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
                              school=>$school,
                              filename=>$filename,
@@ -1862,6 +1876,8 @@ sub analyze_device_line {
             $devices_file{'computer'}{$ws_token_account}{'COMPUTER'}=$ws_token;
             $devices_file{'computer'}{$ws_token_account}{'COMPUTER_DOLLAR'}=$ws_token_account;
             $devices_file{'computer'}{$ws_token_account}{'FILENAME'}=$filename;
+            $devices_file{'computer'}{$ws_token_account}{'sophomorixRole'}=$sophomorix_role;
+            $devices_file{'computer'}{$ws_token_account}{'sophomorixComment'}=$sophomorix_comment;
         }
     }
 }
