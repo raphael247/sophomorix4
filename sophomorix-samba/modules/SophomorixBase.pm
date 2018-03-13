@@ -1401,6 +1401,16 @@ sub console_print_quota_user {
                        $mib.
                        " MiB)";
             }
+            if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}){
+	        printf "| %-77s|\n",
+                       "smbcquota  USED=".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_MiB'}.
+                       "  SOFT=".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_MiB'}.
+                       "  HARD=".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_MiB'}.
+                       "(in MiB)";
+            }
 	} else {
             # print single line
 	    printf "| %-25s| %-7s|%6s|%5s |%5s | %-18s|\n",
@@ -1410,6 +1420,17 @@ sub console_print_quota_user {
                    $quota_user_display,
                    $quota_class_display,
                    $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'GROUPSTRING'};
+            if (exists $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}){
+	        printf "| %-75s|\n",
+                       " smbcquotas in MiB: USED=".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_MiB'}.
+                       "  SOFT=".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_MiB'}.
+                       "  HARD=".
+                       $ref_quota->{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_MiB'}.
+                       "";
+                print "+   -     -     -     -    +  -  -  +   -  +   -  +   -  +    -    -    -    +\n";
+            }
         }
     } # end of share walk
 }
