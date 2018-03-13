@@ -1764,10 +1764,13 @@ sub analyze_device_line {
             $ms_office_key,
             $ms_windows_key,
             $unused,
-            $sysadmin_field,
+            $sophomorix_role,
             $account_flag,
             $pxe,
-            $option)=split(/;/,$line);
+            $option,
+            $field_13,
+            $field_14,
+            $sophomorix_comment)=split(/;/,$line);
 
         $room=&check_room($room,$line);
         $host=&check_host($host,$line);
@@ -1776,8 +1779,6 @@ sub analyze_device_line {
         $ip=&check_ip($ip,$line);
         $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line);
         $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
-#        print "   UNUSED:  $unused\n";
-#        print "   SYSADM:  $sysadmin_field\n";
         $account_flag=&check_account_flag($account_flag,$line);
         $pxe=&check_pxe($pxe,$line);
         $option=&check_option($option,$line);
@@ -1799,14 +1800,14 @@ sub analyze_device_line {
 
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
-        $devices_file{'device'}{$host_token}{'HWK'}=$hwk;
+        $devices_file{'device'}{$host_token}{'ROOM_BASENAME'}=$room;            # 01
+        $devices_file{'device'}{$host_token}{'HWK'}=$hwk;                       # 03
         $devices_file{'hardwareclass'}{$hwk}{$ws_token}=$host_token;
 
-        $devices_file{'device'}{$host_token}{'MAC'}=$mac;
-        $devices_file{'device'}{$host_token}{'IPv4'}=$ip;
-        $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;
-        $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key;
-        $devices_file{'device'}{$host_token}{'ROOM_BASENAME'}=$room;
+        $devices_file{'device'}{$host_token}{'MAC'}=$mac;                       # 04
+        $devices_file{'device'}{$host_token}{'IPv4'}=$ip;                       # 05
+        $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;   # 06
+        $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
         if ($account_flag==1){
             $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
@@ -1818,6 +1819,24 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
         $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
         $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
+
+        if (not defined $option){
+            $option="";
+        }       
+        if (not defined $field_13){
+            $field_13="";
+        }       
+        if (not defined $field_14){
+            $field_14="";
+        }       
+        if (not defined $sophomorix_comment){
+            $sophomorix_comment="";
+        }       
+        $devices_file{'device'}{$host_token}{'sophomorixRole'}=$sophomorix_role;       # 09
+        $devices_file{'device'}{$host_token}{'OPTION'}=$option;                        # 12
+        $devices_file{'device'}{$host_token}{'FIELD_13'}=$field_13;
+        $devices_file{'device'}{$host_token}{'FIELD_14'}=$field_14;
+        $devices_file{'device'}{$host_token}{'sophomorixComment'}=$sophomorix_comment; # 15
 
         # dnsZone
         my @octets=split(/\./,$ip);
