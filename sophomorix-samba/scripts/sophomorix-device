@@ -116,6 +116,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_schoolname
                                  AD_get_name_tokened
                                  AD_get_AD_for_device
+                                 AD_get_full_devicedata
                                  AD_object_search
                                  AD_user_kill
                                  AD_computer_kill
@@ -270,6 +271,8 @@ my %update_computer=(); # device -> count
 my %pxe = qw(ml ok
             );
 
+my $device="";
+
 my %ms_key_ok = ();
 $ms_key_ok{"---"}="ok";
 $ms_key_ok{""}="ok";
@@ -292,6 +295,7 @@ my $testopt=GetOptions(
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
        "password=s" => \$password,
+       "device|d=s" => \$device,
 #       "italc-dir=s" => \$italc_dir,
           );
 
@@ -333,6 +337,7 @@ sophomorix-device adds Devices to the system:
 Options:
   -h   /  --help
   -i   /  --info
+  --info --device <device1>,<device2>,...  detailed view of device
   --list-files              (list processed files and exit)
   -v   /  --verbose
   -vv  /  --verbose --verbose
@@ -706,8 +711,8 @@ if ($print==1){
 # }
 
 
-
-if ($info==1){
+# --info (overview)
+if ($info==1 and $device eq ""){
     my ($ref_devices) = &AD_get_AD_for_device({ldap=>$ldap,
                                                root_dse=>$root_dse,
                                                root_dns=>$root_dns,
@@ -740,6 +745,30 @@ if ($info==1){
     }
     exit;
 }
+
+
+# --info --device <device>
+if ($device ne "" and $info==1){
+    my $ref_devices=&AD_get_full_devicedata({ldap=>$ldap,
+                                             root_dse=>$root_dse,
+                                             root_dns=>$root_dns,
+                                             devicelist=>$device,
+                                             sophomorix_config=>\%sophomorix_config,
+                                            });
+    #print Dumper($ref_devices);
+    my $jsoninfo="DEVICE";
+    my $jsoncomment="One sophomorix device";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $device,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_devices,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
+
 # # ===========================================================================
 # # --info (does not modify system)
 # # ===========================================================================
