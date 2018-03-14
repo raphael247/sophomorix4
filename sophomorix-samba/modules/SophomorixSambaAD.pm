@@ -70,6 +70,7 @@ $Data::Dumper::Terse = 1;
             AD_get_groups_v
             AD_get_shares_v
             AD_get_full_userdata
+            AD_get_full_computerdata
             AD_get_full_groupdata
             AD_get_print_data
             AD_class_fetch
@@ -5920,7 +5921,7 @@ sub AD_get_full_userdata {
     my $root_dns = $arg_ref->{root_dns};
     my $userlist = $arg_ref->{userlist};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-    my @userlist=split(/,/,$userlist);
+    my @userlist=split(/,/,$userlist); # list of parameters, could be 'beck*'
     my $filter;
     my %users=();
 
@@ -5944,7 +5945,10 @@ sub AD_get_full_userdata {
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
+
+        # this is the userlist of all users found, i.e. 'becker,beckerle'
         push @{ $users{'LISTS'}{'USERS'} }, $sam;
+
         $users{'USERS'}{$sam}{'dn'}=$entry->dn();
         $users{'USERS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
         $users{'USERS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
@@ -5998,7 +6002,6 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'userPrincipalName'}=$entry->get_value('userPrincipalName');
         $users{'USERS'}{$sam}{'uSNChanged'}=$entry->get_value('uSNChanged');
         $users{'USERS'}{$sam}{'uSNCreated'}=$entry->get_value('uSNCreated');
-
         # unix
         $users{'USERS'}{$sam}{'uidNumber'}=$entry->get_value('uidNumber');
         $users{'USERS'}{$sam}{'unixHomeDirectory'}=$entry->get_value('unixHomeDirectory');
@@ -6017,14 +6020,15 @@ sub AD_get_full_userdata {
             $users{'USERS'}{$sam}{'PWDFileExists'}=$pwf;
             $users{'USERS'}{$sam}{'PASSWORD'}=$password;
         }
+        
     }
     $users{'COUNTER'}{'TOTAL'}=$max;
     if ($max>0){
         @{ $users{'LISTS'}{'USERS'} } = sort @{ $users{'LISTS'}{'USERS'} };
     }    
 
-    # read logfiles
-    foreach my $user (@userlist){
+    # read logfiles for each user that was found
+    foreach my $user (@{ $users{'LISTS'}{'USERS'} }){
         my $anything_found=0;
         my $log_add=$ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_LOGDIR'}."/".
 	    $ref_sophomorix_config->{'INI'}{'USERLOG'}{'USER_ADD'};
@@ -6093,6 +6097,43 @@ sub AD_get_full_userdata {
     }
     @{ $users{'LISTS'}{'DELETED_USERS'} } = uniq(@{ $users{'LISTS'}{'DELETED_USERS'} });
     return \%users;
+}
+
+
+
+sub AD_get_full_computerdata {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $computerlist = $arg_ref->{computerlist};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my @computerlist=split(/,/,$computerlist);
+    my $filter;
+
+
+    if ($#computerlist==0){
+        $filter="(& (sophomorixRole=*) (sAMAccountName=".$computerlist[0]."))"; 
+    } else {
+        $filter="(& (sophomorixRole=*) (|";
+        foreach my $computer (@computerlist){
+            $filter=$filter." (sAMAccountName=".$computer.")";
+        } 
+        $filter=$filter." ))";
+    }
+    #print "$filter\n";
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                       );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        
+    }
+
 }
 
 
