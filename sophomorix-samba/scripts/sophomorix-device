@@ -20,15 +20,29 @@
 # unused, fuer linuxmuster.net reserviert [0-9a-zA-Z_-.,]
 
 # field 9:
-# permanently unused. sysadmin can use it [0-9a-zA-Z_-.,]
+# sophomorixRole
 # 
 
-# field 10, last bpbatch option: new: account_flag
+# field 10, new: account_flag (history: last bpbatch option) 
 # 0         : device ohne account, mit firewall
 # 1         : device ohne account, ohne firewall
 # 2-6   
 # 
-# 
+
+# field 11:
+# pxe option
+
+# field 12:
+# ???
+
+# field 13:
+# unused
+
+# field 14:
+# unused
+
+# field 15:
+#  sophomorixComment
 
 # sophomorix-device macht
 # - nicht: obsolete accounts und raeume entfernen
@@ -2181,7 +2195,7 @@ sub check_sophomorix_role {
         print "\n";
         print "LINE: $line\n";
         print "  ERROR: >$role< is not a valid role\n";
-        print "     Valid roles for devices are:\n";
+        print "     Valid sophomorixRole for devices are:\n";
         foreach my $keyname (keys %{$sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}} ) {
             print "        $keyname\n";
         }

@@ -4606,20 +4606,10 @@ sub AD_get_AD_for_device {
     # sophomorix computers from ldap
     {
 
-
-
-
-#    my $filter="(&(objectClass=computer)(sophomorixRole=".
-#       $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}."))";
-    my $filter="(&(objectClass=computer)(|(sophomorixRole=".
-        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'SERVER'}.")(sophomorixRole=".
-        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'PRINTER'}.")(sophomorixRole=".
-        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}.")(sophomorixRole=".
-        $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'OTHER'}.")))";
-
-
-
-
+    ### create filter
+    # finds all computer with any string as sophomorixRole
+    my $filter="(& (objectclass=computer) (sophomorixRole=*) )";
+    # print "Filter:  $filter\n";
 
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
@@ -4637,12 +4627,12 @@ sub AD_get_AD_for_device {
                                ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
-    $AD{'RESULT'}{'devices'}{'all'}{'COUNT'}=$max_user;
-    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'SERVER'}}{'COUNT'}=0;
-    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'PRINTER'}}{'COUNT'}=0;
-    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}}{'COUNT'}=0;
-    $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'OTHER'}}{'COUNT'}=0;
-
+    # set total counter
+    $AD{'RESULT'}{'devices'}{'TOTAL'}{'COUNT'}=$max_user;
+    # set role counters to 0, will be upcounted later
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}}) {
+        $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{$keyname}}{'COUNT'}=0;
+    }
 
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
@@ -4909,7 +4899,7 @@ sub AD_get_ui {
                         # this is a known option, which could be processed
                     } elsif ($keyname=~m/^role\./) {
                         my ($key,$role)=split(/\./,$keyname);
-                        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES'}{$role}) {
+                        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'}{$role}) {
                             # OK, role is a correct role
                             if ($ref_ui->{'CONFIG'}{$ui}{$module}{'role.'.$role} eq "TRUE"){
                                 # save the true modules in: ui->module->role=TRUE
@@ -4939,7 +4929,7 @@ sub AD_get_ui {
     foreach my $ui (keys %{ $ref_sophomorix_config->{'INI'}{'UI'} }) {
         # Test if configured school modules are correct (ui is tested already ba scgool.conf.master)
         foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
-            foreach my $role (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'ROLES'} }) {
+            foreach my $role (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'} }) {
                 foreach my $module (@{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$ui}{'MODULE_LIST'} }){
                     if (exists $ref_ui->{'CONFIG'}{$ui}{$module}){
                         # This is an existing ui and an existing module
@@ -8305,7 +8295,10 @@ sub _create_filter_alldevices {
     }
     $role_filter=$role_filter.")";
     my $sam_filter;
-    if ($#{ $ref_devicelist }==0){
+    if ($ref_devicelist eq ""){
+        # no list given
+        $sam_filter="";
+    } elsif ($#{ $ref_devicelist }==0){
         $sam_filter="(sAMAccountName=".${ $ref_devicelist }[0].")"; 
     } else {
         $sam_filter="(|";

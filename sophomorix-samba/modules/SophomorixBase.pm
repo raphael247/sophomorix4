@@ -2462,12 +2462,15 @@ sub config_sophomorix_read {
             # do something
         } elsif ($section eq "HOOKS"){
             # do something
-        } elsif ($section eq "ROLE"){
+        } elsif ($section eq "ROLE_USER"){
             # create LOOKUP for ROLES
             foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE_USER'}}) {
-                $sophomorix_config{'LOOKUP'}{'ROLES'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}=$keyname;
+                $sophomorix_config{'LOOKUP'}{'ROLES_ALL'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}=$keyname;
+                $sophomorix_config{'LOOKUP'}{'ROLES_USER'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}=$keyname;
             }
+        } elsif ($section eq "ROLE_DEVICE"){
             foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE_DEVICE'}}) {
+                $sophomorix_config{'LOOKUP'}{'ROLES_ALL'}{$sophomorix_config{'INI'}{'ROLE_DEVICE'}{$keyname}}=$keyname;
                 $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$sophomorix_config{'INI'}{'ROLE_DEVICE'}{$keyname}}=$keyname;
             }
         } elsif ($section eq "SYNC_MEMBER"){
