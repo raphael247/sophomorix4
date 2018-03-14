@@ -2464,8 +2464,8 @@ sub config_sophomorix_read {
             # do something
         } elsif ($section eq "ROLE"){
             # create LOOKUP for ROLES
-            foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE'}}) {
-                $sophomorix_config{'LOOKUP'}{'ROLES'}{$sophomorix_config{'INI'}{'ROLE'}{$keyname}}=$keyname;
+            foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE_USER'}}) {
+                $sophomorix_config{'LOOKUP'}{'ROLES'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}=$keyname;
             }
             foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE_DEVICE'}}) {
                 $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$sophomorix_config{'INI'}{'ROLE_DEVICE'}{$keyname}}=$keyname;

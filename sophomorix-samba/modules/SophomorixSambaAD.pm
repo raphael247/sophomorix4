@@ -3789,12 +3789,12 @@ sub AD_get_AD {
 
     ##################################################
     if ($users eq "TRUE"){
-        # sophomorix students,teachers from ldap
+        # sophomorix students,teachers, ... from ldap
         my $filter="(&(objectClass=user)(|(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'SCHOOLADMINISTRATOR'}.")))";
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'SCHOOLADMINISTRATOR'}.")))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
@@ -4528,8 +4528,8 @@ sub AD_get_AD_for_check {
        if (defined $entry->get_value('sophomorixRole')){
            $role=$entry->get_value('sophomorixRole');
            $forbidden_warn="$sam forbidden, $sam is a sophomorix user";
-           if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'} or
-               $role eq $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}
+           if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'} or
+               $role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'}
               ){
                # save needed stuff             
                $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
@@ -6604,8 +6604,8 @@ sub AD_get_print_data {
         # sophomorix students,teachers from ldap
         my $filter="(&(objectClass=user)(sophomorixSchoolname=".
            $school.")(|(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'STUDENT'}.")(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE'}{'TEACHER'}.")))";
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'}.")))";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
