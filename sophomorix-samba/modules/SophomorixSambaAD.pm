@@ -4605,6 +4605,10 @@ sub AD_get_AD_for_device {
     ############################################################
     # sophomorix computers from ldap
     {
+
+
+
+
 #    my $filter="(&(objectClass=computer)(sophomorixRole=".
 #       $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}."))";
     my $filter="(&(objectClass=computer)(|(sophomorixRole=".
@@ -4612,6 +4616,11 @@ sub AD_get_AD_for_device {
         $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'PRINTER'}.")(sophomorixRole=".
         $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}.")(sophomorixRole=".
         $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'OTHER'}.")))";
+
+
+
+
+
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
                       scope => 'sub',
@@ -6112,15 +6121,13 @@ sub AD_get_full_devicedata {
     my @devicelist=split(/,/,$devicelist); # list of parameters, could be 'j1010*'
     my %devices=();
 
-    # create filter 
+    ########## create filter (start) ???????????????????????????
     my $objectclass_filter="(objectclass=computer)";
-
     my $role_filter="(|";
     foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}}) {
         $role_filter=$role_filter."(sophomorixRole=".$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{$keyname}.")";
     }
     $role_filter=$role_filter.")";
-
     my $sam_filter;
     if ($#devicelist==0){
         $sam_filter="(sAMAccountName=".$devicelist[0].")"; 
@@ -6131,9 +6138,14 @@ sub AD_get_full_devicedata {
         } 
         $sam_filter=$sam_filter.")";
     }
+    my $filter_old="(& ".$objectclass_filter." ".$role_filter." ".$sam_filter." )";
+    print "Filold: $filter_old\n";
 
-    my $filter="(& ".$objectclass_filter." ".$role_filter." ".$sam_filter." )";
-    #print "$filter\n";
+    ########## create filter (end) ????????????????????
+
+    ### create filter
+    my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config);
+    print "Filter: $filter\n";
 
     # search
     my $mesg = $ldap->search(
@@ -6143,10 +6155,11 @@ sub AD_get_full_devicedata {
                        );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max = $mesg->count;
+    print "HERE: $max entries found\n"; # ????????????????????ß
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-
+        print "HERE2: $sam\n"; # ????????????????????????
         # this is the devicelist of all devices found, i.e. 'j1010p01' 'j1010p01' ... 
         push @{ $devices{'LISTS'}{'DEVICES'} }, $sam;
 
@@ -6194,29 +6207,31 @@ sub AD_get_full_devicedata {
 
         ############################################################
         # searching DNS node
-        my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+#        my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+        my $base="DC=DomainDnsZones,".$root_dse;
         my $filter="(& (objectClass=dnsNode) ".
                    "(cn=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.") ".
                    "(name=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.")".
                    " )";
-        #print "dnsNode filter: $filter\n";
-        #print "dnsNode searchbase: $base\n";
+        print "dnsNode filter: $filter\n";
+        print "dnsNode searchbase: $base\n";
         my $mesg = $ldap->search(
                           base   => $base,
                           scope => 'sub',
                           filter => $filter,
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
-        my $max = $mesg->count;
-        if ($max==1){
-            my $entry = $mesg->entry($index);
+        my $max_dns = $mesg->count;
+        print "HERE3: $max_dns entries found\n"; # ????????????????????ß
+        if ($max_dns==1){
+            my $entry = $mesg->entry(0);
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'cn'}=$entry->get_value('cn');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'name'}=$entry->get_value('name');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'adminDescription'}=$entry->get_value('adminDescription');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dnsRecord'}=$entry->get_value('dnsRecord');
         } else {
-            print "ERROR: $max dnsNodes found\n";
+            print "ERROR: $max_dns dnsNodes found\n";
         }
     }
     $devices{'COUNTER'}{'TOTAL'}=$max;
@@ -8303,6 +8318,31 @@ sub _unipwd_from_plainpwd{
     my $uni_password = $charmap->tou('"'.$sophomorix_first_password.'"')->byteswap()->utf16();
     return $uni_password;
 }
+
+
+
+sub _create_filter_alldevices {
+    my ($ref_devicelist,$ref_sophomorix_config)=@_;
+    my $objectclass_filter="(objectclass=computer)";
+    my $role_filter="(|";
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}}) {
+        $role_filter=$role_filter."(sophomorixRole=".$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{$keyname}.")";
+    }
+    $role_filter=$role_filter.")";
+    my $sam_filter;
+    if ($#{ $ref_devicelist }==0){
+        $sam_filter="(sAMAccountName=".${ $ref_devicelist }[0].")"; 
+    } else {
+        $sam_filter="(|";
+        foreach my $device ( @{ $ref_devicelist } ){
+            $sam_filter=$sam_filter."(sAMAccountName=".$device.")";
+        } 
+        $sam_filter=$sam_filter.")";
+    }
+    $filter="(& ".$objectclass_filter." ".$role_filter." ".$sam_filter." )";
+    return $filter;
+}
+
 
 
 # END OF FILE
