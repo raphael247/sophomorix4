@@ -6157,12 +6157,17 @@ sub AD_get_full_devicedata {
         $devices{'DEVICES'}{$sam}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
         $devices{'DEVICES'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
         $devices{'DEVICES'}{$sam}{'cn'}=$entry->get_value('cn');
+        $devices{'DEVICES'}{$sam}{'name'}=$entry->get_value('name');
         $devices{'DEVICES'}{$sam}{'displayName'}=$entry->get_value('displayName');
         $devices{'DEVICES'}{$sam}{'userAccountControl'}=$entry->get_value('userAccountControl');
+        @{ $devices{'DEVICES'}{$sam}{'servicePrincipalName'} } = sort $entry->get_value('servicePrincipalName');
+
         #$devices{'DEVICES'}{$sam}{'mail'}=$entry->get_value('mail');
         $devices{'DEVICES'}{$sam}{'sophomorixSchoolPrefix'}=$entry->get_value('sophomorixSchoolPrefix');
         $devices{'DEVICES'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
         $devices{'DEVICES'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+        $devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+        $devices{'DEVICES'}{$sam}{'dNSHostName'}=$entry->get_value('dNSHostName');
         @{ $devices{'DEVICES'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');
 
         # samba
@@ -6186,6 +6191,12 @@ sub AD_get_full_devicedata {
         # unix
         $devices{'DEVICES'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
     }
+    $devices{'COUNTER'}{'TOTAL'}=$max;
+    if ($max==0){
+        print "0 devices found in AD\n";
+        print "\n";
+    }
+
 
     # more ?????  dnsNode etc...
 

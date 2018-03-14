@@ -284,6 +284,8 @@ sub json_dump {
             &_console_print_sessions($hash_ref,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "ONESESSION"){
             &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "DEVICE"){
+            &_console_print_device_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "DEVICES"){
             &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "HARDWARECLASSES"){
@@ -1592,6 +1594,98 @@ sub _console_print_user_full {
         } else {
             print "LOGFILES: $ref_users->{'USERS'}{$user}{'HISTORY'}{'ENTRY_COUNT'} Entries\n";
         }
+    }
+}
+
+
+
+
+sub _console_print_device_full {
+    my ($ref_devices,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line1="################################################################################\n";
+    my $line= "--------------------------------------------------------------------------------\n";
+
+    # DEVICES in AD
+    my $device_count=0;
+    foreach my $device (@{ $ref_devices->{'LISTS'}{'DEVICES'} }){
+        $device_count++;
+        print "\n";
+        print $line1;
+        print "Device $device_count/$ref_devices->{'COUNTER'}{'TOTAL'} in AD: ",
+              "$device in school $ref_devices->{'DEVICES'}{$device}{'sophomorixSchoolname'}\n";
+        print "$ref_devices->{'DEVICES'}{$device}{'dn'}\n";
+        print $line1;
+
+        printf "%29s: %-40s\n","sAMAccountName",$ref_devices->{'DEVICES'}{$device}{'sAMAccountName'};
+        printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'cn'};
+        printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'name'};
+        printf "%29s: %-40s\n","displayName",$ref_devices->{'DEVICES'}{$device}{'displayName'};
+        printf "%29s: %-40s\n","sophomorixAdminClass",$ref_devices->{'DEVICES'}{$device}{'sophomorixAdminClass'};
+        printf "%29s: %-40s\n","sophomorixSchoolname",$ref_devices->{'DEVICES'}{$device}{'sophomorixSchoolname'};
+        printf "%29s: %-40s\n","sophomorixAdminFile",$ref_devices->{'DEVICES'}{$device}{'sophomorixAdminFile'};
+        printf "%29s: %-40s\n","sophomorixComment",$ref_devices->{'DEVICES'}{$device}{'sophomorixComment'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",$ref_devices->{'DEVICES'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","dNSHostName",$ref_devices->{'DEVICES'}{$device}{'dNSHostName'};
+        print $line;
+        printf "%29s: %-40s\n","sophomorixRole",$ref_devices->{'DEVICES'}{$device}{'sophomorixRole'};
+        printf "%29s: %-40s\n","sophomorixStatus",$ref_devices->{'DEVICES'}{$device}{'sophomorixStatus'};
+        printf "%29s: %-40s\n","sophomorixCreationDate",$ref_devices->{'DEVICES'}{$device}{'sophomorixCreationDate'};
+        printf "%29s: %-40s\n","userAccountControl",$ref_devices->{'DEVICES'}{$device}{'userAccountControl'};
+        #print $line;
+        #printf "%29s: %-40s\n","mail",$ref_devices->{'DEVICES'}{$device}{'mail'};
+
+        print $line;
+        foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'servicePrincipalName'} } ){
+            printf "%29s: %-40s\n","servicePrincipalName",$item;
+	}
+
+        print $line;
+        foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'memberOf'} } ){
+            print "memberOf: $item\n";
+	}
+
+        # samba stuff:
+        print $line;
+        if ($log_level>=2){
+            printf "%19s: %-50s\n","homeDirectory",$ref_devices->{'DEVICES'}{$device}{'homeDirectory'};
+            printf "%19s: %-50s\n","homeDrive",$ref_devices->{'DEVICES'}{$device}{'homeDrive'};
+
+            printf "%19s: %-50s\n","accountExpires",$ref_devices->{'DEVICES'}{$device}{'accountExpires'};
+            printf "%19s: %-50s\n","badPasswordTime",$ref_devices->{'DEVICES'}{$device}{'badPasswordTime'};
+            printf "%19s: %-50s\n","badPwdCount",$ref_devices->{'DEVICES'}{$device}{'badPwdCount'};
+            printf "%19s: %-50s\n","pwdLastSet",$ref_devices->{'DEVICES'}{$device}{'pwdLastSet'};
+
+            printf "%19s: %-50s\n","lastLogoff",$ref_devices->{'DEVICES'}{$device}{'lastLogoff'};
+            printf "%19s: %-50s\n","lastLogon",$ref_devices->{'DEVICES'}{$device}{'lastLogon'};
+            printf "%19s: %-50s\n","logonCount",$ref_devices->{'DEVICES'}{$device}{'logonCount'};
+
+            if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "17.10"){
+                #my $sid = Net::LDAP::SID->new($ref_devices->{'DEVICES'}{$device}{'objectSid'});
+
+                printf "%19s: %-50s\n","objectSid",$ref_devices->{'DEVICES'}{$device}{'objectSid'};
+                printf "%19s: %-50s\n","objectGUID","(binary)";
+            } else {
+                printf "%19s: %-50s\n","objectSid","(binary)";
+                printf "%19s: %-50s\n","objectGUID","(binary)";
+            }
+
+            printf "%19s: %-50s\n","sAMAccountType",$ref_devices->{'DEVICES'}{$device}{'sAMAccountType'};
+            printf "%19s: %-50s\n","userPrincipalName",$ref_devices->{'DEVICES'}{$device}{'userPrincipalName'};
+
+            printf "%19s: %-50s\n","uSNChanged",$ref_devices->{'DEVICES'}{$device}{'uSNChanged'};
+            printf "%19s: %-50s\n","uSNCreated",$ref_devices->{'DEVICES'}{$device}{'uSNCreated'};
+
+            printf "%19s: %-50s\n","codePage",$ref_devices->{'DEVICES'}{$device}{'codePage'};
+            printf "%19s: %-50s\n","countryCode",$ref_devices->{'DEVICES'}{$device}{'countryCode'};
+	}
+
+        # unix stuff:
+        if ($log_level>=2){
+            printf "%19s: %-50s\n","uidNumber",$ref_devices->{'DEVICES'}{$device}{'uidNumber'};
+            printf "%19s: %-50s\n","unixHomeDirectory",$ref_devices->{'DEVICES'}{$device}{'unixHomeDirectory'};
+            printf "%19s: %-50s\n","primaryGroupID",$ref_devices->{'DEVICES'}{$device}{'primaryGroupID'};
+            print $line;
+	}
     }
 }
 
