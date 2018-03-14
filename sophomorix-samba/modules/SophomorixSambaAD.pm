@@ -6121,31 +6121,9 @@ sub AD_get_full_devicedata {
     my @devicelist=split(/,/,$devicelist); # list of parameters, could be 'j1010*'
     my %devices=();
 
-    ########## create filter (start) ???????????????????????????
-    my $objectclass_filter="(objectclass=computer)";
-    my $role_filter="(|";
-    foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}}) {
-        $role_filter=$role_filter."(sophomorixRole=".$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{$keyname}.")";
-    }
-    $role_filter=$role_filter.")";
-    my $sam_filter;
-    if ($#devicelist==0){
-        $sam_filter="(sAMAccountName=".$devicelist[0].")"; 
-    } else {
-        $sam_filter="(|";
-        foreach my $device (@devicelist){
-            $sam_filter=$sam_filter."(sAMAccountName=".$device.")";
-        } 
-        $sam_filter=$sam_filter.")";
-    }
-    my $filter_old="(& ".$objectclass_filter." ".$role_filter." ".$sam_filter." )";
-    print "Filold: $filter_old\n";
-
-    ########## create filter (end) ????????????????????
-
     ### create filter
     my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config);
-    print "Filter: $filter\n";
+    # print "Filter: $filter\n";
 
     # search
     my $mesg = $ldap->search(
@@ -6155,11 +6133,9 @@ sub AD_get_full_devicedata {
                        );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     my $max = $mesg->count;
-    print "HERE: $max entries found\n"; # ????????????????????ß
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        print "HERE2: $sam\n"; # ????????????????????????
         # this is the devicelist of all devices found, i.e. 'j1010p01' 'j1010p01' ... 
         push @{ $devices{'LISTS'}{'DEVICES'} }, $sam;
 
@@ -6207,14 +6183,14 @@ sub AD_get_full_devicedata {
 
         ############################################################
         # searching DNS node
-#        my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
-        my $base="DC=DomainDnsZones,".$root_dse;
+        my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+        #my $base="DC=DomainDnsZones,".$root_dse;
         my $filter="(& (objectClass=dnsNode) ".
                    "(cn=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.") ".
                    "(name=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.")".
                    " )";
-        print "dnsNode filter: $filter\n";
-        print "dnsNode searchbase: $base\n";
+        # print "dnsNode filter: $filter\n";
+        # print "dnsNode searchbase: $base\n";
         my $mesg = $ldap->search(
                           base   => $base,
                           scope => 'sub',
@@ -6222,7 +6198,6 @@ sub AD_get_full_devicedata {
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         my $max_dns = $mesg->count;
-        print "HERE3: $max_dns entries found\n"; # ????????????????????ß
         if ($max_dns==1){
             my $entry = $mesg->entry(0);
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
