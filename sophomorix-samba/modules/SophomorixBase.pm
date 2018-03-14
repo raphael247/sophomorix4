@@ -1645,10 +1645,9 @@ sub _console_print_device_full {
 	}
 
         # samba stuff:
-        print $line;
         if ($log_level>=2){
-            printf "%19s: %-50s\n","homeDirectory",$ref_devices->{'DEVICES'}{$device}{'homeDirectory'};
-            printf "%19s: %-50s\n","homeDrive",$ref_devices->{'DEVICES'}{$device}{'homeDrive'};
+            #printf "%19s: %-50s\n","homeDirectory",$ref_devices->{'DEVICES'}{$device}{'homeDirectory'};
+            #printf "%19s: %-50s\n","homeDrive",$ref_devices->{'DEVICES'}{$device}{'homeDrive'};
 
             printf "%19s: %-50s\n","accountExpires",$ref_devices->{'DEVICES'}{$device}{'accountExpires'};
             printf "%19s: %-50s\n","badPasswordTime",$ref_devices->{'DEVICES'}{$device}{'badPasswordTime'};
@@ -1670,7 +1669,7 @@ sub _console_print_device_full {
             }
 
             printf "%19s: %-50s\n","sAMAccountType",$ref_devices->{'DEVICES'}{$device}{'sAMAccountType'};
-            printf "%19s: %-50s\n","userPrincipalName",$ref_devices->{'DEVICES'}{$device}{'userPrincipalName'};
+            #printf "%19s: %-50s\n","userPrincipalName",$ref_devices->{'DEVICES'}{$device}{'userPrincipalName'};
 
             printf "%19s: %-50s\n","uSNChanged",$ref_devices->{'DEVICES'}{$device}{'uSNChanged'};
             printf "%19s: %-50s\n","uSNCreated",$ref_devices->{'DEVICES'}{$device}{'uSNCreated'};
@@ -1681,11 +1680,22 @@ sub _console_print_device_full {
 
         # unix stuff:
         if ($log_level>=2){
-            printf "%19s: %-50s\n","uidNumber",$ref_devices->{'DEVICES'}{$device}{'uidNumber'};
-            printf "%19s: %-50s\n","unixHomeDirectory",$ref_devices->{'DEVICES'}{$device}{'unixHomeDirectory'};
+            #printf "%19s: %-50s\n","uidNumber",$ref_devices->{'DEVICES'}{$device}{'uidNumber'};
+            #printf "%19s: %-50s\n","unixHomeDirectory",$ref_devices->{'DEVICES'}{$device}{'unixHomeDirectory'};
             printf "%19s: %-50s\n","primaryGroupID",$ref_devices->{'DEVICES'}{$device}{'primaryGroupID'};
-            print $line;
 	}
+        # dnsNode
+        print $line1;
+        print "dnsNode for $device_count/$ref_devices->{'COUNTER'}{'TOTAL'} in AD: ",
+              "$device in school $ref_devices->{'DEVICES'}{$device}{'sophomorixSchoolname'}\n";
+        print "$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'dn'}\n";
+
+        print $line;
+        printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'cn'};
+        printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'name'};
+        printf "%29s: %-40s\n","adminDescription",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'adminDescription'};
+        printf "%29s: %-40s\n","dnsRecord",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'dnsRecord'};
+        print $line1;
     }
 }
 

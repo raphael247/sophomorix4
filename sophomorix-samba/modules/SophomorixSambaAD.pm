@@ -4634,6 +4634,7 @@ sub AD_get_AD_for_device {
     $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}}{'COUNT'}=0;
     $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'OTHER'}}{'COUNT'}=0;
 
+
     for( my $index = 0 ; $index < $max_user ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
@@ -6190,15 +6191,40 @@ sub AD_get_full_devicedata {
         $devices{'DEVICES'}{$sam}{'uSNCreated'}=$entry->get_value('uSNCreated');
         # unix
         $devices{'DEVICES'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
+
+        ############################################################
+        # searching DNS node
+        my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+        my $filter="(& (objectClass=dnsNode) ".
+                   "(cn=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.") ".
+                   "(name=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.")".
+                   " )";
+        #print "dnsNode filter: $filter\n";
+        #print "dnsNode searchbase: $base\n";
+        my $mesg = $ldap->search(
+                          base   => $base,
+                          scope => 'sub',
+                          filter => $filter,
+                         );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        my $max = $mesg->count;
+        if ($max==1){
+            my $entry = $mesg->entry($index);
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'cn'}=$entry->get_value('cn');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'name'}=$entry->get_value('name');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'adminDescription'}=$entry->get_value('adminDescription');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'dnsRecord'}=$entry->get_value('dnsRecord');
+        } else {
+            print "ERROR: $max dnsNodes found\n";
+        }
     }
     $devices{'COUNTER'}{'TOTAL'}=$max;
     if ($max==0){
         print "0 devices found in AD\n";
         print "\n";
     }
-
-
-    # more ?????  dnsNode etc...
+    # more ?????
 
     return \%devices;
 }
