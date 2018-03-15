@@ -217,15 +217,15 @@ sub AD_object_nonexist {
     my ($ldap,$root_dse,$type,$name) = @_;
     # type: group, user, ...
     # check if object exists
-    # (&(objectclass=user)(cn=pete)
-    # (&(objectclass=group)(cn=7a)
+    # (&(objectClass=user)(cn=pete)
+    # (&(objectClass=group)(cn=7a)
     my $filter;   
     if ($type eq "examaccount"){
-        $filter="(&(objectclass=user) (cn=".$name.") (sAMAccountname=".$name.") )";
+        $filter="(&(objectClass=user) (cn=".$name.") (sAMAccountname=".$name.") )";
     } elsif ($type eq "computer"){
-        $filter="(&(objectclass=computer) (sAMAccountname=".$name.") )";
+        $filter="(&(objectClass=computer) (sAMAccountname=".$name.") )";
     } else {
-        $filter="(&(objectclass=".$type.") (cn=".$name."))";
+        $filter="(&(objectClass=".$type.") (cn=".$name."))";
     } 
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -802,7 +802,7 @@ sub AD_test_object {
             print "  * Login test skipped (Status: $s_status):\n";
             print "    $dn\n";
         } else {
-            print "  * Login test skipped (Objectclass: $objectclass):\n";
+            print "  * Login test skipped (objectClass: $objectclass):\n";
             print "    $dn\n";
         }
 

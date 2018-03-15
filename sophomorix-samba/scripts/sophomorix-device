@@ -956,7 +956,7 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
         if ($devices_file{'computer'}{$device}{'sophomorixRole'} eq $ref_AD_device->{'device'}{$device}{'sophomorixRole'}){
             # no update if equal
         } elsif ($devices_file{'computer'}{$device}{'sophomorixRole'} eq "" and
-                 $ref_AD_device->{'device'}{$device}{'sophomorixRole'} eq $sophomorix_config{'INI'}{'ROLE_DEVICE'}{'OTHER'}
+                 $ref_AD_device->{'device'}{$device}{'sophomorixRole'} eq $sophomorix_config{'INI'}{'GLOBAL'}{'COMPUTERROLE_DEFAULT'}
 	    ){
             # no update, both are on default value
         } else {
@@ -2190,7 +2190,7 @@ sub check_ms_software_key {
 sub check_sophomorix_role {
     my ($role,$line) = @_;
     if ($role eq ""){
-        $role=$sophomorix_config{'INI'}{'ROLE_DEVICE'}{'OTHER'};
+        $role=$sophomorix_config{'INI'}{'GLOBAL'}{'COMPUTERROLE_DEFAULT'};
     } elsif (not exists $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$role}) {
         print "\n";
         print "LINE: $line\n";

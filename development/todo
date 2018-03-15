@@ -52,6 +52,58 @@ sophomorix-user -i -u beckj*
   -> findet dann mehrere user
      Aber nicht deren Logfiles LOGFILES:  Entries
 
+# fix typo
+grep for objectclass -> replace with objectClass
+
+
+# unschöne ausgabe:
+
+----------------------------------------
+# sophomorix-device
+wenn ein Rechner entfernt wird, erscheint unötigerweise:
+
+#### Hardwareclass members to be killed:                                  ####
+KILL: NEXTCLOUD5 from nopxe
+#### Removing member from nopxe:                                          ####
+   * WARNING: User NEXTCLOUD5 nonexisting (0 results)
+
+Reihenfolge anpassen?
+#### Hardwareclass members to be killed:                                  ####
+KILL: NEXTCLOUD6 from nopxe
+
+VOR 
+
+#### Killing 1 computers                                                  ####
+#### Killing computer NEXTCLOUD6$ (1):                                    ####
+   * DN: CN=NEXTCLOUD6,OU=server,OU=Devices,OU=default-school,OU=SCHOOLS,DC=linuxmuster,DC=local
+
+also ganz an den Anfang???
+----------------------------------------
+ Bei wiederanlage eines devices:
+
+#### Creating dnsNode: nextcloud7                                         ####
+   * samba-tool dns add localhost linuxmuster.local nextcloud7 A 172.16.0.22 --password='KYtT64QP9ERT3Y4Y' -U administrator
+       -> Record added successfully
+   * Adding Comments to dnsNode nextcloud7
+   * dnsNode nextcloud7 exists (1 results)
+   * samba-tool dns add localhost 0.16.172.in-addr.arpa 22 PTR nextcloud7  --password='KYtT64QP9ERT3Y4Y' -U administrator
+ERROR(runtime): uncaught exception - (9711, 'WERR_DNS_ERROR_RECORD_ALREADY_EXISTS')
+  File "/usr/lib/python2.7/dist-packages/samba/netcmd/__init__.py", line 176, in _run
+    return self.run(*args, **kwargs)
+  File "/usr/lib/python2.7/dist-packages/samba/netcmd/dns.py", line 1098, in run
+    raise e
+       ->    * dnsNode nextcloud7 (reverse lookup DC=22,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local)
+
+scheint so, als ob der reverse lookup nicht entfernt werden würde
+
+--> Test schreiben für wiederanlage
+
+------------------------------------------------------------
+
+
+
+
+
 
 -j 
 

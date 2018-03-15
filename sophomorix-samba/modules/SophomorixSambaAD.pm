@@ -861,7 +861,7 @@ sub AD_user_kill {
 sub AD_remove_sam_from_sophomorix_attributes {
     my ($ldap,$root_dse,$objectclass,$object)=@_;
     # removes a username/groupname from the listed sophomorix attributes
-    # $objectclass: user,group (Objectclass of the object that will be removed)
+    # $objectclass: user,group (objectClass of the object that will be removed)
     # $object: sAMAccountName of the object that will be removed 
     &Sophomorix::SophomorixBase::print_title("Removing object $object from sophomorix attributes");
     my @attr_list=();
@@ -1214,7 +1214,7 @@ sub AD_computer_create {
                                                         });
     }
 
-    $ldap->add($dn_room,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    $ldap->add($dn_room,attr => ['objectClass' => ['top', 'organizationalUnit']]);
     my $result = $ldap->add( $dn,
                    attr => [
                    sAMAccountName => $smb_name,
@@ -1246,7 +1246,7 @@ sub AD_computer_create {
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
                                      'user','computer' ],
-#                   'objectclass' => \@objectclass,
+#                   'objectClass' => \@objectclass,
                            ]
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
@@ -1644,7 +1644,7 @@ sub AD_user_create {
     }
 
     # make sure $dn_class exists
-    $ldap->add($dn_class,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    $ldap->add($dn_class,attr => ['objectClass' => ['top', 'organizationalUnit']]);
 
     my $user_account_control;
     if (defined $status and $status ne "---"){
@@ -1710,7 +1710,7 @@ sub AD_user_create {
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
                                      'user' ],
-#                   'objectclass' => \@objectclass,
+#                   'objectClass' => \@objectclass,
                            ]
                            );
     my $add_result=&AD_debug_logdump($result,2,(caller(0))[3]);
@@ -2979,7 +2979,7 @@ sub AD_school_create {
     ############################################################
     my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
     my $result1 = $ldap->add($schools_ou,
-                        attr => ['objectclass' => ['top', 'organizationalUnit']]);
+                        attr => ['objectClass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
     ############################################################
     # providing group 'SCHOOLS'
@@ -3005,7 +3005,7 @@ sub AD_school_create {
     # providing the OU=<school>,OU=SCHOOLS for schools
     ############################################################
     my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
-                        attr => ['objectclass' => ['top', 'organizationalUnit']]);
+                        attr => ['objectClass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
     ############################################################
     # providing group <schoolname>
@@ -3043,7 +3043,7 @@ sub AD_school_create {
         my $sub_ou=$ref_sub_ou; # make copy to not modify the hash 
         $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
         print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
-        my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        my $result = $ldap->add($dn,attr => ['objectClass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
@@ -3070,7 +3070,7 @@ sub AD_school_create {
     # providing OU=GLOBAL
     ############################################################
     my $result3 = $ldap->add($ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP},
-                        attr => ['objectclass' => ['top', 'organizationalUnit']]);
+                        attr => ['objectClass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result3,2,(caller(0))[3]);
     ############################################################
     # sub ou's for OU=GLOBAL    
@@ -3080,7 +3080,7 @@ sub AD_school_create {
     foreach my $sub_ou (@{ $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SUB_OU'} } ){
         $dn=$sub_ou.",".$ref_sophomorix_config->{$DevelConf::AD_global_ou}{OU_TOP};
         print "      * DN: $dn\n";
-        my $result = $ldap->add($dn,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        my $result = $ldap->add($dn,attr => ['objectClass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($result,2,(caller(0))[3]);
     }
 
@@ -3200,23 +3200,23 @@ sub AD_create_school_groups {
 sub AD_object_search {
     my ($ldap,$root_dse,$objectclass,$name) = @_;
     # returns 0,"" or 1,"dn of object"
-    # objectclass: group, user, ...
+    # objectClass: group, user, ...
     # check if object exists
-    # (&(objectclass=user)(cn=pete)
-    # (&(objectclass=group)(cn=7a)
+    # (&(objectClass=user)(cn=pete)
+    # (&(objectClass=group)(cn=7a)
     my $filter;
     my $base;
     if ($objectclass eq "dnsNode" or $objectclass eq "dnsZone"){
         # searching dnsNode
         $base="DC=DomainDnsZones,".$root_dse;
-        $filter="(&(objectclass=".$objectclass.") (name=".$name."))"; 
+        $filter="(&(objectClass=".$objectclass.") (name=".$name."))"; 
     } elsif  ($objectclass eq "all"){
         # find all 
         $base=$root_dse;
         $filter="(cn=".$name.")"; 
     } else {
         $base=$root_dse;
-        $filter="(&(objectclass=".$objectclass.") (cn=".$name."))"; 
+        $filter="(&(objectClass=".$objectclass.") (cn=".$name."))"; 
     }
 
     my $mesg = $ldap->search(
@@ -3986,8 +3986,8 @@ sub AD_get_AD {
     ##################################################
     if ($computers eq "TRUE"){
         # sophomorix computers from ldap
-        my $filter="(&(objectClass=computer)(sophomorixRole=".
-           $ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{'COMPUTER'}."))";
+        my $filter="(& (objectClass=computer)(sophomorixRole=*) )";
+        print "Fixlter: $filter\n";
         my $mesg = $ldap->search( # perform a search
                           base   => $root_dse,
                           scope => 'sub',
@@ -4608,7 +4608,7 @@ sub AD_get_AD_for_device {
 
     ### create filter
     # finds all computer with any string as sophomorixRole
-    my $filter="(& (objectclass=computer) (sophomorixRole=*) )";
+    my $filter="(& (objectClass=computer) (sophomorixRole=*) )";
     # print "Filter:  $filter\n";
 
     my $mesg = $ldap->search( # perform a search
@@ -4630,8 +4630,8 @@ sub AD_get_AD_for_device {
     # set total counter
     $AD{'RESULT'}{'devices'}{'TOTAL'}{'COUNT'}=$max_user;
     # set role counters to 0, will be upcounted later
-    foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}}) {
-        $AD{'RESULT'}{'devices'}{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{$keyname}}{'COUNT'}=0;
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}}) {
+        $AD{'RESULT'}{'devices'}{$keyname}{'COUNT'}=0;
     }
 
     for( my $index = 0 ; $index < $max_user ; $index++) {
@@ -6007,7 +6007,7 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'unixHomeDirectory'}=$entry->get_value('unixHomeDirectory');
         $users{'USERS'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
         # password from file
-        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ALLADMINS'}{$entry->get_value('sophomorixRole')}){
+        if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES_ALLADMINS'}{$entry->get_value('sophomorixRole')}){
             # check for password file
             my $pwf="FALSE";
             my $password="Password was not saved on the server!";
@@ -6233,7 +6233,7 @@ sub AD_get_groups_v {
     ############################################################
     # create lookup dn -> role
     ############################################################
-    my $user_filter="(objectclass=user)"; 
+    my $user_filter="(objectClass=user)"; 
     # print "Filter: $user_filter\n";
     my $mesg0 = $ldap->search(
                       base   => $root_dse,
@@ -6253,7 +6253,7 @@ sub AD_get_groups_v {
     ##################################################
     # search for all sophomorix groups
     # Setting the filters
-    my $filter="(objectclass=group)"; 
+    my $filter="(objectClass=group)"; 
     # print "Filter: $filter\n";
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -6405,7 +6405,7 @@ sub AD_get_users_v {
                 "(sophomorixRole=schooladministrator) ".
                 "(sophomorixRole=globaladministrator)) )";
     } else {
-        $filter="( |(objectclass=user) (objectclass=computer) )"; 
+        $filter="( |(objectClass=user) (objectClass=computer) )"; 
     }
     # print "Filter: $filter\n";
     my $mesg = $ldap->search(
@@ -6452,7 +6452,7 @@ sub AD_get_users_v {
             $users{'USERS'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
             push @{ $users{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
             # if its an administrator
-            if (exists $ref_sophomorix_config->{'LOOKUP'}{'ALLADMINS'}{$role}){
+            if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES_ALLADMINS'}{$role}){
                 # check for password file
                 my $pwf="FALSE";
                 my $pwd_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'SECRET_PWD'}."/".$sam;
@@ -7188,7 +7188,7 @@ sub AD_object_move {
     print "   * Target: $target_branch\n";
 
     # create target branch
-    my $result = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    my $result = $ldap->add($target_branch,attr => ['objectClass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result,2,(caller(0))[3]);
     # move object
     $result = $ldap->moddn ( $dn,
@@ -7279,7 +7279,7 @@ sub AD_group_create {
         print "   School:          $school\n";
 
         # make sure target ou exists
-        my $target = $ldap->add($target_branch,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+        my $target = $ldap->add($target_branch,attr => ['objectClass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
 	if ($type eq "project"){
@@ -7802,7 +7802,7 @@ sub AD_examuser_create {
                     ",OU=".$school_AD.",OU=SCHOOLS,".$root_dse;
     }
 
-    $ldap->add($dn_session,attr => ['objectclass' => ['top', 'organizationalUnit']]);
+    $ldap->add($dn_session,attr => ['objectClass' => ['top', 'organizationalUnit']]);
     my $dn="CN=".$examuser.",".$dn_session;
 
     my $file="---";
@@ -8142,7 +8142,7 @@ sub next_free_uidnumber_get {
     my $count=1;
     until ($count==0){
         #print "   * Testing uidNumber <$uidnumber_prop>\n";
-        my $filter="(&(objectclass=user) (uidNumber=".$uidnumber_prop."))"; 
+        my $filter="(&(objectClass=user) (uidNumber=".$uidnumber_prop."))"; 
         #print "      * Filter: $filter\n";
         my $mesg = $ldap->search(
                           base   => $root_dse,
@@ -8191,7 +8191,7 @@ sub next_free_gidnumber_get {
     my $count=1;
     until ($count==0){
         #print "   * Testing gidNumber <$gidnumber_prop>\n";
-        my $filter="(&(objectclass=user) (gidnumber=".$gidnumber_prop."))"; 
+        my $filter="(&(objectClass=user) (gidnumber=".$gidnumber_prop."))"; 
         #print "      * Filter: $filter\n";
            my $mesg = $ldap->search(
                           base   => $root_dse,
@@ -8288,10 +8288,10 @@ sub _unipwd_from_plainpwd{
 
 sub _create_filter_alldevices {
     my ($ref_devicelist,$ref_sophomorix_config)=@_;
-    my $objectclass_filter="(objectclass=computer)";
+    my $objectclass_filter="(objectClass=computer)";
     my $role_filter="(|";
-    foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}}) {
-        $role_filter=$role_filter."(sophomorixRole=".$ref_sophomorix_config->{'INI'}{'ROLE_DEVICE'}{$keyname}.")";
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}}) {
+        $role_filter=$role_filter."(sophomorixRole=".$keyname.")";
     }
     $role_filter=$role_filter.")";
     my $sam_filter;

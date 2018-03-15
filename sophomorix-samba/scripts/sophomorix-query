@@ -379,7 +379,7 @@ my $single_user_attrs=[
     ];
 my $multi_user_attrs=[
       'sophomorixQuota',
-      'objectclass',
+      'objectClass',
     ];
 ### override the user defaults
 if (defined $options{'user-minimal'}){
@@ -612,7 +612,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
     my $search_object_used;
     if ($search_object eq "all"){
         # find out what is searched for
-        my @objectclass=$entry->get_value('objectclass');
+        my @objectclass=$entry->get_value('objectClass');
         foreach my $oc (@objectclass){
             if ($oc eq "user"){
                 $search_object_used="user";
@@ -650,9 +650,9 @@ for( my $index = 0 ; $index < $max ; $index++) {
     # read multi value attributes into %search
     foreach my $attribute ( @{ $multi_attrs } ){
         if ($attribute eq "member" or 
-            $attribute eq "objectclass"){
+            $attribute eq "objectClass"){
             # member is not needed at group, only to find members 
-            # objectclass is onlx needed to decide which object has to be displayed
+            # objectClass is onlx needed to decide which object has to be displayed
             next;
         }
         @{ $search{$top_key}{$sam}{$attribute} }=$entry->get_value($attribute);
@@ -778,29 +778,29 @@ sub setup_json_return {
     if ($search_object eq "user"){
         $top_key="USER";
         $top_count_key="USERCOUNT";
-        $objectclass_filter="(objectclass=user)";
+        $objectclass_filter="(objectClass=user)";
         $single_attrs=$single_user_attrs;
         $multi_attrs=$multi_user_attrs;
     } elsif ($search_object eq "group"){
         $top_key="GROUP";
         $top_count_key="GROUPCOUNT";
-        $objectclass_filter="(objectclass=group)";
+        $objectclass_filter="(objectClass=group)";
         $single_attrs=$single_group_attrs;
         $multi_attrs=$multi_group_attrs;
     } elsif ($search_object eq "room"){
         $top_key="ROOM";
         $top_count_key="ROOMCOUNT";
-        $objectclass_filter="(objectclass=group)";
+        $objectclass_filter="(objectClass=group)";
         $single_attrs=$single_group_attrs;
         $multi_attrs=$multi_group_attrs;
     } elsif ($search_object eq "computer"){
         $top_key="COMPUTER";
         $top_count_key="COMPUTERCOUNT";
-        $objectclass_filter="(objectclass=computer)";
+        $objectclass_filter="(objectClass=computer)";
         $single_attrs=$single_comp_attrs;
         $multi_attrs=$multi_comp_attrs;
     } elsif ($search_object eq "all"){
-        # no objectclass filter
+        # no objectClass filter
         # this is the default
         $top_key="ALL";
         $top_count_key="ALLCOUNT";
@@ -811,7 +811,7 @@ sub setup_json_return {
           'sophomorixType',
         ];
         $multi_attrs=[
-          'objectclass',
+          'objectClass',
         ];
     }
     return ($top_key,$top_count_key,$objectclass_filter,$single_attrs,$multi_attrs);
