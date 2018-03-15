@@ -409,11 +409,11 @@ sub _console_print_onesession {
 
 sub _console_print_devices {
     my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
-    my $line ="+---------------+---------------+----------------+-----------+-----------------+\n";
+    my $line ="+----+---------------+---------------+----------------+-----------+-----------------+\n";
     #if($log_level==1 and $object_name eq ""){
         # one device per line
         print $line;
-        print "| DNS Node      | IPv4          | Device         | Room      | MAC             |\n";
+        print "|Role| DNS-Node      | IPv4          | Device         | Room      | MAC             |\n";
         print $line;
         foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
             my $device;
@@ -429,15 +429,56 @@ sub _console_print_devices {
                 $adminclass="---";
             }
 
-            printf "|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
+            # sophomorixRole and sophomorixComment
+            my $role_short;
+            if (not exists $ref_devices->{'device'}{$device}{'sophomorixRole'}){
+                $role_short="---";
+            } else {
+                $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$ref_devices->{'device'}{$device}{'sophomorixRole'}};
+            }
+            my $comment;
+            if ( not exists $ref_devices->{'device'}{$device}{'sophomorixComment'} ){ 
+		$comment=" ";
+            } elsif ( $ref_devices->{'device'}{$device}{'sophomorixComment'} eq "---" ){
+		$comment="-";
+            } else {
+		$comment="#";
+            }
+            my $role_display=$comment.$role_short;
+
+            printf "|%-4s|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
+                   $role_display,
                    $dns_node,
                    $ref_devices->{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
                    $device,
                    $adminclass,
                    "not in AD";
-            #print "$dns_node\n";
         }
         print $line;
+        print "    /-/#: sophomorixComment nonexisting/---/existing\n";
+
+        # showing help
+        my @role_help=();
+        foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
+            push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
+        }
+        @role_help = sort @role_help;
+
+        my $count=0;
+        foreach my $item (@role_help){
+            if ( int($count/2)*2==$count){
+                #print "even $count\n";
+		if (defined $role_help[$count+1]){
+		    printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
+                } else {
+                    # last element
+		    printf "   %-34s %-34s \n",$role_help[$count],"";
+                }
+            } else {
+                #print "odd  $count\n";
+	    }
+            $count++;
+        }
     #}
 }
 
@@ -445,9 +486,14 @@ sub _console_print_devices {
 
 sub _console_print_hardwareclasses {
     my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
+    my $line ="+-------------------+---------------------------------------------------------------+\n";
+    print $line;
+    print     "| Hardwareclass     |                                                               |\n";
+    print $line;
         foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-            print "   * HWK: $hwk exists in AD\n";
+            printf "| %-18s| %-62s|\n",$hwk,"";
         }
+    print $line;
 }
 
 
