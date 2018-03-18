@@ -52,7 +52,6 @@ if ($option ne ""){
 }
 
 
-
 if ($script eq "r"){
     &reset_smb();
 } elsif ($script eq "all"){
@@ -98,6 +97,7 @@ foreach my $script (@scriptlist){
 }
 
 
+
 # typeout
 foreach my $script (@scriptlist){
     my (@parts)=split(/ /,$script);
@@ -114,6 +114,7 @@ foreach my $script (@scriptlist){
     &printline();
     print "\n";
 }
+
 
 
 sub reset_smb {
@@ -144,7 +145,8 @@ sub reset_smb {
     system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv");
     system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv.orig");
-    system("sophomorix-samba --restore-samba ohne-user");
+#    system("sophomorix-samba --restore-samba ohne-user");
+    system("sophomorix-samba --restore-samba without-sophomorix-schema");
     system("sophomorix-samba --schema-load");
 #    system("sophomorix-samba --restore-samba ohne-user");
     system("rm -rf /srv/samba");
@@ -156,6 +158,8 @@ sub reset_smb {
     print "... done resetting samba for test\n";
     &printline();
 }
+
+
 
 sub printline {
     print "######################################################################\n";

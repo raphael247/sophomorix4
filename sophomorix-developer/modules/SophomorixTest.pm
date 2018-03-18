@@ -6,7 +6,7 @@
 
 package Sophomorix::SophomorixTest;
 require Exporter;
-#use File::Basename;
+use File::Basename;
 use Unicode::Map8;
 use Unicode::String qw(utf16);
 use Net::LDAP;
@@ -970,6 +970,14 @@ sub directory_tree_test {
     my $string=`find $finddir`;
     my @dirs=split(/\n/,$string);
     foreach my $dir (@dirs){
+        my $filename = basename($dir);
+        if ($filename eq "aquota.user" or
+            $filename eq "aquota.group" or
+            $filename eq "lost+found"
+	    ){
+            print "Skipping test for file $filename\n";
+            next;
+        }
         $dir_hash{$dir}="seen";
 	#print "<$dir>\n";
     }
@@ -977,6 +985,7 @@ sub directory_tree_test {
     foreach my $dir (@dirlist){
         # remember in list
         push @{ $ref_fs_test_result->{'directory_tree_test'} }, $dir;
+
         # remember in hash
         if (exists $ref_fs_test_result->{'directory_tree_test_lookup'}{$dir}){
             print "\nERROR: $dir tested twice (Fix your &directory_tree_test)\n\n";
@@ -1000,7 +1009,6 @@ sub directory_tree_test {
     @untested = sort @untested;
     foreach my $dir (@untested){
         is (0,1, "* Existing, but not tested: $dir");
-        #print "$dir\n";
     } 
 }
 
