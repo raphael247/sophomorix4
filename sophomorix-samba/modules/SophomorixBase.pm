@@ -408,6 +408,7 @@ sub _console_print_onesession {
 sub _console_print_devices {
     my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
     my $line ="+----+---------------+---------------+----------------+-----------+-----------------+\n";
+    my $line2="+--------------------+--------------------------------------------------------------+\n";
     #if($log_level==1 and $object_name eq ""){
         # one device per line
         print $line;
@@ -478,14 +479,13 @@ sub _console_print_devices {
             $count++;
         }
     #}
-    my $line ="+-------------------+---------------------------------------------------------------+\n";
-    print $line;
-    print     "| Hardwareclass     |                                                               |\n";
-    print $line;
+    print $line2;
+    print     "| Hardwareclass      |                                                              |\n";
+    print $line2;
         foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-            printf "| %-18s| %-62s|\n",$hwk,"";
+            printf "| %-19s| %-61s|\n",$hwk,"";
         }
-    print $line;
+    print $line2;
 
 
 }

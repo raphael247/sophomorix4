@@ -4639,7 +4639,7 @@ sub AD_get_AD_for_device {
             my $role=$entry->get_value('sophomorixRole');
             my $sn=$entry->get_value('sophomorixSchoolname');
             my $file=$entry->get_value('sophomorixAdminFile');
-            $AD{'device'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+            $AD{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
 
             $AD{'device'}{$sam}{'sophomorixRole'}=$role;
             # increase role counter 
