@@ -4604,71 +4604,69 @@ sub AD_get_AD_for_device {
     &Sophomorix::SophomorixBase::print_title("Query AD for device (start)");
     ############################################################
     # sophomorix computers from ldap
-    {
+    { # BLOCK computer start
+        ### create filter
+        # finds all computer with any string as sophomorixRole
+        my $filter="(& (objectClass=computer) (sophomorixRole=*) )";
+        # print "Filter:  $filter\n";
 
-    ### create filter
-    # finds all computer with any string as sophomorixRole
-    my $filter="(& (objectClass=computer) (sophomorixRole=*) )";
-    # print "Filter:  $filter\n";
+        my $mesg = $ldap->search( # perform a search
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attrs => ['sAMAccountName',
+                                    'sophomorixSchoolPrefix',
+                                    'sophomorixSchoolname',
+                                    'sophomorixAdminFile',
+                                    'sophomorixAdminClass',
+                                    'sophomorixRole',
+                                    'sophomorixDnsNodename',
+                                    'comment',
+                                    'sophomorixComment',
+                                   ]);
+        my $max_computer = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_computer Computers found in AD");
+        # set total counter
+        $AD{'RESULT'}{'computer'}{'TOTAL'}{'COUNT'}=$max_computer;
+        # set role counters to 0, will be upcounted later
+        foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}}) {
+            $AD{'RESULT'}{'computer'}{$keyname}{'COUNT'}=0;
+        }
+        for( my $index = 0 ; $index < $max_computer ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $prefix=$entry->get_value('sophomorixSchoolPrefix');
+            my $role=$entry->get_value('sophomorixRole');
+            my $sn=$entry->get_value('sophomorixSchoolname');
+            my $file=$entry->get_value('sophomorixAdminFile');
+            $AD{'device'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
 
-    my $mesg = $ldap->search( # perform a search
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attrs => ['sAMAccountName',
-                                'sophomorixSchoolPrefix',
-                                'sophomorixSchoolname',
-                                'sophomorixAdminFile',
-                                'sophomorixAdminClass',
-                                'sophomorixRole',
-                                'sophomorixDnsNodename',
-                                'comment',
-                                'sophomorixComment',
-                               ]);
-    my $max_computer = $mesg->count; 
-    &Sophomorix::SophomorixBase::print_title("$max_computer Computers found in AD");
-    # set total counter
-    $AD{'RESULT'}{'computer'}{'TOTAL'}{'COUNT'}=$max_computer;
-    # set role counters to 0, will be upcounted later
-    foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}}) {
-        $AD{'RESULT'}{'computer'}{$keyname}{'COUNT'}=0;
-    }
+            $AD{'device'}{$sam}{'sophomorixRole'}=$role;
+            # increase role counter 
+            $AD{'RESULT'}{'computer'}{$role}{'COUNT'}++;
 
-    for( my $index = 0 ; $index < $max_computer ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
-        my $prefix=$entry->get_value('sophomorixSchoolPrefix');
-        my $role=$entry->get_value('sophomorixRole');
-        my $sn=$entry->get_value('sophomorixSchoolname');
-        my $file=$entry->get_value('sophomorixAdminFile');
-        $AD{'device'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+            $AD{'device'}{$sam}{'sophomorixSchoolname'}=$sn;
+            $AD{'device'}{$sam}{'sophomorixAdminFile'}=$file;
+            $AD{'device'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+            $AD{'device'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+            $AD{'device'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+            $AD{'device'}{$sam}{'comment'}=$entry->get_value('comment');
+            # lists
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
 
-        $AD{'device'}{$sam}{'sophomorixRole'}=$role;
-        # increase role counter 
-        $AD{'RESULT'}{'computer'}{$role}{'COUNT'}++;
+            #$AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
+            $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
 
-        $AD{'device'}{$sam}{'sophomorixSchoolname'}=$sn;
-        $AD{'device'}{$sam}{'sophomorixAdminFile'}=$file;
-        $AD{'device'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
-        $AD{'device'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
-        $AD{'device'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
-        $AD{'device'}{$sam}{'comment'}=$entry->get_value('comment');
-        # lists
-        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
-        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
-
-        #$AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
-        $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
-
-        #my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
-        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
-        #           {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
-        #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, $sam;  
-    }
-    }
+            #my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
+            #           {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, $sam;  
+        }
+    }  # BLOCK computer end
     ############################################################
     # sophomorix rooms/hardwareclasses from ldap
-    {
+    { # BLOCK group start
         my $filter="(& (objectClass=group) (| ".
                    "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}.") ".
                    "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}.") ".
@@ -4721,11 +4719,11 @@ sub AD_get_AD_for_device {
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
             #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
         }
-    }
+    } # BLOCK group end
 
     ############################################################
     # sophomorix dnzones and default Zone from ldap from ldap
-    {
+    { # BLOCK dnsZone start
         my $filter="(objectClass=dnsZone)";
         my $base="DC=DomainDnsZones,".$root_dse;
         $mesg = $ldap->search( # perform a search
@@ -4769,11 +4767,11 @@ sub AD_get_AD_for_device {
         }
         #$AD{'RESULT'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
         #$AD{'RESULT'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
-    }
+    } # BLOCK dnsZone end
 
     ############################################################
     # sophomorix dnsNodes from ldap
-    {
+    { # BLOCK dnsNode start
         # alle NODES suchen
         my $res   = Net::DNS::Resolver->new;
         my $filter="(&(objectClass=dnsNode)(adminDescription=".
@@ -4817,7 +4815,7 @@ sub AD_get_AD_for_device {
                 #print "ELSE: $desc $ip\n";
             }
         }
-    }
+    } # BLOCK dnsNode end
     &Sophomorix::SophomorixBase::print_title("Query AD for device (end)");
     return(\%AD);
 }
