@@ -745,18 +745,6 @@ if ($info==1 and $device eq ""){
                     sophomorix_config => \%sophomorix_config,
                    });
     }
-    {
-        my $jsoninfo="HARDWARECLASSES";
-        my $jsoncomment="The sophomorix hardwareclasses";
-        &json_dump({json => $json,
-                    jsoninfo => $jsoninfo,
-                    jsoncomment => $jsoncomment,
-                    object_name => "",
-                    log_level => $Conf::log_level,
-                    hash_ref => $ref_devices,
-                    sophomorix_config => \%sophomorix_config,
-                  });
-    }
     exit;
 }
 

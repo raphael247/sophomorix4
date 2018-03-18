@@ -288,8 +288,6 @@ sub json_dump {
             &_console_print_device_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "DEVICES"){
             &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
-        } elsif ($jsoninfo eq "HARDWARECLASSES"){
-            &_console_print_hardwareclasses($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "ADMINS_V"){
             &_console_print_admins_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "USERS_V"){
@@ -480,12 +478,6 @@ sub _console_print_devices {
             $count++;
         }
     #}
-}
-
-
-
-sub _console_print_hardwareclasses {
-    my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
     my $line ="+-------------------+---------------------------------------------------------------+\n";
     print $line;
     print     "| Hardwareclass     |                                                               |\n";
@@ -494,6 +486,8 @@ sub _console_print_hardwareclasses {
             printf "| %-18s| %-62s|\n",$hwk,"";
         }
     print $line;
+
+
 }
 
 
