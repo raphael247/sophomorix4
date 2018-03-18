@@ -4641,16 +4641,16 @@ sub AD_get_AD_for_device {
             my $file=$entry->get_value('sophomorixAdminFile');
             $AD{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
 
-            $AD{'device'}{$sam}{'sophomorixRole'}=$role;
+            $AD{'computer'}{$sam}{'sophomorixRole'}=$role;
             # increase role counter 
             $AD{'RESULT'}{'computer'}{$role}{'COUNT'}++;
 
-            $AD{'device'}{$sam}{'sophomorixSchoolname'}=$sn;
-            $AD{'device'}{$sam}{'sophomorixAdminFile'}=$file;
-            $AD{'device'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
-            $AD{'device'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
-            $AD{'device'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
-            $AD{'device'}{$sam}{'comment'}=$entry->get_value('comment');
+            $AD{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
+            $AD{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+            $AD{'computer'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+            $AD{'computer'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+            $AD{'computer'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+            $AD{'computer'}{$sam}{'comment'}=$entry->get_value('comment');
             # lists
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 

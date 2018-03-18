@@ -907,7 +907,7 @@ foreach my $room (keys %{$ref_AD_device->{'room'}}) {
 
 
 # computers to kill
-foreach my $device (keys %{$ref_AD_device->{'device'}}) {
+foreach my $device (keys %{$ref_AD_device->{'computer'}}) {
     if (not exists $devices_file{'computer'}{$device}){
         # host is not in file anymore
         &push_kill_computer($device);
@@ -918,7 +918,7 @@ foreach my $device (keys %{$ref_AD_device->{'device'}}) {
 
 # computers to add
 foreach my $device (keys %{$devices_file{'computer'}}) {
-    if (not exists $ref_AD_device->{'device'}{$device} ){
+    if (not exists $ref_AD_device->{'computer'}{$device} ){
         # nonexisting --> add account
         &push_add_computer($device);
         #&push_update_computer($device); # update ????
@@ -929,22 +929,22 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
 
 # computers to update
 foreach my $device (keys %{$devices_file{'computer'}}) {
-    if (exists $ref_AD_device->{'device'}{$device} ){
+    if (exists $ref_AD_device->{'computer'}{$device} ){
         my $update=0;
         # update
         if($Conf::log_level>=3){
             print "\n"; 
             print "Test for update $device\n";
             print "Files  9: $devices_file{'computer'}{$device}{'sophomorixRole'}\n";
-            print "AD     9: $ref_AD_device->{'device'}{$device}{'sophomorixRole'}\n";
+            print "AD     9: $ref_AD_device->{'compter'}{$device}{'sophomorixRole'}\n";
             print "Files 15: $devices_file{'computer'}{$device}{'sophomorixComment'}\n";
-            print "AD    15: $ref_AD_device->{'device'}{$device}{'sophomorixComment'}\n";
+            print "AD    15: $ref_AD_device->{'computer'}{$device}{'sophomorixComment'}\n";
         }
         # sophomorixRole
-        if ($devices_file{'computer'}{$device}{'sophomorixRole'} eq $ref_AD_device->{'device'}{$device}{'sophomorixRole'}){
+        if ($devices_file{'computer'}{$device}{'sophomorixRole'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixRole'}){
             # no update if equal
         } elsif ($devices_file{'computer'}{$device}{'sophomorixRole'} eq "" and
-                 $ref_AD_device->{'device'}{$device}{'sophomorixRole'} eq $sophomorix_config{'INI'}{'GLOBAL'}{'COMPUTERROLE_DEFAULT'}
+                 $ref_AD_device->{'computer'}{$device}{'sophomorixRole'} eq $sophomorix_config{'INI'}{'GLOBAL'}{'COMPUTERROLE_DEFAULT'}
 	    ){
             # no update, both are on default value
         } else {
@@ -953,10 +953,10 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
         }
 
         # sophomorixComment
-        if ($devices_file{'computer'}{$device}{'sophomorixComment'} eq $ref_AD_device->{'device'}{$device}{'sophomorixComment'}){
+        if ($devices_file{'computer'}{$device}{'sophomorixComment'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComment'}){
             # no update if equal
         } elsif ($devices_file{'computer'}{$device}{'sophomorixComment'} eq "" and
-                 $ref_AD_device->{'device'}{$device}{'sophomorixComment'} eq "---"
+                 $ref_AD_device->{'computer'}{$device}{'sophomorixComment'} eq "---"
 	    ){
             # no update, both are on default value
         } else {
@@ -1649,7 +1649,7 @@ if ($set_computer_passwords==1){
     #          });
     my $count=1;
 
-    foreach my $comp (keys %{$ref_AD_device->{'device'}}) {
+    foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
         my $pw;
         if ($password ne ""){
             # password by option
