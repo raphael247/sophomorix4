@@ -1903,7 +1903,7 @@ sub analyze_device_line {
         $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line);
         $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
 
-        $sophomorix_role=&check_sophomorix_role($sophomorix_role,$line);
+        $sophomorix_role=&check_sophomorix_role($sophomorix_role,$line,$filename);
 
 
         $account_flag=&check_account_flag($account_flag,$line);
@@ -1998,7 +1998,7 @@ sub analyze_device_line {
 
 
 sub check_room {
-    my ($room,$line) = @_;
+    my ($room,$line,$filename) = @_;
     if($Conf::log_level>=3){
         print "   ROOM:    $room\n";
     }
@@ -2006,7 +2006,7 @@ sub check_room {
     if ( $room=~/[^A-Za-z0-9\-]/ ) {
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: $room contains invalid characters\n\n";
+        print "  ERROR: $room contains invalid characters in $filename\n\n";
         exit 88;
     } else {
 
@@ -2017,7 +2017,7 @@ sub check_room {
 
 
 sub check_host {
-    my ($host,$line) = @_;
+    my ($host,$line,$filename) = @_;
     if($Conf::log_level>=3){
         print "   HOST:    $host\n";
     }
@@ -2025,7 +2025,7 @@ sub check_host {
     if ( $host=~/[^A-Za-z0-9\-]/ ) {
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: $host contains invalid characters\n\n";
+        print "  ERROR: $host contains invalid characters in $filename\n\n";
         exit 88;
     } else {
         $host=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
@@ -2038,7 +2038,7 @@ sub check_host {
 
 
 sub check_hwk {
-    my ($hwk,$line) = @_;
+    my ($hwk,$line,$filename) = @_;
     if($Conf::log_level>=3){
         print "   HWK:     $hwk\n";
     }
@@ -2046,7 +2046,7 @@ sub check_hwk {
     if ( $hwk=~/[^A-Za-z0-9\-_]/ ) {
         print "\n";
         print "LINE: $line\n";
-        print "ERROR: $hwk contains invalid characters\n\n";
+        print "ERROR: $hwk contains invalid characters in $filename\n\n";
         exit 88;
     } else {
 
@@ -2057,7 +2057,7 @@ sub check_hwk {
 
 
 sub check_mac {
-    my ($old_mac,$line) = @_;
+    my ($old_mac,$line,$filename) = @_;
     if($Conf::log_level>=3){
        print "   MAC:     $old_mac\n";
     }
@@ -2077,7 +2077,7 @@ sub check_mac {
     if (exists $mac_seen{$new_mac}){
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: MAC >$new_mac< is double!\n\n";
+        print "  ERROR: MAC >$new_mac< is double in $filename!\n\n";
         exit 88;
     } else {
         $mac_seen{$new_mac}="seen";
@@ -2092,7 +2092,7 @@ sub check_mac {
 
 
 sub check_ip {
-    my ($ip,$line) = @_;
+    my ($ip,$line,$filename) = @_;
     if($Conf::log_level>=3){
         print "   IP:      $ip";
     }
@@ -2104,7 +2104,7 @@ sub check_ip {
     if ($dots_in_string!=3){
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: >$ip< does not contain 3 dots\n\n";
+        print "  ERROR: >$ip< does not contain 3 dots $filename\n\n";
         exit 88;        
     }
     
@@ -2115,7 +2115,7 @@ sub check_ip {
             print "      Octet:    $octet\n";
         }
         if ( int($octet) < 0 or int($octet) > 255) {
-            print "\nERROR: ->$ip<- is invalid Option in ip octet\n\n";
+            print "\nERROR: ->$ip<- is invalid Option in ip octet $filename\n\n";
             exit 88;
         } else {
 
@@ -2135,7 +2135,7 @@ sub check_ip {
 
 
 sub check_ms_software_key {
-    my ($ms_software_key,$name,$host,$line) = @_;
+    my ($ms_software_key,$name,$host,$line,$filename) = @_;
     if (exists $ms_key_ok{$ms_software_key}){
         # skip tests, when tagged as 'no key'
         return $ms_software_key;
@@ -2176,13 +2176,13 @@ sub check_ms_software_key {
 
 
 sub check_sophomorix_role {
-    my ($role,$line) = @_;
+    my ($role,$line,$filename) = @_;
     if ($role eq ""){
         $role=$sophomorix_config{'INI'}{'GLOBAL'}{'COMPUTERROLE_DEFAULT'};
     } elsif (not exists $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$role}) {
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: >$role< is not a valid role\n";
+        print "  ERROR: >$role< is not a valid role in $filename\n";
         print "     Valid sophomorixRole for devices are:\n";
         foreach my $keyname (keys %{$sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}} ) {
             print "        $keyname\n";
@@ -2196,7 +2196,7 @@ sub check_sophomorix_role {
 
 
 sub check_account_flag {
-    my ($account_flag,$line) = @_;
+    my ($account_flag,$line,$filename) = @_;
     if ($account_flag eq 0){
         # ok
         $account_flag="0";
@@ -2212,7 +2212,7 @@ sub check_account_flag {
 
 
 sub check_pxe {
-    my ($pxe,$line) = @_;
+    my ($pxe,$line,$filename) = @_;
     if($Conf::log_level>=3){
         print "   PXE:     $pxe\n";
     }
@@ -2223,7 +2223,7 @@ sub check_pxe {
     if ( not exists $pxe{$pxe} ) {
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: >$pxe< is invalid Option in pxe field\n\n";
+        print "  ERROR: >$pxe< is invalid Option in pxe field in $filename\n\n";
         exit 88;
     }
     return $pxe;
@@ -2232,7 +2232,7 @@ sub check_pxe {
 
 
 sub check_option {
-    my ($option,$line) = @_;
+    my ($option,$line,$filename) = @_;
     if (not defined $option){
         $option="";
         # ??? warning ???

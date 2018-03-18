@@ -4309,6 +4309,9 @@ sub get_group_basename {
 # error, when options are not given correctly
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+    if (not defined $Conf::log_level){
+	$Conf::log_level=1;
+    }
     if (not $parse_ergebnis==1){
         my @list = split(/\//,$0);
         my $scriptname = pop @list;
@@ -4331,9 +4334,6 @@ sub check_options{
     # set default for --verbose
     $ref_options->{'CONFIGURED'}{'verbose'}="TRUE";
     $ref_options->{'MODIFIER_OPTIONS'}{'verbose'}="TRUE";
-    if (not defined $Conf::log_level){
-	$Conf::log_level=1;
-    }
     if (defined $ref_options->{'verbose'}){
         $Conf::log_level=$ref_options->{'verbose'}+1;
     }

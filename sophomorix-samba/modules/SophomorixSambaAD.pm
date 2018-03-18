@@ -1149,7 +1149,7 @@ sub AD_computer_create {
     }
 
     # avoid error for empty attribute
-    if ($sophomorix_comment eq ""){
+    if (not defined $sophomorix_comment or $sophomorix_comment eq ""){
         $sophomorix_comment="---";
     }
 
