@@ -38,6 +38,7 @@ JSON Objekte aus STDERR rausparsen:
   # JSON begin
   {... JSON object, oneliner}
   # JSON end
+  besser als nach }{ zu grepen
 ------------------------------------------------------------
 
 
@@ -45,19 +46,32 @@ JSON Objekte aus STDERR rausparsen:
 Migration:
 Vorschlag: bei der migration werden:
   - Strichpunte so ergänzt, dass 15 Felder definiert sind (mit abschließendem ; --> 15 ;)
+    ((bisher 12, leere pxe option ---> 0 (umwandeln) OK!) so letztesmal besprochen)
+    --> bei 9 und 15: --- statt ""(nix), für bessere Orientierung mit Editor
+    --> ab dann wird jede Zeile verworfen, die nicht 15 ; enthält
   - verwendete Felder, die nun von sophomorix genutzt werden, werden ab Feld 16 angehängt
+  - festlegen, wieviele Felder custom dazukommen (wäre besser zu scripten)
+  - evtl. festlegen, welche single/Multi sind:
+         16-20 SigleValue
+         21-25 Multivalue
+    Trennfeld bei Multi in devices.txt:
+    Vorschlag: Erstes Zeichen in Multivalue Feld wird abgeknapst und ist der Trenner
+        so wäre möglich JEDES Zeichen zu nutzen:
+        ;|user1|user2|user&|;    --> user1  user2 user&
+        ;&user1&user2$user3|;    --> user1  user2 user3|
 ------------------------------------------------------------
 
 
 
 
 ------------------------------------------------------------
-einfaches subnetting mit 2 Netzwerkkarten:
+einfaches subnetting mit 2 Netzwerkkarten (Grundschule: 1 Lehrerzimmer, ein Computerraum):
 2 Netzwerkkarten im Server
   - 1 fürs Lehrernetz
   - 1 fürs Schülernetz
 geht das eigentlich?
 ------------------------------------------------------------
+
 
 ------------------------------------------------------------
 Anforderungs-Ausdruck auf der Webseite
@@ -85,12 +99,12 @@ ACLS?
 
 -------------------------------
 17.10 Appliance
-- wie neue Schule enlegen?
+- wie neue Schule anlegen?
 - lvm, filesystem, ....
 --> wo nachzulesen wie default-school share erstellt wird?
 -> scripten des schulanlegens, wer, wo?
 -------------------------------
-schultest:
+schultest (nochmal):
 A) wenn /srv/samba/schools/<name> da, dann net conf addshare <name> dafür erstellen (macht sophomorix)
 B) \\Server/<name> da (remotes share)
 M liefert mehrzeiler, der
@@ -99,82 +113,46 @@ M liefert mehrzeiler, der
    3) fstab eintrag default-school
 später script von T um lokales anzulegen
 
+???? Wäre nicht besser, dass  
+1) das script net conf addshare <name> das share erstellt
+ODER
+2) Ein share von Hand/Anleitung remote erstellt wird
 
--------------------------------
-mehrfachlogin möglich? erlauben? kontrolle?
--------------------------------
--> pro:    simple use (default)
--> contra: passwordklau
---> konfigurierbar ?
---> auf default lassen
-
--------------------------------
-loginnamenumbenennung ja/nein?
--> incl. homebverschieben
--> nur innerhalb der Schule, neuer loginname checken? (prefix, siehe unten)
--------------------------------
---> later or never
+Sophomorix testet dann (beim abarbeiten der conf):
+- ist für eine Konfigurierte schule (sophomorix.conf) ein share da (net conf list Auswertung)
+   -> ja: --> sophomorix rennt los
+   -> nein: --> Abbruch, ohne etwas anzufassen
+      --> share for configured school <school> does not exist
+------------------------------------------------------------
 
 Todo:
 password complexity level on off
 und wo das drin steht in sophomorix-check -ij im JSON object
-
-
--------------------------------
-loginamenvermeidung:
-Reicht es die so gefundenen zu vermeiden:
-(| (objectClass=user) (objectClass=group) (objectClass=computer) )
--------------------------------
---> OK so
---> usernamen blacklisten verwenden (googeln --> )
-
-
--------------------------------
-groß/kleinschreibung von usern,gruppen
-- unterscheidet AD diese Accounts?
---> Festlegen, dass alls wunschlogins,computernamen, .... lowercase sind?
-    Ohne Ausname?
-    Achtung: es gibt per default Guest, Administrator
-    Vorschlag: sophomorix legt nur lowercase an.
-               nicht sophomorix-Objekte werden nach lowercase verwandelt um clashes zu vermeiden
-	       Ausnahme: computer, siehe devices.csv
--------------------------------
-alles sophomorix-lowercase
-alles computer upercase
+????? sollte ich das Umsetzen
 
 
 
--------------------------------
-alpha-Version, wann?
---> intention: migration testen
--------------------------------
+
+
 
 -------------------------------
 Loginnamenerstellung:
-bei mms (Massive-Multischool) gibts doppelung von loginnamen (z.B. Lehrerkürzel)
+bei mms (Massive-Multischool) gibts Doppelung von loginnamen (z.B. Lehrerkürzel)
 Lösungen:
   - schalter bei sophomorix.conf
     TEACHER_LOGIN_PREFIX=yes/no
     --> setzt vor lehrerlogins den prefix der Schule (default-school nicht)
-Default ist: kein prefix
+         --> Hauptschule OHNE prefix, zusatzschule mit Prefix: vhs-bz
+Default ist: kein prefix?
+------------------------------------------------------------
 
--------------------------------
-OK
-.ini-Dateien Vereinheitlichen:
-Wie wird eine on/off konfiguriert?
-TRUE/FALSE   # mein Favorit
-on/off       # so gibts samba-tool zurück: samba-tool domain passwordsettings show  (Password complexity: on)
-yes/no
-1/0
---> True,truE, alles erlaubt , json TRUE/FALSE
-OK
-------------------------------
 devices.csv
 
+------------------------------------------------------------
 migration:
-
-auch migration in andere als default-schule
+auch migration in andere als default-schule ????
   --> Problem: Testaufwand
+------------------------------------------------------------
 
 quota bei migration:
 Idee: mailquota übernehmen
@@ -199,6 +177,9 @@ Abstimmen:
 
 --> sollten nach global
 
+------------------------------------------------------------
+FIREWALL, Dockerhost, ... sollten eigentlich nach global.dvices.csv ???
+------------------------------------------------------------
 
 Zur Info:
 
@@ -421,3 +402,64 @@ Account disablen wenn eine gewisse Zeit um ist
 (wie heisst das feature?) ansonsten brauchen wir einen cronjob
 evtl. ein eigenes time field, bzw. auch einen Status
 ------------------------------------------------------------
+
+############################################################
+Pending
+############################################################
+-------------------------------
+mehrfachlogin möglich? erlauben? kontrolle?
+-------------------------------
+-> pro:    simple use (default)
+-> contra: passwordklau
+--> konfigurierbar ?
+--> auf default lassen
+
+############################################################
+Erledigt:
+############################################################
+-------------------------------
+OK
+.ini-Dateien Vereinheitlichen:
+Wie wird eine on/off konfiguriert?
+TRUE/FALSE   # mein Favorit
+on/off       # so gibts samba-tool zurück: samba-tool domain passwordsettings show  (Password complexity: on)
+yes/no
+1/0
+--> True,truE, alles erlaubt , json TRUE/FALSE
+OK
+------------------------------
+
+
+-------------------------------
+groß/kleinschreibung von usern,gruppen
+- unterscheidet AD diese Accounts?
+--> Festlegen, dass alls wunschlogins,computernamen, .... lowercase sind?
+    Ohne Ausname?
+    Achtung: es gibt per default Guest, Administrator
+    Vorschlag: sophomorix legt nur lowercase an.
+               nicht sophomorix-Objekte werden nach lowercase verwandelt um clashes zu vermeiden
+	       Ausnahme: computer, siehe devices.csv
+-------------------------------
+alles sophomorix-lowercase
+alles computer upercase
+
+-> So legt es auch das Windows GUI tool an.
+
+
+
+-------------------------------
+loginamenvermeidung:
+Reicht es die so gefundenen zu vermeiden:
+(| (objectClass=user) (objectClass=group) (objectClass=computer) )
+-------------------------------
+--> OK so
+--> TODO: usernamen blacklisten verwenden (googeln --> )
+
+
+
+-------------------------------
+loginnamenumbenennung ja/nein?
+-> incl. homebverschieben
+-> nur innerhalb der Schule, neuer loginname checken? (prefix, siehe unten)
+-------------------------------
+--> later or never
