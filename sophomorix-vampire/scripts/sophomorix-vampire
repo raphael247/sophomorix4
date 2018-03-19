@@ -1209,6 +1209,21 @@ sub devices_rewrite {
              $new_line=$line."\n";
         } else {
         my (@items)=split(/;/,$line);
+
+        # field 6
+        # MS office key --> ---
+        # Todo ??????: if netmask/ip --> ---
+        if ($items[5] eq ""){
+            $items[5]="---";
+        }
+
+        # field 7
+        # mS windows key
+        if ($items[6] eq "" or $items[6] eq "1"){## ???? why 1?
+        #if ($items[6] eq ""){## 
+            $items[6]="---";
+        }
+
         if (not defined $items[9]){
             $items[9]="";
         }
@@ -1217,6 +1232,15 @@ sub devices_rewrite {
         }
         if (not defined $items[11]){
             $items[11]="";
+        }
+        if (not defined $items[12]){
+            $items[12]="";
+        }
+        if (not defined $items[13]){
+            $items[13]="";
+        }
+        if (not defined $items[14]){
+            $items[14]="";
         }
 
         # modify pxe to 0, if empty
@@ -1232,12 +1256,17 @@ sub devices_rewrite {
                   $items[5].";".
                   $items[6].";".
                   $items[7].";".
-                  $items[8].";".
+                  "otherdevice;".
                   $items[9].";".
                   $items[10].";".
                   $items[11].";".
+                  $items[12].";".
+                  $items[13].";".
+                  $items[14].";".
+                  $items[8].";". # save in field 16 the value of field 9
                   "\n";
         }
+
         print OUT "$new_line";
     }
     close(IN);
