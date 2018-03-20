@@ -1210,12 +1210,31 @@ sub devices_rewrite {
         } else {
         my (@items)=split(/;/,$line);
 
-        # field 6
+        # field 6 / $item[5]
         # MS office key --> ---
         # Todo ??????: if netmask/ip --> ---
-        if ($items[5] eq ""){
+        # Test for ip
+        my $is_ip=0;
+        my $dots_in_string=$items[5]=~tr/\.//;
+        if($dots_in_string==3){
+            #print " ($dots_in_string dots) in $items[5]\n";
+            my @octets = split(/\./,$items[5]);
+            foreach my $octet (@octets){
+                #print "   Testing $octet\n";
+                if ( int($octet) < 0 or int($octet) > 255 ) {
+                    # not an ip
+	        } else {
+                    #print "LINE: $line\n";
+                    #print "   Field 6: $items[5] is an IP --> replacing it with ---\n";
+                    $is_ip=1;
+                }
+            }
+        }
+
+        if ($items[5] eq "" or $is_ip==1){
             $items[5]="---";
         }
+
 
         # field 7
         # mS windows key
