@@ -45,20 +45,24 @@ JSON Objekte aus STDERR rausparsen:
 ------------------------------------------------------------
 Migration:
 Vorschlag: bei der migration werden:
+  DONE:
   - Strichpunte so ergänzt, dass 15 Felder definiert sind (mit abschließendem ; --> 15 ;)
     ((bisher 12, leere pxe option ---> 0 (umwandeln) OK!) so letztesmal besprochen)
     --> bei 9 und 15: --- statt ""(nix), für bessere Orientierung mit Editor
-    --> ab dann wird jede Zeile verworfen, die nicht 15 ; enthält
-  - verwendete Felder, die nun von sophomorix genutzt werden, werden ab Feld 16 angehängt:
+  ????:
+    --> Jede Zeile verwerfen, die nicht 15 ; enthält
+        -- Abbruch
+        -- Ignorieren
+  - verwendete Felder, die nun von sophomorix genutzt werden (bisher nicht), werden ab Feld 16 angehängt:
     feld 9 -> feld 16
-  - feld 6: neu office key, alt netmask --> wenn es eine IP enthält mit --- ersetzen
+  - feld 6: neu office key, alt netmask --> wenn es eine IP enthält mit --- ersetzen (kein abspeichern)
   - feld 7: neu: windows key --> wenn es eine 1 (bsz) enthält ersetzen mit --- (oder als feld 17 aufheben?)
-
+    (was war davor drin????)
 
   - festlegen, wieviele Felder custom dazukommen (wäre besser zu scripten)
-  - evtl. festlegen, welche single/Multi sind:
-         16-20 SigleValue
-         21-25 Multivalue
+       - evtl. festlegen, welche single/Multi sind:
+            16-20 SigleValue
+            21-25 Multivalue
     Trennfeld bei Multi in devices.txt:
     Vorschlag: Erstes Zeichen in Multivalue Feld wird abgeknapst und ist der Trenner
         so wäre möglich JEDES Zeichen zu nutzen:
