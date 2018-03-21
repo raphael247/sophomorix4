@@ -43,12 +43,21 @@ JSON Objekte aus STDERR rausparsen:
 
 
 ------------------------------------------------------------
+Dockerhost:
+- Reverse Proxy für port-Doppelbelegung (openschulportfolio und Mail, nextcloud, ..)
+  --> weil ein pport gebunden wird
+- Eigene Dockerhub (um Pakete vortesten zu können)
+------------------------------------------------------------
+
+
+------------------------------------------------------------
 Migration:
 Vorschlag: bei der migration werden:
   DONE:
   - Strichpunte so ergänzt, dass 15 Felder definiert sind (mit abschließendem ; --> 15 ;)
     ((bisher 12, leere pxe option ---> 0 (umwandeln) OK!) so letztesmal besprochen)
     --> bei 9 und 15: --- statt ""(nix), für bessere Orientierung mit Editor
+    --> oder gleich mit custom dazu?
   ????:
     --> Jede Zeile verwerfen, die nicht 15 ; enthält
         -- Abbruch
@@ -59,6 +68,7 @@ Vorschlag: bei der migration werden:
   - feld 7: neu: windows key --> wenn es eine 1 (bsz) enthält ersetzen mit --- (oder als feld 17 aufheben?)
     (was war davor drin????)
 
+  - Dringlichkeit der Custom Felder
   - festlegen, wieviele Felder custom dazukommen (wäre besser zu scripten)
        - evtl. festlegen, welche single/Multi sind:
             16-20 SigleValue
