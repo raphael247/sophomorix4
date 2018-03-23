@@ -22,6 +22,8 @@ Gibts da zu viele individuelle Einstellungen
     --> also   
 
 
+
+Neue Attribute:
 ------------------------------------------------------------
 AD-Feld: 
 Lehrerkürzel als Feld vorsehen, dass editiert werden kann aber nicht überschrieben wird?
@@ -29,29 +31,46 @@ Wird auch relevant, wenn loginname nicht dem Kürzel entspricht.
 (MMS: vor Lehrerlogin steht Schulprefix um Doppelungen zu vermeiden: 
 abc-bz an der Schule abc und cdf-bz an der Schule cdf) 
 ------------------------------------------------------------
+- Nextcloudquota
+  --> 
+- Initials
+
+--SophomorixCustomInternnalCustom (je 5)
+--SopomorixToken
+  beim Anlegen eines users befüllen
+
+5 internal single
+5 internal multi
+5 custom single
+5 custom multi
+
 
 
 ------------------------------------------------------------
-JSON Objekte aus STDERR rausparsen:
+TODO: JSON Objekte aus STDERR rausparsen:
   Als Hilfe könnte man einen start Stop string definieren vor/nach dem JSON Objekt
   z.b.
-  # JSON begin
+  # JSON-begin
   {... JSON object, oneliner}
-  # JSON end
+  # JSON-end
   besser als nach }{ zu grepen
 ------------------------------------------------------------
 
 
 ------------------------------------------------------------
 Dockerhost:
-- Reverse Proxy für port-Doppelbelegung (openschulportfolio und Mail, nextcloud, ..)
-  --> weil ein pport gebunden wird
-- Eigene Dockerhub (um Pakete vortesten zu können)
+- OK: Reverse Proxy für port-Doppelbelegung (openschulportfolio und Mail, nextcloud, ..)
+      --> weil ein port gebunden wird
+      --> gibt fertigen container mit nginex
+- ??: Eigene Dockerhub (um Pakete vortesten zu können)
 ------------------------------------------------------------
 
 
 ------------------------------------------------------------
 Migration:
+
+SID-Übernahme? (Wäre evtl. gut, aber zu aufwändig)
+
 Vorschlag: bei der migration werden:
   DONE:
   - Strichpunte so ergänzt, dass 15 Felder definiert sind (mit abschließendem ; --> 15 ;)
@@ -65,31 +84,22 @@ Vorschlag: bei der migration werden:
   - verwendete Felder, die nun von sophomorix genutzt werden (bisher nicht), werden ab Feld 16 angehängt:
     feld 9 -> feld 16
   - feld 6: neu office key, alt netmask --> wenn es eine IP enthält mit --- ersetzen (kein abspeichern)
+
+  - 
   - feld 7: neu: windows key --> wenn es eine 1 (bsz) enthält ersetzen mit --- (oder als feld 17 aufheben?)
-    (was war davor drin????)
+    nicht ersetzten
+
+
+    ; soll eintragbar sein, \; testen, ob sophomorix das richtig splittet
+    TODO: testen mit tr=~
+
 
   - Dringlichkeit der Custom Felder
   - festlegen, wieviele Felder custom dazukommen (wäre besser zu scripten)
        - evtl. festlegen, welche single/Multi sind:
             16-20 SigleValue
-            21-25 Multivalue
-    Trennfeld bei Multi in devices.txt:
-    Vorschlag: Erstes Zeichen in Multivalue Feld wird abgeknapst und ist der Trenner
-        so wäre möglich JEDES Zeichen zu nutzen:
-        ;|user1|user2|user&|;    --> user1  user2 user&
-        ;&user1&user2$user3|;    --> user1  user2 user3|
 ------------------------------------------------------------
 
-
-
-
-------------------------------------------------------------
-einfaches subnetting mit 2 Netzwerkkarten (Grundschule: 1 Lehrerzimmer, ein Computerraum):
-2 Netzwerkkarten im Server
-  - 1 fürs Lehrernetz
-  - 1 fürs Schülernetz
-geht das eigentlich?
-------------------------------------------------------------
 
 
 ------------------------------------------------------------
@@ -116,6 +126,7 @@ Konfigurationsausdruck der gesamten Lösung
 ACLS?
 -------------------------------
 
+
 -------------------------------
 17.10 Appliance
 - wie neue Schule anlegen?
@@ -137,6 +148,13 @@ später script von T um lokales anzulegen
 ODER
 2) Ein share von Hand/Anleitung remote erstellt wird
 
+############################################################
+TODO:
+Wenn schule in sophomorix.conf exsitiert und kein share da
+--> exit und nichts machen
+############################################################
+
+
 Sophomorix testet dann (beim abarbeiten der conf):
 - ist für eine Konfigurierte schule (sophomorix.conf) ein share da (net conf list Auswertung)
    -> ja: --> sophomorix rennt los
@@ -148,7 +166,7 @@ Todo:
 password complexity level on off
 und wo das drin steht in sophomorix-check -ij im JSON object
 ????? sollte ich das Umsetzen
-
+--> sophomorix-befehl dazu
 
 
 
@@ -164,6 +182,10 @@ Lösungen:
          --> Hauptschule OHNE prefix, zusatzschule mit Prefix: vhs-bz
 Default ist: kein prefix?
 ------------------------------------------------------------
+later
+
+
+
 
 devices.csv
 
@@ -172,6 +194,8 @@ migration:
 auch migration in andere als default-schule ????
   --> Problem: Testaufwand
 ------------------------------------------------------------
+so lassen, 
+
 
 quota bei migration:
 Idee: mailquota übernehmen
@@ -199,6 +223,8 @@ Abstimmen:
 ------------------------------------------------------------
 FIREWALL, Dockerhost, ... sollten eigentlich nach global.dvices.csv ???
 ------------------------------------------------------------
+later
+
 
 Zur Info:
 
@@ -317,6 +343,9 @@ Umgang mit PullRequests, Issues, usw. bei der LML7-Entwicklung
 Virusscan;
 - wie bisher mit clamav?
 ------------------------------
+--> bleibt bei clamav
+--> wenns in die Finale version passt
+
 
 ------------------------------
 scripte im Schulkontext aufrufen:
@@ -351,6 +380,28 @@ mailattribute ('mail' bei user, Gruppen) haben @linuxmuster.lan
     --? für dovecot eigenes attribut sophomorixMailIntra?
 --> F.: weitere attribute Mail aktive oder nicht? Gibts das?
 
+
+mail: (wichtig als Versendeadresse)
+    NIE leer lassen
+    Eintrag in school.conf:
+         MAIL_DOMAIN=default       (defaultiert zu samba domain)
+         MAIL_DOMAIN= (optional in school.conf)
+	    --> sophomorix-check -ij MAIL_DOMAIN
+	 wenn da, benutzen im Attribute mail
+
+         sophomorix.conf
+	    FORCE_MAIL_DOMAIN=TRUE  (einbauen, optional, default TRUE)
+         
+
+      MAIL_DOMAIN = default (--> siehe samba domainname @linuxmuster.net)
+         siehe /var/lib/linuxmuster/....../setup.ini vom linuxmuster setup
+
+
+sophomorix-belwue vielleicht in extra Paket (abchecken)
+
+evtl.:
+belwue.template.ini:
+   [ACCOUNT]-->BASE=SETUP
 ------------------------------
 
 
@@ -364,6 +415,7 @@ user hat individuelle ui Einstellungen und wird in andere Rolle verschoben
 (dito beim verschieben in andere schule)
 was soll passieren mit den individuellen einstellungen?
 --> Vorschlag: Entfernen aller Einstellungen ??
+    OK: so machen
 sophomorix-test-1 anpassen
 
 ------------------------------
