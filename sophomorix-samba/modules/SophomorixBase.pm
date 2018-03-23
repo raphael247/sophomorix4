@@ -242,27 +242,18 @@ sub json_progress_print {
     if ($json==1){
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_progress );
-        if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDRR"){
-            print STDERR  "$utf8_pretty_printed";
-        } else {
-            print STDOUT  "$utf8_pretty_printed";
-        }
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "# JSON-begin\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_pretty_printed\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "# JSON-end\n";
     } elsif ($json==2){
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_json_line   = $json_obj->encode( $ref_progress );
-        if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
-            print STDERR  "$utf8_json_line\n";
-        } else {
-            print STDOUT  "$utf8_json_line\n";
-        }
-           #print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line";
-        } elsif ($json==3){
-            if ($ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'} eq "STDERR"){
-                print STDERR Dumper( $ref_progress );
-            } else {
-                print STDOUT Dumper( $ref_progress );
-            }
-       }
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "# JSON-begin\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "$utf8_json_line\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} "# JSON-end\n";
+    } elsif ($json==3){
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PROGRESS'}} Dumper( $ref_progress );
+   }
 }
 
 
@@ -328,14 +319,18 @@ sub json_dump {
         $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
-        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_pretty_printed";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "# JSON-begin\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_pretty_printed\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "# JSON-end\n";
     } elsif ($json==2){
         # compact output
         $hash_ref->{'JSONINFO'}=$jsoninfo;
         $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_json_line   = $json_obj->encode( $hash_ref  );
-        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_json_line";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "# JSON-begin\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "$utf8_json_line\n";
+        print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} "# JSON-end\n";
     } elsif ($json==3){
         &print_title("DUMP: $jsoncomment");
         print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} Dumper( $hash_ref );
@@ -3423,12 +3418,16 @@ sub result_sophomorix_print {
           # pretty output
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_result );
-          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "$utf8_pretty_printed";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "# JSON-begin\n";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "$utf8_pretty_printed\n";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "# JSON-end\n";
       } elsif ($json==2){
           # compact output
           my $json_obj = JSON->new->allow_nonref;
           my $utf8_json_line   = $json_obj->encode( $ref_result  );
-          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "$utf8_json_line";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "# JSON-begin\n";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "$utf8_json_line\n";
+          print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} "# JSON-end\n";
       } elsif ($json==3){
           &print_title("DUMP: ".$ref_result->{'JSONCOMMENT'});
           print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_RESULT'}} Dumper( $ref_result );

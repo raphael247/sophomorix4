@@ -871,11 +871,15 @@ sub json_printout {
         # pretty output
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_search );
+        print STDERR "# JSON-begin\n";
         print STDERR "$utf8_pretty_printed";
+        print STDERR "# JSON-end\n";
     } elsif ($json==2){
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_json_line   = $json_obj->encode( $ref_search  );
+        print STDERR "# JSON-begin\n";
         print STDERR "$utf8_json_line";
+        print STDERR "# JSON-end\n";
     } elsif ($json==3){
         print STDERR Dumper ($ref_search);
     }
