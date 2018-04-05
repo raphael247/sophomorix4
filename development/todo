@@ -19,23 +19,37 @@ Password for 'https://jeffbeck@github.com': ########
 Todo:
 ############################################################
 
+
+
 DRINGEND: 
    OK: JSON output markieren
+
+   Zuerst: schema fertig machen, a,b,c
 
    18.04
      -> script um school share anzulegen
      -> zusatzattribute alle fertig (kein Schema update mehr)
 
-   Konfigurationsdateien aus etc raus, reinkopieren
+   Konfigurationsdateien aus etc raus, reinkopieren bei schulerstellung
 
 
-   Wenn schule konfiguriert UND share da:
+   Wenn schule konfiguriert (sophomorix.conf) UND share da:
+   --> sophomorix rennt los, keine weiteren tests 
+   --> ansonsten: mißconfigured school
+
    --> <name>.school.conf
    Paket: school.conf, students.csv, .... anlegen (leer)
+
    sophomorix-school --check -->
       falls erfolgreich. schulconfig anlegbar, mit --schoolcraete anlegen
+      --> Beispieldateien unter /etc/...
 
-
+   1) Configs nicht mehr im Paket
+   2) script um bisherige schulen anzulegen für tests im developer-paket
+   --> tests sollten laufen
+   3) sophomorix-school doku schule anlegen:
+      - sophomorix needs a school to add users in this school
+   
 
 Todo:
 sophomorix-quota: mit tatsächlichen Werte von smbcquota vergleichen abfragen und mit dem Wert in AD vergleichen. mit Zusatzswitch --smbcquotas
