@@ -1970,6 +1970,20 @@ sub AD_user_update {
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
+    # custom attributes
+    my $custom_1 = $arg_ref->{custom_1};
+    my $custom_2 = $arg_ref->{custom_2};
+    my $custom_3 = $arg_ref->{custom_3};
+    my $custom_4 = $arg_ref->{custom_4};
+    my $custom_5 = $arg_ref->{custom_5};
+    # intrinsic attributes
+    my $intrinsic_1 = $arg_ref->{intrinsic_1};
+    my $intrinsic_2 = $arg_ref->{intrinsic_2};
+    my $intrinsic_3 = $arg_ref->{intrinsic_3};
+    my $intrinsic_4 = $arg_ref->{intrinsic_4};
+    my $intrinsic_5 = $arg_ref->{intrinsic_5};
+
+
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
@@ -2280,7 +2294,7 @@ sub AD_user_update {
     }
     if (defined $examteacher and $examteacher ne ""){
         $replace{'sophomorixExamMode'}=$examteacher;
-        print "   sophomorixExamMode:        $examteacher\n";
+        print "   sophomorixExamMode:         $examteacher\n";
     }
     if (defined $comment){
         if ($comment eq ""){
@@ -2291,6 +2305,101 @@ sub AD_user_update {
         }
         print "   sophomorixComment:          $comment\n";
     }
+
+    # custom attributes
+    if (defined $custom_1){
+        if ($custom_1 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixCustom1";
+        } else {
+            $replace{'sophomorixCustom1'}=$custom_1;
+        }
+        print "   sophomorixCustom1:          $custom_1\n";
+    }
+    if (defined $custom_2){
+        if ($custom_2 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixCustom2";
+        } else {
+            $replace{'sophomorixCustom2'}=$custom_2;
+        }
+        print "   sophomorixCustom2:          $custom_2\n";
+    }
+    if (defined $custom_3){
+        if ($custom_3 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixCustom3";
+        } else {
+            $replace{'sophomorixCustom3'}=$custom_3;
+        }
+        print "   sophomorixCustom3:          $custom_3\n";
+    }
+    if (defined $custom_4){
+        if ($custom_4 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixCustom4";
+        } else {
+            $replace{'sophomorixCustom4'}=$custom_4;
+        }
+        print "   sophomorixCustom4:          $custom_4\n";
+    }
+    if (defined $custom_5){
+        if ($custom_5 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixCustom5";
+        } else {
+            $replace{'sophomorixCustom5'}=$custom_5;
+        }
+        print "   sophomorixCustom5:          $custom_5\n";
+    }
+
+    # intrinsic attributes
+    if (defined $intrinsic_1){
+        if ($intrinsic_1 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixIntrinsic1";
+        } else {
+            $replace{'sophomorixIntrinsic1'}=$intrinsic_1;
+        }
+        print "   sophomorixIntrinsic1:       $intrinsic_1\n";
+    }
+    if (defined $intrinsic_2){
+        if ($intrinsic_2 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixIntrinsic2";
+        } else {
+            $replace{'sophomorixIntrinsic2'}=$intrinsic_2;
+        }
+        print "   sophomorixIntrinsic2:       $intrinsic_2\n";
+    }
+    if (defined $intrinsic_3){
+        if ($intrinsic_3 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixIntrinsic3";
+        } else {
+            $replace{'sophomorixIntrinsic3'}=$intrinsic_3;
+        }
+        print "   sophomorixIntrinsic3:       $intrinsic_3\n";
+    }
+    if (defined $intrinsic_4){
+        if ($intrinsic_4 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixIntrinsic4";
+        } else {
+            $replace{'sophomorixIntrinsic4'}=$intrinsic_4;
+        }
+        print "   sophomorixIntrinsic4:       $intrinsic_4\n";
+    }
+    if (defined $intrinsic_5){
+        if ($intrinsic_5 eq ""){
+            # delete attr if empty
+            push @delete, "sophomorixIntrinsic5";
+        } else {
+            $replace{'sophomorixIntrinsic5'}=$intrinsic_5;
+        }
+        print "   sophomorixIntrinsic5:       $intrinsic_5\n";
+    }
+
     if (defined $webui_dashboard){
         if ($webui_dashboard eq ""){
             # delete attr if empty

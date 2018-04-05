@@ -83,6 +83,17 @@ my $add_webui_permissions;
 my $remove_webui_permissions;
 
 my $comment;
+my $custom_1;
+my $custom_2;
+my $custom_3;
+my $custom_4;
+my $custom_5;
+my $intrinsic_1;
+my $intrinsic_2;
+my $intrinsic_3;
+my $intrinsic_4;
+my $intrinsic_5;
+
 my $quota;
 my $mailquota;
 
@@ -122,6 +133,16 @@ my $testopt=GetOptions(
        "school=s" => \$school,
        "u|user=s" => \$user,
        "comment=s" => \$comment,
+       "custom1=s" => \$custom_1,
+       "custom2=s" => \$custom_2,
+       "custom3=s" => \$custom_3,
+       "custom4=s" => \$custom_4,
+       "custom5=s" => \$custom_5,
+       "intrinsic1=s" => \$intrinsic_1,
+       "intrinsic2=s" => \$intrinsic_2,
+       "intrinsic3=s" => \$intrinsic_3,
+       "intrinsic4=s" => \$intrinsic_4,
+       "intrinsic5=s" => \$intrinsic_5,
        "quota=s" => \$quota,
        "mailquota=s" => \$mailquota,
        "webui-dashboard=s" => \$webui_dashboard,
@@ -208,6 +229,12 @@ Updating Quota/MailQuota of a user:
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
+
+Updating sophomorixCustom1 - sophomorixCustom5:
+  --user <user> --custom<n> "Content of sophomorixCustom<n>"
+
+Updating sophomorixIntrinsic1 - sophomorixIntrinsic5: (Warning! This is for sophomorix internal use)
+  --user <user> --intrinsic<n> "Content of sophomorixIntrinsic<n>"
 
 Updating WebuiDashboard of a user:
   --user <user> --webui-dashboard "Webui Dashboard String"
@@ -549,8 +576,154 @@ if ($user ne "" and defined $comment){
                    });
 }
 
+############################################################
+# -user <user> --custom1(-5) "Test for custom1(-5)"
+if ($user ne "" and defined $custom_1){
+    print "Updating sophomorixCustom1 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_1=>$custom_1,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_2){
+    print "Updating sophomorixCustom2 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_2=>$custom_2,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_3){
+    print "Updating sophomorixCustom3 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_3=>$custom_3,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_4){
+    print "Updating sophomorixCustom4 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_4=>$custom_4,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_5){
+    print "Updating sophomorixCustom5 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_5=>$custom_5,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+
+############################################################
+# -user <user> --intrinsic1(-5) "Test for intrinsic1(-5)"
+if ($user ne "" and defined $intrinsic_1){
+    print "Updating sophomorixIntrinsic1 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     intrinsic_1=>$intrinsic_1,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $intrinsic_2){
+    print "Updating sophomorixIntrinsic2 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     intrinsic_2=>$intrinsic_2,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $intrinsic_3){
+    print "Updating sophomorixIntrinsic3 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     intrinsic_3=>$intrinsic_3,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $intrinsic_4){
+    print "Updating sophomorixIntrinsic4 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     intrinsic_4=>$intrinsic_4,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $intrinsic_5){
+    print "Updating sophomorixIntrinsic5 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     intrinsic_5=>$intrinsic_5,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
 
 
+############################################################
 # -user <user> --quota <school1>:<number1>;<school2>:<number2>
 if ($user ne "" and defined $quota){
     print "Updating quota for user $user:\n";
