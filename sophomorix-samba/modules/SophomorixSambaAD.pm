@@ -5934,6 +5934,30 @@ sub AD_get_full_userdata {
         @{ $users{'USERS'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');
         @{ $users{'USERS'}{$sam}{'sophomorixQuota'} } = sort $entry->get_value('sophomorixQuota');
 
+        # Intrinsic attributes
+        $users{'USERS'}{$sam}{'sophomorixIntrinsic1'}=$entry->get_value('sophomorixIntrinsic1');
+        $users{'USERS'}{$sam}{'sophomorixIntrinsic2'}=$entry->get_value('sophomorixIntrinsic2');
+        $users{'USERS'}{$sam}{'sophomorixIntrinsic3'}=$entry->get_value('sophomorixIntrinsic3');
+        $users{'USERS'}{$sam}{'sophomorixIntrinsic4'}=$entry->get_value('sophomorixIntrinsic4');
+        $users{'USERS'}{$sam}{'sophomorixIntrinsic5'}=$entry->get_value('sophomorixIntrinsic5');
+        @{ $users{'USERS'}{$sam}{'sophomorixIntrinsicMulti1'} } = sort $entry->get_value('sophomorixIntrinsicMulti1');
+        @{ $users{'USERS'}{$sam}{'sophomorixIntrinsicMulti2'} } = sort $entry->get_value('sophomorixIntrinsicMulti2');
+        @{ $users{'USERS'}{$sam}{'sophomorixIntrinsicMulti3'} } = sort $entry->get_value('sophomorixIntrinsicMulti3');
+        @{ $users{'USERS'}{$sam}{'sophomorixIntrinsicMulti4'} } = sort $entry->get_value('sophomorixIntrinsicMulti4');
+        @{ $users{'USERS'}{$sam}{'sophomorixIntrinsicMulti5'} } = sort $entry->get_value('sophomorixIntrinsicMulti5');
+
+        # custom attributes
+        $users{'USERS'}{$sam}{'sophomorixCustom1'}=$entry->get_value('sophomorixCustom1');
+        $users{'USERS'}{$sam}{'sophomorixCustom2'}=$entry->get_value('sophomorixCustom2');
+        $users{'USERS'}{$sam}{'sophomorixCustom3'}=$entry->get_value('sophomorixCustom3');
+        $users{'USERS'}{$sam}{'sophomorixCustom4'}=$entry->get_value('sophomorixCustom4');
+        $users{'USERS'}{$sam}{'sophomorixCustom5'}=$entry->get_value('sophomorixCustom5');
+        @{ $users{'USERS'}{$sam}{'sophomorixCustomMulti1'} } = sort $entry->get_value('sophomorixCustomMulti1');
+        @{ $users{'USERS'}{$sam}{'sophomorixCustomMulti2'} } = sort $entry->get_value('sophomorixCustomMulti2');
+        @{ $users{'USERS'}{$sam}{'sophomorixCustomMulti3'} } = sort $entry->get_value('sophomorixCustomMulti3');
+        @{ $users{'USERS'}{$sam}{'sophomorixCustomMulti4'} } = sort $entry->get_value('sophomorixCustomMulti4');
+        @{ $users{'USERS'}{$sam}{'sophomorixCustomMulti5'} } = sort $entry->get_value('sophomorixCustomMulti5');
+
         # samba
         $users{'USERS'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
         $users{'USERS'}{$sam}{'homeDrive'}=$entry->get_value('homeDrive');
