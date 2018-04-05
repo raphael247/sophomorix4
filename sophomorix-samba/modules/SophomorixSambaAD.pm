@@ -1976,14 +1976,23 @@ sub AD_user_update {
     my $custom_3 = $arg_ref->{custom_3};
     my $custom_4 = $arg_ref->{custom_4};
     my $custom_5 = $arg_ref->{custom_5};
+    my $custom_multi_1 = $arg_ref->{custom_multi_1};
+    my $custom_multi_2 = $arg_ref->{custom_multi_2};
+    my $custom_multi_3 = $arg_ref->{custom_multi_3};
+    my $custom_multi_4 = $arg_ref->{custom_multi_4};
+    my $custom_multi_5 = $arg_ref->{custom_multi_5};
     # intrinsic attributes
     my $intrinsic_1 = $arg_ref->{intrinsic_1};
     my $intrinsic_2 = $arg_ref->{intrinsic_2};
     my $intrinsic_3 = $arg_ref->{intrinsic_3};
     my $intrinsic_4 = $arg_ref->{intrinsic_4};
     my $intrinsic_5 = $arg_ref->{intrinsic_5};
-
-
+    my $intrinsic_multi_1 = $arg_ref->{intrinsic_multi_1};
+    my $intrinsic_multi_2 = $arg_ref->{intrinsic_multi_2};
+    my $intrinsic_multi_3 = $arg_ref->{intrinsic_multi_3};
+    my $intrinsic_multi_4 = $arg_ref->{intrinsic_multi_4};
+    my $intrinsic_multi_5 = $arg_ref->{intrinsic_multi_5};
+    #
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
@@ -2353,7 +2362,54 @@ sub AD_user_update {
         print "   sophomorixCustom5:          $custom_5\n";
     }
 
-    # intrinsic attributes
+    # custom attributes (multiValue)
+    if (defined $custom_multi_1){
+        my @custom_multi_1=split(/,/,$custom_multi_1);
+        @custom_multi_1 = reverse @custom_multi_1;
+        print "   * Setting sophomorixCustomMulti1 to: @custom_multi_1\n";
+        my $custom_multi_1_string=join("|",@custom_multi_1);
+        $update_log_string=$update_log_string."\"sophomorixCustomMulti1=".$custom_multi_1_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixCustomMulti1' => \@custom_multi_1 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $custom_multi_2){
+        my @custom_multi_2=split(/,/,$custom_multi_2);
+        @custom_multi_2 = reverse @custom_multi_2;
+        print "   * Setting sophomorixCustomMulti2 to: @custom_multi_2\n";
+        my $custom_multi_2_string=join("|",@custom_multi_2);
+        $update_log_string=$update_log_string."\"sophomorixCustomMulti2=".$custom_multi_2_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixCustomMulti2' => \@custom_multi_2 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $custom_multi_3){
+        my @custom_multi_3=split(/,/,$custom_multi_3);
+        @custom_multi_3 = reverse @custom_multi_3;
+        print "   * Setting sophomorixCustomMulti3 to: @custom_multi_3\n";
+        my $custom_multi_3_string=join("|",@custom_multi_3);
+        $update_log_string=$update_log_string."\"sophomorixCustomMulti3=".$custom_multi_3_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixCustomMulti3' => \@custom_multi_3 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $custom_multi_4){
+        my @custom_multi_4=split(/,/,$custom_multi_4);
+        @custom_multi_4 = reverse @custom_multi_4;
+        print "   * Setting sophomorixCustomMulti4 to: @custom_multi_4\n";
+        my $custom_multi_4_string=join("|",@custom_multi_4);
+        $update_log_string=$update_log_string."\"sophomorixCustomMulti4=".$custom_multi_4_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixCustomMulti4' => \@custom_multi_4 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $custom_multi_5){
+        my @custom_multi_5=split(/,/,$custom_multi_5);
+        @custom_multi_5 = reverse @custom_multi_5;
+        print "   * Setting sophomorixCustomMulti5 to: @custom_multi_5\n";
+        my $custom_multi_5_string=join("|",@custom_multi_5);
+        $update_log_string=$update_log_string."\"sophomorixCustomMulti5=".$custom_multi_5_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixCustomMulti5' => \@custom_multi_5 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+
+    # intrinsic attributes (singleValue)
     if (defined $intrinsic_1){
         if ($intrinsic_1 eq ""){
             # delete attr if empty
@@ -2400,6 +2456,54 @@ sub AD_user_update {
         print "   sophomorixIntrinsic5:       $intrinsic_5\n";
     }
 
+    # intrinsic attributes (multiValue)
+    if (defined $intrinsic_multi_1){
+        my @intrinsic_multi_1=split(/,/,$intrinsic_multi_1);
+        @intrinsic_multi_1 = reverse @intrinsic_multi_1;
+        print "   * Setting sophomorixIntrinsicMulti1 to: @intrinsic_multi_1\n";
+        my $intrinsic_multi_1_string=join("|",@intrinsic_multi_1);
+        $update_log_string=$update_log_string."\"sophomorixIntrinsicMulti1=".$intrinsic_multi_1_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixIntrinsicMulti1' => \@intrinsic_multi_1 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $intrinsic_multi_2){
+        my @intrinsic_multi_2=split(/,/,$intrinsic_multi_2);
+        @intrinsic_multi_2 = reverse @intrinsic_multi_2;
+        print "   * Setting sophomorixIntrinsicMulti2 to: @intrinsic_multi_2\n";
+        my $intrinsic_multi_2_string=join("|",@intrinsic_multi_2);
+        $update_log_string=$update_log_string."\"sophomorixIntrinsicMulti2=".$intrinsic_multi_2_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixIntrinsicMulti2' => \@intrinsic_multi_2 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $intrinsic_multi_3){
+        my @intrinsic_multi_3=split(/,/,$intrinsic_multi_3);
+        @intrinsic_multi_3 = reverse @intrinsic_multi_3;
+        print "   * Setting sophomorixIntrinsicMulti3 to: @intrinsic_multi_3\n";
+        my $intrinsic_multi_3_string=join("|",@intrinsic_multi_3);
+        $update_log_string=$update_log_string."\"sophomorixIntrinsicMulti3=".$intrinsic_multi_3_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixIntrinsicMulti3' => \@intrinsic_multi_3 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $intrinsic_multi_4){
+        my @intrinsic_multi_4=split(/,/,$intrinsic_multi_4);
+        @intrinsic_multi_4 = reverse @intrinsic_multi_4;
+        print "   * Setting sophomorixIntrinsicMulti4 to: @intrinsic_multi_4\n";
+        my $intrinsic_multi_4_string=join("|",@intrinsic_multi_4);
+        $update_log_string=$update_log_string."\"sophomorixIntrinsicMulti4=".$intrinsic_multi_4_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixIntrinsicMulti4' => \@intrinsic_multi_4 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $intrinsic_multi_5){
+        my @intrinsic_multi_5=split(/,/,$intrinsic_multi_5);
+        @intrinsic_multi_5 = reverse @intrinsic_multi_5;
+        print "   * Setting sophomorixIntrinsicMulti5 to: @intrinsic_multi_5\n";
+        my $intrinsic_multi_5_string=join("|",@intrinsic_multi_5);
+        $update_log_string=$update_log_string."\"sophomorixIntrinsicMulti5=".$intrinsic_multi_5_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixIntrinsicMulti5' => \@intrinsic_multi_5 }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+
+    # webui
     if (defined $webui_dashboard){
         if ($webui_dashboard eq ""){
             # delete attr if empty
