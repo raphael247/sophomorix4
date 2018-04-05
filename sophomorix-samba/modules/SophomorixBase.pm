@@ -1574,6 +1574,73 @@ sub _console_print_user_full {
             print "   $item\n";
 	}
 
+        # custom
+        print "------------ sophomorixCustom: -------------------------------------------------\n";
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixCustom1'}){
+            printf "%29s: %-40s\n","sophomorixCustom1",$ref_users->{'USERS'}{$user}{'sophomorixCustom1'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixCustom2'}){
+            printf "%29s: %-40s\n","sophomorixCustom2",$ref_users->{'USERS'}{$user}{'sophomorixCustom2'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixCustom3'}){
+            printf "%29s: %-40s\n","sophomorixCustom3",$ref_users->{'USERS'}{$user}{'sophomorixCustom3'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixCustom4'}){
+            printf "%29s: %-40s\n","sophomorixCustom4",$ref_users->{'USERS'}{$user}{'sophomorixCustom4'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixCustom5'}){
+            printf "%29s: %-40s\n","sophomorixCustom5",$ref_users->{'USERS'}{$user}{'sophomorixCustom5'};
+        }
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixCustomMulti1'} } ){
+            printf "%29s: %-40s\n","sophomorixCustomMulti1",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixCustomMulti2'} } ){
+            printf "%29s: %-40s\n","sophomorixCustomMulti2",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixCustomMulti3'} } ){
+            printf "%29s: %-40s\n","sophomorixCustomMulti3",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixCustomMulti4'} } ){
+            printf "%29s: %-40s\n","sophomorixCustomMulti4",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixCustomMulti5'} } ){
+            printf "%29s: %-40s\n","sophomorixCustomMulti5",$item;
+	}
+
+
+        # intrinsic
+        print "--------- sophomorixIntrinsic: -------------------------------------------------\n";
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixIntrinsic1'}){
+            printf "%29s: %-40s\n","sophomorixIntrinsic1",$ref_users->{'USERS'}{$user}{'sophomorixIntrinsic1'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixIntrinsic2'}){
+            printf "%29s: %-40s\n","sophomorixIntrinsic2",$ref_users->{'USERS'}{$user}{'sophomorixIntrinsic2'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixIntrinsic3'}){
+            printf "%29s: %-40s\n","sophomorixIntrinsic3",$ref_users->{'USERS'}{$user}{'sophomorixIntrinsic3'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixIntrinsic4'}){
+            printf "%29s: %-40s\n","sophomorixIntrinsic4",$ref_users->{'USERS'}{$user}{'sophomorixIntrinsic4'};
+        }
+        if (defined $ref_users->{'USERS'}{$user}{'sophomorixIntrinsic5'}){
+            printf "%29s: %-40s\n","sophomorixIntrinsic5",$ref_users->{'USERS'}{$user}{'sophomorixIntrinsic5'};
+        }
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixIntrinsicMulti1'} } ){
+            printf "%29s: %-40s\n","sophomorixIntrinsicMulti1",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixIntrinsicMulti2'} } ){
+            printf "%29s: %-40s\n","sophomorixIntrinsicMulti2",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixIntrinsicMulti3'} } ){
+            printf "%29s: %-40s\n","sophomorixIntrinsicMulti3",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixIntrinsicMulti4'} } ){
+            printf "%29s: %-40s\n","sophomorixIntrinsicMulti4",$item;
+	}
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'sophomorixIntrinsicMulti5'} } ){
+            printf "%29s: %-40s\n","sophomorixIntrinsicMulti5",$item;
+	}
+
         print $line;
         foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'memberOf'} } ){
             print "memberOf: $item\n";
