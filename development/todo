@@ -29,13 +29,32 @@ DRINGEND:
    --> OK intrinsic attributes
    --> OK: show sophomorix attributes
 
-   --> TODO: sophomorixUserToken  -> oder gibts da schon was?
-   --> TODO: sophomorixFirstnameInitials -> oder gibts da schon was?
-             sophomorixSurnameInitials -> oder gibts da schon was?
+   --> TODO: sophomorixUserToken
+             --> mit login angelegt, 
+             danach per sophomorix-user updatebar (Lehrerkürzel-Feld, falls nicht mit login gleich)
+   --> TODO: sophomorixFirstnameInitials
+             sophomorixSurnameInitials
+             --> evtl. Initials-attribute?
    --> TODO: Zeitattribute umstellen oms syntax (tut das jetzt)
    --> TODO: caching einstellen
    --> TODO: searchflagsumstellung ohne Editor möglich?
              geht das mit NET::LDAP module und update?
+
+   --> TODO userPrincipalName mit sophomorix-user -i zeigen
+            (dito sophomorixUserToken, sophomorixFirstnameInitials, sophomorixSurnameInitials)
+
+  userPrincipalName ist user logon name (mit @linuxmuster.net)
+  sAMAcountname ist pre windows200 logon name?
+
+  userAccountControl:
+    OK: disabled/Enabled
+    TODO?: User cannot change password
+    TODO?: Password never expires
+    Todo?: Store password using reversible encryption
+  AccountExpires: Todo? setzen mit sophomorix-update???
+
+  userWorkstations (MultiValue: sieht man da an welchen workstations der user angemeldet war? 
+                    Anzeigen mit sophomorix-user -iv --user <sam>?)
 
    single/multi custom/intrinsic usw. wieder leeren möglich
 
