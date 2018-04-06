@@ -122,6 +122,14 @@ If you forgot the suffix look here:
 # ls -l /var/lib/samba/private/*ldb*
 
 
+Show a schema attribute in detail:
+  --show-attribute <attribute>
+Show all attribute names
+  --show-all-attributes
+Show all sophomorix attribute names:
+  --show-sophomorix-attributes 
+
+
 You shold know exactly what you are doing, if you use the following options:
 
 Editing searchFlags of <attribute> with an editor (default is emacs):
@@ -288,8 +296,23 @@ if ($show_all_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'ALL_ATTRS'}{'LDAPDisplayName'} } ) {
-        print "   * $attr\n";
+    my $line="------------------------------------------------------------\n";
+    print "sophomorix schema names:\n";
+    print $line;
+    print "classSchema (".$ref_schema->{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'classSchema'}{'COUNT'}."):\n";
+    print $line;
+    my $count=0;
+    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'classSchema'} } ) {
+        $count++;
+        printf "%6s:  %-60s\n",$count,$attr;
+    } 
+    print $line;
+    print "attributeSchema (".$ref_schema->{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'attributeSchema'}{'COUNT'}."):\n";
+    print $line;
+    $count=0;
+    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'attributeSchema'} } ) {
+        $count++;
+        printf "%6s:  %-60s\n",$count,$attr;
     } 
 } 
 
@@ -302,8 +325,23 @@ if ($show_sophomorix_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'SOPHOMORIX_ATTRS'}{'LDAPDisplayName'} } ) {
-        print "   * $attr\n";
+    my $line="------------------------------------------------------------\n";
+    print "sophomorix schema names:\n";
+    print $line;
+    print "classSchema (".$ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'}."):\n";
+    print $line;
+    my $count=0;
+    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'} } ) {
+        $count++;
+        printf "%6s:  %-60s\n",$count,$attr;
+    } 
+    print $line;
+    print "attributeSchema (".$ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'}{'COUNT'}."):\n";
+    print $line;
+    $count=0;
+    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'} } ) {
+        $count++;
+        printf "%6s:  %-60s\n",$count,$attr;
     } 
 } 
 
