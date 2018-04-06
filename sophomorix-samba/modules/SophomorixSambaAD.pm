@@ -4876,12 +4876,21 @@ sub AD_get_schema {
     }
 
     # sort some lists
-    @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} } = 
-        sort @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} };
-    @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} } = 
-        sort @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} };
-    @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} } = 
-        sort @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} };
+    my @types=("classSchema","attributeSchema");
+    foreach my $type (@types){
+        if (exists $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'}){
+            @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} } = 
+                sort @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} };
+        }
+        if (exists $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'}){
+            @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} } = 
+                sort @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} };
+        }
+        if (exists $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'}){ 
+            @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} } = 
+                sort @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} };
+        }
+    }
 
     # counters
     # all
