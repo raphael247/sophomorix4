@@ -73,6 +73,7 @@ $Data::Dumper::Terse = 1;
             AD_get_full_devicedata
             AD_get_full_groupdata
             AD_get_print_data
+            AD_get_schema
             AD_class_fetch
             AD_project_fetch
             AD_group_fetch
@@ -4803,6 +4804,45 @@ sub AD_get_AD_for_check {
 
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");
     return(\%AD);
+}
+
+
+
+sub AD_get_schema {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my %schema=();
+    &Sophomorix::SophomorixBase::print_title("Query AD for schema (start)");
+    my $filter="(LDAPDisplayName=*)";
+    my $base="CN=Schema,CN=Configuration,".$root_dse;
+    my $mesg = $ldap->search( # perform a search
+                          base   => $base,
+                          scope => 'sub',
+                          filter => $filter,
+                                   );
+    my $max = $mesg->count;
+    my $ref_mesg = $mesg->as_struct; # result in Datenstruktur darstellen
+    # set total counter
+    $schema{'RESULT'}{'LDAPDisplayName'}{'TOTAL'}{'COUNT'}=$max;
+    print "$max attributes found with LDAPDisplayName\n";
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index); 
+        my $dn=$entry->dn();
+        my $name=$entry->get_value('LDAPDisplayName');
+        #print "   * $name -> $dn\n";
+        $schema{'LDAPDisplayName'}{$name}{'DN'}=$dn;
+        $schema{'LOOKUP'}{'LDAPDisplayName_by_DN'}{$dn}=$name;
+        foreach my $attr (keys %{ $ref_mesg->{$dn} }) {
+            print "    attr: $attr -> $ref_mesg->{$dn}{$attr}\n";
+            $schema{'LDAPDisplayName'}{$name}{$attr}=$ref_mesg->{$dn}{$attr};
+        }
+
+    }
+    &Sophomorix::SophomorixBase::print_title("Query AD for schema (end)");
+    return \%schema;
 }
 
 
