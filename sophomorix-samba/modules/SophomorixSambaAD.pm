@@ -4825,22 +4825,82 @@ sub AD_get_schema {
                                    );
     my $max = $mesg->count;
     my $ref_mesg = $mesg->as_struct; # result in Datenstruktur darstellen
+    print Dumper \%mesg;
     # set total counter
     $schema{'RESULT'}{'LDAPDisplayName'}{'TOTAL'}{'COUNT'}=$max;
     print "$max attributes found with LDAPDisplayName\n";
     for( my $index = 0 ; $index < $max ; $index++) {
+        my $is_sophomorix=0; # from sophomorix schema or not
         my $entry = $mesg->entry($index); 
         my $dn=$entry->dn();
         my $name=$entry->get_value('LDAPDisplayName');
-        #print "   * $name -> $dn\n";
         $schema{'LDAPDisplayName'}{$name}{'DN'}=$dn;
         $schema{'LOOKUP'}{'LDAPDisplayName_by_DN'}{$dn}=$name;
-        foreach my $attr (keys %{ $ref_mesg->{$dn} }) {
-            print "    attr: $attr -> $ref_mesg->{$dn}{$attr}\n";
-            $schema{'LDAPDisplayName'}{$name}{$attr}=$ref_mesg->{$dn}{$attr};
+
+        # save Camelcase names 
+        my $lowercase_name=$name;
+        $lowercase_name=~tr/A-Z/a-z/; # make lowercase
+        $schema{'LOOKUP'}{'CamelCase'}{$lowercase_name}=$name;
+
+        # $ype is classSchema or attributeSchema
+        my $type="NONE";
+        foreach my $objectclass (@{ $ref_mesg->{$dn}{'objectclass'} }) { # objectclass MUST be lowercase(NET::LDAP hash)
+            if ($objectclass eq "classSchema" ){
+                $type=$objectclass;
+            } elsif ($objectclass eq "attributeSchema"){
+                $type=$objectclass;
+            }
         }
 
+        foreach my $attr (keys %{ $ref_mesg->{$dn} }) {
+            # save it in returned data structure
+            $schema{'LDAPDisplayName'}{$name}{$attr}=$ref_mesg->{$dn}{$attr};
+            # test if its a sophomorix attribute
+            if ($attr eq "attributeid"){
+                my $attribute_id=$ref_mesg->{$dn}{$attr}[0];
+                # 1.3.6.1.4.1.47512     is linuxmuster.net
+                # 1.3.6.1.4.1.47512.1   is the sophomorix subspace
+                if ( $attribute_id=~m/^1.3.6.1.4.1.47512.1/ ){
+                    $is_sophomorix=1;
+                } 
+            }
+        }
+
+        # save attribute in LISTS
+        push @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} }, $name;
+        if ($is_sophomorix==1){
+            push @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} }, $name;
+        } else {
+            push @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} }, $name;
+        }
     }
+
+    # sort some lists
+    @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} } = 
+        sort @{ $schema{'LISTS'}{'ALL_ATTRS'}{$type}{'LDAPDisplayName'} };
+    @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} } = 
+        sort @{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} };
+    @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} } = 
+        sort @{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{$type}{'LDAPDisplayName'} };
+
+    # counters
+    # all
+    $schema{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'attributeSchema'}{'COUNT'}=
+        $#{ $schema{'LISTS'}{'ALL_ATTRS'}{'attributeSchema'}{'LDAPDisplayName'} }+1;
+    $schema{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'classSchema'}{'COUNT'}=
+        $#{ $schema{'LISTS'}{'ALL_ATTRS'}{'classSchema'}{'LDAPDisplayName'} }+1;
+
+    # non-sophomorix
+    $schema{'RESULT'}{'LDAPDisplayName'}{'NON_SOPHOMORIX_ATTRS'}{'attributeSchema'}{'COUNT'}=
+        $#{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{'attributeSchema'}{'LDAPDisplayName'} }+1;
+    $schema{'RESULT'}{'LDAPDisplayName'}{'NON_SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'}=
+        $#{ $schema{'LISTS'}{'NON_SOPHOMORIX_ATTRS'}{'classSchema'}{'LDAPDisplayName'} }+1;
+
+    # sophomorix
+    $schema{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'}{'COUNT'}=
+        $#{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'}{'LDAPDisplayName'} }+1;
+    $schema{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'}=
+        $#{ $schema{'LISTS'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'LDAPDisplayName'} }+1;
     &Sophomorix::SophomorixBase::print_title("Query AD for schema (end)");
     return \%schema;
 }

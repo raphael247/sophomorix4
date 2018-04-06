@@ -312,6 +312,8 @@ sub json_dump {
             &_console_print_shares($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "UI"){
             &_console_print_ui($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "SCHEMA_ATTRIBUTE"){
+            &_console_print_schema_attribute($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -703,6 +705,46 @@ sub _console_print_projects_overview {
         print $line2;
         print "AQ=AddQuota  AMQ=AddMailQuota  J=Joinable  MM=MaxMembers\n";
         print " A=MailAlias   L=MaiList       S=Status     H=Hidden\n";
+    }
+}
+
+
+
+sub _console_print_schema_attribute {
+    my ($ref_schema,$attribute,$log_level,$ref_sophomorix_config)=@_;
+    my $line1="#####################################################################\n";
+    my $line= "---------------------------------------------------------------------\n";
+
+    if (exists $ref_schema->{'LDAPDisplayName'}{$attribute}){
+        print "\n";
+        print $line1;
+        print "Schema attribute $attribute:\n";
+        print "DN=$ref_schema->{'LDAPDisplayName'}{$attribute}{'DN'}\n";
+        print $line1;
+
+        # create an ascibetical list of keys
+        my @list=();
+        foreach my $key (keys %{ $ref_schema->{'LDAPDisplayName'}{$attribute} }) {
+            if ($key eq "DN"){
+            } else {
+                push @list, $key;
+            }
+        }
+        @list = sort @list;
+
+        # display the keys
+        foreach my $item (@list){
+            foreach $value (@{ $ref_schema->{'LDAPDisplayName'}{$attribute}{$item} }){
+                my $camel_case=$ref_schema->{'LOOKUP'}{'CamelCase'}{$item};
+                #printf "%29s: %-40s\n",$item,$value; # all lowercase
+                printf "%29s: %-40s\n",$camel_case,$value; # camelcase
+            }
+        }
+        print $line;
+    } else {
+        print "\nAttribute $attribute not found\n";
+        print "\nFor a list of all attributes use:\n";
+        print "   sophomorix-samba --show-all-attributes\n\n";
     }
 }
 

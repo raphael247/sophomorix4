@@ -66,6 +66,8 @@ my $start=0;
 
 my $edit_searchflags="";
 my $editor="emacs";
+my $show_all_attributes=0;
+my $show_sophomorix_attributes=0;
 my $show_attribute="";
 
 my $samba_private="/var/lib/samba/private";
@@ -81,6 +83,8 @@ my $testopt=GetOptions(
            "restore-samba=s" => \$restore_samba,
            "edit-searchflags=s" => \$edit_searchflags,
            "show-attribute=s" => \$show_attribute,
+           "show-all-attributes" => \$show_all_attributes,
+           "show-sophomorix-attributes" => \$show_sophomorix_attributes,
            "editor=s" => \$editor,
            "schema-load" => \$schema_load,
            "start" => \$start,
@@ -275,6 +279,36 @@ if ($edit_searchflags ne ""){
 
 }
 
+
+
+# --show-all-attributes
+if ($show_all_attributes==1){
+    my ($ref_schema) = &AD_get_schema({ldap=>$ldap,
+                                       root_dse=>$root_dse,
+                                       root_dns=>$root_dns,
+                                       sophomorix_config=>\%sophomorix_config,
+                                      });
+    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'ALL_ATTRS'}{'LDAPDisplayName'} } ) {
+        print "   * $attr\n";
+    } 
+} 
+
+
+
+# --show-sophomorix-attributes
+if ($show_sophomorix_attributes==1){
+    my ($ref_schema) = &AD_get_schema({ldap=>$ldap,
+                                       root_dse=>$root_dse,
+                                       root_dns=>$root_dns,
+                                       sophomorix_config=>\%sophomorix_config,
+                                      });
+    foreach my $attr ( @{ $ref_schema->{'LISTS'}{'SOPHOMORIX_ATTRS'}{'LDAPDisplayName'} } ) {
+        print "   * $attr\n";
+    } 
+} 
+
+
+
 # --show-attribute <LDAPDisplayName>
 if ($show_attribute ne ""){
     my ($ref_schema) = &AD_get_schema({ldap=>$ldap,
@@ -282,11 +316,12 @@ if ($show_attribute ne ""){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-    my $jsoninfo="SCHEMA_FULL";
+    my $jsoninfo="SCHEMA_ATTRIBUTE";
     my $jsoncomment="The AD Schema";
     &json_dump({json => $json,
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
+                object_name => $show_attribute,
                 log_level => $Conf::log_level,
                 hash_ref => $ref_schema,
                 sophomorix_config => \%sophomorix_config,
