@@ -29,13 +29,47 @@ DRINGEND:
    --> OK intrinsic attributes
    --> OK: show sophomorix attributes
 
+   --> TODO: make capital: in school.conf.master:
+       quota_default_global=3000
+	quota_default_school=3500
+	mailquota_default=
+	webui, .... capital= ???
+
+
+# every managementgroup can have the following section
+[managementgroup.wifi]
+     allow_group=12a,12b,teachers # students
+     allow_users=maierle,muellerle
+     except_users=lucifer   # lucifer ist in 12a
+     except_group=5a  # falls group=students
+     revert_allow_group=12a,12b,teachers # or students
+     revert_allow_users=maierle,muellerle # add users that are NOT in revert_allow_group
+     revert_except_users=lucifer   # if lucifer is in 12a
+     revert_except_group=5a  # if group=students
+     revert_cron=...  # Line für cronjob to revert??
+     # allow:  only these users can be added by supervisors
+     # revert: that is the default, when a cronjob sets back memberships
+[managementgroup.internet]
+     allow_group=students,teachers
+     revert_allow_group=students,teachers
+
+
    --> TODO: sophomorixUserToken
              --> mit login angelegt, 
              danach per sophomorix-user updatebar (Lehrerkürzel-Feld, falls nicht mit login gleich)
    --> TODO: sophomorixFirstnameInitials
              sophomorixSurnameInitials
              --> evtl. Initials-attribute?
-   --> TODO: Zeitattribute umstellen oms syntax (tut das jetzt)
+
+   --> TODO: Bei der rolle in der school.ini eintragen:
+       CLOUDQUOTA_PERCENTAGE=100
+       --> multipliziert das Quotafeld der eigenen schule mit
+       CLOUDQUOTA_PERCENTAGE/100 und füllt damit (je nach Rolle)
+       das neu anzulegende Attribut: sophomorixCloudQuota
+       --> Ausgabe,update mit sophomorix-quota
+       --> sophomorix-user -i Attribut sophomorixCloudQuota  dazu anzeigen
+
+--> TODO: Zeitattribute umstellen oms syntax (tut das jetzt)
    --> TODO: caching einstellen
    --> TODO: searchflagsumstellung ohne Editor möglich?
              geht das mit NET::LDAP module und update?
@@ -59,7 +93,30 @@ DRINGEND:
                     (Anmelden vermeiden der Schüler am Lehrerzimmerrechner, Klassenarbeitsmodus) 
                     Anzeigen mit sophomorix-user -iv --user <sam>?)
 
-   single/multi custom/intrinsic usw. wieder leeren möglich
+   single/multi custom/intrinsic usw. wieder leeren möglich?
+   
+   --> TODO: create function to update intrinsic and custom attributes
+       &update_intrinsic_custom_attributes (%options, "user|group|project|...")
+       sub update_intrinsic_custom_attributes macht folgendes:
+           --> sind/welche Attribute sollen gesetzt werden in %options
+	       add/remove.....
+	       je nach user|group|project| eine passende update sub aufrufen
+
+   sophomorix-sambs --show-sophomorix-attributes:
+      --> searchflag mit angeben
+
+   EVTL: (Bedingung searchflag update reicht aus)
+     Datei mit serachflags, Entwickler (und evtl. anderen Dingen)
+       sophomorixFirstPassword:128       # immer verborgen
+       sophomorixComment:128|1           # kann vom admin umgestellt werden, default ist (erste option)
+     sophomorix-repair --schema
+       --> wenn nur 1 Wert da, sophomorixFirstPassword:
+           setzt zwangswerte für searchflag (wenn nur 1 Wert da, sophomorixFirstPassword)
+       --> wenn mehrere Werte:
+           prüft das searchflag: wenn einer der Vorgabewerte: OK, sonst Auf ersten(default-Wert setzen)
+       --> evtl. parameter in sophomorix.ini:
+            GLOBALADMIN_MANAGED_SEARCHFLAGS=sophomorixFirstpassword, ...
+	    --> überlässt dem Serveradmin das SEARCHFlag management für diese Attribute komplett
 
    18.04
      -> script um school share anzulegen
