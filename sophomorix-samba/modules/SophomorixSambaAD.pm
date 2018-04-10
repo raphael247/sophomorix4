@@ -1486,8 +1486,6 @@ sub AD_user_create {
         $creationdate_ok=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'};
     }
 
-
-
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
           "Creating user $user_count/$max_user_count : $login (start)");
@@ -1596,6 +1594,9 @@ sub AD_user_create {
         # keep $sophomorix_first_password
     }
 
+    my $firstname_initial_utf8=&Sophomorix::SophomorixBase::extract_initial($firstname_utf8);
+    my $surname_initial_utf8=&Sophomorix::SophomorixBase::extract_initial($surname_utf8);
+
     if($Conf::log_level>=1){
         print "   DN:                 $dn\n";
         print "   DN(Parent):         $dn_class\n";
@@ -1603,6 +1604,7 @@ sub AD_user_create {
         print "   Surname(UTF8):      $surname_utf8\n";
         print "   Firstname(ASCII):   $firstname_ascii\n";
         print "   Firstname(UTF8):    $firstname_utf8\n";
+        print "   Initials(UTF8):     $firstname_initial_utf8 $surname_initial_utf8\n";
         print "   Birthday:           $birthdate\n";
         print "   Identifier:         $identifier\n";
         print "   School:             $school\n"; # Organisatinal Unit
@@ -1695,6 +1697,9 @@ sub AD_user_create {
                    sophomorixSurnameASCII  => $surname_ascii,
                    sophomorixBirthdate  => $birthdate,
                    sophomorixRole => $role,
+                   sophomorixUserToken => "---",
+                   sophomorixFirstnameInitial => $firstname_initial_utf8,
+                   sophomorixSurnameInitial => $surname_initial_utf8,
                    sophomorixQuota=> [@quotalist],
                    sophomorixMailQuota=>"---:---:",
                    sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'MAILQUOTA'}{'CALCULATED_DEFAULT'},

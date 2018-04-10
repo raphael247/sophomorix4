@@ -2133,6 +2133,21 @@ sub remove_whitespace {
 
 
 
+sub extract_initial {
+    my ($string)=@_;
+    my $result=$string;
+    my @string = split /[-,\s\/]+/, $string; # split on whitespace and -
+    foreach my $name (@string){
+        my $initial=substr($name,0,1);
+        $initial=$initial.".";
+        #print "$name --> >$initial<\n";
+        $result=~s/$name/$initial/g; # replace name with initial in the complete string
+    }
+    return $result;
+}
+
+
+
 # time stamps
 ######################################################################
 sub ymdhms_to_date {
