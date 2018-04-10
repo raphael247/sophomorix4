@@ -10,6 +10,7 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 * überlebt einen reboot
 * wird global verändert (alle Schulen)?
 * wie geht das/geht das mit ldap-modify?
+  --> einfach nur searchflag attribute ändern
 ############################################################
 
 
@@ -141,41 +142,57 @@ ova's importieren
 
 VirtualBox:
 Host-only Netzwerk: neu anlegen, IP ist die des Wirts in diesem Host-only Netz
-importieren:
-- Namen ändern, Ort anpassen, vdi als Plattenabbild
-- FW booten
-- vom wirt via vboxnet2 auf die innenseite der FW pingen: ping 10.0.0.254
 
 firewall: 
-  booten, device LAn einrichten
+----------------------------------------
+  Appliance importieren:
+   - Namen ändern vm --> ...
+   - Speicher-Ort anpassen 
+   - vdi als Plattenabbild
+  Interfaces Virtualbox: 
+    Adapter1: vboxnet2
+    Adapter2: NAT
+* booten
+* Interfaces in opensense zuweisen
+    welches ist WAN, welches LAN
+
+* device LAN einrichten:
   172.16.0.254/12
+*  reboot
+
 server: 
-  in das richtige voboxnet host-only network bringen: vboxnet2
-  IP setzen: 172.16.0.1/12
+----------------------------------------
+* Appliance importieren:
+   - Namen ändern vm --> ...
+   - Speicher-Ort anpassen 
+   - vdi als Plattenabbild
+* in das richtige voboxnet host-only network bringen: vboxnet2
+* einloggen in virtualbox-Fenster
+*  IP setzen: 172.16.0.1/12
     - linuxmuster-prepare.py -s -u -n 172.16.0.1/12
     - reboot
-  apt update && apt -y dist-upgrade
-  apt install emacs
+* apt update && apt -y dist-upgrade
+* apt install emacs nfs-common sshpass
+
+
   emacs .bashrc 
-    - color prompt enablen:
-      force_color_prompt=yes
-    - farbe von 01;32m auf 01;33m  (gelb)
-  apt install nfs-common
-  mount -t nfs 172.16.0.100://home/bz/github /mnt
+   - color prompt enablen:
+     force_color_prompt=yes
+   - farbe von 01;32m auf 01;33m  (gelb)
+* mount -t nfs 172.16.0.100://home/bz/github /mnt
 
-  -- snapshot machen
+* snapshot machen
 
-   linuxmuster-setup.py
-   IP's wie oben
+*   linuxmuster-setup.py
+   Hostname: bionic
+   IP's: wie oben
    linuxmuster.local (statt linuxmuster.lan, wichtig für tests)
+
+
    danach die vom setup angelegten admins löschen
 
    Zeile in devices.csv für nextcloud
    server;nextcloud;nopxe;08:00:27:38:DF:01;172.16.0.5;;;;;1;0
 
-todo
-regression supertest anpassen:
-   apt-install sshpass 
---> schema load abschaltbar
 
 ############################################################

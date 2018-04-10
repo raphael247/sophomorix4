@@ -43,26 +43,26 @@ DRINGEND:
              OK: schema
              OK: setting on user creation
              OK: update on user update
-             TODO Testing the attributes in Test 1
+             TODO Testing the attributes in Test 1:
+               sophomorixUserToken
+               sophomorixFirstnameInitial
+               sophomorixSurnameInitial
+               sophomorixCloudQuotaCalculated
 
-   --> TODO: sophomorix-user -i zeigt neue Attribute
+   --> OK: sophomorix-user -i zeigt neue Attribute
 
-   --> OK: Bei der rolle in der school.ini eintragen:
-       CLOUDQUOTA_PERCENTAGE=1001	   
+   --> OK: Bei der Rolle in der school.ini eintragen:
+       CLOUDQUOTA_PERCENTAGE=100	   
    --> TODO:
        --> multipliziert das Quotafeld der eigenen schule mit
        CLOUDQUOTA_PERCENTAGE/100 und füllt damit (je nach Rolle)
        das neu anzulegende Attribut: sophomorixCloudQuotaCalculated
        --> Ausgabe,update mit sophomorix-quota
-       --> sophomorix-user -i Attribut sophomorixCloudQuotaCalculated  dazu anzeigen
 
 --> TODO: Zeitattribute umstellen oms syntax (tut das jetzt)
    --> TODO: caching einstellen
    --> TODO: searchflagsumstellung ohne Editor möglich?
              geht das mit NET::LDAP module und update?
-
-   --> TODO userPrincipalName mit sophomorix-user -i zeigen
-            (dito sophomorixUserToken, sophomorixFirstnameInitials, sophomorixSurnameInitials)
 
   userPrincipalName ist user logon name (mit @linuxmuster.net)
   sAMAcountname ist pre windows200 logon name?
