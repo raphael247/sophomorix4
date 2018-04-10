@@ -10,6 +10,7 @@ use File::Basename;
 use Time::Local;
 use Config::IniFiles;
 #use Unicode::GCString;
+use Encode qw(decode encode);
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -2142,15 +2143,16 @@ sub remove_whitespace {
 
 sub extract_initial {
     my ($string)=@_;
-    my $result=$string;
-    my @string = split /[-,\s\/]+/, $string; # split on whitespace and -
+    my $string_logical_chars = decode("utf8", $string); # decode in logical chars, to split by char, not byte
+    my $result=$string_logical_chars;
+    my @string = split /[-,\s\/]+/, $string_logical_chars; # split on whitespace and -
     foreach my $name (@string){
         my $initial=substr($name,0,1);
         $initial=$initial.".";
-        #print "$name --> >$initial<\n";
         $result=~s/$name/$initial/g; # replace name with initial in the complete string
     }
-    return $result;
+    my $result_utf8 = encode("utf8", $result); # encode back into utf8
+    return $result_utf8;
 }
 
 
