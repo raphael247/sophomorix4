@@ -1959,6 +1959,8 @@ sub AD_user_update {
     my $firstname_ascii = $arg_ref->{firstname_ascii};
     my $surname_ascii = $arg_ref->{surname_ascii};
     my $firstname_utf8 = $arg_ref->{firstname_utf8};
+    my $surname_initial_utf8 = $arg_ref->{surname_initial_utf8};
+    my $firstname_initial_utf8 = $arg_ref->{firstname_initial_utf8};
     my $surname_utf8 = $arg_ref->{surname_utf8};
     my $filename = $arg_ref->{filename};
     my $birthdate = $arg_ref->{birthdate};
@@ -2071,7 +2073,14 @@ sub AD_user_update {
         $replace{'displayName'}=$display_name;
         print "   displayName:                $display_name\n";
     }
-
+    if (defined $firstname_initial_utf8 and $firstname_initial_utf8 ne "---" ){
+        $replace{'sophomorixFirstnameInitial'}=$firstname_initial_utf8;
+        print "   sophomorixFirstnameInitial: $firstname_initial_utf8\n";
+    }
+    if (defined $surname_initial_utf8 and $surname_initial_utf8 ne "---" ){
+        $replace{'sophomorixSurnameInitial'}=$surname_initial_utf8;
+        print "   sophomorixSurnameInitial:   $surname_initial_utf8\n";
+    }
     if (defined $firstname_ascii and $firstname_ascii ne "---" ){
         $replace{'sophomorixFirstnameASCII'}=$firstname_ascii;
         print "   sophomorixFirstnameASCII:   $firstname_ascii\n";
@@ -4728,6 +4737,8 @@ sub AD_get_AD_for_check {
                                 'sophomorixBirthdate',
                                 'sn',
                                 'givenName',
+                                'sophomorixSurnameInitial',
+                                'sophomorixFirstnameInitial',
                                 'sophomorixAdminFile',
                                 'sophomorixAdminClass',
                                 'sophomorixRole',
@@ -4760,6 +4771,8 @@ sub AD_get_AD_for_check {
                $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
                $AD{'sAMAccountName'}{$sam}{'sn'}=$entry->get_value('sn');
                $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
+               $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
                $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
                $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
                $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
