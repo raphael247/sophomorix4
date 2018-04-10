@@ -1703,6 +1703,7 @@ sub AD_user_create {
                    sophomorixQuota=> [@quotalist],
                    sophomorixMailQuota=>"---:---:",
                    sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'MAILQUOTA'}{'CALCULATED_DEFAULT'},
+                   sophomorixCloudQuotaCalculated=>"---",
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school,
                    sophomorixCreationDate => $creationdate_ok, 
@@ -6238,6 +6239,7 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
         $users{'USERS'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
         $users{'USERS'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+        $users{'USERS'}{$sam}{'sophomorixUserToken'}=$entry->get_value('sophomorixUserToken');
         $users{'USERS'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
         $users{'USERS'}{$sam}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
         $users{'USERS'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
@@ -6247,6 +6249,10 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sophomorixFirstPassword'}=$entry->get_value('sophomorixFirstPassword');
         $users{'USERS'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
         $users{'USERS'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
+
+        $users{'USERS'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
+        $users{'USERS'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
+
         $users{'USERS'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
         $users{'USERS'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
         @{ $users{'USERS'}{$sam}{'sophomorixWebuiPermissions'} } = 
@@ -6264,6 +6270,7 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
         $users{'USERS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
         $users{'USERS'}{$sam}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
+        $users{'USERS'}{$sam}{'sophomorixCloudQuotaCalculated'}=$entry->get_value('sophomorixCloudQuotaCalculated');
         $users{'USERS'}{$sam}{'sophomorixMailQuotaCalculated'}=$entry->get_value('sophomorixMailQuotaCalculated');
         $users{'USERS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
         @{ $users{'USERS'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');

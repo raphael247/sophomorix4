@@ -38,21 +38,23 @@ DRINGEND:
              OK: schmema
              OK: --> mit login angelegt, 
              TODO: danach per sophomorix-user updatebar (Lehrerkürzel-Feld, falls nicht mit login gleich)
-   --> sophomorixFirstnameInitials
-       sophomorixSurnameInitials
+   --> sophomorixFirstnameInitial
+       sophomorixSurnameInitial
              OK: schema
              OK: setting on user creation
-             TODO: update on user update
+             OK: update on user update
              TODO Testing the attributes in Test 1
+
+   --> TODO: sophomorix-user -i zeigt neue Attribute
 
    --> OK: Bei der rolle in der school.ini eintragen:
        CLOUDQUOTA_PERCENTAGE=1001	   
    --> TODO:
        --> multipliziert das Quotafeld der eigenen schule mit
        CLOUDQUOTA_PERCENTAGE/100 und füllt damit (je nach Rolle)
-       das neu anzulegende Attribut: sophomorixCloudQuota
+       das neu anzulegende Attribut: sophomorixCloudQuotaCalculated
        --> Ausgabe,update mit sophomorix-quota
-       --> sophomorix-user -i Attribut sophomorixCloudQuota  dazu anzeigen
+       --> sophomorix-user -i Attribut sophomorixCloudQuotaCalculated  dazu anzeigen
 
 --> TODO: Zeitattribute umstellen oms syntax (tut das jetzt)
    --> TODO: caching einstellen
