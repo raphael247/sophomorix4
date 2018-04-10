@@ -5,26 +5,26 @@
 	SCHOOL_LONGNAME=Linuxmuster School
 	MAILTYPE=none
 [role.student]
-	quota_default_global=1000
-	quota_default_school=1500
-	mailquota_default=150
+	QUOTA_DEFAULT_GLOBAL=1000
+	QUOTA_DEFAULT_SCHOOL=1500
+	MAILQUOTA_DEFAULT=150
         CLOUDQUOTA_PERCENTAGE=100
-	webui=
-	another_ui=
+	WEBUI=
+	ANOTHER_UI=
 [role.teacher]
-	quota_default_global=2000
-	quota_default_school=2500
-	mailquota_default=300
+	QUOTA_DEFAULT_GLOBAL=2000
+	QUOTA_DEFAULT_SCHOOL=2500
+	MAILQUOTA_DEFAULT=300
         CLOUDQUOTA_PERCENTAGE=100
-	webui=
-	another_ui=
+	WEBUI=
+	ANOTHER_UI=
 [role.schooladministrator]
-	quota_default_global=3000
-	quota_default_school=3500
-	mailquota_default=500
+	QUOTA_DEFAULT_GLOBAL=3000
+	QUOTA_DEFAULT_SCHOOL=3500
+	MAILQUOTA_DEFAULT=500
         CLOUDQUOTA_PERCENTAGE=100
-	webui=
-	another_ui=
+	WEBUI=
+	ANOTHER_UI=
 [type.adminclass]
     # student classes from school administration software (created by students.csv, ...) 
 [type.teacherclass]
@@ -75,19 +75,22 @@
 	PWD_LENGTH=10
 [devicefile.devices.csv]
 	# extrafields go here
-# every managementgroup can have the following section
-[managementgroup.wifi]
-     allow_group=12a,12b,teachers # students
-     allow_users=maierle,muellerle
-     except_users=lucifer   # lucifer ist in 12a
-     except_group=5a  # falls group=students
-     revert_allow_group=12a,12b,teachers # or students
-     revert_allow_users=maierle,muellerle # add users that are NOT in revert_allow_group
-     revert_except_users=lucifer   # if lucifer is in 12a
-     revert_except_group=5a  # if group=students
-     revert_cron=...  # Line für cronjob to revert??
-     # allow:  only these users can be added by supervisors
-     # revert: that is the default, when a cronjob sets back memberships
-[managementgroup.internet]
-     allow_group=students,teachers
-     revert_allow_group=students,teachers
+#
+# The following does not fit, because its lowercase and contains groups of ONE school (cannot be copied to othe schools)
+#
+# # every managementgroup can have the following section
+# [managementgroup.wifi]
+#      allow_group=12a,12b,teachers # students
+#      allow_users=maierle,muellerle
+#      except_users=lucifer   # lucifer ist in 12a
+#      except_group=5a  # falls group=students
+#      revert_allow_group=12a,12b,teachers # or students
+#      revert_allow_users=maierle,muellerle # add users that are NOT in revert_allow_group
+#      revert_except_users=lucifer   # if lucifer is in 12a
+#      revert_except_group=5a  # if group=students
+#      revert_cron=...  # Line für cronjob to revert??
+#      # allow:  only these users can be added by supervisors
+#      # revert: that is the default, when a cronjob sets back memberships
+# [managementgroup.internet]
+#      allow_group=students,teachers
+#      revert_allow_group=students,teachers

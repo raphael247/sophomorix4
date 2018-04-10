@@ -19,6 +19,10 @@ Password for 'https://jeffbeck@github.com': ########
 Todo:
 ############################################################
 
+3.30.x release: 
+  --> capitalize KEYS in school.ini
+      webui --> WEBUI
+
 
 
 DRINGEND: 
@@ -28,31 +32,7 @@ DRINGEND:
    --> OK custom attributes
    --> OK intrinsic attributes
    --> OK: show sophomorix attributes
-
-   --> TODO: make capital: in school.conf.master:
-       quota_default_global=3000
-	quota_default_school=3500
-	mailquota_default=
-	webui, .... capital= ???
-
-
-# every managementgroup can have the following section
-[managementgroup.wifi]
-     allow_group=12a,12b,teachers # students
-     allow_users=maierle,muellerle
-     except_users=lucifer   # lucifer ist in 12a
-     except_group=5a  # falls group=students
-     revert_allow_group=12a,12b,teachers # or students
-     revert_allow_users=maierle,muellerle # add users that are NOT in revert_allow_group
-     revert_except_users=lucifer   # if lucifer is in 12a
-     revert_except_group=5a  # if group=students
-     revert_cron=...  # Line für cronjob to revert??
-     # allow:  only these users can be added by supervisors
-     # revert: that is the default, when a cronjob sets back memberships
-[managementgroup.internet]
-     allow_group=students,teachers
-     revert_allow_group=students,teachers
-
+   --> OK: make capital: in school.conf.master:
 
    --> TODO: sophomorixUserToken
              --> mit login angelegt, 
@@ -61,8 +41,9 @@ DRINGEND:
              sophomorixSurnameInitials
              --> evtl. Initials-attribute?
 
-   --> TODO: Bei der rolle in der school.ini eintragen:
+   --> OK: Bei der rolle in der school.ini eintragen:
        CLOUDQUOTA_PERCENTAGE=100
+   --> TODO:
        --> multipliziert das Quotafeld der eigenen schule mit
        CLOUDQUOTA_PERCENTAGE/100 und füllt damit (je nach Rolle)
        das neu anzulegende Attribut: sophomorixCloudQuota
@@ -644,7 +625,7 @@ Todo END
 AK:
 Win 10, wie sichtbar, wer angemeldet ist.
 
-linbo webui:
+linbo WEBUI:
 - kernel-parameter als drop-down mit beschreibung wozu
   (... fix for Motherboard xyz)
 
@@ -728,7 +709,7 @@ todo:
 bug: sophomorix-check
 
 # todo
-# sophomorix-user -u xxx --add-webui-permissions "webui:upload:TRUE" test names
+# sophomorix-user -u xxx --add-webui-permissions "WEBUI:upload:TRUE" test names
 
 
 
@@ -826,8 +807,8 @@ NEUES UI: What must be done?
     sofern im Multivalue-attribut SophomorixWebuiPermissions etwas steht, wird dies umgesetzt
     (kann auch leer sein, dann keinerlei Änderungen)
     Attributinhalt (Multi-Value):
-     webui:filemanager:TRUE
-     webui:quotamanager:FALSE
+     WEBUI:filemanager:TRUE
+     WEBUI:quotamanager:FALSE
      ...
 
  4) Für jeden user wird dann das multi-value Attribut SophomorixWebuiPermissionsCalculated
@@ -846,10 +827,10 @@ Zu überlegen wäre folgendes:
 WENN die Attribute so aussähen:
 
    bei 3)
-     webui:filemanager:TRUE
-     webui:quotamanager:FALSE
+     WEBUI:filemanager:TRUE
+     WEBUI:quotamanager:FALSE
    bei 4)
-     webui:$TRUE_ENTRY
+     WEBUI:$TRUE_ENTRY
 
 DANN müsste jede UI selber rausfinden, welche Entries in SophomorixWebuiPermissionsCalculated für sie gelten.
 ABER: es wären für neue UI's keine neuen Attribute im AD erforderlich

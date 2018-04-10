@@ -5455,12 +5455,12 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
         # get SHAREDEFAULT for this role
         $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$school}{'SHAREDEFAULT'}=
-            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
+            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'QUOTA_DEFAULT_SCHOOL'};
         $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}}{'SHAREDEFAULT'}=
-            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
+            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'QUOTA_DEFAULT_GLOBAL'};
         # get MAILQUOTA SCHOOLDEFAULT for this role
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAILQUOTA'}{'SCHOOLDEFAULT'}=
-            $ref_sophomorix_config->{'ROLES' }{$school}{$role}{'mailquota_default'};
+            $ref_sophomorix_config->{'ROLES' }{$school}{$role}{'MAILQUOTA_DEFAULT'};
 
         # save mail adress/alias
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLISTMEMBER'}="FALSE"; # may be set to TRUE later

@@ -1350,10 +1350,10 @@ sub console_print_quota_user {
         my $school_default;
         my $share_display;
 	if ($share eq $ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}){
-            $school_default=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_global'};
+            $school_default=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'QUOTA_DEFAULT_GLOBAL'};
 	    $share_display="GLOBAL";
 	} elsif ($share eq $school){
-            $school_default=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'quota_default_school'};
+            $school_default=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'QUOTA_DEFAULT_SCHOOL'};
 	    $share_display=$share;
         } else {
             $school_default="---";                    
