@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-postinst) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+
+my $conf_dir="/etc/linuxmuster/sophomorix";
+my $conf_file=$conf_dir."/sophomorix.conf";
+my $conf_file_source="/usr/share/sophomorix/config-templates/sophomorix.conf.template.ini";
+
+print "sophomorix-postinst start\n";
+
+print "   * Installing sophomorix.conf\n";
+# create directory
+system "mkdir -p $conf_dir";
+# copy the default sophomorix.conf
+if (-e $conf_file){
+    # do nothing
+    print "      * No installation, file exists:\n";
+    print "        $conf_file\n";
+    # LATER: do upgrade sophomorix.conf
+} else {
+    # copy the template
+    print "        Installing $conf_file\n";
+    system("install -oroot -groot --mode=0644 $conf_file_source $conf_file");    
+}
+
+
+
+my $school_dir=$conf_dir."/default-school";
+my $school_file=$school_dir."/school.conf";
+my $school_file_source="/usr/share/sophomorix/config-templates/school.conf.template.ini";
+
+print "   * Installing school.conf\n";
+# create directory
+system "mkdir -p $school_dir";
+# copy the default sophomorix.conf
+if (-e $school_file){
+    # do nothing
+    print "      * No installation, file exists:\n";
+    print "        $school_file\n";
+    # LATER: do upgrade sophomorix.conf
+} else {
+    # copy the template
+    print "        Installing $school_file\n";
+    system("install -oroot -groot --mode=0644 $school_file_source $school_file");    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+print "sophomorix-postinst end\n";
