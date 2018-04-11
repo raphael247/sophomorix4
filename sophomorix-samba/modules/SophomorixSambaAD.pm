@@ -5997,7 +5997,9 @@ sub AD_get_quota {
                 my $school=$quota{'QUOTA'}{'USERS'}{$user}{'sophomorixSchoolname'};
                 my $percentage=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'CLOUDQUOTA_PERCENTAGE'};
                 my $cloudquota_calc=int($calc*$percentage/100);
+                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'PERCENTAGE'}=$percentage;
                 $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'}=$cloudquota_calc." MB";
+                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC_MB'}=$cloudquota_calc;
             }
 
             # add --- for undefined values

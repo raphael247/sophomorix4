@@ -1513,6 +1513,41 @@ sub console_print_quota_user {
             }
         }
     } # end of share walk
+    ############################################################
+    # CLOUDQUOTA
+    my $cloudcalc_display;
+    my $cloudquota_percentage=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'PERCENTAGE'};
+    if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+        # append asterisk
+        $cloudcalc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC_MB'}."*";
+    } else {
+        # append space
+        $cloudcalc_display=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC_MB'}." ";
+    }
+
+    if($log_level>=2){
+        # print extensive information
+	print $line;
+        printf "| %-77s|\n","CloudQuota for user ".$user." ($cloudquota_percentage% of $school share):";
+        if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE"){
+            printf "|%11s%-67s|\n",
+                   $cloudcalc_display,
+                   " sophomorixCloudQuotaCalculated must be set to ".
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'};
+        } else {
+            printf "|%11s%-67s|\n",
+                   $cloudcalc_display,
+                   " sophomorixCloudQuotaCalculated was set to ".
+                   $ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'};
+        }
+    } else {
+        # print single line
+	printf "| %-25s| %-7s|%6s|%32s |\n",
+               "$user($role:$cloudquota_percentage%)",
+               "**CQ**",
+               $cloudcalc_display,
+               "($school)";
+    }
 }
 
 
