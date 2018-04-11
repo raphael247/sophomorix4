@@ -18,6 +18,7 @@ use MIME::Base64;
               );
 
 
+
 # Reading configuration file
 #my $conf="/etc/linuxmuster/sophomorix/sophomorix.conf";
 #if (not -e $conf){
@@ -30,7 +31,11 @@ use MIME::Base64;
 #}
 # Use this variables with $Conf::Variablenname (without 'my' in sophomorix.conf)
 $Conf::lang="de";
-
+my $conf="/etc/linuxmuster/sophomorix/sophomorix.conf";
+if (not -e $conf){
+    print "\nERROR: $conf not found!\n\n";
+    exit 88;
+}
 
 
 # Reading developer configuration file
