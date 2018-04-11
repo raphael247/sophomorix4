@@ -92,7 +92,7 @@ DRINGEND:
 	       add/remove.....
 	       je nach user|group|project| eine passende update sub aufrufen
 
-   sophomorix-sambs --show-sophomorix-attributes:
+   sophomorix-samba --show-sophomorix-attributes:
       --> searchflag mit angeben
 
    EVTL: (Bedingung searchflag update reicht aus)
@@ -108,11 +108,19 @@ DRINGEND:
             GLOBALADMIN_MANAGED_SEARCHFLAGS=sophomorixFirstpassword, ...
 	    --> überlässt dem Serveradmin das SEARCHFlag management für diese Attribute komplett
 
+
+
    18.04
      -> script um school share anzulegen
      -> zusatzattribute alle fertig (kein Schema update mehr)
 
-   Konfigurationsdateien aus etc raus, reinkopieren bei schulerstellung
+   1) Alle Konfigurationsdateien aus etc raus
+   2) Postinstallscript:
+      sophomorix-school --create --school default-school
+      ... um global mit sophomorix.conf zu erstellen
+   3) reinkopieren bei Schulerstellung
+      sophomorix-school --create --school <schoolname>
+   4) recreate all schools im postinst script?
 
 
    Wenn schule konfiguriert (sophomorix.conf) UND share da:

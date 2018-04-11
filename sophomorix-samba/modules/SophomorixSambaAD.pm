@@ -5448,6 +5448,7 @@ sub AD_get_quota {
                              'sophomorixQuota',
                              'sophomorixMailQuota',
                              'sophomorixMailQuotaCalculated',
+                             'sophomorixCloudQuotaCalculated',
                             ]);
     my $max_user = $mesg->count; 
     &Sophomorix::SophomorixBase::print_title(
@@ -5472,6 +5473,8 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixAdminFile'}=$file;
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$school;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixCloudQuotaCalculated'}=$entry->get_value('sophomorixCloudQuotaCalculated');
+
         # get SHAREDEFAULT for this role
         $quota{'QUOTA'}{'USERS'}{$sam}{'SHARES'}{$school}{'SHAREDEFAULT'}=
             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'QUOTA_DEFAULT_SCHOOL'};
@@ -5484,7 +5487,7 @@ sub AD_get_quota {
         # save mail adress/alias
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'MAILLISTMEMBER'}="FALSE"; # may be set to TRUE later
         $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'mail'}=$entry->get_value('mail');
-        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'displayName'}=$entry->get_value('displayName');;
+        $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'displayName'}=$entry->get_value('displayName');
         ($quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIASNAME'},
          $quota{'QUOTA'}{'USERS'}{$sam}{'MAIL'}{'ALIASNAME_LONG'})=
             &Sophomorix::SophomorixBase::alias_from_name($entry->get_value('sophomorixSurnameASCII'),
@@ -5986,6 +5989,14 @@ sub AD_get_quota {
             }
             # update CALC
             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'CALC'}=$calc;
+            # update sophomorixCloudQuotaCalculated
+            if ($share eq $quota{'QUOTA'}{'USERS'}{$user}{'sophomorixSchoolname'}){
+                my $role=$quota{'QUOTA'}{'USERS'}{$user}{'sophomorixRole'};
+                my $school=$quota{'QUOTA'}{'USERS'}{$user}{'sophomorixSchoolname'};
+                my $percentage=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'CLOUDQUOTA_PERCENTAGE'};
+                my $cloudquota_calc=int($calc*$percentage/100);
+                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'}=$cloudquota_calc." MB";
+            }
 
             # add --- for undefined values
             if (not defined $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'OLDCALC'}){
@@ -6016,6 +6027,14 @@ sub AD_get_quota {
                 # no oldcalc set
                 $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'UPDATE'}="TRUE";
                 $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'ACTION'}{'REASON'}{'OLDCALC is ---'}="TRUE";
+            }
+
+            # check update of sophomorixCloudQuotaCalculated
+            if ($quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'} ne 
+                $quota{'QUOTA'}{'USERS'}{$user}{'sophomorixCloudQuotaCalculated'}){
+                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'}="TRUE";
+            } else {
+                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'}="FALSE";
             }
 
             # increase share counter
