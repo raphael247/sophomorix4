@@ -130,11 +130,14 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
-sophomorix-quota sets SMB-Share-Quota(=Quota) and MailQuota
+sophomorix-quota sets SMB-Share-Quota(=Quota) CloudQuota and MailQuota
 
   * Quota is set with the smbcquotas command from samba
+  * CloudQuota sets the attribute sophomorixCloudQuotaCalculated
+    (i.e. to be used by NextCloud) with the quota of the school share
+    multipied by CLOUDQUOTA_PERCENTAGE (in school.ini) of the users role
   * MailQuota sets the attribute sophomorixMailQuotaCalculated
-    (for use by )
+    (i.e. to be used by dovecot)
 
 Options
   -h  / --help
@@ -154,9 +157,9 @@ Show sophomorix info about quota calculation
     --smbcquotas
   
 Setting the user Quota/MailQuota
-  set Quota AND MailQuota
+  set Quota/CloudQuota AND MailQuota
     sophomorix-quota
-  set Quota only:
+  set Quota/CloudQuota only:
     sophomorix-quota --set-quota-only
   set MailQuota only:
     sophomorix-quota --set-mailquota-only
