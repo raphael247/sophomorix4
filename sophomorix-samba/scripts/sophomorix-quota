@@ -493,7 +493,7 @@ foreach my $school_share (@sharelist){
                 print "  WARNING: User $user not found!\n";
                 next;
             }
-            print "   * User $user:\n";
+            print "   * Mailquota of user $user:\n";
             ############################################################
             # set user MailQuota
             if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'MAILQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE" or
@@ -516,7 +516,7 @@ foreach my $school_share (@sharelist){
                                  sophomorix_result=>\%sophomorix_result,
                                });
             } else {
-                print "      *  OK: sophomorixMailQuotaCalculated\n";
+                print "      * OK:  sophomorixMailQuotaCalculated\n";
 	    }
         }
     } # set mailquota end
@@ -530,7 +530,7 @@ foreach my $school_share (@sharelist){
                 print "  WARNING: User $user not found!\n";
                 next;
             }
-            print "   * User $user:\n";
+            print "   * Share-/Cloudquota of user $user:\n";
             ############################################################
             # Walk through all shares
             my $share_count=0;
@@ -565,7 +565,32 @@ foreach my $school_share (@sharelist){
                 } else {
                     print "      * OK:  $share\n";
                 }
-            }
+            } # end Walk through all shares
+            ############################################################
+            # update sophomorixCloudQuotaCalculated 
+            my $cloud_user_count=0; # count the users for progression output
+            if ($ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'} eq "TRUE" or
+                $set==1
+               ){
+                $cloud_user_count++;
+                my $cloudquota_calc=$ref_quota->{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'};
+                print "      * SET: sophomorixCloudQuotaCalculated to $cloudquota_calc MiB:\n";
+                my $dn=$ref_quota->{'QUOTA'}{'LOOKUP'}{'USER'}{'DN_by_sAMAccountName'}{$user};
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$dn,
+                                 user=>$user,
+                                 cloudquota_calc=>$cloudquota_calc,
+                                 user_count=>$cloud_user_count,
+                                 max_user_count=>$ref_quota->{'QUOTA'}{'UPDATE_COUNTER'}{'CLOUDQUOTA'},
+                                 time_stamp_AD=> $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                               });
+            } else {
+                print "      * OK:  sophomorixCloudQuotaCalculated\n";
+	    }
         }
     } # set quota end
 }

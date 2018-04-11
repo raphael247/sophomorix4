@@ -1971,6 +1971,7 @@ sub AD_user_update {
     my $quota_info = $arg_ref->{quota_info};
     my $mailquota = $arg_ref->{mailquota};
     my $mailquota_calc = $arg_ref->{mailquota_calc};
+    my $cloudquota_calc = $arg_ref->{cloudquota_calc};
     my $user_count = $arg_ref->{user_count};
     my $max_user_count = $arg_ref->{max_user_count};
     my $hide_pwd = $arg_ref->{hide_pwd};
@@ -2229,6 +2230,12 @@ sub AD_user_update {
     if (defined $mailquota_calc){
         $replace{'sophomorixMailQuotaCalculated'}=$mailquota_calc;
         print "   sophomorixMailQuotaCalculated:        $mailquota_calc\n";
+    }
+    
+    # cloudquota_calc
+    if (defined $cloudquota_calc){
+        $replace{'sophomorixCloudQuotaCalculated'}=$cloudquota_calc;
+        print "   sophomorixCloudQuotaCalculated:       $cloudquota_calc\n";
     }
     
     # status
@@ -2619,7 +2626,7 @@ sub AD_user_setquota {
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
-    &Sophomorix::SophomorixBase::print_title("Setting Quota for user $user on share $share_count/$max_share_count (start):");
+    &Sophomorix::SophomorixBase::print_title("Setting Quota for user $user on share $share ($share_count/$max_share_count start):");
 
     # calculate limits
     my $hard_bytes;
@@ -2636,40 +2643,40 @@ sub AD_user_setquota {
                           " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                           $smb_admin_pass."'".
                           " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //$root_dns/$share";
-                print "$smbcquotas_command\n";
-                my $stdout=`$smbcquotas_command`;
-                my $return=${^CHILD_ERROR_NATIVE}; # return of value of $smbcquotas_command
-                if ($return==0){
-                    chomp($return);
-                    my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$stdout);
-                    my ($unused,$quota_user)=split(/\\/,$full_user);
-                    $used=~s/\/$//;
-                    $hard_limit=~s/\/$//;
-                    if ($hard_limit eq "NO"){
-                        $hard_limit="NO LIMIT";
-                    }
-                    print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit\n";
-                    # update the sophomorixQuota entry at the user
-		    my $share_quota=$share.":".$quota;
-                    print "Updating quota for user $user to $share_quota:\n";
-                    my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
-                    &AD_user_update({ldap=>$ldap,
-                                     root_dse=>$root_dse,
-                                     dn=>$dn,
-                                     user=>$user,
-                                     quota=>$share_quota,     # <share>:<quota_on_share>
-                                     quota_calc=>$quota,      # what was calculated (same as quota_on_share)
-                                     quota_info=>$hard_limit, # what was set
-                                     user_count=>$user_count,
-                                     max_user_count=>$max_user_count,
-                                     json=>$json,
-                                     sophomorix_config=>$ref_sophomorix_config,
-                                     sophomorix_result=>$ref_sophomorix_result,
-                                   });
-		} else {
-                    print "ERROR: Setting quota on share $share for user $user failed\n";
-                }
-    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user (end)");
+    print "$smbcquotas_command\n";
+    my $stdout=`$smbcquotas_command`;
+    my $return=${^CHILD_ERROR_NATIVE}; # return of value of $smbcquotas_command
+        if ($return==0){
+            chomp($return);
+            my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$stdout);
+            my ($unused,$quota_user)=split(/\\/,$full_user);
+            $used=~s/\/$//;
+            $hard_limit=~s/\/$//;
+            if ($hard_limit eq "NO"){
+                $hard_limit="NO LIMIT";
+            }
+            print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit\n";
+            # update the sophomorixQuota entry at the user
+	    my $share_quota=$share.":".$quota;
+            print "Updating quota for user $user to $share_quota:\n";
+            my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+            &AD_user_update({ldap=>$ldap,
+                             root_dse=>$root_dse,
+                             dn=>$dn,
+                             user=>$user,
+                             quota=>$share_quota,     # <share>:<quota_on_share>
+                             quota_calc=>$quota,      # what was calculated (same as quota_on_share)
+                             quota_info=>$hard_limit, # what was set
+                             user_count=>$user_count,
+                             max_user_count=>$max_user_count,
+                             json=>$json,
+                             sophomorix_config=>$ref_sophomorix_config,
+                             sophomorix_result=>$ref_sophomorix_result,
+                           });
+	} else {
+            print "ERROR: Setting quota on share $share for user $user failed\n";
+        }
+    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user on share $share (end)");
 }
 
 
@@ -4153,9 +4160,6 @@ sub AD_get_AD {
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam;
 
             my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$adminclass};
-            if (not defined $type){
-                print "HERE: $adminclass without TYPE\n"
-            }
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
                        {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
             push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
@@ -5044,8 +5048,6 @@ sub AD_get_AD_for_device {
                 foreach my $dn (@{ $AD{$type}{$sam}{'member'} }){
                     my @parts=split(",",$dn);
                     my ($unused,$memsam)=split("=",$parts[0]);
-		    #print "HERE2: $memsam is in $sam\n";
-                    #push @{ $AD{$type}{$sam}{'member_sam'} },$memsam;
                     $AD{$type}{$sam}{'member_sAMAccountName'}{$memsam}="seen";
                 }
             }
@@ -6030,11 +6032,13 @@ sub AD_get_quota {
             }
 
             # check update of sophomorixCloudQuotaCalculated
-            if ($quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'} ne 
-                $quota{'QUOTA'}{'USERS'}{$user}{'sophomorixCloudQuotaCalculated'}){
-                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'}="TRUE";
-            } else {
-                $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'}="FALSE";
+            if ($share eq $quota{'QUOTA'}{'USERS'}{$user}{'sophomorixSchoolname'}){
+                if ($quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'CALC'} ne 
+                    $quota{'QUOTA'}{'USERS'}{$user}{'sophomorixCloudQuotaCalculated'}){
+                    $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'}="TRUE";
+                } else {
+                    $quota{'QUOTA'}{'USERS'}{$user}{'CLOUDQUOTA'}{'ACTION'}{'UPDATE'}="FALSE";
+                }
             }
 
             # increase share counter
