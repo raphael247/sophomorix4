@@ -207,8 +207,9 @@ if ($school ne "" and $create==1){
         print "WARNING: You must add the school in\n";
         print "         $DevelConf::file_conf_sophomorix\n";
         print "         before you can create it!\n\n";
+        exit;
     } else {
-        # create new school
+        # create new school in AD
         &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,

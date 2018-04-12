@@ -2566,6 +2566,39 @@ sub config_sophomorix_read {
     # SCHOOLS  
     # read the *.school.conf
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
+	# test if school is configured
+	# share <school >must exist
+	if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
+	    &print_title("OK: $school share exists");
+	} else {
+	    print "\n";
+            print "ERROR: You have no share for the configured school $school\n";
+            print "       You need a share $school with:\n";
+            print "         * Full access with the same Administrator password\n";
+            print "         * A fully working quota system on the share\n";
+            print "       You can create the share with:\n";
+            print "         * a local share with ??????? of the linuxmuster-base7 package\n";
+            print "         * a remote share according to a Howto\n";
+	    print "\n";
+	    exit;
+	}
+
+	# <school>.school.conf must exist
+	if (-f $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'}){
+	    &print_title("OK: $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'}");
+	} else {
+	    print "\n";
+            print "ERROR: $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'} nonexisting\n";
+	    print "\n";
+            print "Create the file from a template with the command:\n";
+            print "   sophomorix-postinst $school\n";
+	    print "\n";
+	    exit;
+        }   
+	#print Dumper \%sophomorix_config;
+	#exit;
+
+	# read the config
         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
                  if ($school eq $DevelConf::name_default_school){
