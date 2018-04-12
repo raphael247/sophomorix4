@@ -91,9 +91,6 @@ DRINGEND:
 	       add/remove.....
 	       je nach user|group|project| eine passende update sub aufrufen
 
-   sophomorix-samba --show-sophomorix-attributes:
-      --> searchflag mit angeben
-
    EVTL: (Bedingung searchflag update reicht aus)
      Datei mit serachflags, Entwickler (und evtl. anderen Dingen)
        sophomorixFirstPassword:128       # immer verborgen
@@ -149,44 +146,10 @@ Todo:
 sophomorix-quota: mit tatsächlichen Werte von smbcquota vergleichen abfragen und mit dem Wert in AD vergleichen. mit Zusatzswitch --smbcquotas
 . Lesen der 
 
-Idee:
-
-script. das ein Programm mit allen unterschiedlichen optionskombinationen ausführt, und dann standarderror mitloggt
-
-Anzahl Kombinationen
-1 ->2^1 =2
-2 ->2^2 = 4
-3 ->2^3 = 8
-4 ->2^4 =16
-
-10 ->2^10 =1024
-
-30 ->2^30 =1.073.741.824 = 1 Mrd. (sophomorix-class) dauert 34 Jahre
-
-sophomorix-optionanalyse.
-* alle scripte suchen
-* script --printopt --> json auswerten
-* script --help - in string speichern
-* Analyse
-
-1. Schritt: --printopt : gibt alle optionen zurück (optionenhash auswerten)
-   als json
-2. schritt: Analyse
-   A) hilfe parsen, zu welchen optionen gibts keine Hilfe
-   B) alle kombinationen von optionen durchgehen,
-      stderr und stdout ausgeben
-      Wo gibts Fehler auf stderr?
-
-
---> examnutzer ohne Vorname Nachname
+--> examnutzer ohne Vorname Nachname ist das OK
 
 sophomorix-session --session 2018-02-20_15-07-21 -i
 --> probleme
-
-Zusatzattribute:
-sophomorixFirstnameInitials H.-P.
-sophomorixLastnameInitial(s) B.
---> upgedated mit namensänderung
 
 quota-Abfrage
 so tuts:
