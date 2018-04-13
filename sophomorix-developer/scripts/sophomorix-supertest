@@ -19,11 +19,15 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-regression-supertest.pl runs multiple tests
+sophomorix-supertest runs multiple tests
 Options:
   -h  / --help
 
-  -s r     reset samba
+Preparation:
+  -s r     reset samba, configfiles, shares to installation default
+  -s p     prepare samba dfor the following tests
+
+Run tests:
   -s all   reset an run all tests
 
   -s 1     reset samba and run sophomorix-test-1
@@ -54,6 +58,8 @@ if ($option ne ""){
 
 if ($script eq "r"){
     &reset_smb();
+} elsif ($script eq "p"){
+    &prepare_smb();
 } elsif ($script eq "all"){
     @scriptlist=("sophomorix-test-1 $option ", 
                  "sophomorix-test-2 $option ", 
@@ -89,6 +95,7 @@ foreach my $script (@scriptlist){
     my (@parts)=split(/ /,$script);
     my $command=$script."--full 1> /tmp/".$parts[0].".log 2> /tmp/".$parts[0].".error";
     &reset_smb();
+    &prepare_smb();
     print "\n";
     &printline();
     print "TEST: $command \n";
@@ -117,6 +124,12 @@ foreach my $script (@scriptlist){
 
 
 
+sub prepare_smb {
+    print "Preparing samba for test ... \n";
+
+}
+
+
 sub reset_smb {
     &printline();
     print "Resetting samba for test ... \n";
@@ -129,22 +142,31 @@ sub reset_smb {
     system("net conf delshare ltg");
     system("net conf delshare test");
     system("net conf delshare uni");
-    system("rm -f /etc/linuxmuster/sophomorix/bsz/bsz.devices.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/bsz/bsz.teachers.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/bsz/bsz.students.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/uni/uni.teachers.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/uni/uni.students.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv.orig");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv.orig");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv.orig");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv");
-    system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv.orig");
+    system("rm -rf /etc/linuxmuster/sophomorix");
+    system("sophomorix-postinst");
+    system("net conf addshare linuxmuster-global /srv/samba/global writeable=y guest_ok=y \"Share for school global\"");
+    system("net conf addshare default-school /srv/samba/schools/default-school writeable=y guest_ok=y \"Share for school default-school\"");
+    #system("");
+    #system("");
+    #system("");
+    #system("");
+    #system("");
+#    system("rm -f /etc/linuxmuster/sophomorix/bsz/bsz.devices.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/bsz/bsz.teachers.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/bsz/bsz.students.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/uni/uni.teachers.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/uni/uni.students.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv.orig");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/students.csv.orig");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/devices.csv.orig");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv");
+#    system("rm -f /etc/linuxmuster/sophomorix/default-school/extraclasses.csv.orig");
 #    system("sophomorix-samba --restore-samba ohne-user");
     system("sophomorix-samba --restore-samba without-sophomorix-schema");
     system("sophomorix-samba --schema-load");
