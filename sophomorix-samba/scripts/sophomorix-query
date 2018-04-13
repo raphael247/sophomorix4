@@ -146,9 +146,9 @@ Limit the searchbase (this is faster):
   --sub-projectbase (only works together with schoolbase)
 
 What user attributes to return:
---user-minimal    (i. e. for dropdown menues)
---user-basic      (default)
---user-full       (all attributes)
+--user-minimal      (i. e. for dropdown menues)
+--user-basic        (default)
+--user-full         (all attributes)
 
 What group attributes to return:
 --group-minimal      (i. e. for dropdown menues)
@@ -433,6 +433,7 @@ if (defined $options{'user-minimal'}){
     ];
     $multi_user_attrs=[
       'sophomorixQuota',
+      'memberOf',
       'sophomorixWebuiPermissionsCalculated',
       'sophomorixCustomMulti1',
       'sophomorixCustomMulti2',
@@ -599,6 +600,8 @@ if ($search_object eq "all"){
 }
 
 
+
+
 # display debugging info
 if (defined $options{'verbose'} and $options{'verbose'}==1){
     print "\n";
@@ -682,6 +685,19 @@ for( my $index = 0 ; $index < $max ; $index++) {
         @{ $search{$top_key}{$sam}{$attribute} }=$entry->get_value($attribute);
     }
 
+    # managementgroups
+    if ($search_object eq "user"){
+        my @member_of = $entry->get_value('memberOf');
+        foreach my $member_of (@member_of){
+	    if ($member_of=~m/OU=Management/){
+	        my ($name,@other)=split(/,/,$member_of);
+	        $name=~s/^CN=//;
+                # push @{ $search{$top_key}{$sam}{'MANAGEMENTGROUPS'} }, $name;
+                $search{$top_key}{$sam}{'MANAGEMENTGROUPS'}{$name}="TRUE";
+	    }
+        }
+    }
+    
     # if needed: find group members (users/computers)
     my $top_key_members="";
     my $top_count_key_members="";
@@ -689,7 +705,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
     my $filter_append;
     if (defined $options{'group-members'}){
         my @members = $entry->get_value('member');
-        # decide if comuters or users are searched
+        # decide if computers or users are searched
         if ($search_object_used eq "group"){
             $top_key_members="MEMBERS";
             $top_count_key_members="MEMBERCOUNT";
@@ -759,8 +775,6 @@ for( my $index = 0 ; $index < $max ; $index++) {
         @{ $search{'LISTS'}{$top_list_key_members}{$sam} } = sort @{ $search{'LISTS'}{$top_list_key_members}{$sam} };
     }
 }
-
-
 
 # sort and count some lists
 if ($#{ $search{'LISTS'}{$top_key} }>0){
