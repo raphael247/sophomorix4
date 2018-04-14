@@ -126,44 +126,46 @@ foreach my $script (@scriptlist){
 
 sub prepare_smb {
     print "Preparing samba for test ... \n";
+    my $templates="/usr/share/sophomorix-developer/testtemplates";
+    my $config="/etc/linuxmuster/sophomorix";
 
     # sophomorix.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini.test /etc/linuxmuster/sophomorix/sophomorix.conf");
+    system("install -d -m755 -oroot -groot $config");
+    system("install -v -oroot -groot --mode=0644 $templates/sophomorix.conf.template.ini.test $config/sophomorix.conf");
     # share for global exists
 
     # abc.school.conf 
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/abc");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template.ini.test /etc/linuxmuster/sophomorix/abc/abc.school.conf");
+    system("install -d -m755 -oroot -groot $config/abc");
+    system("install -v -oroot -groot --mode=0644 $templates/abc.school.conf.template.ini.test $config/abc/abc.school.conf");
     system("mkdir -p /srv/samba/schools/abc");
     system("net  conf addshare abc /srv/samba/schools/abc writeable=y guest_ok=y 'Share for school abc'");
 
     # bsz.school.conf 
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/bsz");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template.ini.test /etc/linuxmuster/sophomorix/bsz/bsz.school.conf");
+    system("install -d -m755 -oroot -groot $config/bsz");
+    system("install -v -oroot -groot --mode=0644 $templates/bsz.school.conf.template.ini.test $config/bsz/bsz.school.conf");
     system("mkdir -p /srv/samba/schools/bsz");
     system("net  conf addshare bsz /srv/samba/schools/bsz writeable=y guest_ok=y 'Share for school bsz'");
 
     # school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/default-school");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template.ini.test /etc/linuxmuster/sophomorix/default-school/school.conf");
+    system("install -d -m755 -oroot -groot $config/default-school");
+    system("install -v -oroot -groot --mode=0644 $templates/school.conf.template.ini.test $config/default-school/school.conf");
     # share exists
 
     # ghs.school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/ghs");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/ghs.school.conf.template.ini.test /etc/linuxmuster/sophomorix/ghs/ghs.school.conf");
+    system("install -d -m755 -oroot -groot $config/ghs");
+    system("install -v -oroot -groot --mode=0644 $templates/ghs.school.conf.template.ini.test $config/ghs/ghs.school.conf");
     system("mkdir -p /srv/samba/schools/ghs");
     system("net  conf addshare ghs /srv/samba/schools/ghs writeable=y guest_ok=y 'Share for school ghs'");
 
     # lin.school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/lin");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/lin.school.conf.template.ini.test /etc/linuxmuster/sophomorix/lin/lin.school.conf");
+    system("install -d -m755 -oroot -groot $config/lin");
+    system("install -v -oroot -groot --mode=0644 $templates/lin.school.conf.template.ini.test $config/lin/lin.school.conf");
     system("mkdir -p /srv/samba/schools/lin");
     system("net  conf addshare lin /srv/samba/schools/lin writeable=y guest_ok=y 'Share for school lin'");
 
     # uni.school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/uni");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/uni.school.conf.template.ini.test /etc/linuxmuster/sophomorix/uni/uni.school.conf");
+    system("install -d -m755 -oroot -groot $config/uni");
+    system("install -v -oroot -groot --mode=0644 $templates/uni.school.conf.template.ini.test $config/uni/uni.school.conf");
     system("mkdir -p /srv/samba/schools/uni");
     system("net  conf addshare uni /srv/samba/schools/uni writeable=y guest_ok=y 'Share for school uni'");
 }

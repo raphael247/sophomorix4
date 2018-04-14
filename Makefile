@@ -77,6 +77,7 @@ FILTER=$(DESTDIR)/usr/share/sophomorix/filter
 # Testfiles
 DEVELOPERDIR=$(DESTDIR)/usr/share/sophomorix-developer
 TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
+TESTTEMPLATES=$(DESTDIR)/usr/share/sophomorix-developer/testtemplates
 
 # sophomorix-virusscan
 #VIRUSSCAN=$(DESTDIR)/usr/share/sophomorix-virusscan
@@ -138,12 +139,8 @@ install-sophomorix-samba:
 	@install -d -m700 -oroot -groot $(LIBDIR)/lock
 	@install -d -m700 -oroot -groot $(LIBDIR)/print-data
 	@install -d -m700 -oroot -groot $(LIBDIR)/check-result
-#	@install -d -m755 -oroot -groot $(CACHEDIR)
 	@install -d -m700 -oroot -groot $(LOGDIR)
 	@install -d -m700 -oroot -groot $(LOGDIR)/user
-#	@install -d -m700 -oroot -groot $(CTEMPDIR)
-#	@install -d -m700 -oroot -groot $(CTEMPDIR)/samba/netlogon
-#	@install -d -m700 -oroot -groot $(CTEMPDIR)/apache
 # Install the scripts
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-samba/scripts/sophomorix-*[a-z1-9] $(DESTDIR)/usr/sbin
@@ -156,45 +153,8 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/2_sophomorix-classes.ldif $(SCHEMA)/
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/3_sophomorix-aux.ldif $(SCHEMA)/
 	@install -oroot -groot --mode=0755 sophomorix-samba/schema/sophomorix_schema_add.sh $(SCHEMA)/
-#	@install -oroot -groot --mode=0755 sophomorix-samba/schema/samba-backup $(SCHEMA)/
-#	@install -oroot -groot --mode=0755 sophomorix-samba/schema/samba-restore $(SCHEMA)/
-#	@install -oroot -groot --mode=0755 sophomorix-samba/schema/samba-schema-load $(SCHEMA)/
-# group owner is changed in postinst-script to lehrer
-#	@install -oroot -groot --mode=4750 sophomorix-base/scripts-teacher/sophomorix-*[a-z1-9] $(DESTDIR)/usr/bin
 # installing configs for root
 	@install -d -m755 -oroot -groot $(CONF)
-#	@install -d -m755 -oroot -groot $(CONF)/user
-#	old
-#	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix.conf $(CONF)/user
-#	@install -oroot -groot --mode=0644 sophomorix-samba/config/sophomorix-schools.conf $(CONF)/user
-# #	# New, temporary
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini $(CONF)/sophomorix.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/default-school
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template.ini $(CONF)/default-school/school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/abc
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template.ini $(CONF)/abc/abc.school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/bsz
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template.ini $(CONF)/bsz/bsz.school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/uni
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/uni.school.conf.template.ini $(CONF)/uni/uni.school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/lin
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/lin.school.conf.template.ini $(CONF)/lin/lin.school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/ghs
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ghs.school.conf.template.ini $(CONF)/ghs/ghs.school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/test
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/test.school.conf.template.ini $(CONF)/test/test.school.conf
-# 	@install -d -m755 -oroot -groot $(CONF)/ltg
-# 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ltg.school.conf.template.ini $(CONF)/ltg/ltg.school.conf
-#	@install -oroot -groot --mode=0600 sophomorix-samba/config/quota.txt $(CONF)/user
-#	@install -oroot -groot --mode=0600 sophomorix-samba/config/mailquota.txt $(CONF)/user
-#	@install -d -m755 -oroot -groot $(CONF)/project
-#	@install -d -m755 -oroot -groot $(CONF)/device
-#	@install -oroot -groot --mode=0644 sophomorix-samba/config/projects.create $(CONF)/project
-#	@install -oroot -groot --mode=0644 sophomorix-samba/config/projects.update $(CONF)/project
-# config-templates
-#	@install -oroot -groot --mode=0600 sophomorix-samba/config-templates/*.txt $(CTEMPDIR)
-#	@install -oroot -groot --mode=0600 sophomorix-samba/config-templates/*.map $(CTEMPDIR)
-#	@install -oroot -groot --mode=0600 sophomorix-samba/config/sophomorix.conf $(CTEMPDIR)
 # configs for developers
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/sophomorix-devel.conf $(DEVELCONF)/devel
@@ -224,8 +184,6 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.extraclass $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.student_home $(DEVELCONF)/devel/repdir
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/repdir/repdir.examuser_home $(DEVELCONF)/devel/repdir
-#	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/acl
-#	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/acl/*acl.template $(DEVELCONF)/devel/acl
 # ntacls
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/ntacl
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/ntacl/*ntacl.template $(DEVELCONF)/devel/ntacl
@@ -233,8 +191,6 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(LANGUAGE)
 	@install -oroot -groot --mode=0644 sophomorix-samba/lang/sophomorix-lang.*[a-z] $(LANGUAGE)
 	@install -oroot -groot --mode=0644 sophomorix-samba/lang/errors.*[a-z] $(LANGUAGE)
-#	@install -d -m755 -oroot -groot $(LANGUAGE)/latex-templates
-#	@install -oroot -groot --mode=0644 sophomorix-base/latex-templates/*.tex $(LANGUAGE)/latex-templates
 # latex stuff
 	@install -d -m755 -oroot -groot $(LATEX)
 	@install -d -m755 -oroot -groot $(LATEX)/templates
@@ -246,13 +202,6 @@ install-sophomorix-samba:
 # filter scripts
 	@install -d -m755 -oroot -groot $(FILTER)
 	@install -oroot -groot --mode=0755 sophomorix-samba/filter/*.filter $(FILTER)
-# for samba
-#	@install -d -m700 -oroot -groot $(DESTDIR)/home/samba/netlogon
-#	@install -oroot -groot --mode=0600 sophomorix-base/samba/netlogon/*.bat.template $(CTEMPDIR)/samba/netlogon
-#	@install -d -m700 -oroot -groot $(SAMBAROOTPREEXEC)
-#	@install -oroot -groot --mode=0700 sophomorix-base/samba/root-preexec/sophomorix-root-preexec $(SAMBAROOTPREEXEC)
-#	@install -d -m700 -oroot -groot $(SAMBAROOTPOSTEXEC)
-#	@install -oroot -groot --mode=0700 sophomorix-base/samba/root-postexec/sophomorix-root-postexec $(SAMBAROOTPOSTEXEC)
 
 
 install-virusscan:
@@ -311,6 +260,10 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/modules/SophomorixTest.pm $(PERLMOD)
 # installing  examples
 	@install -d $(DEVELOPERDIR)
+# installing templates
+	@install -d $(TESTTEMPLATES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testtemplates/*.ini.test $(TESTTEMPLATES)
+
 # installing  testdata
 	@install -d $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-errors-firstname $(TESTDATA)
