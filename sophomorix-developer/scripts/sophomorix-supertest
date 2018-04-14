@@ -132,6 +132,12 @@ sub prepare_smb {
     system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini.test /etc/linuxmuster/sophomorix/sophomorix.conf");
     # share for global exists
 
+    # abc.school.conf 
+    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/abc");
+    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template.ini.test /etc/linuxmuster/sophomorix/abc/abc.school.conf");
+    system("mkdir -p /srv/samba/schools/abc");
+    system("net  conf addshare abc /srv/samba/schools/abc writeable=y guest_ok=y 'Share for school abc'");
+
     # bsz.school.conf 
     system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/bsz");
     system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template.ini.test /etc/linuxmuster/sophomorix/bsz/bsz.school.conf");
@@ -168,6 +174,7 @@ sub reset_smb {
     &printline();
     print "Resetting samba for test ... \n";
     system("net conf delshare linuxmuster-global");
+    system("net conf delshare abc");
     system("net conf delshare bsz");
     system("net conf delshare default-school");
     system("net conf delshare ghs");
