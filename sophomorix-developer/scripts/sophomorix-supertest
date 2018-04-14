@@ -132,12 +132,6 @@ sub prepare_smb {
     system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini.test /etc/linuxmuster/sophomorix/sophomorix.conf");
     # share for global exists
 
-    # abc.school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/abc");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/abc.school.conf.template.ini.test /etc/linuxmuster/sophomorix/abc/abc.school.conf");
-    system("mkdir -p /srv/samba/schools/abc");
-    system("net  conf addshare abc /srv/samba/schools/abc writeable=y guest_ok=y 'Share for school abc'");
-
     # bsz.school.conf 
     system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/bsz");
     system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/bsz.school.conf.template.ini.test /etc/linuxmuster/sophomorix/bsz/bsz.school.conf");
@@ -161,18 +155,6 @@ sub prepare_smb {
     system("mkdir -p /srv/samba/schools/lin");
     system("net  conf addshare lin /srv/samba/schools/lin writeable=y guest_ok=y 'Share for school lin'");
 
-    # ltg.school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/ltg");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/ltg.school.conf.template.ini.test /etc/linuxmuster/sophomorix/ltg/ltg.school.conf");
-    system("mkdir -p /srv/samba/schools/ltg");
-    system("net  conf addshare ltg /srv/samba/schools/ltg writeable=y guest_ok=y 'Share for school ltg'");
-
-    # test.school.conf
-    system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/test");
-    system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/test.school.conf.template.ini.test /etc/linuxmuster/sophomorix/test/test.school.conf");
-    system("mkdir -p /srv/samba/schools/test");
-    system("net  conf addshare test /srv/samba/schools/test writeable=y guest_ok=y 'Share for school test'");
-
     # uni.school.conf
     system("install -d -m755 -oroot -groot /etc/linuxmuster/sophomorix/uni");
     system("install -v -oroot -groot --mode=0644 sophomorix-samba/config-template/uni.school.conf.template.ini.test /etc/linuxmuster/sophomorix/uni/uni.school.conf");
@@ -186,13 +168,10 @@ sub reset_smb {
     &printline();
     print "Resetting samba for test ... \n";
     system("net conf delshare linuxmuster-global");
-    system("net conf delshare abc");
     system("net conf delshare bsz");
     system("net conf delshare default-school");
     system("net conf delshare ghs");
     system("net conf delshare lin");
-    system("net conf delshare ltg");
-    system("net conf delshare test");
     system("net conf delshare uni");
     system("rm -rf /etc/linuxmuster/sophomorix");
     system("sophomorix-postinst");
