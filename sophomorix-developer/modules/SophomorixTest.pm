@@ -331,6 +331,9 @@ sub AD_test_object {
     my $s_first_password = $arg_ref->{sophomorixFirstPassword};
     my $s_firstname_ascii = $arg_ref->{sophomorixFirstnameASCII};
     my $s_surname_ascii = $arg_ref->{sophomorixSurnameASCII};
+    my $s_firstname_ini = $arg_ref->{sophomorixFirstnameInitial};
+    my $s_surname_ini = $arg_ref->{sophomorixSurnameInitial};
+    my $s_usertoken = $arg_ref->{sophomorixUserToken};
     my $s_birthdate = $arg_ref->{sophomorixBirthdate};
     my $s_role = $arg_ref->{sophomorixRole};
     my $s_school_prefix = $arg_ref->{sophomorixSchoolPrefix};
@@ -348,6 +351,7 @@ sub AD_test_object {
     my $s_quota = $arg_ref->{sophomorixQuota};
     my $s_mailquota = $arg_ref->{sophomorixMailQuota};
     my $s_mailquotacalc = $arg_ref->{sophomorixMailQuotaCalculated};
+    my $s_cloudquotacalc = $arg_ref->{sophomorixCloudQuotaCalculated};
 
 
     # sophomorix group
@@ -529,6 +533,18 @@ sub AD_test_object {
             is ($entry->get_value ('sophomorixSurnameASCII'),$s_surname_ascii,
 		"  * sophomorixSurnameASCII is $s_surname_ascii");
         }
+        if (defined $s_firstname_ini){
+            is ($entry->get_value ('sophomorixFirstnameInitial'),$s_firstname_ini,
+		"  * sophomorixFirstnameInitial is $s_firstname_ini");
+        }
+        if (defined $s_surname_ini){
+            is ($entry->get_value ('sophomorixSurnameInitial'),$s_surname_ini,
+		"  * sophomorixSurnameInitial is $s_surname_ini");
+        }
+        if (defined $s_usertoken){
+            is ($entry->get_value ('sophomorixUserToken'),$s_usertoken,
+		"  * sophomorixUserToken is $s_usertoken");
+        }
         if (defined $s_birthdate){
             is ($entry->get_value ('sophomorixBirthdate'),$s_birthdate,
 		"  * sophomorixBirthdate is $s_birthdate");
@@ -580,6 +596,10 @@ sub AD_test_object {
                 is ("undef",$s_mailquotacalc,
   		    "  * sophomorixMailQuotaCalculated is undef");
             }
+        }
+        if (defined $s_cloudquotacalc){
+            is ($entry->get_value ('sophomorixCloudQuotaCalculated'),$s_cloudquotacalc,
+  	        "  * sophomorixCloudQuotaCalculated is $s_cloudquotacalc");
         }
         if (defined $s_addmailquota){
             is ($entry->get_value ('sophomorixAddMailQuota'),$s_addmailquota,
