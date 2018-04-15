@@ -167,6 +167,7 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template.ini $(DEVELCONF)/config-templates
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/devices.csv.template $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/belwue.template.ini $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/WEBUI.template.ini $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ANOTHER_UI.template.ini $(DEVELCONF)/config-templates
