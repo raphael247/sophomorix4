@@ -41,7 +41,7 @@ DRINGEND:
              OK: schema
              OK: setting on user creation
              OK: update on user update
-   --> TODO Testing the attributes in Test 1:
+   --> OK: Testing the attributes in test-1, Test workflow:
                sophomorixUserToken
                sophomorixFirstnameInitial
                sophomorixSurnameInitial
@@ -57,7 +57,7 @@ DRINGEND:
        das neu anzulegende Attribut: sophomorixCloudQuotaCalculated
        --> Ausgabe,update mit sophomorix-quota
 
---> TODO: Zeitattribute umstellen oms syntax (tut das jetzt)
+--> TODO: Zeitattribute umstellen oms syntax (17.10 tut noch nicht)
    --> TODO: caching einstellen
    --> TODO: searchflagsumstellung ohne Editor möglich?
              geht das mit NET::LDAP module und update?
@@ -87,6 +87,9 @@ DRINGEND:
    single/multi custom/intrinsic usw. wieder leeren möglich?
    
    --> TODO: create function to update intrinsic and custom attributes
+       (and all that are just updated by option, no question asked: sophomorixComment)
+       rename options to attribut name in script, use shortcut names only as option
+
        &update_intrinsic_custom_attributes (%options, "user|group|project|...")
        sub update_intrinsic_custom_attributes macht folgendes:
            --> sind/welche Attribute sollen gesetzt werden in %options
@@ -107,8 +110,14 @@ DRINGEND:
 	    --> überlässt dem Serveradmin das SEARCHFlag management für diese Attribute komplett
 
 
+sophomorix-supertest:
+auch logfiles usw. entfernen, das nach der Paketinstallation entstanden ist. (mit git init testen)
+
+
+
 
    18.04
+     -> schematest: Zeitattribute
      -> script um school share anzulegen
      -> zusatzattribute alle fertig (kein Schema update mehr)
  
@@ -633,7 +642,6 @@ kommentare in devices.csv erhalten
 Übungsfirmen als Schulen
 Lehrernetz schülernetz-Trennung
 
-Landesschülerid -attribut vorsehen
 
 Schulkonsole:
 Umgang mit Tauschlaufwerken:
@@ -717,6 +725,8 @@ in die Tests einbauen:
 sophomorix-test-1 --mod
 
 
+------------------------------------------------------------
+doku in wiki:
 
 Ziele:
 - posivivliste
@@ -744,7 +754,7 @@ Folgende webui Attribute gibts (beim user)
      * bei Schulkonsolenanmeldung ausgewertet für Anzeige
 
 Auswertung (=Berechnung des Attributes SophomorixWebuiPermissionsCalculated für jeden user)
-
+------------------------------------------------------------
 
 ################   Kurzablauf: <webui> ist als variable zu sehen
 
@@ -868,7 +878,7 @@ sophomorix-sk --ui <Webui>
               --role <student|teacher|administrator>
   konfiguriert für die sk <Webui> in der Schule <schule> für
   alle user der Rolle <student|teacher|administrator> die zu
-  <Webui> gehörenden Attribute im AD.
+  <WEBUI> gehörenden Attribute im AD.
 
   A) liest die Paket-Konfiguration der SK ein <Webui>
   B) modifiziert die Einstellungen entsprechend der school.ini

@@ -296,24 +296,43 @@ if ($show_all_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-    my $line="------------------------------------------------------------\n";
-    print "sophomorix schema names:\n";
+
+    # class schema (no searchflag)
+    my $line1 ="+----------------------------------------------------------------------------+\n";
+    my $line  ="+-------+--------------------------------------------------------------------+\n";
+    my $header="| Nr.   | Attribute                                                          |\n";
+    print $line1;
+    printf "| classSchema: %-5s                                                         |\n",
+            $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'classSchema'}{'COUNT'};    
     print $line;
-    print "classSchema (".$ref_schema->{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'classSchema'}{'COUNT'}."):\n";
-    print $line;
+    print $header;
+    print $line1;
     my $count=0;
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'classSchema'} } ) {
         $count++;
-        printf "%6s:  %-60s\n",$count,$attr;
+        printf "| %6s|  %-66s|\n",$count,$attr;
     } 
     print $line;
-    print "attributeSchema (".$ref_schema->{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'attributeSchema'}{'COUNT'}."):\n";
+    print "\n";
+
+    # attribute schema
+    $line1 ="+----------------------------------------------------------------------------+\n";
+    $line  ="+------+-----+---------------------------------------------------------------+\n";
+    $header="| Nr.  |  SF | Attribute                                                     |\n";
+    print $line1;
+    printf "| attributeSchema: %-5s                                                     |\n",
+            $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'attributeSchema'}{'COUNT'};
+    print $line;
+    print $header;
     print $line;
     $count=0;
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'ALL_ATTRS'}{'attributeSchema'} } ) {
         $count++;
-        printf "%6s:  %-60s\n",$count,$attr;
+        my $search_flag=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'searchflags'} }[0];
+        printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
     } 
+    print $line;
+    print "SF: searchFlags (128: confidential   0:noindex   1:index)\n";
 } 
 
 
@@ -325,10 +344,11 @@ if ($show_sophomorix_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
+
+    # class schema (no searchflag)
     my $line1 ="+----------------------------------------------------------------------------+\n";
-    my $line  ="+------+-----+---------------------------------------------------------------+\n";
-    my $header="| Nr.  |  SF | Attribute                                                     |\n";
-    print "sophomorix schema names:\n";
+    my $line  ="+-------+--------------------------------------------------------------------+\n";
+    my $header="| Nr.   | Attribute                                                          |\n";
     print $line1;
     printf "| classSchema: %-5s                                                         |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'};    
@@ -342,16 +362,18 @@ if ($show_sophomorix_attributes==1){
         printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
     } 
     print $line;
-
     print "\n";
 
+    # attribute schema
+    $line1 ="+----------------------------------------------------------------------------+\n";
+    $line  ="+------+-----+---------------------------------------------------------------+\n";
+    $header="| Nr.  |  SF | Attribute                                                     |\n";
     print $line1;
     printf "| attributeSchema: %-5s                                                     |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'}{'COUNT'};
     print $line;
     print $header;
     print $line;
-    
     $count=0;
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'} } ) {
         $count++;
@@ -359,7 +381,7 @@ if ($show_sophomorix_attributes==1){
         printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
     }
     print $line;
-    print "SF: searchFlags (128: confidential 0:??? 1:???)\n";
+    print "SF: searchFlags (128: confidential   0:noindex   1:index)\n";
 } 
 
 
