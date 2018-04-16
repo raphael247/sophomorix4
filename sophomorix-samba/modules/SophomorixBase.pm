@@ -410,33 +410,33 @@ sub _console_print_devices {
     #if($log_level==1 and $object_name eq ""){
         # one device per line
         print $line;
-        print "|Role| DNS-Node      | IPv4          | Device         | Room      | MAC             |\n";
+        print "|Role| DNS-Node      | IPv4          | Computer       | Room      | MAC             |\n";
         print $line;
         foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
-            my $device;
+            my $computer;
             my $hwc;
             my $adminclass;
             if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
-                $device=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
+                $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
                 $hwc="";
-                $adminclass=$ref_devices->{'device'}{$device}{'sophomorixAdminClass'};
+                $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
             } else {
-                $device="---";
+                $computer="---";
                 $hwc="---";
                 $adminclass="---";
             }
 
             # sophomorixRole and sophomorixComment
             my $role_short;
-            if (not exists $ref_devices->{'device'}{$device}{'sophomorixRole'}){
+            if (not exists $ref_devices->{'computer'}{$computer}{'sophomorixRole'}){
                 $role_short="---";
             } else {
-                $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$ref_devices->{'device'}{$device}{'sophomorixRole'}};
+                $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$ref_devices->{'computer'}{$computer}{'sophomorixRole'}};
             }
             my $comment;
-            if ( not exists $ref_devices->{'device'}{$device}{'sophomorixComment'} ){ 
+            if ( not exists $ref_devices->{'computer'}{$computer}{'sophomorixComment'} ){ 
 		$comment=" ";
-            } elsif ( $ref_devices->{'device'}{$device}{'sophomorixComment'} eq "---" ){
+            } elsif ( $ref_devices->{'computer'}{$computer}{'sophomorixComment'} eq "---" ){
 		$comment="-";
             } else {
 		$comment="#";
@@ -447,7 +447,7 @@ sub _console_print_devices {
                    $role_display,
                    $dns_node,
                    $ref_devices->{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
-                   $device,
+                   $computer,
                    $adminclass,
                    "not in AD";
         }
@@ -484,8 +484,6 @@ sub _console_print_devices {
             printf "| %-19s| %-61s|\n",$hwk,"";
         }
     print $line2;
-
-
 }
 
 
