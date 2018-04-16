@@ -209,9 +209,10 @@ Nextcloud-Anbindung:
 
 2. Nextcloud -> Einstellungen -> Verwaltung -> LDAP/AD Integration
    Reiter 1: Server
-    Host: IP
+    Host: ldap://<IP>
     Port 389 (ermiteln)
     Bind DN aus # sophomorix-admin -i -a nextcloud-bind
+       CN=nextclod-bind,OU=Management,OU=GLOBAL,DC=linuxmuster,DC=local
     Passwort: wie angegeben oder wie in /etc/linuxmuster/.secret/nextcloud-bind
     BaseDN: dc=linuxmuster,dc=local (Muss Kleingeschieben sein, nicht DC  --> geht doch groß)
    Reiter 2: Benutzer
@@ -221,5 +222,6 @@ Nextcloud-Anbindung:
 
 
    Reiter 3: Anmelde-Attribute
-
+       (& (objectclass=user)(sAMAccountName=%uid))
    Reiter 4: Gruppen
+       (objectclass=group)
