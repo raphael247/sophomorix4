@@ -195,4 +195,31 @@ server:
    server;nextcloud;nopxe;08:00:27:38:DF:01;172.16.0.5;;;;;1;0
 
 
+
 ############################################################
+
+Nextcloud-Anbindung:
+
+1. Binduser erstellen:
+   # sophomorix-admin --create-global-binduser nextcloud-bind --password Muster!     (Passwort merken):
+   ODER:
+   # sophomorix-admin --create-global-binduser nextcloud-bind --random-passwd-save    (Passwort merken lassen):
+   Testen mit:
+   # sophomorix-admin -i -a nextcloud-bind
+
+2. Nextcloud -> Einstellungen -> Verwaltung -> LDAP/AD Integration
+   Reiter 1: Server
+    Host: IP
+    Port 389 (ermiteln)
+    Bind DN aus # sophomorix-admin -i -a nextcloud-bind
+    Passwort: wie angegeben oder wie in /etc/linuxmuster/.secret/nextcloud-bind
+    BaseDN: dc=linuxmuster,dc=local (Muss Kleingeschieben sein, nicht DC  --> geht doch groß)
+   Reiter 2: Benutzer
+    Lehrergruppen anzeigen lassen:
+    # sophomorix-class -i --teacherclass
+    
+
+
+   Reiter 3: Anmelde-Attribute
+
+   Reiter 4: Gruppen
