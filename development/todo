@@ -19,9 +19,28 @@ Password for 'https://jeffbeck@github.com': ########
 Todo:
 ############################################################
 
+- /etc/linuxmuster/sophomorix/global.devices.csv parsen und ohne prefix anlegen
+  --> im setup die server dort eintragen
+
+- Befehl um alle User-Rollen und Gruppen-Typen anzuzeigen
+  sophomorix-samba --roletype
+  --> mit anzahl der User in dieser Rolle
+
 - sophomorix-ui integrieren in sophomorix-add (und update???)
   (Dann aus test-1 und test-5 raus)
 - NTACL- funktion bauen mit wenig output (evtl. auch ander smb-befehle)
+
+- sophomorix_config_hash
+  aufräumen, klarstellen
+  "ROLE_USER" wird das gebraucht? gibts bei LOOKUP
+   Besser so:
+   LOOKUP -> user     -> roles
+          -> computer -> roles
+          -> group    -> types
+   - testen auf doppelungen
+   - shortname lookup/existance in LOOKUP
+   ALL von anderen trennen 
+   ROLES_DEVICE -> ROLES_COMPUTER
 
 3.31.x release: 
   --> capitalize KEYS in school.ini

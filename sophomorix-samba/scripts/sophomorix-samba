@@ -69,6 +69,7 @@ my $editor="emacs";
 my $show_all_attributes=0;
 my $show_sophomorix_attributes=0;
 my $show_attribute="";
+my $show_roletype=0;
 
 my $samba_private="/var/lib/samba/private";
 my $samba_private_d="/var/lib/samba/private/sam.ldb.d";
@@ -85,6 +86,7 @@ my $testopt=GetOptions(
            "show-attribute=s" => \$show_attribute,
            "show-all-attributes" => \$show_all_attributes,
            "show-sophomorix-attributes" => \$show_sophomorix_attributes,
+           "show-roletype" => \$show_roletype,
            "editor=s" => \$editor,
            "schema-load" => \$schema_load,
            "start" => \$start,
@@ -129,6 +131,8 @@ Show all attribute names
 Show all sophomorix attribute names:
   --show-sophomorix-attributes 
 
+Show all user roles and group types:
+  --show-roletype
 
 You shold know exactly what you are doing, if you use the following options:
 
@@ -405,6 +409,48 @@ if ($show_attribute ne ""){
                });
 
 }
+
+
+
+# --show-roletype
+if ($show_roletype==1){
+    print "\n";
+    print "########## sophomorixRole ####################################\n";
+    my @itemlist=();
+    my $ref_sophomorix_config=\%sophomorix_config;
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'} } ) {
+        if ($keyname eq "ROLES_ALL" or $keyname eq "ROLES_ALLADMINS"){
+            next;
+        }
+        push @itemlist,$keyname;
+    }
+    @itemlist = sort @itemlist;
+    foreach my $item (@itemlist){
+        my @rolelist=();
+        print "$item:\n";
+        foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{$item} } ) {
+           push @rolelist,$keyname; 
+        }
+        @rolelist = sort @rolelist;
+        foreach my $role (@rolelist){
+            print "   * $role\n";
+        }
+        print "\n";
+    }
+
+    my @typelist=();
+    print "########## sophomorixRole ####################################\n";
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'INI'}{'TYPE'} } ) {
+        push @typelist,$ref_sophomorix_config->{'INI'}{'TYPE'}{$keyname};
+    }
+    @typelist = sort @typelist;
+        foreach my $type (@typelist){
+            print "   * $type\n";
+        }
+        print "\n";
+}
+
+
 
 ############################################################
 # subs
