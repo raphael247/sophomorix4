@@ -29,11 +29,16 @@ if (-e $conf_file){
     system("install -oroot -groot --mode=0644 $conf_file_source $conf_file");    
 }
 
+# without option
 my $school="default-school";
 my $school_dir=$conf_dir."/".$school;
 my $school_file=$school_dir."/school.conf";
 
-if (defined $ARGV[0]){
+# option given, modify 
+if (defined $ARGV[0] and ($ARGV[0] eq "global" or $ARGV[0] eq "linuxmuster-global")){
+    print " \nERROR: You cannot create a school with the name $ARGV[0]\n\n\n";
+    exit;
+} elsif (defined $ARGV[0] and $ARGV[0] ne $school){
     $school=$ARGV[0];
     $school_dir=$conf_dir."/".$school;
     $school_file=$school_dir."/".$school.".school.conf";
