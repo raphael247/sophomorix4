@@ -208,20 +208,30 @@ Nextcloud-Anbindung:
    # sophomorix-admin -i -a nextcloud-bind
 
 2. Nextcloud -> Einstellungen -> Verwaltung -> LDAP/AD Integration
-   Reiter 1: Server
-    Host: ldap://<IP>
+
+   ##### Reiter 1: Server
+    Host: ldap://<IP>    (ldap:// nicht weglassen!)
     Port 389 (ermiteln)
     Bind DN aus # sophomorix-admin -i -a nextcloud-bind
-       CN=nextclod-bind,OU=Management,OU=GLOBAL,DC=linuxmuster,DC=local
-    Passwort: wie angegeben oder wie in /etc/linuxmuster/.secret/nextcloud-bind
-    BaseDN: dc=linuxmuster,dc=local (Muss Kleingeschieben sein, nicht DC  --> geht doch groß)
-   Reiter 2: Benutzer
-    Lehrergruppen anzeigen lassen:
-    # sophomorix-class -i --teacherclass
-    
+       CN=nextcloud-bind,OU=Management,OU=GLOBAL,DC=linuxmuster,DC=local
+    Passwort: Wie angegeben oder wie in /etc/linuxmuster/.secret/nextcloud-bind gespeichert.
+    BaseDN: DC=linuxmuster,DC=local
 
+   ##### Reiter 2: Benutzer
+    (& (objectClass=user)(| (sophomorixRole=student) (sophomorixRole=teacher) ) )
 
-   Reiter 3: Anmelde-Attribute
+   ##### Reiter 3: Anmelde-Attribute
        (& (objectclass=user)(sAMAccountName=%uid))
-   Reiter 4: Gruppen
-       (objectclass=group)
+
+   ##### Reiter 4: Gruppen
+   (objectclass=group) liefert auch admin Gruppen und Räume zurück-> mist
+   
+   --> BESSER: nur sophomorix Gruppen:
+    (& (objectClass=group) (| 
+        (sophomorixType=adminclass)
+        (sophomorixType=extraclass)
+        (sophomorixType=teacherclass)
+        (sophomorixType=project) 
+        (sophomorixType=sophomorix-group) ) 
+    )
+
