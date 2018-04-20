@@ -3423,6 +3423,10 @@ sub load_sophomorix_ini {
                 if ($parameter eq "SCHOOLS"){
 		    my @schools=split(/,/,$ref_modmaster_sophomorix->{$section}{$parameter});
                     foreach my $school (@schools){
+                        if ($school eq $DevelConf::name_default_school){
+                            # ignore this, already configured
+                            next;
+                        }
                         $school=&remove_whitespace($school);
                         push @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }, $school; 
                         $ref_sophomorix_config->{'SCHOOLS'}{$school}{'CONF_FILE'}=
