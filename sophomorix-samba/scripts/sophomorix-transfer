@@ -184,6 +184,10 @@ if ($info==1) {
 ################################################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
+print "HERE0: [$_]\n" foreach @ARGV;
+print "HERE0: \$0: $0\n";
+print "HERE0: @arguments\n";
+
 #print "$from_unix_path\n";
 #print "$to_user\n";
 
@@ -641,21 +645,40 @@ sub smbclient_mput_recurse {
                 my $md_path=$remember.$subdir;
                 $md_commands=$md_commands."md ".$md_path."; ";
                 $remember=$md_path."/";
+                if ($sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_RELY_ON_MKDIR_IGNORE_ERROR'} eq "FALSE"){
+                    # Dirty fix:  #### for ech subdir a smbclient command (which can fail)
+                    my $cd_path=$rel_path_home;
+                    my $md_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                   " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                   $smb_admin_pass."'".
+                                   " //$root_dns/$school_AD "." -c 'cd $cd_path; md $md_path'";
+                    print "HERE1: $md_command\n";
+                    print "HERE2: $cd_path\n";
+                    system($md_command);
+                }
             }
-            #print "\n$md_commands\n\n";
-  
-            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                  " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                  $smb_admin_pass."'".
-                                  " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
-                                  " prompt; recurse; mput *; exit;'";
-            print "$smbclient_command\n";
-            system($smbclient_command);
+
+            if ($sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_RELY_ON_MKDIR_IGNORE_ERROR'} eq "FALSE"){
+                # without md_commands (dirty fix above needed)
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                      $smb_admin_pass."'".
+                                      " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; lcd $localdir;".
+                                      " prompt; recurse; mput *; exit;'";
+                print "$smbclient_command\n";
+                system($smbclient_command);
+            } else {
+                # including md_commands  
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                      $smb_admin_pass."'".
+                                      " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
+                                      " prompt; recurse; mput *; exit;'";
+            }
         } else {
             print "\nERROR: cannot upload to nonexisting user $user\n\n";
         }
     }
-
 }
 
 
