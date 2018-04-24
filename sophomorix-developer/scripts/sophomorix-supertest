@@ -168,6 +168,9 @@ sub prepare_smb {
     system("install -v -oroot -groot --mode=0644 $templates/uni.school.conf.template.ini.test $config/uni/uni.school.conf");
     system("mkdir -p /srv/samba/schools/uni");
     system("net  conf addshare uni /srv/samba/schools/uni writeable=y guest_ok=y 'Share for school uni'");
+
+    # quotacheck
+    system("quotacheck -cvugafR");
 }
 
 
@@ -207,6 +210,8 @@ sub reset_smb {
     system("rm -rf /var/lib/sophomorix/tmp_collect");
     system("rm -rf /var/lib/sophomorix/tmp_pwdupdate");
     print "... done resetting samba for test\n";
+    # quotacheck on global and default-school
+    system("quotacheck -cvugafR");
     &printline();
 }
 
