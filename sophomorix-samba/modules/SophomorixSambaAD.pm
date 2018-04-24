@@ -215,7 +215,11 @@ sub AD_bind_admin {
     }
     my $mesg = $ldap->bind($sophomorix_AD_admin_dn, password => $smb_pwd);
     # show errors from bind
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $return=&AD_debug_logdump($mesg,2,(caller(0))[3]);
+    if ($return==0){
+        print "Please verify the password file for $sophomorix_AD_admin_dn\n\n";
+        exit;
+    }
 
     # Testing if sophomorix schema is present
     # ldbsearch -H ldap://localhost -UAdministrator%<password> -b cn=Schema,cn=Configuration,DC=linuxmuster,DC=local cn=Sophomorix-User

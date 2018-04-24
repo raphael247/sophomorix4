@@ -170,7 +170,9 @@ sub prepare_smb {
     system("net  conf addshare uni /srv/samba/schools/uni writeable=y guest_ok=y 'Share for school uni'");
 
     # quotacheck
+    system("quotaoff -a");
     system("quotacheck -cvugafR");
+    system("quotaon -a");
 }
 
 
@@ -194,7 +196,7 @@ sub reset_smb {
     system("rm -rf /srv/samba");
     sleep 5;
     # resetting passwords
-    system("sshpass -p \"Muster!\" samba-tool user setpassword Administrator");
+    system("samba-tool user setpassword administrator --newpassword `cat /etc/linuxmuster/.secret/administrator`");
     system("samba-tool domain passwordsettings set --complexity=default");
     system("samba-tool domain passwordsettings set --min-pwd-length=default");
     # removing old log files
@@ -211,7 +213,9 @@ sub reset_smb {
     system("rm -rf /var/lib/sophomorix/tmp_pwdupdate");
     print "... done resetting samba for test\n";
     # quotacheck on global and default-school
+    system("quotaoff -a");
     system("quotacheck -cvugafR");
+    system("quotaon -a");
     &printline();
 }
 
