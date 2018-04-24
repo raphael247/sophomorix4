@@ -1050,27 +1050,59 @@ sub AD_group_kill {
             # deleting share if possible, when succesful  the account
             # do not delete ./homes if not empty !
             if ($smb_share ne  "unknown"){
-                my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
-                                                 password  => $smb_admin_pass,
-                                                 debug     => 0);
-                # trying to delete homes (success only if it is empty)
+                #my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+                #                                 password  => $smb_admin_pass,
+                #                                 debug     => 3);
+                ## trying to delete homes (success only if it is empty)
                 my $smb_share_homes=$smb_share."/homes";
-                my $return1=$smb->rmdir($smb_share_homes);
-                if($return1==1){
-                    print "OK: Deleted empty dir with succes $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                #my $return1=$smb->rmdir($smb_share_homes);
+                my $homes=$smb_rel_path."/homes";
+                my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                      " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'".
+                                      $smb_admin_pass."' ".$unc." -c 'rmdir $homes;'";
+                print "$smbclient_command\n";
+                my $smbclient_return=system($smbclient_command);
+                print "   --> smbclient returned $smbclient_return\n";
+
+                my $smbclient_command_ls=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                         " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'".
+                                         $smb_admin_pass."' ".$unc." -c 'ls $homes;'";
+                print "$smbclient_command_ls\n";
+                my $return1=system($smbclient_command_ls);
+                print "   --> smbclient returned $return1\n";
+
+                if($return1==1 or $return1==256){
+                    print "OK: Deleted empty dir with success $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     # go on an recursively delete group/share and
-                    my $return2=$smb->rmdir_recurse($smb_share);
-                    if($return2==1){
+                    #my $return2=$smb->rmdir_recurse($smb_share);
+
+
+                    my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                          " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'".
+                                          $smb_admin_pass."' ".$unc." -c 'deltree $smb_rel_path;'";
+                    print "$smbclient_command\n";
+                    my $smbclient_return=system($smbclient_command);
+                    print "   --> smbclient returned $smbclient_return\n";
+
+
+                    my $smbclient_command_ls=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                                             " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'".
+                                             $smb_admin_pass."' ".$unc." -c 'ls $smb_rel_path;'";
+                    print "$smbclient_command_ls\n";
+                    my $return2=system($smbclient_command_ls);
+                    print "   --> smbclient returned $return2\n";
+
+                    if($return2==1 or $return2==256){
                         print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                         # deleting the AD account
                         my $command="samba-tool group delete ". $group;
                         print "   # $command\n";
                         system($command);
                     } else {
-                        print "ERROR: rmdir_recurse $smb_share $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                        print "ERROR: deltree $unc $smb_rel_path $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     }
                 } else {
-                    print "ERROR: rmdir $smb_share_homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    print "ERROR: rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                 }
 
             }

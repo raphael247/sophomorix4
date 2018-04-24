@@ -184,10 +184,6 @@ if ($info==1) {
 ################################################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
-print "HERE0: [$_]\n" foreach @ARGV;
-print "HERE0: \$0: $0\n";
-print "HERE0: @arguments\n";
-
 #print "$from_unix_path\n";
 #print "$to_user\n";
 
@@ -501,7 +497,9 @@ sub smbclient_mget_recurse {
         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                               $smb_admin_pass."'".
-                              " //$root_dns/$school_AD "." -mNT1 -c 'cd $cd_path; stat $filename; exit;'";
+                              " //$root_dns/$school_AD "." ".
+                              $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+                              " -c 'cd $cd_path; stat $filename; exit;'";
         print "$smbclient_command\n";
         my $stat_string=`$smbclient_command`;
         my @stat_lines=split("\n",$stat_string);
@@ -652,8 +650,6 @@ sub smbclient_mput_recurse {
                                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                    $smb_admin_pass."'".
                                    " //$root_dns/$school_AD "." -c 'cd $cd_path; md $md_path'";
-                    print "HERE1: $md_command\n";
-                    print "HERE2: $cd_path\n";
                     system($md_command);
                 }
             }
@@ -674,6 +670,8 @@ sub smbclient_mput_recurse {
                                       $smb_admin_pass."'".
                                       " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
                                       " prompt; recurse; mput *; exit;'";
+                print "$smbclient_command\n";
+                system($smbclient_command);
             }
         } else {
             print "\nERROR: cannot upload to nonexisting user $user\n\n";
