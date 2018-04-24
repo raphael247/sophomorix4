@@ -184,8 +184,8 @@ sub reset_smb {
     system("net conf delshare uni");
     system("rm -rf /etc/linuxmuster/sophomorix");
     system("sophomorix-postinst");
-    system("net conf addshare linuxmuster-global /srv/samba/global writeable=y guest_ok=y \"Share for school global\"");
-    system("net conf addshare default-school /srv/samba/schools/default-school writeable=y guest_ok=y \"Share for school default-school\"");
+    system("net conf addshare linuxmuster-global /srv/samba/global writeable=y guest_ok=y 'Share for school global'");
+    system("net conf addshare default-school /srv/samba/schools/default-school writeable=y guest_ok=y 'Share for school default-school'");
     system("sophomorix-samba --restore-samba without-sophomorix-schema");
     system("sophomorix-samba --schema-load");
     system("rm -rf /srv/samba");
@@ -194,6 +194,18 @@ sub reset_smb {
     system("sshpass -p \"Muster!\" samba-tool user setpassword Administrator");
     system("samba-tool domain passwordsettings set --complexity=default");
     system("samba-tool domain passwordsettings set --min-pwd-length=default");
+    # removing old log files
+    system("rm /var/log/sophomorix/user/*");
+    system("rm /var/log/sophomorix/command.log");
+    system("rm /var/log/sophomorix/user-add.log");
+    system("rm /var/log/sophomorix/user-update.log");
+    system("rm /var/log/sophomorix/user-kill.log");
+    system("rm -rf /var/log/sophomorix/userlog");
+    # removing old log files
+    system("rm /var/lib/sophomorix/check-result/*");
+    system("rm /var/lib/sophomorix/tmp/*");
+    system("rm -rf /var/lib/sophomorix/tmp_collect");
+    system("rm -rf /var/lib/sophomorix/tmp_pwdupdate");
     print "... done resetting samba for test\n";
     &printline();
 }

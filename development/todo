@@ -58,7 +58,7 @@ sophomorix-supertest:
   --> capitalize KEYS in school.ini
       webui --> WEBUI
   --> all attributes in schema
-      --> still to check on 18.04: Zeitattribute umstellen oms syntax (17.10 tut noch nicht)
+      --> still to check on 18.04: Zeitattribute umstellen oms syntax OK, war vorher schon OK
 
 DRINGEND: 
    OK: JSON output markieren
@@ -94,7 +94,7 @@ DRINGEND:
        das neu anzulegende Attribut: sophomorixCloudQuotaCalculated
        --> Ausgabe,update mit sophomorix-quota
 
---> TODO: Zeitattribute umstellen oms syntax (17.10 tut noch nicht)
+--> OK: Zeitattribute umstellen oms syntax 
    --> TODO: caching einstellen
    --> TODO: searchflagsumstellung ohne Editor möglich?
              geht das mit NET::LDAP module und update?
@@ -103,7 +103,7 @@ DRINGEND:
   sAMAcountname ist pre windows2000 logon name?
 
 
-  TODO: sophomorix-query shows custom and intrinsic attribites
+  TODO: sophomorix-query shows custom and intrinsic attributes
    (and other newly added stuff)
   --> umgesetzt, TEST
   --> MANAGEMENTGROUPS bei usern, TEST
@@ -147,15 +147,11 @@ DRINGEND:
 	    --> überlässt dem Serveradmin das SEARCHFlag management für diese Attribute komplett
 
 
-sophomorix-supertest:
-auch logfiles usw. entfernen, das nach der Paketinstallation entstanden ist. (mit git init testen)
-
-
-
 
    18.04
-     -> smbclient option -mNT1 notwendig ab samba 4.7, da dann unix extensions nicht mehr mit dem Server verhandelt werden.
-        -mNT1: switch toold protocol SMB1
+     -> smbclient option -mNT1 notwendig ab samba 4.7, 
+        da dann unix extensions nicht mehr mit dem Server verhandelt werden.
+        -mNT1: switch toold protocol SMB1 bei stat option
 
      -> schematest: Zeitattribute
      -> script um school share anzulegen
@@ -163,13 +159,6 @@ auch logfiles usw. entfernen, das nach der Paketinstallation entstanden ist. (mi
  
    BUG: sophomorix-admin --kill globaladmin liefer Fehler bei zu
    löschendem home, oder so
-
-   # regressiontest script anpassen an appliance: 
-     reset muss tun
-     --> z.B. /srv/samba/... löschen, auch wenn aquota.user da ist
-     --> nach /etc die richtigen configs kopieren 
-         (make install-test-configs mit copy-Befehlen erklären) 
-
 
    1) OK: Alle Konfigurationsdateien aus etc raus
    2) OK: Postinstallscript installs sophomorix.conf and school.conf
@@ -180,9 +169,6 @@ auch logfiles usw. entfernen, das nach der Paketinstallation entstanden ist. (mi
    3) TODO: reinkopieren bei Schulerstellung
       sophomorix-school --create --school <schoolname>
    4) TODO: recreate all schools im postinst script?
-
-   TODO: make install-test-configs   --> in regression test
-
 
 
    Wenn schule konfiguriert (sophomorix.conf) UND share da:
@@ -3430,7 +3416,8 @@ creationdate
 tolerationdate
 deactivationdate
 
-oMSyntax 23 (Zeit) --> oMSyntax 64 (utf8 string)
+OK:
+oMSyntax 24 (Zeit) --> oMSyntax 64 (utf8 string)
 attributeSyntax: 2.5.5.11 --> attributeSyntax: 2.5.5.12
 
 See: https://technet.microsoft.com/en-us/library/cc961740.aspx
