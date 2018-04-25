@@ -263,6 +263,9 @@ my @updating_computers=();
 my @killing_computers=();
 my @killing_computer_rooms=();
 
+# Rooms
+my @updating_rooms=();
+
 # dnsZones
 my @adding_dnszones=();
 my @killing_dnszones=();
@@ -282,6 +285,7 @@ my %addmembers_hardwareclasses=();
 my %killmembers_hardwareclasses=();
 
 my %update_computer=(); # device -> count
+my %update_room=();
 
 my %pxe = qw(ml ok
             );
@@ -847,6 +851,12 @@ foreach my $device_file (@filelist){
     while(<DEVICES>){
         &analyze_device_line($_,$device_file,$filename,$school);
     }
+    # sort some lists
+    foreach my $room (keys %{$devices_file{'room'}}) {
+        @{ $devices_file{'room'}{$room}{'HOSTLIST'} } = sort @{ $devices_file{'room'}{$room}{'HOSTLIST'} };
+        @{ $devices_file{'room'}{$room}{'MACLIST'} } = sort @{ $devices_file{'room'}{$room}{'MACLIST'} };
+        @{ $devices_file{'room'}{$room}{'IPv4LIST'} } = sort @{ $devices_file{'room'}{$room}{'IPv4LIST'} };
+    }
     close(DEVICES);
 }
 
@@ -1008,6 +1018,53 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
         if ($update>0){
             $update_computer{$device}{'COUNT'}=$update; # count how many attributes must be updated
             &push_update_computer($device);
+        }
+    }
+}
+
+
+
+# computers to update
+foreach my $room (keys %{$devices_file{'room'}}) {
+    print "HERE: Testing room $room\n";
+    if (exists $ref_AD_device->{'room'}{$room} ){
+        my $update=0;
+        print "   HERE: $room is in AD\n";
+        # Test if list have the same length
+        my $devices_items;
+        my $AD_items;
+        # HOSTNAME
+        $devices_items=$#{ $devices_file{'room'}{$room}{'HOSTLIST'} }+1;
+        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomComputers'} }+1;
+        print "$devices_items   --> $AD_items"; # ???
+        if ($devices_items==$AD_items){
+            # test for list entries ??????
+        } else {
+            $update++;
+        }
+        # IP
+        $devices_items=$#{ $devices_file{'room'}{$room}{'MACLIST'} }+1;
+        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomMACs'} }+1;
+        print "$devices_items   --> $AD_items"; # ???
+        if ($devices_items==$AD_items){
+            # test for list entries ??????
+        } else {
+            $update++;
+        }
+        # HOSTNAME
+        $devices_items=$#{ $devices_file{'room'}{$room}{'IPv4LIST'} }+1;
+        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomIPs'} }+1;
+        print "$devices_items   --> $AD_items"; # ???
+        if ($devices_items==$AD_items){
+            # test for list entries ??????
+        } else {
+            $update++;
+        }
+
+
+        if ($update>0){
+            $update_room{$room}{'COUNT'}=$update; # count how many attributes must be updated
+            &push_update_room($room);
         }
     }
 }
@@ -1192,6 +1249,15 @@ if($no_sync==1){
     &print_title("Computers that must be updated: ($count)");
     foreach my $ws (@updating_computers){
         print "UPDATE: $ws ($update_computer{$ws}{'COUNT'} attributes)\n";
+    }
+
+    # Rooms
+    # updates of group room attributes
+    print "\n";
+    $count=$#updating_rooms+1;
+    &print_title("Rooms that must be updated: ($count)");
+    foreach my $room (@updating_rooms){
+        print "UPDATE: $room ($update_room{$room}{'COUNT'} attributes)\n";
     }
 
     # dnsZones
@@ -1506,7 +1572,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Updating computers
     print "\n";
     my $max_computer_count_update=$#updating_computers+1;
-    &print_title("Updatinging $max_computer_count_update computers:");
+    &print_title("Updating $max_computer_count_update computers:");
     my $computer_count_update=1;
     foreach my $computer (@updating_computers){
         &AD_computer_update({ldap=>$ldap,
@@ -1521,6 +1587,27 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              sophomorix_result=>\%sophomorix_result,
                            });
         $computer_count_update++;
+    }
+
+    ############################################################
+    # Updating rooms
+    print "\n";
+    my $max_room_count_update=$#updating_rooms+1;
+    &print_title("Updating $max_room_count_update rooms:");
+    my $room_count_update=1;
+    foreach my $room (@updating_rooms){
+#        &AD_computer_update({ldap=>$ldap,
+#                             root_dse=>$root_dse,
+#                             computer=>$computer,
+#                             computer_count=>$computer_count_update,
+#                             attrs_count=>$update_computer{$computer}{'COUNT'},
+#                             replace=>\%update_computer,
+#                             max_computer_count=>$max_computer_count_update,
+#                             json=>$json,
+#                             sophomorix_config=>\%sophomorix_config,
+#                             sophomorix_result=>\%sophomorix_result,
+#                           });
+        $room_count_update++;
     }
 
     ############################################################
@@ -2020,6 +2107,11 @@ sub analyze_device_line {
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'room'}{$room_token}{'IPv4'}{$ip}="seen";
 
+        # lists at room
+        push @{ $devices_file{'room'}{$room_token}{'HOSTLIST'} }, $host_token;
+        push @{ $devices_file{'room'}{$room_token}{'MACLIST'} }, $mac;
+        push @{ $devices_file{'room'}{$room_token}{'IPv4LIST'} }, $ip;
+
         # field 10 decides 
         # $account_flag==0 (no account)
         # $account_flag==1 (create account) 1and all other values
@@ -2335,6 +2427,13 @@ sub push_update_computer {
 sub push_kill_computer {
     my ($kill) = @_;
     push @killing_computers, $kill;
+}
+
+
+
+sub push_update_room {
+    my ($update) = @_;
+    push @updating_rooms, $update;
 }
 
 
