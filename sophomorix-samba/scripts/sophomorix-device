@@ -969,6 +969,30 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
             $update++;
         }
 
+        # sophomorixComputerIP
+        if ($devices_file{'computer'}{$device}{'sophomorixComputerIP'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerIP'}){
+            # no update if equal
+        } else {
+            $update_computer{$device}{'REPLACE'}{'sophomorixComputerIP'}=$devices_file{'computer'}{$device}{'sophomorixComputerIP'};
+            $update++;
+        }
+
+        # sophomorixComputerMAC
+        if ($devices_file{'computer'}{$device}{'sophomorixComputerMAC'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerMAC'}){
+            # no update if equal
+        } else {
+            $update_computer{$device}{'REPLACE'}{'sophomorixComputerMAC'}=$devices_file{'computer'}{$device}{'sophomorixComputerMAC'};
+            $update++;
+        }
+
+        # sophomorixComputerRoom
+        if ($devices_file{'computer'}{$device}{'sophomorixComputerRoom'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerRoom'}){
+            # no update if equal
+        } else {
+            $update_computer{$device}{'REPLACE'}{'sophomorixComputerRoom'}=$devices_file{'computer'}{$device}{'sophomorixComputerRoom'};
+            $update++;
+        }
+
         # sophomorixComment
         if ($devices_file{'computer'}{$device}{'sophomorixComment'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComment'}){
             # no update if equal
@@ -2008,6 +2032,9 @@ sub analyze_device_line {
             $devices_file{'computer'}{$ws_token_account}{'FILENAME'}=$filename;
             $devices_file{'computer'}{$ws_token_account}{'sophomorixRole'}=$sophomorix_role;
             $devices_file{'computer'}{$ws_token_account}{'sophomorixComment'}=$sophomorix_comment;
+            $devices_file{'computer'}{$ws_token_account}{'sophomorixComputerIP'}=$ip;
+            $devices_file{'computer'}{$ws_token_account}{'sophomorixComputerMAC'}=$mac;
+            $devices_file{'computer'}{$ws_token_account}{'sophomorixComputerRoom'}=$room_token;
         }
     }
 }
