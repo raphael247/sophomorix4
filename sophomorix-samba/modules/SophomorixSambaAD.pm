@@ -5000,6 +5000,10 @@ sub AD_get_AD_for_device {
                                     'sophomorixDnsNodename',
                                     'comment',
                                     'sophomorixComment',
+                                    'sophomorixComputerIP',
+                                    'sophomorixComputerMAC',
+                                    'sophomorixComputerRoom',
+                                    'sophomorixComputerDefaults',
                                    ]);
         my $max_computer = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_computer Computers found in AD");
@@ -5028,6 +5032,11 @@ sub AD_get_AD_for_device {
             $AD{'computer'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
             $AD{'computer'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
             $AD{'computer'}{$sam}{'comment'}=$entry->get_value('comment');
+            $AD{'computer'}{$sam}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
+            $AD{'computer'}{$sam}{'sophomorixComputerMAC'}=$entry->get_value('sophomorixComputerMAC');
+            $AD{'computer'}{$sam}{'sophomorixComputerRoom'}=$entry->get_value('sophomorixComputerRoom');
+            @{ $AD{'computer'}{$sam}{'sophomorixComputerDefaults'} }=$entry->get_value('sophomorixComputerDefaults');
+
             # lists
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
@@ -5058,6 +5067,10 @@ sub AD_get_AD_for_device {
                                  'sophomorixSchoolname',
                                  'sophomorixType',
                                  'member',
+                                 'sophomorixRoomIPs',
+                                 'sophomorixRoomMACs',
+                                 'sophomorixRoomComputers',
+                                 'sophomorixRoomDefaults',
                                 ]);
         my $max_group = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_group sophomorix rooms/hardwareclasses found in AD");
@@ -5070,14 +5083,19 @@ sub AD_get_AD_for_device {
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
             my $schoolname=$entry->get_value('sophomorixSchoolname');
+
             $AD{$type}{$sam}{'room'}=$sam;
             $AD{$type}{$sam}{'sophomorixStatus'}=$stat;
-
             $AD{$type}{$sam}{'sophomorixType'}=$type;
             # increase role counter 
             $AD{'RESULT'}{'group'}{$type}{'COUNT'}++;
 
             $AD{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+
+            @{ $AD{$type}{$sam}{'sophomorixRoomIPs'} }=$entry->get_value('sophomorixRoomIPs');
+            @{ $AD{$type}{$sam}{'sophomorixRoomMACs'} }=$entry->get_value('sophomorixRoomMACs');
+            @{ $AD{$type}{$sam}{'sophomorixRoomComputers'} }=$entry->get_value('sophomorixRoomComputers');
+            @{ $AD{$type}{$sam}{'sophomorixRoomDefaults'} }=$entry->get_value('sophomorixRoomDefaults');
 
             # hardwareclass memberships
             if ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}){
