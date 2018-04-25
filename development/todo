@@ -19,6 +19,8 @@ Password for 'https://jeffbeck@github.com': ########
 Todo:
 ############################################################
 
+
+Neuer Befehl: sophomorix-room (nur informativ, kein setzen von werten)
 room attributes
   sophomorix-room -i (all rooms)
     LOOKUP
@@ -30,13 +32,14 @@ room attributes
         PRINTERS -
 
   sophomorix-room -i -r <room>: 
-    sophomorixIPs       (MultiValue)
-    sophomorixMACs      (MultiValue)
-    sophomorixComputers (MultiValue)
-    sophomorixRoomDefaults  (Multivalue)
-    
+    sophomorixRoomIPs       (MultiValue)     sophomorixComputerIP       (SingleValue)
+    sophomorixRoomMACs      (MultiValue)     sophomorixComputerMAC      (SingleValue)
+    sophomorixRoomComputers (MultiValue)     sophomorixComputerRoom     (SingleValue)
+    sophomorixRoomDefaults  (Multivalue)     sophomorixComputerDefaults (Multivalue)
+    --> sophomorixTye: room, classroom
 
-computer attributes
+   --smbstatus -> zeigt an wer eingeloggt ist
+
 
 - /etc/linuxmuster/sophomorix/global.devices.csv parsen und ohne prefix anlegen
   --> im setup die server dort eintragen
