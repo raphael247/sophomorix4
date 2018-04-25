@@ -209,6 +209,7 @@ if ($school ne ""){
 if ($list==1){
     foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
                                " -L //$root_dns/$share";
@@ -224,6 +225,7 @@ if ($list==1){
 if ($show==1){
     foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
                                " -F //$root_dns/$share";
@@ -239,6 +241,7 @@ if ($show==1){
 if ($school ne "" and  $default_quota ne ""){
     foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                               " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
                                " -S FSQLIM:".$default_quota." //$root_dns/$share";

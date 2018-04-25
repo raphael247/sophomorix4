@@ -2676,6 +2676,7 @@ sub AD_user_setquota {
     }
 
     my $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                          " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                           " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                           $smb_admin_pass."'".
                           " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //$root_dns/$share";
@@ -8424,6 +8425,7 @@ sub AD_smbcquotas_queryuser {
     print "Querying smbcquotas of user $user on share $share\n";
     my $smbcquotas_command=
         $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
         " -u $user //$root_dns/$share";
@@ -8478,6 +8480,7 @@ sub AD_smbcquotas_testshare {
     my ($root_dns,$smb_admin_pass,$share,$ref_sophomorix_config,$ref_schools)=@_;
     my $smbcquotas_command=
         $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
         " -F //$root_dns/$share";
