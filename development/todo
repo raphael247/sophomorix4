@@ -49,11 +49,10 @@ room attributes
 
 folgende Anmerkungen/Fragen:
 --------------------------------------------
-  1) WEBUI_PERMISSIONS bitte mit _ und nicht Bindestrich
-(sophomorix-standard)
+  OK: WEBUI_PERMISSIONS mit _
 
-  2) Rollennamen bitte exakt so nutzn, wie sie heißen:
-    siehe sophomorix-samba --show-roletype
+  OK: roles exakt
+    siehe: sophomorix-samba --show-roletype
 
 ROLES_USER:
    * globaladministrator
@@ -61,9 +60,7 @@ ROLES_USER:
    * student
    * teacher
 
-also nicht global-administrator, weils die Rolle nicht gibt
-
-3) Rolle nicht erwähnt --> keine attribute befüllt: OK?
+OK Rolle nicht erwähnt --> keine attribute befüllt: OK?
 
 
 4) Was muss genau ins attribute?
@@ -72,13 +69,9 @@ also nicht global-administrator, weils die Rolle nicht gibt
 lm:linbo:configs:
 lm:linbo:configs
 
-5) ich entferne whitespace hinten, bevor ich das attribut fülle?
-   OK
-6) kommen nur die true Zeilen ins AD?
-   nein alle
+OK: ich entferne whitespace hinten, bevor ich das attribut fülle?
 
---> sophomorix-ui
-    --> switch für true false anzeigen
+OK: alle zeilen kommen ins AD (Konfigurierbar in sophomorix-ui CALCLIST,CALCTRUELIST,CALCFALSELIST)
 
 
 sophomorix-session ..... "" soll alle user raus löschen:

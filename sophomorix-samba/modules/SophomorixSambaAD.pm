@@ -5241,11 +5241,9 @@ sub AD_get_ui {
     my $root_dns = $arg_ref->{root_dns};
     my $abs_path_ini = $arg_ref->{abs_path_ini};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-    
 
     ############################################################
     # read default permissions from WEBUI package
-
     my $path_abs;
     if ($abs_path_ini ne ""){
         $path_abs=$abs_path_ini;
@@ -5310,10 +5308,31 @@ sub AD_get_ui {
         push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
         push @{ $ui{'LISTS'}{'USERS'} },$sam;
 
-        foreach my $item (@{ $ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'} }){
-            push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item
+        # create lists
+        @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} }=();
+        @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} }=();
+        @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} }=();
+        if (exists $ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'}){
+            my @items=&Sophomorix::SophomorixBase::ini_list($ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'});
+            #foreach my $item (@{ $ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'} }){
+            foreach my $item (@items){
+                print "HERE: $role <$item>\n";
+                $item=~s/\s+$//g;# remove trailing whitespace
+                if ($item=~m/true$/){
+                    # TRUE
+                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
+                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
+                } elsif ($item=~m/false$/){
+                    # FALSE
+                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
+                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} },$item;
+                } else {
+                    print "File: $path_abs:\n";
+		    print "   >$item< (contains neither false nor true at the end!\n\n";
+                    exit 88;
+                }
+            }
         }
-
         # always update for now ????
         $ui{'UI'}{'USERS'}{$sam}{'CALC'}{'UPDATE'}="TRUE";
     }
