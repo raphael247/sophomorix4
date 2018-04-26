@@ -45,6 +45,53 @@ room attributes
    --smbstatus -> zeigt an wer eingeloggt ist
 
 
+
+
+folgende Anmerkungen/Fragen:
+--------------------------------------------
+  1) WEBUI_PERMISSIONS bitte mit _ und nicht Bindestrich
+(sophomorix-standard)
+
+  2) Rollennamen bitte exakt so nutzn, wie sie heißen:
+    siehe sophomorix-samba --show-roletype
+
+ROLES_USER:
+   * globaladministrator
+   * schooladministrator
+   * student
+   * teacher
+
+also nicht global-administrator, weils die Rolle nicht gibt
+
+3) Rolle nicht erwähnt --> keine attribute befüllt: OK?
+
+
+4) Was muss genau ins attribute?
+<lm:linbo:configs: false> OK
+<lm:linbo:configs:> --> lm=modul, linbo=name des moduls, configs=einstellung false/true wert false true lowercase
+lm:linbo:configs:
+lm:linbo:configs
+
+5) ich entferne whitespace hinten, bevor ich das attribut fülle?
+   OK
+6) kommen nur die true Zeilen ins AD?
+   nein alle
+
+--> sophomorix-ui
+    --> switch für true false anzeigen
+
+
+sophomorix-session ..... "" soll alle user raus löschen:
+
+
+
+
+
+
+
+
+
+
 - /etc/linuxmuster/sophomorix/global.devices.csv parsen und ohne prefix anlegen
   --> im setup die server dort eintragen
 
