@@ -72,6 +72,8 @@ my $json=0;
 my $school="";
 my $force=0;
 my $user="";
+my $abs_path_ini="";
+
 $Conf::log_level=1;
 
 # Parsen der Optionen
@@ -81,6 +83,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "school=s" => \$school,
+           "abs-path-ini=s" => \$abs_path_ini,
            "force|f" => \$force,
           );
 
@@ -112,6 +115,8 @@ Options
 
   -i  (show what would be updated)
   --school <school1>,<school2>,...
+
+  --abs-path-ini /path/to/ini  (use another ini file, for tests)
 
   --force  (update every user)
 
@@ -145,6 +150,7 @@ if ($school ne ""){
 my $ref_ui=&AD_get_ui({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
+                       abs_path_ini=>$abs_path_ini,
                        sophomorix_config=>\%sophomorix_config,
                      });
 
