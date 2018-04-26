@@ -124,6 +124,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_computer_create
                                  AD_computer_update
                                  AD_group_create
+                                 AD_group_update
                                  AD_group_kill
                                  AD_group_addmember
                                  AD_group_removemember
@@ -1024,7 +1025,7 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
 
 
 
-# computers to update
+# rooms to update
 foreach my $room (keys %{$devices_file{'room'}}) {
     print "HERE: Testing room $room\n";
     if (exists $ref_AD_device->{'room'}{$room} ){
@@ -1596,6 +1597,14 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Updating $max_room_count_update rooms:");
     my $room_count_update=1;
     foreach my $room (@updating_rooms){
+	print "HERE: calling update room\n";
+         &AD_group_update({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           dn=>$ref_AD_device->{'room'}{$room}{'DN'},
+                           sophomorix_config=>\%sophomorix_config,
+                            });
+
+
 #        &AD_computer_update({ldap=>$ldap,
 #                             root_dse=>$root_dse,
 #                             computer=>$computer,

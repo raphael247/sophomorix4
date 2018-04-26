@@ -5079,6 +5079,7 @@ sub AD_get_AD_for_device {
         $AD{'RESULT'}{'group'}{'hardwareclass'}{'COUNT'}=0;
         for( my $index = 0 ; $index < $max_group ; $index++) {
             my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
             my $sam=$entry->get_value('sAMAccountName');
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
@@ -5091,6 +5092,7 @@ sub AD_get_AD_for_device {
             $AD{'RESULT'}{'group'}{$type}{'COUNT'}++;
 
             $AD{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            $AD{$type}{$sam}{'DN'}=$dn;
 
             @{ $AD{$type}{$sam}{'sophomorixRoomIPs'} }=$entry->get_value('sophomorixRoomIPs');
             @{ $AD{$type}{$sam}{'sophomorixRoomMACs'} }=$entry->get_value('sophomorixRoomMACs');
