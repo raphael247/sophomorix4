@@ -5209,6 +5209,21 @@ sub AD_get_AD_for_device {
             }
         }
     } # BLOCK dnsNode end
+    # sort some room lists
+    foreach my $room (keys %{$AD{'room'}}) {
+        if($#{ $AD{'room'}{$room}{'sophomorixRoomComputers'} }>0){
+           @{ $AD{'room'}{$room}{'sophomorixRoomComputers'} } = 
+               sort @{ $devices_file{'room'}{$room}{'sophomorixRoomComputers'} };
+        }
+        if($#{ $AD{'room'}{$room}{'sophomorixRoomMACs'} }>0){
+           @{ $AD{'room'}{$room}{'sophomorixRoomMACs'} } = 
+               sort @{ $devices_file{'room'}{$room}{'sophomorixRoomMACs'} };
+        }
+        if($#{ $AD{'room'}{$room}{'sophomorixRoomIPs'} }>0){
+           @{ $AD{'room'}{$room}{'sophomorixRoomIPs'} } = 
+               sort @{ $devices_file{'room'}{$room}{'sophomorixRoomIPs'} };
+        }
+    }
     &Sophomorix::SophomorixBase::print_title("Query AD for device (end)");
     return(\%AD);
 }
