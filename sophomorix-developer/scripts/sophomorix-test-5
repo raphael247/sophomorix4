@@ -181,7 +181,7 @@ if ($add_admin==1){
     &run_command("sophomorix-admin --create-global-binduser global-binduser-66 --random-passwd-save $all_options");
     &run_command("sophomorix-admin --create-global-binduser global-binduser-666 --password 'Muster!' $all_options");
 
-    &run_command("sophomorix-ui $all_options");
+    &run_command("sophomorix-ui $all_options --abs-path-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
 
 }
 
@@ -226,7 +226,7 @@ if ($test_add_admin==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "WEBUI:module admin-filemanager|WEBUI:module whoami",
+                   sophomorixWebuiPermissionsCalculated => "lm:quotas:apply: true|lm:quotas:configure: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
@@ -283,7 +283,7 @@ if ($test_add_admin==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "WEBUI:module admin-filemanager|WEBUI:module whoami",
+                   sophomorixWebuiPermissionsCalculated => "lm:quotas:apply: true|lm:quotas:configure: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
@@ -339,7 +339,7 @@ if ($test_add_admin==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "WEBUI:module myquota|WEBUI:module whoami",
+                   sophomorixWebuiPermissionsCalculated => "lm:quotas:apply: true|lm:quotas:configure: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
@@ -379,7 +379,7 @@ if ($test_add_admin==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "WEBUI:module myquota|WEBUI:module whoami",
+                   sophomorixWebuiPermissionsCalculated => "lm:quotas:apply: true|lm:quotas:configure: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
@@ -453,7 +453,7 @@ if ($test_add_admin==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:linbo:configs: false|lm:linbo:examples: true|lm:linbo:images: true",
                    sophomorixExamMode => "---",
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
@@ -495,7 +495,7 @@ if ($test_add_admin==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:linbo:configs: false|lm:linbo:examples: true|lm:linbo:images: true",
                    sophomorixExamMode => "---",
                    sophomorixStatus=>"P",
                    sophomorixUnid => "---",
