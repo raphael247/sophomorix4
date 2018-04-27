@@ -1500,7 +1500,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $room_basename=$devices_file{'computer'}{$computer}{'ROOM_BASENAME'};
         my $ws_saved=$devices_file{'computer'}{$computer}{'COMPUTER'};
         my $filename=$devices_file{'computer'}{$computer}{'FILENAME'};
-        
+        my $ipv4=$devices_file{'computer'}{$computer}{'sophomorixComputerIP'};
+        my $mac=$devices_file{'computer'}{$computer}{'sophomorixComputerMAC'};
         if (not exists $school_created{$school}){
             # create ou
             &AD_school_create({ldap=>$ldap,
@@ -1540,6 +1541,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
 		             type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
                              school=>$school,
                              filename=>$filename,
+                             ipv4=>$ipv4,
+                             mac=>$mac,
                              json=>$json,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,

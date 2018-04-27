@@ -324,6 +324,9 @@ sub AD_test_object {
 
     # sophomorix computer
     my $s_dns_nodename = $arg_ref->{sophomorixDnsNodename};
+    my $s_ip = $arg_ref->{sophomorixComputerIP};
+    my $s_mac = $arg_ref->{sophomorixComputerMAC};
+    my $s_room = $arg_ref->{sophomorixComputerRoom};
 
     # sophomorix user
     my $s_admin_class = $arg_ref->{sophomorixAdminClass};
@@ -516,6 +519,18 @@ sub AD_test_object {
         if (defined $s_dns_nodename){
             is ($entry->get_value ('sophomorixDnsNodename'),$s_dns_nodename,
 		"  * sophomorixDnsNodename is $s_dns_nodename");
+        }
+        if (defined $s_ip){
+            is ($entry->get_value ('sophomorixComputerIP'),$s_ip,
+		"  * sophomorixComputerIP is $s_ip");
+        }
+        if (defined $s_mac){
+            is ($entry->get_value ('sophomorixComputerMAC'),$s_mac,
+		"  * sophomorixComputerMAC is $s_mac");
+        }
+        if (defined $s_room){
+            is ($entry->get_value ('sophomorixComputerRoom'),$s_room,
+		"  * sophomorixComputerRoom is $s_room");
         }
         if (defined $s_exit_admin_class){
             is ($entry->get_value ('sophomorixExitAdminClass'),$s_exit_admin_class,

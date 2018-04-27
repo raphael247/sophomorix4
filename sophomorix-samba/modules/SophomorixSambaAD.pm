@@ -1169,6 +1169,8 @@ sub AD_computer_create {
     my $max_computer_count = $arg_ref->{max_computer_count};
     my $school = $arg_ref->{school};
     my $filename = $arg_ref->{filename};
+    my $mac = $arg_ref->{mac};
+    my $ipv4 = $arg_ref->{ipv4};
     my $creationdate = $arg_ref->{creationdate};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
@@ -1265,7 +1267,9 @@ sub AD_computer_create {
                    servicePrincipalName => \@service_principal_name,
 #                   unicodePwd => $uni_password,
 #                   sophomorixExitAdminClass => "unknown", 
-#                   sophomorixUnid => $unid,
+                   sophomorixComputerIP => $ipv4,
+                   sophomorixComputerMAC => $mac,
+                   sophomorixComputerRoom => $room,
                    sophomorixStatus => "P",
                    sophomorixAdminClass => $room,    
 #                   sophomorixFirstPassword => $sophomorix_first_password, 
