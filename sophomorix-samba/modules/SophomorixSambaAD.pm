@@ -5265,6 +5265,40 @@ sub AD_get_ui {
         exit;
     }
 
+    # Test config file for double module paths
+    foreach my $role (keys %{ $ref_ui->{'CONFIG'}{'WEBUI'} }) {
+        my %seen=();
+        my @items=&Sophomorix::SophomorixBase::ini_list($ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'});
+        foreach my $item (@items){
+            $item=~s/\s+$//g;# remove trailing whitespace
+            my $mod_path=$item;
+            if ($item=~m/true$/){
+                $mod_path=~s/true$//g;# remove true
+            } elsif ($item=~m/false$/){
+                $mod_path=~s/false$//g;# remove false
+            } else {
+                print "File: $path_abs:\n";
+                print "   >$item< (contains neither false nor true at the end!\n\n";
+                exit 88;
+            }
+
+            # remember $mod_path
+            $mod_path=~s/\s+$//g;# remove trailing whitespace
+            if (exists $seen{$mod_path}){
+                print "\nERROR: Module path $mod_path double in role $role\n\n";
+                exit 88;
+            } else {
+                $seen{$mod_path}="seen";
+            }
+ 
+            # fill LOOKUP
+            $ref_ui->{'LOOKUP'}{'MODULES'}{$role}{$mod_path}="OK";
+            $ref_ui->{'LOOKUP'}{'MODULES'}{'ALL'}{$mod_path}="OK";
+        }
+    }
+
+
+
     ############################################################
     # read user data from AD
     &Sophomorix::SophomorixBase::print_title("Query AD (begin)");
@@ -5313,10 +5347,10 @@ sub AD_get_ui {
         @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} }=();
         @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} }=();
         if (exists $ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'}){
+            # make sure @items is a list:
             my @items=&Sophomorix::SophomorixBase::ini_list($ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'});
-            #foreach my $item (@{ $ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'} }){
             foreach my $item (@items){
-                print "HERE: $role <$item>\n";
+                #print "HERE: $role <$item>\n";
                 $item=~s/\s+$//g;# remove trailing whitespace
                 if ($item=~m/true$/){
                     # TRUE
@@ -5326,10 +5360,6 @@ sub AD_get_ui {
                     # FALSE
                     push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
                     push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} },$item;
-                } else {
-                    print "File: $path_abs:\n";
-		    print "   >$item< (contains neither false nor true at the end!\n\n";
-                    exit 88;
                 }
             }
         }
@@ -5911,7 +5941,6 @@ sub AD_get_quota {
 	my @memberof = $entry->get_value('memberOf');
 
 	my $count=0;
-	my %seen=();
 
         # save stuff about GROUPS
   	$quota{'QUOTA'}{'GROUPS'}{$sam}{'sophomorixSchoolname'}=$school;
