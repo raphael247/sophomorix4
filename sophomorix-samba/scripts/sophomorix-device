@@ -981,27 +981,33 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
         }
 
         # sophomorixComputerIP
-        if ($devices_file{'computer'}{$device}{'sophomorixComputerIP'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerIP'}){
-            # no update if equal
-        } else {
-            $update_computer{$device}{'REPLACE'}{'sophomorixComputerIP'}=$devices_file{'computer'}{$device}{'sophomorixComputerIP'};
-            $update++;
+        if (defined $ref_AD_device->{'computer'}{$device}{'sophomorixComputerIP'}){
+            if ($devices_file{'computer'}{$device}{'sophomorixComputerIP'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerIP'}){
+                # no update if equal
+            } else {
+                $update_computer{$device}{'REPLACE'}{'sophomorixComputerIP'}=$devices_file{'computer'}{$device}{'sophomorixComputerIP'};
+                $update++;
+            }
         }
 
         # sophomorixComputerMAC
-        if ($devices_file{'computer'}{$device}{'sophomorixComputerMAC'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerMAC'}){
-            # no update if equal
-        } else {
-            $update_computer{$device}{'REPLACE'}{'sophomorixComputerMAC'}=$devices_file{'computer'}{$device}{'sophomorixComputerMAC'};
-            $update++;
+        if (defined $ref_AD_device->{'computer'}{$device}{'sophomorixComputerMAC'}){
+            if ($devices_file{'computer'}{$device}{'sophomorixComputerMAC'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerMAC'}){
+                # no update if equal
+            } else {
+                $update_computer{$device}{'REPLACE'}{'sophomorixComputerMAC'}=$devices_file{'computer'}{$device}{'sophomorixComputerMAC'};
+                $update++;
+            }
         }
 
         # sophomorixComputerRoom
-        if ($devices_file{'computer'}{$device}{'sophomorixComputerRoom'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerRoom'}){
-            # no update if equal
-        } else {
-            $update_computer{$device}{'REPLACE'}{'sophomorixComputerRoom'}=$devices_file{'computer'}{$device}{'sophomorixComputerRoom'};
-            $update++;
+        if (defined $ref_AD_device->{'computer'}{$device}{'sophomorixComputerRoom'}){
+            if ($devices_file{'computer'}{$device}{'sophomorixComputerRoom'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerRoom'}){
+                # no update if equal
+            } else {
+                $update_computer{$device}{'REPLACE'}{'sophomorixComputerRoom'}=$devices_file{'computer'}{$device}{'sophomorixComputerRoom'};
+                $update++;
+            }
         }
 
         # sophomorixComment
