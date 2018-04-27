@@ -3969,6 +3969,7 @@ if ($mod==1){
 
 
     &run_command("sophomorix-user $all_options --webui-permissions \"lm:printers: false\" --user maiersa42");
+    &run_command("sophomorix-ui $all_options --abs-path-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4008,7 +4009,7 @@ if ($mod==1){
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
                    sophomorixWebuiPermissions => "lm:printers: false",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: false",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
@@ -4016,7 +4017,8 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --add-webui-permissions \"lm:quotas:apply: false\" --user maiersa42");
+    &run_command("sophomorix-user $all_options --add-webui-permissions \"lm:quotas:apply: true\" --user maiersa42");
+    &run_command("sophomorix-ui $all_options --abs-path-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4055,8 +4057,8 @@ if ($mod==1){
                    sophomorixDeactivationDate => "default",
                    sophomorixComment => "Test Comment!",
                    sophomorixWebuiDashboard => "Test webui!",
-                   sophomorixWebuiPermissions => "lm:printers: false|lm:quotas:apply: false",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
+                   sophomorixWebuiPermissions => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
                    sophomorixStatus => "A",
                    sophomorixUnid => "unid1234",
                    userAccountControl => "512",
@@ -4064,7 +4066,8 @@ if ($mod==1){
                   });
 
 
-    &run_command("sophomorix-user $all_options --remove-webui-permissions \"lm:printers: false,lm:quotas:apply: false\" --user maiersa42");
+    &run_command("sophomorix-user $all_options --remove-webui-permissions \"lm:printers: false,lm:quotas:apply: true\" --user maiersa42");
+    &run_command("sophomorix-ui $all_options --abs-path-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,

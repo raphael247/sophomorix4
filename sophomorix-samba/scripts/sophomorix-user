@@ -1731,6 +1731,11 @@ if ($enable==1){
 
 sub test_webui_permission {
     my ($perm,$ref_sophomorix_config)=@_;
+    print "Testing omited for: $perm\n";
+}
+
+sub test_webui_permission_old {
+    my ($perm,$ref_sophomorix_config)=@_;
     print "Testing $perm\n";
     my ($ui,$module,$switch)=split(/:/,$perm);
     if (not exists $ref_sophomorix_config->{'INI'}{'UI'}{$ui}){

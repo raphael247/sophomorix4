@@ -2071,7 +2071,7 @@ sub _console_print_ui {
                 foreach my $user ( @{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} } ){
                     print " $user ($ref_ui->{'UI'}{'USERS'}{$user}{'displayName'}, $role):\n"; 
                     print " sophomorixWebuiPermissionsCalculated: (new)\n";
-                    foreach my $item ( @{ $ref_ui->{'UI'}{'USERS'}{$user}{'CALCTRUELIST'} } ){
+                    foreach my $item ( @{ $ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'} } ){
                         print "    $item\n";
 	            }
                     print $line;

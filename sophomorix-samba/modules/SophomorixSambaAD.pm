@@ -5276,10 +5276,13 @@ sub AD_get_ui {
         foreach my $item (@items){
             $item=~s/\s+$//g;# remove trailing whitespace
             my $mod_path=$item;
+            my $setting;
             if ($item=~m/true$/){
                 $mod_path=~s/true$//g;# remove true
+                $setting="true";
             } elsif ($item=~m/false$/){
                 $mod_path=~s/false$//g;# remove false
+                $setting="false";
             } else {
                 print "File: $path_abs:\n";
                 print "   >$item< (contains neither false nor true at the end!\n\n";
@@ -5292,6 +5295,7 @@ sub AD_get_ui {
                 print "\nERROR: Module path $mod_path double in role $role\n\n";
                 exit 88;
             } else {
+                $ref_ui->{'CONFIG'}{'WEBUI_LOOKUP'}{$role}{$mod_path}=$setting;
                 $seen{$mod_path}="seen";
             }
  
@@ -5300,8 +5304,6 @@ sub AD_get_ui {
             $ref_ui->{'LOOKUP'}{'MODULES'}{'ALL'}{$mod_path}="OK";
         }
     }
-
-
 
     ############################################################
     # read user data from AD
@@ -5346,25 +5348,53 @@ sub AD_get_ui {
         push @{ $ui{'LISTS'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
         push @{ $ui{'LISTS'}{'USERS'} },$sam;
 
-        # create lists
+        # create CALC hash at every user (copy the package maintainer default)
+        foreach my $mod_path (keys %{ $ref_ui->{'CONFIG'}{'WEBUI_LOOKUP'}{$role} }) {
+            $ui{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path}=
+                $ref_ui->{'CONFIG'}{'WEBUI_LOOKUP'}{$role}{$mod_path};  
+        }
+
+        # override from schooladmin/update CALC hash ???
+
+
+        # override from sophomorixWebuiPermissions/update CALC hash
+        foreach my $item (@{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissions'} }){
+            print "   Analyze sophomorixWebuiPermissions: $item\n";
+            $item=~s/\s+$//g;# remove trailing whitespace
+            my $setting;
+            my $mod_path=$item;
+            if ($item=~m/true$/){
+                $setting="true";
+                $mod_path=~s/true$//g;# remove true
+            } elsif ($item=~m/false$/){
+                $setting="false";
+                $mod_path=~s/false$//g;# remove false
+            } else {
+                print " sophomorixWebuiPermissions entry $item contains neither false nor true at the end!\n\n";
+                exit 88;
+            }
+            $mod_path=~s/\s+$//g;# remove trailing whitespace
+            if (exists $ui{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path}){
+                # override
+                print "HERE: $sam $mod_path $setting\n";
+                $ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path}=$setting;
+            } else {
+                print " sophomorixWebuiPermissions does not mach a configured module path\n\n";
+                exit 88;
+            }
+        }
+
+        # create CALC*LISTs from CALC hash
         @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} }=();
         @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} }=();
         @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} }=();
-        if (exists $ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'}){
-            # make sure @items is a list:
-            my @items=&Sophomorix::SophomorixBase::ini_list($ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'});
-            foreach my $item (@items){
-                #print "HERE: $role <$item>\n";
-                $item=~s/\s+$//g;# remove trailing whitespace
-                if ($item=~m/true$/){
-                    # TRUE
-                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
-                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
-                } elsif ($item=~m/false$/){
-                    # FALSE
-                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
-                    push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} },$item;
-                }
+        foreach my $mod_path (keys %{ $ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'} }) {
+            my $item=$mod_path." ".$ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path};
+            push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
+            if ($ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path} eq "true"){
+                push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
+            } elsif ($ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path} eq "false"){
+                push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} },$item;
             }
         }
 
@@ -5373,22 +5403,8 @@ sub AD_get_ui {
         push @{ $ui{'LISTS_UPDATE'}{'USERS'} },$sam;
     }
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");
-
-
-    # read school admin modifications ?????
-    # override with school.conf settings
-    # --> update list @{ $ui{'UI'}{'USERS'}{$sam}{'CALC'}{'sophomorixWebuiPermissions'} }
-
-
-    # override with users sophomorixWebuiPermissions ?????
-    # --> update list @{ $ui{'UI'}{'USERS'}{$sam}{'CALC'}{'sophomorixWebuiPermissions'} }
-
-    # set update to false if lists match ?????
-
     return(\%ui);
 }
-
-
 
 
  
