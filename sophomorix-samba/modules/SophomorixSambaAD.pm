@@ -5363,8 +5363,10 @@ sub AD_get_ui {
                 }
             }
         }
+
         # always update for now ????
-        $ui{'UI'}{'USERS'}{$sam}{'CALC'}{'UPDATE'}="TRUE";
+        push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
+        push @{ $ui{'LISTS_UPDATE'}{'USERS'} },$sam;
     }
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");
 
