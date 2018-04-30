@@ -1102,6 +1102,8 @@ sub ACL_test {
     }
 } 
 
+
+
 ############################################################
 # smbcquotas
 ############################################################
@@ -1115,13 +1117,20 @@ sub smbcquotas_test {
     my ($unused,$quota_user)=split(/\\/,$full_user);
     $used=~s/\/$//;
     $hard_limit=~s/\/$//;
-    if ($hard_limit eq "NO"){
+    if ($hard_limit eq "NO" or $hard_limit eq "LIMIT"){
         $hard_limit="NO LIMIT";
     }
-    $hard_limit_mib=$hard_limit/1024/1024;
+    if ($hard_limit=~m/[0-9]/) { 
+        # a number consisting of 0-9
+        $hard_limit_mib=$hard_limit/1024/1024;        
+    } else {
+        # not a number
+        $hard_limit_mib=$hard_limit;
+    }
     #print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit ($hard_limit_mib)\n";
-    is ($quota_expected,$hard_limit_mib, "* Quota of $user is $quota_expected MiB (was: $hard_limit_mib MiB)");  
+    is ($hard_limit_mib,$quota_expected, "* Quota of $user is $quota_expected MiB (was: $hard_limit_mib MiB)");  
 }
+
 
 
 ############################################################
