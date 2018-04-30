@@ -323,6 +323,11 @@ sub AD_test_object {
     # group
     my $gidnumber =$arg_ref->{gidNumber};
 
+    # room
+    my $s_room_ips =$arg_ref->{sophomorixRoomIPs};
+    my $s_room_macs =$arg_ref->{sophomorixRoomMACs};
+    my $s_room_computers =$arg_ref->{sophomorixRoomComputers};
+
     # sophomorix computer
     my $s_dns_nodename = $arg_ref->{sophomorixDnsNodename};
     my $s_ip = $arg_ref->{sophomorixComputerIP};
@@ -357,7 +362,6 @@ sub AD_test_object {
     my $s_mailquotacalc = $arg_ref->{sophomorixMailQuotaCalculated};
     my $s_cloudquotacalc = $arg_ref->{sophomorixCloudQuotaCalculated};
 
-
     # sophomorix group
     my $s_type = $arg_ref->{sophomorixType};
     my $s_addquota = $arg_ref->{sophomorixAddQuota};
@@ -380,8 +384,6 @@ sub AD_test_object {
 
     # dnsNode/dnsZone
     my $admin_description = $arg_ref->{adminDescription};
-
-
 
     my $filter="(|(cn=*)(dn=*))";
     my $mesg = $ldap->search(
@@ -772,8 +774,17 @@ sub AD_test_object {
             &test_multivalue($s_sessions,"sophomorixSessions",$entry,$sam_account);
         }
         ##################################################
-
-
+        if (defined $s_room_ips){
+            &test_multivalue($s_room_ips,"sophomorixRoomIPs",$entry,$sam_account);
+        }
+        ##################################################
+        if (defined $s_room_macs){
+            &test_multivalue($s_room_macs,"sophomorixRoomMACs",$entry,$sam_account);
+        }
+        ##################################################
+        if (defined $s_room_computers){
+            &test_multivalue($s_room_computers,"sophomorixRoomComputers",$entry,$sam_account);
+        }
         ##################################################
         if (defined $member){
             &test_multivalue($member,"member",$entry,$sam_account);
