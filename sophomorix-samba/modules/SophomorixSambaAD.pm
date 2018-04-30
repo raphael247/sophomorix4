@@ -7389,8 +7389,10 @@ sub AD_group_update {
     my $admingroups = $arg_ref->{admingroups};
     my $creationdate = $arg_ref->{creationdate};
     my $gidnumber = $arg_ref->{gidnumber};
+    my $ref_room_ips = $arg_ref->{sophomorixRoomIPs};
+    my $ref_room_macs = $arg_ref->{sophomorixRoomMACs};
+    my $ref_room_computers = $arg_ref->{sophomorixRoomComputers};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
-
     my $sync_members=0;
     
     print "\n";
@@ -7581,6 +7583,22 @@ sub AD_group_update {
         my $mesg = $ldap->modify($dn,replace => {'sophomorixAdmingroups' => \@admingroups }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         $sync_members++;
+    }
+
+    # room stuff
+    if (defined $ref_room_ips){
+        print "   * Setting sophomorixRoomIPs to: @{ $ref_room_ips }\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixRoomIPs' => $ref_room_ips }); 
+    }
+
+    if (defined $ref_room_macs){
+        print "   * Setting sophomorixRoomMACs to: @{ $ref_room_macs }\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixRoomMACs' => $ref_room_macs }); 
+    }
+
+    if (defined $ref_room_computers){
+        print "   * Setting sophomorixRoomCOMPUTERs to: @{ $ref_room_computers }\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixRoomCOMPUTERs' => $ref_room_computers }); 
     }
 
     # sync memberships if necessary
@@ -8806,6 +8824,7 @@ sub next_free_gidnumber_get {
 }
 
 
+
 sub _uac_disable_user {
     my ($uac)=@_;
     # bit 2 to set must be 1, OR
@@ -8813,6 +8832,8 @@ sub _uac_disable_user {
     my $res = $uac | $set_disable_bit;
     return $res;
 }
+
+
 
 sub _uac_enable_user {
     my ($uac)=@_;

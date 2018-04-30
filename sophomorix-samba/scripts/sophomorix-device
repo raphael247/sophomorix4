@@ -1603,28 +1603,17 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Updating rooms
     print "\n";
     my $max_room_count_update=$#updating_rooms+1;
-    &print_title("Updating $max_room_count_update rooms:");
+    &print_title("Updating $max_room_count_update rooms");
     my $room_count_update=1;
     foreach my $room (@updating_rooms){
-	print "HERE: calling update room\n";
          &AD_group_update({ldap=>$ldap,
                            root_dse=>$root_dse,
                            dn=>$ref_AD_device->{'room'}{$room}{'DN'},
+                           sophomorixRoomIPs=>\@{ $devices_file{'room'}{$room}{'IPv4LIST'} },
+                           sophomorixRoomMACs=>\@{ $devices_file{'room'}{$room}{'MACLIST'} },
+                           sophomorixRoomComputers=>\@{ $devices_file{'room'}{$room}{'HOSTLIST'} },
                            sophomorix_config=>\%sophomorix_config,
-                            });
-	print Dumper(\%update_room);
-
-#        &AD_computer_update({ldap=>$ldap,
-#                             root_dse=>$root_dse,
-#                             computer=>$computer,
-#                             computer_count=>$computer_count_update,
-#                             attrs_count=>$update_computer{$computer}{'COUNT'},
-#                             replace=>\%update_computer,
-#                             max_computer_count=>$max_computer_count_update,
-#                             json=>$json,
-#                             sophomorix_config=>\%sophomorix_config,
-#                             sophomorix_result=>\%sophomorix_result,
-#                           });
+                         });
         $room_count_update++;
     }
 
@@ -2083,7 +2072,7 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;   # 06
         $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
-	print "HERE: $host_token :$account_flag was $unused_2\n";
+        # set account flag
         if ($account_flag==1){
             $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
         } else {
