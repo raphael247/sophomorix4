@@ -1145,7 +1145,7 @@ sub NTACL_test {
     my $unc_path="//".$root_dns."/".$share;
 
     my $abs_path_linux;
-    if ($share eq "global" or $share eq "linuxmuster-global" or $share eq "lml-global" ){
+    if ($share eq "global" or $share eq "linuxmuster-global" or $share eq "lmn-global" ){
         $abs_path_linux="/srv/samba/global".$smb_rel;
         $abs_path_linux=~s/\/$//; # remove trailing /
     } else {
