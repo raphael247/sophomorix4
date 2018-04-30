@@ -44,6 +44,7 @@ $Data::Dumper::Terse = 1;
             file_test_chars
             AD_get_samaccountname
             cat_wcl_test
+            smbcquotas_test
             );
 
 
@@ -1101,6 +1102,26 @@ sub ACL_test {
     }
 } 
 
+############################################################
+# smbcquotas
+############################################################
+sub smbcquotas_test {
+    my ($user,$share,$quota_expected,$root_dns,$smb_pass)=@_;
+    my $smbcquotas_command="/usr/bin/smbcquotas -mNT1 --debuglevel=0 -U administrator%'".$smb_pass."'".
+                           " --user ".$user." //".$root_dns."/".$share;
+    #print "$smbcquotas_command\n";
+    my $stdout=`$smbcquotas_command`;
+    my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$stdout);
+    my ($unused,$quota_user)=split(/\\/,$full_user);
+    $used=~s/\/$//;
+    $hard_limit=~s/\/$//;
+    if ($hard_limit eq "NO"){
+        $hard_limit="NO LIMIT";
+    }
+    $hard_limit_mib=$hard_limit/1024/1024;
+    #print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit ($hard_limit_mib)\n";
+    is ($quota_expected,$hard_limit_mib, "* Quota of $user is $quota_expected MiB (was: $hard_limit_mib MiB)");  
+}
 
 
 ############################################################
