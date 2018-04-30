@@ -440,9 +440,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -475,9 +475,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -676,9 +676,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -708,9 +708,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -860,6 +860,74 @@ if ($test_ws_1==1){
                      cn=>"2.170.10.in-addr.arpa",
                    });
 
+    ############################################################
+    # switch01
+    # test that there is no examaccount
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","switch01");
+    # test for sophomorixRole iponly that there is no account
+    &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH01\$");
+
+    ##############################
+    #dns 
+    ##############################
+    &AD_test_dns($res,"switch01","10.10.210.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=switch01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"switch01",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                     cn=>"switch01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.10.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from devices.csv",
+                     cn=>"210.10.10.in-addr.arpa",
+                   });
+    ############################################################
+    # switch02
+    # test that there is no examaccount
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","switch02");
+    # test for sophomorixRole iponly that there is no account
+    &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH02\$");
+
+    ##############################
+    #dns 
+    ##############################
+    &AD_test_dns($res,"switch02","10.10.210.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=switch02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"switch02",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                     cn=>"switch02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=2,DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"2",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.10.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from devices.csv",
+                     cn=>"210.10.10.in-addr.arpa",
+                   });
     ############################################################
     # bsz.devices.csv
     ############################################################
@@ -1050,9 +1118,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -1082,9 +1150,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -1282,9 +1350,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -1314,9 +1382,9 @@ if ($test_ws_1==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -1687,9 +1755,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=4,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"4",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -1907,9 +1975,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -1939,9 +2007,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from devices.csv",
                    });
     # dnsZone
@@ -2089,6 +2157,74 @@ if ($test_ws_2==1){
                      name=>"2.170.10.in-addr.arpa",
                      adminDescription=>"SophomorixdnsZone from devices.csv",
                      cn=>"2.170.10.in-addr.arpa",
+                   });
+    ############################################################
+    # switch01
+    # test that there is no examaccount
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","switch01");
+    # test for sophomorixRole iponly that there is no account
+    &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH01\$");
+
+    ##############################
+    #dns 
+    ##############################
+    &AD_test_dns($res,"switch01","10.10.210.1");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=switch01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"switch01",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                     cn=>"switch01",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=1,DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"1",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.10.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from devices.csv",
+                     cn=>"210.10.10.in-addr.arpa",
+                   });
+    ############################################################
+    # switch02
+    # test that there is no examaccount
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","switch02");
+    # test for sophomorixRole iponly that there is no account
+    &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH02\$");
+
+    ##############################
+    #dns 
+    ##############################
+    &AD_test_dns($res,"switch02","10.10.210.2");
+    # dnsNode
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=switch02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"switch02",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                     cn=>"switch02",
+                   });
+    # dns reverse lookup
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=2,DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"2",
+                     adminDescription=>"SophomorixdnsNode from devices.csv",
+                   });
+    # dnsZone
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"DC=210.10.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     #####
+                     name=>"210.10.10.in-addr.arpa",
+                     adminDescription=>"SophomorixdnsZone from devices.csv",
+                     cn=>"210.10.10.in-addr.arpa",
                    });
 
     ############################################################
@@ -2279,9 +2415,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -2311,9 +2447,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=208.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -2511,9 +2647,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=2,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"2",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -2543,9 +2679,9 @@ if ($test_ws_2==1){
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=210.171.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"30",
                      adminDescription=>"SophomorixdnsNode from bsz.devices.csv",
                    });
     # dnsZone
@@ -2779,6 +2915,13 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c002p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","C002P01\$");
     &AD_test_nondns($res,"c002p01");
+
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","switch01");
+    &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH01\$");
+    &AD_test_nondns($res,"switch01");
+    &AD_object_nonexist($ldap,$root_dse,"examaccount","switch02");
+    &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH02\$");
+    &AD_test_nondns($res,"switch02");
 
     ############################################################
     # bsz
