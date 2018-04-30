@@ -31,7 +31,8 @@ use Sophomorix::SophomorixTest qw(
                                  AD_test_session_count
                                  ACL_test
                                  NTACL_test
-                                 );
+                                 smbcquotas_test  
+                               );
 
 $Conf::log_level=1;
 my $add=0;
@@ -319,6 +320,7 @@ if ($add==1 or $test_add==1){
     &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
 
     ##### Testing the users
+
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3138,9 +3140,12 @@ if ($migration_kill==1){
 # Modifying users --mod
 ############################################################
 if ($mod==1){
+    #&run_command("sophomorix-quota $all_options");
     &run_command("sophomorix-user $all_options -T --user maiersa42");
+    &run_command("sophomorix-quota $all_options --school default-school");
     # Testing change
     # maiersa42
+    #&smbcquotas_test("maiersa42","bsz","2506",$root_dns,$smb_pass)
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maiersa42,OU=m7ab,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
@@ -5544,13 +5549,16 @@ if ($ses==1){
                    sophomorixSurnameASCII  => "Schneider",
                    sophomorixFirstnameInitial => "M.",
                    sophomorixSurnameInitial  => "S.",
-                   sophomorixCloudQuotaCalculated => "---",
+#                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixCloudQuotaCalculated => "1506 MB",
                    sophomorixUserToken => "---",
                    sophomorixBirthdate  => "21.01.1991",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+ #                  sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixQuota=>"default-school:1506:1506:1579155456:---:|linuxmuster-global:1006:1006:1054867456:---:",
                    sophomorixMailQuota=>"---:---:",
-                   sophomorixMailQuotaCalculated=>"1",
+#                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixMailQuotaCalculated=>"156",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "students.csv",
@@ -7790,13 +7798,16 @@ if ($update==1 or $test_update==1){
                    sophomorixSurnameASCII  => "Schneider",
                    sophomorixFirstnameInitial => "M.",
                    sophomorixSurnameInitial  => "S.",
-                   sophomorixCloudQuotaCalculated => "---",
+#                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixCloudQuotaCalculated => "1506 MB",
                    sophomorixUserToken => "---",
                    sophomorixBirthdate  => "21.01.1991",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+#                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixQuota=>"default-school:1506:1506:1579155456:---:|linuxmuster-global:1006:1006:1054867456:---:",
                    sophomorixMailQuota=>"---:---:",
-                   sophomorixMailQuotaCalculated=>"1",
+#                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixMailQuotaCalculated=>"156",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "students.csv",
@@ -7875,13 +7886,14 @@ if ($update==1 or $test_update==1){
                    sophomorixSurnameASCII  => "Schaefer",
                    sophomorixFirstnameInitial => "M.",
                    sophomorixSurnameInitial  => "S.",
-                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixCloudQuotaCalculated => "2506 MB",
                    sophomorixUserToken => "---",
                    sophomorixBirthdate  => "12.05.1991",
                    sophomorixRole => "student",
-                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+#                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixQuota=>"default-school:2506:2506:2627731456:---:|linuxmuster-global:2006:2006:2103443456:---:",
                    sophomorixMailQuota=>"---:---:",
-                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixMailQuotaCalculated=>"306",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "students.csv",
