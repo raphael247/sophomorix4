@@ -2034,7 +2034,8 @@ sub analyze_device_line {
             $ms_windows_key,
             $unused,
             $sophomorix_role,
-            $account_flag,
+            $unused_2,
+#            $account_flag,
             $pxe,
             $option,
             $field_13,
@@ -2049,10 +2050,10 @@ sub analyze_device_line {
         $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line);
         $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
 
-        $sophomorix_role=&check_sophomorix_role($sophomorix_role,$line,$filename);
+        my $account_flag;
+        ($sophomorix_role,$account_flag)=&check_sophomorix_role($sophomorix_role,$line,$filename);
 
-
-        $account_flag=&check_account_flag($account_flag,$line);
+        #$account_flag=&check_account_flag($account_flag,$line);
         $pxe=&check_pxe($pxe,$line);
         $option=&check_option($option,$line);
 
@@ -2082,6 +2083,7 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;   # 06
         $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
+	print "HERE: $host_token :$account_flag was $unused_2\n";
         if ($account_flag==1){
             $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
         } else {
@@ -2344,24 +2346,38 @@ sub check_sophomorix_role {
         print "\n";
         exit 88;
     }
-    return $role;
-}
-
-
-
-sub check_account_flag {
-    my ($account_flag,$line,$filename) = @_;
-    if ($account_flag eq 0){
-        # ok
-        $account_flag="0";
+    # calculate account flag
+    my $account_flag;
+    my $key="computerrole.".$role;
+    if ($sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'} eq "TRUE"){
+        $account_flag=1;
+    } elsif ($sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'} eq "FALSE"){
+        $account_flag=0;
     } else {
-        $account_flag="1";
+        print "\n";
+        print "ERROR: Cold not determine account flag by role $role";
+        print "\n";
+        exit 88;
     }
-    if($Conf::log_level>=3){
-        print "   ACCOUNT FLAG:     $account_flag\n";
-    }
-    return $account_flag;
+
+    return ($role,$account_flag);
 }
+
+
+
+# sub check_account_flag {
+#     my ($account_flag,$line,$filename) = @_;
+#     if ($account_flag eq 0){
+#         # ok
+#         $account_flag="0";
+#     } else {
+#         $account_flag="1";
+#     }
+#     if($Conf::log_level>=3){
+#         print "   ACCOUNT FLAG:     $account_flag\n";
+#     }
+#     return $account_flag;
+# }
 
 
 

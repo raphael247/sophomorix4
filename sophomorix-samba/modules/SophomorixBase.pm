@@ -2711,9 +2711,11 @@ sub config_sophomorix_read {
         } elsif ($section=~m/^computerrole\./){ 
             my ($string,$role)=split(/\./,$section);
             foreach my $keyname (keys %{$sophomorix_config{'INI'}{$section}}) {
-                if ($keyname eq "COMPUTER_SHORT"){
+                if ($keyname eq "DEVICE_SHORT"){
                     $sophomorix_config{'LOOKUP'}{'ROLES_ALL'}{$role}=$sophomorix_config{'INI'}{$section}{$keyname};
                     $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$role}=$sophomorix_config{'INI'}{$section}{$keyname};
+                } elsif ($keyname eq "COMPUTER_ACCOUNT"){
+                    # ok, no warning
                 } else {
                     print "WARNING: Do not know what to do with $keyname in section $section\n";
                 }
