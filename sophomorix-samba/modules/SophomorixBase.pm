@@ -416,14 +416,17 @@ sub _console_print_devices {
             my $computer;
             my $hwc;
             my $adminclass;
+            my $mac;
             if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
                 $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
                 $hwc="";
                 $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
+                $mac=$ref_devices->{'computer'}{$computer}{'sophomorixComputerMAC'};
             } else {
                 $computer="---";
                 $hwc="---";
                 $adminclass="---";
+                $mac="---";
             }
 
             # sophomorixRole and sophomorixComment
@@ -449,7 +452,7 @@ sub _console_print_devices {
                    $ref_devices->{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
                    $computer,
                    $adminclass,
-                   "not in AD";
+                   $mac;
         }
         print $line;
         print "    /-/#: sophomorixComment nonexisting/---/existing\n";
