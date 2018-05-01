@@ -1033,41 +1033,67 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
 
 # rooms to update
 foreach my $room (keys %{$devices_file{'room'}}) {
-    print "HERE: Testing room $room\n";
     if (exists $ref_AD_device->{'room'}{$room} ){
         my $update=0;
-        print "   HERE: $room is in AD\n";
-        # Test if list have the same length
         my $devices_items;
         my $AD_items;
+
         # HOSTNAME
         $devices_items=$#{ $devices_file{'room'}{$room}{'HOSTLIST'} }+1;
         $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomComputers'} }+1;
-        print "$devices_items   --> $AD_items"; # ???
         if ($devices_items==$AD_items){
-            # test for list entries ??????
+            # lists have the same length and are sorted
+            my $count=0;
+            foreach my $item (@{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomComputers'} }){
+                my $other_item=$devices_file{'room'}{$room}{'HOSTLIST'}[$count];
+                if ($item ne $other_item){
+                    $update++;
+                    last;
+                }
+                $count++;
+            }
         } else {
-            $update++;
-        }
-        # IP
-        $devices_items=$#{ $devices_file{'room'}{$room}{'MACLIST'} }+1;
-        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomMACs'} }+1;
-        print "$devices_items   --> $AD_items"; # ???
-        if ($devices_items==$AD_items){
-            # test for list entries ??????
-        } else {
-            $update++;
-        }
-        # HOSTNAME
-        $devices_items=$#{ $devices_file{'room'}{$room}{'IPv4LIST'} }+1;
-        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomIPs'} }+1;
-        print "$devices_items   --> $AD_items"; # ???
-        if ($devices_items==$AD_items){
-            # test for list entries ??????
-        } else {
+            # update if lists have different lengths
             $update++;
         }
 
+        # IP
+        $devices_items=$#{ $devices_file{'room'}{$room}{'MACLIST'} }+1;
+        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomMACs'} }+1;
+        if ($devices_items==$AD_items){
+            # lists have the same length and are sorted
+            my $count=0;
+            foreach my $item (@{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomMACs'} }){
+                my $other_item=$devices_file{'room'}{$room}{'MACLIST'}[$count];
+                if ($item ne $other_item){
+                    $update++;
+                    last;
+                }
+                $count++;
+            }
+        } else {
+            # update if lists have different lengths
+            $update++;
+        }
+
+        # HOSTNAME
+        $devices_items=$#{ $devices_file{'room'}{$room}{'IPv4LIST'} }+1;
+        $AD_items=$#{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomIPs'} }+1;
+        if ($devices_items==$AD_items){
+            # lists have the same length and are sorted
+            my $count=0;
+            foreach my $item (@{ $ref_AD_device->{'room'}{$room}{'sophomorixRoomIPs'} }){
+                my $other_item=$devices_file{'room'}{$room}{'IPv4LIST'}[$count];
+                if ($item ne $other_item){
+                    $update++;
+                    last;
+                }
+                $count++;
+            }
+        } else {
+            # update if lists have different lengths
+            $update++;
+        }
 
         if ($update>0){
             $update_room{$room}{'COUNT'}=$update; # count how many attributes must be updated
@@ -1562,6 +1588,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                               type=>$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixType'},
     	      		      sub_ou=>"OU=".$room_basename.",".$sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'},
                               smb_admin_pass=>$smb_admin_pass,
+                              sophomorixRoomIPs=>\@{ $devices_file{'room'}{$room_saved}{'IPv4LIST'} },
+                              sophomorixRoomMACs=>\@{ $devices_file{'room'}{$room_saved}{'MACLIST'} },
+                              sophomorixRoomComputers=>\@{ $devices_file{'room'}{$room_saved}{'HOSTLIST'} },
                               sophomorix_config=>\%sophomorix_config,
                               sophomorix_result=>\%sophomorix_result,
                             });

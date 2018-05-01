@@ -5219,15 +5219,15 @@ sub AD_get_AD_for_device {
     foreach my $room (keys %{$AD{'room'}}) {
         if($#{ $AD{'room'}{$room}{'sophomorixRoomComputers'} }>0){
            @{ $AD{'room'}{$room}{'sophomorixRoomComputers'} } = 
-               sort @{ $devices_file{'room'}{$room}{'sophomorixRoomComputers'} };
+               sort @{ $AD{'room'}{$room}{'sophomorixRoomComputers'} };
         }
         if($#{ $AD{'room'}{$room}{'sophomorixRoomMACs'} }>0){
            @{ $AD{'room'}{$room}{'sophomorixRoomMACs'} } = 
-               sort @{ $devices_file{'room'}{$room}{'sophomorixRoomMACs'} };
+               sort @{ $AD{'room'}{$room}{'sophomorixRoomMACs'} };
         }
         if($#{ $AD{'room'}{$room}{'sophomorixRoomIPs'} }>0){
            @{ $AD{'room'}{$room}{'sophomorixRoomIPs'} } = 
-               sort @{ $devices_file{'room'}{$room}{'sophomorixRoomIPs'} };
+               sort @{ $AD{'room'}{$room}{'sophomorixRoomIPs'} };
         }
     }
     &Sophomorix::SophomorixBase::print_title("Query AD for device (end)");
@@ -5376,7 +5376,6 @@ sub AD_get_ui {
             $mod_path=~s/\s+$//g;# remove trailing whitespace
             if (exists $ui{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path}){
                 # override
-                print "HERE: $sam $mod_path $setting\n";
                 $ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path}=$setting;
             } else {
                 print " sophomorixWebuiPermissions does not mach a configured module path\n\n";
@@ -7597,8 +7596,8 @@ sub AD_group_update {
     }
 
     if (defined $ref_room_computers){
-        print "   * Setting sophomorixRoomCOMPUTERs to: @{ $ref_room_computers }\n";
-        my $mesg = $ldap->modify($dn,replace => {'sophomorixRoomCOMPUTERs' => $ref_room_computers }); 
+        print "   * Setting sophomorixRoomComputers to: @{ $ref_room_computers }\n";
+        my $mesg = $ldap->modify($dn,replace => {'sophomorixRoomComputers' => $ref_room_computers }); 
     }
 
     # sync memberships if necessary
@@ -7827,6 +7826,9 @@ sub AD_group_create {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $file = $arg_ref->{file};
     my $sub_ou = $arg_ref->{sub_ou};
+    my $ref_room_ips = $arg_ref->{sophomorixRoomIPs};
+    my $ref_room_macs = $arg_ref->{sophomorixRoomMACs};
+    my $ref_room_computers = $arg_ref->{sophomorixRoomComputers};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $joinable){
@@ -7998,6 +8000,35 @@ sub AD_group_create {
                                 ]
                             );
             &AD_debug_logdump($result,2,(caller(0))[3]);
+	} elsif ($type eq "room"){
+            my $result = $ldap->add( $dn,
+                                attr => [
+                                    cn   => $cn,
+                                    description => $description,
+                                    sAMAccountName => $group,
+                                    mail => $mail,
+                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                                    sophomorixType => $type, 
+                                    sophomorixSchoolname => $school, 
+                                    sophomorixStatus => $status,
+                                    sophomorixAddQuota => ["---"],
+                                    sophomorixAddMailQuota => "---",
+                                    sophomorixQuota => ["---"],
+                                    sophomorixMailQuota => "---",
+                                    sophomorixMaxMembers => "0",
+                                    sophomorixMailAlias => "FALSE",
+                                    sophomorixMailList => "FALSE",
+                                    sophomorixJoinable => $joinable,
+                                    sophomorixHidden => "FALSE",
+                                    gidNumber => $gidnumber_wish,
+                                    sophomorixRoomIPs => $ref_room_ips,
+                                    sophomorixRoomMACs => $ref_room_macs,
+                                    sophomorixRoomComputers => $ref_room_computers,
+                                    objectclass => ['top',
+                                                      'group' ],
+                                ]
+                            );
+           &AD_debug_logdump($result,2,(caller(0))[3]);
         } else {
             my $result = $ldap->add( $dn,
                                 attr => [
