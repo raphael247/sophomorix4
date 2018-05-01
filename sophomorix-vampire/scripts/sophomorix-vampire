@@ -1108,10 +1108,12 @@ sub killog_rewrite {
     close(OUT);
 
     # prepend old log to existing log
-    my $killog="/var/log/sophomorix/userlog/user-kill.log";
+    my $logdir="/var/log/sophomorix/userlog";
+    my $killog=$logdir."/user-kill.log";
     my $killog_tmp=$killog.".tmp";
     my @oldlines=();
     my %oldlines=();
+    system("mkdir -p $logdir");
     open(TMPLOG,">$killog_tmp");
 
     # read old killog lines and remember them
@@ -1259,13 +1261,21 @@ sub devices_rewrite {
             $items[13]="";
         }
         if (not defined $items[14]){
-            $items[14]="";
+            $items[14]="MIGRATION";
         }
 
         # modify pxe to 0, if empty
         if ($items[10] eq ""){
             $items[10]="0";
         }
+        my $sophomorix_type;
+        if ($items[9] eq "0"){
+	    $sophomorix_type="iponly";
+        } else {
+	    $sophomorix_type="computer";
+        }
+        # account_flag field 10 not used anymore
+        $items[9]="---";
 
         $new_line=$items[0].";".
                   $items[1].";".
@@ -1275,7 +1285,7 @@ sub devices_rewrite {
                   $items[5].";".
                   $items[6].";".
                   $items[7].";".
-                  "otherdevice;".
+                  $sophomorix_type.";".
                   $items[9].";".
                   $items[10].";".
                   $items[11].";".

@@ -49,6 +49,16 @@ Dockerhost:
 ------------------------------------------------------------
 Migration:
 
+Problem: 
+  A) Migration erzeugt devices.csv
+  B) Dort gibts aber schon Einträge vom Setup
+  --> anhängen! Aber war macht man wenn das script mehrfach aufgerufen wird?
+  Lösung 1:
+    A) Setup erzeugt doch global.devices.csv
+    B) die setup-Zeilen nutzen das Kommentarfeld 15 und schreiben dort SETUP rein
+       --> Migration: behält diese SETUP-Zeilen bei, hängt dann die migrierten an
+       (Die zeilen die von sophomorix-vampire angefasst wurden, bekommen MIGRATION in Feld 15)
+
 SID-Übernahme? (Wäre evtl. gut, aber zu aufwändig)
 
 Vorschlag: bei der migration werden:
