@@ -127,11 +127,14 @@ Please see the sophomorix-kill(8) man pages for full documentation
 }
 
 
+
 # --unlock
 if ($unlock==1) {
     &unlock_sophomorix();
     exit;
 }
+
+
 
 # --lock
 if ($lock==1) {
@@ -140,25 +143,13 @@ if ($lock==1) {
 }
 
 
+
 # --loginname
 if ($loginname ne "") {
   #
   print "Loginname $loginname angegeben.\n";
 }
 
-
-&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
-
-
-# ===========================================================================
-# Abbruch, wenn sophomorix.kill fehlt oder leer
-# ===========================================================================
-#if (not (-s "$kill_file")
-#    and $killuser eq "") {
-#    exit;
-  #&log_script_exit("No users to kill!",1,1,0,\@arguments,\%sophomorix_result,$json);
-#}
 
 
 # --info
@@ -221,38 +212,18 @@ if ($info==1) {
     exit;
 }
 
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 
-
-#my $imap=&imap_connect("localhost",${DevelConf::imap_admin});
+################################################################################
+# Start
+################################################################################
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 # logging sophomorix.kill
 &backup_auk_file("kill","before",\%sophomorix_config);
 
 
-
-# ===========================================================================
-# Protokolldatei lesen
-# ===========================================================================
-#%protokoll_hash=&protokoll_linien();
-#%protokoll_hash=&get_protokoll_lines();
-
-
-# ===========================================================================
-# Datei mit den Schülern, die nicht gelöscht wurden
-# ===========================================================================
-if (not -e "$kill_file_new" ){
-    system("mkdir -p $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}");
-    system("touch $kill_file_new");
-}
-open(YETTOKILL,">$kill_file_new") 
-     || die "ERROR: $!";
-
-
-# ===========================================================================
-# Datei mit den zu löschenden Schülern
-# ===========================================================================
-&print_title("Beginn deletion ...");
-
+# --killuser
 if ($killuser ne ""){
     # killing users given by option --killuser
     #print "Killing the following List of users: $killuser\n";
@@ -274,11 +245,33 @@ if ($killuser ne ""){
                         });
     }
 } else {
-    # calulate users to kill from file
+    ### using the kill file
+    # file for users that are NOT killed
+    open(STILLTOKILL,">$kill_file_new") 
+         || die "ERROR: $!";
+
+    # the kill file
+    if (not -f $kill_file){
+        &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,"",$kill_file." not found!");
+        &result_sophomorix_add_summary({
+            NAME=>"ADDED", 
+            RESULT=>0, 
+            RESULT_TYPE => "integer",
+            DESCRIPTION_POST => "users added", 
+            DESCRIPTION_PRE => "added users", 
+            FORMAT_TYPE => 1,
+            sophomorix_result=>\%sophomorix_result,
+	    });
+        &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    }
+
+    # calulate users to kill (from file)
     my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.kill | wc -l`;
     chomp($max_user_count);
-    # killing users from file
+
+    # open kill file
     open(KILL,"$kill_file") || die "ERROR: $!";
+
     while(<KILL>){
         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
  	    next;
@@ -301,7 +294,7 @@ if ($killuser ne ""){
                      });
     }
     close(KILL);
-    close(YETTOKILL);
+    close(STILLTOKILL);
 }
 
 
@@ -434,7 +427,7 @@ if ($user_count>0){
 #                     "be deleted(not given by option).\n";
 #           }
 #           # Merken, dass user noch nicht entfernt wird
-#           print YETTOKILL "$_\n";
+#           print STILLTOKILL "$_\n";
 #           return 0;
 #        }
 #      }

@@ -259,10 +259,6 @@ if ($group ne "") {
 # Start
 ################################################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
-# exit if there are no users to add
-#if (not (-s "$add_file") ) {
-#  &log_script_exit("No users to add!",1,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-#}
 
 # create students and teachers
 my @password_chars=&get_passwd_charlist();
@@ -270,17 +266,33 @@ my @password_chars=&get_passwd_charlist();
 # logging sophomorix.add
 &backup_auk_file("add","before",\%sophomorix_config);
 
-# calulate users to add
-my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.add | wc -l`;
-chomp($max_user_count);
-
 # file for users that are NOT added
 open(STILLTOADD,">$add_file_new") 
     || die "ERROR: $!";
 
-# the users
+# the add file
+if (not -f $add_file){
+    &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,"",$add_file." not found!");
+    &result_sophomorix_add_summary({
+        NAME=>"ADDED", 
+        RESULT=>0, 
+        RESULT_TYPE => "integer",
+        DESCRIPTION_POST => "users added", 
+        DESCRIPTION_PRE => "added users", 
+        FORMAT_TYPE => 1,
+        sophomorix_result=>\%sophomorix_result,
+	});
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
+
+# calulate users to add
+my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.add | wc -l`;
+chomp($max_user_count);
+
+# open add file
 open(SOPHOMORIXADD,"$add_file") 
     || die "ERROR: $!";
+
 # loop through all users in sophomorix.add
 while(<SOPHOMORIXADD>){
     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile

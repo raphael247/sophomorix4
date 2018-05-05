@@ -271,17 +271,32 @@ if ($info==1) {
 # sophomorix.update mitloggen
 &backup_auk_file("update","before",\%sophomorix_config);
 
+# file for usrs that are not updated
+open(STILLTOUPDATE,">$update_file_new") 
+     || die "ERROR: $!";
+
+if (not -f $update_file){
+    &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,"",$update_file." not found!");
+    &result_sophomorix_add_summary({
+        NAME=>"ADDED", 
+        RESULT=>0, 
+        RESULT_TYPE => "integer",
+        DESCRIPTION_POST => "users added", 
+        DESCRIPTION_PRE => "added users", 
+        FORMAT_TYPE => 1,
+        sophomorix_result=>\%sophomorix_result,
+	});
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
+
 # calulate users to update
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.update | wc -l`;
 chomp($max_user_count);
 
-
-# Datei mit den Schülern, die nicht versetzt wurden
-open(NOCHUPDATE,">$update_file_new") 
-     || die "ERROR: $!";
-
+# open update file
 open(USERUPDATE,"$update_file") 
      || die "ERROR: $!";
+
 while(<USERUPDATE>){
     if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
         next;
@@ -394,7 +409,7 @@ while(<USERUPDATE>){
 
 
 close(USERUPDATE);
-close(NOCHUPDATE);
+close(STILLTOUPDATE);
 
 
 # sophomorix.update mitloggen
