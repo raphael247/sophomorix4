@@ -72,10 +72,7 @@ my $dev_null="1>/dev/null 2>/dev/null";
 my $json=0;
 
 $Conf::log_level=1;
-if($Conf::log_level>=3){
-   # avoid logging STDOUT,STDERR to /dev/null
-   $dev_null="";
-}
+
 my $help=0;
 my $info=0;
 
@@ -116,6 +113,11 @@ my $testopt=GetOptions(
 
 if ($school eq ""){
     $school=$DevelConf::name_default_school;
+}
+
+if($Conf::log_level>=3){
+   # avoid logging STDOUT,STDERR to /dev/null
+   $dev_null="";
 }
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-check");
@@ -519,13 +521,12 @@ sub pdflatex {
     system($pdflatex_command); # 2x, to create table of contents correctly
 
     # clean up
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
-    # make files ro for root
-    system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.* $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
 
+    &print_title("PDF-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.pdf");
 }
 
 
@@ -552,11 +553,13 @@ sub latex {
     system($ps2pdf_command);
 
     # clean up
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
-    system("rm $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.log $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.toc $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
+    system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
+
+    &print_title("PDF-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.pdf");
 }
 
 
