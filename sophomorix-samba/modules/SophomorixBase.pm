@@ -12,6 +12,7 @@ use Config::IniFiles;
 #use Unicode::GCString;
 use Encode qw(decode encode);
 use Data::Dumper;
+use LaTeX::Encode ':all';
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
@@ -67,6 +68,7 @@ $Data::Dumper::Terse = 1;
             recode_utf8_to_ascii
             read_smb_conf
             call_sophomorix_command
+            string_to_latex
             run_hook_scripts
             );
 
@@ -4757,6 +4759,45 @@ sub dns_query_ip {
     #return $ip;
 }
 
+
+# latex stuff
+
+
+
+sub string_to_latex { # old name: latexize_string
+    # make string usable by latex (convert)
+    my ($string) = @_;
+
+    my $string_logical_chars = decode("utf8", $string); # decode in logical chars, to split by char, not byte
+    $latex_string  = latex_encode($string_logical_chars);
+
+    # not sure if the following line is needed
+    $latex_string = encode("utf8", $latex_string); # encode back into utf8
+
+    return $latex_string;
+
+    # # own replacements, before usung module
+    # #replace existing \   with   \textbackslash{}
+    # $string=~s/\\/\\textbackslash\{\}/g;
+
+    # # here a \ added again as escape characters:
+    # #replace  _   with   \_
+    # $string=~s/_/\\_/g;
+    # #replace  $   with   \$
+    # $string=~s/\$/\\\$/g;
+    # #replace  #   with   \#
+    # $string=~s/\#/\\\#/g;
+    # #replace  &   with   \&
+    # $string=~s/\&/\\\&/g;
+    # #replace  %   with   \%
+    # $string=~s/\%/\\\%/g;
+    # #replace  {   with   \{
+    # $string=~s/\{/\\\{/g;
+    # #replace  }   with   \}
+    # $string=~s/\}/\\\}/g;
+    # # [] seem to work
+    # return $string; 
+}
 
 
 # encoding, recoding stuff

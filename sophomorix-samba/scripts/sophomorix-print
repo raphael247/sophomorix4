@@ -37,6 +37,7 @@ use Sophomorix::SophomorixBase qw(
                                  filelist_fetch
                                  remove_whitespace
                                  json_dump
+                                 string_to_latex
                                  recode_utf8_to_ascii
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -59,7 +60,6 @@ use Sophomorix::SophomorixSambaAD qw(
 
 Getopt::Long::Configure ("bundling");
 use Net::LDAP;
-#use Sys::Hostname;
 use JSON;
 use Data::Dumper;
 use File::Basename qw( basename
@@ -613,10 +613,12 @@ sub latex_datablock_from_list {
             $latex_datablock=$latex_datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
         }
         my @data=split(/;/,$item);
+        # $data[3] is the password ??? convert to latex
+        my $password=&string_to_latex($data[3]);
         $latex_datablock=$latex_datablock."\\sophomorixdatabox{".$data[0]."}".
                                           "{".$data[1]."}".
                                           "{".$data[2]."}".
-                                          "{".$data[3]."}".
+                                          "{".$password."}".
                                           "{".$data[4]."}".
                                           "{".$data[5]."}".
                                           "{".$data[8]."}".
