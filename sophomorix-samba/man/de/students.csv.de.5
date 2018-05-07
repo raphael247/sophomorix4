@@ -1,0 +1,83 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH STUDENTS.CSV 5 "May 08, 2018"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+
+Konfigurationsdateien für die Schüleraccounts bei sophomorix4:
+
+.B 1) Aus dem Export des Schülerverwaltungsprogramms:
+
+default-school:
+.br
+/etc/linuxmuster/sophomorix/default-school/students.csv
+
+Andere <school>:q
+.br
+/etc/linuxmuster/sophomorix/<school>/<school>.students.csv
+
+
+.B 2) Als mit dem Editor gepflegte Datei:
+
+default-school:
+.br
+/etc/linuxmuster/sophomorix/default-school/extrastudents.csv
+
+Andere <school>:q
+.br
+/etc/linuxmuster/sophomorix/<school>/<school>.extrastudents.csv
+
+
+.SH DESCRIPTION
+Um den Sollzustand von usern der sophomorixRole 'student' vorzugeben
+werden diese in den obigen Dateien konfiguriert.
+
+Leerzeichen in der Klasse werden entfernt.
+
+Die Klassenbezeichnung wird in Kleinbuchstaben umgewandelt.
+
+Bei der default-school ist der Gruppenname ohne prefix: '<class>'.
+.br
+Bei anderen Schulen mit prefix: '<school>-<class>'.
+
+sophomorixType dieser Klassen ist 'adminclass' (students.csv)
+bzw. 'extraclass' (extrastudents.csv).
+
+.PP
+.SH FELDER
+
+Die folgenden Felder bilden eine Zeile, die durch Strichpunkte
+getrennt abgeschlosse werden:
+.TP
+.B Feld 1: Klasse des Users.
+.TP
+.B Feld 2: Nachname des Users
+.TP
+.B Feld 3: Vorname des Users
+.TP
+.B Feld 4: Geburtsdatum des user im Format dd.mm.yyyy
+.TP
+.B Feld 5: Eindeutiger Identifikationsstring des users der sich nicht ändert (Optional)
+.br 
+Zum Beispiel die Datenbank ID des Schulverwaltungsprogramms.
+.TP
+.B Feld 6: Abteilung (Optional, bisher nicht genutzt)
+.TP
+.SH SEE ALSO
+.BR sophomorix-check (8)
+.
+.SH AUTHOR
+Written by <jeffbeck@web.de>.
