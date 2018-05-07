@@ -1,0 +1,131 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH DEVICES.CSV 5 "May 08, 2018"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+
+Konfigurationsdateien für Netzwerkgeräte bei sophomorix4:
+
+
+default-school:
+.br
+/etc/linuxmuster/sophomorix/default-school/devices.csv
+
+Andere <school>:
+.br
+/etc/linuxmuster/sophomorix/<school>/<school>.devices.csv
+
+.br
+.SH DESCRIPTION
+Um eine Rechnerbezogene Konfiguration der Dienste DNS,
+DHCP, LINBO, ... vorzunehmen, werden die Rechner durch diese Datei
+konfiguriert und danach mit linuxmuster-import-devices importiert.
+
+Als Teil dieses Imports übernimmt sophomorix-device im Active
+Directory von samba4 de Eintragungen für DNS, computer-accounts der
+Rechner sowie Gruppen (Raum, Hardwareclasse, ...)
+
+.PP
+.SH FELDER
+
+Die folgenden 15 Felder bilden eine Zeile, die durch Strichpunkte getrennt sind:
+.TP
+.B Feld 1: Raumname
+.br
+Erstellt eine Gruppe mit dem sophomorixType 'room'
+.TP
+.B Feld 2: Rechnername
+.br
+Erstellt einen dnsNode und (je nach sophomorixRole) einen computer
+account und evtl. eine Gruppe (wenn sophomorixRole printer ist).
+.TP
+.B Feld 3: Hardwareklasse
+.br
+Erstellt eine Gruppe mit dem sophomorixType 'hardwareclass'
+.TP
+.B Feld 4: MAC-Adresse des Rechners
+.TP
+.B Feld 5: IP des Rechners (IPv4)
+.TP
+.B Feld 6: MS-Office-Key
+.TP
+.B Feld 7: MS-Windows-Key
+.TP
+.B Feld 8: Reserviert für linuxmuster.net
+.TP
+.B Feld 9: sophomorixRole
+.br
+Hier sind nur ganz bestimmte Rollennamen zulässig.
+.TP
+.B Feld 10: Reserviert für linuxmuster.net
+.TP
+.B Feld 11: PXE-Flag
+.TP
+.B Feld 12: Reserviert für linuxmuster.net
+.TP
+.B Feld 13: Reserviert für linuxmuster.net
+.TP
+.B Feld 14: Reserviert für linuxmuster.net
+.TP
+.B Feld 15: sophomorixComment
+.br
+Kommentarfeld sophomorixComment beim computer account.
+
+.SH ANMERKUNGEN:
+
+.B Raumname
+.br
+Raumnamen, werden außerhalb der 'default-school' mit prefix
+versehen: '<school>-<room>'.
+
+.B Rechnername
+.br
+dnsNode-Namen sowie computer accounts werden außerhalb
+der 'default-school' mit prefix versehen: '<school>-<rechnername>'.
+
+Computeraccount-Namen bestehen aus Großbuchstaben, gefolgt von $
+(Rechnername 'a102pc1' führt zu dnsNode 'a102pc1' und computer
+account 'A102PC1$')
+
+.B Hardwareklasse
+.br
+Werden NICHT mit prefix versehen. Sie sind schulübergreifend nutzbar.
+
+.B sophomorixRole
+.br
+Es sind nur vorgegebene Werte nutzbar, siehe dazu
+
+sophomorix-samba --show-roletype
+
+Die sophomorixRole entscheidet, ob ein computer account angelegt wird
+oder nicht.
+
+.B Weitere Felder ...
+.br
+Felder ab Feld 16 stören nicht. Und können in Zukunft per Konfigurations
+ins AD synchronisiert werden
+
+
+.SH SEE ALSO
+.BR sophomorix-device (8),
+
+.\".BR baz (1).
+.\".br
+.\"You can see the full options of the Programs by calling for example 
+.\".IR "sophomrix-useradd -h" ,
+.
+.SH AUTHOR
+Written by <jeffbeck@web.de>.
