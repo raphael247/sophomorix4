@@ -433,7 +433,15 @@ if ($show_roletype==1){
         }
         @rolelist = sort @rolelist;
         foreach my $role (@rolelist){
-            print "   * $role\n";
+            if ($item eq "ROLES_DEVICE"){
+                if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'COMPUTER_ACCOUNT'} eq "TRUE"){
+                    print "   * $role (computer account)\n";
+                } else {
+                    print "   * $role\n";
+                }
+            } else {
+                print "   * $role \n";
+            }
         }
         print "\n";
     }
