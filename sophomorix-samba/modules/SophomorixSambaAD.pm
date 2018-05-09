@@ -1047,7 +1047,6 @@ sub AD_group_kill {
     &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"group",$group);
 
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
-
     if ($count > 0){
         if ($type eq "adminclass"){
             ### adminclass #####################################
@@ -1146,6 +1145,13 @@ sub AD_group_kill {
             my $command="samba-tool group delete ". $group;
             print "   # $command\n";
             system($command);
+	} elsif (exists $ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'}{$type}){
+            # just delete the host group
+            my $command="samba-tool group delete ". $group;
+            print "   # $command   ($ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'}{$type})\n";
+            system($command);
+        } else {
+            print "ERROR: Not killing Group of unknown type $type\n";
         }
         return;
     } else {
@@ -5066,7 +5072,7 @@ sub AD_get_AD_for_device {
         }
         $filter=$filter.") )";
 
-	print "Filter for device groups: $filter\n";
+	#print "Filter for device groups: $filter\n";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',

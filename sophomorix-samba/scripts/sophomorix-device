@@ -1616,11 +1616,10 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Add host_groups
     print "\n";
     my $max_host_group_count_create=$#adding_host_groups+1;
-    &print_title("Adding $max_host_group_count_create host group:");
+    &print_title("Adding $max_host_group_count_create host groups:");
     my $host_group_count_create=1;
     foreach my $host_group (@adding_host_groups){
         my $description="Host group for $devices_file{'host_group'}{$host_group}{'COMPUTER_DOLLAR'}";
-        # this does not work
         my $sub_ou=$devices_file{'host_group'}{$host_group}{'SUB_OU'}.",".
             $sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'};
         &AD_group_create({ldap=>$ldap,
@@ -1637,6 +1636,24 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           sophomorix_config=>\%sophomorix_config,
                           sophomorix_result=>\%sophomorix_result,
                          });
+    }
+
+    ############################################################
+    # kill host_groups
+    print "\n";
+    my $max_host_group_count_kill=$#killing_host_groups+1;
+    &print_title("Killing $max_host_group_count_kill host groups:");
+    my $host_group_count_kill=1;
+    foreach my $host_group (@killing_host_groups){
+        print "Kill group $host_group -> Type: $ref_AD_device->{'host_group'}{$host_group}\n";
+        &AD_group_kill({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        root_dns=>$root_dns,
+                        group=>$host_group,
+                        type=>$ref_AD_device->{'host_group'}{$host_group},
+                        group_count=>$host_group_count_kill,
+                        sophomorix_config=>\%sophomorix_config,
+                  });
     }
 
     ############################################################
