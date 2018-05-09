@@ -2724,7 +2724,8 @@ sub config_sophomorix_read {
                 } elsif ($keyname eq "HOST_GROUP"){
                     # ok, no warning
                 } elsif ($keyname eq "HOST_GROUP_TYPE"){
-                    # ok, no warning
+                    my $value=$sophomorix_config{'INI'}{$section}{$keyname};
+                    $sophomorix_config{'LOOKUP'}{'HOST_GROUP_TYPE'}{$value}=$role;
                 } else {
                     print "WARNING: Do not know what to do with $keyname in section $section\n";
                 }

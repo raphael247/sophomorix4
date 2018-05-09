@@ -5059,9 +5059,14 @@ sub AD_get_AD_for_device {
     { # BLOCK group start
         my $filter="(& (objectClass=group) (| ".
                    "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}.") ".
-                   "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}.") ".
-                   ") )";
+                   "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}.") ";
+        # add defined host group types from sophomorix.ini
+        foreach my $type (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'} }) {
+            $filter=$filter."(sophomorixType=".$type.") ";
+        }
+        $filter=$filter.") )";
 
+	print "Filter for device groups: $filter\n";
         $mesg = $ldap->search( # perform a search
                        base   => $root_dse,
                        scope => 'sub',
@@ -5102,6 +5107,11 @@ sub AD_get_AD_for_device {
             @{ $AD{$type}{$sam}{'sophomorixRoomMACs'} }=$entry->get_value('sophomorixRoomMACs');
             @{ $AD{$type}{$sam}{'sophomorixRoomComputers'} }=$entry->get_value('sophomorixRoomComputers');
             @{ $AD{$type}{$sam}{'sophomorixRoomDefaults'} }=$entry->get_value('sophomorixRoomDefaults');
+
+            # host groups
+            if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$type}){
+                $AD{'host_group'}{$sam}=$type;
+            }
 
             # hardwareclass memberships
             if ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}){
