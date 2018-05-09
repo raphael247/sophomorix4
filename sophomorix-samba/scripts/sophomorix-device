@@ -1667,6 +1667,33 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
+    # Add host_groups
+    print "\n";
+    my $max_host_group_count_create=$#adding_host_groups+1;
+    &print_title("Adding $max_host_group_count_create host group:");
+    my $host_group_count_create=1;
+    foreach my $host_group (@adding_host_groups){
+        my $description="Host group for $devices_file{'host_group'}{$host_group}{'COMPUTER_DOLLAR'}";
+        # this does not work
+        my $sub_ou=$devices_file{'host_group'}{$host_group}{'SUB_OU'}.",".
+            $sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'};
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          group=>$host_group,
+                          group_basename=>$devices_file{'host_group'}{$host_group}{'HOST_BASENAME'},
+                          description=>$description,
+                          school=>$devices_file{'host_group'}{$host_group}{'sophomorixSchoolname'},
+                          status=>"P",
+                          type=>$devices_file{'host_group'}{$host_group}{'sophomorixType'},
+     	   		  sub_ou=>$sub_ou,
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
+                          sophomorix_result=>\%sophomorix_result,
+                         });
+    }
+
+    ############################################################
     # Updating rooms
     print "\n";
     my $max_room_count_update=$#updating_rooms+1;
@@ -2187,6 +2214,12 @@ sub analyze_device_line {
         # decide if host group is needed 
         if ($host_group eq "TRUE"){
             $devices_file{'host_group'}{$host_token}{'sophomorixType'}=$host_group_type;
+            $devices_file{'host_group'}{$host_token}{'sophomorixSchoolname'}=$school;
+            $devices_file{'host_group'}{$host_token}{'HOST_BASENAME'}=$host;
+            $devices_file{'host_group'}{$host_token}{'COMPUTER_DOLLAR'}=$ws_token_account;
+            $devices_file{'host_group'}{$host_token}{'ROOM'}=$room_token;
+            $devices_file{'host_group'}{$host_token}{'ROOM_BASENAME'}=$room;
+            $devices_file{'host_group'}{$host_token}{'SUB_OU'}="OU=".$host_group_type."-groups";
         }
         $devices_file{'room'}{$room_token}{'HOSTS'}{$host_token}="seen";
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
