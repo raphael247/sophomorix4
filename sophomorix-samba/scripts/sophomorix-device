@@ -4,71 +4,17 @@
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
-# valid pxe options
-# pxe==0 -> no pxe, accounts nach field 10
-# pxe==alle anderen -> pxe, accounts nach field 10    (option ml)
-#
-
-# field 6, MS-Office-Key
-# string: xxxxx-yyyyy-zzzzz-vvvvv-uuuuu
-
-
-# field 7, MS-Windows-Key
-# string: xxxxx-yyyyy-zzzzz-vvvvv-uuuuu
-
-# field 8:
-# unused, fuer linuxmuster.net reserviert [0-9a-zA-Z_-.,]
-
-# field 9:
-# sophomorixRole
-# 
-
-# field 10, new: account_flag (history: last bpbatch option) 
-# 0         : device ohne account, mit firewall
-# 1         : device ohne account, ohne firewall
-# 2-6   
-# 
-
-# field 11:
-# pxe option
-
-# field 12:
-# ???
-
-# field 13:
-# unused
-
-# field 14:
-# unused
-
-# field 15:
-#  sophomorixComment
-
-# sophomorix-device macht
-# - nicht: obsolete accounts und raeume entfernen
-# - neue accounts und raume anlegen
-# - Aufruf: sophomorix-device
-# - Rueckgabewerte:
-# - 0: alles OK
-# - 1: Fehler Allgemein. import_workstations bricht ab
-
-
-
-## ???? additional:
-# remove workstation homes that have no matching account
-
 
 ## --print
 # add this to doku and man page:
-# 1. Die Ergebnisdatei entsteht in /etc/linuxmuster/
+# 1. Die Ergebnisdatei entsteht in /var/lib/sophomorix/print-data
 
 # 2. Formatieren Sie /etc/linuxmuster/workstations mit Kommentaren:
 #      # Das wird eine Überschrift     (1 #-Zeichen)
 #      ## Das bleibt unberücksichtigt  (2 #-Zeichen) 
 
-# Todo für ML 6.0
+# Todo für ML 7.0
 # oneside/twoside konfigurierbar
-# Unter 1 aufgeführte Variablen selber ermitteln
 # Text in lang-Datei auslagern
 
 # show italcrooms/teacherhosts and classrooms at --print
@@ -2141,7 +2087,6 @@ sub analyze_device_line {
          $host_group,
          $host_group_type)=&check_sophomorix_role($sophomorix_role,$line,$filename);
 
-        #$account_flag=&check_account_flag($account_flag,$line);
         $pxe=&check_pxe($pxe,$line);
         $option=&check_option($option,$line);
 
@@ -2171,12 +2116,13 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;   # 06
         $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
-        # set account flag
-        if ($account_flag==1){
-            $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
-        } else {
-            $devices_file{'device'}{$host_token}{'ACCOUNT'}="FALSE";
-        }
+        $devices_file{'device'}{$host_token}{'ACCOUNT'}=$account_flag;
+#        # set account flag
+#        if ($account_flag==1){
+#            $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
+#        } else {
+#            $devices_file{'device'}{$host_token}{'ACCOUNT'}="FALSE";
+#        }
         $devices_file{'device'}{$host_token}{'COMPUTER'}=$ws_token;
         $devices_file{'device'}{$host_token}{'COMPUTER_DOLLAR'}=$ws_token_account;
         $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
@@ -2230,9 +2176,7 @@ sub analyze_device_line {
         push @{ $devices_file{'room'}{$room_token}{'MACLIST'} }, $mac;
         push @{ $devices_file{'room'}{$room_token}{'IPv4LIST'} }, $ip;
 
-        # $account_flag==0 (no account)
-        # $account_flag==1 (create account) and all other values
-        if ($account_flag==1){
+        if ($account_flag eq "TRUE"){
             $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
             $devices_file{'computer'}{$ws_token_account}{'ROOM_BASENAME'}=$room;
@@ -2446,12 +2390,10 @@ sub check_sophomorix_role {
 
     my $key="computerrole.".$role;
 
-    # calculate account flag
+    # calculate account flag (mandatory)
     my $account_flag;
-    if ($sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'} eq "TRUE"){
-        $account_flag=1;
-    } elsif ($sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'} eq "FALSE"){
-        $account_flag=0;
+    if (defined $sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'}){
+        $account_flag=$sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'};
     } else {
         print "\n";
         print "ERROR: Could not determine account flag by role $role";
@@ -2459,29 +2401,18 @@ sub check_sophomorix_role {
         exit 88;
     }
     
+    # host_group (optional)
+    my $host_group="---";
+    if (defined $sophomorix_config{'INI'}{$key}{'HOST_GROUP'}){
+        $host_group=$sophomorix_config{'INI'}{$key}{'HOST_GROUP'};
+    }
     my $host_group_type="---";
-    my $host_group=$sophomorix_config{'INI'}{$key}{'HOST_GROUP'};
     if (defined $sophomorix_config{'INI'}{$key}{'HOST_GROUP_TYPE'}){
 	$host_group_type=$sophomorix_config{'INI'}{$key}{'HOST_GROUP_TYPE'};
     }
+
     return ($role,$account_flag,$host_group,$host_group_type);
 }
-
-
-
-# sub check_account_flag {
-#     my ($account_flag,$line,$filename) = @_;
-#     if ($account_flag eq 0){
-#         # ok
-#         $account_flag="0";
-#     } else {
-#         $account_flag="1";
-#     }
-#     if($Conf::log_level>=3){
-#         print "   ACCOUNT FLAG:     $account_flag\n";
-#     }
-#     return $account_flag;
-# }
 
 
 
@@ -2580,7 +2511,6 @@ sub push_kill_host_group {
     my ($kill) = @_;
     push @killing_host_groups, $kill;
 }
-
 
 
 
