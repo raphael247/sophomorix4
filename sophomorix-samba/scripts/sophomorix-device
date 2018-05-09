@@ -267,6 +267,10 @@ my @killing_computer_rooms=();
 # Rooms
 my @updating_rooms=();
 
+# host groups
+my @adding_host_groups=();
+my @killing_host_groups=();
+
 # dnsZones
 my @adding_dnszones=();
 my @killing_dnszones=();
@@ -574,7 +578,7 @@ if ($dns_show==1 or $dns_kill==1){
 # ===========================================================================
 # fetching data
 # ===========================================================================
-&print_title("Asking the system for Computers and DNS data ...");
+&print_title("Asking the system for computer accounts and DNS data ...");
 
 my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
                                              root_dse=>$root_dse,
@@ -934,7 +938,7 @@ foreach my $room (keys %{$ref_AD_device->{'room'}}) {
 
 
 
-# computers to kill
+# computer accounts to kill
 foreach my $device (keys %{$ref_AD_device->{'computer'}}) {
     if (not exists $devices_file{'computer'}{$device}){
         # host is not in file anymore
@@ -944,7 +948,7 @@ foreach my $device (keys %{$ref_AD_device->{'computer'}}) {
 
 
 
-# computers to add
+# computer accounts to add
 foreach my $device (keys %{$devices_file{'computer'}}) {
     if (not exists $ref_AD_device->{'computer'}{$device} ){
         # nonexisting --> add account
@@ -955,7 +959,7 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
 
 
 
-# computers to update
+# computer accounts to update
 foreach my $device (keys %{$devices_file{'computer'}}) {
     if (exists $ref_AD_device->{'computer'}{$device} ){
         my $update=0;
@@ -1026,6 +1030,26 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
             $update_computer{$device}{'COUNT'}=$update; # count how many attributes must be updated
             &push_update_computer($device);
         }
+    }
+}
+
+
+
+# host groups to kill
+foreach my $host_group (keys %{$ref_AD_device->{'host_group'}}) {
+    if (not exists $devices_file{'host_group'}{$host_group}){
+        # host_group is not in file anymore
+        &push_kill_host_group($host_group);
+    }
+}
+
+
+
+# host groups to add
+foreach my $host_group (keys %{$devices_file{'host_group'}}) {
+    if (not exists $ref_AD_device->{'host_group'}{$host_group} ){
+        # nonexisting --> add group
+        &push_add_host_group($host_group);
     }
 }
 
@@ -1263,25 +1287,39 @@ if($no_sync==1){
         print "KILL: $room\n";
     }
 
-    # Computers
+    # Computer Accounts
     print "\n";
     $count=$#killing_computers+1;
-    &print_title("Computers that must be killed: ($count)");
+    &print_title("Computer accounts that must be killed: ($count)");
     foreach my $ws (@killing_computers){
         print "KILL: $ws\n";
     }
     print "\n";
     $count=$#adding_computers+1;
-    &print_title("Computers that must be added: ($count)");
+    &print_title("Computer accounts that must be added: ($count)");
     foreach my $ws (@adding_computers){
         print "ADD: $ws\n";
     }
     # updates of computer attributes
     print "\n";
     $count=$#updating_computers+1;
-    &print_title("Computers that must be updated: ($count)");
+    &print_title("Computer accounts that must be updated: ($count)");
     foreach my $ws (@updating_computers){
         print "UPDATE: $ws ($update_computer{$ws}{'COUNT'} attributes)\n";
+    }
+
+    # Host Groups
+    print "\n";
+    $count=$#killing_host_groups+1;
+    &print_title("Host groups that must be killed: ($count)");
+    foreach my $host_group (@killing_host_groups){
+        print "KILL: $host_group\n";
+    }
+    print "\n";
+    $count=$#adding_host_groups+1;
+    &print_title("Host groups that must be added: ($count)");
+    foreach my $host_group (@adding_host_groups){
+        print "ADD: $host_group (sophomorixType: $devices_file{'host_group'}{$host_group}{'sophomorixType'})\n";
     }
 
     # Rooms
@@ -1495,7 +1533,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Kill computers
+    # Kill computer accounts
     print "\n";
     my $max_computer_count_kill=$#killing_computers+1;
 
@@ -1515,7 +1553,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Add computers
+    # Add computer accounts
     print "\n";
     my $max_computer_count_create=$#adding_computers+1;
     &print_title("Adding $max_computer_count_create computers:");
@@ -1608,7 +1646,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Updating computers
+    # Updating computer accounts
     print "\n";
     my $max_computer_count_update=$#updating_computers+1;
     &print_title("Updating $max_computer_count_update computers:");
@@ -2069,7 +2107,12 @@ sub analyze_device_line {
         $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
 
         my $account_flag;
-        ($sophomorix_role,$account_flag)=&check_sophomorix_role($sophomorix_role,$line,$filename);
+        my $host_group;
+        my $host_group_type;
+        ($sophomorix_role,
+         $account_flag,
+         $host_group,
+         $host_group_type)=&check_sophomorix_role($sophomorix_role,$line,$filename);
 
         #$account_flag=&check_account_flag($account_flag,$line);
         $pxe=&check_pxe($pxe,$line);
@@ -2141,6 +2184,10 @@ sub analyze_device_line {
         # dnsNode
         $devices_file{'dnsNode'}{$host_token}=$ip;
 
+        # decide if host group is needed 
+        if ($host_group eq "TRUE"){
+            $devices_file{'host_group'}{$host_token}{'sophomorixType'}=$host_group_type;
+        }
         $devices_file{'room'}{$room_token}{'HOSTS'}{$host_token}="seen";
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'room'}{$room_token}{'IPv4'}{$ip}="seen";
@@ -2150,9 +2197,8 @@ sub analyze_device_line {
         push @{ $devices_file{'room'}{$room_token}{'MACLIST'} }, $mac;
         push @{ $devices_file{'room'}{$room_token}{'IPv4LIST'} }, $ip;
 
-        # field 10 decides 
         # $account_flag==0 (no account)
-        # $account_flag==1 (create account) 1and all other values
+        # $account_flag==1 (create account) and all other values
         if ($account_flag==1){
             $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school;
             $devices_file{'computer'}{$ws_token_account}{'ROOM'}=$room_token;
@@ -2364,21 +2410,28 @@ sub check_sophomorix_role {
         print "\n";
         exit 88;
     }
+
+    my $key="computerrole.".$role;
+
     # calculate account flag
     my $account_flag;
-    my $key="computerrole.".$role;
     if ($sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'} eq "TRUE"){
         $account_flag=1;
     } elsif ($sophomorix_config{'INI'}{$key}{'COMPUTER_ACCOUNT'} eq "FALSE"){
         $account_flag=0;
     } else {
         print "\n";
-        print "ERROR: Cold not determine account flag by role $role";
+        print "ERROR: Could not determine account flag by role $role";
         print "\n";
         exit 88;
     }
-
-    return ($role,$account_flag);
+    
+    my $host_group_type="---";
+    my $host_group=$sophomorix_config{'INI'}{$key}{'HOST_GROUP'};
+    if (defined $sophomorix_config{'INI'}{$key}{'HOST_GROUP_TYPE'}){
+	$host_group_type=$sophomorix_config{'INI'}{$key}{'HOST_GROUP_TYPE'};
+    }
+    return ($role,$account_flag,$host_group,$host_group_type);
 }
 
 
@@ -2480,6 +2533,21 @@ sub push_kill_computer {
     my ($kill) = @_;
     push @killing_computers, $kill;
 }
+
+
+
+sub push_add_host_group {
+    my ($add) = @_;
+    push @adding_host_groups, $add;
+}
+
+
+
+sub push_kill_host_group {
+    my ($kill) = @_;
+    push @killing_host_groups, $kill;
+}
+
 
 
 

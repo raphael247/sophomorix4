@@ -2721,6 +2721,10 @@ sub config_sophomorix_read {
                     $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$role}=$sophomorix_config{'INI'}{$section}{$keyname};
                 } elsif ($keyname eq "COMPUTER_ACCOUNT"){
                     # ok, no warning
+                } elsif ($keyname eq "HOST_GROUP"){
+                    # ok, no warning
+                } elsif ($keyname eq "HOST_GROUP_TYPE"){
+                    # ok, no warning
                 } else {
                     print "WARNING: Do not know what to do with $keyname in section $section\n";
                 }
