@@ -487,6 +487,20 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/LASER1008.".$root_dns.",",
                   });
 
+    # laser1008 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=laser1008,OU=printer-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for LASER1008\$",
+                   name=>"laser1008",
+                   cn=>"laser1008",
+                   sAMAccountname=>"laser1008",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "default-school",
+                   member => "",
+                  });
+
     ##############################
     #dns 
     ##############################
@@ -747,6 +761,19 @@ if ($test_ws_1==1){
                                            "HOST/LASER1010.".$root_dns.",".
                                            "RestrictedKrbHost/LASER1010,".
                                            "RestrictedKrbHost/LASER1010.".$root_dns.",",
+                  });
+    # laser1010 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=laser1010,OU=printer-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for LASER1010\$",
+                   name=>"laser1010",
+                   cn=>"laser1010",
+                   sAMAccountname=>"laser1010",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "default-school",
+                   member => "",
                   });
 
     ##############################
@@ -1225,6 +1252,19 @@ if ($test_ws_1==1){
                                            "RestrictedKrbHost/BSZ-LASER1008,".
                                            "RestrictedKrbHost/BSZ-LASER1008.".$root_dns.",",
                   });
+    # bsz-laser1008 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-laser1008,OU=printer-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for BSZ-LASER1008\$",
+                   name=>"bsz-laser1008",
+                   cn=>"bsz-laser1008",
+                   sAMAccountname=>"bsz-laser1008",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "bsz",
+                   member => "",
+                  });
 
     ##############################
     #dns 
@@ -1485,6 +1525,19 @@ if ($test_ws_1==1){
                                            "HOST/BSZ-LASER1010.".$root_dns.",".
                                            "RestrictedKrbHost/BSZ-LASER1010,".
                                            "RestrictedKrbHost/BSZ-LASER1010.".$root_dns.",",
+                  });
+    # bsz-laser1010 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-laser1010,OU=printer-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for BSZ-LASER1010\$",
+                   name=>"bsz-laser1010",
+                   cn=>"bsz-laser1010",
+                   sAMAccountname=>"bsz-laser1010",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "bsz",
+                   member => "",
                   });
 
     ##############################
@@ -1929,6 +1982,19 @@ if ($test_ws_2==1){
                                            "RestrictedKrbHost/LASER1008,".
                                            "RestrictedKrbHost/LASER1008.".$root_dns.",",
                   });
+    # laser1008 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=laser1008,OU=printer-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for LASER1008\$",
+                   name=>"laser1008",
+                   cn=>"laser1008",
+                   sAMAccountname=>"laser1008",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "default-school",
+                   member => "",
+                  });
 
     ##############################
     #dns 
@@ -2174,6 +2240,19 @@ if ($test_ws_2==1){
                                            "HOST/LASER1010.".$root_dns.",".
                                            "RestrictedKrbHost/LASER1010,".
                                            "RestrictedKrbHost/LASER1010.".$root_dns.",",
+                  });
+    # laser1010 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=laser1010,OU=printer-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for LASER1010\$",
+                   name=>"laser1010",
+                   cn=>"laser1010",
+                   sAMAccountname=>"laser1010",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "default-school",
+                   member => "",
                   });
 
     ##############################
@@ -2624,7 +2703,46 @@ if ($test_ws_2==1){
     ############################################################
     # bsz-laser1008
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1008");
-    #&AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER\$");
+
+    # BSZ-LASER1008$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-LASER1008,OU=j1008,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-LASER1008",
+                   name=>"BSZ-LASER1008",
+                   sophomorixDnsNodename=>"bsz-laser1008",
+                   cn=>"BSZ-LASER1008",
+                   sAMAccountname=>"BSZ-LASER1008\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixComputerIP=>"10.171.208.30",
+                   sophomorixComputerMAC=>"01:01:E6:3E:1B:BA",
+                   sophomorixComputerRoom=>"bsz-j1008",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-LASER1008.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.devices.csv",
+                   servicePrincipalName => "HOST/BSZ-LASER1008,".
+                                           "HOST/BSZ-LASER1008.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-LASER1008,".
+                                           "RestrictedKrbHost/BSZ-LASER1008.".$root_dns.",",
+                  });
+    # bsz-laser1008 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-laser1008,OU=printer-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for BSZ-LASER1008\$",
+                   name=>"bsz-laser1008",
+                   cn=>"bsz-laser1008",
+                   sAMAccountname=>"bsz-laser1008",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "bsz",
+                   member => "",
+                  });
+
     ##############################
     #dns 
     ##############################
@@ -2859,7 +2977,46 @@ if ($test_ws_2==1){
     ############################################################
     # bsz-laser1010
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1010");
-    #&AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1010\$");
+
+    # BSZ-LASER1010$
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=BSZ-LASER1010,OU=j1010,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Computer BSZ-LASER1010",
+                   name=>"BSZ-LASER1010",
+                   sophomorixDnsNodename=>"bsz-laser1010",
+                   cn=>"BSZ-LASER1010",
+                   sAMAccountname=>"BSZ-LASER1010\$",
+                   #sophomorixFirstPassword => "Muster!",
+                   sophomorixRole => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixComputerIP=>"10.171.210.30",
+                   sophomorixComputerMAC=>"09:2E:5F:BB:57:DB",
+                   sophomorixComputerRoom=>"bsz-j1010",
+                   accountExpires => "9223372036854775807",
+                   dNSHostName => "BSZ-LASER1010.".$root_dns,
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.devices.csv",
+                   servicePrincipalName => "HOST/BSZ-LASER1010,".
+                                           "HOST/BSZ-LASER1010.".$root_dns.",".
+                                           "RestrictedKrbHost/BSZ-LASER1010,".
+                                           "RestrictedKrbHost/BSZ-LASER1010.".$root_dns.",",
+                  });
+    # bsz-laser1010 host_group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-laser1010,OU=printer-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   description=>"Host group for BSZ-LASER1010\$",
+                   name=>"bsz-laser1010",
+                   cn=>"bsz-laser1010",
+                   sAMAccountname=>"bsz-laser1010",
+                   sophomorixType => "printer",
+                   sophomorixStatus=>"P",
+                   sophomorixSchoolname => "bsz",
+                   member => "",
+                  });
+
     ##############################
     #dns 
     ##############################
@@ -3098,7 +3255,8 @@ if ($test_ws_5==1){
     &AD_test_nondns($res,"j1008p02");
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1008\$");
-    &AD_test_nondns($res,"laserj1008");
+    &AD_test_nondns($res,"laser1008");
+    &AD_object_nonexist($ldap,$root_dse,"group","laser1008");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","j1010p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","J1010P01\$");
@@ -3109,6 +3267,7 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","LASER1010\$");
     &AD_test_nondns($res,"laser1010");
+    &AD_object_nonexist($ldap,$root_dse,"group","laser1010");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","c001p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","C001P01\$");
@@ -3135,6 +3294,7 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1008");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1008\$");
     &AD_test_nondns($res,"bsz-laser1008");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-laser1008");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-j1010p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-J1010P01\$");
@@ -3145,6 +3305,7 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-laser1010");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-LASER1010\$");
     &AD_test_nondns($res,"bsz-laser1010");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-laser1010");
 
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-d001p01");
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-D001P01\$");
