@@ -39,7 +39,7 @@ smbcquotas:
    - override in quotaFeld des users testen
    - project, class oberride testen
    - dito mit mailquota calculated
-smbcquotas von einer Schule auf alle erweitern (script für shareerstellung fehlt noch)
+smbcquotas Tests von einer Schule auf alle erweitern (script für shareerstellung fehlt noch)
 
 sophomorix-ui:
    - add school.conf override 
@@ -51,8 +51,6 @@ sophomorix-ui:
    - auf update testen ist schneller  
 
 Anmelden an exam account: einmalpasswort forcen, geht das. Konfigurierbar
-
-default-zustand für managementgruppen konfigurierbar in school.conf? je Rolle.
 
 Ein Lehrer an mehreren Schulen
 --> Stammschule, nur da anlegen
@@ -72,6 +70,12 @@ room attributes
         room_by_computer$ -> room
         CLASSROOMS -> classroom --> DEFAULTS
         PRINTERS -
+
+oder besser mit
+
+--type room,hardwareclass,printer(the hostgroup of the role printer)--> 
+ --role 
+
 
   sophomorix-room -i -r <room>: 
     sophomorixRoomIPs       (MultiValue)     sophomorixComputerIP       (SingleValue)

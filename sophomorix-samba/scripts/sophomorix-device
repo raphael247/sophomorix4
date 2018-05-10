@@ -346,6 +346,8 @@ Please see the sophomorix-device(8) man pages for full documentation
    exit 0;
 }
 
+
+
 ############################################################################
 # --add-example-line
 ############################################################################
@@ -358,6 +360,7 @@ if ($add_example_line ne ""){
 
     exit;
 }
+
 
 
 ############################################################################
@@ -432,7 +435,6 @@ if ($dns_test==1){
 ############################################################################
 # --dns-show / --dns-kill
 ############################################################################
-
 if ($dns_show==1 or $dns_kill==1){
     my $res   = Net::DNS::Resolver->new;
     my @zonelist=();
@@ -521,9 +523,9 @@ if ($dns_show==1 or $dns_kill==1){
 }
 
 
-# ===========================================================================
+################################################################################
 # fetching data
-# ===========================================================================
+################################################################################
 &print_title("Asking the system for computer accounts and DNS data ...");
 
 my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
@@ -531,26 +533,6 @@ my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
                                              root_dns=>$root_dns,
                                              sophomorix_config=>\%sophomorix_config,
                                            });
-# fetch system data (OLD)
-#my ($ref_AD_device_old) = &AD_get_AD({ldap=>$ldap,
-#                                  root_dse=>$root_dse,
-#                                  root_dns=>$root_dns,
-#                                  computers=>"TRUE",
-#                                  rooms=>"TRUE",
-#                                  #examaccounts=>"TRUE",
-#                                  dnszones=>"TRUE",
-#                                  dnsnodes=>"TRUE",
-#                                  sophomorix_config=>\%sophomorix_config,
-#                                });
-
-
-#print Dumper( $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'} );
-#print Dumper( $ref_AD_device->{'objectclassOLD'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'} );
-
-
-#print Dumper($ref_AD_device_old->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{'j1008p01'});
-#exit;
-
 # /etc/linuxmuster/classroom
 # ?????????????????????????
 #&get_classrooms();
@@ -568,137 +550,40 @@ if ($dump_AD==1){
 }
 
 
+
+# --print
 if ($print==1){
-    print "--print not working\n";
+    &print_devices_latex($ref_AD_device);
     exit;
 }
 
-# # ===========================================================================
-# # --print     (does not modify system)
-# # ===========================================================================
-# if ($print==1){
-#     if (not -e ${host_workstation}){
-#         print "\n$host_workstation does not exist\n\n";
-#         exit 1;
-#     }
-
-#     my $admins="";
-#     if (defined $Conf::admins_print){
-#         if ($Conf::admins_print ne ""){
-# 	    $admins=$Conf::admins_print;
-#         }
-#     }
-
-#     my $out_base="/etc/linuxmuster/workstations_formatted";
-#     my $out_dir="/etc/linuxmuster";
-#     my $out_file="$out_base".".tex";
-#     my $out_file_dvi="$out_base".".dvi";
-#     my @line=();
-#     my $host=0; # counter for the hosts
-#     # draw a horizontal line in the table after this many lines of text
-#     my $hor_lines=5; 
-#     my $line_count=1;
-
-#     print "Writing to $out_file";
-#     open(TEX, ">$out_file");
-
-#     print TEX '\documentclass[a4paper, twoside]{article}',"\n",
-#           '\usepackage{longtable}',"\n",
-#           '\usepackage{ngerman}',"\n",
-#           '\usepackage{layout}',"\n",
-#           '\usepackage{fancyhdr}',"\n",
-#           '\usepackage{lastpage}',"\n",
-#           '\setlength{\oddsidemargin}{-5mm}',"\n",
-#           '\setlength{\evensidemargin}{-16.8mm}',"\n",
-#           '\setlength{\textwidth}{180mm}',"\n",
-#           '\setlength{\textheight}{255mm}',"\n",
-#           '\setlength{\topmargin}{-20mm}',"\n",
-#           '\pagestyle{fancy}',"\n",
-#           "\\lhead{$Conf::schul_name}","\n",
-#           "\\rhead{Seite \\thepage/\\pageref{LastPage}}","\n",
-#           "\\cfoot{$admins}","\n",
-#           '\pagestyle{fancy}',"\n",
-#           '\renewcommand{\baselinestretch}{1.2}',"\n\n",
-
-#           '\begin{document}',"\n\n",
-#           # show layout of page
-#           # '\layout',"\n\n",
-#           '\begin{longtable}{|r|c|c|c|c|c|} ',"\n",
-#           '   \caption*{\large \bfseries Rechner und ',
-#           '             Drucker ',
-#           "($Conf::schul_name)",
-#           '}\\\\ \\hline',"\n",
-#           '   \bfseries Nr. & \bfseries DNS-Name & \bfseries Raum & ',
-#           '      \bfseries HW-Klasse & \bfseries IP-Adresse & ',
-#           '      \bfseries MAC-Adresse \\\\ \hline \hline',"\n",
-#           '   \endhead',"\n",
-#           '      \hline \multicolumn{6}{r}{Fortsetzung auf der n\"{a}chsten Seite ...}',"\n",
-#           '   \endfoot',"\n",
-#           '      \hline ',"\n",
-#           '   \endlastfoot',"\n";
-
-#     open(IN, "<${host_workstation}");
-#     while(<IN>){
-#         chomp();
-#         my $line=$_;
-#         if ($line eq "") {
-# 	    next;
-#         } elsif(/^\#\#/){
-# 	    print "Comment $line \n";
-#         } elsif (/^\#/){
-# 	    print "Header $line \n";
-#             s/^\#//g;
-#             if ($line eq "") {
-# 	        next;
-#             }
-#             $line=&latexize_string($line);
-#             print TEX "\\hline \\hline  ",
-#                  "\\multicolumn{6}{|l|}{\\rule{0mm}{4mm}\\bfseries $line}",
-#                  " \\\\ \\hline ","\n";
-#         } else {
-#             @line = split(/;/);
-#             $host++;
-#             $host=&latexize_string($host);
-#             $line[1]=&latexize_string($line[1]);
-#             $line[2]=&latexize_string($line[2]);
-#             $line[3]=&latexize_string($line[3]);
-#             $line[4]=&latexize_string($line[4]);
-#             $line="$host & $line[1] & $line[0] & $line[2]".
-#                   " & $line[4] & \\texttt{$line[3]} \\\\ ";
-#             print TEX $line; 
-#             # Horizontal lines
-#              if ($line_count==$hor_lines){
-#                  print TEX ' \hline',"\n";
-#                  $line_count=0;
-#              } else {
-#                  print TEX "\n";
-#              }
-#              $line_count++;
-#         }
-#     }
-#     close(IN);
-
-#     print TEX '\end{longtable}',"\n";
-#     print TEX "\\textbf{$host Rechner/Drucker sind im p\"{a}dagogischen ",
-#               "Netz ($Conf::schul_name).} \n \n";
-#     print TEX "Ausdruck: \\today .",
-#               "\n \n",
-#               "\\textbf{Die Netzwerkadministratoren:}",
-#               "\n",
-#               "$admins","\n";
-#     print TEX "\n",'\end{document}',"\n";
-#     close(TEX);
-
-#     # latex
-#     system("cd $out_dir; latex $out_file");
-#     system("cd $out_dir; latex $out_file");
-#     system("cd $out_dir; dvips $out_file_dvi");
-#     exit;
-# }
 
 
-# --info (overview)
-if ($info==1 and $device eq ""){
+# all --info option goe here
+if ($device ne "" and $info==1){
+    ##################################################
+    # --info --device <device>
+    my $ref_devices=&AD_get_full_devicedata({ldap=>$ldap,
+                                             root_dse=>$root_dse,
+                                             root_dns=>$root_dns,
+                                             devicelist=>$device,
+                                             sophomorix_config=>\%sophomorix_config,
+                                            });
+    #print Dumper($ref_devices);
+    my $jsoninfo="DEVICE";
+    my $jsoncomment="One sophomorix device";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $device,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_devices,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+} elsif ($info==1){
+    ##################################################
+    # --info (overview)
     my ($ref_devices) = &AD_get_AD_for_device({ldap=>$ldap,
                                                root_dse=>$root_dse,
                                                root_dns=>$root_dns,
@@ -718,74 +603,9 @@ if ($info==1 and $device eq ""){
                    });
     }
     exit;
+} else {
+    # skip info stuff
 }
-
-
-# --info --device <device>
-if ($device ne "" and $info==1){
-    my $ref_devices=&AD_get_full_devicedata({ldap=>$ldap,
-                                             root_dse=>$root_dse,
-                                             root_dns=>$root_dns,
-                                             devicelist=>$device,
-                                             sophomorix_config=>\%sophomorix_config,
-                                            });
-    #print Dumper($ref_devices);
-    my $jsoninfo="DEVICE";
-    my $jsoncomment="One sophomorix device";
-    &json_dump({json => $json,
-                jsoninfo => $jsoninfo,
-                jsoncomment => $jsoncomment,
-                object_name => $device,
-                log_level => $Conf::log_level,
-                hash_ref => $ref_devices,
-                sophomorix_config => \%sophomorix_config,
-               });
-    exit;
-}
-
-# # ===========================================================================
-# # --info (does not modify system)
-# # ===========================================================================
-# if ($info==1){
-#     print "\n";
-#     &print_title("Reading the following device files:");
-#     foreach my $file (@filelist){
-#         print "   * $file\n";
-#     }
-
-#     # fetch and sort rooms
-#     my @rooms=();
-#     while (my ($room,$v) = each %rooms_system){
-#         push @rooms, $room;
-#     }
-#     @rooms = sort @rooms;
-
-#     foreach my $room (@rooms){
-#         my $classroom="";
-#         my $italcroom="";
-#         if (exists $class_rooms{$room}){
-#             $classroom="(CLASSROOM) ";
-#         }
-#         if (exists $italc_rooms{$room}){
-#             $italcroom="(ITALC ROOM) ";
-#         }
-# 	print "ROOM: $room ${classroom}${italcroom}\n";
-#         # fetch and sort examaccounts
-#         my @examaccounts=();
-#         while (my ($account,$room_entry) = each %examaccounts_system){
-#             #print $account , " ", $roomentry, "\n";
-#             if ($room_entry eq $room){
-#                 push @examaccounts,$account;
-#             }
-#         }
-#         @examaccounts = sort @examaccounts;
-#         foreach my $account (@examaccounts){
-#             print "    HOST: $account\n";
-#         }
-#     }
-#     exit 0;
-# }
-
 
 
 
@@ -812,68 +632,10 @@ foreach my $device_file (@filelist){
 }
 
 
+
 ############################################################################
 # Decide what must be done
 ############################################################################
-
-# # ExamAccounts to kill
-# foreach my $examaccount (keys %{$ref_AD_device->{'objectclass'}{'user'}{'examaccount'}}) {
-#     if (not exists $devices_file{'device'}{$examaccount}){
-#         # host is not in file anymore
-#         &push_kill_examaccount($examaccount);
-#     }
-# }
-
-
-# # ExamAccounts to add
-# foreach my $examaccount (keys %{$devices_file{'device'}}) {
-#     if (not exists $ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}){
-#         # host is not in system
-#         # examaccounts only for classroom devices and 
-#         my $room=$devices_file{'device'}{$examaccount}{'ROOM'};
-#         if (exists $class_rooms{$room} and $devices_file{'device'}{$examaccount}{'ACCOUNT'} eq "TRUE"){
-#             &push_add_examaccount($examaccount);
-#         } else {
-#             # not adding
-#         }
-#     } else {
-#         # device is not in correct room -> update (kill and add)
-#         if ($ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'} ne 
-#             $devices_file{'device'}{$examaccount}{'ROOM'}){
-#             if($Conf::log_level>=2){
-# 	        print "$examaccount: Changed room from ",
-#                       "$ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'room'}",
-#                       " to $devices_file{'device'}{$examaccount}{'ROOM'}\n";
-#             }
-#             &push_kill_examaccount($examaccount);
-#             &push_add_examaccount($examaccount);
-#         }
-#         # sophomorixAdminFile ist not correct
-#         if ($ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'} ne 
-#             $devices_file{'device'}{$examaccount}{'FILENAME'}){
-#             if($Conf::log_level>=2){
-# 	        print "$examaccount: Was moved from file ",
-#                       "$ref_AD_device->{'objectclass'}{'user'}{'examaccount'}{$examaccount}{'sophomorixAdminFile'}",
-#                       " to $devices_file{'device'}{$examaccount}{'FILENAME'}\n";
-#             }
-#             &push_kill_examaccount($examaccount);
-#             &push_add_examaccount($examaccount);
-#         }
-
-
-#     }
-# }
-
-
-# # ExamAccount rooms to kill
-# foreach my $room (keys %{$ref_AD_device->{'room'}}) {
-#     if (not exists $devices_file{'room'}{$room}){
-#         # host is not in file anymore
-#         &push_kill_examaccount_room($room);
-#     }
-# }
-
-
 # computer rooms to kill
 foreach my $room (keys %{$ref_AD_device->{'room'}}) {
     if (not exists $devices_file{'room'}{$room}){
@@ -1201,6 +963,8 @@ if ($dump_files==1){
 }
 
 
+############################################################################
+# sync or not
 ############################################################################
 if($no_sync==1){
     # show info about what will be done
@@ -2579,6 +2343,134 @@ sub push_kill_hardwareclass {
 }
 
 
+
+sub print_devices_latex {
+    my ($ref_device)=@_;
+    print "--print not working at present\n";
+# # ===========================================================================
+# # --print     (does not modify system)
+# # ===========================================================================
+# if ($print==1){
+#     if (not -e ${host_workstation}){
+#         print "\n$host_workstation does not exist\n\n";
+#         exit 1;
+#     }
+
+#     my $admins="";
+#     if (defined $Conf::admins_print){
+#         if ($Conf::admins_print ne ""){
+# 	    $admins=$Conf::admins_print;
+#         }
+#     }
+
+#     my $out_base="/etc/linuxmuster/workstations_formatted";
+#     my $out_dir="/etc/linuxmuster";
+#     my $out_file="$out_base".".tex";
+#     my $out_file_dvi="$out_base".".dvi";
+#     my @line=();
+#     my $host=0; # counter for the hosts
+#     # draw a horizontal line in the table after this many lines of text
+#     my $hor_lines=5; 
+#     my $line_count=1;
+
+#     print "Writing to $out_file";
+#     open(TEX, ">$out_file");
+
+#     print TEX '\documentclass[a4paper, twoside]{article}',"\n",
+#           '\usepackage{longtable}',"\n",
+#           '\usepackage{ngerman}',"\n",
+#           '\usepackage{layout}',"\n",
+#           '\usepackage{fancyhdr}',"\n",
+#           '\usepackage{lastpage}',"\n",
+#           '\setlength{\oddsidemargin}{-5mm}',"\n",
+#           '\setlength{\evensidemargin}{-16.8mm}',"\n",
+#           '\setlength{\textwidth}{180mm}',"\n",
+#           '\setlength{\textheight}{255mm}',"\n",
+#           '\setlength{\topmargin}{-20mm}',"\n",
+#           '\pagestyle{fancy}',"\n",
+#           "\\lhead{$Conf::schul_name}","\n",
+#           "\\rhead{Seite \\thepage/\\pageref{LastPage}}","\n",
+#           "\\cfoot{$admins}","\n",
+#           '\pagestyle{fancy}',"\n",
+#           '\renewcommand{\baselinestretch}{1.2}',"\n\n",
+
+#           '\begin{document}',"\n\n",
+#           # show layout of page
+#           # '\layout',"\n\n",
+#           '\begin{longtable}{|r|c|c|c|c|c|} ',"\n",
+#           '   \caption*{\large \bfseries Rechner und ',
+#           '             Drucker ',
+#           "($Conf::schul_name)",
+#           '}\\\\ \\hline',"\n",
+#           '   \bfseries Nr. & \bfseries DNS-Name & \bfseries Raum & ',
+#           '      \bfseries HW-Klasse & \bfseries IP-Adresse & ',
+#           '      \bfseries MAC-Adresse \\\\ \hline \hline',"\n",
+#           '   \endhead',"\n",
+#           '      \hline \multicolumn{6}{r}{Fortsetzung auf der n\"{a}chsten Seite ...}',"\n",
+#           '   \endfoot',"\n",
+#           '      \hline ',"\n",
+#           '   \endlastfoot',"\n";
+
+#     open(IN, "<${host_workstation}");
+#     while(<IN>){
+#         chomp();
+#         my $line=$_;
+#         if ($line eq "") {
+# 	    next;
+#         } elsif(/^\#\#/){
+# 	    print "Comment $line \n";
+#         } elsif (/^\#/){
+# 	    print "Header $line \n";
+#             s/^\#//g;
+#             if ($line eq "") {
+# 	        next;
+#             }
+#             $line=&latexize_string($line);
+#             print TEX "\\hline \\hline  ",
+#                  "\\multicolumn{6}{|l|}{\\rule{0mm}{4mm}\\bfseries $line}",
+#                  " \\\\ \\hline ","\n";
+#         } else {
+#             @line = split(/;/);
+#             $host++;
+#             $host=&latexize_string($host);
+#             $line[1]=&latexize_string($line[1]);
+#             $line[2]=&latexize_string($line[2]);
+#             $line[3]=&latexize_string($line[3]);
+#             $line[4]=&latexize_string($line[4]);
+#             $line="$host & $line[1] & $line[0] & $line[2]".
+#                   " & $line[4] & \\texttt{$line[3]} \\\\ ";
+#             print TEX $line; 
+#             # Horizontal lines
+#              if ($line_count==$hor_lines){
+#                  print TEX ' \hline',"\n";
+#                  $line_count=0;
+#              } else {
+#                  print TEX "\n";
+#              }
+#              $line_count++;
+#         }
+#     }
+#     close(IN);
+
+#     print TEX '\end{longtable}',"\n";
+#     print TEX "\\textbf{$host Rechner/Drucker sind im p\"{a}dagogischen ",
+#               "Netz ($Conf::schul_name).} \n \n";
+#     print TEX "Ausdruck: \\today .",
+#               "\n \n",
+#               "\\textbf{Die Netzwerkadministratoren:}",
+#               "\n",
+#               "$admins","\n";
+#     print TEX "\n",'\end{document}',"\n";
+#     close(TEX);
+
+#     # latex
+#     system("cd $out_dir; latex $out_file");
+#     system("cd $out_dir; latex $out_file");
+#     system("cd $out_dir; dvips $out_file_dvi");
+#     exit;
+# }
+
+}
 
 
 # sub get_classrooms {
