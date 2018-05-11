@@ -69,6 +69,7 @@ $Data::Dumper::Terse = 1;
             read_smb_conf
             call_sophomorix_command
             string_to_latex
+            get_lang_from_config
             run_hook_scripts
             );
 
@@ -4798,10 +4799,27 @@ sub dns_query_ip {
 }
 
 
+
+# LANG stuff
+######################################################################
+sub get_lang_from_config {
+    my ($school,$ref_sophomorix_config)=@_;
+    my $lang;
+    if (exists $ref_sophomorix_config->{'SCHOOLS'}{$school}{'LANG'}){
+        $lang=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'LANG'}
+    } elsif (exists $ref_sophomorix_config->{'GLOBAL'}{'LANG'}) {
+        $lang=$ref_sophomorix_config->{'GLOBAL'}{'LANG'};
+    } else {
+        print "\nERROR: Could not determine a language\n\n";
+        exit 88;
+    }
+    return $lang;
+}
+
+
+
 # latex stuff
-
-
-
+######################################################################
 sub string_to_latex { # old name: latexize_string
     # make string usable by latex (convert)
     my ($string) = @_;

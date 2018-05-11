@@ -39,6 +39,7 @@ use Sophomorix::SophomorixBase qw(
                                  json_dump
                                  string_to_latex
                                  recode_utf8_to_ascii
+                                 get_lang_from_config
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -111,9 +112,6 @@ my $testopt=GetOptions(
            "info|i" => \$info
           );
 
-if ($school eq ""){
-    $school=$DevelConf::name_default_school;
-}
 
 if($Conf::log_level>=3){
    # avoid logging STDOUT,STDERR to /dev/null
@@ -131,6 +129,15 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
+if ($school eq ""){
+    $school=$DevelConf::name_default_school;
+} else {
+    if (not exists $sophomorix_config{'SCHOOLS'}{$school}){
+        print "\nERROR: $school is not a valid school\n\n";
+        exit 88;
+    }
+}
+
 
 # --help
 if ($help==1) {
@@ -146,7 +153,7 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
 
-sophomorix-print looks in ONE school for users (without option the default-school)
+sophomorix-print looks in ONE school for users (without option in: default-school)
 For other schools use the following option:
   -s <schoolname> / --school <schoolname>
 
@@ -200,9 +207,11 @@ system("mkdir -p $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}");
 # ===========================================================================
 my $output_file_basename="";
 my $template_num;
+my $lang=&get_lang_from_config($school,\%sophomorix_config);
+
 my $template_path_abs=$sophomorix_config{'INI'}{'LATEX'}{'TEMPLATES'}.
                       "/datalist-".
-                      $sophomorix_config{'GLOBAL'}{'LANG'}.
+                      $lang.
                       "-";
 
 my $class_filename_part="";
@@ -288,7 +297,7 @@ if ($template ne ""){
 } elsif (-d $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}){
     # looking for custom templates
     &print_title("Custom templates:  $sophomorix_config{'SCHOOLS'}{$school}{'TEMPLATES_LATEX_DIR'}");
-    my $search_string="-".$sophomorix_config{'GLOBAL'}{'LANG'}."-".$template_num."-template.tex";
+    my $search_string="-".$lang."-".$template_num."-template.tex";
     my $custom_template="";
 
     print "   * Looking for a custom template *$search_string\n";
@@ -352,15 +361,17 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
 if ($info==1){
     my @datelist=&sorted_datelist();
     my $back_in_time_count=0;
-    print "+---------------------+---------------------+-------+-------------------+\n";
+    my $line="+---------------------+---------------------+-------+-------------------+\n";
+    print $line;
     print "| Option to use       | Date                | users | AD-Date           |\n";
-    print "+---------------------+---------------------+-------+-------------------+\n";
+    print $line;
     foreach my $ymdhms (@datelist){
         my $date=&ymdhms_to_date($ymdhms);
         my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}+1;
-        printf "  --back-in-time %-6s $date %7s   $ymdhms\n",$back_in_time_count, $count;
+        printf "| --back-in-time %-5s| %7s |%6s | %7s |\n",$back_in_time_count, $date, $count, $ymdhms;
         $back_in_time_count++;
     }
+    print $line;
     exit;
 }
 
