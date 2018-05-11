@@ -1,15 +1,23 @@
 Create Latex templates
 
+In the subdirectory 'templates' you will find the templates that are
+used in sophomorix4.
 
+If you have a latex system installed (with the used latex packeges)
+you cn compile the template (they contain example data.)
+
+################################################################################
+The templates are processed by sophomorix-print this way:
+################################################################################
 
 1) The following Latex-Datastructures will be replaced by sophomorix:
 
-\textcolor{red}{ADMINCLASS}      ........  The adminclass of a user/users
-\textcolor{red}{TEACHERMEMBERS}  ........  The members of the adminclass
-\textcolor{red}{SCHOOL}          ........  The SCHOOL_LONGNAME oof a user/users with the SCHHOLNAME in brackets()
-\textcolor{red}{FILENAME}        ........  The filename (without extension) of the file created
+   \textcolor{red}{ADMINCLASS}      ........  The adminclass of a user/users
+   \textcolor{red}{TEACHERMEMBERS}  ........  The members of the adminclass
+   \textcolor{red}{SCHOOL}          ........  The SCHOOL_LONGNAME oof a user/users with the SCHHOLNAME in brackets()
+   \textcolor{red}{FILENAME}        ........  The filename (without extension) of the file created
 
-You should use these Latex-Datastructures in headers and footers, since they describe more then one user
+   You should use these Latex-Datastructures in headers and footers, since they describe more then one user
 
 
 
@@ -28,22 +36,53 @@ You should use these Latex-Datastructures in headers and footers, since they des
 
 
 
+################################################################################
+Translating templates:
+################################################################################
 
-3. To create a template, 
+   To translate a Template, just copy it to your language:
+
+      cp datalist-DE-36-template.tex  datalist-EN-36-template.tex
+ 
+   Replace the language specific words and compile the template with latex.
+
+
+
+
+
+################################################################################
+Create your own templates: 
+################################################################################
 
    A) create a latexfile in the schooldirectory/latex-templates that is named like:  
    <schoolname>.<yourname>-<LANG>-<num>-template.tex
 
    <schoolname>:  is the short schoolname
    <yourname>:    is an ascii-string that describes the template
-   <LAND>:        describes the language used in the Template: DE, EN, ...
+   <LANG>:        describes the language used in the Template: DE, EN, ...
    <num>:         is the number of data entries you want in ONE page
 
-   Beispiel:      bsz.datalist-DE-1-template.tex
-   In directory:  /etc/linuxmuster/sophomorix/bsz/latex-templates/
+   Example:      bsz.datalist-DE-1-template.tex
+      saved in:  /etc/linuxmuster/sophomorix/bsz/latex-templates/bsz.datalist-DE-1-template.tex
    
 
-   B) Contents of the latex file
+
+
+   B) Test the template
+
+      1) Test the template with data within the template:
+         - just compile your template:
+           # latex -> dvips -> ps2pdf (default)
+           # pdflatex
+
+      2) Test the template with AD-data:
+         Call the template with sophomorix-print:
+           # sophomorix-print --template /path/to/mytemplate-DE-1-template.tex
+
+
+
+
+   C) Contents of the template latex file:
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    \documentclass[...]{...}    % whatever you want
@@ -51,20 +90,23 @@ You should use these Latex-Datastructures in headers and footers, since they des
    \usepackage[utf8]{inputenc} % this is mandatory, the data will come as utf8
    \usepackage{color}          % this is mandatory for the textcolor command
    \usepackage{fancyhdr}       % add whatever you need
+   % ... add packages you need
   
    % page layout
    \setlength{\paperwidth}{210mm}
-   ...
+   % ... set what you need
 
 
-   % command for a newpage
+   % command for a newpage (mandatory)
    \newcommand{\sophomorixnewpage}[2]{
-      ... do what has to be done on a new page, update your headers and footers here
+      % ... do what has to be done on a new page, update your headers and footers here
+      % ... data comes in latex syntax (i.e. '&' comes as '\&'), you don't need verbatim stuff.
    }
 
-   % command to create new entry
+   % command to create new entry (mandatory)
    \newcommand{\sophomorixdatabox}[9]{
-      ... do what you need with the 9 parameters, take care of empty commands \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+      % ... do what you need with the 9 parameters, take care of empty parameters: \sophomorixdatabox{}{}{}{}{}{}{}{}{}%
+      % ... data comes in latex syntax (i.e. '&' comes as '\&'), you don't need verbatim stuff.
    }
 
 
