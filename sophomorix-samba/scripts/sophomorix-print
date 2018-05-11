@@ -467,11 +467,11 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
 } elsif (defined $back_in_time) {
     &open_output_files($output_file_basename);
     # go for back in time stuff, if nothing else ist given
-    my @datelist=&sorted_datelist();
-    my $date=&ymdhms_to_date($datelist[$back_in_time]);
-    print " Going Back in time $back_in_time steps to $date ($datelist[$back_in_time])\n";
+    my $AD_date=${ $ref_AD_print_data->{'LISTS'}{'sophomorixCreationDate'} }[$back_in_time];
+    my $date=&ymdhms_to_date($AD_date);
+    print " Going Back in time $back_in_time steps to $date ($AD_date)\n";
+    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$AD_date};
 
-    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$datelist[$back_in_time]};
     $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
     &create_csv_files($ref_printlist);
 
@@ -567,19 +567,6 @@ sub latex {
     system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
 
     &print_title("PDF-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.pdf");
-}
-
-
-
-sub sorted_datelist {
-    my @datelist=();
-    foreach my $date (keys %{$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}}) {
-	#print "$date\n";
-        push @datelist, $date;
-    }
-    # sort the dates in reverse order
-    @datelist=sort{$b cmp $a} @datelist; # for strings
-    return @datelist;  
 }
 
 
