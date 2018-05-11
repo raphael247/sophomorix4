@@ -7263,6 +7263,9 @@ sub AD_get_printdata {
         @{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} } = 
             sort{$b cmp $a} @{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} }
     }
+    # counter for history
+    $AD_printdata{'RESULT'}{'HISTORY'}{'TOTAL'}=$#{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} }+1;
+    $AD_printdata{'RESULT'}{'BACK_IN_TIME_MAX'}=$#{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} };
     return(\%AD_printdata);
 }
 

@@ -465,12 +465,18 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     &make_output_files_ro;
 
 } elsif (defined $back_in_time) {
+    if ($back_in_time > $ref_AD_printdata->{'RESULT'}{'BACK_IN_TIME_MAX'}){
+        print "\n";
+        print "ERROR: I Can only go back to:   --back-in-time $ref_AD_printdata->{'RESULT'}{'BACK_IN_TIME_MAX'}\n";
+        print "  SEE: sophomorix-print -i\n\n";
+        exit 88;
+    }
     &open_output_files($output_file_basename);
     # go for back in time stuff, if nothing else ist given
-    my $AD_date=${ $ref_AD_printdata->{'LISTS'}{'sophomorixCreationDate'} }[$back_in_time];
-    my $date=&ymdhms_to_date($AD_date);
-    print " Going Back in time $back_in_time steps to $date ($AD_date)\n";
-    $ref_printlist=$ref_AD_printdata->{'LIST_BY_sophomorixCreationDate'}{$AD_date};
+    my $ymdhms=${ $ref_AD_printdata->{'LISTS'}{'sophomorixCreationDate'} }[$back_in_time];
+    my $date=&ymdhms_to_date($ymdhms);
+    print " Going Back in time $back_in_time steps to $date ($ymdhms)\n";
+    $ref_printlist=$ref_AD_printdata->{'LIST_BY_sophomorixCreationDate'}{$ymdhms};
 
     $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
     &create_csv_files($ref_printlist);

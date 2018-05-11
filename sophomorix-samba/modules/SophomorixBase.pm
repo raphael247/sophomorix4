@@ -759,7 +759,8 @@ sub _console_print_schema_attribute {
 
 sub _console_print_printdata {
     my ($ref_printdata,$school_opt,$log_level,$ref_sophomorix_config)=@_;
-    &print_title("History of user additions:");
+    
+    &print_title("History of $ref_printdata->{'RESULT'}{'HISTORY'}{'TOTAL'} user additions:");
     my $back_in_time_count=0;
     my $line="+---------------------+---------------------+-------+-------------------+\n";
     print $line;
