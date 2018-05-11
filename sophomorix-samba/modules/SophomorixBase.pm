@@ -318,6 +318,8 @@ sub json_dump {
             &_console_print_ui($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         } elsif ($jsoninfo eq "SCHEMA_ATTRIBUTE"){
             &_console_print_schema_attribute($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+        } elsif ($jsoninfo eq "PRINTDATA"){
+            &_console_print_printdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
         }
     } elsif ($json==1){
         # pretty output
@@ -751,6 +753,25 @@ sub _console_print_schema_attribute {
         print "\nFor a list of all attributes use:\n";
         print "   sophomorix-samba --show-all-attributes\n\n";
     }
+}
+
+
+
+sub _console_print_printdata {
+    my ($ref_printdata,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    &print_title("History of user additions:");
+    my $back_in_time_count=0;
+    my $line="+---------------------+---------------------+-------+-------------------+\n";
+    print $line;
+    print "| Option to use       | Date                | users | AD-Date           |\n";
+    print $line;
+    foreach my $ymdhms ( @{ $ref_printdata->{'LISTS'}{'sophomorixCreationDate'} } ){
+        my $date=&ymdhms_to_date($ymdhms);
+        my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}+1;
+        printf "| --back-in-time %-5s| %7s |%6s | %7s |\n",$back_in_time_count, $date, $count, $ymdhms;
+        $back_in_time_count++;
+    }
+    print $line;
 }
 
 

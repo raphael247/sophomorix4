@@ -96,6 +96,9 @@ my $school="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "school|s=s" => \$school,
            "class|c=s" => \$class,
@@ -103,13 +106,11 @@ my $testopt=GetOptions(
            "template=s" => \$template,
            "per-page|pp=i" => \$pp,
            "user|u=s" => \$user,
-           "help|h" => \$help,
            "caller=s" => \$caller,
            "caller-copy|callercopy=s" => \$caller_copy,
            "command=s" => \$command,
            "back-in-time|backintime=i" => \$back_in_time,
            "one-per-page" => \$one_per_page,
-           "info|i" => \$info
           );
 
 
@@ -353,27 +354,22 @@ my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
                                       school=>$school,
                                       sophomorix_config=>\%sophomorix_config,
              });
-#print Dumper($ref_AD_print_data);
-
-
 
 # --info
 if ($info==1){
-    my @datelist=&sorted_datelist();
-    my $back_in_time_count=0;
-    my $line="+---------------------+---------------------+-------+-------------------+\n";
-    print $line;
-    print "| Option to use       | Date                | users | AD-Date           |\n";
-    print $line;
-    foreach my $ymdhms (@datelist){
-        my $date=&ymdhms_to_date($ymdhms);
-        my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}+1;
-        printf "| --back-in-time %-5s| %7s |%6s | %7s |\n",$back_in_time_count, $date, $count, $ymdhms;
-        $back_in_time_count++;
-    }
-    print $line;
+    my $jsoninfo="PRINTDATA";
+    my $jsoncomment="Printable Data";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_AD_print_data,
+                sophomorix_config => \%sophomorix_config,
+               });
     exit;
 }
+
 
 
 # ===========================================================================

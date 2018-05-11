@@ -7258,15 +7258,21 @@ sub AD_get_print_data {
             $AD_print_data{'LOOKUP_BY_sAMAccountName'}{$entry->get_value('sAMAccountName')}=$line;
             $AD_print_data{'LOOKUP_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')}="exists";
         }
-        # sorting some lists
 #        my $unneeded1=$#{ $AD_print_data{'LISTS'}{'student'} }; # make list computer nonempty        
 #        @{ $AD_print_data{'LISTS'}{'student'} } = sort @{ $AD_print_data{'LISTS'}{'student'} }; 
 #        my $unneeded2=$#{ $AD_print_data{'LISTS'}{'teacher'} }; # make list computer nonempty        
 #        @{ $AD_print_data{'LISTS'}{'teacher'} } = sort @{ $AD_print_data{'LISTS'}{'teacher'} }; 
     }
 
-
-
+    # create list for --back-in-time
+    foreach my $date ( keys %{ $AD_print_data{'LIST_BY_sophomorixCreationDate'} } ){
+        push @{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} },$date;
+    }
+    # sort list for --back-in-time (reverse order)
+    if ( $#{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} }>0){
+        @{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} } = 
+            sort{$b cmp $a} @{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} }
+    }
     return(\%AD_print_data);
 }
 
