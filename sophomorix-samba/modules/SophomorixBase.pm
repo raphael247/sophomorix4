@@ -2565,6 +2565,23 @@ sub config_sophomorix_read {
                                                    \%sophomorix_config);
     &load_sophomorix_ini($ref_modmaster_sophomorix,\%sophomorix_config,$ref_result);
 
+    # Working on the sections of sophomorix.ini 
+    # part 1 (before knowing about schools)
+    ###############################################
+    # if you need process it differently for each school, move it to part 2
+    foreach my $section  (keys %{$sophomorix_config{'INI'}}) {
+        if ($section eq "LANG"){
+            foreach my $keyname (keys %{$sophomorix_config{'INI'}{$section}}) {
+                if ($keyname eq "LANG_ALLOWED"){
+                    my @lang=split(/,/,$sophomorix_config{'INI'}{$section}{$keyname});
+                    foreach my $lang (@lang){
+                        $sophomorix_config{'LOOKUP'}{'LANG_ALLOWED'}{$lang}="allowed";
+                    }
+                }
+            }
+        }
+    }
+
     ##################################################
     # SCHOOLS  
     # read the *.school.conf
@@ -2628,6 +2645,20 @@ sub config_sophomorix_read {
         # mountpoint
         $sophomorix_config{'SCHOOLS'}{$school}{'MOUNTPOINT'}=
             $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$school;
+        # lang of school
+        if ($sophomorix_config{'SCHOOLS'}{$school}{'LANG'} eq ""){
+            # use global as the lang
+            $sophomorix_config{'SCHOOLS'}{$school}{'LANG'}=$sophomorix_config{'GLOBAL'}{'LANG'};
+        } else {
+            # test lang
+            if (not exists $sophomorix_config{'LOOKUP'}{'LANG_ALLOWED'}{$sophomorix_config{'SCHOOLS'}{$school}{'LANG'}}){
+                print "$sophomorix_config{'SCHOOLS'}{$school}{'LANG'}\n";
+                print "$sophomorix_config{'LOOKUP'}{'LANG_ALLOWED'}\n";
+                print "ERROR: Unallowed language $sophomorix_config{'SCHOOLS'}{$school}{'LANG'}\n";
+                print "   in: $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'}\n\n";
+                exit 88;
+            }
+        }
         # mailconf
         if ($sophomorix_config{'SCHOOLS'}{$school}{'MAILTYPE'} ne "none"){
             $sophomorix_config{'SCHOOLS'}{$school}{'MAILCONFDIR'}=
@@ -2694,8 +2725,10 @@ sub config_sophomorix_read {
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'MOUNTPOINT'}=
         $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$DevelConf::name_default_school;
 
-   # Working on the sections of sophomorix.ini
+    # Working on the sections of sophomorix.ini 
+    # part 2 (school-list is known)
     ###############################################
+    # if you need process it before reading schools, move it to part 1
     foreach my $section  (keys %{$sophomorix_config{'INI'}}) {
         if ($section eq "SCHOOLS"){
             # do something
