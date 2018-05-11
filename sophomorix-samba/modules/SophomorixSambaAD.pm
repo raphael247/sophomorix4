@@ -72,7 +72,7 @@ $Data::Dumper::Terse = 1;
             AD_get_full_userdata
             AD_get_full_devicedata
             AD_get_full_groupdata
-            AD_get_print_data
+            AD_get_printdata
             AD_get_schema
             AD_class_fetch
             AD_project_fetch
@@ -7184,8 +7184,8 @@ sub AD_get_shares_v {
 
 
 
-sub AD_get_print_data {
-    my %AD_print_data=();
+sub AD_get_printdata {
+    my %AD_printdata=();
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -7219,7 +7219,7 @@ sub AD_get_print_data {
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found for password printout");
-        $AD_print_data{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
+        $AD_printdata{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
         my %seen_classes=();
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
@@ -7234,46 +7234,36 @@ sub AD_get_print_data {
                      $entry->get_value('sophomorixRole').";".
                      $entry->get_value('sophomorixCreationDate').";".
                      $entry->get_value('uidNumber').";";
-            # list creation
-#            push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
-#                                  {$entry->get_value('sophomorixSchoolname')}
-#                                  {$entry->get_value('sophomorixAdminClass')} }, 
-#                                  $line; 
-#print Dumper(\%seen_classes);
             if (not exists $seen_classes{$entry->get_value('sophomorixAdminClass')}){
-                push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
+                push @{ $AD_printdata{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
 		                      {$entry->get_value('sophomorixSchoolname')} },$entry->get_value('sophomorixAdminClass');
                 $seen_classes{$entry->get_value('sophomorixAdminClass')}="seen";
 		$seen_classes{'ONE'}="seen";
             }
-            push @{ $AD_print_data{'LIST_BY_sophomorixAdminClass'}
+            push @{ $AD_printdata{'LIST_BY_sophomorixAdminClass'}
                                   {$entry->get_value('sophomorixAdminClass')} }, 
                                   $line; 
-            push @{ $AD_print_data{'LIST_BY_sophomorixSchoolname'}
+            push @{ $AD_printdata{'LIST_BY_sophomorixSchoolname'}
                                   {$entry->get_value('sophomorixSchoolname')} }, 
                                   $line; 
-            push @{ $AD_print_data{'LIST_BY_sophomorixCreationDate'}{$entry->get_value('sophomorixCreationDate')} }, 
+            push @{ $AD_printdata{'LIST_BY_sophomorixCreationDate'}{$entry->get_value('sophomorixCreationDate')} }, 
                                   $line;
             # lookup creation
-            $AD_print_data{'LOOKUP_BY_sAMAccountName'}{$entry->get_value('sAMAccountName')}=$line;
-            $AD_print_data{'LOOKUP_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')}="exists";
+            $AD_printdata{'LOOKUP_BY_sAMAccountName'}{$entry->get_value('sAMAccountName')}=$line;
+            $AD_printdata{'LOOKUP_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')}="exists";
         }
-#        my $unneeded1=$#{ $AD_print_data{'LISTS'}{'student'} }; # make list computer nonempty        
-#        @{ $AD_print_data{'LISTS'}{'student'} } = sort @{ $AD_print_data{'LISTS'}{'student'} }; 
-#        my $unneeded2=$#{ $AD_print_data{'LISTS'}{'teacher'} }; # make list computer nonempty        
-#        @{ $AD_print_data{'LISTS'}{'teacher'} } = sort @{ $AD_print_data{'LISTS'}{'teacher'} }; 
     }
 
     # create list for --back-in-time
-    foreach my $date ( keys %{ $AD_print_data{'LIST_BY_sophomorixCreationDate'} } ){
-        push @{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} },$date;
+    foreach my $date ( keys %{ $AD_printdata{'LIST_BY_sophomorixCreationDate'} } ){
+        push @{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} },$date;
     }
     # sort list for --back-in-time (reverse order)
-    if ( $#{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} }>0){
-        @{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} } = 
-            sort{$b cmp $a} @{ $AD_print_data{'LISTS'}{'sophomorixCreationDate'} }
+    if ( $#{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} }>0){
+        @{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} } = 
+            sort{$b cmp $a} @{ $AD_printdata{'LISTS'}{'sophomorixCreationDate'} }
     }
-    return(\%AD_print_data);
+    return(\%AD_printdata);
 }
 
 

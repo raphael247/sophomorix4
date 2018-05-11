@@ -767,7 +767,7 @@ sub _console_print_printdata {
     print $line;
     foreach my $ymdhms ( @{ $ref_printdata->{'LISTS'}{'sophomorixCreationDate'} } ){
         my $date=&ymdhms_to_date($ymdhms);
-        my $count=$#{ $ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}+1;
+        my $count=$#{ $ref_printdata->{'LIST_BY_sophomorixCreationDate'}{$ymdhms}}+1;
         printf "| --back-in-time %-5s| %7s |%6s | %7s |\n",$back_in_time_count, $date, $count, $ymdhms;
         $back_in_time_count++;
     }

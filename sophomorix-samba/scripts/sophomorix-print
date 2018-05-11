@@ -53,7 +53,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
                                  AD_get_user
-                                 AD_get_print_data
+                                 AD_get_printdata
                                  AD_dns_get
                                  AD_get_passwd
                                  AD_object_search
@@ -347,7 +347,7 @@ my $template_basename = basename($template_path_abs);
 # Read data from AD
 # ===========================================================================
 &Sophomorix::SophomorixBase::print_title("Looking for printout data in school $school");
-my $ref_AD_print_data=&AD_get_print_data({ldap=>$ldap,
+my $ref_AD_printdata=&AD_get_printdata({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       users=>"TRUE",
@@ -364,7 +364,7 @@ if ($info==1){
                 jsoncomment => $jsoncomment,
                 object_name => $school,
                 log_level => $Conf::log_level,
-                hash_ref => $ref_AD_print_data,
+                hash_ref => $ref_AD_printdata,
                 sophomorix_config => \%sophomorix_config,
                });
     exit;
@@ -382,15 +382,15 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     # print one school completely
     &open_output_files($output_file_basename);
     # walk through classes
-    if (not exists $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school}){
+    if (not exists $ref_AD_printdata->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school}){
         print "\nERROR: School $school has no printout data\n\n";
         exit 88;
     }
-    my @classlist = @{ $ref_AD_print_data->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
+    my @classlist = @{ $ref_AD_printdata->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
     @classlist = sort @classlist;
     foreach my $class_item (@classlist){
 	print "   * Creating datablock for $class_item\n";
-        $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class_item};
+        $ref_printlist=$ref_AD_printdata->{'LIST_BY_sophomorixAdminClass'}{$class_item};
         $latex_datablock=&latex_datablock_from_list($class_item,$ref_printlist);
         &create_csv_files($ref_printlist);
     }
@@ -412,7 +412,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     foreach my $class_item (@classlist_option){
         if (exists $classes_seen{$class_item}){
             # seen already, doing nothing
-        } elsif (exists $ref_AD_print_data->{'LOOKUP_BY_sophomorixAdminClass'}{$class_item} 
+        } elsif (exists $ref_AD_printdata->{'LOOKUP_BY_sophomorixAdminClass'}{$class_item} 
             and not exists $classes_seen{$class_item}){
             print "   * $class_item selected\n";
             push @classlist, $class_item;
@@ -427,7 +427,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
 
     foreach my $class_item (@classlist){
 	print "   * Creating datablock for $class_item\n";
-        $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixAdminClass'}{$class_item};
+        $ref_printlist=$ref_AD_printdata->{'LIST_BY_sophomorixAdminClass'}{$class_item};
         $latex_datablock=&latex_datablock_from_list($class_item,$ref_printlist);
         &create_csv_files($ref_printlist);
     }
@@ -445,9 +445,9 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     my %printdata=();
     my @users=split(/,/,$user);
     foreach my $username (@users){
-        if (exists $ref_AD_print_data->{'LOOKUP_BY_sAMAccountName'}{$username}){
+        if (exists $ref_AD_printdata->{'LOOKUP_BY_sAMAccountName'}{$username}){
             print "   * $username selected\n";
-            push @{ $printdata{'LIST'} }, $ref_AD_print_data->{'LOOKUP_BY_sAMAccountName'}{$username};
+            push @{ $printdata{'LIST'} }, $ref_AD_printdata->{'LOOKUP_BY_sAMAccountName'}{$username};
         } else {
             print "\nERROR: User $username has no printout data in school $school\n\n";
             exit 88;
@@ -467,10 +467,10 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
 } elsif (defined $back_in_time) {
     &open_output_files($output_file_basename);
     # go for back in time stuff, if nothing else ist given
-    my $AD_date=${ $ref_AD_print_data->{'LISTS'}{'sophomorixCreationDate'} }[$back_in_time];
+    my $AD_date=${ $ref_AD_printdata->{'LISTS'}{'sophomorixCreationDate'} }[$back_in_time];
     my $date=&ymdhms_to_date($AD_date);
     print " Going Back in time $back_in_time steps to $date ($AD_date)\n";
-    $ref_printlist=$ref_AD_print_data->{'LIST_BY_sophomorixCreationDate'}{$AD_date};
+    $ref_printlist=$ref_AD_printdata->{'LIST_BY_sophomorixCreationDate'}{$AD_date};
 
     $latex_datablock=&latex_datablock_from_list($class,$ref_printlist);
     &create_csv_files($ref_printlist);
@@ -533,6 +533,7 @@ sub pdflatex {
     system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.aux $dev_null");
     system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
 
+    &print_title("TEX-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.tex");
     &print_title("PDF-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.pdf");
 }
 
@@ -566,6 +567,7 @@ sub latex {
     system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.out $dev_null");
     system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
 
+    &print_title("TEX-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.tex");
     &print_title("PDF-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.pdf");
 }
 
