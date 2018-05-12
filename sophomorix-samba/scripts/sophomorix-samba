@@ -70,6 +70,7 @@ my $show_all_attributes=0;
 my $show_sophomorix_attributes=0;
 my $show_attribute="";
 my $show_roletype=0;
+my $show_lang=0;
 
 my $samba_private="/var/lib/samba/private";
 my $samba_private_d="/var/lib/samba/private/sam.ldb.d";
@@ -87,6 +88,7 @@ my $testopt=GetOptions(
            "show-all-attributes" => \$show_all_attributes,
            "show-sophomorix-attributes" => \$show_sophomorix_attributes,
            "show-roletype" => \$show_roletype,
+           "show-lang" => \$show_lang,
            "editor=s" => \$editor,
            "schema-load" => \$schema_load,
            "start" => \$start,
@@ -133,6 +135,9 @@ Show all sophomorix attribute names:
 
 Show all user roles and group types:
   --show-roletype
+
+Show all allowed languages:
+  --show-lang
 
 You shold know exactly what you are doing, if you use the following options:
 
@@ -408,6 +413,34 @@ if ($show_attribute ne ""){
                 sophomorix_config => \%sophomorix_config,
                });
 
+}
+
+
+
+# --show_lang
+if ($show_lang==1){
+    print "\n";
+    print "########## Language configuration ####################################\n";
+    my $ref_sophomorix_config=\%sophomorix_config;
+    my @itemlist=();
+    my $ref_sophomorix_config=\%sophomorix_config;
+    foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'LANG_ALLOWED'} } ) {
+        push @itemlist,$keyname;
+    }
+    foreach my $item (@itemlist){
+        print "   ALLOWED LANG: $item     (from sophomorix.ini)\n";
+    }
+
+    print "\n";
+    print "Configured languages on this system:\n\n";
+    print "   GLOBAL:\n";
+    printf "%20s: %-6s \n","global",$ref_sophomorix_config->{'GLOBAL'}{'LANG'};
+    print "\n";
+    print "   SCHOOLS (inherited from GLOBAL if not configured otherwise):\n";
+    foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+        printf "%20s: %-5s \n",$school,$ref_sophomorix_config->{'SCHOOLS'}{$school}{'LANG'};
+    }
+    print "\n";
 }
 
 
