@@ -703,12 +703,12 @@ sub latex_from_template_and_datablock {
         my $line=$_;
 
         # replacements (use underscore here, from school.conf)
-        my $admins_print=$sophomorix_config{'SCHOOLS'}{$school}{'ADMINS_PRINT'};
+        my $admins_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'ADMINS_PRINT'});
         my $schoolstring;
         if ($school eq $DevelConf::name_default_school){
-            $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'};
+            $schoolstring=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'});
         } else {
-            $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
+            $schoolstring=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")");
         }
         # (use hyphen here for template)
         $line=~s/\\textcolor\{red\}\{SCHOOL-LONGNAME\}/$schoolstring/;
