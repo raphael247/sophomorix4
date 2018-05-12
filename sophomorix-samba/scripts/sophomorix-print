@@ -702,10 +702,18 @@ sub latex_from_template_and_datablock {
     while (<TEMPLATE>){
         my $line=$_;
 
-        # replacements
-        my $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
-        $line=~s/\\textcolor\{red\}\{SCHOOL\}/$schoolstring/;
+        # replacements (use underscore here, from school.conf)
+        my $admins_print=$sophomorix_config{'SCHOOLS'}{$school}{'ADMINS_PRINT'};
+        my $schoolstring;
+        if ($school eq $DevelConf::name_default_school){
+            $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'};
+        } else {
+            $schoolstring=$sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")";
+        }
+        # (use hyphen here for template)
+        $line=~s/\\textcolor\{red\}\{SCHOOL-LONGNAME\}/$schoolstring/;
         $line=~s/\\textcolor\{red\}\{FILENAME\}/$output_file_basename/;
+        $line=~s/\\textcolor\{red\}\{ADMINS-PRINT\}/$admins_print/;
 
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
