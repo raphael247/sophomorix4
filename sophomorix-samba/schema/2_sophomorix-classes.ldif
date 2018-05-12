@@ -84,6 +84,40 @@ mayContain: sophomorixComputerRoom
 mayContain: sophomorixComputerDefaults
 
 
+# <-- dnsNode -->
+
+dn: CN=Sophomorix-DnsNode,<SchemaContainerDN>
+changetype: add
+adminDescription: Sophomorix-DnsNode
+adminDisplayName: Sophomorix-DnsNode
+cn: Sophomorix-DnsNode
+defaultHidingValue: TRUE
+governsID: 1.3.6.1.4.1.47512.1.2.4
+instanceType: 4
+lDAPDisplayName: sophomorixDnsNode
+name: Sophomorix-DnsNode
+objectCategory: CN=Class-Schema,<SchemaContainerDN>
+objectClass: classSchema
+objectClassCategory: 3
+possSuperiors: top
+rDNAttID: cn
+schemaIDGUID:: 2S2X+EAGS6WL4FDnHY+PKw==
+subClassOf: top
+systemOnly: FALSE
+
+dn: CN=Sophomorix-DnsNode,<SchemaContainerDN>
+changetype: modify
+replace: mayContain
+mayContain: sophomorixAdminFile
+mayContain: sophomorixRole
+mayContain: sophomorixSchoolname
+mayContain: sophomorixComment
+mayContain: sophomorixDnsNodename
+mayContain: sophomorixComputerIP
+mayContain: sophomorixComputerMAC
+mayContain: sophomorixComputerRoom
+
+
 # <-- Group -->
 
 dn: CN=Sophomorix-Group,<SchemaContainerDN>
