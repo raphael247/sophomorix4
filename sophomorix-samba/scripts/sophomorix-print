@@ -181,13 +181,16 @@ Examples to print timely additions:
   sophomorix-print --back-in-time <num> --caller bz [--school <schoolname>]
   sophomorix-print --back-in-time <num> --caller-copy bz [--school <schoolname>]
 
-Changing the LaTeX-template:
-  --per-page <num> / --pp <num> (change to the template with the given number)
-  Test your template:
-  --template  /abs/path/override  (use specified template, entries per page is calculated from filename)
-Custom templates are used for a school when 
-  A) they are saved in /etc/linuxmuster/sophomorix/<school>/latex-templates
-  B) They follow the naming convention <school>.*-<LANG>-<NUM>-template.tex
+Changing the LaTeX-template (i.e numer of users per page):
+  --per-page <num> / --pp <num> (change to the template with the given number in filename)
+
+Test your your own template (entries per page is calculated from filename):
+  --template  /abs/path/to/datalist-DE-18-template.tex
+
+Configuring custom templates per school:
+  A) Save them in /etc/linuxmuster/sophomorix/<school>/latex-templates
+  B) They must follow the naming convention <school>.*-<LANG>-<NUM>-template.tex
+     * must be datalist at the moment?
 
 Deprecated in sophomorix4 (at the moment):
   -p project / --project project
