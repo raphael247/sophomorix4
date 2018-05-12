@@ -5048,10 +5048,9 @@ sub AD_get_AD_for_device {
             @{ $AD{'computer'}{$sam}{'sophomorixComputerDefaults'} }=$entry->get_value('sophomorixComputerDefaults');
 
             # lists
-            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
-            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            push @{ $AD{'LISTS'}{'COMPUTER_BY_sophomorixSchoolname'}{$sn}{$role} }, $sam; 
 
-            #$AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
+            # lookup
             $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
 
             #my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
