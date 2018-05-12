@@ -91,6 +91,7 @@ my $back_in_time;# undef
 my $template="";
 my $one_per_page=0;
 my $pp=0;
+my $lang_by_option="";
 
 my $school="";
 
@@ -104,6 +105,7 @@ my $testopt=GetOptions(
            "class|c=s" => \$class,
            "project|p=s" => \$project,
            "template=s" => \$template,
+           "lang=s" => \$lang_by_option,
            "per-page|pp=i" => \$pp,
            "user|u=s" => \$user,
            "caller=s" => \$caller,
@@ -182,7 +184,10 @@ Examples to print timely additions:
   sophomorix-print --back-in-time <num> --caller-copy bz [--school <schoolname>]
 
 Changing the LaTeX-template (i.e numer of users per page):
-  --per-page <num> / --pp <num> (change to the template with the given number in filename)
+  Changing the number-part in the template filename (Users per page):
+  --per-page <num> / --pp <num> 
+  Changing the LANG-part in the template filename (LANG of template):
+  --lang <XY>
 
 Test your your own template (entries per page is calculated from filename):
   --template  /abs/path/to/datalist-DE-18-template.tex
@@ -211,12 +216,23 @@ system("mkdir -p $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}");
 # ===========================================================================
 my $output_file_basename="";
 my $template_num;
-my $lang=&get_lang_from_config($school,\%sophomorix_config);
 
+# Setting the abs-path of the template
+my $lang=&get_lang_from_config($school,\%sophomorix_config);
+# --lang <xy>
+if ($lang_by_option ne ""){
+    if (exists $sophomorix_config{'LOOKUP'}{'LANG_ALLOWED'}{$lang_by_option}){
+        $lang=$lang_by_option;
+    } else {
+	print "\nERROR: $lang_by_option is not an allowed Lanuage\n\n";
+        exit 88;
+    }
+}
 my $template_path_abs=$sophomorix_config{'INI'}{'LATEX'}{'TEMPLATES'}.
                       "/datalist-".
                       $lang.
                       "-";
+
 
 my $class_filename_part="";
 if ($class ne ""){
