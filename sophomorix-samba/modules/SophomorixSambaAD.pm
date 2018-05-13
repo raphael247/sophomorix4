@@ -4917,7 +4917,9 @@ sub AD_get_schema {
         my $entry = $mesg->entry($index); 
         my $dn=$entry->dn();
         my $name=$entry->get_value('LDAPDisplayName');
+        my $cn=$entry->get_value('cn');
         $schema{'LDAPDisplayName'}{$name}{'DN'}=$dn;
+        $schema{'LDAPDisplayName'}{$name}{'CN'}=$cn;
         $schema{'LOOKUP'}{'LDAPDisplayName_by_DN'}{$dn}=$name;
 
         # save Camelcase names 

@@ -353,13 +353,13 @@ if ($show_sophomorix_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-
+    #print Dumper $ref_schema;
     # class schema (no searchflag)
-    my $line1 ="+----------------------------------------------------------------------------+\n";
-    my $line  ="+-------+--------------------------------------------------------------------+\n";
-    my $header="| Nr.   | Attribute                                                          |\n";
+    my $line1 ="+--------------------------------------------------------------------------------------------+\n";
+    my $line  ="+-------+------------------------------------------------------------------------------------+\n";
+    my $header="| Nr.   | Attribute                                                                          |\n";
     print $line1;
-    printf "| classSchema: %-5s                                                         |\n",
+    printf "| classSchema: %-5s                                                                         |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'};    
     print $line;
     print $header;
@@ -368,17 +368,17 @@ if ($show_sophomorix_attributes==1){
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'} } ) {
         $count++;
 	my $search_flag=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'searchflags'} }[0];
-        printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
+        printf "|%6s| %3s | %-78s|\n",$count,$search_flag,$attr;
     } 
     print $line;
     print "\n";
 
     # attribute schema
-    $line1 ="+----------------------------------------------------------------------------+\n";
-    $line  ="+------+-----+---------------------------------------------------------------+\n";
-    $header="| Nr.  |  SF | Attribute                                                     |\n";
+    $line1 ="+--------------------------------------------------------------------------------------------+\n";
+    $line  ="+------+-----+-------------------------------------------------------------------------------+\n";
+    $header="| Nr.  |  SF | Attribute                                                                     |\n";
     print $line1;
-    printf "| attributeSchema: %-5s                                                     |\n",
+    printf  "| attributeSchema: %-5s                                                                     |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'}{'COUNT'};
     print $line;
     print $header;
@@ -387,7 +387,9 @@ if ($show_sophomorix_attributes==1){
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'} } ) {
         $count++;
 	my $search_flag=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'searchflags'} }[0];
-        printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
+	my $cn=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'cn'} }[0];
+
+        printf "|%6s| %3s | %-78s|\n",$count,$search_flag,$attr." (".$cn.")";
     }
     print $line;
     print "SF: searchFlags (128: confidential   0:noindex   1:index)\n";
@@ -423,7 +425,6 @@ if ($show_lang==1){
     print "########## Language configuration ####################################\n";
     my $ref_sophomorix_config=\%sophomorix_config;
     my @itemlist=();
-    my $ref_sophomorix_config=\%sophomorix_config;
     foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'LANG_ALLOWED'} } ) {
         push @itemlist,$keyname;
     }
