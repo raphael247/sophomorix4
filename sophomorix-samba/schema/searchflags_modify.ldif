@@ -1,0 +1,14 @@
+# apply this ldif file with:
+# ldbmodify -H /var/lib/samba/private/sam.ldb  ./file.ldif --option="dsdb:schema update allowed"=true
+
+dn: CN=Sophomorix-Comment,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local
+objectClass: attributeSchema
+changetype: modify
+replace:searchFlags
+searchFlags: 128
+
+dn: CN=sophomorix-Add-Mail-Quota,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local
+objectClass: attributeSchema
+changetype: modify
+replace:searchFlags
+searchFlags: 128
