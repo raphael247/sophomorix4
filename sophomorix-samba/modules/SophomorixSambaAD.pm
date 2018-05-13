@@ -290,6 +290,7 @@ sub AD_dns_create {
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
     my $school = $arg_ref->{school};
+    my $role = $arg_ref->{role};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # calc dnsNode, reverse lookup
@@ -317,9 +318,6 @@ sub AD_dns_create {
     if (not defined $dns_type){
         $dns_type="A";
     }
-#    if (not defined $dns_zone){
-#        $dns_zone=&AD_dns_get($root_dse);
-#    }
     
     ############################################################
     # adding dnsNode with samba-tool
@@ -334,13 +332,12 @@ sub AD_dns_create {
     # adding comments to recognize the dnsNode as created by sophomorix
     my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node);
     print "   * Adding Comments to dnsNode $dns_node\n";
-
     if ($count > 0){
              print "   * dnsNode $dns_node exists ($count results)\n";
              my $mesg = $ldap->modify( $dn_exist_dnshost, add => {
                                        adminDescription => $dns_admin_description,
                                        cn => $dns_cn,
-                                       sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_ROLE'},
+                                       sophomorixRole => $role,
                                        sophomorixAdminFile => $filename,
                                        sophomorixSchoolname => $school,
                                        sophomorixComputerIP => $dns_ipv4,
@@ -361,14 +358,10 @@ sub AD_dns_create {
     # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
     print "   * dnsNode $dns_node (reverse lookup $dns_node_reverse)\n";
-#    my $mesg = $ldap->modify( $dns_node_reverse, add => {
-#                      adminDescription => $dns_admin_description,
-#                      cn => $dns_cn,
-#                    });
     my $mesg = $ldap->modify( $dns_node_reverse, replace => {
                               adminDescription => $dns_admin_description,
                               cn => $dns_cn,
-                              sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_ROLE_REVERSE'},
+                              sophomorixRole => $role,
                               sophomorixAdminFile => $filename,
                               sophomorixSchoolname => $school,
                               sophomorixComputerIP => $dns_ipv4,
