@@ -289,6 +289,8 @@ sub AD_dns_create {
     my $dns_type = $arg_ref->{dns_type};
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
+    my $school = $arg_ref->{school};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # calc dnsNode, reverse lookup
     my @octets=split(/\./,$dns_ipv4);
@@ -319,9 +321,8 @@ sub AD_dns_create {
 #        $dns_zone=&AD_dns_get($root_dse);
 #    }
     
+    ############################################################
     # adding dnsNode with samba-tool
-#    my $command="  samba-tool dns add $dns_server $dns_zone $dns_node $dns_type $dns_ipv4".
-#                " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command\n";
@@ -329,6 +330,7 @@ sub AD_dns_create {
     my $res=`$command`;
     print "       -> $res";
 
+    ############################################################
     # adding comments to recognize the dnsNode as created by sophomorix
     my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node);
     print "   * Adding Comments to dnsNode $dns_node\n";
@@ -338,18 +340,24 @@ sub AD_dns_create {
              my $mesg = $ldap->modify( $dn_exist_dnshost, add => {
                                        adminDescription => $dns_admin_description,
                                        cn => $dns_cn,
+                                       sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_ROLE'},
+                                       sophomorixAdminFile => $filename,
+                                       sophomorixSchoolname => $school,
+                                       sophomorixComputerIP => $dns_ipv4,
+                                       sophomorixDnsNodename => $dns_node,
                                       });
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
 
+    ############################################################
     # adding reverse lookup with samba-tool
     my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
                 " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command_reverse\n";
-    # system($command_reverse);
     my $res2=`$command_reverse`;
     print "       -> $res2";
 
+    ############################################################
     # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
     print "   * dnsNode $dns_node (reverse lookup $dns_node_reverse)\n";
@@ -358,8 +366,13 @@ sub AD_dns_create {
 #                      cn => $dns_cn,
 #                    });
     my $mesg = $ldap->modify( $dns_node_reverse, replace => {
-                      adminDescription => $dns_admin_description,
-                      cn => $dns_cn,
+                              adminDescription => $dns_admin_description,
+                              cn => $dns_cn,
+                              sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_ROLE_REVERSE'},
+                              sophomorixAdminFile => $filename,
+                              sophomorixSchoolname => $school,
+                              sophomorixComputerIP => $dns_ipv4,
+                              sophomorixDnsNodename => $dns_node,
                     });
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     return;
@@ -1291,8 +1304,8 @@ sub AD_computer_create {
                    userAccountControl => '4096',
                    instanceType => '4',
                    objectclass => ['top', 'person',
-                                     'organizationalPerson',
-                                     'user','computer' ],
+                                   'organizationalPerson',
+                                   'user','computer' ],
 #                   'objectClass' => \@objectclass,
                            ]
                            );
