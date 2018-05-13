@@ -1505,14 +1505,16 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("dnsZones to be added:");
     $dns_zone_count=1;
     foreach my $dns_zone (@adding_dnszones){
-        #my $filename="";
-        my $filename=$devices_file{'dnsZone'}{$dns_zone};
+        my $filename=$devices_file{'dnsZone'}{$dns_zone}{'FILENAME'};
+        my $school=$devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'};
         &AD_dns_zonecreate({ldap=>$ldap, 
                             root_dse=>$root_dse,
                             filename=>$filename,
+                            school=>$school,
                             dns_server=>$root_dns,
                             dns_zone=>$dns_zone,
                             smb_pwd=>$smb_admin_pass,
+                            sophomorix_config=>\%sophomorix_config,
                           });
         $dns_zone_count++;
     }
@@ -1962,7 +1964,8 @@ sub analyze_device_line {
         # dnsZone
         my @octets=split(/\./,$ip);
         my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
-        $devices_file{'dnsZone'}{$dns_zone}=$filename;
+        $devices_file{'dnsZone'}{$dns_zone}{'FILENAME'}=$filename;
+        $devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'}=$school;
 
 #???	print "   * Zone: $dns_zone needed\n";
 

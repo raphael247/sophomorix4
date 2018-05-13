@@ -390,6 +390,8 @@ sub AD_dns_zonecreate {
     my $dns_admin_description = $arg_ref->{dns_admin_description};
     my $dns_cn = $arg_ref->{dns_cn};
     my $filename = $arg_ref->{filename};
+    my $school = $arg_ref->{school};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if($Conf::log_level>=1){
         print "\n";
@@ -411,6 +413,7 @@ sub AD_dns_zonecreate {
         $dns_server="localhost";
     }
 
+    ############################################################
     # adding dnsNode with samba-tool
     my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
     print "   * $command\n";
@@ -418,6 +421,7 @@ sub AD_dns_zonecreate {
     my $res=`$command`;
     print "       -> $res";
 
+    ############################################################
     # adding comments to recognize the dnsZone as created by sophomorix
     my ($count,$dn_exist_dnszone,$cn_exist_dnszone)=&AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
     print "   * Adding Comments to dnsZone $dns_zone\n";
@@ -427,6 +431,9 @@ sub AD_dns_zonecreate {
              my $mesg = $ldap->modify($dn_exist_dnszone, add => {
                                       adminDescription => $dns_admin_description,
                                       cn => $dns_cn,
+                                      sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'},
+                                      sophomorixAdminFile => $filename,
+                                      sophomorixSchoolname => $school,
                                      });
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
              return;
