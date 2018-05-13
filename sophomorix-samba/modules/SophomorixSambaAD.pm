@@ -4941,7 +4941,7 @@ sub AD_get_schema {
             # save it in returned data structure
             $schema{'LDAPDisplayName'}{$name}{$attr}=$ref_mesg->{$dn}{$attr};
             # test if its a sophomorix attribute
-            if ($attr eq "attributeid"){
+            if ($attr eq "attributeid" or $attr eq "governsid"){
                 my $attribute_id=$ref_mesg->{$dn}{$attr}[0];
                 # 1.3.6.1.4.1.47512     is linuxmuster.net
                 # 1.3.6.1.4.1.47512.1   is the sophomorix subspace

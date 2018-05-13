@@ -367,8 +367,8 @@ if ($show_sophomorix_attributes==1){
     my $count=0;
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'} } ) {
         $count++;
-	my $search_flag=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'searchflags'} }[0];
-        printf "|%6s| %3s | %-78s|\n",$count,$search_flag,$attr;
+	my $cn=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'cn'} }[0];
+        printf "| %6s|  %-82s|\n",$count,$attr." (".$cn.")";
     } 
     print $line;
     print "\n";
