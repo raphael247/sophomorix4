@@ -1069,13 +1069,23 @@ if($no_sync==1){
         print "UPDATE: $room ($update_room{$room}{'COUNT'} attributes)\n";
     }
 
-    # dnsZones
+    # killing dnsNodes
+    print "\n";
+    $count=$#killing_dnsnodes+1;
+    &print_title("dnsNodes that must be killed: ($count)");
+    foreach my $dns_node (@killing_dnsnodes){
+        print "KILL: $dns_node\n";
+    }
+
+    # killing  dnsZones
     print "\n";
     $count=$#killing_dnszones+1;
     &print_title("dnsZones that must be killed: ($count)");
     foreach my $dns_zone (@killing_dnszones){
         print "KILL: $dns_zone\n";
     }
+
+    # adding  dnsZones
     print "\n";
     $count=$#adding_dnszones+1;
     &print_title("dnsZones that must be added: ($count)");
@@ -1083,13 +1093,7 @@ if($no_sync==1){
         print "ADD: $dns_zone\n";
     }
 
-    # dnsNodes
-    print "\n";
-    $count=$#killing_dnsnodes+1;
-    &print_title("dnsNodes that must be killed: ($count)");
-    foreach my $dns_node (@killing_dnsnodes){
-        print "KILL: $dns_node\n";
-    }
+    # adding dnsNodes
     print "\n";
     $count=$#adding_dnsnodes+1;
     &print_title("dnsNodes that must be added: ($count)");
@@ -1257,7 +1261,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Kill the rooms of computers
     print "\n";
     my $max_room_count_kill=$#killing_computer_rooms+1;
-    &print_title("Killing $max_room_count_kill rooms:");
+    &print_title("Killing $max_room_count_kill computer rooms:");
     my $kill_computer_room_count=1;
     foreach my $room (@killing_computer_rooms){
         print "   * Killing Computer Room $room ...\n";
@@ -1276,7 +1280,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     print "\n";
     my $max_computer_count_kill=$#killing_computers+1;
 
-    &print_title("Killing $max_computer_count_kill computers");
+    &print_title("Killing $max_computer_count_kill computer accounts");
     my $computer_count_kill=1;
     foreach my $computer (@killing_computers){
         &AD_computer_kill({ldap=>$ldap,
@@ -1295,7 +1299,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Add computer accounts
     print "\n";
     my $max_computer_count_create=$#adding_computers+1;
-    &print_title("Adding $max_computer_count_create computers:");
+    &print_title("Adding $max_computer_count_create computer accounts:");
     my $computer_count_create=1;
     foreach my $computer (@adding_computers){
         my $school=$devices_file{'computer'}{$computer}{'SCHOOL'};
@@ -1388,7 +1392,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Updating computer accounts
     print "\n";
     my $max_computer_count_update=$#updating_computers+1;
-    &print_title("Updating $max_computer_count_update computers:");
+    &print_title("Updating $max_computer_count_update computer accounts:");
     my $computer_count_update=1;
     foreach my $computer (@updating_computers){
         &AD_computer_update({ldap=>$ldap,
@@ -1403,6 +1407,24 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              sophomorix_result=>\%sophomorix_result,
                            });
         $computer_count_update++;
+    }
+
+    ############################################################
+    # kill host_groups
+    print "\n";
+    my $max_host_group_count_kill=$#killing_host_groups+1;
+    &print_title("Killing $max_host_group_count_kill host groups:");
+    my $host_group_count_kill=1;
+    foreach my $host_group (@killing_host_groups){
+        print "Kill group $host_group -> Type: $ref_AD_device->{'host_group'}{$host_group}\n";
+        &AD_group_kill({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        root_dns=>$root_dns,
+                        group=>$host_group,
+                        type=>$ref_AD_device->{'host_group'}{$host_group},
+                        group_count=>$host_group_count_kill,
+                        sophomorix_config=>\%sophomorix_config,
+                  });
     }
 
     ############################################################
@@ -1429,24 +1451,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           sophomorix_config=>\%sophomorix_config,
                           sophomorix_result=>\%sophomorix_result,
                          });
-    }
-
-    ############################################################
-    # kill host_groups
-    print "\n";
-    my $max_host_group_count_kill=$#killing_host_groups+1;
-    &print_title("Killing $max_host_group_count_kill host groups:");
-    my $host_group_count_kill=1;
-    foreach my $host_group (@killing_host_groups){
-        print "Kill group $host_group -> Type: $ref_AD_device->{'host_group'}{$host_group}\n";
-        &AD_group_kill({ldap=>$ldap,
-                        root_dse=>$root_dse,
-                        root_dns=>$root_dns,
-                        group=>$host_group,
-                        type=>$ref_AD_device->{'host_group'}{$host_group},
-                        group_count=>$host_group_count_kill,
-                        sophomorix_config=>\%sophomorix_config,
-                  });
     }
 
     ############################################################
