@@ -390,10 +390,7 @@ sub AD_dns_zonecreate {
     my $smb_pwd = $arg_ref->{smb_pwd};
     my $dns_server = $arg_ref->{dns_server};
     my $dns_zone = $arg_ref->{dns_zone};
-    my $dns_admin_description = $arg_ref->{dns_admin_description};
     my $dns_cn = $arg_ref->{dns_cn};
-    my $filename = $arg_ref->{filename};
-    my $school = $arg_ref->{school};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if($Conf::log_level>=1){
@@ -403,12 +400,7 @@ sub AD_dns_zonecreate {
     } 
 
     # set defaults if not defined
-    if (not defined $filename){
-        $filename="---";
-    }
-     if (not defined $dns_admin_description){
-        $dns_admin_description=$DevelConf::dns_zone_prefix_string." from ".$filename;
-    }
+
     if (not defined $dns_cn){
         $dns_cn=$dns_zone;
     }
@@ -432,7 +424,6 @@ sub AD_dns_zonecreate {
     if ($count > 0){
              print "   * dnsZone $dns_zone exists ($count results)\n";
              my $mesg = $ldap->modify($dn_exist_dnszone, replace => {
-                                      adminDescription => $dns_admin_description,
                                       cn => $dns_cn,
                                       sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'},
                                      });
@@ -5171,7 +5162,6 @@ sub AD_get_AD_for_device {
                                  'dc',
                                  'cn',
                                  'dnsZone',
-                                 'adminDescription',
                                  'sophomorixRole',
                                 ]);
         my $max_zone = $mesg->count; 
@@ -5184,30 +5174,25 @@ sub AD_get_AD_for_device {
             my $entry = $mesg->entry($index);
             my $zone=$entry->get_value('dc');
             my $name=$entry->get_value('name');
-            my $desc=$entry->get_value('adminDescription');
+            my $role="";
+            if (defined $entry->get_value('sophomorixRole') ){
+                $role=$entry->get_value('sophomorixRole');
+            }
             if($Conf::log_level>=2){
                 print "   * ",$entry->get_value('dc'),"\n";
             }
-            if (not defined $desc){$desc=""};
-            if ($desc=~ m/^${DevelConf::dns_zone_prefix_string}/ or
-                $name eq $root_dns){
+            if ($role eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}){
                 # shophomorix dnsZone or default dnsZone
                 $AD{'RESULT'}{'dnsZone'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
-                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
-                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'sophomorixRole'}=$role;
                 $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'cn'}=$entry->get_value('cn');
-                #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'sophomorixdnsZone'} }, $zone;
             } else {
                 # other dnsZone
                 $AD{'RESULT'}{'dnsZone'}{'other'}{'COUNT'}++;
                 $AD{'dnsZone'}{'otherdnsZone'}{$zone}{'name'}=$name;
-                $AD{'dnsZone'}{'otherdnsZone'}{$zone}{'adminDescription'}=$desc;
-                #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'otherdnsZone'} }, $zone;
             }
         }
-        #$AD{'RESULT'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
-        #$AD{'RESULT'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
     } # BLOCK dnsZone end
 
     ############################################################

@@ -957,7 +957,9 @@ foreach my $dns_zone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_pr
 
 # dnsZones to add
 foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
-    if (not exists $ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dns_zone} ){
+    print "HERE $dns_zone\n";
+    if (not exists $ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dns_zone} and
+        not exists $ref_AD_device->{'dnsZone'}{'otherdnsZone'}{$dns_zone}){
         # nonexisting --> add dnszone
         &push_add_dnszone($dns_zone);
     }
@@ -1568,12 +1570,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Adding $max_dns_zone_count_add dnsZones:");
     $dns_zone_count=1;
     foreach my $dns_zone (@adding_dnszones){
-        my $filename=$devices_file{'dnsZone'}{$dns_zone}{'FILENAME'};
-        my $school=$devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'};
         &AD_dns_zonecreate({ldap=>$ldap, 
                             root_dse=>$root_dse,
-                            filename=>$filename,
-                            school=>$school,
                             dns_server=>$root_dns,
                             dns_zone=>$dns_zone,
                             smb_pwd=>$smb_admin_pass,
