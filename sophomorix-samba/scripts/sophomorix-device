@@ -1528,12 +1528,14 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
         my $school=$devices_file{'device'}{$dns_node}{'SCHOOL'};
         my $role=$devices_file{'device'}{$dns_node}{'sophomorixRole'};
+        my $comment=$devices_file{'device'}{$dns_node}{'sophomorixComment'};
         &AD_dns_create({ldap=>$ldap, 
                         root_dse=>$root_dse,
                         root_dns=>$root_dns,
                         filename=>$filename,
                         school=>$school,
                         role=>$role,
+                        comment=>$comment,
                         dns_node=>$dns_node,
                         dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
                         smb_pwd=>$smb_admin_pass,

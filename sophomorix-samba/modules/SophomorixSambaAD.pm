@@ -291,6 +291,7 @@ sub AD_dns_create {
     my $filename = $arg_ref->{filename};
     my $school = $arg_ref->{school};
     my $role = $arg_ref->{role};
+    my $comment = $arg_ref->{comment};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # calc dnsNode, reverse lookup
@@ -308,6 +309,9 @@ sub AD_dns_create {
     # set defaults if not defined
     if (not defined $filename){
         $filename="---";
+    }
+    if (not defined $comment or $comment eq ""){
+        $comment="---";
     }
     if (not defined $dns_cn){
         $dns_cn=$dns_node;
@@ -342,6 +346,7 @@ sub AD_dns_create {
                                        sophomorixSchoolname => $school,
                                        sophomorixComputerIP => $dns_ipv4,
                                        sophomorixDnsNodename => $dns_node,
+                                       sophomorixComment => $comment,
                                       });
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
@@ -366,6 +371,7 @@ sub AD_dns_create {
                               sophomorixSchoolname => $school,
                               sophomorixComputerIP => $dns_ipv4,
                               sophomorixDnsNodename => $dns_node,
+                              sophomorixComment => $comment,
                     });
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
     return;
