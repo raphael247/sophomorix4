@@ -3892,15 +3892,15 @@ sub AD_get_AD {
     #my $examaccounts = $arg_ref->{examaccounts};
     #if (not defined $examaccounts){$examaccounts="FALSE"};
 
-    my $dnszones = $arg_ref->{dnszones};
-    if (not defined $dnszones){$dnszones="FALSE"};
+    my $dns_zones = $arg_ref->{dnszones};
+    if (not defined $dns_zones){$dns_zones="FALSE"};
 
-    my $dnsnodes = $arg_ref->{dnsnodes};
-    if (not defined $dnsnodes){
-        $dnsnodes="FALSE"
+    my $dns_nodes = $arg_ref->{dnsnodes};
+    if (not defined $dns_nodes){
+        $dns_nodes="FALSE"
     } else {
         # dnsZones are needed to get dnsNodes
-        $dnszones="TRUE";
+        $dns_zones="TRUE";
     }
 
     # make sure adminclass lists exist, when users are added
@@ -4660,7 +4660,7 @@ sub AD_get_AD {
 
 
     ##################################################
-    if ($dnszones eq "TRUE"){
+    if ($dns_zones eq "TRUE"){
         ## sophomorix dnsZones and default Zone from ldap
         #my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
         #                $DevelConf::dns_zone_prefix_string.
@@ -4721,7 +4721,7 @@ sub AD_get_AD {
 
 
     ##################################################
-    if ($dnsnodes eq "TRUE"){
+    if ($dns_nodes eq "TRUE"){
         # sophomorix dnsNodes from ldap by dnsZone
         # go through all dnsZones
         foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string} }) {

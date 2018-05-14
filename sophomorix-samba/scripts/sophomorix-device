@@ -867,31 +867,31 @@ foreach my $room (keys %{$devices_file{'room'}}) {
 
 
 # dnsNodes to kill
-foreach my $dnsnode (keys %{$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
-    if (not exists $devices_file{'dnsNode'}{$dnsnode}){
+foreach my $dns_node (keys %{$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
+    if (not exists $devices_file{'dnsNode'}{$dns_node}){
         # host is not in file anymore
-        &push_kill_dnsnode($dnsnode);
+        &push_kill_dnsnode($dns_node);
     }
 }
 
 
 
 # dnsNodes to add
-foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
-    if (not exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
+foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
+    if (not exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node} ){
         # nonexisting --> add account
-        &push_add_dnsnode($dnsnode);
-    } elsif (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
-        my $ip_system=$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'IPv4'};
-        my $ip_file=$devices_file{'dnsNode'}{$dnsnode};
+        &push_add_dnsnode($dns_node);
+    } elsif (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node} ){
+        my $ip_system=$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'};
+        my $ip_file=$devices_file{'dnsNode'}{$dns_node};
         if ($ip_system ne $ip_file){
             # recreate dns entry
-            print "WARNING: $dnsnode exists with $ip_system, but should be $ip_file\n";
-            &push_kill_dnsnode($dnsnode);
-            &push_add_dnsnode($dnsnode);
+            print "WARNING: $dns_node exists with $ip_system, but should be $ip_file\n";
+            &push_kill_dnsnode($dns_node);
+            &push_add_dnsnode($dns_node);
         } else {
             if($Conf::log_level>=3){
-                print "   OK: $dnsnode exists with $ip_system",
+                print "   OK: $dns_node exists with $ip_system",
                       " (= $ip_file from file)\n";
             }
         }
@@ -901,45 +901,43 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 
 
 # dnsNodes to update
-foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
-    if (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}){
+foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
+    if (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}){
         my $update=0;
         # sophomorixAdminFile
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixAdminFile'} ne 
-            $devices_file{'device'}{$dnsnode}{'FILENAME'}){
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixAdminFile'} ne 
+            $devices_file{'device'}{$dns_node}{'FILENAME'}){
             $update++;
         }
         # sophomorixComment
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixComment'} ne 
-            $devices_file{'device'}{$dnsnode}{'sophomorixComment'}){
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixComment'} ne 
+            $devices_file{'device'}{$dns_node}{'sophomorixComment'}){
             $update++;
         }
         # sophomorixDnsNodename
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixDnsNodename'} ne 
-            $devices_file{'device'}{$dnsnode}{'sophomorixDnsNodename'}){
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixDnsNodename'} ne 
+            $devices_file{'device'}{$dns_node}{'sophomorixDnsNodename'}){
             $update++;
         }
         # sophomorixRole
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixRole'} ne 
-            $devices_file{'device'}{$dnsnode}{'sophomorixRole'}){
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixRole'} ne 
+            $devices_file{'device'}{$dns_node}{'sophomorixRole'}){
             $update++;
         }
         # sophomorixSchoolname
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixSchoolname'} ne 
-            $devices_file{'device'}{$dnsnode}{'SCHOOL'}){
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixSchoolname'} ne 
+            $devices_file{'device'}{$dns_node}{'SCHOOL'}){
             $update++;
         }
         # sophomorixComputerIP
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixComputerIP'} ne 
-            $devices_file{'device'}{$dnsnode}{'IPv4'}){
-            #print "HERE1\n  $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixComputerIP'}\n\n";
-            #print "HERE2\n  $devices_file{'device'}{$dnsnode}{'IPv4'}\n\n";
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixComputerIP'} ne 
+            $devices_file{'device'}{$dns_node}{'IPv4'}){
             $update++;
         }
 
         if ($update>0){
-            $update_dnsnode{$dnsnode}{'COUNT'}=$update; # count how many attributes must be updated
-            &push_update_dnsnode($dnsnode);
+            $update_dnsnode{$dns_node}{'COUNT'}=$update; # count how many attributes must be updated
+            &push_update_dnsnode($dns_node);
         }
     }
 
@@ -948,20 +946,20 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 
 
 # dnsZones to kill
-foreach my $dnszone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
-    if (not exists $devices_file{'dnsZone'}{$dnszone}){
+foreach my $dns_zone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
+    if (not exists $devices_file{'dnsZone'}{$dns_zone}){
         # dns node is not needed anymore, no host
-        &push_kill_dnszone($dnszone);
+        &push_kill_dnszone($dns_zone);
     }
 }
 
 
 
 # dnsZones to add
-foreach my $dnszone (keys %{$devices_file{'dnsZone'}}) {
-    if (not exists $ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dnszone} ){
+foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
+    if (not exists $ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dns_zone} ){
         # nonexisting --> add dnszone
-        &push_add_dnszone($dnszone);
+        &push_add_dnszone($dns_zone);
     }
 }
 
