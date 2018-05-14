@@ -226,6 +226,7 @@ my @killing_dnszones=();
 # dnsNodes
 my @adding_dnsnodes=();
 my @killing_dnsnodes=();
+my @updating_dnsnodes=();
 
 # hardwareclasses
 my @adding_hardwareclasses=();
@@ -239,6 +240,7 @@ my %killmembers_hardwareclasses=();
 
 my %update_computer=(); # device -> count
 my %update_room=();
+my %update_dnsnode=();
 
 my %pxe = qw(ml ok
             );
@@ -898,6 +900,53 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 
 
 
+# dnsNodes to update
+foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
+    if (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}){
+        my $update=0;
+        # sophomorixAdminFile
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixAdminFile'} ne 
+            $devices_file{'device'}{$dnsnode}{'FILENAME'}){
+            $update++;
+        }
+        # sophomorixComment
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixComment'} ne 
+            $devices_file{'device'}{$dnsnode}{'sophomorixComment'}){
+            $update++;
+        }
+        # sophomorixDnsNodename
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixDnsNodename'} ne 
+            $devices_file{'device'}{$dnsnode}{'sophomorixDnsNodename'}){
+            $update++;
+        }
+        # sophomorixRole
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixRole'} ne 
+            $devices_file{'device'}{$dnsnode}{'sophomorixRole'}){
+            $update++;
+        }
+        # sophomorixSchoolname
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixSchoolname'} ne 
+            $devices_file{'device'}{$dnsnode}{'SCHOOL'}){
+            $update++;
+        }
+        # sophomorixComputerIP
+        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixComputerIP'} ne 
+            $devices_file{'device'}{$dnsnode}{'IPv4'}){
+            #print "HERE1\n  $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'sophomorixComputerIP'}\n\n";
+            #print "HERE2\n  $devices_file{'device'}{$dnsnode}{'IPv4'}\n\n";
+            $update++;
+        }
+
+        if ($update>0){
+            $update_dnsnode{$dnsnode}{'COUNT'}=$update; # count how many attributes must be updated
+            &push_update_dnsnode($dnsnode);
+        }
+    }
+
+}
+
+
+
 # dnsZones to kill
 foreach my $dnszone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
     if (not exists $devices_file{'dnsZone'}{$dnszone}){
@@ -1099,6 +1148,14 @@ if($no_sync==1){
     &print_title("dnsNodes that must be added: ($count)");
     foreach my $dns_node (@adding_dnsnodes){
         print "ADD: $dns_node\n";
+    }
+
+    # updating dnsNodes
+    print "\n";
+    $count=$#updating_dnsnodes+1;
+    &print_title("dnsNodes that must be updated: ($count)");
+    foreach my $dns_node (@updating_dnsnodes){
+        print "UPDATE: $dns_node ($update_dnsnode{$dns_node}{'COUNT'} attributes)\n";
     }
 
     # hardwareclasses
@@ -1963,6 +2020,7 @@ sub analyze_device_line {
         if (not defined $sophomorix_comment){
             $sophomorix_comment="";
         }       
+        $devices_file{'device'}{$host_token}{'sophomorixDnsNodename'}=$host_token;
         $devices_file{'device'}{$host_token}{'sophomorixRole'}=$sophomorix_role;       # 09
         $devices_file{'device'}{$host_token}{'OPTION'}=$option;                        # 12
         $devices_file{'device'}{$host_token}{'FIELD_13'}=$field_13;
@@ -2352,6 +2410,13 @@ sub push_add_dnsnode {
 sub push_kill_dnsnode {
     my ($kill) = @_;
     push @killing_dnsnodes, $kill;
+}
+
+
+
+sub push_update_dnsnode {
+    my ($update) = @_;
+    push @updating_dnsnodes, $update;
 }
 
 

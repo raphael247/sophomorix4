@@ -5220,6 +5220,12 @@ sub AD_get_AD_for_device {
                           attrs => ['dc',
                                     'dnsRecord',
                                     'adminDescription',
+                                    'sophomorixAdminFile',
+                                    'sophomorixComment',
+                                    'sophomorixDnsNodename',
+                                    'sophomorixRole',
+                                    'sophomorixSchoolname',
+                                    'sophomorixComputerIP',
                                    ]);
         my $max_node = $mesg->count; 
         $AD{'RESULT'}{'dnsNode'}{'TOTAL'}{'COUNT'}=$max_node;
@@ -5244,6 +5250,18 @@ sub AD_get_AD_for_device {
                 $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
                 $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=
                     $entry->get_value('adminDescription');
+                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixAdminFile'}=
+                    $entry->get_value('sophomorixAdminFile');
+                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixComment'}=
+                    $entry->get_value('sophomorixComment');
+                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixDnsNodename'}=
+                    $entry->get_value('sophomorixDnsNodename');
+                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixRole'}=
+                    $entry->get_value('sophomorixRole');
+                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixSchoolname'}=
+                    $entry->get_value('sophomorixSchoolname');
+                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixComputerIP'}=
+                    $entry->get_value('sophomorixComputerIP');
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
             } else {
                 $AD{'RESULT'}{'dnsNode'}{'other'}{'COUNT'}++;
