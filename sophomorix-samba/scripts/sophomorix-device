@@ -459,7 +459,7 @@ if ($dns_show==1 or $dns_kill==1){
 
     # Fetch dnsZones and their DN
     my $base="DC=DomainDnsZones,".$root_dse;
-    my $filter="(&(objectclass=dnsZone) (name=*))";
+    my $filter="(&(objectclass=dnsZone) (sophomorixRole=".$sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}."))";
     my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
@@ -469,12 +469,8 @@ if ($dns_show==1 or $dns_kill==1){
     my $max_zone = $mesg->count;
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
-        my $admin_description=$entry->get_value('adminDescription');
         my $zone_name=$entry->get_value('name');
-        if (defined $admin_description and # attribute is defined
-           $admin_description=~m/^$DevelConf::dns_zone_prefix_string/ and # attribute starts with prefix
-           $zone_name ne $root_dns # do not add $root_dns 
-           ){
+        if ($zone_name ne $root_dns){ # do not add $root_dns 
             # list of sophomorix dnsZones without $root_dns
             # these Zones will be deleted
             push @zonelist, $zone_name;
@@ -496,9 +492,11 @@ if ($dns_show==1 or $dns_kill==1){
         &Sophomorix::SophomorixBase::print_title("dnsZone $zone_count) $zone:");
         # dnsNodes in this dnsZone
         my $base=$zonehash{$zone}{'DN'};
-        my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
-                   $DevelConf::dns_node_prefix_string.
-                   "*))";
+#        my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
+#                   $DevelConf::dns_node_prefix_string.
+#                   "*))";
+        my $filter="(&(objectclass=dnsNode) (sophomorixRole=*))";
+	print "BASE: $base\n";
         my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
@@ -532,8 +530,8 @@ if ($dns_show==1 or $dns_kill==1){
             } else {
                 print "   * Skipping killing provisioned zone $zone\n";
             }
-            $zone_count++;
         }
+        $zone_count++;
     }
     exit;
 }
@@ -946,7 +944,7 @@ foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
 
 
 # dnsZones to kill
-foreach my $dns_zone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
+foreach my $dns_zone (keys %{$ref_AD_device->{'dnsZone'}{$sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}}}) {
     if (not exists $devices_file{'dnsZone'}{$dns_zone}){
         # dns node is not needed anymore, no host
         &push_kill_dnszone($dns_zone);
@@ -957,8 +955,7 @@ foreach my $dns_zone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_pr
 
 # dnsZones to add
 foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
-    print "HERE $dns_zone\n";
-    if (not exists $ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dns_zone} and
+    if (not exists $ref_AD_device->{'dnsZone'}{$sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$dns_zone} and
         not exists $ref_AD_device->{'dnsZone'}{'otherdnsZone'}{$dns_zone}){
         # nonexisting --> add dnszone
         &push_add_dnszone($dns_zone);

@@ -195,9 +195,7 @@ sub AD_dnsnodes_any {
 
 sub AD_dnszones_any {
     my ($ldap,$root_dse) = @_;
-    my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
-                             $DevelConf::dns_zone_prefix_string.
-                            "*))";
+    my $filter_zone="(& (objectClass=dnsZone) (sophomorixRole=sophomorixdnsZone) )";
     $mesg = $ldap->search( # perform a search
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',

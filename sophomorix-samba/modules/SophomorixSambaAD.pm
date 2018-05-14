@@ -4652,10 +4652,6 @@ sub AD_get_AD {
 
     ##################################################
     if ($dns_zones eq "TRUE"){
-        ## sophomorix dnsZones and default Zone from ldap
-        #my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
-        #                $DevelConf::dns_zone_prefix_string.
-        #                "*))";
         # All dnsZones from ldap
         my $filter_zone="(objectClass=dnsZone)";
         my $base_zones="DC=DomainDnsZones,".$root_dse;
@@ -4686,11 +4682,11 @@ sub AD_get_AD {
                 print "   * ",$entry->get_value('dc'),"\n";
             }
             if (not defined $desc){$desc=""};
-            if ($desc=~ m/^${DevelConf::dns_zone_prefix_string}/ or
+            if ($desc=~ m/^$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}/ or
                 $name eq $root_dns){
                 # shophomorix dnsZone or default dnsZone
-                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
-                $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
+                $AD{'objectclass'}{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$zone}{'name'}=$name;
+                $AD{'objectclass'}{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$zone}{'adminDescription'}=$desc;
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'sophomorixdnsZone'} }, $zone;
             } else {
                 # other dnsZone
@@ -4701,7 +4697,7 @@ sub AD_get_AD {
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'otherdnsZone'} }, $zone;
             }
         }
-        $AD{'RESULT'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{'COUNT'}=$sopho_max_zone;
+        $AD{'RESULT'}{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{'COUNT'}=$sopho_max_zone;
         $AD{'RESULT'}{'dnsZone'}{'otherdnsZone'}{'COUNT'}=$other_max_zone;
         # sorting some lists
 #        my $unneeded1=$#{ $AD{'LISTS'}{'sophomorixdnsZone'} }; 
@@ -4715,7 +4711,7 @@ sub AD_get_AD {
     if ($dns_nodes eq "TRUE"){
         # sophomorix dnsNodes from ldap by dnsZone
         # go through all dnsZones
-        foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'}{$DevelConf::dns_zone_prefix_string} }) {
+        foreach my $dns_zone (keys %{ $AD{'objectclass'}{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}} }) {
             my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
                 &AD_object_search($ldap,$root_dse,"dnsZone",$dns_zone);
             my $base_hosts=$dn_dns_zone;
@@ -5184,9 +5180,9 @@ sub AD_get_AD_for_device {
             if ($role eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}){
                 # shophomorix dnsZone or default dnsZone
                 $AD{'RESULT'}{'dnsZone'}{'sophomorix'}{'COUNT'}++;
-                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
-                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'sophomorixRole'}=$role;
-                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'cn'}=$entry->get_value('cn');
+                $AD{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$zone}{'name'}=$name;
+                $AD{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$zone}{'sophomorixRole'}=$role;
+                $AD{'dnsZone'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$zone}{'cn'}=$entry->get_value('cn');
             } else {
                 # other dnsZone
                 $AD{'RESULT'}{'dnsZone'}{'other'}{'COUNT'}++;
