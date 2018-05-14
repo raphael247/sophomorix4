@@ -431,12 +431,10 @@ sub AD_dns_zonecreate {
 
     if ($count > 0){
              print "   * dnsZone $dns_zone exists ($count results)\n";
-             my $mesg = $ldap->modify($dn_exist_dnszone, add => {
+             my $mesg = $ldap->modify($dn_exist_dnszone, replace => {
                                       adminDescription => $dns_admin_description,
                                       cn => $dns_cn,
                                       sophomorixRole => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSZONE_ROLE'},
-                                      sophomorixAdminFile => $filename,
-                                      sophomorixSchoolname => $school,
                                      });
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
              return;
@@ -5171,8 +5169,10 @@ sub AD_get_AD_for_device {
                        filter => $filter,
                        attrs => ['name',
                                  'dc',
+                                 'cn',
                                  'dnsZone',
                                  'adminDescription',
+                                 'sophomorixRole',
                                 ]);
         my $max_zone = $mesg->count; 
         $AD{'RESULT'}{'dnsZone'}{'TOTAL'}{'COUNT'}=$max_zone;
@@ -5195,6 +5195,8 @@ sub AD_get_AD_for_device {
                 $AD{'RESULT'}{'dnsZone'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'name'}=$name;
                 $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'adminDescription'}=$desc;
+                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+                $AD{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$zone}{'cn'}=$entry->get_value('cn');
                 #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'sophomorixdnsZone'} }, $zone;
             } else {
                 # other dnsZone
