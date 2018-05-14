@@ -83,7 +83,7 @@ $Data::Dumper::Terse = 1;
             AD_debug_logdump
             AD_login_test
             AD_dns_get
-            AD_dns_create
+            AD_dns_create_update
             AD_dns_zonecreate
             AD_dns_kill
             AD_dns_zonekill
@@ -276,7 +276,7 @@ sub AD_dns_get {
 
 
 
-sub AD_dns_create {
+sub AD_dns_create_update {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -292,6 +292,7 @@ sub AD_dns_create {
     my $school = $arg_ref->{school};
     my $role = $arg_ref->{role};
     my $comment = $arg_ref->{comment};
+    my $create = $arg_ref->{create};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # calc dnsNode, reverse lookup
@@ -325,20 +326,22 @@ sub AD_dns_create {
     
     ############################################################
     # adding dnsNode with samba-tool
-    my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
-                " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    print "   * $command\n";
-    # system($command);
-    my $res=`$command`;
-    print "       -> $res";
+    if ($create eq "TRUE"){
+        my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
+                    " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+        print "   * $command\n";
+        # system($command);
+        my $res=`$command`;
+        print "       -> $res";
+    }
 
     ############################################################
-    # adding comments to recognize the dnsNode as created by sophomorix
+    # add/update comments to recognize the dnsNode as created by sophomorix
     my ($count,$dn_exist_dnshost,$cn_exist_dnshost)=&AD_object_search($ldap,$root_dse,"dnsNode",$dns_node);
     print "   * Adding Comments to dnsNode $dns_node\n";
     if ($count > 0){
              print "   * dnsNode $dns_node exists ($count results)\n";
-             my $mesg = $ldap->modify( $dn_exist_dnshost, add => {
+             my $mesg = $ldap->modify( $dn_exist_dnshost, replace => {
                                        adminDescription => $dns_admin_description,
                                        cn => $dns_cn,
                                        sophomorixRole => $role,
@@ -352,15 +355,16 @@ sub AD_dns_create {
     }
 
     ############################################################
-    # adding reverse lookup with samba-tool
-    my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
-                " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    print "   * $command_reverse\n";
-    my $res2=`$command_reverse`;
-    print "       -> $res2";
-
+    if ($create eq "TRUE"){
+        # adding reverse lookup with samba-tool
+        my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
+                            " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+        print "   * $command_reverse\n";
+        my $res2=`$command_reverse`;
+        print "       -> $res2";
+    }
     ############################################################
-    # adding comments to recognize the dnsNode reverse lookup as created by sophomorix
+    # add/update comments to recognize the dnsNode reverse lookup as created by sophomorix
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
     print "   * dnsNode $dns_node (reverse lookup $dns_node_reverse)\n";
     my $mesg = $ldap->modify( $dns_node_reverse, replace => {

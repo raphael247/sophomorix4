@@ -82,7 +82,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_kill
                                  AD_computer_kill
                                  AD_dns_get
-                                 AD_dns_create
+                                 AD_dns_create_update
                                  AD_dns_zonecreate
                                  AD_dns_kill
                                  AD_dns_zonekill
@@ -1595,19 +1595,48 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $school=$devices_file{'device'}{$dns_node}{'SCHOOL'};
         my $role=$devices_file{'device'}{$dns_node}{'sophomorixRole'};
         my $comment=$devices_file{'device'}{$dns_node}{'sophomorixComment'};
-        &AD_dns_create({ldap=>$ldap, 
-                        root_dse=>$root_dse,
-                        root_dns=>$root_dns,
-                        filename=>$filename,
-                        school=>$school,
-                        role=>$role,
-                        comment=>$comment,
-                        dns_node=>$dns_node,
-                        dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
-                        smb_pwd=>$smb_admin_pass,
-                        sophomorix_config=>\%sophomorix_config,
-                           });
+        &AD_dns_create_update({ldap=>$ldap, 
+                               root_dse=>$root_dse,
+                               root_dns=>$root_dns,
+                               create=>"TRUE",
+                               filename=>$filename,
+                               school=>$school,
+                               role=>$role,
+                               comment=>$comment,
+                               dns_node=>$dns_node,
+                               dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
+                               smb_pwd=>$smb_admin_pass,
+                               sophomorix_config=>\%sophomorix_config,
+                             });
         $dns_node_count++;
+    }
+
+    ############################################################
+    # Updating dnsNodes
+    print "\n";
+    my $max_dns_node_count_update=$#updating_dnsnodes+1;
+    &print_title("Updating $max_dns_node_count_update dnsNodes:");
+    $dns_node_count=1;
+    foreach my $dns_node (@updating_dnsnodes){
+        print "$dns_node\n";
+        my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
+        my $school=$devices_file{'device'}{$dns_node}{'SCHOOL'};
+        my $role=$devices_file{'device'}{$dns_node}{'sophomorixRole'};
+        my $comment=$devices_file{'device'}{$dns_node}{'sophomorixComment'};
+        &AD_dns_create_update({ldap=>$ldap, 
+                               root_dse=>$root_dse,
+                               root_dns=>$root_dns,
+                               create=>"FALSE",
+                               filename=>$filename,
+                               school=>$school,
+                               role=>$role,
+                               comment=>$comment,
+                               dns_node=>$dns_node,
+                               dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
+                               smb_pwd=>$smb_admin_pass,
+                               sophomorix_config=>\%sophomorix_config,
+                             });
+       $dns_node_count++;
     }
 
     ############################################################
