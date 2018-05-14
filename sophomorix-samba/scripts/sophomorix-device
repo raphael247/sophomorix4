@@ -1256,7 +1256,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill the rooms of computers
     print "\n";
-    &print_title("Computer rooms to be killed:");
+    my $max_room_count_kill=$#killing_computer_rooms+1;
+    &print_title("Killing $max_room_count_kill rooms:");
     my $kill_computer_room_count=1;
     foreach my $room (@killing_computer_rooms){
         print "   * Killing Computer Room $room ...\n";
@@ -1469,7 +1470,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill dnsNodes
     print "\n";
-    &print_title("dnsNodes to be killed:");
+    my $max_dns_node_count_kill=$#killing_dnsnodes+1;
+    &print_title("Killing $max_dns_node_count_kill dnsNodes:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
         &AD_dns_kill({ldap=>$ldap, 
@@ -1486,7 +1488,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill dnsZones
     print "\n";
-    &print_title("dnsZones to be killed:");
+    my $max_dns_zone_count_kill=$#killing_dnszones+1;
+    &print_title("Killing $max_dns_zone_count_kill dnsZones:");
     my $dns_zone_count=1;
     foreach my $dns_zone (@killing_dnszones){
 	print "        $dns_zone\n";
@@ -1502,7 +1505,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add dnsZones
     print "\n";
-    &print_title("dnsZones to be added:");
+    my $max_dns_zone_count_add=$#adding_dnszones+1;
+    &print_title("Adding $max_dns_zone_count_add dnsZones:");
     $dns_zone_count=1;
     foreach my $dns_zone (@adding_dnszones){
         my $filename=$devices_file{'dnsZone'}{$dns_zone}{'FILENAME'};
@@ -1522,7 +1526,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add dnsNodes
     print "\n";
-    &print_title("dnsNodes to be added:");
+    my $max_dns_node_count_add=$#adding_dnsnodes+1;
+    &print_title("Adding $max_dns_node_count_add dnsNodes:");
     $dns_node_count=1;
     foreach my $dns_node (@adding_dnsnodes){
         my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
@@ -1547,7 +1552,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill hardwareclasses
     print "\n";
-    &print_title("Hardwareclasses to be killed:");
+    my $max_hwk_count_kill=$#killing_hardwareclasses+1;
+    &print_title("Killing $max_hwk_count_kill hardwareclasses:");
     my $kill_hwk_count=1;
     foreach my $hwk (@killing_hardwareclasses){
         print "   * Killing Hardwareclass $hwk ...\n";
@@ -1564,7 +1570,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add hardwareclasses
     print "\n";
-    &print_title("Hardwareclasses to be added:");
+    my $max_hwk_count_add=$#adding_hardwareclasses+1;
+    &print_title("Adding $max_hwk_count_add hardwareclasses:");
     my $hwk_count=0;
     foreach my $hwk (@adding_hardwareclasses){
         $hwk_count++;
