@@ -342,10 +342,10 @@ Managing accounts:
   --set-computer-passwords  (set computer passwords to 12345678)
   --password password       (use password instead of 12345678)
 
-Managing DNS:
-  --dns-test (do DNS queries for devices in files)
-  --dns-kill (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
-  --dns-show (show DNS-Nodes and DNS-Zones created by sophomorix)
+Managing DNS 
+  --dns-test  (Do DNS queries for devices in *.devices.csv)
+  --dns-show  (show DNS-Nodes and DNS-Zones created by sophomorix)
+  --dns-kill  (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
 
 Dumping data:                     
   --dump-files -j                  (dump contents of user files)
@@ -424,23 +424,11 @@ if ($dns_test==1){
     }
     foreach my $host (@domcomputers_file){
         my $file_ip=$devices_file{'device'}{$host}{"IPv4"};
-        my $reply = $res->search($host);
-        if ($reply) {
-            foreach my $rr ($reply->answer) {
-                next unless $rr->type eq "A";
-                #print $rr->address, "\n";
-                if ($file_ip eq $rr->address){
-                    print "OK: $host has IP: ",$rr->address,"\n";
-                } else {
-                    print "ERROR $host has IP: ",
-                          $rr->address," (expected was $file_ip)\n";
-                }
-            }
+        my ($dns_result,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$host);
+        if ($file_ip eq $dns_result){
+            print "OK:    $host has IP $file_ip\n";
         } else {
-            # no reply: query failed
-             warn "    * query failed: ", 
-                 $res->errorstring, 
-                 " ($host has expected IP $file_ip)\n";
+            print "ERROR: $host has IP $file_ip ($dns_result)\n";
         }
     }
     exit;
@@ -455,11 +443,10 @@ if ($dns_show==1 or $dns_kill==1){
     my $res   = Net::DNS::Resolver->new;
     my @zonelist=();
     my %zonehash=();
-    my @zone_delete=(); # samba-tool command to delete node
 
     # Fetch dnsZones and their DN
     my $base="DC=DomainDnsZones,".$root_dse;
-    my $filter="(&(objectclass=dnsZone) (sophomorixRole=".$sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}."))";
+    my $filter="(& (objectclass=dnsZone) (name=*) )";
     my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
@@ -467,48 +454,53 @@ if ($dns_show==1 or $dns_kill==1){
                       attr => ['cn']
                             );
     my $max_zone = $mesg->count;
+    # All dns zones found on this server
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
         my $zone_name=$entry->get_value('name');
-        if ($zone_name ne $root_dns){ # do not add $root_dns 
-            # list of sophomorix dnsZones without $root_dns
-            # these Zones will be deleted
+        my $role="";
+        if (defined $entry->get_value('sophomorixRole')){
+            $role=$entry->get_value('sophomorixRole');
+        }
+        if ($zone_name eq $root_dns){ 
+            # do not add $root_dns cause it will be prepended
+            print "   * Skipping dnsZone $zone_name\n";
+        } elsif ($role eq $sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}) {
             push @zonelist, $zone_name;
-
+        } else {
+            print "   * Skipping dnsZone $zone_name\n";
         }
         my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
             &AD_object_search($ldap,$root_dse,"dnsZone",$zone_name);
         $zonehash{$zone_name}{'DN'}=$dn_dns_zone;
         $zonehash{$zone_name}{'CN'}=$cn_dns_zone;
         $zonehash{$zone_name}{'count'}=$count;
-        $zonehash{$zone_name}{'adminDescription'}=$info;
     }
-    # add the $root_dns zone (will not be deleted later)
+
+    # add the $root_dns zone as first entry (will not be deleted later)
     unshift @zonelist, $root_dns;
 
     # print output starts here
     my $zone_count=1;
+
     foreach my $zone (@zonelist){
         &Sophomorix::SophomorixBase::print_title("dnsZone $zone_count) $zone:");
         # dnsNodes in this dnsZone
         my $base=$zonehash{$zone}{'DN'};
-#        my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
-#                   $DevelConf::dns_node_prefix_string.
-#                   "*))";
         my $filter="(&(objectclass=dnsNode) (sophomorixRole=*))";
-	print "BASE: $base\n";
         my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
                       filter => $filter,
-                      attr => ['cn']
+                      attr => ['cn','name']
                             );
         my $max_node = $mesg->count;
         for( my $index = 0 ; $index < $max_node ; $index++) {
             my $entry = $mesg->entry($index);
             my $name=$entry->get_value('name');
-            my $ipv4=&Sophomorix::SophomorixBase::dns_query_ip($res,$name);
-            print "   * $name  ->  $ipv4\n";
+            my $cn=$entry->get_value('cn');
+            my ($ipv4,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$cn);
+            print "   * $cn (name=$name)  ->  $ipv4\n";
             if ($dns_kill==1){
                 &AD_dns_kill({ldap=>$ldap, 
                               root_dse=>$root_dse,
@@ -520,15 +512,15 @@ if ($dns_show==1 or $dns_kill==1){
                             });
            }
         }
-        if ($dns_kill==1){
-            if ($zone ne $root_dns){
-            &AD_dns_zonekill({ldap=>$ldap, 
-                              root_dse=>$root_dse,
-                              dns_zone=>$zone,
-                              smb_pwd=>$smb_admin_pass,
-                            });
-            } else {
-                print "   * Skipping killing provisioned zone $zone\n";
+        if ($zone eq $root_dns){
+            # not deleting the $root_dns
+        } else {
+            if ($dns_kill==1){
+                &AD_dns_zonekill({ldap=>$ldap, 
+                                  root_dse=>$root_dse,
+                                  dns_zone=>$zone,
+                                  smb_pwd=>$smb_admin_pass,
+                                });
             }
         }
         $zone_count++;

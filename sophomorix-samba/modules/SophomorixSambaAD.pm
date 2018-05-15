@@ -366,7 +366,7 @@ sub AD_dns_create_update {
     ############################################################
     # add/update comments to recognize the dnsNode reverse lookup as created by sophomorix
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
-    print "   * dnsNode $dns_node (reverse lookup $dns_node_reverse)\n";
+    print "   * Adding Comments to reverse lookup $dns_node_reverse\n";
     my $mesg = $ldap->modify( $dns_node_reverse, replace => {
                               adminDescription => $dns_admin_description,
                               cn => $dns_cn,
@@ -4735,8 +4735,8 @@ sub AD_get_AD {
                 my $dc=$entry->get_value('dc');
                 # get ip from dns, because in AD its binary (last 4 Bytes)
 
-                my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
-                if ($ip eq "NXDOMAIN"){
+                my ($ip,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+                if ($message eq "NXDOMAIN"){
                     next;
                 }
                 my $record=$entry->get_value('dnsRecord');
@@ -5225,8 +5225,8 @@ sub AD_get_AD_for_device {
             my $dn=$entry->dn();
             my $dc=$entry->get_value('dc');
             my $desc=$entry->get_value('adminDescription');
-            my $ip=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
-            if ($desc=~ m/^${DevelConf::dns_node_prefix_string}/ and $ip ne "NXDOMAIN" and $ip ne "NOERROR"){
+            my ($ip,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+            if ($desc=~ m/^${DevelConf::dns_node_prefix_string}/ and $message ne "NXDOMAIN" and $message ne "NOERROR"){
                 #print "$desc $ip\n";
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;

@@ -4805,19 +4805,20 @@ sub check_options{
 ######################################################################
 sub dns_query_ip {
     my ($res,$host)=@_;
-
-    my $ip=$host;
     my $reply = $res->search($host);
     if ($reply) {
         foreach my $rr ($reply->answer) {
             next unless $rr->type eq "A";
-            return $rr->address;
+            return ($rr->address,"IP FOUND");
         }
     } else {
+        my $result=$res->errorstring;
         # no reply: query failed
-        return $res->errorstring;
+        if ($res->errorstring eq "NOERROR"){
+            $result="Query successful, but no entry for ".$host." (".$res->errorstring.")";
+        }
+        return ($result,$res->errorstring);
     }
-    #return $ip;
 }
 
 
