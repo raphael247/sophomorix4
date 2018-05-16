@@ -178,7 +178,7 @@ sub AD_dnsnodes_count {
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
                    filter => $filter_node,
-                   attrs => ['dc',"sophomorixRole"]
+                   attrs => ['dc','sophomorixRole','sophomorixdnsNodename']
                          );
     my $max_user = $mesg->count; 
     is ($max_user,$expected,"  * $expected sophomorix dnsNodes found");
@@ -187,7 +187,9 @@ sub AD_dnsnodes_count {
     } else {
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
-            printf "   * %-14s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('sophomorixRole');
+            my $string="sophomorixdnsNodename:".$entry->get_value('sophomorixdnsNodename').", ".
+                       "sophomorixRole:".$entry->get_value('sophomorixRole');
+            printf "   * %-14s-> %-50s\n",$entry->get_value('dc'),$string;
         }
     }
 }
