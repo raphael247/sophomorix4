@@ -30,7 +30,7 @@ $Data::Dumper::Terse = 1;
             AD_test_nondns
             AD_computers_any
             AD_examaccounts_any
-            AD_dnsnodes_any
+            AD_dnsnodes_count
             AD_dnszones_any
             AD_rooms_any
             AD_user_timeupdate
@@ -171,23 +171,24 @@ sub AD_user_timeupdate {
 
 
 
-sub AD_dnsnodes_any {
-    my ($ldap,$root_dse) = @_;
-    my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
-                             $DevelConf::dns_node_prefix_string.
-                            "*))";
-
+sub AD_dnsnodes_count {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=dnsNode)(sophomorixRole=*))";
     $mesg = $ldap->search( # perform a search
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
                    filter => $filter_node,
-                   attrs => ['dc',"adminDescription"]
+                   attrs => ['dc',"sophomorixRole"]
                          );
     my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All sophomorix dnsNodes are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        printf "   * %-14s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('adminDescription');
+    is ($max_user,$expected,"  * $expected sophomorix dnsNodes found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            printf "   * %-14s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('sophomorixRole');
+        }
     }
 }
 
@@ -380,9 +381,6 @@ sub AD_test_object {
     my $member_of = $arg_ref->{memberOf};
     #my $not_member_of = $arg_ref->{not_memberOf};
 
-    # dnsNode/dnsZone
-    my $admin_description = $arg_ref->{adminDescription};
-
     my $filter="(|(cn=*)(dn=*))";
     my $mesg = $ldap->search(
                       base   => $dn,
@@ -417,10 +415,6 @@ sub AD_test_object {
 
 
         # Testing attributes
-        if (defined $admin_description){
-            is ($entry->get_value ('adminDescription'),$admin_description,
-                                   "  * adminDescription is $admin_description");
-        }
         if (defined $cn){
             is ($entry->get_value ('cn'),$cn,
                                    "  * cn is $cn");
