@@ -6812,15 +6812,12 @@ sub AD_get_full_devicedata {
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'cn'}=$entry->get_value('cn');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'name'}=$entry->get_value('name');
-            
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
-
-            #$devices{'DEVICES'}{$sam}{'dnsNode'}{'adminDescription'}=$entry->get_value('adminDescription');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dnsRecord'}=$entry->get_value('dnsRecord');
         } else {
             print "ERROR: $max_dns dnsNodes found\n";
