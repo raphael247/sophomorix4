@@ -5195,12 +5195,7 @@ sub AD_get_AD_for_device {
     { # BLOCK dnsNode start
         # alle NODES suchen
         my $res   = Net::DNS::Resolver->new;
-
-        # search for (& (objectClass=dnsNode) (sophomorixRole=*) )"
-
-        my $filter="(&(objectClass=dnsNode)(adminDescription=".
-                   $DevelConf::dns_node_prefix_string.
-                   "*))";
+        my $filter="(& (objectClass=dnsNode) (sophomorixRole=*) )";
         my $base="DC=DomainDnsZones,".$root_dse;
         my $mesg = $ldap->search( # perform a search
                           base   => $base,
@@ -5208,7 +5203,6 @@ sub AD_get_AD_for_device {
                           filter => $filter,
                           attrs => ['dc',
                                     'dnsRecord',
-                                    'adminDescription',
                                     'sophomorixAdminFile',
                                     'sophomorixComment',
                                     'sophomorixDnsNodename',
@@ -5226,21 +5220,13 @@ sub AD_get_AD_for_device {
             my $entry = $mesg->entry($index);
             my $dn=$entry->dn();
             my $dc=$entry->get_value('dc');
-            my $desc=$entry->get_value('adminDescription');
             my ($ip,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
-            if ($desc=~ m/^${DevelConf::dns_node_prefix_string}/ and $message ne "NXDOMAIN" and $message ne "NOERROR"){
+            if ($message ne "NXDOMAIN" and $message ne "NOERROR"){
                 # sophomorixdnsNodes
-
-                #print "$desc $ip\n";
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsNode'}=$dc;
-                # down there the dns zone was calualted
-                #$AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsZone'}=$dns_zone;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsZone'}=$root_dns;
-
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'IPv4'}=$ip;
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'adminDescription'}=
-                    $entry->get_value('adminDescription');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixAdminFile'}=
                     $entry->get_value('sophomorixAdminFile');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixComment'}=
@@ -5257,7 +5243,6 @@ sub AD_get_AD_for_device {
             } else {
                 # other dnsNodes
                 $AD{'RESULT'}{'dnsNode'}{'other'}{'COUNT'}++;
-                #print "ELSE: $desc $ip\n";
             }
         }
     } # BLOCK dnsNode end
