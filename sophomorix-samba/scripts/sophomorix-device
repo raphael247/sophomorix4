@@ -112,8 +112,7 @@ my $sophomorix_first_password="";
 my $role="";
 my $school="";
 my $prefix="";
-my %school_created=();
-$school_created{$school}="created";
+
 # rooms that have been created while the script is running
 my %room_created=();
 my $dump_files=0;
@@ -1207,102 +1206,6 @@ if($no_sync==1){
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
-    # # kill examaccounts
-    # &print_title("ExamAccounts to be killed:");
-    # my $kill_count=1;
-    # foreach my $exam_account (@killing_examaccounts){
-    #     print "   * Killing ExamAccount $exam_account ...\n";
-    #     &AD_user_kill({ldap=>$ldap,
-    #                    root_dse=>$root_dse,
-    #                    login=>$exam_account,
-    #                    user_count=>$kill_count,
-    #                    sophomorix_config=>\%sophomorix_config,
-    #                  });
-    #     #system("/usr/sbin/sophomorix-kill --killuser $exam_account");
-    # }
-
-    ############################################################
-    # # add examaccounts
-    # &print_title("ExamAccounts to be added:");
-    # my $add_count=1;
-    # foreach my $exam_account (@adding_examaccounts){
-    #     my $role="examaccount";
-    #     my $school=$devices_file{'device'}{$exam_account}{'SCHOOL'};
-    #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
-    #     $sophomorix_first_password=&get_plain_password($role,$file,$random,$length,@password_chars);
-    #     if (not exists $school_created{$school}){
-    #         # create ou
-    #         &AD_school_create({ldap=>$ldap,
-    #                     root_dse=>$root_dse,
-    #                     root_dns=>$root_dns,
-    #                     school=>$school,
-    #                     creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-    #                     sophomorix_config=>\%sophomorix_config,
-    #                     sophomorix_result=>\%sophomorix_result,
-    #                  });
-    #         # remember ou
-    #         $school_created{$school}="already created";
-    #     }
-    #     &AD_user_create({ldap=>$ldap, 
-    #                      root_dse=>$root_dse,
-    #                      user_count=>$add_count,
-    #                      login=>$exam_account,
-    #                      group=>$devices_file{'device'}{$exam_account}{'ROOM'},
-    #                      group_basename=>$devices_file{'device'}{$exam_account}{'ROOM'},
-    #                      firstname_ascii=>"Exam",
-    #                      surname_ascii=>"Account",
-    #                      firstname_utf8=>"Exam",
-    #                      surname_utf8=>"Account",
-    #                      birthdate=>$birthdate,
-    #                      sophomorix_first_password=>$sophomorix_first_password,
-    #                      role=>"examaccount",
-    #                      type=>"room",
-    #                      school=>$school,
-    #                      creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-    #                      tolerationdate=>"---",
-    #                      deactivationdate=>"---",
-    #                      status=>"P",
-    #                      file=>$filename,
-    #                    });
-    #     $add_count++;
-    #     # make sure that the room exists
-    #     # use the saved, tokened value
-    #     my $room_saved=$devices_file{'device'}{$exam_account}{'ROOM'};
-    #     my $examaccount_token=$school."-".$DevelConf::examaccount;
-    #     &AD_group_create({ldap=>$ldap,
-    #                       root_dse=>$root_dse,
-    #                       group=>$room_saved,
-    #                       group_basename=>$room_saved,
-    #                       description=>$room_saved,
-    #                       school=>$school,
-    #                       status=>"P",
-    #                       type=>"room",
-    #                       creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-    #                      });
-    #     # add examaccount to its room
-    #     &AD_group_addmember({ldap => $ldap,
-    #                          root_dse => $root_dse, 
-    #                          group => $room_saved,
-    #                          addmember => $exam_account,
-    #                         });   
-    # }
-
-    ############################################################
-    # # Kill the rooms of examaccounts
-    # &print_title("Rooms to be killed:");
-    # my $kill_room_count=1;
-    # foreach my $room (@killing_examaccount_rooms){
-    #     print "   * Killing ExamAccount Room $room ...\n";
-    #     &AD_group_kill({ldap=>$ldap,
-    #                     root_dse=>$root_dse,
-    #                     group=>$room,
-    #                     type=>"room",
-    #                     group_count=>$kill_room_count,
-    #                     sophomorix_config=>\%sophomorix_config,
-    #               });
-    # }
-
-    ############################################################
     # Kill the rooms of computers
     print "\n";
     my $max_room_count_kill=$#killing_computer_rooms+1;
@@ -1354,22 +1257,16 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $filename=$devices_file{'computer'}{$computer}{'FILENAME'};
         my $ipv4=$devices_file{'computer'}{$computer}{'sophomorixComputerIP'};
         my $mac=$devices_file{'computer'}{$computer}{'sophomorixComputerMAC'};
-        if (not exists $school_created{$school}){
-            # create ou
-            &AD_school_create({ldap=>$ldap,
-                               root_dse=>$root_dse,
-                               root_dns=>$root_dns,
-                               school=>$school,
-                               smb_admin_pass=>$smb_admin_pass,
-                               sophomorix_config=>\%sophomorix_config,
-                               sophomorix_result=>\%sophomorix_result,
-                             });
-            # remember ou
-            $school_created{$school}="already created";
-        } else {
-            print "   * OU $school already created\n";
-        }
 
+        # create school
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$school,
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
         my $role;
         if ($devices_file{'computer'}{$computer}{'sophomorixRole'} ne ""){
             $role=$devices_file{'computer'}{$computer}{'sophomorixRole'};
@@ -1482,6 +1379,15 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $description="Host group for $devices_file{'host_group'}{$host_group}{'COMPUTER_DOLLAR'}";
         my $sub_ou=$devices_file{'host_group'}{$host_group}{'SUB_OU'}.",".
             $sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'};
+        # create school
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$devices_file{'host_group'}{$host_group}{'sophomorixSchoolname'},
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
@@ -1649,20 +1555,28 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     my $hwk_count=0;
     foreach my $hwk (@adding_hardwareclasses){
         $hwk_count++;
-        #my $group_token=&AD_get_name_tokened($hwk,$school,"hardwareclass");
-         &AD_group_create({ldap=>$ldap,
+        # create school
+        &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            school=>$school,
-                           group=>$hwk,
-                           group_basename=>$hwk,
-                           description=>$hwk,
-                           type=>"hardwareclass",
-                           status=>"P",
-                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>\%sophomorix_config,
                            sophomorix_result=>\%sophomorix_result,
+                         });
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          school=>$school,
+                          group=>$hwk,
+                          group_basename=>$hwk,
+                          description=>$hwk,
+                          type=>"hardwareclass",
+                          status=>"P",
+                          sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
+                          sophomorix_result=>\%sophomorix_result,
                          });
     }
 

@@ -3185,6 +3185,16 @@ sub AD_school_create {
     my $ref_result = $arg_ref->{sophomorix_result};
     my $gidnumber_wish;
 
+    # test with RUNTIME stuff in sophomorix_config
+    # if school was already created in this script
+    if (exists $ref_sophomorix_config->{'RUNTIME'}{'SCHOOLS_CREATED'}{$school}){
+        print "   * $school already created RUNTIME\n";
+        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+        return;
+    } else {
+        print "   * $school must be created RUNTIME\n";
+        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+    }
     $school=&AD_get_schoolname($school);
 
     print "\n";
@@ -3433,6 +3443,8 @@ sub AD_school_create {
                          });
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (end) ...");
     print "\n";
+    # update runtime hash
+    $ref_sophomorix_config->{'RUNTIME'}{'SCHOOLS_CREATED'}{$school}="created by AD_school_create";
 }
 
 
