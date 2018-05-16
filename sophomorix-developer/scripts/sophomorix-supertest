@@ -27,6 +27,8 @@ Preparation:
   -s r     reset samba, configfiles, shares to installation default
   -s p     prepare samba dfor the following tests
 
+  -s rp    reset+prepare 
+
 Run tests:
   -s all   reset an run all tests
 
@@ -59,6 +61,9 @@ if ($option ne ""){
 if ($script eq "r"){
     &reset_smb();
 } elsif ($script eq "p"){
+    &prepare_smb();
+} elsif ($script eq "rp"){
+    &reset_smb();
     &prepare_smb();
 } elsif ($script eq "all"){
     @scriptlist=("sophomorix-test-1 $option ", 
