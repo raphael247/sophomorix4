@@ -283,7 +283,6 @@ sub AD_dns_create_update {
     my $root_dns = $arg_ref->{root_dns};
     my $smb_pwd = $arg_ref->{smb_pwd};
     my $dns_server = $arg_ref->{dns_server};
-    #my $dns_zone = $arg_ref->{dns_zone};
     my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
@@ -342,7 +341,7 @@ sub AD_dns_create_update {
     if ($count > 0){
              print "   * dnsNode $dns_node exists ($count results)\n";
              my $mesg = $ldap->modify( $dn_exist_dnshost, replace => {
-                                       adminDescription => $dns_admin_description,
+#                                       adminDescription => $dns_admin_description,
                                        cn => $dns_cn,
                                        sophomorixRole => $role,
                                        sophomorixAdminFile => $filename,
@@ -368,7 +367,7 @@ sub AD_dns_create_update {
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
     print "   * Adding Comments to reverse lookup $dns_node_reverse\n";
     my $mesg = $ldap->modify( $dns_node_reverse, replace => {
-                              adminDescription => $dns_admin_description,
+#                              adminDescription => $dns_admin_description,
                               cn => $dns_cn,
                               sophomorixRole => $role,
                               sophomorixAdminFile => $filename,
@@ -5196,6 +5195,9 @@ sub AD_get_AD_for_device {
     { # BLOCK dnsNode start
         # alle NODES suchen
         my $res   = Net::DNS::Resolver->new;
+
+        # search for (& (objectClass=dnsNode) (sophomorixRole=*) )"
+
         my $filter="(&(objectClass=dnsNode)(adminDescription=".
                    $DevelConf::dns_node_prefix_string.
                    "*))";
@@ -5227,30 +5229,33 @@ sub AD_get_AD_for_device {
             my $desc=$entry->get_value('adminDescription');
             my ($ip,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
             if ($desc=~ m/^${DevelConf::dns_node_prefix_string}/ and $message ne "NXDOMAIN" and $message ne "NOERROR"){
+                # sophomorixdnsNodes
+
                 #print "$desc $ip\n";
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsNode'}=$dc;
                 # down there the dns zone was calualted
-                #$AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$root_dns;
+                #$AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsZone'}=$dns_zone;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsZone'}=$root_dns;
 
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'IPv4'}=$ip;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'adminDescription'}=
                     $entry->get_value('adminDescription');
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixAdminFile'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixAdminFile'}=
                     $entry->get_value('sophomorixAdminFile');
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixComment'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixComment'}=
                     $entry->get_value('sophomorixComment');
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixDnsNodename'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixDnsNodename'}=
                     $entry->get_value('sophomorixDnsNodename');
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixRole'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixRole'}=
                     $entry->get_value('sophomorixRole');
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixSchoolname'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixSchoolname'}=
                     $entry->get_value('sophomorixSchoolname');
-                $AD{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'sophomorixComputerIP'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixComputerIP'}=
                     $entry->get_value('sophomorixComputerIP');
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
             } else {
+                # other dnsNodes
                 $AD{'RESULT'}{'dnsNode'}{'other'}{'COUNT'}++;
                 #print "ELSE: $desc $ip\n";
             }
