@@ -31,7 +31,7 @@ $Data::Dumper::Terse = 1;
             AD_computers_any
             AD_examaccounts_any
             AD_dnsnodes_count
-            AD_dnszones_any
+            AD_dnszones_count
             AD_rooms_any
             AD_user_timeupdate
             ACL_test
@@ -196,20 +196,26 @@ sub AD_dnsnodes_count {
 
 
 
-sub AD_dnszones_any {
-    my ($ldap,$root_dse) = @_;
+sub AD_dnszones_count {
+    my ($expected,$ldap,$root_dse) = @_;
     my $filter_zone="(& (objectClass=dnsZone) (sophomorixRole=sophomorixdnsZone) )";
     $mesg = $ldap->search( # perform a search
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
                    filter => $filter_zone,
-                   attrs => ['dc',"adminDescription"]
+                   attrs => ['dc','sophomorixRole','cn']
                          );
     my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All sophomorix dnsZones are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        printf "   * %-24s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('adminDescription');
+    is ($max_user,$expected,"  * $expected sophomorixdnsZones found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $string="sophomorixRole:".$entry->get_value('sophomorixRole').", ".
+                       "cn:".$entry->get_value('cn');
+            printf "   * %-26s-> %-40s\n",$entry->get_value('dc'),$string;
+        }
     }
 }
 
