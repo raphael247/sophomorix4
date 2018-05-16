@@ -341,7 +341,6 @@ sub AD_dns_create_update {
     if ($count > 0){
              print "   * dnsNode $dns_node exists ($count results)\n";
              my $mesg = $ldap->modify( $dn_exist_dnshost, replace => {
-#                                       adminDescription => $dns_admin_description,
                                        cn => $dns_cn,
                                        sophomorixRole => $role,
                                        sophomorixAdminFile => $filename,
@@ -367,7 +366,6 @@ sub AD_dns_create_update {
     my $dns_node_reverse="DC=".$dns_last_octet.",DC=".$dns_zone.",CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
     print "   * Adding Comments to reverse lookup $dns_node_reverse\n";
     my $mesg = $ldap->modify( $dns_node_reverse, replace => {
-#                              adminDescription => $dns_admin_description,
                               cn => $dns_cn,
                               sophomorixRole => $role,
                               sophomorixAdminFile => $filename,
@@ -3538,9 +3536,9 @@ sub AD_object_search {
         } elsif ($objectclass eq "user"){
             $info = $entry->get_value ('sophomorixRole');
         } elsif ($objectclass eq "dnsZone"){
-            $info = $entry->get_value ('adminDescription');
+            $info = $entry->get_value ('sophomorixRole');
         } elsif ($objectclass eq "dnsNode"){
-            $info = $entry->get_value ('adminDescription');
+            $info = $entry->get_value ('sophomorixRole');
         }
         return ($count,$dn,$cn,$info);
     } else {
@@ -6732,8 +6730,9 @@ sub AD_get_full_devicedata {
     my %devices=();
 
     ### create filter
-    my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config);
-    # print "Filter: $filter\n";
+    my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config,"computer");
+    #$filter="(sAMAccountName=j1008p01)";
+    #print "Filter: $filter\n";
 
     # search
     my $mesg = $ldap->search(
@@ -6813,7 +6812,15 @@ sub AD_get_full_devicedata {
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'cn'}=$entry->get_value('cn');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'name'}=$entry->get_value('name');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'adminDescription'}=$entry->get_value('adminDescription');
+            
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+
+            #$devices{'DEVICES'}{$sam}{'dnsNode'}{'adminDescription'}=$entry->get_value('adminDescription');
             $devices{'DEVICES'}{$sam}{'dnsNode'}{'dnsRecord'}=$entry->get_value('dnsRecord');
         } else {
             print "ERROR: $max_dns dnsNodes found\n";
@@ -8960,9 +8967,35 @@ sub _unipwd_from_plainpwd{
 
 
 
+sub _append_dollar {
+    my ($string)=@_;
+    if ($string=~m/\$$/){
+        # OK, ends with \$
+    } else {
+        # append $
+        $string=$string."\$";
+    } 
+    return $string; 
+}
+
+
+
+sub _detatch_dollar {
+    my ($string)=@_;
+    if ($string=~m/\$$/){
+        # detach $
+        $string=~s/\$$//;
+    } else {
+        # OK, no $ at the end
+    } 
+    return $string;    
+}
+
+
+
 sub _create_filter_alldevices {
-    my ($ref_devicelist,$ref_sophomorix_config)=@_;
-    my $objectclass_filter="(objectClass=computer)";
+    my ($ref_devicelist,$ref_sophomorix_config,$objectclass)=@_;
+    my $objectclass_filter="(objectClass=".$objectclass.")";
     my $role_filter="(|";
     foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}}) {
         $role_filter=$role_filter."(sophomorixRole=".$keyname.")";
@@ -8972,12 +9005,23 @@ sub _create_filter_alldevices {
     if ($ref_devicelist eq ""){
         # no list given
         $sam_filter="";
-    } elsif ($#{ $ref_devicelist }==0){
-        $sam_filter="(sAMAccountName=".${ $ref_devicelist }[0].")"; 
+    } elsif ($#{ $ref_devicelist }==0){ # one name, counter 0
+        my $sam;
+        if ($objectclass eq "computer"){
+            $sam=&_append_dollar(${ $ref_devicelist }[0]);
+        } else {
+            $sam=&_detach_dollar(${ $ref_devicelist }[0]);
+        }
+        $sam_filter="(sAMAccountName=".$sam.")"; 
     } else {
         $sam_filter="(|";
-        foreach my $device ( @{ $ref_devicelist } ){
-            $sam_filter=$sam_filter."(sAMAccountName=".$device.")";
+        foreach my $sam ( @{ $ref_devicelist } ){
+            if ($objectclass eq "computer"){
+                $sam=&_append_dollar($sam);
+            } else {
+                $sam=&_detach_dollar($sam);
+            }
+            $sam_filter=$sam_filter."(sAMAccountName=".$sam.")";
         } 
         $sam_filter=$sam_filter.")";
     }
