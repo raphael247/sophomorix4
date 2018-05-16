@@ -6745,10 +6745,57 @@ sub AD_get_full_devicedata {
     my @devicelist=split(/,/,$devicelist); # list of parameters, could be 'j1010*'
     my %devices=();
 
+    ############################################################
+    # look for dnsNode
+    my $filter_node=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config,"dnsNode","sophomorixDnsNodename");
+
+    # search
+    my $base="DC=DomainDnsZones,".$root_dse;
+    my $mesg_node = $ldap->search(
+                           base   => $base,
+                           scope => 'sub',
+                           filter => $filter_node,
+                          );
+    &AD_debug_logdump($mesg_node,2,(caller(0))[3]);
+    my $max_node = $mesg_node->count;
+    for( my $index = 0 ; $index < $max_node ; $index++) {
+        my $entry = $mesg_node->entry($index);
+        my $name=$entry->get_value('name');
+        my $dn=$entry->dn();
+        my $cn=$entry->get_value('cn');
+        if ($name=~m/^[0-9]+$/ and $name > 0 and $name < 256){
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dn'}=$dn;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'cn'}=$cn;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord'}=$entry->get_value('dnsRecord');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'name'}=$entry->get_value('name');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
+            # list of results
+            push @{ $devices{'LISTS'}{'dnsNode_REVERSE'} }, $name;
+        } else {
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dn'}=$dn;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'cn'}=$cn;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord'}=$entry->get_value('dnsRecord');;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'name'}=$entry->get_value('name');;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
+            # list of results
+            push @{ $devices{'LISTS'}{'dnsNode'} }, $name;
+        }
+    }
+
+    ############################################################
+    # look for computer account
     ### create filter
-    my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config,"computer");
-    #$filter="(sAMAccountName=j1008p01)";
-    #print "Filter: $filter\n";
+    my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config,"computer","sAMAccountName");
 
     # search
     my $mesg = $ldap->search(
@@ -6761,92 +6808,154 @@ sub AD_get_full_devicedata {
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        # this is the devicelist of all devices found, i.e. 'j1010p01' 'j1010p01' ... 
-        push @{ $devices{'LISTS'}{'DEVICES'} }, $sam;
-
-        $devices{'DEVICES'}{$sam}{'dn'}=$entry->dn();
-        $devices{'DEVICES'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
-        $devices{'DEVICES'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
-        $devices{'DEVICES'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
-        $devices{'DEVICES'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
-        $devices{'DEVICES'}{$sam}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
-        $devices{'DEVICES'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
-        $devices{'DEVICES'}{$sam}{'cn'}=$entry->get_value('cn');
-        $devices{'DEVICES'}{$sam}{'name'}=$entry->get_value('name');
-        $devices{'DEVICES'}{$sam}{'displayName'}=$entry->get_value('displayName');
-        $devices{'DEVICES'}{$sam}{'userAccountControl'}=$entry->get_value('userAccountControl');
-        @{ $devices{'DEVICES'}{$sam}{'servicePrincipalName'} } = sort $entry->get_value('servicePrincipalName');
-
-        #$devices{'DEVICES'}{$sam}{'mail'}=$entry->get_value('mail');
-        $devices{'DEVICES'}{$sam}{'sophomorixSchoolPrefix'}=$entry->get_value('sophomorixSchoolPrefix');
-        $devices{'DEVICES'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
-        $devices{'DEVICES'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
-        $devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
-        $devices{'DEVICES'}{$sam}{'dNSHostName'}=$entry->get_value('dNSHostName');
-        @{ $devices{'DEVICES'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');
+        my $device=$entry->get_value('sophomorixDnsNodename');
+        $devices{'DEVICES'}{$device}{'computer'}{'dn'}=$entry->dn();
+        $devices{'DEVICES'}{$device}{'computer'}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+        $devices{'DEVICES'}{$device}{'computer'}{'cn'}=$entry->get_value('cn');
+        $devices{'DEVICES'}{$device}{'computer'}{'name'}=$entry->get_value('name');
+        $devices{'DEVICES'}{$device}{'computer'}{'displayName'}=$entry->get_value('displayName');
+        $devices{'DEVICES'}{$device}{'computer'}{'userAccountControl'}=$entry->get_value('userAccountControl');
+        @{  $devices{'DEVICES'}{$device}{'computer'}{'servicePrincipalName'} }= sort $entry->get_value('servicePrincipalName');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixSchoolPrefix'}=$entry->get_value('sophomorixSchoolPrefix');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+        $devices{'DEVICES'}{$device}{'computer'}{'dNSHostName'}=$entry->get_value('dNSHostName');
+        @{  $devices{'DEVICES'}{$device}{'computer'}{'memberOf'} }= sort $entry->get_value('memberOf');
 
         # samba
-        #$devices{'DEVICES'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
-        #$devices{'DEVICES'}{$sam}{'homeDrive'}=$entry->get_value('homeDrive');
-        $devices{'DEVICES'}{$sam}{'accountExpires'}=$entry->get_value('accountExpires');
-        $devices{'DEVICES'}{$sam}{'badPasswordTime'}=$entry->get_value('badPasswordTime');
-        $devices{'DEVICES'}{$sam}{'badPwdCount'}=$entry->get_value('badPwdCount');
-        $devices{'DEVICES'}{$sam}{'codePage'}=$entry->get_value('codePage');
-        $devices{'DEVICES'}{$sam}{'countryCode'}=$entry->get_value('countryCode');
-        $devices{'DEVICES'}{$sam}{'lastLogoff'}=$entry->get_value('lastLogoff');
-        $devices{'DEVICES'}{$sam}{'lastLogon'}=$entry->get_value('lastLogon');
-        $devices{'DEVICES'}{$sam}{'logonCount'}=$entry->get_value('logonCount');
-        $devices{'DEVICES'}{$sam}{'objectSid'}=$entry->get_value('objectSid');
-        $devices{'DEVICES'}{$sam}{'objectGUID'}=$entry->get_value('objectGUID');
-        $devices{'DEVICES'}{$sam}{'pwdLastSet'}=$entry->get_value('pwdLastSet');
-        $devices{'DEVICES'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
-        #$devices{'DEVICES'}{$sam}{'userPrincipalName'}=$entry->get_value('userPrincipalName');
-        $devices{'DEVICES'}{$sam}{'uSNChanged'}=$entry->get_value('uSNChanged');
-        $devices{'DEVICES'}{$sam}{'uSNCreated'}=$entry->get_value('uSNCreated');
+        $devices{'DEVICES'}{$device}{'computer'}{'accountExpires'}=$entry->get_value('accountExpires');
+        $devices{'DEVICES'}{$device}{'computer'}{'badPasswordTime'}=$entry->get_value('badPasswordTime');
+        $devices{'DEVICES'}{$device}{'computer'}{'badPwdCount'}=$entry->get_value('badPwdCount');
+        $devices{'DEVICES'}{$device}{'computer'}{'codePage'}=$entry->get_value('codePage');
+        $devices{'DEVICES'}{$device}{'computer'}{'countryCode'}=$entry->get_value('countryCode');
+        $devices{'DEVICES'}{$device}{'computer'}{'lastLogoff'}=$entry->get_value('lastLogoff');
+        $devices{'DEVICES'}{$device}{'computer'}{'lastLogon'}=$entry->get_value('lastLogon');
+        $devices{'DEVICES'}{$device}{'computer'}{'logonCount'}=$entry->get_value('logonCount');
+        $devices{'DEVICES'}{$device}{'computer'}{'objectSid'}=$entry->get_value('objectSid');
+        $devices{'DEVICES'}{$device}{'computer'}{'objectGUID'}=$entry->get_value('objectGUID');
+        $devices{'DEVICES'}{$device}{'computer'}{'pwdLastSet'}=$entry->get_value('pwdLastSet');
+        $devices{'DEVICES'}{$device}{'computer'}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
+        $devices{'DEVICES'}{$device}{'computer'}{'uSNChanged'}=$entry->get_value('uSNChanged');
+        $devices{'DEVICES'}{$device}{'computer'}{'uSNCreated'}=$entry->get_value('uSNCreated');
         # unix
-        $devices{'DEVICES'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
-
-        ############################################################
-        # searching DNS node
-        my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
-        #my $base="DC=DomainDnsZones,".$root_dse;
-        my $filter="(& (objectClass=dnsNode) ".
-                   "(cn=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.") ".
-                   "(name=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.")".
-                   " )";
-        # print "dnsNode filter: $filter\n";
-        # print "dnsNode searchbase: $base\n";
-        my $mesg = $ldap->search(
-                          base   => $base,
-                          scope => 'sub',
-                          filter => $filter,
-                         );
-        &AD_debug_logdump($mesg,2,(caller(0))[3]);
-        my $max_dns = $mesg->count;
-        if ($max_dns==1){
-            my $entry = $mesg->entry(0);
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'cn'}=$entry->get_value('cn');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'name'}=$entry->get_value('name');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
-            $devices{'DEVICES'}{$sam}{'dnsNode'}{'dnsRecord'}=$entry->get_value('dnsRecord');
-        } else {
-            print "ERROR: $max_dns dnsNodes found\n";
-        }
+        $devices{'DEVICES'}{$device}{'computer'}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
+        # list of results
+        push @{ $devices{'LISTS'}{'computer'} }, $device;
     }
-    $devices{'COUNTER'}{'TOTAL'}=$max;
-    if ($max==0){
-        print "0 devices found in AD\n";
-        print "\n";
-    }
-    # more ?????
 
-    return \%devices;
+    $devices{'COUNTER'}{'dnsNode'}{'TOTAL'}=$#{ $devices{'LISTS'}{'dnsNode'} }+1;
+    $devices{'COUNTER'}{'dnsNode_REVERSE'}{'TOTAL'}=$#{ $devices{'LISTS'}{'dnsNode_REVERSE'} }+1;
+    $devices{'COUNTER'}{'computer'}{'TOTAL'}=$#{ $devices{'LISTS'}{'computer'} }+1;
+    
+    return \%devices;;
+    # ############################################################
+    # # look for computer account
+    # ### create filter
+    # my $filter=&_create_filter_alldevices(\@devicelist,$ref_sophomorix_config,"computer","sAMAccountName");
+
+    # # search
+    # my $mesg = $ldap->search(
+    #                   base   => $root_dse,
+    #                   scope => 'sub',
+    #                   filter => $filter,
+    #                    );
+    # &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    # my $max = $mesg->count;
+    # for( my $index = 0 ; $index < $max ; $index++) {
+    #     my $entry = $mesg->entry($index);
+    #     my $sam=$entry->get_value('sAMAccountName');
+    #     # this is the devicelist of all devices found, i.e. 'j1010p01' 'j1010p01' ... 
+    #     push @{ $devices{'LISTS'}{'DEVICES'} }, $sam;
+
+    #     $devices{'DEVICES'}{$sam}{'dn'}=$entry->dn();
+    #     $devices{'DEVICES'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixCreationDate'}=$entry->get_value('sophomorixCreationDate');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+    #     $devices{'DEVICES'}{$sam}{'cn'}=$entry->get_value('cn');
+    #     $devices{'DEVICES'}{$sam}{'name'}=$entry->get_value('name');
+    #     $devices{'DEVICES'}{$sam}{'displayName'}=$entry->get_value('displayName');
+    #     $devices{'DEVICES'}{$sam}{'userAccountControl'}=$entry->get_value('userAccountControl');
+    #     @{ $devices{'DEVICES'}{$sam}{'servicePrincipalName'} } = sort $entry->get_value('servicePrincipalName');
+
+    #     #$devices{'DEVICES'}{$sam}{'mail'}=$entry->get_value('mail');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixSchoolPrefix'}=$entry->get_value('sophomorixSchoolPrefix');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+    #     $devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+    #     $devices{'DEVICES'}{$sam}{'dNSHostName'}=$entry->get_value('dNSHostName');
+    #     @{ $devices{'DEVICES'}{$sam}{'memberOf'} } = sort $entry->get_value('memberOf');
+
+    #     # samba
+    #     #$devices{'DEVICES'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
+    #     #$devices{'DEVICES'}{$sam}{'homeDrive'}=$entry->get_value('homeDrive');
+    #     $devices{'DEVICES'}{$sam}{'accountExpires'}=$entry->get_value('accountExpires');
+    #     $devices{'DEVICES'}{$sam}{'badPasswordTime'}=$entry->get_value('badPasswordTime');
+    #     $devices{'DEVICES'}{$sam}{'badPwdCount'}=$entry->get_value('badPwdCount');
+    #     $devices{'DEVICES'}{$sam}{'codePage'}=$entry->get_value('codePage');
+    #     $devices{'DEVICES'}{$sam}{'countryCode'}=$entry->get_value('countryCode');
+    #     $devices{'DEVICES'}{$sam}{'lastLogoff'}=$entry->get_value('lastLogoff');
+    #     $devices{'DEVICES'}{$sam}{'lastLogon'}=$entry->get_value('lastLogon');
+    #     $devices{'DEVICES'}{$sam}{'logonCount'}=$entry->get_value('logonCount');
+    #     $devices{'DEVICES'}{$sam}{'objectSid'}=$entry->get_value('objectSid');
+    #     $devices{'DEVICES'}{$sam}{'objectGUID'}=$entry->get_value('objectGUID');
+    #     $devices{'DEVICES'}{$sam}{'pwdLastSet'}=$entry->get_value('pwdLastSet');
+    #     $devices{'DEVICES'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
+    #     #$devices{'DEVICES'}{$sam}{'userPrincipalName'}=$entry->get_value('userPrincipalName');
+    #     $devices{'DEVICES'}{$sam}{'uSNChanged'}=$entry->get_value('uSNChanged');
+    #     $devices{'DEVICES'}{$sam}{'uSNCreated'}=$entry->get_value('uSNCreated');
+    #     # unix
+    #     $devices{'DEVICES'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
+
+    #     ############################################################
+    #     # searching DNS node
+    #     my $base="CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse;
+    #     #my $base="DC=DomainDnsZones,".$root_dse;
+    #     my $filter="(& (objectClass=dnsNode) ".
+    #                "(cn=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.") ".
+    #                "(name=".$devices{'DEVICES'}{$sam}{'sophomorixDnsNodename'}.")".
+    #                " )";
+    #     # print "dnsNode filter: $filter\n";
+    #     # print "dnsNode searchbase: $base\n";
+    #     my $mesg = $ldap->search(
+    #                       base   => $base,
+    #                       scope => 'sub',
+    #                       filter => $filter,
+    #                      );
+    #     &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    #     my $max_dns = $mesg->count;
+    #     if ($max_dns==1){
+    #         my $entry = $mesg->entry(0);
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'dn'}=$entry->dn();
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'cn'}=$entry->get_value('cn');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'name'}=$entry->get_value('name');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixRole'}=$entry->get_value('sophomorixRole');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+    #         $devices{'DEVICES'}{$sam}{'dnsNode'}{'dnsRecord'}=$entry->get_value('dnsRecord');
+    #     } else {
+    #         print "ERROR: $max_dns dnsNodes found\n";
+    #     }
+    # }
+    # $devices{'COUNTER'}{'TOTAL'}=$max;
+    # if ($max==0){
+    #     print "0 devices found in AD\n";
+    #     print "\n";
+    # }
+    # # more ?????
+
+    # return \%devices;
 }
 
 
@@ -8993,7 +9102,7 @@ sub _append_dollar {
 
 
 
-sub _detatch_dollar {
+sub _detach_dollar {
     my ($string)=@_;
     if ($string=~m/\$$/){
         # detach $
@@ -9007,7 +9116,7 @@ sub _detatch_dollar {
 
 
 sub _create_filter_alldevices {
-    my ($ref_devicelist,$ref_sophomorix_config,$objectclass)=@_;
+    my ($ref_devicelist,$ref_sophomorix_config,$objectclass,$attribute)=@_;
     my $objectclass_filter="(objectClass=".$objectclass.")";
     my $role_filter="(|";
     foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}}) {
@@ -9025,7 +9134,7 @@ sub _create_filter_alldevices {
         } else {
             $sam=&_detach_dollar(${ $ref_devicelist }[0]);
         }
-        $sam_filter="(sAMAccountName=".$sam.")"; 
+        $sam_filter="(".$attribute."=".$sam.")"; 
     } else {
         $sam_filter="(|";
         foreach my $sam ( @{ $ref_devicelist } ){
@@ -9034,7 +9143,7 @@ sub _create_filter_alldevices {
             } else {
                 $sam=&_detach_dollar($sam);
             }
-            $sam_filter=$sam_filter."(sAMAccountName=".$sam.")";
+            $sam_filter=$sam_filter."(".$attribute."=".$sam.")";
         } 
         $sam_filter=$sam_filter.")";
     }

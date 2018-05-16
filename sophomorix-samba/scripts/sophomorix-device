@@ -568,13 +568,6 @@ if ($print==1){
 if ($info==1 and $show_role ne ""){
     ##################################################
     # --info --show-role <role>
-    my $ref_devices=&AD_get_full_devicedata({ldap=>$ldap,
-                                             root_dse=>$root_dse,
-                                             root_dns=>$root_dns,
-                                             devicelist=>$device,
-                                             sophomorix_config=>\%sophomorix_config,
-                                            });
-
     print "HERE: show role $show_role\n";
 
 
