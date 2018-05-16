@@ -354,8 +354,9 @@ sub AD_dns_create_update {
 
     ############################################################
     if ($create eq "TRUE"){
+        my $dns_type="PTR";
         # adding reverse lookup with samba-tool
-        my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet PTR $dns_node ".
+        my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet $dns_type $dns_node ".
                             " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
         print "   * $command_reverse\n";
         my $res2=`$command_reverse`;
@@ -450,22 +451,25 @@ sub AD_dns_kill {
         $dns_type="A";
     }
 
-    # delete dnsNode
     if ($dns_ipv4 ne "NXDOMAIN" and $dns_ipv4 ne "NOERROR"){
+        # delete dnsNode
         my $command="samba-tool dns delete $dns_server ".
                     "$dns_zone $dns_node $dns_type $dns_ipv4 ".
                     "--password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
         print "   * $command\n";
         system($command);
-    }
 
-    # delete reverse lookup ?????? deleted with the zone?
-    #$dns_type="PTR";
-    #my $command="samba-tool dns delete $dns_server ".
-    #            "$dns_zone $dns_node $dns_type $dns_ipv4 ".
-    #            "--password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    #print "     * $command\n";
-    #system($command);
+        # delete reverse lookup
+        my @octets=split(/\./,$dns_ipv4);
+        my $dns_zone_reverse=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+        my $dns_last_octet=$octets[3];
+        my $dns_type="PTR";
+        my $command_reverse="samba-tool dns delete $dns_server $dns_zone_reverse $dns_last_octet $dns_type $dns_node ".
+                            " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+        print "   * $command_reverse\n";
+        my $res2=`$command_reverse`;
+        print "       -> $res2";
+    }
 }
 
 
