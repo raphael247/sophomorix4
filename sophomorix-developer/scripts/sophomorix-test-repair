@@ -1,0 +1,58 @@
+#!/bin/sh
+
+
+############################################################
+# test1 nodamage
+############################################################
+# reset and repair
+sophomorix-supertest -s rp > /dev/null
+rm -rf /var/lib/sophomorix/sophomorix-repair
+
+# add users with test1
+sophomorix-test-1 --cp-add > /dev/null
+sophomorix-add > /dev/null
+
+# create all schools (the wil be repaired otherwise)
+sophomorix-school --recreate-all-schools > /dev/null 
+
+# save this (unrepaired state)
+sophomorix-repair --acl-snapshot test1-reference > /dev/null
+
+# test if repair adds unnecessary stuff
+sophomorix-repair --all > /dev/null
+sophomorix-repair --acl-snapshot test1-repaired-nodamage > /dev/null
+
+echo "Diff after sophomorix-test-1 (step1) nodamage repair"
+sophomorix-repair --acl-snapshot-diff test1-reference,test1-repaired-nodamage
+
+
+
+############################################################
+# test1 full damage
+############################################################
+# reset and repair
+sophomorix-supertest -s rp > /dev/null
+rm -rf /var/lib/sophomorix/sophomorix-repair
+
+# add users with test1
+sophomorix-test-1 --cp-add > /dev/null
+sophomorix-add > /dev/null
+
+# create all schools (the wil be repaired otherwise)
+sophomorix-school --recreate-all-schools > /dev/null 
+
+# save this (unrepaired state)
+sophomorix-repair --acl-snapshot test1-reference > /dev/null
+
+# full damage
+rm -rf /srv/samba
+
+# test if repair repairs everything
+sophomorix-repair --all > /dev/null
+# recreate the schools (would be missing otherwise)
+sophomorix-school --recreate-all-schools > /dev/null 
+
+sophomorix-repair --acl-snapshot test1-repaired-fulldamage > /dev/null
+
+echo "Diff after sophomorix-test-1 (step1) nodamage repair"
+sophomorix-repair --acl-snapshot-diff test1-reference,test1-repaired-fulldamage

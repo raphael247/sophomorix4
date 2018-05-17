@@ -256,6 +256,7 @@ install-developer:
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-errorfiles $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-infoscripts $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-exammode $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-repair $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-JSON-example $(DESTDIR)/usr/sbin
 # copying perl developer modules
 	@install -d -m755 -oroot -groot $(PERLMOD)
