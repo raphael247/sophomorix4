@@ -5238,20 +5238,20 @@ sub AD_get_AD_for_device {
             if ($message ne "NXDOMAIN" and $message ne "NOERROR"){
                 # sophomorixdnsNodes
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsNode'}=$dc;
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'dnsZone'}=$root_dns;
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'IPv4'}=$ip;
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixAdminFile'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsNode'}=$dc;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsZone'}=$root_dns;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixAdminFile'}=
                     $entry->get_value('sophomorixAdminFile');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixComment'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixComment'}=
                     $entry->get_value('sophomorixComment');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixDnsNodename'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixDnsNodename'}=
                     $entry->get_value('sophomorixDnsNodename');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixRole'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixRole'}=
                     $entry->get_value('sophomorixRole');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixSchoolname'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixSchoolname'}=
                     $entry->get_value('sophomorixSchoolname');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_HASH_KEYNAME'}}{$dc}{'sophomorixComputerIP'}=
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixComputerIP'}=
                     $entry->get_value('sophomorixComputerIP');
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
             } else {
