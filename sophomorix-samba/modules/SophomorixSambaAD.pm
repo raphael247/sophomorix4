@@ -4291,11 +4291,10 @@ sub AD_get_AD_for_repair {
     if ($computers eq "TRUE"){
         # sophomorix computers from ldap
         my $filter="(& (objectClass=computer)(sophomorixRole=*) )";
-        print "Filter: $filter\n";
+        #print "Filter: $filter\n";
         my $mesg = $ldap->search( # perform a search
                           base   => $root_dse,
                           scope => 'sub',
-#                          filter => '(&(objectClass=computer)(sophomorixRole=computer))',
                           filter => $filter,
                           attrs => ['sAMAccountName',
                                     'sophomorixSchoolPrefix',
