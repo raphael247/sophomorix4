@@ -1822,6 +1822,7 @@ sub _console_print_device_full {
     my $device_count=0;
     foreach my $device (@{ $ref_devices->{'LISTS'}{'dnsNode'} }){
         $device_count++;
+        # computer
         if (exists $ref_devices->{'DEVICES'}{$device}{'computer'}){
             print "\n";
             print $line1;
@@ -1829,7 +1830,6 @@ sub _console_print_device_full {
                   "$device in school $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixSchoolname'}\n";
             print "$ref_devices->{'DEVICES'}{$device}{'computer'}{'dn'}\n";
             print $line1;
-
             printf "%29s: %-40s\n","sAMAccountName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sAMAccountName'};
             printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'computer'}{'cn'};
             printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'computer'}{'name'};
@@ -1863,60 +1863,104 @@ sub _console_print_device_full {
                 #printf "%19s: %-50s\n","homeDirectory",$ref_devices->{'DEVICES'}{$device}{'computer'}{'homeDirectory'};
                 #printf "%19s: %-50s\n","homeDrive",$ref_devices->{'DEVICES'}{$device}{'computer'}{'homeDrive'};
 
-                printf "%19s: %-50s\n","accountExpires",$ref_devices->{'DEVICES'}{$device}{'computer'}{'accountExpires'};
-                printf "%19s: %-50s\n","badPasswordTime",$ref_devices->{'DEVICES'}{$device}{'computer'}{'badPasswordTime'};
-                printf "%19s: %-50s\n","badPwdCount",$ref_devices->{'DEVICES'}{$device}{'computer'}{'badPwdCount'};
-                printf "%19s: %-50s\n","pwdLastSet",$ref_devices->{'DEVICES'}{$device}{'computer'}{'pwdLastSet'};
-
-                printf "%19s: %-50s\n","lastLogoff",$ref_devices->{'DEVICES'}{$device}{'computer'}{'lastLogoff'};
-                printf "%19s: %-50s\n","lastLogon",$ref_devices->{'DEVICES'}{$device}{'computer'}{'lastLogon'};
-                printf "%19s: %-50s\n","logonCount",$ref_devices->{'DEVICES'}{$device}{'computer'}{'logonCount'};
+                printf "%19s: %-50s\n","accountExpires",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'accountExpires'};
+                printf "%19s: %-50s\n","badPasswordTime",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'badPasswordTime'};
+                printf "%19s: %-50s\n","badPwdCount",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'badPwdCount'};
+                printf "%19s: %-50s\n","pwdLastSet",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'pwdLastSet'};
+                printf "%19s: %-50s\n","lastLogoff",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'lastLogoff'};
+                printf "%19s: %-50s\n","lastLogon",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'lastLogon'};
+                printf "%19s: %-50s\n","logonCount",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'logonCount'};
 
                 if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "17.10"){
                     #my $sid = Net::LDAP::SID->new($ref_devices->{'DEVICES'}{$device}{'objectSid'});
 
-                    printf "%19s: %-50s\n","objectSid",$ref_devices->{'DEVICES'}{$device}{'computer'}{'objectSid'};
+                    printf "%19s: %-50s\n","objectSid",
+                        $ref_devices->{'DEVICES'}{$device}{'computer'}{'objectSid'};
                     printf "%19s: %-50s\n","objectGUID","(binary)";
                 } else {
                     printf "%19s: %-50s\n","objectSid","(binary)";
                     printf "%19s: %-50s\n","objectGUID","(binary)";
                 }
 
-                printf "%19s: %-50s\n","sAMAccountType",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sAMAccountType'};
-                #printf "%19s: %-50s\n","userPrincipalName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'userPrincipalName'};
-
-                printf "%19s: %-50s\n","uSNChanged",$ref_devices->{'DEVICES'}{$device}{'computer'}{'uSNChanged'};
-                printf "%19s: %-50s\n","uSNCreated",$ref_devices->{'DEVICES'}{$device}{'computer'}{'uSNCreated'};
-
-                printf "%19s: %-50s\n","codePage",$ref_devices->{'DEVICES'}{$device}{'computer'}{'codePage'};
-                printf "%19s: %-50s\n","countryCode",$ref_devices->{'DEVICES'}{$device}{'computer'}{'countryCode'};
+                printf "%19s: %-50s\n","sAMAccountType",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'sAMAccountType'};
+                #printf "%19s: %-50s\n","userPrincipalName",
+                #    $ref_devices->{'DEVICES'}{$device}{'computer'}{'userPrincipalName'};
+                printf "%19s: %-50s\n","uSNChanged",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'uSNChanged'};
+                printf "%19s: %-50s\n","uSNCreated",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'uSNCreated'};
+                printf "%19s: %-50s\n","codePage",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'codePage'};
+                printf "%19s: %-50s\n","countryCode",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'countryCode'};
         	}
 
             # unix stuff:
             if ($log_level>=2){
-                #printf "%19s: %-50s\n","uidNumber",$ref_devices->{'DEVICES'}{$device}{'uidNumber'};
-                #printf "%19s: %-50s\n","unixHomeDirectory",$ref_devices->{'DEVICES'}{$device}{'computer'}{'unixHomeDirectory'};
-                printf "%19s: %-50s\n","primaryGroupID",$ref_devices->{'DEVICES'}{$device}{'computer'}{'primaryGroupID'};
+                #printf "%19s: %-50s\n","uidNumber",
+                #    $ref_devices->{'DEVICES'}{$device}{'uidNumber'};
+                #printf "%19s: %-50s\n","unixHomeDirectory",
+                #    $ref_devices->{'DEVICES'}{$device}{'computer'}{'unixHomeDirectory'};
+                printf "%19s: %-50s\n","primaryGroupID",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'primaryGroupID'};
             }
         }
 
         # dnsNode
         print $line1;
-        print "dnsNode for $device_count/$ref_devices->{'COUNTER'}{'dnsNode'}{'TOTAL'} in AD: ",
+        print "dnsNode (IP LOOKUP) for $device_count/$ref_devices->{'COUNTER'}{'dnsNode'}{'TOTAL'} in AD: ",
               "$device in school $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'}\n";
         print "$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dn'}\n";
-
         print $line;
-        printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'cn'};
-        printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'name'};
-        printf "%29s: %-40s\n","sophomorixRole",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixRole'};
-        printf "%29s: %-40s\n","sophomorixAdminFile",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixAdminFile'};
-        printf "%29s: %-40s\n","sophomorixSchoolname",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'};
-        printf "%29s: %-40s\n","sophomorixComputerIP",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComputerIP'};
-        printf "%29s: %-40s\n","sophomorixDnsNodename",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodename'};
-        printf "%29s: %-40s\n","sophomorixComment",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComment'};
-        printf "%29s: %-40s\n","dnsRecord",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord'};
+        printf "%29s: %-40s\n","cn",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'cn'};
+        printf "%29s: %-40s\n","name",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'name'};
+        printf "%29s: %-40s\n","sophomorixRole",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixRole'};
+        printf "%29s: %-40s\n","sophomorixAdminFile",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixAdminFile'};
+        printf "%29s: %-40s\n","sophomorixSchoolname",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'};
+        printf "%29s: %-40s\n","sophomorixComputerIP",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComputerIP'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","sophomorixComment",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComment'};
+        printf "%29s: %-40s\n","dnsRecord",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord'};
         print $line1;
+        print "dnsNode (REVERSE LOOKUP) for $device_count/$ref_devices->{'COUNTER'}{'dnsNode_REVERSE'}{'TOTAL'} in AD: ",
+              "$device in school $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixSchoolname'}\n";
+        print "$ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dn'}\n";
+        print $line;
+        printf "%29s: %-40s\n","cn",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'cn'};
+        printf "%29s: %-40s\n","name",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'name'};
+        printf "%29s: %-40s\n","sophomorixRole",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixRole'};
+        printf "%29s: %-40s\n","sophomorixAdminFile",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixAdminFile'};
+        printf "%29s: %-40s\n","sophomorixSchoolname",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixSchoolname'};
+        printf "%29s: %-40s\n","sophomorixComputerIP",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComputerIP'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","sophomorixComment",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComment'};
+        printf "%29s: %-40s\n","dnsRecord",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord'};
     }
 }
 
