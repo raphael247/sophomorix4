@@ -61,7 +61,7 @@ $Data::Dumper::Terse = 1;
             AD_ou_create
             AD_school_create
             AD_object_search
-            AD_get_AD
+            AD_get_AD_for_repair
             AD_get_AD_for_check
             AD_get_AD_for_device
             AD_get_ui
@@ -3860,7 +3860,7 @@ sub AD_get_sessions {
 
 
 
-sub AD_get_AD {
+sub AD_get_AD_for_repair {
     my %AD=();
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};

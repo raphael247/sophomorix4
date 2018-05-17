@@ -1618,18 +1618,7 @@ if ($set_computer_passwords==1){
                                                  root_dns=>$root_dns,
                                                  sophomorix_config=>\%sophomorix_config,
                                                });
-    # my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
-    #                        root_dse=>$root_dse,
-    #                        root_dns=>$root_dns,
-    #                        computers=>"TRUE",
-    #                        #rooms=>"TRUE",
-    #                        #examaccounts=>"TRUE",
-    #                        dnszones=>"TRUE",
-    #                        dnsnodes=>"TRUE",
-    #                        sophomorix_config=>\%sophomorix_config,
-    #          });
     my $count=1;
-
     foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
         my $pw;
         if ($password ne ""){
