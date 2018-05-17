@@ -80,6 +80,10 @@ my $extraclass=0;
 my $student_home=0;
 my $all=0;
 
+# acl snapshot stuff
+my $acl_snapshot="";
+my $acl_snapshot_diff="";
+
 
 ###############################################################################
 # Beginn
@@ -104,6 +108,8 @@ my $testopt=GetOptions(
            "extraclass" => \$extraclass,
            "student-home" => \$student_home,
            "all" => \$all,
+           "acl-snapshot=s" => \$acl_snapshot,
+           "acl-snapshot-diff=s" => \$acl_snapshot_diff,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-repair");
@@ -151,6 +157,12 @@ What to repair in the Filesystem:
 
   -- all                     (use all the above, top to bottom order)
 
+Tools to create a sort of snapshot of /srv/samba
+
+  --acl-snapshot <name>          (create acl snapshots in /var/lib/sophomorix/sophomorix-repair)
+  --acl-snapshot-diff <name>     (diff /srv/samba with acl snapshots in /var/lib/sophomorix/sophomorix-repair)
+
+
 Please see the sophomorix-repair(8) man pages for full documentation
 ');
    exit;
@@ -164,22 +176,21 @@ Please see the sophomorix-repair(8) man pages for full documentation
 &print_title("Asking the system for users ...");
 
 # fetch system data
-my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-                           root_dse=>$root_dse,
-                           root_dns=>$root_dns,
-                           computers=>"TRUE",
-                           rooms=>"FALSE",
-                           management=>"TRUE",
-                           adminclasses=>"FALSE",
-                           administratorclasses=>"TRUE",
-                           teacherclasses=>"FALSE",
-                           projects=>"TRUE",
-#                           examaccounts=>"TRUE",
-                           users=>"TRUE",
-                           dnszones=>"TRUE",
-                           dnsnodes=>"TRUE",
-                           sophomorix_config=>\%sophomorix_config,
-             });
+my ($ref_AD) = &AD_get_AD_for_repair({ldap=>$ldap,
+                                      root_dse=>$root_dse,
+                                      root_dns=>$root_dns,
+                                      computers=>"TRUE",
+                                      rooms=>"FALSE",
+                                      management=>"TRUE",
+                                      adminclasses=>"FALSE",
+                                      administratorclasses=>"TRUE",
+                                      teacherclasses=>"FALSE",
+                                      projects=>"TRUE",
+                                      users=>"TRUE",
+                                      dnszones=>"TRUE",
+                                      dnsnodes=>"TRUE",
+                                      sophomorix_config=>\%sophomorix_config,
+                                    });
 
 # --dump-AD
 if ($dump_AD==1){
@@ -370,6 +381,50 @@ if ($student_home==1) {
                          sophomorix_result=>\%sophomorix_result,
                         });
 }
+
+
+
+
+
+############################################################
+# acl snapshot stuff
+my $source=$sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT_SOURCE'};
+my $target=$sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT_TARGET'};
+my $target_file_find="find_result.txt";
+
+# --acl-snapshot
+if ($acl_snapshot ne ""){
+
+    &print_title("Start creating acl snapshot $acl_snapshot in $target");
+    my $snapshot_target=$target."/".$acl_snapshot;
+    system("mkdir -p $snapshot_target");
+    my $find_result=$snapshot_target."/".$target_file_find;
+    print "   * Saving snapshot to $snapshot_target\n";
+
+    # find
+    my $find_command="find $source > $find_result";
+    print "   * $find_command\n";
+    system ($find_command);
+    
+    # smbcacls
+    #open()
+
+
+    &print_title("End creating acl snapshot $acl_snapshot in $target");
+}
+
+
+
+# --acl-snapshot-diff
+if ($acl_snapshot_diff ne ""){
+    &print_title("Start diffing acl snapshot $acl_snapshot_diff from $sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT'}");
+
+
+    &print_title("End diffing acl snapshot $acl_snapshot_diff from $sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT'}");
+}
+
+
+
 
 
 

@@ -4291,7 +4291,7 @@ sub AD_get_AD_for_repair {
     if ($computers eq "TRUE"){
         # sophomorix computers from ldap
         my $filter="(& (objectClass=computer)(sophomorixRole=*) )";
-        print "Fixlter: $filter\n";
+        print "Filter: $filter\n";
         my $mesg = $ldap->search( # perform a search
                           base   => $root_dse,
                           scope => 'sub',
