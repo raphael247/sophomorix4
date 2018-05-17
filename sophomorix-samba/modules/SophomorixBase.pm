@@ -454,7 +454,6 @@ sub _console_print_devices {
             printf "|%-4s|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
                    $role_display,
                    $dns_node,
-#                   $ref_devices->{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
                    $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
                    $computer,
                    $adminclass,

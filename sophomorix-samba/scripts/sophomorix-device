@@ -849,7 +849,7 @@ foreach my $room (keys %{$devices_file{'room'}}) {
 
 
 # dnsNodes to kill
-foreach my $dns_node (keys %{$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
+foreach my $dns_node (keys %{$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}}) {
     if (not exists $devices_file{'dnsNode'}{$dns_node}){
         # host is not in file anymore
         &push_kill_dnsnode($dns_node);
@@ -860,11 +860,11 @@ foreach my $dns_node (keys %{$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_pr
 
 # dnsNodes to add
 foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
-    if (not exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node} ){
+    if (not exists $ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node} ){
         # nonexisting --> add account
         &push_add_dnsnode($dns_node);
-    } elsif (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node} ){
-        my $ip_system=$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'};
+    } elsif (exists $ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node} ){
+        my $ip_system=$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'};
         my $ip_file=$devices_file{'dnsNode'}{$dns_node};
         if ($ip_system ne $ip_file){
             # recreate dns entry
@@ -884,35 +884,35 @@ foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
 
 # dnsNodes to update
 foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
-    if (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}){
+    if (exists $ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}){
         my $update=0;
         # sophomorixAdminFile
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixAdminFile'} ne 
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixAdminFile'} ne 
             $devices_file{'device'}{$dns_node}{'FILENAME'}){
             $update++;
         }
         # sophomorixComment
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixComment'} ne 
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixComment'} ne 
             $devices_file{'device'}{$dns_node}{'sophomorixComment'}){
             $update++;
         }
         # sophomorixDnsNodename
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixDnsNodename'} ne 
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixDnsNodename'} ne 
             $devices_file{'device'}{$dns_node}{'sophomorixDnsNodename'}){
             $update++;
         }
         # sophomorixRole
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixRole'} ne 
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixRole'} ne 
             $devices_file{'device'}{$dns_node}{'sophomorixRole'}){
             $update++;
         }
         # sophomorixSchoolname
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixSchoolname'} ne 
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixSchoolname'} ne 
             $devices_file{'device'}{$dns_node}{'SCHOOL'}){
             $update++;
         }
         # sophomorixComputerIP
-        if ($ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'sophomorixComputerIP'} ne 
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixComputerIP'} ne 
             $devices_file{'device'}{$dns_node}{'IPv4'}){
             $update++;
         }
@@ -1425,9 +1425,9 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         &AD_dns_kill({ldap=>$ldap, 
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
-                      dns_zone=>$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'dnsZone'},
+                      dns_zone=>$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'dnsZone'},
                       dns_node=>$dns_node,
-                      dns_ipv4=>$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'},
+                      dns_ipv4=>$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
                       smb_pwd=>$smb_admin_pass,
                     });
         $dns_node_count++;

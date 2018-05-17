@@ -298,7 +298,6 @@ sub AD_dns_create_update {
     my @octets=split(/\./,$dns_ipv4);
     my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
     my $dns_last_octet=$octets[3];
-    my $dns_admin_description=$DevelConf::dns_node_prefix_string." from ".$filename;
 
     if($Conf::log_level>=1){
         print "\n";
@@ -4730,7 +4729,7 @@ sub AD_get_AD {
             my $base_hosts=$dn_dns_zone;
             my $res   = Net::DNS::Resolver->new;
             my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
-                             $DevelConf::dns_node_prefix_string.
+                             $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}.
                             "*))";
             $mesg = $ldap->search( # perform a search
                            base   => $base_hosts,
@@ -4754,17 +4753,17 @@ sub AD_get_AD {
                 }
                 my $record=$entry->get_value('dnsRecord');
                 my $desc=$entry->get_value('adminDescription');
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsNode'}=$dc;
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'dnsZone'}=$dns_zone;
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'IPv4'}=$ip;
-                $AD{'objectclass'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'adminDescription'}=$desc;
+                $AD{'objectclass'}{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsNode'}=$dc;
+                $AD{'objectclass'}{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsZone'}=$dns_zone;
+                $AD{'objectclass'}{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;
+                $AD{'objectclass'}{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'adminDescription'}=$desc;
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
                 if($Conf::log_level>=2){
                     print "   * $dc\n";
                 }
             }
             if (defined $dc){ 
-                $AD{'RESULT'}{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dc}{'COUNT'}=$max_node;
+                $AD{'RESULT'}{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'COUNT'}=$max_node;
 	    }
         }
         # sorting some lists
