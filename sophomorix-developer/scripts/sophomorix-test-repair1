@@ -6,11 +6,12 @@
 ############################################################
 # reset and repair
 sophomorix-supertest -s rp > /dev/null
-rm -rf /var/lib/sophomorix/sophomorix-repair
+rm -rf /var/lib/sophomorix/sophomrix-repair
 
 # add users with test1
 sophomorix-test-1 --cp-add > /dev/null
 sophomorix-add > /dev/null
+# ... more
 
 # create all schools (the wil be repaired otherwise)
 sophomorix-school --recreate-all-schools > /dev/null 
@@ -32,11 +33,11 @@ sophomorix-repair --acl-snapshot-diff test1-reference,test1-repaired-nodamage
 ############################################################
 # reset and repair
 sophomorix-supertest -s rp > /dev/null
-rm -rf /var/lib/sophomorix/sophomorix-repair
-
+rm -rf /var/lib/sophomorix/sophomrix-repair
 # add users with test1
 sophomorix-test-1 --cp-add > /dev/null
 sophomorix-add > /dev/null
+# ... more
 
 # create all schools (the wil be repaired otherwise)
 sophomorix-school --recreate-all-schools > /dev/null 

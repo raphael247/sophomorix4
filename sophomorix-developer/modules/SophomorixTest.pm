@@ -45,6 +45,7 @@ $Data::Dumper::Terse = 1;
             AD_get_samaccountname
             cat_wcl_test
             smbcquotas_test
+            diff_acl_snapshot
             );
 
 
@@ -1306,12 +1307,14 @@ sub file_test_chars {
 
 sub run_command {
     my ($command) = @_;
+    my $return_value=666;
     print "\n";
     print "######################################################################\n";
     print "$command\n";
     print "######################################################################\n";
-    system("$command");
+    $return_value=system("$command");
     print "######################################################################\n";
+    return $return_value;
 }
 
 
@@ -1329,6 +1332,40 @@ sub cat_wcl_test {
     my $count=`$command`;
     chomp($count);
     is ($count,$expect,"  * $count results for \"$grep\" in $abs");
+}
+
+
+
+sub diff_acl_snapshot {
+    my ($file,$snapshot1,$snapshot2)=@_;
+    print "Running diff command:\n";
+    my $command="/usr/bin/diff /var/lib/sophomorix/sophomrix-repair/".$snapshot1."/".$file.
+                             " /var/lib/sophomorix/sophomrix-repair/".$snapshot2."/".$file;
+
+    print "$command\n";
+    my $stdout=`$command`;
+    my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+
+    # Test for return Value
+    is ($return,0,"  * Diff returned 0 (file is identical)");
+
+    # Test output
+    my $output_lines;
+    if ($stdout eq ""){
+        $output_lines=0;
+    } else {
+        my (@lines)=split(/\n/,$stdout);
+        $output_lines=$#lines+1;
+    }
+    is ($output_lines,0,"  * Diff output line number is 0 (file is identical)");
+
+    # display output nicely when not 0 lines
+    if ($output_lines>0){
+        print "####### diff output (start) #####################################################\n";
+        print $stdout;
+        print "####### diff output (end)   #####################################################\n";
+    }
+
 }
 
 

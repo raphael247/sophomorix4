@@ -30,20 +30,23 @@ Preparation:
   -s rp    reset+prepare 
 
 Run tests:
-  -s all   reset an run all tests
+  -s all    reset an run all tests
 
-  -s 1     reset samba and run sophomorix-test-1
-  -s 2     reset samba and run sophomorix-test-2
-  -s 3     reset samba and run sophomorix-test-3
-  -s 4     reset samba and run sophomorix-test-4
-  -s 5     reset samba and run sophomorix-test-5
-  -s w     reset samba and run sophomorix-test-workflow
-  -s er    reset samba and run sophomorix-test-errorfiles
-  -s ex    reset samba and run sophomorix-test-exammode
+  -s 1      reset samba and run sophomorix-test-1
+  -s 2      reset samba and run sophomorix-test-2
+  -s 3      reset samba and run sophomorix-test-3
+  -s 4      reset samba and run sophomorix-test-4
+  -s 5      reset samba and run sophomorix-test-5
+  -s w      reset samba and run sophomorix-test-workflow
+  -s er     reset samba and run sophomorix-test-errorfiles
+  -s ex     reset samba and run sophomorix-test-exammode
 
-  -o j    run tests with option -j
-  -o jj   run tests with option -jj
-  -o vv   run tests with option -vv
+  -s rep1   reset samba and run sophomorix-test-repair1
+  -s rep2   reset samba and run sophomorix-test-repair2
+
+  -o j     run tests with option -j
+  -o jj    run tests with option -jj
+  -o vv    run tests with option -vv
 ');
    print "\n";
    exit;
@@ -91,6 +94,10 @@ if ($script eq "r"){
     @scriptlist=("sophomorix-test-errorfiles $option ");
 } elsif ($script eq "ex"){
     @scriptlist=("sophomorix-test-exammode $option ");
+} elsif ($script eq "rep1"){
+    @scriptlist=("sophomorix-test-repair1 $option ");
+} elsif ($script eq "rep2"){
+    @scriptlist=("sophomorix-test-repair2 $option ");
 }
 
 
