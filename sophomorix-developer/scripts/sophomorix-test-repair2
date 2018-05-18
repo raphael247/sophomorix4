@@ -53,9 +53,9 @@ my $dev_null="";
 &run_command("sophomorix-repair --all $dev_null");
 &run_command("sophomorix-repair --acl-snapshot test2-repaired-nodamage $dev_null");
 
-&run_command("echo 'Diff after sophomorix-test-2 (step1) nodamage repair'");
-&run_command("sophomorix-repair --acl-snapshot-diff test2-reference,test2-repaired-nodamage");
-
+# tests
+&diff_acl_snapshot("find-result.txt","test2-reference","test2-repaired-nodamage");
+&diff_acl_snapshot("acl-snapshot.txt","test2-reference","test2-repaired-nodamage");
 
 
 ############################################################
