@@ -525,6 +525,8 @@ sub AD_repdir_using_file {
     my @schools=("");
     if (defined $school){
         @schools=($school);
+    } else {
+
     }
 
     # reading repdir file
@@ -571,15 +573,14 @@ sub AD_repdir_using_file {
             }
         }
         if (/\$directory_management/) {
-            #$group_type="admins";
-	    print "HEREGO\n";
-            # wehen $directory_management is followed by @@USER@@ a group is needed:
+            # when $directory_management is followed by @@USER@@ a group is needed:
             # repdir.globaladministrator_home --> global-admins
             # repdir.schooladministrator_home --> admins
             if ($repdir_file eq "repdir.schooladministrator_home"){
                 $group_type="admins";
             } elsif ($repdir_file eq "repdir.globaladministrator_home"){
                 $group_type="global-admins";
+                @schools = ($ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'});
             } else {
                 $group_type="admins";
                 print "WARNING: This else was not expected: $repdir_file\n";
@@ -590,9 +591,6 @@ sub AD_repdir_using_file {
         if (not defined $ntaclonly){
             $ntaclonly="";            
         }
-
-	    print "HERE1: $repdir_file --> grouptype in school $school is $group_type\n";
-
 
         # replacing $vars in path
         my @old_dirs=split(/\//,$path_with_var);
@@ -670,6 +668,8 @@ sub AD_repdir_using_file {
             } elsif(defined $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'groups_BY_sophomorixType'}{$group_type}){
                 # there is a group list -> use it
                 @groups=@{ $ref_AD->{'LISTS'}{'BY_SCHOOL'}{$school}{'groups_BY_sophomorixType'}{$group_type} };
+            } elsif ($group_type eq "global-admins"){
+                @groups=("global-admins");
             } else {
                 @groups=("");
             }
@@ -701,7 +701,6 @@ sub AD_repdir_using_file {
 
                 ########################################
                 # user loop start
-		print "HERE: Userloop with group $group\n";
                 my @users=("");
                 if ($path_after_group=~/\@\@USER\@\@/) {
                     # determining list of users
@@ -734,9 +733,15 @@ sub AD_repdir_using_file {
 	            }
                     if ($entry_type eq "SMB"){
                         # smbclient
+                        my $share;
+                        if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+                            $share=$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
+                        } else {
+                            $share=$school;
+                        }
                         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                                               " -U ".$DevelConf::sophomorix_file_admin."%'".
-                                              $smb_admin_pass."'"." //$root_dns/$school -c 'mkdir $path_after_user_smb'";
+                                              $smb_admin_pass."'"." //$root_dns/$share -c 'mkdir $path_after_user_smb'";
                         my $user_typeout;
                         if ($user eq ""){
                             $user_typeout="<none>";
@@ -748,7 +753,7 @@ sub AD_repdir_using_file {
                         } else {
                             $group_typeout=$group;
                         }
-                        print "\nUser: $user_typeout in group $group_typeout in school $school\n";
+                        print "\nUser: $user_typeout in group $group_typeout in school $school (SHARE: $share)\n";
                         print "---------------------------------------------------------------\n";
                         if ($ntaclonly ne "ntaclonly"){
                             print "* $smbclient_command\n";
@@ -761,7 +766,7 @@ sub AD_repdir_using_file {
                         &Sophomorix::SophomorixBase::NTACL_set_file({root_dns=>$root_dns,
                                                                      user=>$user,
                                                                      group=>$group,
-                                                                     school=>$school,
+                                                                     school=>$share,
                                                                      ntacl=>$ntacl,
                                                                      smbpath=>$path_after_user_smb,
                                                                      smb_admin_pass=>$smb_admin_pass,
