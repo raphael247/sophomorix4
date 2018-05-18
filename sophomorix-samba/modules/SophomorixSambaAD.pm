@@ -3859,8 +3859,282 @@ sub AD_get_sessions {
 }
 
 
-
 sub AD_get_AD_for_repair {
+    my %AD=();
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    {
+        # sophomorixType adminclass/extraclass from ldap
+        my $filter="(& (objectClass=group) (| ".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'EXTRACLASS'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINCLASS'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'TEACHERCLASS'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ADMINS'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ALLADMINS'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'POWERGROUP'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'PROJECT'}.")".
+           "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}.")".
+           " ) )";
+        
+        print "FILTER: $filter\n";
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => $filter,
+                       attrs => ['sAMAccountName',
+                                 'sophomorixSchoolname',
+                                 'sophomorixStatus',
+                                 'sophomorixType',
+                                ]);
+        my $max_adminclass = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title(
+            "$max_adminclass sophomorix adminclasses found in AD");
+        $AD{'RESULT'}{'group'}{'class'}{'COUNT'}=$max_adminclass;
+        for( my $index = 0 ; $index < $max_adminclass ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+##            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+#            $AD{'objectclass'}{'group'}{$type}{$sam}{'room'}=$sam;
+##            $AD{'objectclass'}{'group'}{$type}{$sam}{'sophomorixStatus'}=$stat;
+#            $AD{'objectclass'}{'group'}{$type}{$sam}{'sophomorixType'}=$type;
+#            $AD{'objectclass'}{'group'}{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            # lists
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+            if($Conf::log_level>=2){
+                print "   * $sam\n";
+            }
+#            $AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
+        }
+    }
+# ($users eq "TRUE"){
+    {
+        # sophomorix students,teachers, ... from ldap
+        my $filter="(&(objectClass=user)(|(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'GLOBALADMINISTRATOR'}.")(sophomorixRole=".
+           $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'SCHOOLADMINISTRATOR'}.")))";
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => $filter,
+                       attrs => ['sAMAccountName',
+                                 'sophomorixAdminClass',
+                                 'givenName',
+                                 'sn',
+                                 'sophomorixFirstnameASCII',
+                                 'sophomorixSurnameASCII',
+                                 'sophomorixBirthdate',
+                                 'sophomorixStatus',
+                                 'sophomorixSchoolname',
+                                 'sophomorixSchoolPrefix',
+                                 'sophomorixAdminFile',
+                                 'sophomorixTolerationDate',
+                                 'sophomorixDeactivationDate',
+                                 'sophomorixUnid',
+                                 'sophomorixRole',
+                                 'userAccountControl',
+                                ]);
+        my $max_user = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_user sophomorix students found in AD");
+        $AD{'RESULT'}{'user'}{'student'}{'COUNT'}=$max_user;
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+
+
+
+            # my $role=$entry->get_value('sophomorixRole');
+            # my $adminclass=$entry->get_value('sophomorixAdminClass');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminClass'}=$adminclass;
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}=
+            #     $entry->get_value('sophomorixFirstnameASCII');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}=
+            #     $entry->get_value('sophomorixSurnameASCII');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'givenName'}=
+            #     $entry->get_value('givenName');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sn'}=
+            #     $entry->get_value('sn');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'}=
+            #     $entry->get_value('sophomorixBirthdate');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixStatus'}=
+            #     $entry->get_value('sophomorixStatus');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSchoolname'}=
+            #     $entry->get_value('sophomorixSchoolname');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixPrefix'}=
+            #     $entry->get_value('sophomorixPrefix');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixAdminFile'}=
+            #     $entry->get_value('sophomorixAdminFile');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixTolerationDate'}=
+            #     $entry->get_value('sophomorixTolerationDate');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixDeactivationDate'}=
+            #     $entry->get_value('sophomorixDeactivationDate');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixUnid'}=
+            #     $entry->get_value('sophomorixUnid');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixRole'}=
+            #     $entry->get_value('sophomorixRole');
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'userAccountControl'}=
+            #     $entry->get_value('userAccountControl');
+
+            # # calculate identifiers
+            # my $identifier_ascii=
+            #    $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}
+            #    .";".
+            #    $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}
+            #    .";".
+            #    $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+            # my $identifier_utf8=
+            #    $AD{'objectclass'}{'user'}{$role}{$sam}{'sn'}
+            #    .";".
+            #    $AD{'objectclass'}{'user'}{$role}{$sam}{'givenName'}
+            #    .";".
+            #    $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
+            # $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+            # # new: by sam
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=
+            #     $entry->get_value('sophomorixAdminClass');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=
+            #     $entry->get_value('sophomorixFirstnameASCII');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=
+            #     $entry->get_value('sophomorixSurnameASCII');
+            # $AD{'sAMAccountName'}{$sam}{'givenName'}=
+            #     $entry->get_value('givenName');
+            # $AD{'sAMAccountName'}{$sam}{'sn'}=
+            #     $entry->get_value('sn');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=
+            #     $entry->get_value('sophomorixBirthdate');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=
+            #     $entry->get_value('sophomorixStatus');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=
+            #     $entry->get_value('sophomorixSchoolname');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixPrefix'}=
+            #     $entry->get_value('sophomorixPrefix');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=
+            #     $entry->get_value('sophomorixAdminFile');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=
+            #     $entry->get_value('sophomorixTolerationDate');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=
+            #     $entry->get_value('sophomorixDeactivationDate');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=
+            #     $entry->get_value('sophomorixUnid');
+            # $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=
+            #     $entry->get_value('sophomorixRole');
+            # $AD{'sAMAccountName'}{$sam}{'userAccountControl'}=
+            #     $entry->get_value('userAccountControl');
+            # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+            # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+            # # lookup
+            # if ($entry->get_value('sophomorixUnid') ne "---"){
+            #     # no lookup for unid '---'
+            #     $AD{'LOOKUP'}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
+            #     $AD{'LOOKUP'}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+            #         $identifier_utf8;
+            #     $AD{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+            #         $identifier_ascii;
+            # }
+            # $AD{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
+            # $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
+            # $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+            # $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_utf8'}{$identifier_utf8}=$entry->get_value('sophomorixStatus');
+            # $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
+
+            # # lists
+            # push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            # push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam;
+
+#             my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$adminclass};
+
+
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
+                       {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
+#            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
+#                       {'users_BY_sophomorixType'}{$type} }, $sam;  
+        }
+        # sorting some lists
+
+
+
+    }
+
+# ($computers eq "TRUE"){
+
+    {
+        # sophomorix computers from ldap
+        my $filter="(& (objectClass=computer)(sophomorixRole=*) )";
+        #print "Filter: $filter\n";
+        my $mesg = $ldap->search( # perform a search
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attrs => ['sAMAccountName',
+                                    'sophomorixSchoolPrefix',
+                                    'sophomorixSchoolname',
+                                    'sophomorixAdminFile',
+                                    'sophomorixAdminClass',
+                                    'sophomorixRole',
+                                    'sophomorixDnsNodename',
+                                  ]);
+        my $max_user = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_user Computers found in AD");
+        $AD{'RESULT'}{'computer'}{'computer'}{'COUNT'}=$max_user;
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $sam=$entry->get_value('sAMAccountName');
+            # my $prefix=$entry->get_value('sophomorixSchoolPrefix');
+            # my $role=$entry->get_value('sophomorixRole');
+            # my $sn=$entry->get_value('sophomorixSchoolname');
+            # my $file=$entry->get_value('sophomorixAdminFile');
+            # $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
+            # $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixRole'}=$role;
+            # $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
+            # $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
+            # $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixDnsNodename'}=
+            #     $entry->get_value('sophomorixDnsNodename');
+            # $AD{'objectclass'}{'computer'}{'computer'}{$sam}{'sophomorixAdminClass'}=
+            #     $entry->get_value('sophomorixAdminClass');
+            # # lists
+            # push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            # push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$sn}{'users_BY_sophomorixRole'}{$entry->get_value('sophomorixRole')} }, $sam; 
+            # if($Conf::log_level>=2){
+            #     print "   * $sam\n";
+            # }
+
+#            $AD{'LOOKUP'}{'sophomorixDnsNodename_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixDnsNodename');
+#            $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
+
+            push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}
+                       {'users_BY_group'}{$entry->get_value('sophomorixAdminClass')} }, $sam;  
+
+#            my $type=$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$entry->get_value('sophomorixAdminClass')};
+#            if (not defined $type){
+#    	        print "\nWARNING: Group ".$entry->get_value('sophomorixAdminClass').
+#                " without type (a device account without a group??)\n\n";
+#            } else {
+#                # there is a group for the user
+#                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$entry->get_value('sophomorixSchoolname')}{'users_BY_sophomorixType'}{$type} }, 
+#                $sam;  
+#            }
+        }
+
+
+
+    }
+
+    #print Dumper (\%AD);
+    return(\%AD);
+}
+
+
+sub AD_get_AD_for_repair_old {
     my %AD=();
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -4166,7 +4440,7 @@ sub AD_get_AD_for_repair {
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixSurnameASCII'}
                .";".
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixFirstnameASCII'}
-               .";".
+	    .";".
                $AD{'objectclass'}{'user'}{$role}{$sam}{'sophomorixBirthdate'};
             $AD{'objectclass'}{'user'}{$role}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
             my $identifier_utf8=

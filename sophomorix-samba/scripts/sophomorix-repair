@@ -176,21 +176,28 @@ Please see the sophomorix-repair(8) man pages for full documentation
 &print_title("Asking the system for users ...");
 
 # fetch system data
+#my ($ref_AD) = &AD_get_AD_for_repair({ldap=>$ldap,
+#                                      root_dse=>$root_dse,
+#                                      root_dns=>$root_dns,
+#                                      computers=>"TRUE",
+#                                      rooms=>"FALSE",
+#                                      management=>"TRUE",
+#                                      adminclasses=>"FALSE",
+#                                      administratorclasses=>"TRUE",
+#                                      teacherclasses=>"FALSE",
+#                                      projects=>"TRUE",
+#                                      users=>"TRUE",
+#                                      dnszones=>"TRUE",
+#                                      dnsnodes=>"TRUE",
+#                                      sophomorix_config=>\%sophomorix_config,
+#                                    });
 my ($ref_AD) = &AD_get_AD_for_repair({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
-                                      computers=>"TRUE",
-                                      rooms=>"FALSE",
-                                      management=>"TRUE",
-                                      adminclasses=>"FALSE",
-                                      administratorclasses=>"TRUE",
-                                      teacherclasses=>"FALSE",
-                                      projects=>"TRUE",
-                                      users=>"TRUE",
-                                      dnszones=>"TRUE",
-                                      dnsnodes=>"TRUE",
                                       sophomorix_config=>\%sophomorix_config,
                                     });
+#print Dumper ($ref_AD);
+#exit;
 
 # --dump-AD
 if ($dump_AD==1){
