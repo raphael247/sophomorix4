@@ -80,10 +80,13 @@ my $extraclass=0;
 my $student_home=0;
 my $all=0;
 
+# fs snapshot stuff
+my $fs_snapshot="";
+my $fs_snapshot_diff="";
+
 # acl snapshot stuff
 my $acl_snapshot="";
 my $acl_snapshot_diff="";
-
 
 ###############################################################################
 # Beginn
@@ -110,6 +113,8 @@ my $testopt=GetOptions(
            "all" => \$all,
            "acl-snapshot=s" => \$acl_snapshot,
            "acl-snapshot-diff=s" => \$acl_snapshot_diff,
+           "fs-snapshot=s" => \$fs_snapshot,
+           "fs-snapshot-diff=s" => \$fs_snapshot_diff,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-repair");
@@ -159,8 +164,12 @@ What to repair in the Filesystem:
 
 Tools to create a sort of snapshot of /srv/samba
 
+  --fs-snapshot <name>                (create filesystem snapshot <name> in /var/lib/sophomorix/sophomorix-repair)
+  --fs-snapshot-diff <name1>,<name2>  (diff <name1> and <name2> filesystem snapshot)
+
+  acl snapshots include fs snapshots:
   --acl-snapshot <name>               (create acl snapshot <name> in /var/lib/sophomorix/sophomorix-repair)
-  --acl-snapshot-diff <name1>,<name2> (diff <name1> and <name2> snapshot)
+  --acl-snapshot-diff <name1>,<name2> (diff <name1> and <name2> acl snapshot)
 
 
 Please see the sophomorix-repair(8) man pages for full documentation
@@ -401,10 +410,16 @@ my $target_file_find="find-result.txt";
 my $target_file_acl="acl-snapshot.txt";
 
 # --acl-snapshot
-if ($acl_snapshot ne ""){
+if ($fs_snapshot ne "" or $acl_snapshot ne ""){
+    my $snapshot;
+    if ($acl_snapshot ne ""){
+        $snapshot=$acl_snapshot;
+    } elsif ($fs_snapshot ne ""){
+        $snapshot=$fs_snapshot;
+    }
 
-    &print_title("Start creating acl snapshot $acl_snapshot in $target");
-    my $snapshot_target=$target."/".$acl_snapshot;
+    &print_title("Start creating acl snapshot $snapshot in $target");
+    my $snapshot_target=$target."/".$snapshot;
     system("mkdir -p $snapshot_target");
     my $find_result=$snapshot_target."/".$target_file_find;
     my $find_result_acl=$snapshot_target."/".$target_file_acl;
@@ -423,24 +438,26 @@ if ($acl_snapshot ne ""){
     my $max_count =`cat $find_result | wc -l`;
     chomp($max_count);
 
-    open(FIND,$find_result);
-    while(<FIND>){
-	$count++;
-        chomp();
-        my $dir=$_;
-        print "$count/$max_count) $dir:\n";
-        my $command="/usr/sbin/sophomorix-cacls $dir --append-to-file $find_result_acl 1>/dev/null";
-        print "  * $command\n";
-        system($command);
+    if ($acl_snapshot ne ""){
+        open(FIND,$find_result);
+        while(<FIND>){
+	    $count++;
+            chomp();
+            my $dir=$_;
+            print "$count/$max_count) $dir:\n";
+            my $command="/usr/sbin/sophomorix-cacls $dir --append-to-file $find_result_acl 1>/dev/null";
+            print "  * $command\n";
+            system($command);
+        }
+        close(FIND);
     }
-    close(FIND);
-    &print_title("End creating acl snapshot $acl_snapshot in $target");
+    &print_title("End creating acl snapshot $snapshot in $target");
 }
 
 
 
 # --acl-snapshot-diff
-if ($acl_snapshot_diff ne ""){
+if ($fs_snapshot_diff ne "" or $acl_snapshot_diff ne ""){
     my $line="----------------------------------------------------------------------\n";
     my ($name1,$name2)=split(/,/,$acl_snapshot_diff);
     my $abs_name1=$sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT_TARGET'}."/".$name1;
@@ -456,14 +473,16 @@ if ($acl_snapshot_diff ne ""){
     print $line;
     system($diff_find_command);
 
-    # acl diff
-    my $file1_acl=$abs_name1."/".$target_file_acl;
-    my $file2_acl=$abs_name2."/".$target_file_acl;
-    my $diff_acl_command="diff $file1_acl $file2_acl";
-    print $line;
-    print " $diff_acl_command\n";
-    print $line;
-    system($diff_acl_command);
+    if ($acl_snapshot_diff ne ""){
+        # acl diff
+        my $file1_acl=$abs_name1."/".$target_file_acl;
+        my $file2_acl=$abs_name2."/".$target_file_acl;
+        my $diff_acl_command="diff $file1_acl $file2_acl";
+        print $line;
+        print " $diff_acl_command\n";
+        print $line;
+        system($diff_acl_command);
+    }
 
     &print_title("End diffing $name1 <-> $name2 in $sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT_TARGET'}");
 }
