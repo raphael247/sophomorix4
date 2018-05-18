@@ -2624,7 +2624,7 @@ sub config_sophomorix_read {
         my $Type;
         if ($file eq "."){next};
         if ($file eq ".."){next};
-        $sophomorix_config{'REPDIR_FILES'}{$file}=$abs_path;
+        $sophomorix_config{'REPDIR_FILES'}{$file}{'PATH_ABS'}=$abs_path;
     }
     closedir REPDIR;
 

@@ -516,7 +516,7 @@ sub AD_repdir_using_file {
     my $student_home = $arg_ref->{student_home};
 
     # abs path
-    my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file};
+    my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file}{'PATH_ABS'};
     my $entry_num=0; # was $num
     my $line_num=0;
     &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file (start)");
@@ -571,14 +571,28 @@ sub AD_repdir_using_file {
             }
         }
         if (/\$directory_management/) {
-            $group_type="admins";
-            # go through one group loop for admins
+            #$group_type="admins";
+	    print "HEREGO\n";
+            # wehen $directory_management is followed by @@USER@@ a group is needed:
+            # repdir.globaladministrator_home --> global-admins
+            # repdir.schooladministrator_home --> admins
+            if ($repdir_file eq "repdir.schooladministrator_home"){
+                $group_type="admins";
+            } elsif ($repdir_file eq "repdir.globaladministrator_home"){
+                $group_type="global-admins";
+            } else {
+                $group_type="admins";
+                print "WARNING: This else was not expected: $repdir_file\n";
+            }
         }
 
         my ($entry_type,$path_with_var, $owner, $groupowner, $permission,$ntacl,$ntaclonly) = split(/::/,$line);
         if (not defined $ntaclonly){
             $ntaclonly="";            
         }
+
+	    print "HERE1: $repdir_file --> grouptype in school $school is $group_type\n";
+
 
         # replacing $vars in path
         my @old_dirs=split(/\//,$path_with_var);
@@ -687,6 +701,7 @@ sub AD_repdir_using_file {
 
                 ########################################
                 # user loop start
+		print "HERE: Userloop with group $group\n";
                 my @users=("");
                 if ($path_after_group=~/\@\@USER\@\@/) {
                     # determining list of users
