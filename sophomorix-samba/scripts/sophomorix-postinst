@@ -6,7 +6,7 @@
 
 # modules
 use strict;
-
+use Sophomorix::SophomorixConfig;
 my $conf_dir="/etc/linuxmuster/sophomorix";
 my $conf_file=$conf_dir."/sophomorix.conf";
 my $conf_file_source="/usr/share/sophomorix/config-templates/sophomorix.conf.template.ini";
@@ -17,7 +17,9 @@ print "\n";
 print "* Testing $conf_file\n";
 # create directory
 system "mkdir -p $conf_dir";
-# copy the default sophomorix.conf
+######################################################################
+# copy the default sophomorix.conf if nonexisting
+######################################################################
 if (-e $conf_file){
     # do nothing
     print "   * File exists, no installation:\n";
@@ -29,12 +31,16 @@ if (-e $conf_file){
     system("install -oroot -groot --mode=0644 $conf_file_source $conf_file");    
 }
 
-# without option
+
+######################################################################
+# copy the school.conf 
+######################################################################
+# defaults without options in sophomorix-postinst 
 my $school="default-school";
 my $school_dir=$conf_dir."/".$school;
 my $school_file=$school_dir."/school.conf";
 
-# option given, modify 
+# option given, modify the schoolname
 if (defined $ARGV[0] and ($ARGV[0] eq "global" or $ARGV[0] eq "linuxmuster-global")){
     print " \nERROR: You cannot create a school with the name $ARGV[0]\n\n\n";
     exit;
@@ -63,7 +69,41 @@ if (-e $school_file){
 }
 
 
+######################################################################
+# update the schema (If the schema is not there --> DO NOTHING)
+######################################################################
 
+# testing if schema exists 
+print "\n";
+print "* Testing for sophomorix schema update\n";
+my $ldbsearch_command="ldbsearch -H /var/lib/samba/private/sam.ldb ".
+                      "-b CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local ".
+                      "rangeUpper | grep rangeUpper";
+#print "$ldbsearch_command\n";
+my $stdout=`$ldbsearch_command`;
+my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+#print "RESULT: $return   $stdout\n";
+if ($return==0){
+    my $version=$stdout;
+    $version=~s/rangeUpper//;
+    $version=~s/://;
+    $version=~s/\s+$//g;# remove trailing whitespace
+    $version=~s/^\s+//g;# remove leading whitespace
+    print "   * Installed Sophomorix-Schema-Version: <$version>\n";
+    print "   * Target    Sophomorix-Schema-Version: <$DevelConf::sophomorix_schema_version>\n";
+    if ($DevelConf::sophomorix_schema_version eq $version){
+        print "   * No sophomorix schema update needed\n";
+    } else {
+       
+       for( my $number = $version+1 ; $number < $DevelConf::sophomorix_schema_version+1 ; $number++) {
+           print "      * Running update to Sophomorix-Schema-Version $number\n"
+           # code goes here to run update script ????????
+       }
+    }
+
+} else {
+    print "Something went wrong retrieving Sophomorix-Schema-Version\n";
+}
 
 print "\n";
 print "##### sophomorix-postinst end #####\n";
