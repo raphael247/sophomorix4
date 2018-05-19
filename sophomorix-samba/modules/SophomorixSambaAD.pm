@@ -227,22 +227,38 @@ sub AD_bind_admin {
         print "Testing if the Sophomorix Schema exists (Sophomorix-User)...\n";
     }
 
-    my $base="CN=Sophomorix-User,CN=Schema,CN=Configuration,".$root_dse;
-    my $filter="(cn=Sophomorix-User)";
+
+#    my $base="CN=Sophomorix-User,CN=Schema,CN=Configuration,".$root_dse;
+#    my $filter="(cn=Sophomorix-User)";
+
+#    my $base="CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,".$root_dse;
+    my $base="CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,".$root_dse;
+    my $filter="(cn=sophomorix-Schema-Version)";
     my $mesg2 = $ldap->search(
                        base   => $base,
                        scope => 'base',
                        filter => $filter,
+                       attrs => ['rangeUpper']
                             );
     my $res = $mesg2->count; 
     if ($res!=1){
-            print "   * ERROR: Sophomorix-Schema nonexisting\n";
+            print "   * ERROR: Sophomorix-Schema-Version nonexisting\n";
         exit;
     } elsif ($res==1){
+        my $entry = $mesg2->entry(0);
+        my $version=$entry->get_value('rangeUpper');
         if($Conf::log_level>=2){
-            print "   * Sophomorix-Schema exists\n";
+            print "   * Sophomorix-Schema exists  (SophomorixSchemaVersion=$version)\n";
+        }
+        if (not $version==$DevelConf::sophomorix_schema_version){
+            print "\n   * ERROR: Sophomorix-Schema-Version $version is not the required verson: ",
+                  "$DevelConf::sophomorix_schema_version\n\n";
+            exit;
+        } else {
+            print "OK: SophomorixSchemaVersion $version matches required Version $DevelConf::sophomorix_schema_version\n";
         }
     }
+
     return ($ldap,$root_dse);
 }
 
