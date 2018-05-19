@@ -43,6 +43,10 @@ Run tests:
 
   -s rep1   reset samba and run sophomorix-test-repair1
   -s rep2   reset samba and run sophomorix-test-repair2
+  -s rep3   reset samba and run sophomorix-test-repair3
+  -s rep4   reset samba and run sophomorix-test-repair4
+  -s rep5   reset samba and run sophomorix-test-repair5
+
 
   -o j     run tests with option -j
   -o jj    run tests with option -jj
@@ -98,6 +102,12 @@ if ($script eq "r"){
     @scriptlist=("sophomorix-test-repair1 $option ");
 } elsif ($script eq "rep2"){
     @scriptlist=("sophomorix-test-repair2 $option ");
+} elsif ($script eq "rep3"){
+    @scriptlist=("sophomorix-test-repair3 $option ");
+} elsif ($script eq "rep4"){
+    @scriptlist=("sophomorix-test-repair4 $option ");
+} elsif ($script eq "rep5"){
+    @scriptlist=("sophomorix-test-repair5 $option ");
 }
 
 
