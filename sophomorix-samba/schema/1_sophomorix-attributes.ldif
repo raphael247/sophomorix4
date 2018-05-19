@@ -2,6 +2,33 @@
 # Sophomorix AD Schema: Attributes
 #
 
+# <-- Schema Version attribute -->
+# the value of rangeUpper is the version number (Initially: 1)
+# Updates increase this number, step by step
+
+dn: CN=Sophomorix-Schema-Version,<SchemaContainerDN>
+changetype: add
+adminDisplayName: Sophomorix-Schema-Version
+attributeID: 1.3.6.1.4.1.47512.1.1.80
+attributeSyntax: 2.5.5.12
+cn: Sophomorix-Schema-Version
+distinguishedName: CN=Sophomorix-Schema-Version,<SchemaContainerDN>
+instanceType: 4
+isMemberOfPartialAttributeSet: TRUE
+isSingleValued: TRUE
+lDAPDisplayName: sophomorixSchemaVersion
+name: Sophomorix-Schema-Version
+objectCategory: CN=Attribute-Schema,<SchemaContainerDN>
+objectClass: top
+objectClass: attributeSchema
+oMSyntax: 64
+schemaIDGUID:: +pu7ipWIRQryzTdGfreiEg==
+showInAdvancedViewOnly: TRUE
+searchFlags: 1
+systemOnly: FALSE
+rangeUpper: 1
+
+
 # <-- User attributes -->
 
 dn: CN=Sophomorix-Unique-ID,<SchemaContainerDN>
