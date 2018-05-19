@@ -31,42 +31,42 @@ my $dev_null="";
 
 
 ############################################################
-# test5 nodamage
+# test3 nodamage
 ############################################################
 # reset and repair
 #sophomorix-supertest -s rp $dev_null
 &run_command("rm -rf /var/lib/sophomorix/sophomrix-repair");
 
 
-# add admins with test5
-&run_command("sophomorix-test-5 --add-admin $dev_null");
+# add users/projects with test3
+&run_command("sophomorix-test-3 --add-pro $dev_null");
 # ... more
 
 # create all schools (the wil be repaired otherwise)
 &run_command("sophomorix-school --recreate-all-schools $dev_null"); 
 
 # save this (unrepaired state)
-&run_command("sophomorix-repair --acl-snapshot test5-reference $dev_null");
+&run_command("sophomorix-repair --acl-snapshot test3-reference $dev_null");
 
 # test if repair adds unnecessary stuff
 &run_command("sophomorix-repair --all $dev_null");
-&run_command("sophomorix-repair --acl-snapshot test5-repaired-nodamage $dev_null");
+&run_command("sophomorix-repair --acl-snapshot test3-repaired-nodamage $dev_null");
 
 # tests
-&diff_acl_snapshot("find-result.txt","test5-reference","test5-repaired-nodamage");
-&diff_acl_snapshot("acl-snapshot.txt","test5-reference","test5-repaired-nodamage");
+&diff_acl_snapshot("find-result.txt","test3-reference","test3-repaired-nodamage");
+&diff_acl_snapshot("acl-snapshot.txt","test3-reference","test3-repaired-nodamage");
 
 
 
 ############################################################
-# test5 full damage
+# test3 full damage
 ############################################################
 # reset and repair
 &run_command("sophomorix-supertest -s rp $dev_null");
 &run_command("rm -rf /var/lib/sophomorix/sophomrix-repair");
 
-# add admins with test5
-&run_command("sophomorix-test-5 --add-admin $dev_null");
+# add users/projecs with test3
+&run_command("sophomorix-test-3 --add-pro $dev_null");
 
 # ... more
 
@@ -74,7 +74,7 @@ my $dev_null="";
 &run_command("sophomorix-school --recreate-all-schools $dev_null"); 
 
 # save this (unrepaired state)
-&run_command("sophomorix-repair --acl-snapshot test5-reference $dev_null");
+&run_command("sophomorix-repair --acl-snapshot test3-reference $dev_null");
 
 # full damage
 &run_command("rm -rf /srv/samba");
@@ -84,9 +84,9 @@ my $dev_null="";
 # recreate the schools (would be missing otherwise)
 &run_command("sophomorix-school --recreate-all-schools $dev_null"); 
 
-&run_command("sophomorix-repair --acl-snapshot test5-repaired-fulldamage $dev_null");
+&run_command("sophomorix-repair --acl-snapshot test3-repaired-fulldamage $dev_null");
 
 
 # tests
-&diff_acl_snapshot("find-result.txt","test5-reference","test5-repaired-fulldamage");
-&diff_acl_snapshot("acl-snapshot.txt","test5-reference","test5-repaired-fulldamage");
+&diff_acl_snapshot("find-result.txt","test3-reference","test3-repaired-fulldamage");
+&diff_acl_snapshot("acl-snapshot.txt","test3-reference","test3-repaired-fulldamage");
