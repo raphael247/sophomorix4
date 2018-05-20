@@ -222,15 +222,15 @@ sub reset_smb {
     system("samba-tool domain passwordsettings set --complexity=default");
     system("samba-tool domain passwordsettings set --min-pwd-length=default");
     # removing old log files
-    system("rm /var/log/sophomorix/user/*");
-    system("rm /var/log/sophomorix/command.log");
-    system("rm /var/log/sophomorix/user-add.log");
-    system("rm /var/log/sophomorix/user-update.log");
-    system("rm /var/log/sophomorix/user-kill.log");
+    system("rm -f /var/log/sophomorix/user/*");
+    system("rm -f /var/log/sophomorix/command.log");
+    system("rm -f /var/log/sophomorix/user-add.log");
+    system("rm -f /var/log/sophomorix/user-update.log");
+    system("rm -f /var/log/sophomorix/user-kill.log");
     system("rm -rf /var/log/sophomorix/userlog");
     # removing old log files
-    system("rm /var/lib/sophomorix/check-result/*");
-    system("rm /var/lib/sophomorix/tmp/*");
+    system("rm -f /var/lib/sophomorix/check-result/*");
+    system("rm -f /var/lib/sophomorix/tmp/*");
     system("rm -rf /var/lib/sophomorix/tmp_collect");
     system("rm -rf /var/lib/sophomorix/tmp_pwdupdate");
     print "... done resetting samba for test\n";
