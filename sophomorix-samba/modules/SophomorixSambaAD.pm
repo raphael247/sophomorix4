@@ -252,7 +252,7 @@ sub AD_bind_admin {
             print "   * Sophomorix-Schema exists  (SophomorixSchemaVersion=$version)\n";
         }
         if (not $version==$DevelConf::sophomorix_schema_version){
-            print "\n   * ERROR: Sophomorix-Schema-Version $version is not the required verson: ",
+            print "\n   * ERROR: Sophomorix-Schema-Version $version (in AD) is not the required verson: ",
                   "$DevelConf::sophomorix_schema_version\n\n";
             exit;
         } else {
@@ -8091,34 +8091,67 @@ sub AD_smbcquotas_testshare {
 sub AD_sophomorix_schema_update {
     print "\n";
     print "* Testing for sophomorix schema update\n";
+    my $AD_version=&AD_sophomorix_schema_version();
+    if (not $AD_version==0){
+        # Version in AD found, checking for updates
+        print "   * Installed Sophomorix-Schema-Version: <$AD_version>\n";
+        print "   * Target    Sophomorix-Schema-Version: <$DevelConf::sophomorix_schema_version>\n";
+        if ($DevelConf::sophomorix_schema_version eq $AD_version){
+            print "* No sophomorix schema update needed\n";
+        } else {
+            my @ldif_list=();
+            my %ldif_info=();
+            my $ldif_not_found_count=0;
+            # Testing for necessary ldif files
+            for( my $number = $AD_version+1 ; $number < $DevelConf::sophomorix_schema_version+1 ; $number++) {
+		my $ldif_file="sophomorix-schema-update-".$number.".ldif";
+		my $ldif_abs=$DevelConf::sophomorix_schema_update_path."/".$ldif_file;
+                print "      * Testing for $ldif_file --> Update to Version $number\n";
+                if (-f $ldif_abs){
+                    push @ldif_list,$ldif_abs;
+                    $ldif_info{$ldif_abs}=$number
+                } else {
+                    print "        NOT FOUND: $ldif_abs\n";
+                    $ldif_not_found_count++;
+                }
+            }
+            # decide what to do
+            if ($ldif_not_found_count==0){
+                # updating
+                print "* All ldif files found, running updates:\n";
+                foreach my $ldif (@ldif_list){
+                    print "   * Running update to Sophomorix-Schema-Version $ldif_info{$ldif}:\n";
+                    print "     LOADING: $ldif\n";
+                }
+            } else {
+                # cancel updates (files missing)
+                print "\nERROR: No schema update possible (some files are missing)\n\n";
+            }
+        }
+    } else {
+        # No AD Version found -> schema never loaded -> no updates
+        print "   WARNING: No Sophomorix-Schema-Version in AD found: Skipping updates\n";
+    }
+}
+
+
+
+sub AD_sophomorix_schema_version {
     my $ldbsearch_command="ldbsearch -H /var/lib/samba/private/sam.ldb ".
                           "-b CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local ".
                           "rangeUpper | grep rangeUpper";
-    #print "$ldbsearch_command\n";
     my $stdout=`$ldbsearch_command`;
     my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
-    #print "RESULT: $return   $stdout\n";
     if ($return==0){
         my $version=$stdout;
         $version=~s/rangeUpper//;
         $version=~s/://;
         $version=~s/\s+$//g;# remove trailing whitespace
         $version=~s/^\s+//g;# remove leading whitespace
-        print "   * Installed Sophomorix-Schema-Version: <$version>\n";
-        print "   * Target    Sophomorix-Schema-Version: <$DevelConf::sophomorix_schema_version>\n";
-        if ($DevelConf::sophomorix_schema_version eq $version){
-            print "   * No sophomorix schema update needed\n";
-        } else {
-       
-           for( my $number = $version+1 ; $number < $DevelConf::sophomorix_schema_version+1 ; $number++) {
-               print "      * Running update to Sophomorix-Schema-Version $number\n"
-               # code goes here to run update script ????????
-               # run update scripts
-           }
-        }
+        return $version;
     } else {
-        print "Something went wrong retrieving Sophomorix-Schema-Version\n";
-        print "Usually that means that you are installing the sophomorix.package package for the first time\n";
+        #print "Something went wrong retrieving Sophomorix-Schema-Version\n";
+        return 0; # no version found
     }
 }
 

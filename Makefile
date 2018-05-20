@@ -153,6 +153,8 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/2_sophomorix-classes.ldif $(SCHEMA)/
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/3_sophomorix-aux.ldif $(SCHEMA)/
 	@install -oroot -groot --mode=0755 sophomorix-samba/schema/sophomorix_schema_add.sh $(SCHEMA)/
+	@install -d -m755 -oroot -groot $(SCHEMA)/schema-updates
+	@install -oroot -groot --mode=0644 sophomorix-samba/schema/schema-updates/sophomorix-schema-update-[0-9]*.ldif $(SCHEMA)/schema-updates
 # installing configs for root
 	@install -d -m755 -oroot -groot $(CONF)
 # configs for developers
