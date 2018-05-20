@@ -251,7 +251,6 @@ if ($restore_samba ne ""){
 if ($schema_load==1){
     my %smb_conf=();
     &read_smb_conf(\%smb_conf);
-    print Dumper( \%smb_conf );
     if ($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'} eq "DC="){
         print "\nERROR: Cannot load schema with a misconfigured smb.conf\n\n";
     } else {

@@ -172,7 +172,6 @@ sub testmount_school {
         }
     }
     close(PROCMOUNTS);
-    #print Dumper(\%mounts);
     if ($list==1){
         ##### list
         my @unc_list=();
@@ -2691,8 +2690,6 @@ sub config_sophomorix_read {
 	    print "\n";
 	    exit;
         }   
-	#print Dumper \%sophomorix_config;
-	#exit;
 
 	# read the config
         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
@@ -4749,10 +4746,8 @@ sub check_options{
 	}
     }
     
-
     print Dumper (\%tmp);
     print Dumper ($ref_options);
-    
 
     my $action_count=0;
     foreach my $opt_given (keys %{$ref_options}) {
@@ -4845,9 +4840,6 @@ sub check_options{
 	print "* forcing info mode\n";
         $ref_options->{'info'}=1;
     }
-
-    #print Dumper ($ref_options);
-
 
     print "Option combinations successfully checked\n";
     #exit; # ??????????
