@@ -194,7 +194,7 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/ntacl/*ntacl.template $(DEVELCONF)/devel/ntacl
 # language stuff
 	@install -d -m755 -oroot -groot $(LANGUAGE)
-	@install -oroot -groot --mode=0644 sophomorix-samba/lang/sophomorix-lang.*[a-z] $(LANGUAGE)
+#	@install -oroot -groot --mode=0644 sophomorix-samba/lang/sophomorix-lang.*[a-z] $(LANGUAGE)
 	@install -oroot -groot --mode=0644 sophomorix-samba/lang/errors.*[a-z] $(LANGUAGE)
 # latex stuff
 	@install -d -m755 -oroot -groot $(LATEX)

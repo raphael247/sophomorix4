@@ -2632,7 +2632,8 @@ sub config_sophomorix_read {
     push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $DevelConf::name_default_school; 
 
     ##################################################
-    # sophomorix.conf 
+    # sophomorix.conf
+    # reading the master file
     my $ref_master_sophomorix=&read_master_ini($DevelConf::path_conf_master_sophomorix,$ref_result);
     my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,
                                                    $DevelConf::file_conf_sophomorix,
@@ -3208,9 +3209,8 @@ sub check_config_ini {
     &print_title("Reading $configfile");
     if (not -e $configfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$configfile." not found!");
-        return;
-        #print "\nERROR: $configfile not found!\n\n";
-        #exit;
+        print "\nERROR: $configfile not found!\n\n";
+        exit 88;
     }
     #print "Checking file $configfile\n";
     tie %config, 'Config::IniFiles',

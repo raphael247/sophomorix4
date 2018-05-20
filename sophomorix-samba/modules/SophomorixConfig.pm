@@ -4,12 +4,10 @@
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linusmuster.net
 
-
 package Sophomorix::SophomorixConfig;
 require Exporter;
 use Digest::SHA;
 use MIME::Base64;
-
 
 @ISA = qw(Exporter);
 
@@ -17,60 +15,27 @@ use MIME::Base64;
 @EXPORT = qw( 
               );
 
-
-
-# Reading configuration file
-#my $conf="/etc/linuxmuster/sophomorix/sophomorix.conf";
-#if (not -e $conf){
-#    print "ERROR: $conf not found!\n";
-#    exit;
-#}
-#
-#{ package Conf ; do "$conf" 
-#  || die "ERROR: sophomorix.conf could not be processed (syntax error?)\n" 
-#}
-# Use this variables with $Conf::Variablenname (without 'my' in sophomorix.conf)
-$Conf::lang="de";
-my $conf="/etc/linuxmuster/sophomorix/sophomorix.conf";
-if (not -e $conf){
-    print "\nERROR: $conf not found!\n\n";
-    exit 88;
-}
-
-
-# Reading developer configuration file
+# Exit if developer config file is nonexisting
 my $develconf="/usr/share/sophomorix/devel/sophomorix-devel.conf";
 if (not -e $develconf){
     print "ERROR: $develconf not found!\n";
     exit 88;
 }
 
-# Einlesen der Konfigurationsdatei für Entwickler
+# Reading developer config file
 { package DevelConf ; do "$develconf"
   || die "Error: sophomorix-devel.conf could not be processed (syntax error?)\n" 
 }
 
-
-
-
 ######################################################################
-# make sure files exist
+# create command.log 
 ######################################################################
-
 if (not -e $DevelConf::log_command){
     open(LOG,">>$DevelConf::log_command");
     print LOG "##### $DevelConf::log_command created by SophomorixConfig.pm\n";
     close(LOG)
 }
 
-
-
-
-
-
-
-
-
-# ENDE DER DATEI
-# Wert wahr=1 zurückgeben
+# END OF FILRE
+# Return 1 (TRUE)
 1;
