@@ -8095,8 +8095,8 @@ sub AD_sophomorix_schema_update {
     my $AD_version=&AD_sophomorix_schema_version();
     if (not $AD_version==0){
         # Version in AD found, checking for updates
-        print "   * Installed Sophomorix-Schema-Version: <$AD_version>\n";
-        print "   * Target    Sophomorix-Schema-Version: <$DevelConf::sophomorix_schema_version>\n";
+        print "   * Installed Sophomorix-Schema-Version:  $AD_version\n";
+        print "   * Target    Sophomorix-Schema-Version:  $DevelConf::sophomorix_schema_version\n";
         if ($DevelConf::sophomorix_schema_version eq $AD_version){
             print "* No sophomorix schema update needed\n";
         } else {
