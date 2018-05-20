@@ -91,6 +91,7 @@ $Data::Dumper::Terse = 1;
             AD_examuser_create
             AD_examuser_kill
             AD_smbclient_testfile
+            AD_sophomorix_schema_update
             next_free_uidnumber_set
             next_free_uidnumber_get
             next_free_gidnumber_set
@@ -8083,6 +8084,42 @@ sub AD_smbcquotas_testshare {
             $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
             $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NOT OK";
 	}
+}
+
+
+
+sub AD_sophomorix_schema_update {
+    print "\n";
+    print "* Testing for sophomorix schema update\n";
+    my $ldbsearch_command="ldbsearch -H /var/lib/samba/private/sam.ldb ".
+                          "-b CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local ".
+                          "rangeUpper | grep rangeUpper";
+    #print "$ldbsearch_command\n";
+    my $stdout=`$ldbsearch_command`;
+    my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    #print "RESULT: $return   $stdout\n";
+    if ($return==0){
+        my $version=$stdout;
+        $version=~s/rangeUpper//;
+        $version=~s/://;
+        $version=~s/\s+$//g;# remove trailing whitespace
+        $version=~s/^\s+//g;# remove leading whitespace
+        print "   * Installed Sophomorix-Schema-Version: <$version>\n";
+        print "   * Target    Sophomorix-Schema-Version: <$DevelConf::sophomorix_schema_version>\n";
+        if ($DevelConf::sophomorix_schema_version eq $version){
+            print "   * No sophomorix schema update needed\n";
+        } else {
+       
+           for( my $number = $version+1 ; $number < $DevelConf::sophomorix_schema_version+1 ; $number++) {
+               print "      * Running update to Sophomorix-Schema-Version $number\n"
+               # code goes here to run update script ????????
+               # run update scripts
+           }
+        }
+    } else {
+        print "Something went wrong retrieving Sophomorix-Schema-Version\n";
+        print "Usually that means that you are installing the sophomorix.package package for the first time\n";
+    }
 }
 
 
