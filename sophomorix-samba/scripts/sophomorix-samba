@@ -42,6 +42,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_object_search
                                  AD_get_passwd
+                                 AD_sophomorix_schema_update
                                     );
 
 
@@ -260,6 +261,10 @@ if ($schema_load==1){
         my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
         print "$command\n";
         system($command);
+
+        # adding schema updates
+        &AD_sophomorix_schema_update($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'});
+
         &samba_start();
     }
     exit;
