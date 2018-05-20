@@ -79,6 +79,7 @@ DEVELOPERDIR=$(DESTDIR)/usr/share/sophomorix-developer
 TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
 TESTTEMPLATES=$(DESTDIR)/usr/share/sophomorix-developer/testtemplates
 
+
 # sophomorix-virusscan
 #VIRUSSCAN=$(DESTDIR)/usr/share/sophomorix-virusscan
 
@@ -259,6 +260,7 @@ install-developer:
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-infoscripts $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-exammode $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-JSON-example $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-developer/schema-tools/sophomorix-develtool-set-schema-version $(DESTDIR)/usr/sbin
 # copying perl developer modules
 	@install -d -m755 -oroot -groot $(PERLMOD)
 	@install -oroot -groot --mode=0644 sophomorix-developer/modules/SophomorixTest.pm $(PERLMOD)
@@ -267,6 +269,9 @@ install-developer:
 # installing templates
 	@install -d $(TESTTEMPLATES)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testtemplates/*.ini.test $(TESTTEMPLATES)
+# schema tols
+	@install -d -m755 -oroot -groot $(DEVELOPERDIR)/schema-tools
+	@install -oroot -groot --mode=0644 sophomorix-developer/schema-tools/sophomorix-schema-update-set-schema-version.ldif $(DEVELOPERDIR)/schema-tools
 
 # installing  testdata
 	@install -d $(TESTDATA)

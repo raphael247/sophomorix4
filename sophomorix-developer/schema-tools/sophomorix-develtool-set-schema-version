@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-develtool-set-schema-version) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+use Sophomorix::SophomorixConfig;
+use Sophomorix::SophomorixSambaAD qw(AD_sophomorix_schema_update);
+use Sophomorix::SophomorixBase qw(read_smb_conf);
+
+$Conf::log_level=1;
+my %smb_conf=();
+my $ref_result;
+&read_smb_conf(\%smb_conf,$ref_result);
+
+######################################################################
+
+my $ldif="";
+my $ldif_patched="";
+my $ldbmodify_command="";
+
+print "Using:   $ldif \n";
+print "patched: $ldif_patched \n";
+
+
+# testing if schema needs to be updated
+#&AD_sophomorix_schema_update($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'});
+
