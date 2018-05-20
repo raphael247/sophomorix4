@@ -8089,6 +8089,7 @@ sub AD_smbcquotas_testshare {
 
 
 sub AD_sophomorix_schema_update {
+    my ($root_dns)=@_;
     print "\n";
     print "* Testing for sophomorix schema update\n";
     my $AD_version=&AD_sophomorix_schema_version();
@@ -8120,8 +8121,31 @@ sub AD_sophomorix_schema_update {
                 # updating
                 print "* All ldif files found, running updates:\n";
                 foreach my $ldif (@ldif_list){
+                    my $ldif_patched=$ldif.".sed";
                     print "   * Running update to Sophomorix-Schema-Version $ldif_info{$ldif}:\n";
-                    print "     LOADING: $ldif\n";
+                    print "     PATCHING: $ldif\n";
+                    my $sed_command="cat \"".$ldif.
+                        "\" | sed -e \"s/<SchemaContainerDN>/CN=Schema,CN=Configuration,".
+                        $root_dns."/\" > \"$ldif_patched\"";
+                    #print "$sed_command\n";
+                    system("$sed_command");
+                    print "     LOADING: $ldif_patched\n";
+
+                    my $ldbmodify_command="ldbmodify -H /var/lib/samba/private/sam.ldb ".
+                          $ldif_patched." ".
+                          "--option=\"dsdb:schema update allowed\"=true";
+                    #print "$ldbmodify_command\n";
+                    my $stdout=`$ldbmodify_command`;
+                    chomp($stdout);
+                    my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+                    if ($return==0){
+                        print "     SUCCESS: $stdout\n";
+                    } else {
+                        print "\n";
+                        print "ERROR: Update failed: skipping other updates\n";
+                        print "\n";
+                        last;
+                    }
                 }
             } else {
                 # cancel updates (files missing)

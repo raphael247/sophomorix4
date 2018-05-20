@@ -7,9 +7,13 @@
 # modules
 use strict;
 use Sophomorix::SophomorixConfig;
-
 use Sophomorix::SophomorixSambaAD qw(AD_sophomorix_schema_update);
+use Sophomorix::SophomorixBase qw(read_smb_conf);
 
+$Conf::log_level=1;
+my %smb_conf=();
+my $ref_result;
+&read_smb_conf(\%smb_conf,$ref_result);
 
 my $conf_dir="/etc/linuxmuster/sophomorix";
 my $conf_file=$conf_dir."/sophomorix.conf";
@@ -78,7 +82,7 @@ if (-e $school_file){
 ######################################################################
 
 # testing if schema needs to be updated
-&AD_sophomorix_schema_update();
+&AD_sophomorix_schema_update($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'});
 
 print "\n";
 print "##### sophomorix-postinst end #####\n";
