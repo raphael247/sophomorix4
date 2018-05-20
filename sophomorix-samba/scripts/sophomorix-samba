@@ -305,7 +305,6 @@ if ($show_all_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-
     # class schema (no searchflag)
     my $line1 ="+----------------------------------------------------------------------------+\n";
     my $line  ="+-------+--------------------------------------------------------------------+\n";
@@ -355,9 +354,11 @@ if ($show_sophomorix_attributes==1){
                                       });
     #print Dumper $ref_schema;
     # class schema (no searchflag)
+
     my $line1 ="+--------------------------------------------------------------------------------------------+\n";
     my $line  ="+-------+------------------------------------------------------------------------------------+\n";
     my $header="| Nr.   | Attribute                                                                          |\n";
+    print "SophomorixSchemaVersion: ${ $ref_schema->{'LDAPDisplayName'}{'sophomorixSchemaVersion'}{'rangeupper'} }[0]\n";
     print $line1;
     printf "| classSchema: %-5s                                                                         |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'};    
@@ -392,6 +393,7 @@ if ($show_sophomorix_attributes==1){
         printf "|%6s| %3s | %-78s|\n",$count,$search_flag,$attr." (".$cn.")";
     }
     print $line;
+    print "SophomorixSchemaVersion: ${ $ref_schema->{'LDAPDisplayName'}{'sophomorixSchemaVersion'}{'rangeupper'} }[0]\n";
     print "SF: searchFlags (128: confidential   0:noindex   1:index)\n";
 } 
 
