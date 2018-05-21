@@ -83,7 +83,7 @@ $Data::Dumper::Terse = 1;
             AD_debug_logdump
             AD_login_test
             AD_dns_get
-            AD_dns_create_update
+            AD_dns_nodecreate_update
             AD_dns_zonecreate
             AD_dns_kill
             AD_dns_zonekill
@@ -296,7 +296,7 @@ sub AD_dns_get {
 
 
 
-sub AD_dns_create_update {
+sub AD_dns_nodecreate_update {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
@@ -366,6 +366,7 @@ sub AD_dns_create_update {
                                        sophomorixSchoolname => $school,
                                        sophomorixComputerIP => $dns_ipv4,
                                        sophomorixDnsNodename => $dns_node,
+                                       sophomorixDnsNodetype => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_LOOKUP'},
                                        sophomorixComment => $comment,
                                       });
              &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -392,6 +393,7 @@ sub AD_dns_create_update {
                               sophomorixSchoolname => $school,
                               sophomorixComputerIP => $dns_ipv4,
                               sophomorixDnsNodename => $dns_node,
+                              sophomorixDnsNodetype => $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_REVERSE'},
                               sophomorixComment => $comment,
                     });
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -4432,7 +4434,7 @@ sub AD_get_AD_for_device {
     # sophomorix dnsNodes from ldap
     { # BLOCK dnsNode start
         # alle NODES suchen
-        my $res   = Net::DNS::Resolver->new;
+        #my $res   = Net::DNS::Resolver->new;
         my $filter="(& (objectClass=dnsNode) (sophomorixRole=*) )";
         my $base="DC=DomainDnsZones,".$root_dse;
         my $mesg = $ldap->search( # perform a search
@@ -4444,6 +4446,7 @@ sub AD_get_AD_for_device {
                                     'sophomorixAdminFile',
                                     'sophomorixComment',
                                     'sophomorixDnsNodename',
+                                    'sophomorixDnsNodetype',
                                     'sophomorixRole',
                                     'sophomorixSchoolname',
                                     'sophomorixComputerIP',
@@ -4458,7 +4461,14 @@ sub AD_get_AD_for_device {
             my $entry = $mesg->entry($index);
             my $dn=$entry->dn();
             my $dc=$entry->get_value('dc');
-            if (defined $entry->get_value('sophomorixRole') ){
+            
+            # sophomorixDnsNodetype (lookup/reverse))
+            my $dnsnode_type="";
+            if (defined $entry->get_value('sophomorixDnsNodetype')){
+                $dnsnode_type=$entry->get_value('sophomorixDnsNodetype');
+            }
+
+            if ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_LOOKUP'}){
                 # sophomorixdnsNodes
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsNode'}=$dc;
@@ -4470,6 +4480,8 @@ sub AD_get_AD_for_device {
                     $entry->get_value('sophomorixComment');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixDnsNodename'}=
                     $entry->get_value('sophomorixDnsNodename');
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixDnsNodetype'}=
+                    $entry->get_value('sophomorixDnsNodetype');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixRole'}=
                     $entry->get_value('sophomorixRole');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixSchoolname'}=
@@ -4487,6 +4499,8 @@ sub AD_get_AD_for_device {
 	        #}
 
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
+            } elsif ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_REVERSE'}){
+                # do not know if they are treaded separately
             } else {
                 # other dnsNodes
                 $AD{'RESULT'}{'dnsNode'}{'other'}{'COUNT'}++;
