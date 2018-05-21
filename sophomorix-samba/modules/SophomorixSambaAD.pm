@@ -4458,13 +4458,12 @@ sub AD_get_AD_for_device {
             my $entry = $mesg->entry($index);
             my $dn=$entry->dn();
             my $dc=$entry->get_value('dc');
-            my ($ip,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
-            if ($message ne "NXDOMAIN" and $message ne "NOERROR"){
+            if (defined $entry->get_value('sophomorixRole') ){
                 # sophomorixdnsNodes
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsNode'}=$dc;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsZone'}=$root_dns;
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;
+                #$AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixAdminFile'}=
                     $entry->get_value('sophomorixAdminFile');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixComment'}=
@@ -4477,6 +4476,16 @@ sub AD_get_AD_for_device {
                     $entry->get_value('sophomorixSchoolname');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixComputerIP'}=
                     $entry->get_value('sophomorixComputerIP');
+                # get ipv4
+                # fast: by attribute
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=
+                    $entry->get_value('sophomorixComputerIP');;
+                # slow: query dns
+                # my ($ip,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$dc);
+                #if ($message ne "NXDOMAIN" and $message ne "NOERROR"){
+                #  $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;  
+	        #}
+
                 push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
             } else {
                 # other dnsNodes
@@ -4484,6 +4493,7 @@ sub AD_get_AD_for_device {
             }
         }
     } # BLOCK dnsNode end
+    &Sophomorix::SophomorixBase::print_title("Sorting lists ...");
     # sort some room lists
     foreach my $room (keys %{$AD{'room'}}) {
         if($#{ $AD{'room'}{$room}{'sophomorixRoomComputers'} }>0){
