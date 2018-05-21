@@ -1270,9 +1270,11 @@ sub devices_rewrite {
         }
         my $sophomorix_type;
         if ($items[9] eq "0"){
+            # default device without account
 	    $sophomorix_type="iponly";
         } else {
-	    $sophomorix_type="computer";
+            # default device with account
+	    $sophomorix_type="classroom-studentcomputer";
         }
         # account_flag field 10 not used anymore
         $items[9]="---";
