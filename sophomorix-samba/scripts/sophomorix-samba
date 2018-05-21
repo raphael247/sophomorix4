@@ -18,6 +18,9 @@ use Sophomorix::SophomorixBase qw(
                                  json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
+                                    samba_stop
+                                    samba_start
+                                    samba_status
                                     );
 use JSON;
 use Data::Dumper;
@@ -503,28 +506,6 @@ if ($show_roletype==1){
 ############################################################
 # subs
 ############################################################
-
-sub samba_stop {
-    my $command="/bin/systemctl stop samba-ad-dc";
-    print "\nStopping samba with command $command\n\n";
-    system($command);
-}
-
-
-
-sub samba_start {
-    my $command="/bin/systemctl start samba-ad-dc";
-    print "\nStarting samba with command $command\n\n";
-    system($command);
-}
-
-
-
-sub samba_status {
-    my $command="/bin/systemctl status samba-ad-dc";
-    print "\nShowing samba status with command $command\n\n";
-    system($command);
-}
 
 
 

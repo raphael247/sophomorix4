@@ -96,6 +96,9 @@ $Data::Dumper::Terse = 1;
             next_free_uidnumber_get
             next_free_gidnumber_set
             next_free_gidnumber_get
+            samba_stop
+            samba_start
+            samba_status
             );
 
 
@@ -8097,7 +8100,7 @@ sub AD_sophomorix_schema_update {
         # Version in AD found, checking for updates
         print "   * Installed Sophomorix-Schema-Version:  $AD_version\n";
         print "   * Target    Sophomorix-Schema-Version:  $DevelConf::sophomorix_schema_version\n";
-        if ($DevelConf::sophomorix_schema_version eq $AD_version){
+        if ($DevelConf::sophomorix_schema_version <= $AD_version){
             print "* No sophomorix schema update needed\n";
         } else {
             my @ldif_list=();
@@ -8120,6 +8123,7 @@ sub AD_sophomorix_schema_update {
             if ($ldif_not_found_count==0){
                 # updating
                 print "* All ldif files found, running updates:\n";
+                &samba_stop();
                 foreach my $ldif (@ldif_list){
                     my $ldif_patched=$ldif.".sed";
                     print "   * Running update to Sophomorix-Schema-Version $ldif_info{$ldif}:\n";
@@ -8147,6 +8151,7 @@ sub AD_sophomorix_schema_update {
                         last;
                     }
                 }
+                &samba_start();
             } else {
                 # cancel updates (files missing)
                 print "\nERROR: No schema update possible (some files are missing)\n\n";
@@ -8275,6 +8280,30 @@ sub next_free_gidnumber_get {
     my $gidnumber_free_next=$gidnumber_free+1;
     &next_free_gidnumber_set($ldap,$root_dse,$gidnumber_free_next);
     return $gidnumber_free;
+}
+
+
+
+sub samba_stop {
+    my $command="/bin/systemctl stop samba-ad-dc";
+    print "\nStopping samba with command $command\n\n";
+    system($command);
+}
+
+
+
+sub samba_start {
+    my $command="/bin/systemctl start samba-ad-dc";
+    print "\nStarting samba with command $command\n\n";
+    system($command);
+}
+
+
+
+sub samba_status {
+    my $command="/bin/systemctl status samba-ad-dc";
+    print "\nShowing samba status with command $command\n\n";
+    system($command);
 }
 
 
