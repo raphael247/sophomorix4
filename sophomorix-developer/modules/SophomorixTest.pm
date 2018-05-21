@@ -338,6 +338,7 @@ sub AD_test_object {
 
     # sophomorix computer
     my $s_dns_nodename = $arg_ref->{sophomorixDnsNodename};
+    my $s_dns_nodetype = $arg_ref->{sophomorixDnsNodetype};
     my $s_ip = $arg_ref->{sophomorixComputerIP};
     my $s_mac = $arg_ref->{sophomorixComputerMAC};
     my $s_room = $arg_ref->{sophomorixComputerRoom};
@@ -523,6 +524,10 @@ sub AD_test_object {
         if (defined $s_dns_nodename){
             is ($entry->get_value ('sophomorixDnsNodename'),$s_dns_nodename,
 		"  * sophomorixDnsNodename is $s_dns_nodename");
+        }
+        if (defined $s_dns_nodetype){
+            is ($entry->get_value ('sophomorixDnsNodetype'),$s_dns_nodetype,
+		"  * sophomorixDnsNodetype is $s_dns_nodetype");
         }
         if (defined $s_ip){
             is ($entry->get_value ('sophomorixComputerIP'),$s_ip,
