@@ -6013,7 +6013,14 @@ sub AD_get_full_devicedata {
         my $name=$entry->get_value('name');
         my $dn=$entry->dn();
         my $cn=$entry->get_value('cn');
-        if ($name=~m/^[0-9]+$/ and $name > 0 and $name < 256){
+	print "HERE: $cn\n";
+        # sophomorixDnsNodetype (lookup/reverse))
+        my $dnsnode_type="";
+        if (defined $entry->get_value('sophomorixDnsNodetype')){
+            $dnsnode_type=$entry->get_value('sophomorixDnsNodetype');
+        }
+
+        if ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_REVERSE'}){
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dn'}=$dn;
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'cn'}=$cn;
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord'}=
@@ -6026,6 +6033,8 @@ sub AD_get_full_devicedata {
                 $entry->get_value('sophomorixComment');
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixDnsNodename'}=
                 $entry->get_value('sophomorixDnsNodename');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixDnsNodetype'}=
+                $entry->get_value('sophomorixDnsNodetype');
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixSchoolname'}=
@@ -6034,7 +6043,7 @@ sub AD_get_full_devicedata {
                 $entry->get_value('sophomorixComputerIP');
             # list of results
             push @{ $devices{'LISTS'}{'dnsNode_REVERSE'} }, $name;
-        } else {
+        } elsif ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_LOOKUP'}) {
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dn'}=$dn;
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'cn'}=$cn;
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord'}=
@@ -6047,6 +6056,8 @@ sub AD_get_full_devicedata {
                 $entry->get_value('sophomorixComment');
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixDnsNodename'}=
                 $entry->get_value('sophomorixDnsNodename');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixDnsNodetype'}=
+                $entry->get_value('sophomorixDnsNodetype');
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixRole'}=
                 $entry->get_value('sophomorixRole');
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixSchoolname'}=
@@ -6055,6 +6066,8 @@ sub AD_get_full_devicedata {
                 $entry->get_value('sophomorixComputerIP');
             # list of results
             push @{ $devices{'LISTS'}{'dnsNode'} }, $name;
+        } else {
+            # all sophomorix node have sophomorixDnsNodetype = lookup/reverse 
         }
     }
 

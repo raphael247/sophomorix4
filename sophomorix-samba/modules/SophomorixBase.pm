@@ -1832,12 +1832,12 @@ sub _console_print_device_full {
             printf "%29s: %-40s\n","sAMAccountName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sAMAccountName'};
             printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'computer'}{'cn'};
             printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'computer'}{'name'};
+            printf "%29s: %-40s\n","sophomorixDnsNodename",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixDnsNodename'};
             printf "%29s: %-40s\n","displayName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'displayName'};
             printf "%29s: %-40s\n","sophomorixAdminClass",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixAdminClass'};
             printf "%29s: %-40s\n","sophomorixSchoolname",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixSchoolname'};
             printf "%29s: %-40s\n","sophomorixAdminFile",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixAdminFile'};
             printf "%29s: %-40s\n","sophomorixComment",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixComment'};
-            printf "%29s: %-40s\n","sophomorixDnsNodename",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixDnsNodename'};
             printf "%29s: %-40s\n","dNSHostName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'dNSHostName'};
             print $line;
             printf "%29s: %-40s\n","sophomorixRole",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixRole'};
@@ -1923,6 +1923,10 @@ sub _console_print_device_full {
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'cn'};
         printf "%29s: %-40s\n","name",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'name'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","sophomorixDnsNodetype",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodetype'};
         printf "%29s: %-40s\n","sophomorixRole",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixRole'};
         printf "%29s: %-40s\n","sophomorixAdminFile",
@@ -1931,8 +1935,6 @@ sub _console_print_device_full {
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'};
         printf "%29s: %-40s\n","sophomorixComputerIP",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComputerIP'};
-        printf "%29s: %-40s\n","sophomorixDnsNodename",
-            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodename'};
         printf "%29s: %-40s\n","sophomorixComment",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComment'};
         printf "%29s: %-40s\n","dnsRecord",
@@ -1946,6 +1948,10 @@ sub _console_print_device_full {
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'cn'};
         printf "%29s: %-40s\n","name",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'name'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","sophomorixDnsNodetype",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixDnsNodetype'};
         printf "%29s: %-40s\n","sophomorixRole",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixRole'};
         printf "%29s: %-40s\n","sophomorixAdminFile",
@@ -1954,8 +1960,6 @@ sub _console_print_device_full {
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixSchoolname'};
         printf "%29s: %-40s\n","sophomorixComputerIP",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComputerIP'};
-        printf "%29s: %-40s\n","sophomorixDnsNodename",
-            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixDnsNodename'};
         printf "%29s: %-40s\n","sophomorixComment",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComment'};
         printf "%29s: %-40s\n","dnsRecord",
