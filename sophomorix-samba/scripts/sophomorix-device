@@ -526,27 +526,17 @@ if ($dns_show==1 or $dns_kill==1){
 }
 
 
-################################################################################
-# fetching data
-################################################################################
-&print_title("Asking the system for computer accounts and DNS data ...");
-
-my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-                                             root_dse=>$root_dse,
-                                             root_dns=>$root_dns,
-                                             sophomorix_config=>\%sophomorix_config,
-                                           });
-# /etc/linuxmuster/classroom
-# ?????????????????????????
-#&get_classrooms();
-
 
 # --dump-AD
 if ($dump_AD==1){
+    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                 root_dse=>$root_dse,
+                                                 root_dns=>$root_dns,
+                                                 sophomorix_config=>\%sophomorix_config,
+                                               });
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
-#                hash_ref=>\%AD,
                 hash_ref=>$ref_AD_device,
                 sophomorix_config=>\%sophomorix_config,
                });
@@ -556,6 +546,11 @@ if ($dump_AD==1){
 
 # --print
 if ($print==1){
+    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                 root_dse=>$root_dse,
+                                                 root_dns=>$root_dns,
+                                                 sophomorix_config=>\%sophomorix_config,
+                                               });
     &print_devices_latex($ref_AD_device);
     exit;
 }
@@ -566,6 +561,11 @@ if ($print==1){
 if ($info==1 and $show_role ne ""){
     ##################################################
     # --info --show-role <role>
+    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                 root_dse=>$root_dse,
+                                                 root_dns=>$root_dns,
+                                                 sophomorix_config=>\%sophomorix_config,
+                                               });
     print "HERE: show role $show_role\n";
 
 
@@ -594,13 +594,11 @@ if ($info==1 and $show_role ne ""){
 } elsif ($info==1){
     ##################################################
     # --info (overview)
-    my ($ref_devices) = &AD_get_AD_for_device({ldap=>$ldap,
-                                               root_dse=>$root_dse,
-                                               root_dns=>$root_dns,
-                                               sophomorix_config=>\%sophomorix_config,
-                                             });
-
-    {
+        my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                     root_dse=>$root_dse,
+                                                     root_dns=>$root_dns,
+                                                     sophomorix_config=>\%sophomorix_config,
+                                                   });
         my $jsoninfo="DEVICES";
         my $jsoncomment="The sophomorix devices";
         &json_dump({json => $json,
@@ -608,10 +606,9 @@ if ($info==1 and $show_role ne ""){
                     jsoncomment => $jsoncomment,
                     object_name => "",
                     log_level => $Conf::log_level,
-                    hash_ref => $ref_devices,
+                    hash_ref => $ref_AD_device,
                     sophomorix_config => \%sophomorix_config,
                    });
-    }
     exit;
 } else {
     # skip info stuff
@@ -619,8 +616,18 @@ if ($info==1 and $show_role ne ""){
 
 
 
+################################################################################
+# fetching data for sync
+################################################################################
+my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                             root_dse=>$root_dse,
+                                             root_dns=>$root_dns,
+                                             sophomorix_config=>\%sophomorix_config,
+                                           });
+
+
 ############################################################################
-# reading and checking files
+# reading and checking files for sync
 ############################################################################
 # reading and checking all device files
 foreach my $device_file (@filelist){
