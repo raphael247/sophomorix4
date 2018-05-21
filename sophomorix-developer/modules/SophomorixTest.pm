@@ -30,7 +30,8 @@ $Data::Dumper::Terse = 1;
             AD_test_nondns
             AD_computers_any
             AD_examaccounts_any
-            AD_dnsnodes_count
+            AD_dnsnodes_count_lookup
+            AD_dnsnodes_count_reverse
             AD_dnszones_count
             AD_rooms_any
             AD_user_timeupdate
@@ -172,9 +173,9 @@ sub AD_user_timeupdate {
 
 
 
-sub AD_dnsnodes_count {
+sub AD_dnsnodes_count_lookup {
     my ($expected,$ldap,$root_dse) = @_;
-    my $filter_node="(&(objectClass=dnsNode)(sophomorixRole=*))";
+    my $filter_node="(&(objectClass=dnsNode)(sophomorixRole=*)(sophomorixDnsNodetype=lookup))";
     $mesg = $ldap->search( # perform a search
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
@@ -182,15 +183,42 @@ sub AD_dnsnodes_count {
                    attrs => ['dc','sophomorixRole','sophomorixdnsNodename']
                          );
     my $max_user = $mesg->count; 
-    is ($max_user,$expected,"  * $expected sophomorix dnsNodes found");
+    is ($max_user,$expected,"  * $expected sophomorix dnsNodes of sophomorixDnsNodetype=lookup found");
     if ($max_user==$expected){
         # no output
     } else {
+        print "   * dnsNodes of sophomorixDnsNodetype=lookup:\n";
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             my $string="sophomorixdnsNodename:".$entry->get_value('sophomorixdnsNodename').", ".
                        "sophomorixRole:".$entry->get_value('sophomorixRole');
             printf "   * %-14s-> %-50s\n",$entry->get_value('dc'),$string;
+        }
+    }
+}
+
+
+
+sub AD_dnsnodes_count_reverse {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=dnsNode)(sophomorixRole=*)(sophomorixDnsNodetype=reverse))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['dc','sophomorixRole','sophomorixdnsNodename']
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,$expected,"  * $expected sophomorix dnsNodes of sophomorixDnsNodetype=reverse found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * dnsNodes of sophomorixDnsNodetype=reverse:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $string="sophomorixdnsNodename:".$entry->get_value('sophomorixdnsNodename').", ".
+                       "sophomorixRole:".$entry->get_value('sophomorixRole');
+            printf "   * %-5s-> %-50s\n",$entry->get_value('dc'),$string;
         }
     }
 }

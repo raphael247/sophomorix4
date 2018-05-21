@@ -54,7 +54,8 @@ use Sophomorix::SophomorixTest qw(
                                  AD_test_nondns
                                  AD_computers_any
                                  AD_examaccounts_any
-                                 AD_dnsnodes_count
+                                 AD_dnsnodes_count_lookup
+                                 AD_dnsnodes_count_reverse
                                  AD_dnszones_count
                                  AD_rooms_any
                                  run_command
@@ -1946,7 +1947,8 @@ if ($test_ws_1==1){
                    });
 
     # 18 devices -> 36 dnsNode Objects (incl. reverse lookup)
-    &AD_dnsnodes_count(36,$ldap,$root_dse);
+    &AD_dnsnodes_count_lookup(18,$ldap,$root_dse);
+    &AD_dnsnodes_count_reverse(18,$ldap,$root_dse);
     &AD_dnszones_count(9,$ldap,$root_dse);
 }
 
@@ -3659,7 +3661,8 @@ if ($test_ws_2==1){
                    });
    
     # 18 devices -> 36 dnsNode Objects (incl. reverse lookup)
-    &AD_dnsnodes_count(36,$ldap,$root_dse);
+    &AD_dnsnodes_count_lookup(18,$ldap,$root_dse);
+    &AD_dnsnodes_count_reverse(18,$ldap,$root_dse);
     &AD_dnszones_count(9,$ldap,$root_dse);
 }
 
@@ -3789,7 +3792,8 @@ if ($test_ws_5==1){
 
     &AD_computers_any($ldap,$root_dse);
     &AD_examaccounts_any($ldap,$root_dse);
-    &AD_dnsnodes_count(0,$ldap,$root_dse);
+    &AD_dnsnodes_count_lookup(0,$ldap,$root_dse);
+    &AD_dnsnodes_count_reverse(0,$ldap,$root_dse);
     &AD_dnszones_count(0,$ldap,$root_dse);
     &AD_rooms_any($ldap,$root_dse);
 }
