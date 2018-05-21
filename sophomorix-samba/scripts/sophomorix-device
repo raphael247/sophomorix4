@@ -55,6 +55,7 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  result_sophomorix_init
                                  result_sophomorix_add
+                                 result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  dns_query_ip
@@ -112,6 +113,10 @@ my $sophomorix_first_password="";
 my $role="";
 my $school="";
 my $prefix="";
+
+# if this counter goes up, sophomorix-device will stop
+# after checking the files 
+my $error_in_files=0; 
 
 # rooms that have been created while the script is running
 my %room_created=();
@@ -649,6 +654,30 @@ foreach my $device_file (@filelist){
 }
 
 
+############################################################################
+# Stop if there were errors in the file
+############################################################################
+if ($error_in_files > 0){
+    print "\n";
+    print "There were errors in the files.\n";
+    print "Please fix them first\n";
+    print "\n";
+
+    &result_sophomorix_add_summary({
+                     NAME=>"ADD", 
+                     RESULT=>$error_in_files, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => " errors at parsing device files", 
+                     DESCRIPTION_PRE => "Errors at parsing device files:", 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    #&log_script_exit("ERROR parsing device files: $error_in_files errors.",1,1,0,
+    #                 \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    exit 88;
+}
 
 ############################################################################
 # Decide what must be done
@@ -1903,6 +1932,14 @@ sub analyze_device_line {
             print "Computer\$:  $host  -->  $ws_token_account\n";
             print "\n";
 	}
+
+        # some things are nor allowed to be double:
+        # name
+        if (exists $devices_file{'device'}{$host_token}){
+            print "Device Name (Field2) is double: $host_token\n";
+            &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,,"$filename:Device Name (Field2) is double: $host_token");
+            $error_in_files++;
+        }
 
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
