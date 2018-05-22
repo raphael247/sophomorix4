@@ -4638,6 +4638,12 @@ sub get_group_basename {
 # error, when options are not given correctly
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+    # get effective/real userID
+    my $uid_effective=$<;
+    my $uid_real=$>;
+    print "Effective User ID: $uid_effective\n";
+    print "Real User ID:      $uid_real\n";
+
     if (not defined $Conf::log_level){
 	$Conf::log_level=1;
     }

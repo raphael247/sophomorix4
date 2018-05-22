@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+use strict;
+
+# sudo uid_test
+# changes errective and real uid
+
+my $uid_effective=$<;
+my $uid_real=$>;
+print "Effective User ID: $uid_effective\n";
+print "Real User ID:      $uid_real\n";
+
+system("ls /root/.ssh");
+system("cat /root/.ssh/known_hosts");
