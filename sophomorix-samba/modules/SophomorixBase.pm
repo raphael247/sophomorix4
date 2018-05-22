@@ -417,14 +417,14 @@ sub _console_print_devices {
         @school_list=($school_opt);
     }
 
-    my $line0="+-----------------------------------------------------------------------------+\n";
-    my $line ="+---------------+---------------+-----------+---------------------------------+\n";
-    my $line2="+--------------------------+--------------------------------------------------+\n";
+    my $line0="+---------------------------------------------------------------------------------+\n";
+    my $line ="+----------------+----------------+------------+----------------------------------+\n";
+    my $line2="+--------------------------+------------------------------------------------------+\n";
     foreach my $school (@school_list){
         my $school_devices_count=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }+1;
         print "\n";
         print $line0;
-	printf "| %-76s|\n",$school_devices_count." Devices in school $school:";
+	printf "| %-80s|\n",$school_devices_count." Devices in school $school:";
         foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
             my $role_alt=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
 
@@ -449,9 +449,10 @@ sub _console_print_devices {
                 next;
             }
             # one device per line
-            print $line;
-            printf "| %-76s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
-            print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
+            print $line0;
+            printf "| %-80s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
+            #print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
+            print "| dnsNode          IPv4             Room         sophomorixComment                |\n";
             print $line;
             foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
                 my $computer;
@@ -487,7 +488,7 @@ sub _console_print_devices {
                 }
                 my $role_display=$comment.$role_short;
 
-                printf "|%-15s|%-15s|%-11s|%-33s|\n",
+                printf "| %-15s| %-15s| %-11s| %-33s|\n",
                        $dns_node,
                        $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
                        $adminclass,
@@ -527,10 +528,10 @@ sub _console_print_devices {
     # global part
     print "\n";
     print $line2;
-    print     "| Hardwareclasses (global) |                                                  |\n";
+    print     "| Hardwareclasses (global) |                                                      |\n";
     print $line2;
         foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-            printf "| %-25s| %-49s|\n",$hwk,"";
+            printf "| %-25s| %-53s|\n",$hwk,"";
         }
     print $line2;
 }
