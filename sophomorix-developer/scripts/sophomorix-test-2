@@ -301,7 +301,7 @@ if ($test_ws_1==1){
                    sophomorixStatus=>"P",
                    description=>"j1008 in default-school",
                    sophomorixType=>"room",
-                   sophomorixRoomIPs=>"10.170.208.1|10.170.208.2|10.170.208.30",
+                   sophomorixRoomIPs=>"172.16.0.50|172.16.0.52|172.16.0.30",
                    sophomorixRoomMACs=>"94:DE:80:B1:5B:2E|94:DE:80:B1:58:2A|00:01:E6:3E:1B:BA",
                    sophomorixRoomComputers=>"j1008p01|j1008p02|laser1008",
                    sophomorixSchoolname => "default-school",
@@ -321,7 +321,7 @@ if ($test_ws_1==1){
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "classroom-studentcomputer",
                    sophomorixStatus=>"P",
-                   sophomorixComputerIP=>"10.170.208.1",
+                   sophomorixComputerIP=>"172.16.0.50",
                    sophomorixComputerMAC=>"94:DE:80:B1:5B:2E",
                    sophomorixComputerRoom=>"j1008",
                    sophomorixComment => "TEST",
@@ -339,7 +339,7 @@ if ($test_ws_1==1){
     ##############################
     #dns 
     ##############################
-    &AD_test_dns($res,"j1008p01","10.170.208.1");
+    &AD_test_dns($res,"j1008p01","172.16.0.50");
     # dnsNode
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=j1008p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -349,30 +349,30 @@ if ($test_ws_1==1){
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.1",
+                     sophomorixComputerIP => "172.16.0.50",
                      sophomorixDnsNodename => "j1008p01",
                      sophomorixDnsNodetype => "lookup",
                      sophomorixComment => "TEST",
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=50,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"50",
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.1",
+                     sophomorixComputerIP => "172.16.0.50",
                      sophomorixDnsNodename => "j1008p01",
                      sophomorixDnsNodetype => "reverse",
                      sophomorixComment => "TEST",
                    });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"208.170.10.in-addr.arpa",
-                     cn=>"208.170.10.in-addr.arpa",
+                     name=>"0.16.172.in-addr.arpa",
+                     cn=>"0.16.172.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
 
@@ -429,7 +429,7 @@ if ($test_ws_1==1){
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "classroom-studentcomputer",
                    sophomorixStatus=>"P",
-                   sophomorixComputerIP=>"10.170.208.2",
+                   sophomorixComputerIP=>"172.16.0.52",
                    sophomorixComputerMAC=>"94:DE:80:B1:58:2A",
                    sophomorixComputerRoom=>"j1008",
                    sophomorixComment => "TEST",
@@ -447,7 +447,7 @@ if ($test_ws_1==1){
     ##############################
     #dns 
     ##############################
-    &AD_test_dns($res,"j1008p02","10.170.208.2");
+    &AD_test_dns($res,"j1008p02","172.16.0.52");
     # dnsNode
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=j1008p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -457,30 +457,30 @@ if ($test_ws_1==1){
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.2",
+                     sophomorixComputerIP => "172.16.0.52",
                      sophomorixDnsNodename => "j1008p02",
                      sophomorixDnsNodetype => "lookup",
                      sophomorixComment => "TEST",
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=2,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=52,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"2",
+                     name=>"52",
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.2",
+                     sophomorixComputerIP => "172.16.0.52",
                      sophomorixDnsNodename => "j1008p02",
                      sophomorixDnsNodetype => "reverse",
                      sophomorixComment => "TEST",
                    });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"208.170.10.in-addr.arpa",
-                     cn=>"208.170.10.in-addr.arpa",
+                     name=>"0.16.172.in-addr.arpa",
+                     cn=>"0.16.172.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
 
@@ -500,7 +500,7 @@ if ($test_ws_1==1){
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "printer",
                    sophomorixStatus=>"P",
-                   sophomorixComputerIP=>"10.170.208.30",
+                   sophomorixComputerIP=>"172.16.0.30",
                    sophomorixComputerMAC=>"00:01:E6:3E:1B:BA",
                    sophomorixComputerRoom=>"j1008",
                    sophomorixComment => "TEST",
@@ -532,7 +532,7 @@ if ($test_ws_1==1){
     ##############################
     #dns 
     ##############################
-    &AD_test_dns($res,"laser1008","10.170.208.30");
+    &AD_test_dns($res,"laser1008","172.16.0.30");
     # dnsNode
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=laser1008,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -542,30 +542,30 @@ if ($test_ws_1==1){
                      sophomorixRole => "printer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.30",
+                     sophomorixComputerIP => "172.16.0.30",
                      sophomorixDnsNodename => "laser1008",
                      sophomorixDnsNodetype => "lookup",
                      sophomorixComment => "TEST",
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=30,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
                      name=>"30",
                      sophomorixRole => "printer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.30",
+                     sophomorixComputerIP => "172.16.0.30",
                      sophomorixDnsNodename => "laser1008",
                      sophomorixDnsNodetype => "reverse",
                      sophomorixComment => "TEST",
                    });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"208.170.10.in-addr.arpa",
-                     cn=>"208.170.10.in-addr.arpa",
+                     name=>"0.16.172.in-addr.arpa",
+                     cn=>"0.16.172.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
     ############################################################
@@ -2022,7 +2022,7 @@ if ($test_ws_2==1){
                    sophomorixStatus=>"P",
                    description=>"j1008 in default-school",
                    sophomorixType=>"room",
-                   sophomorixRoomIPs=>"10.170.208.1|10.170.208.4|10.170.208.30",
+                   sophomorixRoomIPs=>"172.16.0.50|172.16.0.54|172.16.0.30",
                    sophomorixRoomMACs=>"94:DE:80:B1:5B:2E|94:DE:80:B1:58:2A|00:01:E6:3E:1B:BA",
                    sophomorixRoomComputers=>"j1008p03|j1008p02|laser1008",
                    sophomorixSchoolname => "default-school",
@@ -2041,7 +2041,7 @@ if ($test_ws_2==1){
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "classroom-studentcomputer",
                    sophomorixStatus=>"P",
-                   sophomorixComputerIP=>"10.170.208.1",
+                   sophomorixComputerIP=>"172.16.0.50",
                    sophomorixComputerMAC=>"94:DE:80:B1:5B:2E",
                    sophomorixComputerRoom=>"j1008",
                    sophomorixComment => "TEST2",
@@ -2058,7 +2058,7 @@ if ($test_ws_2==1){
     ##############################
     #dns 
     ##############################
-    &AD_test_dns($res,"j1008p03","10.170.208.1");
+    &AD_test_dns($res,"j1008p03","172.16.0.50");
     # dnsNode
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=j1008p03,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -2068,30 +2068,30 @@ if ($test_ws_2==1){
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.1",
+                     sophomorixComputerIP => "172.16.0.50",
                      sophomorixDnsNodename => "j1008p03",
                      sophomorixDnsNodetype => "lookup",
                      sophomorixComment => "TEST2",
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=1,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=50,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"1",
+                     name=>"50",
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.1",
+                     sophomorixComputerIP => "172.16.0.50",
                      sophomorixDnsNodename => "j1008p03",
                      sophomorixDnsNodetype => "reverse",
                      sophomorixComment => "TEST2",
                    });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"208.170.10.in-addr.arpa",
-                     cn=>"208.170.10.in-addr.arpa",
+                     name=>"0.16.172.in-addr.arpa",
+                     cn=>"0.16.172.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
 
@@ -2164,7 +2164,7 @@ if ($test_ws_2==1){
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "classroom-studentcomputer",
                    sophomorixStatus=>"P",
-                   sophomorixComputerIP=>"10.170.208.4",
+                   sophomorixComputerIP=>"172.16.0.54",
                    sophomorixComputerMAC=>"94:DE:80:B1:58:2A",
                    sophomorixComputerRoom=>"j1008",
                    sophomorixComment => "TEST2",
@@ -2181,7 +2181,7 @@ if ($test_ws_2==1){
     ##############################
     #dns 
     ##############################
-    &AD_test_dns($res,"j1008p02","10.170.208.4");
+    &AD_test_dns($res,"j1008p02","172.16.0.54");
     # dnsNode
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=j1008p02,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -2191,30 +2191,30 @@ if ($test_ws_2==1){
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.4",
+                     sophomorixComputerIP => "172.16.0.54",
                      sophomorixDnsNodename => "j1008p02",
                      sophomorixDnsNodetype => "lookup",
                      sophomorixComment => "TEST2",
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=4,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=54,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"4",
+                     name=>"54",
                      sophomorixRole => "classroom-studentcomputer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.4",
+                     sophomorixComputerIP => "172.16.0.54",
                      sophomorixDnsNodename => "j1008p02",
                      sophomorixDnsNodetype => "reverse",
                      sophomorixComment => "TEST2",
                    });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"208.170.10.in-addr.arpa",
-                     cn=>"208.170.10.in-addr.arpa",
+                     name=>"0.16.172.in-addr.arpa",
+                     cn=>"0.16.172.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
 
@@ -2234,7 +2234,7 @@ if ($test_ws_2==1){
                    #sophomorixFirstPassword => "Muster!",
                    sophomorixRole => "printer",
                    sophomorixStatus=>"P",
-                   sophomorixComputerIP=>"10.170.208.30",
+                   sophomorixComputerIP=>"172.16.0.30",
                    sophomorixComputerMAC=>"00:01:E6:3E:1B:BA",
                    sophomorixComputerRoom=>"j1008",
                    sophomorixComment => "TEST2",
@@ -2265,7 +2265,7 @@ if ($test_ws_2==1){
     ##############################
     #dns 
     ##############################
-    &AD_test_dns($res,"laser1008","10.170.208.30");
+    &AD_test_dns($res,"laser1008","172.16.0.30");
     # dnsNode
     &AD_test_object({ldap=>$ldap,
                      dn=>"DC=laser1008,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
@@ -2275,30 +2275,30 @@ if ($test_ws_2==1){
                      sophomorixRole => "printer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.30",
+                     sophomorixComputerIP => "172.16.0.30",
                      sophomorixDnsNodename => "laser1008",
                      sophomorixDnsNodetype => "lookup",
                      sophomorixComment => "TEST2",
                    });
     # dns reverse lookup
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=30,DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=30,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
                      name=>"30",
                      sophomorixRole => "printer",
                      sophomorixAdminFile => "devices.csv",
                      sophomorixSchoolname => "default-school",
-                     sophomorixComputerIP => "10.170.208.30",
+                     sophomorixComputerIP => "172.16.0.30",
                      sophomorixDnsNodename => "laser1008",
                      sophomorixDnsNodetype => "reverse",
                      sophomorixComment => "TEST2",
                    });
     # dnsZone
     &AD_test_object({ldap=>$ldap,
-                     dn=>"DC=208.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
+                     dn=>"DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,".$root_dse,
                      #####
-                     name=>"208.170.10.in-addr.arpa",
-                     cn=>"208.170.10.in-addr.arpa",
+                     name=>"0.16.172.in-addr.arpa",
+                     cn=>"0.16.172.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
 
