@@ -1,0 +1,33 @@
+#!/bin/bash
+
+rm -rf /tmp/LOGDIR
+rm -rf /tmp/ERRORDIR
+mkdir -p /tmp/LOGDIR
+mkdir -p /tmp/ERRORDIR
+
+# delete later ????
+#rm -rf /var/log/sophomorix/userlog/
+date
+
+# 0 min
+echo ""
+echo "--analyze"
+time sophomorix-vampire --datadir ../sophomorix-dump --analyze 1> /tmp/LOGDIR/file-01.log 2> /tmp/ERRORDIR/file-01.err
+cat /tmp/ERRORDIR/file-01.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+# 1 min
+
+echo ""
+echo "--restore-config-files"
+time sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files 1> /tmp/LOGDIR/file-11.log 2> /tmp/ERRORDIR/file-11.err
+time sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files 1> /tmp/LOGDIR/file-11.log 2> /tmp/ERRORDIR/file-11.err
+cat /tmp/ERRORDIR/file-11.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+
+# 5/5/7 min
+echo ""
+echo "sophomorix-device"
+time sophomorix-device 1> /tmp/LOGDIR/file-16.log 2> /tmp/ERRORDIR/file-16.err
+cat /tmp/ERRORDIR/file-16.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+date
