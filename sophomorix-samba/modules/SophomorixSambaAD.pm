@@ -4495,6 +4495,7 @@ sub AD_get_AD_for_device {
 	        #}
 
                  push @{ $AD{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }, $dc; 
+                 push @{ $AD{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }, $dc; 
             } elsif ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_REVERSE'}){
                 # do not know if they are treaded separately
             } else {

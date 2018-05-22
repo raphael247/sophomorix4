@@ -417,115 +417,120 @@ sub _console_print_devices {
         @school_list=($school_opt);
     }
 
-    #print "HERE: @school_list\n";
-
+    my $line0="+-----------------------------------------------------------------------------+\n";
     my $line ="+---------------+---------------+-----------+---------------------------------+\n";
-    my $line2="+--------------------+--------------------------------------------------------+\n";
-    #if($log_level==1 and $object_name eq ""){
+    my $line2="+--------------------------+--------------------------------------------------+\n";
     foreach my $school (@school_list){
+        my $school_devices_count=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }+1;
         print "\n";
-	print "Devices in $school\n";
-    foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
-        my $role_alt=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
+        print $line0;
+	printf "| %-76s|\n",$school_devices_count." Devices in school $school:";
+        foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
+            my $role_alt=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
 
-        my $device_string;
-        if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'COMPUTER_ACCOUNT'} eq "TRUE"){
-            $device_string="dnsNode+computer";
-        } else {
-            $device_string="dnsNode";
-        }
-
-        my $host_group_string;
-        if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'HOST_GROUP'} eq "TRUE"){
-            $host_group_string=",hostgroup";
-        } else {
-            $host_group_string="";
-        }
-
-        #print "HERE2: $school --> $role items: $#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }\n";
-        my $number_of_devices=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }+1;
-        if ($number_of_devices==0){
-            # no device of this role
-            next;
-        }
-        # one device per line
-        print $line;
-        printf "| %-76s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
-        print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
-        print $line;
-#        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
-        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
-            my $computer;
-            my $hwc;
-            my $adminclass;
-            my $mac;
-            if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
-                $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
-                $hwc="";
-                $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
-                $mac=$ref_devices->{'computer'}{$computer}{'sophomorixComputerMAC'};
+            my $device_string;
+            if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'COMPUTER_ACCOUNT'} eq "TRUE"){
+                $device_string="dnsNode+computer";
             } else {
-                $computer="---";
-                $hwc="---";
-                $adminclass="---";
-                $mac="---";
+                $device_string="dnsNode";
             }
 
-            # sophomorixRole and sophomorixComment
-            my $role_short;
-            if (not exists $ref_devices->{'computer'}{$computer}{'sophomorixRole'}){
-                $role_short="---";
+            my $host_group_string;
+            if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'HOST_GROUP'} eq "TRUE"){
+                $host_group_string=",hostgroup";
             } else {
-                $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$ref_devices->{'computer'}{$computer}{'sophomorixRole'}};
+                $host_group_string="";
             }
-            my $comment;
-            if ( not exists $ref_devices->{'computer'}{$computer}{'sophomorixComment'} ){ 
-		$comment=" ";
-            } elsif ( $ref_devices->{'computer'}{$computer}{'sophomorixComment'} eq "---" ){
-		$comment=" ";
-            } else {
-		$comment=$ref_devices->{'computer'}{$computer}{'sophomorixComment'};
-            }
-            my $role_display=$comment.$role_short;
 
-            printf "|%-15s|%-15s|%-11s|%-33s|\n",
-                   $dns_node,
-                   $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
-                   $adminclass,
-                   $comment;
+            # skip when there are 0 devices
+            my $number_of_devices=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }+1;
+            if ($number_of_devices==0){
+                # no device of this role
+                next;
+            }
+            # one device per line
+            print $line;
+            printf "| %-76s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
+            print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
+            print $line;
+            foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
+                my $computer;
+                my $hwc;
+                my $adminclass;
+                my $mac;
+                if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
+                    $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
+                    $hwc="";
+                    $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
+                    $mac=$ref_devices->{'computer'}{$computer}{'sophomorixComputerMAC'};
+                } else {
+                    $computer="---";
+                    $hwc="---";
+                    $adminclass="---";
+                    $mac="---";
+                }
+
+                # sophomorixRole and sophomorixComment
+                my $role_short;
+                if (not exists $ref_devices->{'computer'}{$computer}{'sophomorixRole'}){
+                    $role_short="---";
+                } else {
+                    $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
+                }
+                my $comment;
+                if ( not exists $ref_devices->{'computer'}{$computer}{'sophomorixComment'} ){ 
+		    $comment=" ";
+                } elsif ( $ref_devices->{'computer'}{$computer}{'sophomorixComment'} eq "---" ){
+	  	    $comment=" ";
+                } else {
+		    $comment=$ref_devices->{'computer'}{$computer}{'sophomorixComment'};
+                }
+                my $role_display=$comment.$role_short;
+
+                printf "|%-15s|%-15s|%-11s|%-33s|\n",
+                       $dns_node,
+                       $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
+                       $adminclass,
+                       $comment;
+            }
+            print $line;
+            #print "    /-/#: sophomorixComment nonexisting/---/existing\n";
+
+            # showing help
+            # my @role_help=();
+            # foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
+            #     push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
+            # }
+            # @role_help = sort @role_help;
+            #
+            # my $count=0;
+            # foreach my $item (@role_help){
+            #     if ( int($count/2)*2==$count){
+            #         #print "even $count\n";
+	    # 	      if (defined $role_help[$count+1]){
+	    # 	          printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
+            #         } else {
+            #             # last element
+	    # 	          printf "   %-34s %-34s \n",$role_help[$count],"";
+            #         }
+            #     } else {
+            #         #print "odd  $count\n";
+	    #     }
+            #     $count++;
+            # }
         }
-        print $line;
-        #print "    /-/#: sophomorixComment nonexisting/---/existing\n";
-
-        # showing help
-        # my @role_help=();
-        # foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
-        #     push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
-        # }
-        # @role_help = sort @role_help;
-        #
-        # my $count=0;
-        # foreach my $item (@role_help){
-        #     if ( int($count/2)*2==$count){
-        #         #print "even $count\n";
-	# 	if (defined $role_help[$count+1]){
-	# 	    printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
-        #         } else {
-        #             # last element
-	# 	    printf "   %-34s %-34s \n",$role_help[$count],"";
-        #         }
-        #     } else {
-        #         #print "odd  $count\n";
-	#     }
-        #     $count++;
-        # }
+        if ($school_devices_count==0){
+	    print $line0;
+        }
     }
-    }
+
+    # global part
+    print "\n";
     print $line2;
-    print     "| Hardwareclass      |                                                              |\n";
+    print     "| Hardwareclasses (global) |                                                  |\n";
     print $line2;
         foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-            printf "| %-19s| %-61s|\n",$hwk,"";
+            printf "| %-25s| %-49s|\n",$hwk,"";
         }
     print $line2;
 }
