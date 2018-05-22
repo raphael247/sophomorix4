@@ -231,11 +231,6 @@ sub AD_bind_admin {
         print "Testing if the Sophomorix Schema exists (Sophomorix-User)...\n";
     }
 
-
-#    my $base="CN=Sophomorix-User,CN=Schema,CN=Configuration,".$root_dse;
-#    my $filter="(cn=Sophomorix-User)";
-
-#    my $base="CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,".$root_dse;
     my $base="CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,".$root_dse;
     my $filter="(cn=sophomorix-Schema-Version)";
     my $mesg2 = $ldap->search(
