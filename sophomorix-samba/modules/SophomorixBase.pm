@@ -3591,7 +3591,11 @@ sub result_sophomorix_add {
     # $num: -1, no number, else look in ERROR|WARNING db
     # $ref_parameter: list of parameters to be fitted in db string
     # $message: used if errnumber is not found in db
-    my ($ref_result,$type,$num,$ref_parameter,$message)=@_;
+    my ($ref_result,
+        $type, # ERROR OR WARNING
+        $num,  # error number (for lookup), -1: dont search
+        $ref_parameter,
+        $message)=@_;
 
 #    print "LIST of parameters:\n";
 #    foreach my $para ( @{ $ref_parameter}  ){ 
@@ -3605,6 +3609,7 @@ sub result_sophomorix_add {
              NUMBER     => $num,
              MESSAGE_EN => $message,
              MESSAGE_DE => $message,
+             #ARGUMENTS => $ref_parameter,
             };
     } else {
         push @{ $ref_result->{'OUTPUT'} }, 
@@ -3996,9 +4001,10 @@ sub log_script_exit {
         $skiplock,       # skiplock (unused)
         $ref_arguments,  # arguments of calling script
         $ref_result,     # reference to result hash
+        $ref_sophomorix_config,
         $json,
         $ref_parameter,  # replacement parameter list for error scripts
-        $ref_sophomorix_config)=@_;
+        )=@_;
 
     # log script exit uses its own time (calculate how long a script was running)
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;

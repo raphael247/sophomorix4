@@ -407,10 +407,12 @@ if ($dns_test==1){
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
         $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
-       open(DEVICES,"$device_file") || 
-             die "ERROR: $device_file not found!";  
+        open(DEVICES,"$device_file") || 
+            die "ERROR: $device_file not found!";
+        my $device_line_count=0;  
         while(<DEVICES>){
-            &analyze_device_line($_,$device_file,$filename,$school);
+            $device_line_count++;
+            &analyze_device_line($_,$device_file,$filename,$school,$device_line_count);
         }
         close(DEVICES);
     }
@@ -640,9 +642,11 @@ foreach my $device_file (@filelist){
     $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
     &print_title("Reading $device_file");
     open(DEVICES,"$device_file") || 
-         die "ERROR: $device_file not found!";  
+         die "ERROR: $device_file not found!"; 
+    my $device_line_count=0;  
     while(<DEVICES>){
-        &analyze_device_line($_,$device_file,$filename,$school);
+        $device_line_count++;
+        &analyze_device_line($_,$device_file,$filename,$school,$device_line_count);
     }
     # sort some lists
     foreach my $room (keys %{$devices_file{'room'}}) {
@@ -673,10 +677,10 @@ if ($error_in_files > 0){
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
-&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-    #&log_script_exit("ERROR parsing device files: $error_in_files errors.",1,1,0,
-    #                 \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-    exit 88;
+#&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    &log_script_exit("ERROR parsing device files: $error_in_files errors.",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    #exit 88;
 }
 
 ############################################################################
@@ -1878,7 +1882,7 @@ exit 0;
 # subs
 # ===========================================================================
 sub analyze_device_line {
-    my ($line,$device_file,$filename,$school) = @_;
+    my ($line,$device_file,$filename,$school,$device_line_count) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -1937,7 +1941,11 @@ sub analyze_device_line {
         # name
         if (exists $devices_file{'device'}{$host_token}){
             print "Device Name (Field2) is double: $host_token\n";
-            &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,,"$filename:Device Name (Field2) is double: $host_token");
+            &result_sophomorix_add(\%sophomorix_result,
+                                   "ERROR",
+                                   -1,
+                                   \@arguments,
+                                   "$filename (Line: $device_line_count): Device Name (Field2) is double: $host_token");
             $error_in_files++;
         }
 
