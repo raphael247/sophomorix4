@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# This script (sophomorix-develtool-set-schema-version) is maintained by Rüdiger Beck
+# This script (sophomorix-testtool-set-schema-version) is maintained by Rüdiger Beck
 # It is Free Software (License GPLv3)
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
@@ -18,24 +18,28 @@ my $target_version=1;
 if (defined $ARGV[0]){
     if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help"){
    print('
-  sophomorix-develtool-set-schema-version sets the Sophomorix-Schema-Version in AD 
+  sophomorix-testtool-set-schema-version sets the Sophomorix-Schema-Version in AD 
   to any <number> (i.E. rangeUpper): 
      * WITHOUT doing any updates/downgrades of the schema.
      * This will most likely cause a lot of trouble. 
      * It is useful only in development.
 
   Usage:
-     sophomorix-develtool-set-schema-version       (set version 1)
-     sophomorix-develtool-set-schema-version <n>   (set version <n>)
+     sophomorix-testtool-set-schema-version       (set version 1)
+     sophomorix-testtool-set-schema-version <n>   (set version <n>)
 
 ');
    exit;
     } elsif ($ARGV[0] eq "0") {
-        print "\n$ARGV[0] not allowed\n\n";
+        print "\n$ARGV[0] not allowed as schema version\n\n";
         exit;
     } else {
 	$target_version=$ARGV[0];
     }
+} else {
+        print "\nERROR: sophomorix-testtool-set-schema-version needs an option (-h for help)\n\n";
+        exit;
+
 }
 
 
