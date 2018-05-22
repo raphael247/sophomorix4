@@ -4272,7 +4272,7 @@ sub AD_get_AD_for_device {
             my $sam=$entry->get_value('sAMAccountName');
             my $prefix=$entry->get_value('sophomorixSchoolPrefix');
             my $role=$entry->get_value('sophomorixRole');
-            my $sn=$entry->get_value('sophomorixSchoolname');
+            my $school=$entry->get_value('sophomorixSchoolname');
             my $file=$entry->get_value('sophomorixAdminFile');
             $AD{'computer'}{$sam}{'sophomorixSchoolPrefix'}=$prefix;
 
@@ -4280,7 +4280,7 @@ sub AD_get_AD_for_device {
             # increase role counter 
             $AD{'RESULT'}{'computer'}{$role}{'COUNT'}++;
 
-            $AD{'computer'}{$sam}{'sophomorixSchoolname'}=$sn;
+            $AD{'computer'}{$sam}{'sophomorixSchoolname'}=$school;
             $AD{'computer'}{$sam}{'sophomorixAdminFile'}=$file;
             $AD{'computer'}{$sam}{'sophomorixDnsNodename'}=$entry->get_value('sophomorixDnsNodename');
             $AD{'computer'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
@@ -4292,7 +4292,8 @@ sub AD_get_AD_for_device {
             @{ $AD{'computer'}{$sam}{'sophomorixComputerDefaults'} }=$entry->get_value('sophomorixComputerDefaults');
 
             # lists
-            push @{ $AD{'LISTS'}{'COMPUTER_BY_sophomorixSchoolname'}{$sn}{$role} }, $sam; 
+            push @{ $AD{'LISTS'}{'COMPUTER_BY_sophomorixSchoolname'}{$school}{$role} }, $sam; 
+            #push @{ $AD{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }, $sam; 
 
             # lookup
             $AD{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$entry->get_value('sophomorixDnsNodename')}=$sam;
@@ -4465,9 +4466,13 @@ sub AD_get_AD_for_device {
 
             if ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_LOOKUP'}){
                 # sophomorixdnsNodes
+                my $role=$entry->get_value('sophomorixRole');
+                my $school=$entry->get_value('sophomorixSchoolname');
                 $AD{'RESULT'}{'dnsNode'}{'sophomorix'}{'COUNT'}++;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsNode'}=$dc;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'dnsZone'}=$root_dns;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixRole'}=$role;
+                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixSchoolname'}=$school;
                 #$AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixAdminFile'}=
                     $entry->get_value('sophomorixAdminFile');
@@ -4477,10 +4482,6 @@ sub AD_get_AD_for_device {
                     $entry->get_value('sophomorixDnsNodename');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixDnsNodetype'}=
                     $entry->get_value('sophomorixDnsNodetype');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixRole'}=
-                    $entry->get_value('sophomorixRole');
-                $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixSchoolname'}=
-                    $entry->get_value('sophomorixSchoolname');
                 $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'sophomorixComputerIP'}=
                     $entry->get_value('sophomorixComputerIP');
                 # get ipv4
@@ -4493,7 +4494,7 @@ sub AD_get_AD_for_device {
                 #  $AD{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dc}{'IPv4'}=$ip;  
 	        #}
 
-                push @{ $AD{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} }, $dc;
+                 push @{ $AD{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }, $dc; 
             } elsif ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_REVERSE'}){
                 # do not know if they are treaded separately
             } else {

@@ -408,15 +408,53 @@ sub _console_print_onesession {
 
 
 sub _console_print_devices {
-    my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
-    my $line ="+----+---------------+---------------+----------------+-----------+-----------------+\n";
-    my $line2="+--------------------+--------------------------------------------------------------+\n";
+    my ($ref_devices,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    #print "HERE: @school_list\n";
+
+    my $line ="+---------------+---------------+-----------+---------------------------------+\n";
+    my $line2="+--------------------+--------------------------------------------------------+\n";
     #if($log_level==1 and $object_name eq ""){
+    foreach my $school (@school_list){
+        print "\n";
+	print "Devices in $school\n";
+    foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
+        my $role_alt=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
+
+        my $device_string;
+        if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'COMPUTER_ACCOUNT'} eq "TRUE"){
+            $device_string="dnsNode+computer";
+        } else {
+            $device_string="dnsNode";
+        }
+
+        my $host_group_string;
+        if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'HOST_GROUP'} eq "TRUE"){
+            $host_group_string=",hostgroup";
+        } else {
+            $host_group_string="";
+        }
+
+        #print "HERE2: $school --> $role items: $#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }\n";
+        my $number_of_devices=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }+1;
+        if ($number_of_devices==0){
+            # no device of this role
+            next;
+        }
         # one device per line
         print $line;
-        print "|Role| DNS-Node      | IPv4          | Computer       | Room      | MAC             |\n";
+        printf "| %-76s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
+        print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
         print $line;
-        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
+#        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
+        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
             my $computer;
             my $hwc;
             my $adminclass;
@@ -444,46 +482,45 @@ sub _console_print_devices {
             if ( not exists $ref_devices->{'computer'}{$computer}{'sophomorixComment'} ){ 
 		$comment=" ";
             } elsif ( $ref_devices->{'computer'}{$computer}{'sophomorixComment'} eq "---" ){
-		$comment="-";
+		$comment=" ";
             } else {
-		$comment="#";
+		$comment=$ref_devices->{'computer'}{$computer}{'sophomorixComment'};
             }
             my $role_display=$comment.$role_short;
 
-            printf "|%-4s|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
-                   $role_display,
+            printf "|%-15s|%-15s|%-11s|%-33s|\n",
                    $dns_node,
                    $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
-                   $computer,
                    $adminclass,
-                   $mac;
+                   $comment;
         }
         print $line;
-        print "    /-/#: sophomorixComment nonexisting/---/existing\n";
+        #print "    /-/#: sophomorixComment nonexisting/---/existing\n";
 
         # showing help
-        my @role_help=();
-        foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
-            push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
-        }
-        @role_help = sort @role_help;
-
-        my $count=0;
-        foreach my $item (@role_help){
-            if ( int($count/2)*2==$count){
-                #print "even $count\n";
-		if (defined $role_help[$count+1]){
-		    printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
-                } else {
-                    # last element
-		    printf "   %-34s %-34s \n",$role_help[$count],"";
-                }
-            } else {
-                #print "odd  $count\n";
-	    }
-            $count++;
-        }
-    #}
+        # my @role_help=();
+        # foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
+        #     push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
+        # }
+        # @role_help = sort @role_help;
+        #
+        # my $count=0;
+        # foreach my $item (@role_help){
+        #     if ( int($count/2)*2==$count){
+        #         #print "even $count\n";
+	# 	if (defined $role_help[$count+1]){
+	# 	    printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
+        #         } else {
+        #             # last element
+	# 	    printf "   %-34s %-34s \n",$role_help[$count],"";
+        #         }
+        #     } else {
+        #         #print "odd  $count\n";
+	#     }
+        #     $count++;
+        # }
+    }
+    }
     print $line2;
     print     "| Hardwareclass      |                                                              |\n";
     print $line2;
@@ -2825,6 +2862,7 @@ sub config_sophomorix_read {
             }
         } elsif ($section=~m/^computerrole\./){ 
             my ($string,$role)=split(/\./,$section);
+            push @{ $sophomorix_config{'LISTS'}{'ROLE_DEVICE'} },$role;
             foreach my $keyname (keys %{$sophomorix_config{'INI'}{$section}}) {
                 if ($keyname eq "DEVICE_SHORT"){
                     $sophomorix_config{'LOOKUP'}{'ROLES_ALL'}{$role}=$sophomorix_config{'INI'}{$section}{$keyname};
@@ -2951,6 +2989,9 @@ sub config_sophomorix_read {
             }
         }
     }
+    # sort some lits
+    @{ $sophomorix_config{'LISTS'}{'ROLE_DEVICE'} } = sort @{ $sophomorix_config{'LISTS'}{'ROLE_DEVICE'} };
+  
 
     # Working on the Lists of sophomorix.ini
     ###############################################

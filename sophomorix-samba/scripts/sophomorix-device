@@ -255,7 +255,8 @@ my %ms_key_ok = ();
 $ms_key_ok{"---"}="ok";
 $ms_key_ok{""}="ok";
 
-
+# for display only
+my $school="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -263,6 +264,7 @@ my $testopt=GetOptions(
        "i|info" => \$info,
        "json|j+" => \$json,
        "verbose|v+" => \$Conf::log_level,
+       "school=s" => \$school,
        "list-files" => \$list_files,
        "p|print" => \$print,
        "dump-AD" => \$dump_AD,
@@ -611,7 +613,7 @@ if ($info==1 and $show_role ne ""){
         &json_dump({json => $json,
                     jsoninfo => $jsoninfo,
                     jsoncomment => $jsoncomment,
-                    object_name => "",
+                    object_name => $school,
                     log_level => $Conf::log_level,
                     hash_ref => $ref_AD_device,
                     sophomorix_config => \%sophomorix_config,
