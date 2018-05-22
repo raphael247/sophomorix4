@@ -624,7 +624,7 @@ if ($info==1 and $show_role ne ""){
 
 
 ################################################################################
-# fetching data for sync
+# fetching data from AD for sync
 ################################################################################
 my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
                                              root_dse=>$root_dse,
@@ -636,7 +636,6 @@ my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
 ############################################################################
 # reading and checking files for sync
 ############################################################################
-# reading and checking all device files
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
     $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
@@ -656,6 +655,7 @@ foreach my $device_file (@filelist){
     }
     close(DEVICES);
 }
+
 
 
 ############################################################################
