@@ -130,61 +130,6 @@ my $password="";
 # where data from workstation file is saved
 my @domcomputers_file=(); # list ordered
 my %devices_file=();
-# device   -> $name     -> ACCOUNT 0/1
-#                       -> FILENAME
-#                       -> HWK
-#                       -> IPv4
-#                       -> MAC
-#                       -> MS_OFFICE_KEY
-#                       -> MS_WINDOWS_KEY
-#                       -> OU
-#                       -> PATH_ABS
-#                       -> ROOM
-#                       -> SCHOOL
-#                       -> COMPUTER    (capitalized name)
-#                       -> COMPUTER_DOLLAR (capitalized with $)
-#
-# room     -> $room     -> HOSTS
-#                       -> IPv4
-#                       -> MAC
-#                       -> CLASSROOM=TRUE/FALSE 
-# dnsNode  -> $dnsNode  -> $IP
-# dnsZone  -> $dnsZone  -> name
-# computer -> $computer -> ROOM
-#                       -> OU
-#                       -> SCHOOL
-#                       -> COMPUTER    (capitalized name)
-#                       -> COMPUTER_DOLLAR (capitalized with $)
-#
-
-
-
-# italc
-# my $italc_owner="root";
-# my $italc_dir="";
-# my $italc_conf_dir="/etc/linuxmuster/sophomorix/italc";
-# my $italc_conf=$italc_conf_dir."/italcrooms.conf";
-# my $italc_key_dir=$italc_conf_dir."/private";
-# my $italc_key_dir_admin=$italc_key_dir."/admin";
-# my $italc_key_dir_supporter=$italc_key_dir."/supporter";
-# my $italc_key_dir_teacher=$italc_key_dir."/teacher";
-# # italc
-# my $w_coord=169;
-# my $h_coord=126;
-# my $x_coord="xxxxxxxxxxxx";
-# my $y_coord="yyyyyyyyyyyy";
-# my @x_coord=(0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513); # max 40 hosts
-# my @y_coord=(0,0,0,0,128,128,128,128,
-#              256,256,256,256,384,384,384,384,
-#              512,512,512,512,640,640,640,640,
-#              768,768,768,768,896,896,896,896,
-#              1024,1024,1024,1024,1152,1152,1152,1152); # max 40 hosts
-# my %italc_rooms=();
-# my @italc_rooms=();
 
 # classrooms
 my %class_rooms=();
@@ -194,7 +139,7 @@ $class_rooms{'j1008'}="seen";
 $class_rooms{'bsz-j1010'}="seen";
 $class_rooms{'bsz-j1008'}="seen";
 
-my $set_computer_passwords=0;
+#my $set_computer_passwords=0;
 my $dns_test=0;
 my $dns_show=0;
 my $dns_kill=0;
@@ -269,7 +214,7 @@ my $testopt=GetOptions(
        "dump-AD" => \$dump_AD,
        "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
-       "set-computer-passwords" => \$set_computer_passwords,
+#       "set-computer-passwords" => \$set_computer_passwords,
        "dns-test" => \$dns_test,
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
@@ -277,7 +222,6 @@ my $testopt=GetOptions(
        "device|d=s" => \$device,
        "show-role=s" => \$show_role,
        "add-example-line=s" => \$add_example_line,
-#       "italc-dir=s" => \$italc_dir,
           );
 
 
@@ -353,10 +297,6 @@ Managing DNS
 Dumping data:                     
   --dump-files -j                  (dump contents of user files)
   --dump-AD -j                     (dump AD data)
-
-Obsolete: Managing italc:
-          --italc-dir /path/to/dir  (create italc files in /path/to/dir:
-                                   italcroom/globalconfig.xml)
 
 
 Please see the sophomorix-device(8) man pages for full documentation
@@ -1230,7 +1170,6 @@ if($no_sync==1){
 # Modifying System
 # ===========================================================================
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
-#&get_italcrooms();
 
 
 # ===========================================================================
@@ -1643,239 +1582,37 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                               });   
     }
 
+    &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
-# ===========================================================================
-# --set-computer-passwords (setting computer passwords)
-# ===========================================================================
-if ($set_computer_passwords==1){
-    print "Setting password for all Computer accounts:\n";
-    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-                                                 root_dse=>$root_dse,
-                                                 root_dns=>$root_dns,
-                                                 sophomorix_config=>\%sophomorix_config,
-                                               });
-    my $count=1;
-    foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
-        my $pw;
-        if ($password ne ""){
-            # password by option
-            $pw=$password;
-        } else {
-            # default password
-            $pw=$pass;
-        }
-        print "\n*** $count: $comp  --> $pw\n";
-        system("/usr/sbin/sophomorix-passwd --force -u $comp --pass $pw");
-        $count++;
-    }
-    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-}
-
-
-
 # # ===========================================================================
-# # --italc-dir  (create config files for italc)
+# # --set-computer-passwords (setting computer passwords)
 # # ===========================================================================
-# if ($italc_dir ne ""){
-#     print "Creating italc files in $italc_dir\n";
-#     system("mkdir -p $italc_dir");
-#     system("chown $italc_owner.${DevelConf::teacher} $italc_dir");
-#     system("chmod 0755 $italc_dir");
-
-#     my $file_global="globalconfig.xml";
-#     my $file_personal="personalconfig.xml";
-#     my $dir_snapshots="snapshots";
-
-#     foreach my $room (@italc_rooms){
-#         my @teacher_hosts=();
-#         my $classroom_name=$italc_rooms{$room}{'NAME'};
-#         my $master_host=$italc_rooms{$room}{'MASTER'};
-
-#         my $italc_parent=$italc_dir."/".$room;
-#         my $italc_file_global=$italc_parent."/".$file_global;
-#         my $italc_file_personal=$italc_parent."/".$file_personal;
-#         my $italc_snapshots_dir=$italc_parent."/".$dir_snapshots;
-
-#         system("mkdir -p $italc_parent");
-#         system("chown $italc_owner.${DevelConf::teacher} $italc_parent");
-#         system("chmod 0755 $italc_parent");
-
-#         system("mkdir -p $italc_snapshots_dir");
-#         system("chmod 0777 $italc_snapshots_dir");
-
-#         print "Creating $italc_file_global for italcroom $room ...\n";
-#         open(ITALCGLOBAL, ">$italc_file_global");
-#         print ITALCGLOBAL '<?xml version="1.0"?>'."\n";
-#         print ITALCGLOBAL '<!DOCTYPE italc-config-file>'."\n";
-#         print ITALCGLOBAL '<globalclientconfig version="1.0.7" >'."\n";
-#         print ITALCGLOBAL '  <body>'."\n";
-#         print ITALCGLOBAL '    <classroom name="'.$classroom_name.'" >'."\n";
-
-#         print "Creating $italc_file_personal for italcroom $room ...\n";
-#         open(ITALCPERSONAL, ">$italc_file_personal");
-#         print ITALCPERSONAL '<?xml version="1.0"?>'."\n";
-#         print ITALCPERSONAL '<!DOCTYPE italc-config-file>'."\n";
-#         print ITALCPERSONAL '<personalconfig version="1.0.7" >'."\n";
-#         print ITALCPERSONAL '  <head>'."\n";
-
-#         my @host_list_global=();
-#         my @host_list_personal=();
-#         my %host_lines_global=();
-#         my %host_lines_personal=();
-#         for my $host ( keys %{ $rooms_file{$room}{"HOSTS"} } ) {
-#             my $ip=$domcomputers_file{$host}{"IP"};
-#             my $mac=$domcomputers_file{$host}{"MAC"};
-#             my $account_flag=$domcomputers_file{$host}{"ACCOUNT"};
-#             # type? 0/1 
-#             my $type=0;
-#             if (exists $italc_rooms{$room}{"$host"}{'TYPE'}){
-#                if ($italc_rooms{$room}{"$host"}{'TYPE'} eq "teacher host"){
-# 		    $type=1;
-#                     # remember teacher hosts
-#                     push @teacher_hosts, $host;
-#                 }
-#             }
-
-#             # visible? yes/no
-#             my $visible="yes";
-#             if (exists $italc_rooms{$room}{"$host"}{'INVISIBLE'}){
-#                if ($italc_rooms{$room}{"$host"}{'INVISIBLE'} eq "yes"){
-#                     $visible="no";
-#                 }
-#             }
-
-#             # id is 6 digits of MAC-address converted to decimal
-#             # more digits are not suppoorted bay italc 1.0.7
-#             # perl can calculate lager hex numbers.
-#             # warnings must be be disabled if you need more 
-#             # -> see beginning of script: no warnings ....
-#             my $hex_mac=$mac;
-#             $hex_mac=~s/://g;
-#             $hex_mac=substr($hex_mac,6,6);
-# 	    my $dec_mac =  hex($hex_mac);
-#             my $id=$dec_mac;
-
-#             my $line_global="      <client localip=\"".$ip."\" ".
-#                                               "mac=\"".$mac."\" ".
-#                                              "type=\"".$type."\" ".
-#                                                "id=\"".$id."\" ".
-#                                              "name=\"".$host."\" ".
-#                             "/>\n";
-#             my $line_personal="      <client w=\"".$w_coord."\" ".
-#                                             "x=\"".$x_coord."\" ".
-#                                             "y=\"".$y_coord."\" ".
-#                                             "h=\"".$h_coord."\" ".
-#                                       "visible=\"".$visible."\" ".
-#                                            "id=\"".$id."\" ".
-#                               "/> <!-- $host -->\n";
-#             if ($account_flag eq "1"){
-#                 # for sorting
-#                 push @host_list_global, $host;
-#                 push @host_list_personal, $host;
-#                 # save lines for later use
-#                 $host_lines_global{$host}=$line_global;
-#                 $host_lines_personal{$host}=$line_personal;
-#             } else {
-#                 # no account flag -> no italc account 
-#             }
+# if ($set_computer_passwords==1){
+#     print "Setting password for all Computer accounts:\n";
+#     my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+#                                                  root_dse=>$root_dse,
+#                                                  root_dns=>$root_dns,
+#                                                  sophomorix_config=>\%sophomorix_config,
+#                                                });
+#     my $count=1;
+#     foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
+#         my $pw;
+#         if ($password ne ""){
+#             # password by option
+#             $pw=$password;
+#         } else {
+#             # default password
+#             $pw=$pass;
 #         }
-
-#         @host_list_global = sort @host_list_global;
-#         @host_list_personal = sort @host_list_personal;
-
-#         foreach my $host (@host_list_global){
-# 		print ITALCGLOBAL "$host_lines_global{$host}";
-#         }
-        
-#         # italc global file
-#         print ITALCGLOBAL '    </classroom>'."\n";
-#         print ITALCGLOBAL '  </body>'."\n";
-#         print ITALCGLOBAL '</globalclientconfig>'."\n";
-#         close(ITALCGLOBAL);
-#         system("chown $italc_owner.${DevelConf::teacher} $italc_file_global");
-#         system("chmod 0755 $italc_file_global");
-
-#         # italc personal file
-#         my $master_ip=$domcomputers_file{$master_host}{"IP"};
-#         print ITALCPERSONAL '  <globalsettings '.
-#                             "demo-master-ip=\"".$master_ip."\" ".
-#                             'opened-tab="5" '.
-#                             'demoquality="0" '.
-#                             'defaultdomain="" '.
-#                             'role="1" '.
-#                             'demo-net-iface="eth0" '.
-#                             'client-update-interval="1" '.
-#                             'wincfg="AAAA/wAAAAD9AAAAAAAABAAAAAJfAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AdABvAG8AbABiAGEAcgEAAAAAAAAEAAAAAAAAAAAA" '.
-#                             'notooltips="0" '.
-#                             'win-height="663" '.
-#                             'win-x="0" '.
-#                             'ismaximized="1" '.
-#                             'win-y="0" '.
-#                             'clientdoubleclickaction="0" '.
-#                             'win-width="1024" '.
-#                             'showUserColumn="0" />'."\n";
-#         print ITALCPERSONAL '  </head>'."\n";
-#         print ITALCPERSONAL '  <body>'."\n";
-#         print ITALCPERSONAL '    <classroom name="'.$classroom_name.'" >'."\n";
-#         my $host_index=0; # index for array: index=0 --> first element
-#         foreach my $host (@host_list_personal){
-# 	    my $line_to_print=$host_lines_personal{$host};
-#             # replace coordinates
-#             $line_to_print=~s/$x_coord/$x_coord[$host_index]/g;
-#             $line_to_print=~s/$y_coord/$y_coord[$host_index]/g;
-#             print ITALCPERSONAL "$line_to_print";
-#             # old: print unmodified
-# 	    #print ITALCPERSONAL "$host_lines_personal{$host}";
-#             $host_index++;
-#         }
-#         print ITALCPERSONAL '    </classroom>'."\n";
-#         print ITALCPERSONAL '  </body>'."\n";
-#         print ITALCPERSONAL '</personalconfig>'."\n";
-#         close(ITALCPERSONAL);
-#         system("chown $italc_owner.${DevelConf::teacher} $italc_file_personal");
-#         system("chmod 0755 $italc_file_personal");
-
-#         foreach my $teacher_host (@teacher_hosts){
-#             # create links for teacher hosts
-#             system("cd $italc_dir; ln -s $room $teacher_host");
-#         }
+#         print "\n*** $count: $comp  --> $pw\n";
+#         system("/usr/sbin/sophomorix-passwd --force -u $comp --pass $pw");
+#         $count++;
 #     }
-
-#     # copying the keys
-#     print "* Copying italc keys to $italc_dir\n";
-#     system("cp -r $italc_key_dir $italc_dir");
-#     system("chown -R $italc_owner.${DevelConf::teacher} $italc_dir");
-#     if (-e "${italc_key_dir_admin}/key"){
-#         system("chmod 440 ${italc_key_dir_admin}/key");
-#     } else {
-#         print "\nPlease add a key ${italc_key_dir_admin}/key!\n\n";
-#     }
-#     if (-e "${italc_key_dir_supporter}/key"){
-#         system("chmod 440 ${italc_key_dir_supporter}/key");
-#     } else {
-#         print "\nPlease add a key ${italc_key_dir_supporter}/key!\n\n";
-#     }
-#     if (-e "${italc_key_dir_teacher}/key"){
-#         system("chmod 440 ${italc_key_dir_teacher}/key");
-#     } else {
-#         print "\nPlease add a key ${italc_key_dir_teacher}/key!\n\n";
-#     }
-#     &log_script_end(\@arguments,\%sophomorix_result,$json);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 # }
-
-
-
-&AD_unbind_admin($ldap);
-
-# syntax was OK
-#&log_script_end(\@arguments,\%sophomorix_result,$json);
-exit 0;
-
-
-
 
 
 
