@@ -3628,6 +3628,7 @@ sub result_sophomorix_init {
     $sophomorix_result{'SCRIPTNAME'}=$scriptname;
     $sophomorix_result{'JSONINFO'}="RESULT";
     $sophomorix_result{'JSONCOMMENT'}="---";
+    @{ $sophomorix_result{'OUTPUT'} }=();
     return %sophomorix_result; 
 }
 
@@ -3648,7 +3649,6 @@ sub result_sophomorix_add {
 #    foreach my $para ( @{ $ref_parameter}  ){ 
 #        print "$para\n";
 #    } 
-
     if ($type eq "ERROR" or $type eq "WARNING" ){
         # get error from db, update $message_de, $message_en
         push @{ $ref_result->{'OUTPUT'} }, 
@@ -3674,11 +3674,16 @@ sub result_sophomorix_add_log {
     # $num: -1, no number, else look in ERROR|WARNING db
     # $ref_parameter: list of parameters to be fitted in db string
     # $message: used if errnumber is not found in db
-    my ($ref_result,$log_message)=@_;
-    push @{ $ref_result->{'OUTPUT'} }, 
-        {TYPE       => "LOG", 
-         LOG => $log_message,
-        };
+    my ($ref_result,$log_message) = @_;
+    my %out_hash=();
+    $out_hash{'TYPE'}="LOG";
+    $out_hash{'LOG'}=$log_message;
+    push @{ $ref_result->{'OUTPUT'} },{%out_hash};
+
+#    push @{ $ref_result->{'OUTPUT'} }, 
+#        {TYPE => "LOG", 
+#         LOG  => $log_message
+#        };
 }
 
 
