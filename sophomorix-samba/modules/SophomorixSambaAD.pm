@@ -6012,7 +6012,6 @@ sub AD_get_full_devicedata {
         my $name=$entry->get_value('name');
         my $dn=$entry->dn();
         my $cn=$entry->get_value('cn');
-	print "HERE: $cn\n";
         # sophomorixDnsNodetype (lookup/reverse))
         my $dnsnode_type="";
         if (defined $entry->get_value('sophomorixDnsNodetype')){

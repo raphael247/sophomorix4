@@ -100,7 +100,6 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
-my $show_role="";
 
 my $json=0;
 my $list_files=0;
@@ -196,6 +195,7 @@ my %pxe = qw(ml ok
             );
 
 my $device="";
+my $room="";
 
 my %ms_key_ok = ();
 $ms_key_ok{"---"}="ok";
@@ -220,7 +220,7 @@ my $testopt=GetOptions(
        "dns-show" => \$dns_show,
        "password=s" => \$password,
        "device|d=s" => \$device,
-       "show-role=s" => \$show_role,
+       "room|r=s" => \$room,
        "add-example-line=s" => \$add_example_line,
           );
 
@@ -258,12 +258,14 @@ sophomorix-device adds Devices to the system:
     DNS entries 
 
 Options:
-  -h   /  --help
-  -i   /  --info
-  --info --device <device1>,<device2>,...  detailed view of device
-  --list-files              (list processed files and exit)
-  -v   /  --verbose
-  -vv  /  --verbose --verbose
+  -h / --help
+  --list-files                             (list processed files and exit)
+  -i / --info                              (overview over all schools)
+  -i / --info --school <school>            (overview over school <school>)
+  --info --device <device1>,<device2>,...  (detailed view of device1,...)
+  --info --room <room1>,<room2>,...        (detailed view of room1,...)
+  -v / --verbose
+  -vv / --verbose --verbose
 
 Information about devices in AD:
   sophomorix-device --info 
@@ -506,15 +508,17 @@ if ($print==1){
 
 
 # all --info option go here
-if ($info==1 and $show_role ne ""){
+if ($info==1 and $room ne ""){
     ##################################################
-    # --info --show-role <role>
-    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-                                                 root_dse=>$root_dse,
-                                                 root_dns=>$root_dns,
-                                                 sophomorix_config=>\%sophomorix_config,
-                                               });
-    print "HERE: show role $show_role\n";
+    # --info --room <room>
+    #my $ref_devices=&AD_get_full_roomdata({ldap=>$ldap,
+    #                                       root_dse=>$root_dse,
+    #                                       root_dns=>$root_dns,
+    #                                       roomlist=>$room,
+    #                                       sophomorix_config=>\%sophomorix_config,
+    #                                      });
+
+    print "HERE: show room $room\n";
 
 
     exit;
