@@ -3739,7 +3739,7 @@ sub result_sophomorix_check_exit {
     my $err=0;
     # count results
     foreach my $line ( @{ $ref_result->{'OUTPUT'}}  ){
-	print "$line\n";
+	#print "$line\n";
         if ($line->{'TYPE'} eq "ERROR"){
             $err++;
         } elsif ($line->{'TYPE'} eq "WARNING"){
