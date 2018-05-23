@@ -421,8 +421,20 @@ sub _console_print_devices {
     my $line ="+----------------+----------------+------------+----------------------------------+\n";
     my $line2="+--------------------------+------------------------------------------------------+\n";
     foreach my $school (@school_list){
-        my $school_devices_count=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }+1;
+        # rooms
+        my $school_rooms_count=$#{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }+1;
         print "\n";
+        print $line0;
+	printf "| %-80s|\n",$school_rooms_count." Rooms in school $school:";
+        print $line0;
+        foreach my $room (@{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }){
+            printf "| %-80s|\n",$room;
+        }
+
+
+        # devices
+        my $school_devices_count=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }+1;
+        #print "\n";
         print $line0;
 	printf "| %-80s|\n",$school_devices_count." Devices in school $school:";
         foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
