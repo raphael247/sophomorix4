@@ -20,6 +20,8 @@ DESTDIR=
 # etc
 ETC=$(DESTDIR)/etc
 SYSTEMD=$(DESTDIR)/run/systemd
+NETPLAN=$(DESTDIR)/etc/netplan
+
 
 all: install
 
@@ -40,5 +42,7 @@ help:
 install:
 	### install client
 	@install -osystemd-resolve -gsystemd-resolve --mode=0644 templates/resolv.conf.template $(SYSTEMD)/resolve/stub-resolv.conf
+	@install -oroot -groot --mode=0644 templates/netplan.yaml $(NETPLAN)/01-network-manager-all.yaml
+	#sudo netplan apply
 
 
