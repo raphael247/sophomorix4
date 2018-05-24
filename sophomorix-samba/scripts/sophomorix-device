@@ -259,23 +259,21 @@ sophomorix-device adds Devices to the system:
 
 Options:
   -h / --help
-  --list-files                             (list processed files and exit)
-  -i / --info                              (overview over all schools)
-  -i / --info --school <school>            (overview over school <school>)
-  --info --device <device1>,<device2>,...  (detailed view of device1,...)
-  --info --room <room1>,<room2>,...        (detailed view of room1,...)
   -v / --verbose
   -vv / --verbose --verbose
 
+List processed files and exit:
+  --list-files
+
 Information about devices in AD:
-  sophomorix-device --info 
+  -i / --info                              (overview over all schools)
+  -i / --info --school <school>            (overview over school <school>)
 
-Full information about one devices:
-  sophomorix-device --info --device <device>
+Full information about one/some devices:
+  --info --device <device1>,<device2>,...
 
-Information about devices of sophomorixRole <role>:
-  sophomorix-device --info --show-role <role>
-
+Full information about one/some devices:
+  --info --room <room1>,<room2>,...        (detailed view of room1,...)
 
 
 Synchronize the devices:
@@ -287,7 +285,7 @@ Just show what would be done (but do not do it):
 Show and append example device line:
   --add-example-line /path/to/devices.csv
 
-Managing accounts:
+Managing accounts  (Test if that works???):
   --set-computer-passwords  (set computer passwords to 12345678)
   --password password       (use password instead of 12345678)
 
