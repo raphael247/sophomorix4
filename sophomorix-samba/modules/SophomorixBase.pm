@@ -172,7 +172,6 @@ sub testmount_school {
         }
     }
     close(PROCMOUNTS);
-    #print Dumper(\%mounts);
     if ($list==1){
         ##### list
         my @unc_list=();
@@ -409,87 +408,142 @@ sub _console_print_onesession {
 
 
 sub _console_print_devices {
-    my ($ref_devices,$object_name,$log_level,$ref_sophomorix_config)=@_;
-    my $line ="+----+---------------+---------------+----------------+-----------+-----------------+\n";
-    my $line2="+--------------------+--------------------------------------------------------------+\n";
-    #if($log_level==1 and $object_name eq ""){
-        # one device per line
-        print $line;
-        print "|Role| DNS-Node      | IPv4          | Computer       | Room      | MAC             |\n";
-        print $line;
-        foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'BY_SCHOOL'}{'global'}{'dnsNode'} } ){
-            my $computer;
-            my $hwc;
-            my $adminclass;
-            my $mac;
-            if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
-                $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
-                $hwc="";
-                $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
-                $mac=$ref_devices->{'computer'}{$computer}{'sophomorixComputerMAC'};
-            } else {
-                $computer="---";
-                $hwc="---";
-                $adminclass="---";
-                $mac="---";
-            }
+    my ($ref_devices,$school_opt,$log_level,$ref_sophomorix_config)=@_;
 
-            # sophomorixRole and sophomorixComment
-            my $role_short;
-            if (not exists $ref_devices->{'computer'}{$computer}{'sophomorixRole'}){
-                $role_short="---";
-            } else {
-                $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$ref_devices->{'computer'}{$computer}{'sophomorixRole'}};
-            }
-            my $comment;
-            if ( not exists $ref_devices->{'computer'}{$computer}{'sophomorixComment'} ){ 
-		$comment=" ";
-            } elsif ( $ref_devices->{'computer'}{$computer}{'sophomorixComment'} eq "---" ){
-		$comment="-";
-            } else {
-		$comment="#";
-            }
-            my $role_display=$comment.$role_short;
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
 
-            printf "|%-4s|%-15s|%-15s|%-16s|%-11s|%-17s|\n",
-                   $role_display,
-                   $dns_node,
-                   $ref_devices->{'dnsNode'}{'SophomorixdnsNode'}{$dns_node}{'IPv4'},
-                   $computer,
-                   $adminclass,
-                   $mac;
+    my $line0="+---------------------------------------------------------------------------------+\n";
+    my $line ="+----------------+----------------+------------+----------------------------------+\n";
+    my $line2="+--------------------------+------------------------------------------------------+\n";
+    foreach my $school (@school_list){
+        # rooms
+        my $school_rooms_count=$#{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }+1;
+        print "\n";
+        print $line0;
+	printf "| %-80s|\n",$school_rooms_count." Rooms in school $school:";
+        print $line0;
+        foreach my $room (@{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }){
+            printf "| %-80s|\n",$room;
         }
-        print $line;
-        print "    /-/#: sophomorixComment nonexisting/---/existing\n";
 
-        # showing help
-        my @role_help=();
-        foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
-            push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
-        }
-        @role_help = sort @role_help;
 
-        my $count=0;
-        foreach my $item (@role_help){
-            if ( int($count/2)*2==$count){
-                #print "even $count\n";
-		if (defined $role_help[$count+1]){
-		    printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
+        # devices
+        my $school_devices_count=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }+1;
+        #print "\n";
+        print $line0;
+	printf "| %-80s|\n",$school_devices_count." Devices in school $school:";
+        foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
+            my $role_alt=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
+
+            my $device_string;
+            if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'COMPUTER_ACCOUNT'} eq "TRUE"){
+                $device_string="dnsNode+computer";
+            } else {
+                $device_string="dnsNode";
+            }
+
+            my $host_group_string;
+            if ($ref_sophomorix_config->{'INI'}{"computerrole.".$role}{'HOST_GROUP'} eq "TRUE"){
+                $host_group_string=",hostgroup";
+            } else {
+                $host_group_string="";
+            }
+
+            # skip when there are 0 devices
+            my $number_of_devices=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} }+1;
+            if ($number_of_devices==0){
+                # no device of this role
+                next;
+            }
+            # one device per line
+            print $line0;
+            printf "| %-80s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
+            #print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
+            print "| dnsNode          IPv4             Room         sophomorixComment                |\n";
+            print $line;
+            foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
+                my $computer;
+                my $hwc;
+                my $adminclass;
+                my $mac;
+                if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
+                    $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
+                    $hwc="";
+                    $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
+                    $mac=$ref_devices->{'computer'}{$computer}{'sophomorixComputerMAC'};
                 } else {
-                    # last element
-		    printf "   %-34s %-34s \n",$role_help[$count],"";
+                    $computer="---";
+                    $hwc="---";
+                    $adminclass="---";
+                    $mac="---";
                 }
-            } else {
-                #print "odd  $count\n";
-	    }
-            $count++;
+
+                # sophomorixRole and sophomorixComment
+                my $role_short;
+                if (not exists $ref_devices->{'computer'}{$computer}{'sophomorixRole'}){
+                    $role_short="---";
+                } else {
+                    $role_short=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
+                }
+                my $comment;
+                if ( not exists $ref_devices->{'computer'}{$computer}{'sophomorixComment'} ){ 
+		    $comment=" ";
+                } elsif ( $ref_devices->{'computer'}{$computer}{'sophomorixComment'} eq "---" ){
+	  	    $comment=" ";
+                } else {
+		    $comment=$ref_devices->{'computer'}{$computer}{'sophomorixComment'};
+                }
+                my $role_display=$comment.$role_short;
+
+                printf "| %-15s| %-15s| %-11s| %-33s|\n",
+                       $dns_node,
+                       $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
+                       $adminclass,
+                       $comment;
+            }
+            print $line;
+            #print "    /-/#: sophomorixComment nonexisting/---/existing\n";
+
+            # showing help
+            # my @role_help=();
+            # foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}} ) {
+            #     push @role_help, "$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$keyname}: $keyname";
+            # }
+            # @role_help = sort @role_help;
+            #
+            # my $count=0;
+            # foreach my $item (@role_help){
+            #     if ( int($count/2)*2==$count){
+            #         #print "even $count\n";
+	    # 	      if (defined $role_help[$count+1]){
+	    # 	          printf "   %-34s %-34s \n",$role_help[$count],$role_help[$count+1];
+            #         } else {
+            #             # last element
+	    # 	          printf "   %-34s %-34s \n",$role_help[$count],"";
+            #         }
+            #     } else {
+            #         #print "odd  $count\n";
+	    #     }
+            #     $count++;
+            # }
         }
-    #}
+        if ($school_devices_count==0){
+	    print $line0;
+        }
+    }
+
+    # global part
+    print "\n";
     print $line2;
-    print     "| Hardwareclass      |                                                              |\n";
+    print     "| Hardwareclasses (global) |                                                      |\n";
     print $line2;
         foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-            printf "| %-19s| %-61s|\n",$hwk,"";
+            printf "| %-25s| %-53s|\n",$hwk,"";
         }
     print $line2;
 }
@@ -1820,95 +1874,151 @@ sub _console_print_device_full {
 
     # DEVICES in AD
     my $device_count=0;
-    foreach my $device (@{ $ref_devices->{'LISTS'}{'DEVICES'} }){
+    foreach my $device (@{ $ref_devices->{'LISTS'}{'dnsNode'} }){
         $device_count++;
-        print "\n";
-        print $line1;
-        print "Device $device_count/$ref_devices->{'COUNTER'}{'TOTAL'} in AD: ",
-              "$device in school $ref_devices->{'DEVICES'}{$device}{'sophomorixSchoolname'}\n";
-        print "$ref_devices->{'DEVICES'}{$device}{'dn'}\n";
-        print $line1;
+        # computer
+        if (exists $ref_devices->{'DEVICES'}{$device}{'computer'}){
+            print "\n";
+            print $line1;
+            print "Device $device_count/$ref_devices->{'COUNTER'}{'dnsNode'}{'TOTAL'} in AD: ",
+                  "$device in school $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixSchoolname'}\n";
+            print "$ref_devices->{'DEVICES'}{$device}{'computer'}{'dn'}\n";
+            print $line1;
+            printf "%29s: %-40s\n","sAMAccountName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sAMAccountName'};
+            printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'computer'}{'cn'};
+            printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'computer'}{'name'};
+            printf "%29s: %-40s\n","sophomorixDnsNodename",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixDnsNodename'};
+            printf "%29s: %-40s\n","displayName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'displayName'};
+            printf "%29s: %-40s\n","sophomorixAdminClass",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixAdminClass'};
+            printf "%29s: %-40s\n","sophomorixSchoolname",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixSchoolname'};
+            printf "%29s: %-40s\n","sophomorixAdminFile",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixAdminFile'};
+            printf "%29s: %-40s\n","sophomorixComment",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixComment'};
+            printf "%29s: %-40s\n","dNSHostName",$ref_devices->{'DEVICES'}{$device}{'computer'}{'dNSHostName'};
+            print $line;
+            printf "%29s: %-40s\n","sophomorixRole",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixRole'};
+            printf "%29s: %-40s\n","sophomorixStatus",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixStatus'};
+            printf "%29s: %-40s\n","sophomorixCreationDate",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCreationDate'};
+            printf "%29s: %-40s\n","userAccountControl",$ref_devices->{'DEVICES'}{$device}{'computer'}{'userAccountControl'};
+            #print $line;
+            #printf "%29s: %-40s\n","mail",$ref_devices->{'DEVICES'}{$device}{'computer'}{'mail'};
+    
+            print $line;
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'servicePrincipalName'} } ){
+                printf "%29s: %-40s\n","servicePrincipalName",$item;
+        	}
 
-        printf "%29s: %-40s\n","sAMAccountName",$ref_devices->{'DEVICES'}{$device}{'sAMAccountName'};
-        printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'cn'};
-        printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'name'};
-        printf "%29s: %-40s\n","displayName",$ref_devices->{'DEVICES'}{$device}{'displayName'};
-        printf "%29s: %-40s\n","sophomorixAdminClass",$ref_devices->{'DEVICES'}{$device}{'sophomorixAdminClass'};
-        printf "%29s: %-40s\n","sophomorixSchoolname",$ref_devices->{'DEVICES'}{$device}{'sophomorixSchoolname'};
-        printf "%29s: %-40s\n","sophomorixAdminFile",$ref_devices->{'DEVICES'}{$device}{'sophomorixAdminFile'};
-        printf "%29s: %-40s\n","sophomorixComment",$ref_devices->{'DEVICES'}{$device}{'sophomorixComment'};
-        printf "%29s: %-40s\n","sophomorixDnsNodename",$ref_devices->{'DEVICES'}{$device}{'sophomorixDnsNodename'};
-        printf "%29s: %-40s\n","dNSHostName",$ref_devices->{'DEVICES'}{$device}{'dNSHostName'};
-        print $line;
-        printf "%29s: %-40s\n","sophomorixRole",$ref_devices->{'DEVICES'}{$device}{'sophomorixRole'};
-        printf "%29s: %-40s\n","sophomorixStatus",$ref_devices->{'DEVICES'}{$device}{'sophomorixStatus'};
-        printf "%29s: %-40s\n","sophomorixCreationDate",$ref_devices->{'DEVICES'}{$device}{'sophomorixCreationDate'};
-        printf "%29s: %-40s\n","userAccountControl",$ref_devices->{'DEVICES'}{$device}{'userAccountControl'};
-        #print $line;
-        #printf "%29s: %-40s\n","mail",$ref_devices->{'DEVICES'}{$device}{'mail'};
+            print $line;
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'memberOf'} } ){
+                print "memberOf: $item\n";
+        	}
 
-        print $line;
-        foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'servicePrincipalName'} } ){
-            printf "%29s: %-40s\n","servicePrincipalName",$item;
-	}
+            # samba stuff:
+            if ($log_level>=2){
+                #printf "%19s: %-50s\n","homeDirectory",$ref_devices->{'DEVICES'}{$device}{'computer'}{'homeDirectory'};
+                #printf "%19s: %-50s\n","homeDrive",$ref_devices->{'DEVICES'}{$device}{'computer'}{'homeDrive'};
 
-        print $line;
-        foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'memberOf'} } ){
-            print "memberOf: $item\n";
-	}
+                printf "%19s: %-50s\n","accountExpires",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'accountExpires'};
+                printf "%19s: %-50s\n","badPasswordTime",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'badPasswordTime'};
+                printf "%19s: %-50s\n","badPwdCount",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'badPwdCount'};
+                printf "%19s: %-50s\n","pwdLastSet",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'pwdLastSet'};
+                printf "%19s: %-50s\n","lastLogoff",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'lastLogoff'};
+                printf "%19s: %-50s\n","lastLogon",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'lastLogon'};
+                printf "%19s: %-50s\n","logonCount",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'logonCount'};
 
-        # samba stuff:
-        if ($log_level>=2){
-            #printf "%19s: %-50s\n","homeDirectory",$ref_devices->{'DEVICES'}{$device}{'homeDirectory'};
-            #printf "%19s: %-50s\n","homeDrive",$ref_devices->{'DEVICES'}{$device}{'homeDrive'};
+                if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "17.10"){
+                    #my $sid = Net::LDAP::SID->new($ref_devices->{'DEVICES'}{$device}{'objectSid'});
 
-            printf "%19s: %-50s\n","accountExpires",$ref_devices->{'DEVICES'}{$device}{'accountExpires'};
-            printf "%19s: %-50s\n","badPasswordTime",$ref_devices->{'DEVICES'}{$device}{'badPasswordTime'};
-            printf "%19s: %-50s\n","badPwdCount",$ref_devices->{'DEVICES'}{$device}{'badPwdCount'};
-            printf "%19s: %-50s\n","pwdLastSet",$ref_devices->{'DEVICES'}{$device}{'pwdLastSet'};
+                    printf "%19s: %-50s\n","objectSid",
+                        $ref_devices->{'DEVICES'}{$device}{'computer'}{'objectSid'};
+                    printf "%19s: %-50s\n","objectGUID","(binary)";
+                } else {
+                    printf "%19s: %-50s\n","objectSid","(binary)";
+                    printf "%19s: %-50s\n","objectGUID","(binary)";
+                }
 
-            printf "%19s: %-50s\n","lastLogoff",$ref_devices->{'DEVICES'}{$device}{'lastLogoff'};
-            printf "%19s: %-50s\n","lastLogon",$ref_devices->{'DEVICES'}{$device}{'lastLogon'};
-            printf "%19s: %-50s\n","logonCount",$ref_devices->{'DEVICES'}{$device}{'logonCount'};
+                printf "%19s: %-50s\n","sAMAccountType",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'sAMAccountType'};
+                #printf "%19s: %-50s\n","userPrincipalName",
+                #    $ref_devices->{'DEVICES'}{$device}{'computer'}{'userPrincipalName'};
+                printf "%19s: %-50s\n","uSNChanged",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'uSNChanged'};
+                printf "%19s: %-50s\n","uSNCreated",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'uSNCreated'};
+                printf "%19s: %-50s\n","codePage",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'codePage'};
+                printf "%19s: %-50s\n","countryCode",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'countryCode'};
+        	}
 
-            if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "17.10"){
-                #my $sid = Net::LDAP::SID->new($ref_devices->{'DEVICES'}{$device}{'objectSid'});
-
-                printf "%19s: %-50s\n","objectSid",$ref_devices->{'DEVICES'}{$device}{'objectSid'};
-                printf "%19s: %-50s\n","objectGUID","(binary)";
-            } else {
-                printf "%19s: %-50s\n","objectSid","(binary)";
-                printf "%19s: %-50s\n","objectGUID","(binary)";
+            # unix stuff:
+            if ($log_level>=2){
+                #printf "%19s: %-50s\n","uidNumber",
+                #    $ref_devices->{'DEVICES'}{$device}{'uidNumber'};
+                #printf "%19s: %-50s\n","unixHomeDirectory",
+                #    $ref_devices->{'DEVICES'}{$device}{'computer'}{'unixHomeDirectory'};
+                printf "%19s: %-50s\n","primaryGroupID",
+                    $ref_devices->{'DEVICES'}{$device}{'computer'}{'primaryGroupID'};
             }
+        }
 
-            printf "%19s: %-50s\n","sAMAccountType",$ref_devices->{'DEVICES'}{$device}{'sAMAccountType'};
-            #printf "%19s: %-50s\n","userPrincipalName",$ref_devices->{'DEVICES'}{$device}{'userPrincipalName'};
-
-            printf "%19s: %-50s\n","uSNChanged",$ref_devices->{'DEVICES'}{$device}{'uSNChanged'};
-            printf "%19s: %-50s\n","uSNCreated",$ref_devices->{'DEVICES'}{$device}{'uSNCreated'};
-
-            printf "%19s: %-50s\n","codePage",$ref_devices->{'DEVICES'}{$device}{'codePage'};
-            printf "%19s: %-50s\n","countryCode",$ref_devices->{'DEVICES'}{$device}{'countryCode'};
-	}
-
-        # unix stuff:
-        if ($log_level>=2){
-            #printf "%19s: %-50s\n","uidNumber",$ref_devices->{'DEVICES'}{$device}{'uidNumber'};
-            #printf "%19s: %-50s\n","unixHomeDirectory",$ref_devices->{'DEVICES'}{$device}{'unixHomeDirectory'};
-            printf "%19s: %-50s\n","primaryGroupID",$ref_devices->{'DEVICES'}{$device}{'primaryGroupID'};
-	}
         # dnsNode
         print $line1;
-        print "dnsNode for $device_count/$ref_devices->{'COUNTER'}{'TOTAL'} in AD: ",
-              "$device in school $ref_devices->{'DEVICES'}{$device}{'sophomorixSchoolname'}\n";
-        print "$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'dn'}\n";
-
+        print "dnsNode (IP LOOKUP) for $device_count/$ref_devices->{'COUNTER'}{'dnsNode'}{'TOTAL'} in AD: ",
+              "$device in school $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'}\n";
+        print "$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dn'}\n";
         print $line;
-        printf "%29s: %-40s\n","cn",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'cn'};
-        printf "%29s: %-40s\n","name",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'name'};
-        printf "%29s: %-40s\n","adminDescription",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'adminDescription'};
-        printf "%29s: %-40s\n","dnsRecord",$ref_devices->{'DEVICES'}{$device}{'dnsNode'}{'dnsRecord'};
+        printf "%29s: %-40s\n","cn",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'cn'};
+        printf "%29s: %-40s\n","name",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'name'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","sophomorixDnsNodetype",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixDnsNodetype'};
+        printf "%29s: %-40s\n","sophomorixRole",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixRole'};
+        printf "%29s: %-40s\n","sophomorixAdminFile",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixAdminFile'};
+        printf "%29s: %-40s\n","sophomorixSchoolname",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'};
+        printf "%29s: %-40s\n","sophomorixComputerIP",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComputerIP'};
+        printf "%29s: %-40s\n","sophomorixComment",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComment'};
+        printf "%29s: %-40s\n","dnsRecord",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord'};
         print $line1;
+        print "dnsNode (REVERSE LOOKUP) for $device_count/$ref_devices->{'COUNTER'}{'dnsNode_REVERSE'}{'TOTAL'} in AD: ",
+              "$device in school $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixSchoolname'}\n";
+        print "$ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dn'}\n";
+        print $line;
+        printf "%29s: %-40s\n","cn",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'cn'};
+        printf "%29s: %-40s\n","name",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'name'};
+        printf "%29s: %-40s\n","sophomorixDnsNodename",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixDnsNodename'};
+        printf "%29s: %-40s\n","sophomorixDnsNodetype",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixDnsNodetype'};
+        printf "%29s: %-40s\n","sophomorixRole",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixRole'};
+        printf "%29s: %-40s\n","sophomorixAdminFile",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixAdminFile'};
+        printf "%29s: %-40s\n","sophomorixSchoolname",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixSchoolname'};
+        printf "%29s: %-40s\n","sophomorixComputerIP",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComputerIP'};
+        printf "%29s: %-40s\n","sophomorixComment",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComment'};
+        printf "%29s: %-40s\n","dnsRecord",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord'};
     }
 }
 
@@ -2572,7 +2682,7 @@ sub config_sophomorix_read {
         my $Type;
         if ($file eq "."){next};
         if ($file eq ".."){next};
-        $sophomorix_config{'REPDIR_FILES'}{$file}=$abs_path;
+        $sophomorix_config{'REPDIR_FILES'}{$file}{'PATH_ABS'}=$abs_path;
     }
     closedir REPDIR;
 
@@ -2580,7 +2690,8 @@ sub config_sophomorix_read {
     push @{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }, $DevelConf::name_default_school; 
 
     ##################################################
-    # sophomorix.conf 
+    # sophomorix.conf
+    # reading the master file
     my $ref_master_sophomorix=&read_master_ini($DevelConf::path_conf_master_sophomorix,$ref_result);
     my $ref_modmaster_sophomorix=&check_config_ini($ref_master_sophomorix,
                                                    $DevelConf::file_conf_sophomorix,
@@ -2638,8 +2749,6 @@ sub config_sophomorix_read {
 	    print "\n";
 	    exit;
         }   
-	#print Dumper \%sophomorix_config;
-	#exit;
 
 	# read the config
         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
@@ -2771,6 +2880,7 @@ sub config_sophomorix_read {
             }
         } elsif ($section=~m/^computerrole\./){ 
             my ($string,$role)=split(/\./,$section);
+            push @{ $sophomorix_config{'LISTS'}{'ROLE_DEVICE'} },$role;
             foreach my $keyname (keys %{$sophomorix_config{'INI'}{$section}}) {
                 if ($keyname eq "DEVICE_SHORT"){
                     $sophomorix_config{'LOOKUP'}{'ROLES_ALL'}{$role}=$sophomorix_config{'INI'}{$section}{$keyname};
@@ -2897,6 +3007,9 @@ sub config_sophomorix_read {
             }
         }
     }
+    # sort some lits
+    @{ $sophomorix_config{'LISTS'}{'ROLE_DEVICE'} } = sort @{ $sophomorix_config{'LISTS'}{'ROLE_DEVICE'} };
+  
 
     # Working on the Lists of sophomorix.ini
     ###############################################
@@ -3156,9 +3269,8 @@ sub check_config_ini {
     &print_title("Reading $configfile");
     if (not -e $configfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$configfile." not found!");
-        return;
-        #print "\nERROR: $configfile not found!\n\n";
-        #exit;
+        print "\nERROR: $configfile not found!\n\n";
+        exit 88;
     }
     #print "Checking file $configfile\n";
     tie %config, 'Config::IniFiles',
@@ -3528,6 +3640,7 @@ sub result_sophomorix_init {
     $sophomorix_result{'SCRIPTNAME'}=$scriptname;
     $sophomorix_result{'JSONINFO'}="RESULT";
     $sophomorix_result{'JSONCOMMENT'}="---";
+    @{ $sophomorix_result{'OUTPUT'} }=();
     return %sophomorix_result; 
 }
 
@@ -3538,13 +3651,16 @@ sub result_sophomorix_add {
     # $num: -1, no number, else look in ERROR|WARNING db
     # $ref_parameter: list of parameters to be fitted in db string
     # $message: used if errnumber is not found in db
-    my ($ref_result,$type,$num,$ref_parameter,$message)=@_;
+    my ($ref_result,
+        $type, # ERROR OR WARNING
+        $num,  # error number (for lookup), -1: dont search
+        $ref_parameter,
+        $message)=@_;
 
 #    print "LIST of parameters:\n";
 #    foreach my $para ( @{ $ref_parameter}  ){ 
 #        print "$para\n";
 #    } 
-
     if ($type eq "ERROR" or $type eq "WARNING" ){
         # get error from db, update $message_de, $message_en
         push @{ $ref_result->{'OUTPUT'} }, 
@@ -3552,6 +3668,7 @@ sub result_sophomorix_add {
              NUMBER     => $num,
              MESSAGE_EN => $message,
              MESSAGE_DE => $message,
+             #ARGUMENTS => $ref_parameter,
             };
     } else {
         push @{ $ref_result->{'OUTPUT'} }, 
@@ -3569,11 +3686,16 @@ sub result_sophomorix_add_log {
     # $num: -1, no number, else look in ERROR|WARNING db
     # $ref_parameter: list of parameters to be fitted in db string
     # $message: used if errnumber is not found in db
-    my ($ref_result,$log_message)=@_;
-    push @{ $ref_result->{'OUTPUT'} }, 
-        {TYPE       => "LOG", 
-         LOG => $log_message,
-        };
+    my ($ref_result,$log_message) = @_;
+    my %out_hash=();
+    $out_hash{'TYPE'}="LOG";
+    $out_hash{'LOG'}=$log_message;
+    push @{ $ref_result->{'OUTPUT'} },{%out_hash};
+
+#    push @{ $ref_result->{'OUTPUT'} }, 
+#        {TYPE => "LOG", 
+#         LOG  => $log_message
+#        };
 }
 
 
@@ -3629,7 +3751,7 @@ sub result_sophomorix_check_exit {
     my $err=0;
     # count results
     foreach my $line ( @{ $ref_result->{'OUTPUT'}}  ){
-	print "$line\n";
+	#print "$line\n";
         if ($line->{'TYPE'} eq "ERROR"){
             $err++;
         } elsif ($line->{'TYPE'} eq "WARNING"){
@@ -3943,9 +4065,10 @@ sub log_script_exit {
         $skiplock,       # skiplock (unused)
         $ref_arguments,  # arguments of calling script
         $ref_result,     # reference to result hash
+        $ref_sophomorix_config,
         $json,
         $ref_parameter,  # replacement parameter list for error scripts
-        $ref_sophomorix_config)=@_;
+        )=@_;
 
     # log script exit uses its own time (calculate how long a script was running)
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S'`;
@@ -4579,6 +4702,12 @@ sub get_group_basename {
 # error, when options are not given correctly
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+    # get effective/real userID
+    my $uid_effective=$<;
+    my $uid_real=$>;
+    print "Effective User ID: $uid_effective\n";
+    print "Real User ID:      $uid_real\n";
+
     if (not defined $Conf::log_level){
 	$Conf::log_level=1;
     }
@@ -4697,10 +4826,8 @@ sub check_options{
 	}
     }
     
-
     print Dumper (\%tmp);
     print Dumper ($ref_options);
-    
 
     my $action_count=0;
     foreach my $opt_given (keys %{$ref_options}) {
@@ -4794,9 +4921,6 @@ sub check_options{
         $ref_options->{'info'}=1;
     }
 
-    #print Dumper ($ref_options);
-
-
     print "Option combinations successfully checked\n";
     #exit; # ??????????
 }
@@ -4805,19 +4929,20 @@ sub check_options{
 ######################################################################
 sub dns_query_ip {
     my ($res,$host)=@_;
-
-    my $ip=$host;
     my $reply = $res->search($host);
     if ($reply) {
         foreach my $rr ($reply->answer) {
             next unless $rr->type eq "A";
-            return $rr->address;
+            return ($rr->address,"IP FOUND");
         }
     } else {
+        my $result=$res->errorstring;
         # no reply: query failed
-        return $res->errorstring;
+        if ($res->errorstring eq "NOERROR"){
+            $result="Query successful, but no entry for ".$host." (".$res->errorstring.")";
+        }
+        return ($result,$res->errorstring);
     }
-    #return $ip;
 }
 
 

@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+
+
+# modules
+use strict;
+use Getopt::Long;
+use Net::DNS;
+Getopt::Long::Configure ("bundling");
+
+use Sophomorix::SophomorixTest qw(
+                                 AD_object_nonexist
+                                 AD_test_object
+                                 AD_test_dns
+                                 AD_test_nondns
+                                 AD_computers_any
+                                 AD_examaccounts_any
+                                 AD_dnsnodes_count
+                                 AD_dnszones_count
+                                 AD_rooms_any
+                                 run_command
+                                 directory_tree_test
+                                 start_fs_test
+                                 end_fs_test
+                                 diff_acl_snapshot
+                                 );
+
+
+my $dev_null="";
+# my $dev_null=" > /dev/null";
+
+
+
+############################################################
+# test1 nodamage
+############################################################
+# reset and repair
+#sophomorix-supertest -s rp $dev_null
+&run_command("rm -rf /var/lib/sophomorix/sophomrix-repair");
+
+
+# add devices with test1
+&run_command("sophomorix-test-1 --cp-add $dev_null");
+&run_command("sophomorix-add $dev_null");
+# ... more
+
+# create all schools (the wil be repaired otherwise)
+&run_command("sophomorix-school --recreate-all-schools $dev_null"); 
+
+# save this (unrepaired state)
+&run_command("sophomorix-repair --acl-snapshot test1-reference $dev_null");
+
+# test if repair adds unnecessary stuff
+&run_command("sophomorix-repair --all $dev_null");
+&run_command("sophomorix-repair --acl-snapshot test1-repaired-nodamage $dev_null");
+
+# tests
+&diff_acl_snapshot("find-result.txt","test1-reference","test1-repaired-nodamage");
+&diff_acl_snapshot("acl-snapshot.txt","test1-reference","test1-repaired-nodamage");
+
+
+
+############################################################
+# test1 full damage
+############################################################
+# reset and repair
+&run_command("sophomorix-supertest -s rp $dev_null");
+&run_command("rm -rf /var/lib/sophomorix/sophomrix-repair");
+
+# add users with test1
+&run_command("sophomorix-test-1 --cp-add $dev_null");
+&run_command("sophomorix-add $dev_null");
+# ... more
+
+# create all schools (the wil be repaired otherwise)
+&run_command("sophomorix-school --recreate-all-schools $dev_null"); 
+
+# save this (unrepaired state)
+&run_command("sophomorix-repair --acl-snapshot test1-reference $dev_null");
+
+# full damage
+&run_command("rm -rf /srv/samba");
+
+# test if repair repairs everything
+&run_command("sophomorix-repair --all $dev_null");
+# recreate the schools (would be missing otherwise)
+&run_command("sophomorix-school --recreate-all-schools $dev_null"); 
+
+&run_command("sophomorix-repair --acl-snapshot test1-repaired-fulldamage $dev_null");
+
+
+# tests
+&diff_acl_snapshot("find-result.txt","test1-reference","test1-repaired-fulldamage");
+&diff_acl_snapshot("acl-snapshot.txt","test1-reference","test1-repaired-fulldamage");

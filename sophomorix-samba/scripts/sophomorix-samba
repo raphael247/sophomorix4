@@ -18,6 +18,9 @@ use Sophomorix::SophomorixBase qw(
                                  json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
+                                    samba_stop
+                                    samba_start
+                                    samba_status
                                     );
 use JSON;
 use Data::Dumper;
@@ -42,6 +45,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_object_search
                                  AD_get_passwd
+                                 AD_sophomorix_schema_update
                                     );
 
 
@@ -250,7 +254,6 @@ if ($restore_samba ne ""){
 if ($schema_load==1){
     my %smb_conf=();
     &read_smb_conf(\%smb_conf);
-    print Dumper( \%smb_conf );
     if ($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'} eq "DC="){
         print "\nERROR: Cannot load schema with a misconfigured smb.conf\n\n";
     } else {
@@ -260,6 +263,10 @@ if ($schema_load==1){
         my $command="cd /usr/share/sophomorix/schema; ./sophomorix_schema_add.sh $dn . -H /var/lib/samba/private/sam.ldb -writechanges";
         print "$command\n";
         system($command);
+
+        # adding schema updates
+        &AD_sophomorix_schema_update($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'});
+
         &samba_start();
     }
     exit;
@@ -305,7 +312,6 @@ if ($show_all_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-
     # class schema (no searchflag)
     my $line1 ="+----------------------------------------------------------------------------+\n";
     my $line  ="+-------+--------------------------------------------------------------------+\n";
@@ -353,13 +359,15 @@ if ($show_sophomorix_attributes==1){
                                        root_dns=>$root_dns,
                                        sophomorix_config=>\%sophomorix_config,
                                       });
-
+    #print Dumper $ref_schema;
     # class schema (no searchflag)
-    my $line1 ="+----------------------------------------------------------------------------+\n";
-    my $line  ="+-------+--------------------------------------------------------------------+\n";
-    my $header="| Nr.   | Attribute                                                          |\n";
+
+    my $line1 ="+--------------------------------------------------------------------------------------------+\n";
+    my $line  ="+-------+------------------------------------------------------------------------------------+\n";
+    my $header="| Nr.   | Attribute                                                                          |\n";
+    print "SophomorixSchemaVersion: ${ $ref_schema->{'LDAPDisplayName'}{'sophomorixSchemaVersion'}{'rangeupper'} }[0]\n";
     print $line1;
-    printf "| classSchema: %-5s                                                         |\n",
+    printf "| classSchema: %-5s                                                                         |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'}{'COUNT'};    
     print $line;
     print $header;
@@ -367,18 +375,18 @@ if ($show_sophomorix_attributes==1){
     my $count=0;
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'classSchema'} } ) {
         $count++;
-	my $search_flag=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'searchflags'} }[0];
-        printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
+	my $cn=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'cn'} }[0];
+        printf "| %6s|  %-82s|\n",$count,$attr." (".$cn.")";
     } 
     print $line;
     print "\n";
 
     # attribute schema
-    $line1 ="+----------------------------------------------------------------------------+\n";
-    $line  ="+------+-----+---------------------------------------------------------------+\n";
-    $header="| Nr.  |  SF | Attribute                                                     |\n";
+    $line1 ="+--------------------------------------------------------------------------------------------+\n";
+    $line  ="+------+-----+-------------------------------------------------------------------------------+\n";
+    $header="| Nr.  |  SF | Attribute                                                                     |\n";
     print $line1;
-    printf "| attributeSchema: %-5s                                                     |\n",
+    printf  "| attributeSchema: %-5s                                                                     |\n",
             $ref_schema->{'RESULT'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'}{'COUNT'};
     print $line;
     print $header;
@@ -387,9 +395,12 @@ if ($show_sophomorix_attributes==1){
     foreach my $attr ( @{ $ref_schema->{'LISTS'}{'LDAPDisplayName'}{'SOPHOMORIX_ATTRS'}{'attributeSchema'} } ) {
         $count++;
 	my $search_flag=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'searchflags'} }[0];
-        printf "|%6s| %3s | %-62s|\n",$count,$search_flag,$attr;
+	my $cn=${ $ref_schema->{'LDAPDisplayName'}{$attr}{'cn'} }[0];
+
+        printf "|%6s| %3s | %-78s|\n",$count,$search_flag,$attr." (".$cn.")";
     }
     print $line;
+    print "SophomorixSchemaVersion: ${ $ref_schema->{'LDAPDisplayName'}{'sophomorixSchemaVersion'}{'rangeupper'} }[0]\n";
     print "SF: searchFlags (128: confidential   0:noindex   1:index)\n";
 } 
 
@@ -423,7 +434,6 @@ if ($show_lang==1){
     print "########## Language configuration ####################################\n";
     my $ref_sophomorix_config=\%sophomorix_config;
     my @itemlist=();
-    my $ref_sophomorix_config=\%sophomorix_config;
     foreach my $keyname (keys %{$ref_sophomorix_config->{'LOOKUP'}{'LANG_ALLOWED'} } ) {
         push @itemlist,$keyname;
     }
@@ -496,28 +506,6 @@ if ($show_roletype==1){
 ############################################################
 # subs
 ############################################################
-
-sub samba_stop {
-    my $command="/bin/systemctl stop samba-ad-dc";
-    print "\nStopping samba with command $command\n\n";
-    system($command);
-}
-
-
-
-sub samba_start {
-    my $command="/bin/systemctl start samba-ad-dc";
-    print "\nStarting samba with command $command\n\n";
-    system($command);
-}
-
-
-
-sub samba_status {
-    my $command="/bin/systemctl status samba-ad-dc";
-    print "\nShowing samba status with command $command\n\n";
-    system($command);
-}
 
 
 

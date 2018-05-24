@@ -6,6 +6,14 @@
 
 # modules
 use strict;
+use Sophomorix::SophomorixConfig;
+use Sophomorix::SophomorixSambaAD qw(AD_sophomorix_schema_update);
+use Sophomorix::SophomorixBase qw(read_smb_conf);
+
+$Conf::log_level=1;
+my %smb_conf=();
+my $ref_result;
+&read_smb_conf(\%smb_conf,$ref_result);
 
 my $conf_dir="/etc/linuxmuster/sophomorix";
 my $conf_file=$conf_dir."/sophomorix.conf";
@@ -17,7 +25,9 @@ print "\n";
 print "* Testing $conf_file\n";
 # create directory
 system "mkdir -p $conf_dir";
-# copy the default sophomorix.conf
+######################################################################
+# copy the default sophomorix.conf if nonexisting
+######################################################################
 if (-e $conf_file){
     # do nothing
     print "   * File exists, no installation:\n";
@@ -29,12 +39,16 @@ if (-e $conf_file){
     system("install -oroot -groot --mode=0644 $conf_file_source $conf_file");    
 }
 
-# without option
+
+######################################################################
+# copy the school.conf 
+######################################################################
+# defaults without options in sophomorix-postinst 
 my $school="default-school";
 my $school_dir=$conf_dir."/".$school;
 my $school_file=$school_dir."/school.conf";
 
-# option given, modify 
+# option given, modify the schoolname
 if (defined $ARGV[0] and ($ARGV[0] eq "global" or $ARGV[0] eq "linuxmuster-global")){
     print " \nERROR: You cannot create a school with the name $ARGV[0]\n\n\n";
     exit;
@@ -63,7 +77,12 @@ if (-e $school_file){
 }
 
 
+######################################################################
+# update the schema (If the schema is not there --> DO NOTHING)
+######################################################################
 
+# testing if schema needs to be updated
+&AD_sophomorix_schema_update($smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'});
 
 print "\n";
 print "##### sophomorix-postinst end #####\n";

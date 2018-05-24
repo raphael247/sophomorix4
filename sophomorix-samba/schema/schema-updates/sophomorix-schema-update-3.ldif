@@ -1,0 +1,23 @@
+############################################################
+# Update Version to 3
+############################################################
+dn: CN=Sophomorix-Schema-Version,<SchemaContainerDN>
+objectClass: attributeSchema
+changetype: modify
+replace:rangeUpper
+rangeUpper: 3
+
+############################################################
+# Update the schema
+############################################################
+dn: CN=Sophomorix-Comment,<SchemaContainerDN>
+objectClass: attributeSchema
+changetype: modify
+replace:searchFlags
+searchFlags: 128
+
+dn: CN=sophomorix-Add-Mail-Quota,<SchemaContainerDN>
+objectClass: attributeSchema
+changetype: modify
+replace:searchFlags
+searchFlags: 128

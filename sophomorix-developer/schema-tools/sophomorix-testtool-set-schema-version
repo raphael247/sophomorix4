@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-testtool-set-schema-version) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+use Sophomorix::SophomorixConfig;
+use Sophomorix::SophomorixSambaAD qw(AD_sophomorix_schema_update);
+use Sophomorix::SophomorixBase qw(read_smb_conf);
+
+$Conf::log_level=1;
+my %smb_conf=();
+my $ref_result;
+
+my $target_version=1;
+if (defined $ARGV[0]){
+    if ($ARGV[0] eq "-h" or $ARGV[0] eq "--help"){
+   print('
+  sophomorix-testtool-set-schema-version sets the Sophomorix-Schema-Version in AD 
+  to any <number> (i.E. rangeUpper): 
+     * WITHOUT doing any updates/downgrades of the schema.
+     * This will most likely cause a lot of trouble. 
+     * It is useful only in development.
+
+  Usage:
+     sophomorix-testtool-set-schema-version       (set version 1)
+     sophomorix-testtool-set-schema-version <n>   (set version <n>)
+
+');
+   exit;
+    } elsif ($ARGV[0] eq "0") {
+        print "\n$ARGV[0] not allowed as schema version\n\n";
+        exit;
+    } else {
+	$target_version=$ARGV[0];
+    }
+} else {
+        print "\nERROR: sophomorix-testtool-set-schema-version needs an option (-h for help)\n\n";
+        exit;
+
+}
+
+
+&read_smb_conf(\%smb_conf,$ref_result);
+
+######################################################################
+my $ldif_abs="/usr/share/sophomorix-developer/schema-tools/sophomorix-schema-update-set-schema-version.ldif";
+my $ldif_patched_abs=$ldif_abs.".sed";
+
+print "\n";
+print "Using:   $ldif_abs \n";
+print "patched: $ldif_patched_abs \n";
+my $sed_command="cat \"".$ldif_abs.
+                "\" | sed -e \"s/<SchemaContainerDN>/CN=Schema,CN=Configuration,".
+                $smb_conf{'samba'}{'from_smb.conf'}{'DomainDNS'}."/\" ".
+                " -e \"s/<set-schema-version>/".$target_version."/\" ".
+                "> \"$ldif_patched_abs\"";
+# print "$sed_command\n";
+system("$sed_command");
+my $ldbmodify_command="ldbmodify -H /var/lib/samba/private/sam.ldb ".
+                      $ldif_patched_abs." ".
+                      "--option=\"dsdb:schema update allowed\"=true";
+my $stdout=`$ldbmodify_command`;
+chomp($stdout);
+my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+if ($return==0){
+    print "     SUCCESS: $stdout\n\n";
+} else {
+    print "\n";
+    print "ERROR: Update failed: skipping other updates\n";
+    print "\n";
+}
+

@@ -15,6 +15,8 @@ git push https-origin bionic
 Username for 'https://github.com': ########
 Password for 'https://jeffbeck@github.com': ########
 
+upload to fleischsalat: scp sophomorix*3.42.1-3* fleischsalat:bionic-testing
+
 ############################################################
 Todo:
 ############################################################
@@ -22,6 +24,10 @@ Todo:
 take care about ./changelog-sophomorix-source
 
 school.conf:   
+
+more logging (example see sophomorix-device)
+
+school.conf: 
  WEBUI_PERMISSIONS=lm:printers: false,lm:quotas:apply: true
 auswerten
 
@@ -58,8 +64,21 @@ Ein Lehrer an mehreren Schulen
 --> Stammschule, nur da anlegen
 --> zugriff auf andere schulen auf andere weise ermöglichen
 
+sophomorix-device : creating DNSNode,DNSreverse und DNSZone: 
+  - adminDescription weg (nicht mehr befüllen)
+  - andersweitig dnsNode, ... erkennen
+  - dnsnode zusatzdate erkennen und updaten
+
+
 sophomorix-ui --> Zeilen aus school.conf auslesen
 code cleanup: subs mit _old löschen -> besser: neues programm, das die custom felder befüllt?
+
+DNS:
+dns reverseLookup not removed when just changing the IP
+--> test this
+--> sync dns and reverse DNS seperately?
+
+sophomorix-print --caller/callercopy zusammenfassen
 
 
 Neuer Befehl: sophomorix-room (nur informativ, kein setzen von werten)
@@ -2211,14 +2230,11 @@ sophomorix-device ???:
 use settings from [devicefile.devices.csv]
 --> nur noch aus Develconf::
 $dns_node_prefix_string="SophomorixdnsNode";
-$dns_zone_prefix_string="SophomorixdnsZone";
 --> später nach sophomorix.ini umziehen:
-[VARS]
-#	DNS_NODE_PREFIX = "SophomorixdnsNode"    # Prefix for all DNS Nodes created by sophomorix
-#	DNS_ZONE_PREFIX = "SophomorixdnsZone"    # Prefix for all DNS Zones created by sophomorix
 
 
-
+sophomorix-test-2:
+WARNING: j1008p02 exists with 10.170.208.2, but should be 10.170.208.4
 
 
 sophomorix.ini ?????:
@@ -2583,9 +2599,6 @@ Next:
   - Am Ende (devices entfernt)
     - alle dnsNode incl. reverse weg?                                 OK. 
     - alle dnsZone weg?                                               OK.
-
-angleichen variablennamen: $dnszone, $dns_zone
-                           $dnsnode, $dns_node
 
 
 test1: test all options and flows of user account status changes      OK: 

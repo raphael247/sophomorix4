@@ -79,6 +79,7 @@ DEVELOPERDIR=$(DESTDIR)/usr/share/sophomorix-developer
 TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
 TESTTEMPLATES=$(DESTDIR)/usr/share/sophomorix-developer/testtemplates
 
+
 # sophomorix-virusscan
 #VIRUSSCAN=$(DESTDIR)/usr/share/sophomorix-virusscan
 
@@ -153,6 +154,8 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/2_sophomorix-classes.ldif $(SCHEMA)/
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/3_sophomorix-aux.ldif $(SCHEMA)/
 	@install -oroot -groot --mode=0755 sophomorix-samba/schema/sophomorix_schema_add.sh $(SCHEMA)/
+	@install -d -m755 -oroot -groot $(SCHEMA)/schema-updates
+	@install -oroot -groot --mode=0644 sophomorix-samba/schema/schema-updates/sophomorix-schema-update-[0-9]*.ldif $(SCHEMA)/schema-updates
 # installing configs for root
 	@install -d -m755 -oroot -groot $(CONF)
 # configs for developers
@@ -191,7 +194,7 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/ntacl/*ntacl.template $(DEVELCONF)/devel/ntacl
 # language stuff
 	@install -d -m755 -oroot -groot $(LANGUAGE)
-	@install -oroot -groot --mode=0644 sophomorix-samba/lang/sophomorix-lang.*[a-z] $(LANGUAGE)
+#	@install -oroot -groot --mode=0644 sophomorix-samba/lang/sophomorix-lang.*[a-z] $(LANGUAGE)
 	@install -oroot -groot --mode=0644 sophomorix-samba/lang/errors.*[a-z] $(LANGUAGE)
 # latex stuff
 	@install -d -m755 -oroot -groot $(LATEX)
@@ -257,6 +260,7 @@ install-developer:
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-infoscripts $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-exammode $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-JSON-example $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-developer/schema-tools/sophomorix-testtool-set-schema-version $(DESTDIR)/usr/sbin
 # copying perl developer modules
 	@install -d -m755 -oroot -groot $(PERLMOD)
 	@install -oroot -groot --mode=0644 sophomorix-developer/modules/SophomorixTest.pm $(PERLMOD)
@@ -265,6 +269,9 @@ install-developer:
 # installing templates
 	@install -d $(TESTTEMPLATES)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testtemplates/*.ini.test $(TESTTEMPLATES)
+# schema tols
+	@install -d -m755 -oroot -groot $(DEVELOPERDIR)/schema-tools
+	@install -oroot -groot --mode=0644 sophomorix-developer/schema-tools/sophomorix-schema-update-set-schema-version.ldif $(DEVELOPERDIR)/schema-tools
 
 # installing  testdata
 	@install -d $(TESTDATA)

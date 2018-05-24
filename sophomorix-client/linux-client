@@ -1,0 +1,22 @@
+Todo on client:
+
+cp netplan.conf:
+
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+# do we need dhcp6? -> I dont think so
+network:
+ version: 2
+ renderer: networkd
+ ethernets:
+   @@ens33@@:
+     dhcp4: yes
+     dhcp6: yes
+
+
+sudo netplan apply
+
+(do we need dhclient?)
+
+update resolve.conf
+

@@ -55,6 +55,8 @@ use Sophomorix::SophomorixBase qw(
                                  config_sophomorix_read
                                  result_sophomorix_init
                                  result_sophomorix_add
+                                 result_sophomorix_add_log
+                                 result_sophomorix_add_summary
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  dns_query_ip
@@ -82,7 +84,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_kill
                                  AD_computer_kill
                                  AD_dns_get
-                                 AD_dns_create
+                                 AD_dns_nodecreate_update
                                  AD_dns_zonecreate
                                  AD_dns_kill
                                  AD_dns_zonekill
@@ -98,7 +100,6 @@ my @arguments = @ARGV;
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
-my $show_role="";
 
 my $json=0;
 my $list_files=0;
@@ -112,8 +113,11 @@ my $sophomorix_first_password="";
 my $role="";
 my $school="";
 my $prefix="";
-my %school_created=();
-$school_created{$school}="created";
+
+# if this counter goes up, sophomorix-device will stop
+# after checking the files 
+my $error_in_files=0; 
+
 # rooms that have been created while the script is running
 my %room_created=();
 my $dump_files=0;
@@ -125,61 +129,6 @@ my $password="";
 # where data from workstation file is saved
 my @domcomputers_file=(); # list ordered
 my %devices_file=();
-# device   -> $name     -> ACCOUNT 0/1
-#                       -> FILENAME
-#                       -> HWK
-#                       -> IPv4
-#                       -> MAC
-#                       -> MS_OFFICE_KEY
-#                       -> MS_WINDOWS_KEY
-#                       -> OU
-#                       -> PATH_ABS
-#                       -> ROOM
-#                       -> SCHOOL
-#                       -> COMPUTER    (capitalized name)
-#                       -> COMPUTER_DOLLAR (capitalized with $)
-#
-# room     -> $room     -> HOSTS
-#                       -> IPv4
-#                       -> MAC
-#                       -> CLASSROOM=TRUE/FALSE 
-# dnsNode  -> $dnsNode  -> $IP
-# dnsZone  -> $dnsZone  -> name
-# computer -> $computer -> ROOM
-#                       -> OU
-#                       -> SCHOOL
-#                       -> COMPUTER    (capitalized name)
-#                       -> COMPUTER_DOLLAR (capitalized with $)
-#
-
-
-
-# italc
-# my $italc_owner="root";
-# my $italc_dir="";
-# my $italc_conf_dir="/etc/linuxmuster/sophomorix/italc";
-# my $italc_conf=$italc_conf_dir."/italcrooms.conf";
-# my $italc_key_dir=$italc_conf_dir."/private";
-# my $italc_key_dir_admin=$italc_key_dir."/admin";
-# my $italc_key_dir_supporter=$italc_key_dir."/supporter";
-# my $italc_key_dir_teacher=$italc_key_dir."/teacher";
-# # italc
-# my $w_coord=169;
-# my $h_coord=126;
-# my $x_coord="xxxxxxxxxxxx";
-# my $y_coord="yyyyyyyyyyyy";
-# my @x_coord=(0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513,
-#              0,171,342,513,0,171,342,513); # max 40 hosts
-# my @y_coord=(0,0,0,0,128,128,128,128,
-#              256,256,256,256,384,384,384,384,
-#              512,512,512,512,640,640,640,640,
-#              768,768,768,768,896,896,896,896,
-#              1024,1024,1024,1024,1152,1152,1152,1152); # max 40 hosts
-# my %italc_rooms=();
-# my @italc_rooms=();
 
 # classrooms
 my %class_rooms=();
@@ -189,7 +138,7 @@ $class_rooms{'j1008'}="seen";
 $class_rooms{'bsz-j1010'}="seen";
 $class_rooms{'bsz-j1008'}="seen";
 
-my $set_computer_passwords=0;
+#my $set_computer_passwords=0;
 my $dns_test=0;
 my $dns_show=0;
 my $dns_kill=0;
@@ -226,6 +175,7 @@ my @killing_dnszones=();
 # dnsNodes
 my @adding_dnsnodes=();
 my @killing_dnsnodes=();
+my @updating_dnsnodes=();
 
 # hardwareclasses
 my @adding_hardwareclasses=();
@@ -239,16 +189,17 @@ my %killmembers_hardwareclasses=();
 
 my %update_computer=(); # device -> count
 my %update_room=();
+my %update_dnsnode=();
 
 my %pxe = qw(ml ok
             );
 
 my $device="";
+my $room="";
 
 my %ms_key_ok = ();
 $ms_key_ok{"---"}="ok";
 $ms_key_ok{""}="ok";
-
 
 
 # Parsen der Optionen
@@ -257,20 +208,20 @@ my $testopt=GetOptions(
        "i|info" => \$info,
        "json|j+" => \$json,
        "verbose|v+" => \$Conf::log_level,
+       "school=s" => \$school,
        "list-files" => \$list_files,
        "p|print" => \$print,
        "dump-AD" => \$dump_AD,
        "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
-       "set-computer-passwords" => \$set_computer_passwords,
+#       "set-computer-passwords" => \$set_computer_passwords,
        "dns-test" => \$dns_test,
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
        "password=s" => \$password,
        "device|d=s" => \$device,
-       "show-role=s" => \$show_role,
+       "room|r=s" => \$room,
        "add-example-line=s" => \$add_example_line,
-#       "italc-dir=s" => \$italc_dir,
           );
 
 
@@ -293,8 +244,6 @@ my @filelist=&filelist_fetch({filetype=>"devices",
 # set linuxmuster.local as a dnsZone needed in files
 $devices_file{'dnsZone'}{$root_dns}="seen";
 
-#print Dumper(\%sophomorix_config{'FILES'});
-
 ############################################################################
 # --help
 ############################################################################
@@ -309,22 +258,22 @@ sophomorix-device adds Devices to the system:
     DNS entries 
 
 Options:
-  -h   /  --help
-  -i   /  --info
-  --info --device <device1>,<device2>,...  detailed view of device
-  --list-files              (list processed files and exit)
-  -v   /  --verbose
-  -vv  /  --verbose --verbose
+  -h / --help
+  -v / --verbose
+  -vv / --verbose --verbose
+
+List processed files and exit:
+  --list-files
 
 Information about devices in AD:
-  sophomorix-device --info 
+  -i / --info                              (overview over all schools)
+  -i / --info --school <school>            (overview over school <school>)
 
-Full information about one devices:
-  sophomorix-device --info --device <device>
+Full information about one/some devices:
+  --info --device <device1>,<device2>,...
 
-Information about devices of sophomorixRole <role>:
-  sophomorix-device --info --show-role <role>
-
+Full information about one/some devices:
+  --info --room <room1>,<room2>,...        (detailed view of room1,...)
 
 
 Synchronize the devices:
@@ -336,22 +285,18 @@ Just show what would be done (but do not do it):
 Show and append example device line:
   --add-example-line /path/to/devices.csv
 
-Managing accounts:
+Managing accounts  (Test if that works???):
   --set-computer-passwords  (set computer passwords to 12345678)
   --password password       (use password instead of 12345678)
 
-Managing DNS:
-  --dns-test (do DNS queries for devices in files)
-  --dns-kill (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
-  --dns-show (show DNS-Nodes and DNS-Zones created by sophomorix)
+Managing DNS 
+  --dns-test  (Do DNS queries for devices in *.devices.csv)
+  --dns-show  (show DNS-Nodes and DNS-Zones created by sophomorix)
+  --dns-kill  (remove all DNS-Nodes and DNS-Zones shown by --dns-show)
 
 Dumping data:                     
   --dump-files -j                  (dump contents of user files)
   --dump-AD -j                     (dump AD data)
-
-Obsolete: Managing italc:
-          --italc-dir /path/to/dir  (create italc files in /path/to/dir:
-                                   italcroom/globalconfig.xml)
 
 
 Please see the sophomorix-device(8) man pages for full documentation
@@ -403,10 +348,12 @@ if ($dns_test==1){
     foreach my $device_file (@filelist){
         my $filename = basename($device_file);
         $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
-       open(DEVICES,"$device_file") || 
-             die "ERROR: $device_file not found!";  
+        open(DEVICES,"$device_file") || 
+            die "ERROR: $device_file not found!";
+        my $device_line_count=0;  
         while(<DEVICES>){
-            &analyze_device_line($_,$device_file,$filename,$school);
+            $device_line_count++;
+            &analyze_device_line($_,$device_file,$filename,$school,$device_line_count);
         }
         close(DEVICES);
     }
@@ -422,23 +369,11 @@ if ($dns_test==1){
     }
     foreach my $host (@domcomputers_file){
         my $file_ip=$devices_file{'device'}{$host}{"IPv4"};
-        my $reply = $res->search($host);
-        if ($reply) {
-            foreach my $rr ($reply->answer) {
-                next unless $rr->type eq "A";
-                #print $rr->address, "\n";
-                if ($file_ip eq $rr->address){
-                    print "OK: $host has IP: ",$rr->address,"\n";
-                } else {
-                    print "ERROR $host has IP: ",
-                          $rr->address," (expected was $file_ip)\n";
-                }
-            }
+        my ($dns_result,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$host);
+        if ($file_ip eq $dns_result){
+            print "OK:    $host has IP $file_ip\n";
         } else {
-            # no reply: query failed
-             warn "    * query failed: ", 
-                 $res->errorstring, 
-                 " ($host has expected IP $file_ip)\n";
+            print "ERROR: $host has IP $file_ip ($dns_result)\n";
         }
     }
     exit;
@@ -453,11 +388,10 @@ if ($dns_show==1 or $dns_kill==1){
     my $res   = Net::DNS::Resolver->new;
     my @zonelist=();
     my %zonehash=();
-    my @zone_delete=(); # samba-tool command to delete node
 
     # Fetch dnsZones and their DN
     my $base="DC=DomainDnsZones,".$root_dse;
-    my $filter="(&(objectclass=dnsZone) (name=*))";
+    my $filter="(& (objectclass=dnsZone) (name=*) )";
     my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
@@ -465,50 +399,53 @@ if ($dns_show==1 or $dns_kill==1){
                       attr => ['cn']
                             );
     my $max_zone = $mesg->count;
+    # All dns zones found on this server
     for( my $index = 0 ; $index < $max_zone ; $index++) {
         my $entry = $mesg->entry($index);
-        my $admin_description=$entry->get_value('adminDescription');
         my $zone_name=$entry->get_value('name');
-        if (defined $admin_description and # attribute is defined
-           $admin_description=~m/^$DevelConf::dns_zone_prefix_string/ and # attribute starts with prefix
-           $zone_name ne $root_dns # do not add $root_dns 
-           ){
-            # list of sophomorix dnsZones without $root_dns
-            # these Zones will be deleted
+        my $role="";
+        if (defined $entry->get_value('sophomorixRole')){
+            $role=$entry->get_value('sophomorixRole');
+        }
+        if ($zone_name eq $root_dns){ 
+            # do not add $root_dns cause it will be prepended
+            print "   * Skipping dnsZone $zone_name\n";
+        } elsif ($role eq $sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}) {
             push @zonelist, $zone_name;
-
+        } else {
+            print "   * Skipping dnsZone $zone_name\n";
         }
         my ($count,$dn_dns_zone,$cn_dns_zone,$info)=
             &AD_object_search($ldap,$root_dse,"dnsZone",$zone_name);
         $zonehash{$zone_name}{'DN'}=$dn_dns_zone;
         $zonehash{$zone_name}{'CN'}=$cn_dns_zone;
         $zonehash{$zone_name}{'count'}=$count;
-        $zonehash{$zone_name}{'adminDescription'}=$info;
     }
-    # add the $root_dns zone (will not be deleted later)
+
+    # add the $root_dns zone as first entry (will not be deleted later)
     unshift @zonelist, $root_dns;
 
     # print output starts here
     my $zone_count=1;
+
     foreach my $zone (@zonelist){
         &Sophomorix::SophomorixBase::print_title("dnsZone $zone_count) $zone:");
         # dnsNodes in this dnsZone
         my $base=$zonehash{$zone}{'DN'};
-        my $filter="(&(objectclass=dnsNode) (name=*) (adminDescription=".
-                   $DevelConf::dns_node_prefix_string.
-                   "*))";
+        my $filter="(&(objectclass=dnsNode) (sophomorixRole=*))";
         my $mesg = $ldap->search(
                       base   => $base,
                       scope => 'sub',
                       filter => $filter,
-                      attr => ['cn']
+                      attr => ['cn','name']
                             );
         my $max_node = $mesg->count;
         for( my $index = 0 ; $index < $max_node ; $index++) {
             my $entry = $mesg->entry($index);
             my $name=$entry->get_value('name');
-            my $ipv4=&Sophomorix::SophomorixBase::dns_query_ip($res,$name);
-            print "   * $name  ->  $ipv4\n";
+            my $cn=$entry->get_value('cn');
+            my ($ipv4,$message)=&Sophomorix::SophomorixBase::dns_query_ip($res,$cn);
+            print "   * $cn (name=$name)  ->  $ipv4\n";
             if ($dns_kill==1){
                 &AD_dns_kill({ldap=>$ldap, 
                               root_dse=>$root_dse,
@@ -520,44 +457,34 @@ if ($dns_show==1 or $dns_kill==1){
                             });
            }
         }
-        if ($dns_kill==1){
-            if ($zone ne $root_dns){
-            &AD_dns_zonekill({ldap=>$ldap, 
-                              root_dse=>$root_dse,
-                              dns_zone=>$zone,
-                              smb_pwd=>$smb_admin_pass,
-                            });
-            } else {
-                print "   * Skipping killing provisioned zone $zone\n";
+        if ($zone eq $root_dns){
+            # not deleting the $root_dns
+        } else {
+            if ($dns_kill==1){
+                &AD_dns_zonekill({ldap=>$ldap, 
+                                  root_dse=>$root_dse,
+                                  dns_zone=>$zone,
+                                  smb_pwd=>$smb_admin_pass,
+                                });
             }
-            $zone_count++;
         }
+        $zone_count++;
     }
     exit;
 }
 
 
-################################################################################
-# fetching data
-################################################################################
-&print_title("Asking the system for computer accounts and DNS data ...");
-
-my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-                                             root_dse=>$root_dse,
-                                             root_dns=>$root_dns,
-                                             sophomorix_config=>\%sophomorix_config,
-                                           });
-# /etc/linuxmuster/classroom
-# ?????????????????????????
-#&get_classrooms();
-
 
 # --dump-AD
 if ($dump_AD==1){
+    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                 root_dse=>$root_dse,
+                                                 root_dns=>$root_dns,
+                                                 sophomorix_config=>\%sophomorix_config,
+                                               });
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
-#                hash_ref=>\%AD,
                 hash_ref=>$ref_AD_device,
                 sophomorix_config=>\%sophomorix_config,
                });
@@ -567,6 +494,11 @@ if ($dump_AD==1){
 
 # --print
 if ($print==1){
+    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                 root_dse=>$root_dse,
+                                                 root_dns=>$root_dns,
+                                                 sophomorix_config=>\%sophomorix_config,
+                                               });
     &print_devices_latex($ref_AD_device);
     exit;
 }
@@ -574,17 +506,17 @@ if ($print==1){
 
 
 # all --info option go here
-if ($info==1 and $show_role ne ""){
+if ($info==1 and $room ne ""){
     ##################################################
-    # --info --show-role <role>
-    my $ref_devices=&AD_get_full_devicedata({ldap=>$ldap,
-                                             root_dse=>$root_dse,
-                                             root_dns=>$root_dns,
-                                             devicelist=>$device,
-                                             sophomorix_config=>\%sophomorix_config,
-                                            });
+    # --info --room <room>
+    #my $ref_devices=&AD_get_full_roomdata({ldap=>$ldap,
+    #                                       root_dse=>$root_dse,
+    #                                       root_dns=>$root_dns,
+    #                                       roomlist=>$room,
+    #                                       sophomorix_config=>\%sophomorix_config,
+    #                                      });
 
-    print "HERE: show role $show_role\n";
+    print "HERE: show room $room\n";
 
 
     exit;
@@ -612,24 +544,21 @@ if ($info==1 and $show_role ne ""){
 } elsif ($info==1){
     ##################################################
     # --info (overview)
-    my ($ref_devices) = &AD_get_AD_for_device({ldap=>$ldap,
-                                               root_dse=>$root_dse,
-                                               root_dns=>$root_dns,
-                                               sophomorix_config=>\%sophomorix_config,
-                                             });
-
-    {
+        my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                                     root_dse=>$root_dse,
+                                                     root_dns=>$root_dns,
+                                                     sophomorix_config=>\%sophomorix_config,
+                                                   });
         my $jsoninfo="DEVICES";
         my $jsoncomment="The sophomorix devices";
         &json_dump({json => $json,
                     jsoninfo => $jsoninfo,
                     jsoncomment => $jsoncomment,
-                    object_name => "",
+                    object_name => $school,
                     log_level => $Conf::log_level,
-                    hash_ref => $ref_devices,
+                    hash_ref => $ref_AD_device,
                     sophomorix_config => \%sophomorix_config,
                    });
-    }
     exit;
 } else {
     # skip info stuff
@@ -637,18 +566,30 @@ if ($info==1 and $show_role ne ""){
 
 
 
+################################################################################
+# fetching data from AD for sync
+################################################################################
+my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+                                             root_dse=>$root_dse,
+                                             root_dns=>$root_dns,
+                                             sophomorix_config=>\%sophomorix_config,
+                                           });
+
+
 ############################################################################
-# reading and checking files
+# reading and checking files for sync
 ############################################################################
-# reading and checking all device files
 foreach my $device_file (@filelist){
     my $filename = basename($device_file);
     $school=$sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'SCHOOL'};
     &print_title("Reading $device_file");
+    &result_sophomorix_add_log(\%sophomorix_result,"Reading $device_file");
     open(DEVICES,"$device_file") || 
-         die "ERROR: $device_file not found!";  
+         die "ERROR: $device_file not found!"; 
+    my $device_line_count=0;  
     while(<DEVICES>){
-        &analyze_device_line($_,$device_file,$filename,$school);
+        $device_line_count++;
+        &analyze_device_line($_,$device_file,$filename,$school,$device_line_count);
     }
     # sort some lists
     foreach my $room (keys %{$devices_file{'room'}}) {
@@ -659,6 +600,31 @@ foreach my $device_file (@filelist){
     close(DEVICES);
 }
 
+
+
+############################################################################
+# Stop if there were errors in the file
+############################################################################
+if ($error_in_files > 0){
+    print "\n";
+    print "There were errors in the files.\n";
+    print "Please fix them first\n";
+    print "\n";
+
+    &result_sophomorix_add_summary({
+                     NAME=>"ADD", 
+                     RESULT=>$error_in_files, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => " errors at parsing device files", 
+                     DESCRIPTION_PRE => "Errors at parsing device files:", 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+    &log_script_exit("ERROR parsing device files: $error_in_files errors.",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+} else {
+    &result_sophomorix_add_log(\%sophomorix_result,"All *.devices.csv files without syntax error");
+}
 
 
 ############################################################################
@@ -865,31 +831,31 @@ foreach my $room (keys %{$devices_file{'room'}}) {
 
 
 # dnsNodes to kill
-foreach my $dnsnode (keys %{$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}}) {
-    if (not exists $devices_file{'dnsNode'}{$dnsnode}){
+foreach my $dns_node (keys %{$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}}) {
+    if (not exists $devices_file{'dnsNode'}{$dns_node}){
         # host is not in file anymore
-        &push_kill_dnsnode($dnsnode);
+        &push_kill_dnsnode($dns_node);
     }
 }
 
 
 
 # dnsNodes to add
-foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
-    if (not exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
+foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
+    if (not exists $ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node} ){
         # nonexisting --> add account
-        &push_add_dnsnode($dnsnode);
-    } elsif (exists $ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode} ){
-        my $ip_system=$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dnsnode}{'IPv4'};
-        my $ip_file=$devices_file{'dnsNode'}{$dnsnode};
+        &push_add_dnsnode($dns_node);
+    } elsif (exists $ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node} ){
+        my $ip_system=$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'};
+        my $ip_file=$devices_file{'dnsNode'}{$dns_node};
         if ($ip_system ne $ip_file){
             # recreate dns entry
-            print "WARNING: $dnsnode exists with $ip_system, but should be $ip_file\n";
-            &push_kill_dnsnode($dnsnode);
-            &push_add_dnsnode($dnsnode);
+            print "WARNING: $dns_node exists with $ip_system, but should be $ip_file\n";
+            &push_kill_dnsnode($dns_node);
+            &push_add_dnsnode($dns_node);
         } else {
             if($Conf::log_level>=3){
-                print "   OK: $dnsnode exists with $ip_system",
+                print "   OK: $dns_node exists with $ip_system",
                       " (= $ip_file from file)\n";
             }
         }
@@ -898,21 +864,66 @@ foreach my $dnsnode (keys %{$devices_file{'dnsNode'}}) {
 
 
 
+# dnsNodes to update
+foreach my $dns_node (keys %{$devices_file{'dnsNode'}}) {
+    if (exists $ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}){
+        my $update=0;
+        # sophomorixAdminFile
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixAdminFile'} ne 
+            $devices_file{'device'}{$dns_node}{'FILENAME'}){
+            $update++;
+        }
+        # sophomorixComment
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixComment'} ne 
+            $devices_file{'device'}{$dns_node}{'sophomorixComment'}){
+            $update++;
+        }
+        # sophomorixDnsNodename
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixDnsNodename'} ne 
+            $devices_file{'device'}{$dns_node}{'sophomorixDnsNodename'}){
+            $update++;
+        }
+        # sophomorixRole
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixRole'} ne 
+            $devices_file{'device'}{$dns_node}{'sophomorixRole'}){
+            $update++;
+        }
+        # sophomorixSchoolname
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixSchoolname'} ne 
+            $devices_file{'device'}{$dns_node}{'SCHOOL'}){
+            $update++;
+        }
+        # sophomorixComputerIP
+        if ($ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'sophomorixComputerIP'} ne 
+            $devices_file{'device'}{$dns_node}{'IPv4'}){
+            $update++;
+        }
+
+        if ($update>0){
+            $update_dnsnode{$dns_node}{'COUNT'}=$update; # count how many attributes must be updated
+            &push_update_dnsnode($dns_node);
+        }
+    }
+}
+
+
+
 # dnsZones to kill
-foreach my $dnszone (keys %{$ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}}) {
-    if (not exists $devices_file{'dnsZone'}{$dnszone}){
+foreach my $dns_zone (keys %{$ref_AD_device->{'dnsZone'}{$sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}}}) {
+    if (not exists $devices_file{'dnsZone'}{$dns_zone}){
         # dns node is not needed anymore, no host
-        &push_kill_dnszone($dnszone);
+        &push_kill_dnszone($dns_zone);
     }
 }
 
 
 
 # dnsZones to add
-foreach my $dnszone (keys %{$devices_file{'dnsZone'}}) {
-    if (not exists $ref_AD_device->{'dnsZone'}{$DevelConf::dns_zone_prefix_string}{$dnszone} ){
+foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
+    if (not exists $ref_AD_device->{'dnsZone'}{$sophomorix_config{'INI'}{'DNS'}{'DNSZONE_ROLE'}}{$dns_zone} and
+        not exists $ref_AD_device->{'dnsZone'}{'otherdnsZone'}{$dns_zone}){
         # nonexisting --> add dnszone
-        &push_add_dnszone($dnszone);
+        &push_add_dnszone($dns_zone);
     }
 }
 
@@ -1069,13 +1080,23 @@ if($no_sync==1){
         print "UPDATE: $room ($update_room{$room}{'COUNT'} attributes)\n";
     }
 
-    # dnsZones
+    # killing dnsNodes
+    print "\n";
+    $count=$#killing_dnsnodes+1;
+    &print_title("dnsNodes that must be killed: ($count)");
+    foreach my $dns_node (@killing_dnsnodes){
+        print "KILL: $dns_node\n";
+    }
+
+    # killing  dnsZones
     print "\n";
     $count=$#killing_dnszones+1;
     &print_title("dnsZones that must be killed: ($count)");
     foreach my $dns_zone (@killing_dnszones){
         print "KILL: $dns_zone\n";
     }
+
+    # adding  dnsZones
     print "\n";
     $count=$#adding_dnszones+1;
     &print_title("dnsZones that must be added: ($count)");
@@ -1083,18 +1104,20 @@ if($no_sync==1){
         print "ADD: $dns_zone\n";
     }
 
-    # dnsNodes
-    print "\n";
-    $count=$#killing_dnsnodes+1;
-    &print_title("dnsNodes that must be killed: ($count)");
-    foreach my $dns_node (@killing_dnsnodes){
-        print "KILL: $dns_node\n";
-    }
+    # adding dnsNodes
     print "\n";
     $count=$#adding_dnsnodes+1;
     &print_title("dnsNodes that must be added: ($count)");
     foreach my $dns_node (@adding_dnsnodes){
         print "ADD: $dns_node\n";
+    }
+
+    # updating dnsNodes
+    print "\n";
+    $count=$#updating_dnsnodes+1;
+    &print_title("dnsNodes that must be updated: ($count)");
+    foreach my $dns_node (@updating_dnsnodes){
+        print "UPDATE: $dns_node ($update_dnsnode{$dns_node}{'COUNT'} attributes)\n";
     }
 
     # hardwareclasses
@@ -1149,7 +1172,6 @@ if($no_sync==1){
 # Modifying System
 # ===========================================================================
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
-#&get_italcrooms();
 
 
 # ===========================================================================
@@ -1158,105 +1180,10 @@ if($no_sync==1){
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
-    # # kill examaccounts
-    # &print_title("ExamAccounts to be killed:");
-    # my $kill_count=1;
-    # foreach my $exam_account (@killing_examaccounts){
-    #     print "   * Killing ExamAccount $exam_account ...\n";
-    #     &AD_user_kill({ldap=>$ldap,
-    #                    root_dse=>$root_dse,
-    #                    login=>$exam_account,
-    #                    user_count=>$kill_count,
-    #                    sophomorix_config=>\%sophomorix_config,
-    #                  });
-    #     #system("/usr/sbin/sophomorix-kill --killuser $exam_account");
-    # }
-
-    ############################################################
-    # # add examaccounts
-    # &print_title("ExamAccounts to be added:");
-    # my $add_count=1;
-    # foreach my $exam_account (@adding_examaccounts){
-    #     my $role="examaccount";
-    #     my $school=$devices_file{'device'}{$exam_account}{'SCHOOL'};
-    #     my $filename=$devices_file{'device'}{$exam_account}{'FILENAME'};
-    #     $sophomorix_first_password=&get_plain_password($role,$file,$random,$length,@password_chars);
-    #     if (not exists $school_created{$school}){
-    #         # create ou
-    #         &AD_school_create({ldap=>$ldap,
-    #                     root_dse=>$root_dse,
-    #                     root_dns=>$root_dns,
-    #                     school=>$school,
-    #                     creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-    #                     sophomorix_config=>\%sophomorix_config,
-    #                     sophomorix_result=>\%sophomorix_result,
-    #                  });
-    #         # remember ou
-    #         $school_created{$school}="already created";
-    #     }
-    #     &AD_user_create({ldap=>$ldap, 
-    #                      root_dse=>$root_dse,
-    #                      user_count=>$add_count,
-    #                      login=>$exam_account,
-    #                      group=>$devices_file{'device'}{$exam_account}{'ROOM'},
-    #                      group_basename=>$devices_file{'device'}{$exam_account}{'ROOM'},
-    #                      firstname_ascii=>"Exam",
-    #                      surname_ascii=>"Account",
-    #                      firstname_utf8=>"Exam",
-    #                      surname_utf8=>"Account",
-    #                      birthdate=>$birthdate,
-    #                      sophomorix_first_password=>$sophomorix_first_password,
-    #                      role=>"examaccount",
-    #                      type=>"room",
-    #                      school=>$school,
-    #                      creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-    #                      tolerationdate=>"---",
-    #                      deactivationdate=>"---",
-    #                      status=>"P",
-    #                      file=>$filename,
-    #                    });
-    #     $add_count++;
-    #     # make sure that the room exists
-    #     # use the saved, tokened value
-    #     my $room_saved=$devices_file{'device'}{$exam_account}{'ROOM'};
-    #     my $examaccount_token=$school."-".$DevelConf::examaccount;
-    #     &AD_group_create({ldap=>$ldap,
-    #                       root_dse=>$root_dse,
-    #                       group=>$room_saved,
-    #                       group_basename=>$room_saved,
-    #                       description=>$room_saved,
-    #                       school=>$school,
-    #                       status=>"P",
-    #                       type=>"room",
-    #                       creationdate=>$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-    #                      });
-    #     # add examaccount to its room
-    #     &AD_group_addmember({ldap => $ldap,
-    #                          root_dse => $root_dse, 
-    #                          group => $room_saved,
-    #                          addmember => $exam_account,
-    #                         });   
-    # }
-
-    ############################################################
-    # # Kill the rooms of examaccounts
-    # &print_title("Rooms to be killed:");
-    # my $kill_room_count=1;
-    # foreach my $room (@killing_examaccount_rooms){
-    #     print "   * Killing ExamAccount Room $room ...\n";
-    #     &AD_group_kill({ldap=>$ldap,
-    #                     root_dse=>$root_dse,
-    #                     group=>$room,
-    #                     type=>"room",
-    #                     group_count=>$kill_room_count,
-    #                     sophomorix_config=>\%sophomorix_config,
-    #               });
-    # }
-
-    ############################################################
     # Kill the rooms of computers
     print "\n";
-    &print_title("Computer rooms to be killed:");
+    my $max_room_count_kill=$#killing_computer_rooms+1;
+    &print_title("Killing $max_room_count_kill computer rooms:");
     my $kill_computer_room_count=1;
     foreach my $room (@killing_computer_rooms){
         print "   * Killing Computer Room $room ...\n";
@@ -1275,7 +1202,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     print "\n";
     my $max_computer_count_kill=$#killing_computers+1;
 
-    &print_title("Killing $max_computer_count_kill computers");
+    &print_title("Killing $max_computer_count_kill computer accounts");
     my $computer_count_kill=1;
     foreach my $computer (@killing_computers){
         &AD_computer_kill({ldap=>$ldap,
@@ -1294,7 +1221,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Add computer accounts
     print "\n";
     my $max_computer_count_create=$#adding_computers+1;
-    &print_title("Adding $max_computer_count_create computers:");
+    &print_title("Adding $max_computer_count_create computer accounts:");
     my $computer_count_create=1;
     foreach my $computer (@adding_computers){
         my $school=$devices_file{'computer'}{$computer}{'SCHOOL'};
@@ -1304,22 +1231,16 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
         my $filename=$devices_file{'computer'}{$computer}{'FILENAME'};
         my $ipv4=$devices_file{'computer'}{$computer}{'sophomorixComputerIP'};
         my $mac=$devices_file{'computer'}{$computer}{'sophomorixComputerMAC'};
-        if (not exists $school_created{$school}){
-            # create ou
-            &AD_school_create({ldap=>$ldap,
-                               root_dse=>$root_dse,
-                               root_dns=>$root_dns,
-                               school=>$school,
-                               smb_admin_pass=>$smb_admin_pass,
-                               sophomorix_config=>\%sophomorix_config,
-                               sophomorix_result=>\%sophomorix_result,
-                             });
-            # remember ou
-            $school_created{$school}="already created";
-        } else {
-            print "   * OU $school already created\n";
-        }
 
+        # create school
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$school,
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
         my $role;
         if ($devices_file{'computer'}{$computer}{'sophomorixRole'} ne ""){
             $role=$devices_file{'computer'}{$computer}{'sophomorixRole'};
@@ -1387,7 +1308,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     # Updating computer accounts
     print "\n";
     my $max_computer_count_update=$#updating_computers+1;
-    &print_title("Updating $max_computer_count_update computers:");
+    &print_title("Updating $max_computer_count_update computer accounts:");
     my $computer_count_update=1;
     foreach my $computer (@updating_computers){
         &AD_computer_update({ldap=>$ldap,
@@ -1402,32 +1323,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                              sophomorix_result=>\%sophomorix_result,
                            });
         $computer_count_update++;
-    }
-
-    ############################################################
-    # Add host_groups
-    print "\n";
-    my $max_host_group_count_create=$#adding_host_groups+1;
-    &print_title("Adding $max_host_group_count_create host groups:");
-    my $host_group_count_create=1;
-    foreach my $host_group (@adding_host_groups){
-        my $description="Host group for $devices_file{'host_group'}{$host_group}{'COMPUTER_DOLLAR'}";
-        my $sub_ou=$devices_file{'host_group'}{$host_group}{'SUB_OU'}.",".
-            $sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'};
-        &AD_group_create({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          group=>$host_group,
-                          group_basename=>$devices_file{'host_group'}{$host_group}{'HOST_BASENAME'},
-                          description=>$description,
-                          school=>$devices_file{'host_group'}{$host_group}{'sophomorixSchoolname'},
-                          status=>"P",
-                          type=>$devices_file{'host_group'}{$host_group}{'sophomorixType'},
-     	   		  sub_ou=>$sub_ou,
-                          smb_admin_pass=>$smb_admin_pass,
-                          sophomorix_config=>\%sophomorix_config,
-                          sophomorix_result=>\%sophomorix_result,
-                         });
     }
 
     ############################################################
@@ -1446,6 +1341,41 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                         group_count=>$host_group_count_kill,
                         sophomorix_config=>\%sophomorix_config,
                   });
+    }
+
+    ############################################################
+    # Add host_groups
+    print "\n";
+    my $max_host_group_count_create=$#adding_host_groups+1;
+    &print_title("Adding $max_host_group_count_create host groups:");
+    my $host_group_count_create=1;
+    foreach my $host_group (@adding_host_groups){
+        my $description="Host group for $devices_file{'host_group'}{$host_group}{'COMPUTER_DOLLAR'}";
+        my $sub_ou=$devices_file{'host_group'}{$host_group}{'SUB_OU'}.",".
+            $sophomorix_config{'INI'}{'OU'}{'AD_devices_ou'};
+        # create school
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$devices_file{'host_group'}{$host_group}{'sophomorixSchoolname'},
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          group=>$host_group,
+                          group_basename=>$devices_file{'host_group'}{$host_group}{'HOST_BASENAME'},
+                          description=>$description,
+                          school=>$devices_file{'host_group'}{$host_group}{'sophomorixSchoolname'},
+                          status=>"P",
+                          type=>$devices_file{'host_group'}{$host_group}{'sophomorixType'},
+     	   		  sub_ou=>$sub_ou,
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
+                          sophomorix_result=>\%sophomorix_result,
+                         });
     }
 
     ############################################################
@@ -1469,15 +1399,16 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill dnsNodes
     print "\n";
-    &print_title("dnsNodes to be killed:");
+    my $max_dns_node_count_kill=$#killing_dnsnodes+1;
+    &print_title("Killing $max_dns_node_count_kill dnsNodes:");
     my $dns_node_count=1;
     foreach my $dns_node (@killing_dnsnodes){
         &AD_dns_kill({ldap=>$ldap, 
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
-                      dns_zone=>$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'dnsZone'},
+                      dns_zone=>$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'dnsZone'},
                       dns_node=>$dns_node,
-                      dns_ipv4=>$ref_AD_device->{'dnsNode'}{$DevelConf::dns_node_prefix_string}{$dns_node}{'IPv4'},
+                      dns_ipv4=>$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
                       smb_pwd=>$smb_admin_pass,
                     });
         $dns_node_count++;
@@ -1486,7 +1417,8 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill dnsZones
     print "\n";
-    &print_title("dnsZones to be killed:");
+    my $max_dns_zone_count_kill=$#killing_dnszones+1;
+    &print_title("Killing $max_dns_zone_count_kill dnsZones:");
     my $dns_zone_count=1;
     foreach my $dns_zone (@killing_dnszones){
 	print "        $dns_zone\n";
@@ -1502,17 +1434,16 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add dnsZones
     print "\n";
-    &print_title("dnsZones to be added:");
+    my $max_dns_zone_count_add=$#adding_dnszones+1;
+    &print_title("Adding $max_dns_zone_count_add dnsZones:");
     $dns_zone_count=1;
     foreach my $dns_zone (@adding_dnszones){
-        #my $filename="";
-        my $filename=$devices_file{'dnsZone'}{$dns_zone};
         &AD_dns_zonecreate({ldap=>$ldap, 
                             root_dse=>$root_dse,
-                            filename=>$filename,
                             dns_server=>$root_dns,
                             dns_zone=>$dns_zone,
                             smb_pwd=>$smb_admin_pass,
+                            sophomorix_config=>\%sophomorix_config,
                           });
         $dns_zone_count++;
     }
@@ -1520,25 +1451,63 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add dnsNodes
     print "\n";
-    &print_title("dnsNodes to be added:");
+    my $max_dns_node_count_add=$#adding_dnsnodes+1;
+    &print_title("Adding $max_dns_node_count_add dnsNodes:");
     $dns_node_count=1;
     foreach my $dns_node (@adding_dnsnodes){
         my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
-        &AD_dns_create({ldap=>$ldap, 
-                        root_dse=>$root_dse,
-                        root_dns=>$root_dns,
-                        filename=>$filename,
-                        dns_node=>$dns_node,
-                        dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
-                        smb_pwd=>$smb_admin_pass,
-                           });
+        my $school=$devices_file{'device'}{$dns_node}{'SCHOOL'};
+        my $role=$devices_file{'device'}{$dns_node}{'sophomorixRole'};
+        my $comment=$devices_file{'device'}{$dns_node}{'sophomorixComment'};
+        &AD_dns_nodecreate_update({ldap=>$ldap, 
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   create=>"TRUE",
+                                   filename=>$filename,
+                                   school=>$school,
+                                   role=>$role,
+                                   comment=>$comment,
+                                   dns_node=>$dns_node,
+                                   dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
+                                   smb_pwd=>$smb_admin_pass,
+                                   sophomorix_config=>\%sophomorix_config,
+                                 });
         $dns_node_count++;
+    }
+
+    ############################################################
+    # Updating dnsNodes
+    print "\n";
+    my $max_dns_node_count_update=$#updating_dnsnodes+1;
+    &print_title("Updating $max_dns_node_count_update dnsNodes:");
+    $dns_node_count=1;
+    foreach my $dns_node (@updating_dnsnodes){
+        print "$dns_node\n";
+        my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
+        my $school=$devices_file{'device'}{$dns_node}{'SCHOOL'};
+        my $role=$devices_file{'device'}{$dns_node}{'sophomorixRole'};
+        my $comment=$devices_file{'device'}{$dns_node}{'sophomorixComment'};
+        &AD_dns_nodecreate_update({ldap=>$ldap, 
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   create=>"FALSE",
+                                   filename=>$filename,
+                                   school=>$school,
+                                   role=>$role,
+                                   comment=>$comment,
+                                   dns_node=>$dns_node,
+                                   dns_ipv4=>$devices_file{'device'}{$dns_node}{'IPv4'},
+                                   smb_pwd=>$smb_admin_pass,
+                                   sophomorix_config=>\%sophomorix_config,
+                                 });
+       $dns_node_count++;
     }
 
     ############################################################
     # Kill hardwareclasses
     print "\n";
-    &print_title("Hardwareclasses to be killed:");
+    my $max_hwk_count_kill=$#killing_hardwareclasses+1;
+    &print_title("Killing $max_hwk_count_kill hardwareclasses:");
     my $kill_hwk_count=1;
     foreach my $hwk (@killing_hardwareclasses){
         print "   * Killing Hardwareclass $hwk ...\n";
@@ -1555,24 +1524,33 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add hardwareclasses
     print "\n";
-    &print_title("Hardwareclasses to be added:");
+    my $max_hwk_count_add=$#adding_hardwareclasses+1;
+    &print_title("Adding $max_hwk_count_add hardwareclasses:");
     my $hwk_count=0;
     foreach my $hwk (@adding_hardwareclasses){
         $hwk_count++;
-        #my $group_token=&AD_get_name_tokened($hwk,$school,"hardwareclass");
-         &AD_group_create({ldap=>$ldap,
+        # create school
+        &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
                            root_dns=>$root_dns,
                            school=>$school,
-                           group=>$hwk,
-                           group_basename=>$hwk,
-                           description=>$hwk,
-                           type=>"hardwareclass",
-                           status=>"P",
-                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
                            smb_admin_pass=>$smb_admin_pass,
                            sophomorix_config=>\%sophomorix_config,
                            sophomorix_result=>\%sophomorix_result,
+                         });
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          school=>$school,
+                          group=>$hwk,
+                          group_basename=>$hwk,
+                          description=>$hwk,
+                          type=>"hardwareclass",
+                          status=>"P",
+                          sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
+                          sophomorix_result=>\%sophomorix_result,
                          });
     }
 
@@ -1606,251 +1584,37 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                               });   
     }
 
-
-    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
-# ===========================================================================
-# --set-computer-passwords (setting computer passwords)
-# ===========================================================================
-if ($set_computer_passwords==1){
-    print "Setting password for all Computer accounts:\n";
-    my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-                                                 root_dse=>$root_dse,
-                                                 root_dns=>$root_dns,
-                                                 sophomorix_config=>\%sophomorix_config,
-                                               });
-    # my ($ref_AD_device) = &AD_get_AD({ldap=>$ldap,
-    #                        root_dse=>$root_dse,
-    #                        root_dns=>$root_dns,
-    #                        computers=>"TRUE",
-    #                        #rooms=>"TRUE",
-    #                        #examaccounts=>"TRUE",
-    #                        dnszones=>"TRUE",
-    #                        dnsnodes=>"TRUE",
-    #                        sophomorix_config=>\%sophomorix_config,
-    #          });
-    my $count=1;
-
-    foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
-        my $pw;
-        if ($password ne ""){
-            # password by option
-            $pw=$password;
-        } else {
-            # default password
-            $pw=$pass;
-        }
-        print "\n*** $count: $comp  --> $pw\n";
-        system("/usr/sbin/sophomorix-passwd --force -u $comp --pass $pw");
-        $count++;
-    }
-    &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-}
-
-
-
 # # ===========================================================================
-# # --italc-dir  (create config files for italc)
+# # --set-computer-passwords (setting computer passwords)
 # # ===========================================================================
-# if ($italc_dir ne ""){
-#     print "Creating italc files in $italc_dir\n";
-#     system("mkdir -p $italc_dir");
-#     system("chown $italc_owner.${DevelConf::teacher} $italc_dir");
-#     system("chmod 0755 $italc_dir");
-
-#     my $file_global="globalconfig.xml";
-#     my $file_personal="personalconfig.xml";
-#     my $dir_snapshots="snapshots";
-
-#     foreach my $room (@italc_rooms){
-#         my @teacher_hosts=();
-#         my $classroom_name=$italc_rooms{$room}{'NAME'};
-#         my $master_host=$italc_rooms{$room}{'MASTER'};
-
-#         my $italc_parent=$italc_dir."/".$room;
-#         my $italc_file_global=$italc_parent."/".$file_global;
-#         my $italc_file_personal=$italc_parent."/".$file_personal;
-#         my $italc_snapshots_dir=$italc_parent."/".$dir_snapshots;
-
-#         system("mkdir -p $italc_parent");
-#         system("chown $italc_owner.${DevelConf::teacher} $italc_parent");
-#         system("chmod 0755 $italc_parent");
-
-#         system("mkdir -p $italc_snapshots_dir");
-#         system("chmod 0777 $italc_snapshots_dir");
-
-#         print "Creating $italc_file_global for italcroom $room ...\n";
-#         open(ITALCGLOBAL, ">$italc_file_global");
-#         print ITALCGLOBAL '<?xml version="1.0"?>'."\n";
-#         print ITALCGLOBAL '<!DOCTYPE italc-config-file>'."\n";
-#         print ITALCGLOBAL '<globalclientconfig version="1.0.7" >'."\n";
-#         print ITALCGLOBAL '  <body>'."\n";
-#         print ITALCGLOBAL '    <classroom name="'.$classroom_name.'" >'."\n";
-
-#         print "Creating $italc_file_personal for italcroom $room ...\n";
-#         open(ITALCPERSONAL, ">$italc_file_personal");
-#         print ITALCPERSONAL '<?xml version="1.0"?>'."\n";
-#         print ITALCPERSONAL '<!DOCTYPE italc-config-file>'."\n";
-#         print ITALCPERSONAL '<personalconfig version="1.0.7" >'."\n";
-#         print ITALCPERSONAL '  <head>'."\n";
-
-#         my @host_list_global=();
-#         my @host_list_personal=();
-#         my %host_lines_global=();
-#         my %host_lines_personal=();
-#         for my $host ( keys %{ $rooms_file{$room}{"HOSTS"} } ) {
-#             my $ip=$domcomputers_file{$host}{"IP"};
-#             my $mac=$domcomputers_file{$host}{"MAC"};
-#             my $account_flag=$domcomputers_file{$host}{"ACCOUNT"};
-#             # type? 0/1 
-#             my $type=0;
-#             if (exists $italc_rooms{$room}{"$host"}{'TYPE'}){
-#                if ($italc_rooms{$room}{"$host"}{'TYPE'} eq "teacher host"){
-# 		    $type=1;
-#                     # remember teacher hosts
-#                     push @teacher_hosts, $host;
-#                 }
-#             }
-
-#             # visible? yes/no
-#             my $visible="yes";
-#             if (exists $italc_rooms{$room}{"$host"}{'INVISIBLE'}){
-#                if ($italc_rooms{$room}{"$host"}{'INVISIBLE'} eq "yes"){
-#                     $visible="no";
-#                 }
-#             }
-
-#             # id is 6 digits of MAC-address converted to decimal
-#             # more digits are not suppoorted bay italc 1.0.7
-#             # perl can calculate lager hex numbers.
-#             # warnings must be be disabled if you need more 
-#             # -> see beginning of script: no warnings ....
-#             my $hex_mac=$mac;
-#             $hex_mac=~s/://g;
-#             $hex_mac=substr($hex_mac,6,6);
-# 	    my $dec_mac =  hex($hex_mac);
-#             my $id=$dec_mac;
-
-#             my $line_global="      <client localip=\"".$ip."\" ".
-#                                               "mac=\"".$mac."\" ".
-#                                              "type=\"".$type."\" ".
-#                                                "id=\"".$id."\" ".
-#                                              "name=\"".$host."\" ".
-#                             "/>\n";
-#             my $line_personal="      <client w=\"".$w_coord."\" ".
-#                                             "x=\"".$x_coord."\" ".
-#                                             "y=\"".$y_coord."\" ".
-#                                             "h=\"".$h_coord."\" ".
-#                                       "visible=\"".$visible."\" ".
-#                                            "id=\"".$id."\" ".
-#                               "/> <!-- $host -->\n";
-#             if ($account_flag eq "1"){
-#                 # for sorting
-#                 push @host_list_global, $host;
-#                 push @host_list_personal, $host;
-#                 # save lines for later use
-#                 $host_lines_global{$host}=$line_global;
-#                 $host_lines_personal{$host}=$line_personal;
-#             } else {
-#                 # no account flag -> no italc account 
-#             }
+# if ($set_computer_passwords==1){
+#     print "Setting password for all Computer accounts:\n";
+#     my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
+#                                                  root_dse=>$root_dse,
+#                                                  root_dns=>$root_dns,
+#                                                  sophomorix_config=>\%sophomorix_config,
+#                                                });
+#     my $count=1;
+#     foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
+#         my $pw;
+#         if ($password ne ""){
+#             # password by option
+#             $pw=$password;
+#         } else {
+#             # default password
+#             $pw=$pass;
 #         }
-
-#         @host_list_global = sort @host_list_global;
-#         @host_list_personal = sort @host_list_personal;
-
-#         foreach my $host (@host_list_global){
-# 		print ITALCGLOBAL "$host_lines_global{$host}";
-#         }
-        
-#         # italc global file
-#         print ITALCGLOBAL '    </classroom>'."\n";
-#         print ITALCGLOBAL '  </body>'."\n";
-#         print ITALCGLOBAL '</globalclientconfig>'."\n";
-#         close(ITALCGLOBAL);
-#         system("chown $italc_owner.${DevelConf::teacher} $italc_file_global");
-#         system("chmod 0755 $italc_file_global");
-
-#         # italc personal file
-#         my $master_ip=$domcomputers_file{$master_host}{"IP"};
-#         print ITALCPERSONAL '  <globalsettings '.
-#                             "demo-master-ip=\"".$master_ip."\" ".
-#                             'opened-tab="5" '.
-#                             'demoquality="0" '.
-#                             'defaultdomain="" '.
-#                             'role="1" '.
-#                             'demo-net-iface="eth0" '.
-#                             'client-update-interval="1" '.
-#                             'wincfg="AAAA/wAAAAD9AAAAAAAABAAAAAJfAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AdABvAG8AbABiAGEAcgEAAAAAAAAEAAAAAAAAAAAA" '.
-#                             'notooltips="0" '.
-#                             'win-height="663" '.
-#                             'win-x="0" '.
-#                             'ismaximized="1" '.
-#                             'win-y="0" '.
-#                             'clientdoubleclickaction="0" '.
-#                             'win-width="1024" '.
-#                             'showUserColumn="0" />'."\n";
-#         print ITALCPERSONAL '  </head>'."\n";
-#         print ITALCPERSONAL '  <body>'."\n";
-#         print ITALCPERSONAL '    <classroom name="'.$classroom_name.'" >'."\n";
-#         my $host_index=0; # index for array: index=0 --> first element
-#         foreach my $host (@host_list_personal){
-# 	    my $line_to_print=$host_lines_personal{$host};
-#             # replace coordinates
-#             $line_to_print=~s/$x_coord/$x_coord[$host_index]/g;
-#             $line_to_print=~s/$y_coord/$y_coord[$host_index]/g;
-#             print ITALCPERSONAL "$line_to_print";
-#             # old: print unmodified
-# 	    #print ITALCPERSONAL "$host_lines_personal{$host}";
-#             $host_index++;
-#         }
-#         print ITALCPERSONAL '    </classroom>'."\n";
-#         print ITALCPERSONAL '  </body>'."\n";
-#         print ITALCPERSONAL '</personalconfig>'."\n";
-#         close(ITALCPERSONAL);
-#         system("chown $italc_owner.${DevelConf::teacher} $italc_file_personal");
-#         system("chmod 0755 $italc_file_personal");
-
-#         foreach my $teacher_host (@teacher_hosts){
-#             # create links for teacher hosts
-#             system("cd $italc_dir; ln -s $room $teacher_host");
-#         }
+#         print "\n*** $count: $comp  --> $pw\n";
+#         system("/usr/sbin/sophomorix-passwd --force -u $comp --pass $pw");
+#         $count++;
 #     }
-
-#     # copying the keys
-#     print "* Copying italc keys to $italc_dir\n";
-#     system("cp -r $italc_key_dir $italc_dir");
-#     system("chown -R $italc_owner.${DevelConf::teacher} $italc_dir");
-#     if (-e "${italc_key_dir_admin}/key"){
-#         system("chmod 440 ${italc_key_dir_admin}/key");
-#     } else {
-#         print "\nPlease add a key ${italc_key_dir_admin}/key!\n\n";
-#     }
-#     if (-e "${italc_key_dir_supporter}/key"){
-#         system("chmod 440 ${italc_key_dir_supporter}/key");
-#     } else {
-#         print "\nPlease add a key ${italc_key_dir_supporter}/key!\n\n";
-#     }
-#     if (-e "${italc_key_dir_teacher}/key"){
-#         system("chmod 440 ${italc_key_dir_teacher}/key");
-#     } else {
-#         print "\nPlease add a key ${italc_key_dir_teacher}/key!\n\n";
-#     }
-#     &log_script_end(\@arguments,\%sophomorix_result,$json);
+#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 # }
-
-
-
-&AD_unbind_admin($ldap);
-
-# syntax was OK
-#&log_script_end(\@arguments,\%sophomorix_result,$json);
-exit 0;
-
-
-
 
 
 
@@ -1858,7 +1622,7 @@ exit 0;
 # subs
 # ===========================================================================
 sub analyze_device_line {
-    my ($line,$device_file,$filename,$school) = @_;
+    my ($line,$device_file,$filename,$school,$device_line_count) = @_;
     if (/^#/ or /^\s*$/){
         return 0;
     } else {
@@ -1873,7 +1637,6 @@ sub analyze_device_line {
             $unused,
             $sophomorix_role,
             $unused_2,
-#            $account_flag,
             $pxe,
             $option,
             $field_13,
@@ -1914,6 +1677,18 @@ sub analyze_device_line {
             print "\n";
 	}
 
+        # some things are nor allowed to be double:
+        # name
+        if (exists $devices_file{'device'}{$host_token}){
+            print "Device Name (Field2) is double: $host_token\n";
+            &result_sophomorix_add(\%sophomorix_result,
+                                   "ERROR",
+                                   -1,
+                                   \@arguments,
+                                   "$filename (Line: $device_line_count): Device Name (Field2) is double: $host_token");
+            $error_in_files++;
+        }
+
         # save data into hash for reuse
         push @domcomputers_file, $host_token;
         $devices_file{'device'}{$host_token}{'ROOM_BASENAME'}=$room;            # 01
@@ -1926,12 +1701,6 @@ sub analyze_device_line {
         $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
         $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
         $devices_file{'device'}{$host_token}{'ACCOUNT'}=$account_flag;
-#        # set account flag
-#        if ($account_flag==1){
-#            $devices_file{'device'}{$host_token}{'ACCOUNT'}="TRUE";
-#        } else {
-#            $devices_file{'device'}{$host_token}{'ACCOUNT'}="FALSE";
-#        }
         $devices_file{'device'}{$host_token}{'COMPUTER'}=$ws_token;
         $devices_file{'device'}{$host_token}{'COMPUTER_DOLLAR'}=$ws_token_account;
         $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
@@ -1950,6 +1719,7 @@ sub analyze_device_line {
         if (not defined $sophomorix_comment){
             $sophomorix_comment="";
         }       
+        $devices_file{'device'}{$host_token}{'sophomorixDnsNodename'}=$host_token;
         $devices_file{'device'}{$host_token}{'sophomorixRole'}=$sophomorix_role;       # 09
         $devices_file{'device'}{$host_token}{'OPTION'}=$option;                        # 12
         $devices_file{'device'}{$host_token}{'FIELD_13'}=$field_13;
@@ -1959,9 +1729,8 @@ sub analyze_device_line {
         # dnsZone
         my @octets=split(/\./,$ip);
         my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
-        $devices_file{'dnsZone'}{$dns_zone}=$filename;
-
-#???	print "   * Zone: $dns_zone needed\n";
+        $devices_file{'dnsZone'}{$dns_zone}{'FILENAME'}=$filename;
+        $devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'}=$school;
 
         # dnsNode
         $devices_file{'dnsNode'}{$host_token}=$ip;
@@ -2340,6 +2109,13 @@ sub push_add_dnsnode {
 sub push_kill_dnsnode {
     my ($kill) = @_;
     push @killing_dnsnodes, $kill;
+}
+
+
+
+sub push_update_dnsnode {
+    my ($update) = @_;
+    push @updating_dnsnodes, $update;
 }
 
 

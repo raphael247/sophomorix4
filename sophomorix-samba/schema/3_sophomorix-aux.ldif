@@ -1,11 +1,27 @@
 #
-# Sophomorix AD Schema: apply auxiliary classes
+# Sophomorix AD Schema: apply auxiliary classes 
+# to structural objectclasses as Computer, User, ...
 #
 
 dn: CN=User,<SchemaContainerDN>
 changetype: modify
 add: auxiliaryClass
 auxiliaryClass: sophomorixUser
+
+dn: CN=Computer,<SchemaContainerDN>
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: sophomorixComputer
+
+dn: CN=Dns-Node,<SchemaContainerDN>
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: sophomorixDnsNode
+
+dn: CN=Dns-Zone,<SchemaContainerDN>
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: sophomorixDnsZone
 
 dn: CN=Group,<SchemaContainerDN>
 changetype: modify

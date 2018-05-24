@@ -30,8 +30,9 @@ $Data::Dumper::Terse = 1;
             AD_test_nondns
             AD_computers_any
             AD_examaccounts_any
-            AD_dnsnodes_any
-            AD_dnszones_any
+            AD_dnsnodes_count_lookup
+            AD_dnsnodes_count_reverse
+            AD_dnszones_count
             AD_rooms_any
             AD_user_timeupdate
             ACL_test
@@ -45,6 +46,7 @@ $Data::Dumper::Terse = 1;
             AD_get_samaccountname
             cat_wcl_test
             smbcquotas_test
+            diff_acl_snapshot
             );
 
 
@@ -171,44 +173,78 @@ sub AD_user_timeupdate {
 
 
 
-sub AD_dnsnodes_any {
-    my ($ldap,$root_dse) = @_;
-    my $filter_node="(&(objectClass=dnsNode)(adminDescription=".
-                             $DevelConf::dns_node_prefix_string.
-                            "*))";
-
+sub AD_dnsnodes_count_lookup {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=dnsNode)(sophomorixRole=*)(sophomorixDnsNodetype=lookup))";
     $mesg = $ldap->search( # perform a search
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
                    filter => $filter_node,
-                   attrs => ['dc',"adminDescription"]
+                   attrs => ['dc','sophomorixRole','sophomorixdnsNodename']
                          );
     my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All sophomorix dnsNodes are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        printf "   * %-14s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('adminDescription');
+    is ($max_user,$expected,"  * $expected sophomorix dnsNodes of sophomorixDnsNodetype=lookup found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * dnsNodes of sophomorixDnsNodetype=lookup:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $string="sophomorixdnsNodename:".$entry->get_value('sophomorixdnsNodename').", ".
+                       "sophomorixRole:".$entry->get_value('sophomorixRole');
+            printf "   * %-14s-> %-50s\n",$entry->get_value('dc'),$string;
+        }
     }
 }
 
 
 
-sub AD_dnszones_any {
-    my ($ldap,$root_dse) = @_;
-    my $filter_zone="(&(objectClass=dnsZone)(adminDescription=".
-                             $DevelConf::dns_zone_prefix_string.
-                            "*))";
+sub AD_dnsnodes_count_reverse {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=dnsNode)(sophomorixRole=*)(sophomorixDnsNodetype=reverse))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['dc','sophomorixRole','sophomorixdnsNodename']
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,$expected,"  * $expected sophomorix dnsNodes of sophomorixDnsNodetype=reverse found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * dnsNodes of sophomorixDnsNodetype=reverse:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $string="sophomorixdnsNodename:".$entry->get_value('sophomorixdnsNodename').", ".
+                       "sophomorixRole:".$entry->get_value('sophomorixRole');
+            printf "   * %-5s-> %-50s\n",$entry->get_value('dc'),$string;
+        }
+    }
+}
+
+
+
+sub AD_dnszones_count {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_zone="(& (objectClass=dnsZone) (sophomorixRole=sophomorixdnsZone) )";
     $mesg = $ldap->search( # perform a search
                    base   => "CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local",
                    scope => 'sub',
                    filter => $filter_zone,
-                   attrs => ['dc',"adminDescription"]
+                   attrs => ['dc','sophomorixRole','cn']
                          );
     my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All sophomorix dnsZones are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        printf "   * %-24s-> %-40s\n",$entry->get_value('dc'),$entry->get_value('adminDescription');
+    is ($max_user,$expected,"  * $expected sophomorixdnsZones found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $string="sophomorixRole:".$entry->get_value('sophomorixRole').", ".
+                       "cn:".$entry->get_value('cn');
+            printf "   * %-26s-> %-40s\n",$entry->get_value('dc'),$string;
+        }
     }
 }
 
@@ -330,6 +366,7 @@ sub AD_test_object {
 
     # sophomorix computer
     my $s_dns_nodename = $arg_ref->{sophomorixDnsNodename};
+    my $s_dns_nodetype = $arg_ref->{sophomorixDnsNodetype};
     my $s_ip = $arg_ref->{sophomorixComputerIP};
     my $s_mac = $arg_ref->{sophomorixComputerMAC};
     my $s_room = $arg_ref->{sophomorixComputerRoom};
@@ -382,9 +419,6 @@ sub AD_test_object {
     my $member_of = $arg_ref->{memberOf};
     #my $not_member_of = $arg_ref->{not_memberOf};
 
-    # dnsNode/dnsZone
-    my $admin_description = $arg_ref->{adminDescription};
-
     my $filter="(|(cn=*)(dn=*))";
     my $mesg = $ldap->search(
                       base   => $dn,
@@ -419,10 +453,6 @@ sub AD_test_object {
 
 
         # Testing attributes
-        if (defined $admin_description){
-            is ($entry->get_value ('adminDescription'),$admin_description,
-                                   "  * adminDescription is $admin_description");
-        }
         if (defined $cn){
             is ($entry->get_value ('cn'),$cn,
                                    "  * cn is $cn");
@@ -522,6 +552,10 @@ sub AD_test_object {
         if (defined $s_dns_nodename){
             is ($entry->get_value ('sophomorixDnsNodename'),$s_dns_nodename,
 		"  * sophomorixDnsNodename is $s_dns_nodename");
+        }
+        if (defined $s_dns_nodetype){
+            is ($entry->get_value ('sophomorixDnsNodetype'),$s_dns_nodetype,
+		"  * sophomorixDnsNodetype is $s_dns_nodetype");
         }
         if (defined $s_ip){
             is ($entry->get_value ('sophomorixComputerIP'),$s_ip,
@@ -1306,12 +1340,14 @@ sub file_test_chars {
 
 sub run_command {
     my ($command) = @_;
+    my $return_value=666;
     print "\n";
     print "######################################################################\n";
     print "$command\n";
     print "######################################################################\n";
-    system("$command");
+    $return_value=system("$command");
     print "######################################################################\n";
+    return $return_value;
 }
 
 
@@ -1329,6 +1365,40 @@ sub cat_wcl_test {
     my $count=`$command`;
     chomp($count);
     is ($count,$expect,"  * $count results for \"$grep\" in $abs");
+}
+
+
+
+sub diff_acl_snapshot {
+    my ($file,$snapshot1,$snapshot2)=@_;
+    print "Running diff command:\n";
+    my $command="/usr/bin/diff /var/lib/sophomorix/sophomrix-repair/".$snapshot1."/".$file.
+                             " /var/lib/sophomorix/sophomrix-repair/".$snapshot2."/".$file;
+
+    print "$command\n";
+    my $stdout=`$command`;
+    my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+
+    # Test for return Value
+    is ($return,0,"  * Diff returned 0 (file is identical)");
+
+    # Test output
+    my $output_lines;
+    if ($stdout eq ""){
+        $output_lines=0;
+    } else {
+        my (@lines)=split(/\n/,$stdout);
+        $output_lines=$#lines+1;
+    }
+    is ($output_lines,0,"  * Diff output line number is 0 (file is identical)");
+
+    # display output nicely when not 0 lines
+    if ($output_lines>0){
+        print "####### diff output (start) #####################################################\n";
+        print $stdout;
+        print "####### diff output (end)   #####################################################\n";
+    }
+
 }
 
 

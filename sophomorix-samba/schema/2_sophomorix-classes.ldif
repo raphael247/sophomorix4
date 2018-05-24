@@ -1,5 +1,5 @@
 #
-# Sophomorix AD Schema: Classes
+# Sophomorix AD Schema: Classes (objectClassCategory: 3, auxilary)
 #
 
 # <-- User -->
@@ -19,7 +19,7 @@ objectClass: classSchema
 objectClassCategory: 3
 possSuperiors: top
 rDNAttID: cn
-schemaIDGUID:: 2S2X+EAGS6WL4FDnHY+PKw==
+schemaIDGUID: 95b0428e-c09e-4e72-9c8e-351d51595454
 subClassOf: top
 systemOnly: FALSE
 
@@ -55,9 +55,63 @@ mayContain: sophomorixComment
 mayContain: sophomorixWebuiDashboard
 mayContain: sophomorixWebuiPermissions
 mayContain: sophomorixWebuiPermissionsCalculated
-mayContain: sophomorixDnsNodename
 mayContain: sophomorixCloudQuotaCalculated
 mayContain: sophomorixUniverseID
+mayContain: sophomorixStickyGroup
+mayContain: sophomorixCustom1
+mayContain: sophomorixCustom2
+mayContain: sophomorixCustom3
+mayContain: sophomorixCustom4
+mayContain: sophomorixCustom5
+mayContain: sophomorixCustomMulti1
+mayContain: sophomorixCustomMulti2
+mayContain: sophomorixCustomMulti3
+mayContain: sophomorixCustomMulti4
+mayContain: sophomorixCustomMulti5
+mayContain: sophomorixIntrinsic1
+mayContain: sophomorixIntrinsic2
+mayContain: sophomorixIntrinsic3
+mayContain: sophomorixIntrinsic4
+mayContain: sophomorixIntrinsic5
+mayContain: sophomorixIntrinsicMulti1
+mayContain: sophomorixIntrinsicMulti2
+mayContain: sophomorixIntrinsicMulti3
+mayContain: sophomorixIntrinsicMulti4
+mayContain: sophomorixIntrinsicMulti5
+
+
+# <-- Computer -->
+
+dn: CN=Sophomorix-Computer,<SchemaContainerDN>
+changetype: add
+adminDescription: Sophomorix-Computer
+adminDisplayName: Sophomorix-Computer
+cn: Sophomorix-Computer
+defaultHidingValue: TRUE
+governsID: 1.3.6.1.4.1.47512.1.2.6
+instanceType: 4
+lDAPDisplayName: sophomorixComputer
+name: Sophomorix-Computer
+objectCategory: CN=Class-Schema,<SchemaContainerDN>
+objectClass: classSchema
+objectClassCategory: 3
+possSuperiors: top
+rDNAttID: cn
+schemaIDGUID: a09f0cff-2a67-4d2d-b7b8-908f3ae30d10
+subClassOf: top
+systemOnly: FALSE
+
+dn: CN=Sophomorix-Computer,<SchemaContainerDN>
+changetype: modify
+replace: mayContain
+mayContain: sophomorixStatus
+mayContain: sophomorixCreationDate
+mayContain: sophomorixAdminFile
+mayContain: sophomorixRole
+mayContain: sophomorixSchoolPrefix
+mayContain: sophomorixSchoolname
+mayContain: sophomorixComment
+mayContain: sophomorixDnsNodename
 mayContain: sophomorixCustom1
 mayContain: sophomorixCustom2
 mayContain: sophomorixCustom3
@@ -84,6 +138,77 @@ mayContain: sophomorixComputerRoom
 mayContain: sophomorixComputerDefaults
 
 
+# <-- dnsNode -->
+
+dn: CN=Sophomorix-DnsNode,<SchemaContainerDN>
+changetype: add
+adminDescription: Sophomorix-DnsNode
+adminDisplayName: Sophomorix-DnsNode
+cn: Sophomorix-DnsNode
+defaultHidingValue: TRUE
+governsID: 1.3.6.1.4.1.47512.1.2.4
+instanceType: 4
+lDAPDisplayName: sophomorixDnsNode
+name: Sophomorix-DnsNode
+objectCategory: CN=Class-Schema,<SchemaContainerDN>
+objectClass: classSchema
+objectClassCategory: 3
+possSuperiors: top
+rDNAttID: cn
+schemaIDGUID: 4a2192bd-5cd9-4561-8b98-77273ca00fa2
+subClassOf: top
+systemOnly: FALSE
+
+dn: CN=Sophomorix-DnsNode,<SchemaContainerDN>
+changetype: modify
+replace: mayContain
+mayContain: sophomorixAdminFile
+mayContain: sophomorixRole
+mayContain: sophomorixSchoolname
+mayContain: sophomorixComment
+mayContain: sophomorixDnsNodename
+mayContain: sophomorixDnsNodetype
+mayContain: sophomorixComputerIP
+mayContain: sophomorixIntrinsic1
+mayContain: sophomorixIntrinsicMulti1
+mayContain: sophomorixCustom1
+mayContain: sophomorixCustomMulti1
+
+
+# <-- dnsZone -->
+
+dn: CN=Sophomorix-DnsZone,<SchemaContainerDN>
+changetype: add
+adminDescription: Sophomorix-DnsZone
+adminDisplayName: Sophomorix-DnsZone
+cn: Sophomorix-DnsZone
+defaultHidingValue: TRUE
+governsID: 1.3.6.1.4.1.47512.1.2.5
+instanceType: 4
+lDAPDisplayName: sophomorixDnsZone
+name: Sophomorix-DnsZone
+objectCategory: CN=Class-Schema,<SchemaContainerDN>
+objectClass: classSchema
+objectClassCategory: 3
+possSuperiors: top
+rDNAttID: cn
+schemaIDGUID: 179018ed-74e6-4a67-ad25-c1ca1ffd9c9e
+subClassOf: top
+systemOnly: FALSE
+
+dn: CN=Sophomorix-DnsZone,<SchemaContainerDN>
+changetype: modify
+replace: mayContain
+mayContain: sophomorixAdminFile
+mayContain: sophomorixRole
+mayContain: sophomorixSchoolname
+mayContain: sophomorixComment
+mayContain: sophomorixIntrinsic1
+mayContain: sophomorixIntrinsicMulti1
+mayContain: sophomorixCustom1
+mayContain: sophomorixCustomMulti1
+
+
 # <-- Group -->
 
 dn: CN=Sophomorix-Group,<SchemaContainerDN>
@@ -101,7 +226,7 @@ objectClass: classSchema
 objectClassCategory: 3
 possSuperiors: top
 rDNAttID: cn
-schemaIDGUID:: FH0uS2isTniC8eXZ4euoDQ==
+schemaIDGUID: 3849cf94-655c-43c7-92d2-da1668a3881c
 subClassOf: top
 systemOnly: FALSE
 
@@ -118,6 +243,7 @@ mayContain: sophomorixComment
 mayContain: sophomorixType
 mayContain: sophomorixMailAlias
 mayContain: sophomorixMailList
+mayContain: sophomorixStickyGroup
 mayContain: sophomorixCustom1
 mayContain: sophomorixCustom2
 mayContain: sophomorixCustom3
@@ -161,7 +287,7 @@ objectClass: classSchema
 objectClassCategory: 3
 possSuperiors: top
 rDNAttID: cn
-schemaIDGUID:: pkoov8mDSV6c3ELyXMGM/g
+schemaIDGUID: 0ed665e8-113f-4f9b-afaf-597b57e4f7c6
 subClassOf: top
 systemOnly: FALSE
 

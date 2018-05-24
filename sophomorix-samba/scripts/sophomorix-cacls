@@ -56,6 +56,7 @@ use Sophomorix::SophomorixSambaAD qw(
 # Variablen für Optionen
 $Conf::log_level=1;
 my $help=0;
+my $append_to_file="";
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-cacls");
 my $user=$DevelConf::sophomorix_AD_admin;
@@ -69,6 +70,7 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "help|h" => \$help,
+           "append-to-file=s" => \$append_to_file,
           );
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
@@ -85,6 +87,9 @@ sophomorix-cacls accepts one ore more unix paths as the option and connects via 
 
 Options:
   -h  / --help
+
+  --append-to-file /abs/file.txt   # appends >> the diffable result to /abs/file.txt
+
 ');
    print "\n";
    exit;
@@ -103,10 +108,23 @@ foreach my $share (keys %{$sophomorix_config{'samba'}{'net_conf_list'}}) {
     }
 }
 
+
+
+# --append-to-file works only if file exists already
+if ($append_to_file ne ""){
+    if (not -f $append_to_file){
+        print "\nERROR: Not an existing file: $append_to_file\n\n";
+        exit;
+    }
+}
+
+
+
 foreach my $linux_path (@linux_paths){
     my $smb_unc="";
     my $smb_rel="";
     my $command="";
+    my $command_append="";
     my $is_smb=0;
     foreach my $path (keys %share_by_path) {
         # if unix path starts with a known share path
@@ -124,25 +142,34 @@ foreach my $linux_path (@linux_paths){
             }
             $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCACLS'}.
                      " -U ".$user."%".$pass." ".$smb_unc." '".$smb_rel."'";
+            $command_append=$command." >> ".$append_to_file;
         }
     }
 
     # printout
-    if ($is_smb==0){
-        print "=============================================================\n";
-        print "LINUX: $linux_path is not on a SMB share\n";
-    } else {
-        print "=============================================================\n";
-        print "LINUX: $linux_path\n";
-        print "   SMB-UNC: $smb_unc\n";
-        print "   SMB-RELPATH: $smb_rel\n";
-        print "   $command\n";
-        print "---------------------------------------------------------------\n";
-        if ($smb_rel eq ""){
-            print "directory/file name is not allowed to be empty\n";
+    if ($append_to_file eq ""){
+        # print to console
+        if ($is_smb==0){
+            print "=============================================================\n";
+            print "LINUX: $linux_path is not on a SMB share\n";
         } else {
-            system($command);
+            print "=============================================================\n";
+            print "LINUX: $linux_path\n";
+            print "   SMB-UNC: $smb_unc\n";
+            print "   SMB-RELPATH: $smb_rel\n";
+            print "   $command\n";
+            print "---------------------------------------------------------------\n";
+            if ($smb_rel eq ""){
+                print "directory/file name is not allowed to be empty\n";
+            } else {
+                system($command);
+            }
+            print "\n\n";
         }
-        print "\n\n";
+    } else {
+        # append to file
+        system("echo '\n$linux_path' >> $append_to_file");
+        print "   $command_append\n";
+        system($command_append);
     }
 }
