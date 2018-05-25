@@ -2062,7 +2062,9 @@ sub _console_print_device_full {
             }
         }
 
+        ############################################################
         # dnsNode
+        ##### LOOKUP
         print $line1;
         print "dnsNode (IP LOOKUP) for $device_count/$ref_devices->{'COUNTER'}{'dnsNode'}{'TOTAL'} in AD: ",
               "$device in school $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixSchoolname'}\n";
@@ -2086,8 +2088,33 @@ sub _console_print_device_full {
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComputerIP'};
         printf "%29s: %-40s\n","sophomorixComment",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'sophomorixComment'};
-        printf "%29s: %-40s\n","dnsRecord",
-            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord'};
+
+        # dnsRecord:
+        printf "%29s: %-40s\n","dnsRecord","(binary, data follows, completely unchecked)";
+        printf "%29s: %-40s\n","dnsRecord_DataLength",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_DataLength'};
+        printf "%29s: %-40s\n","dnsRecord_Type",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Type'};
+        printf "%29s: %-40s\n","dnsRecord_Version",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Version'};
+        printf "%29s: %-40s\n","dnsRecord_Rank",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Rank'};
+        printf "%29s: %-40s\n","dnsRecord_Flags",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Flags'};
+        printf "%29s: %-40s\n","dnsRecord_Serial",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Serial'};
+        printf "%29s: %-40s\n","dnsRecord_TtlSeconds",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_TtlSeconds'};
+        printf "%29s: %-40s\n","dnsRecord_Reserved",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Reserved'};
+        printf "%29s: %-40s\n","dnsRecord_TimeStamp",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_TimeStamp'};
+        #printf "%29s: %-40s\n","dnsRecord_Data",
+        #    $ref_devices->{'DEVICES'}{$device}{'dnsNode'}{$device}{'dnsRecord_Data'};
+        printf "%29s: %-40s\n","dnsRecord_Data","todo ???";
+
+        
+        ##### REVERSE LOOKUP
         print $line1;
         print "dnsNode (REVERSE LOOKUP) for $device_count/$ref_devices->{'COUNTER'}{'dnsNode_REVERSE'}{'TOTAL'} in AD: ",
               "$device in school $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixSchoolname'}\n";
@@ -2111,8 +2138,30 @@ sub _console_print_device_full {
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComputerIP'};
         printf "%29s: %-40s\n","sophomorixComment",
             $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'sophomorixComment'};
-        printf "%29s: %-40s\n","dnsRecord",
-            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord'};
+
+        # dnsRecord:
+        printf "%29s: %-40s\n","dnsRecord","(binary, data follows, completely unchecked)";
+        printf "%29s: %-40s\n","dnsRecord_DataLength",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_DataLength'};
+        printf "%29s: %-40s\n","dnsRecord_Type",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Type'};
+        printf "%29s: %-40s\n","dnsRecord_Version",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Version'};
+        printf "%29s: %-40s\n","dnsRecord_Rank",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Rank'};
+        printf "%29s: %-40s\n","dnsRecord_Flags",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Flags'};
+        printf "%29s: %-40s\n","dnsRecord_Serial",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Serial'};
+        printf "%29s: %-40s\n","dnsRecord_TtlSeconds",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_TtlSeconds'};
+        printf "%29s: %-40s\n","dnsRecord_Reserved",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Reserved'};
+        printf "%29s: %-40s\n","dnsRecord_TimeStamp",
+            $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_TimeStamp'};
+        #printf "%29s: %-40s\n","dnsRecord_Data",
+        #    $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Data'};
+        printf "%29s: %-40s\n","dnsRecord_Data","todo ???";
     }
 }
 

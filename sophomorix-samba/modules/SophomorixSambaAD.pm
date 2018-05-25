@@ -15,6 +15,8 @@ use List::MoreUtils qw(uniq);
 use File::Basename;
 use Math::Round;
 use Data::Dumper;
+use MIME::Base64;
+use Socket;
 
 # for smb://
 use POSIX;
@@ -6063,8 +6065,32 @@ sub AD_get_full_devicedata {
         if ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_REVERSE'}){
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dn'}=$dn;
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'cn'}=$cn;
-            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord'}=
-                $entry->get_value('dnsRecord');
+
+            # dnsRecord: see https://msdn.microsoft.com/en-us/library/ee898781.aspx
+            my $dns_blob=$entry->get_value('dnsRecord');
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord'}=$dns_blob;
+            my $blob = decode_base64($dns_blob);
+            my ($dataLength,    # 2 bytes
+                $type,          # 2 bytes
+                $version,       # 1 byte
+                $rank,          # 1 byte
+                $flags,         # 2 bytes 
+                $serial,        # 4 bytes 
+                $ttl,           # 4 bytes 
+                $reserved,      # 4 bytes 
+                $timestamp,     # 4 bytes
+                $data ) = unpack( 'S S C C S L N L L a*', $dns_blob );
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_DataLength'}=$dataLength;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Type'}=$type;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Version'}=$version;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Rank'}=$rank;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Flags'}=$flags;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Serial'}=$serial;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_TtlSeconds'}=$ttl;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Reserved'}=$reserved;
+            $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_TimeStamp'}=$timestamp;
+            #$devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'dnsRecord_Data'}=inet_ntoa($data);
+
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'name'}=
                 $entry->get_value('name');
             $devices{'DEVICES'}{$cn}{'dnsNode_REVERSE'}{$cn}{'sophomorixAdminFile'}=
@@ -6086,8 +6112,31 @@ sub AD_get_full_devicedata {
         } elsif ($dnsnode_type eq $ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_TYPE_LOOKUP'}) {
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dn'}=$dn;
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'cn'}=$cn;
-            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord'}=
-                $entry->get_value('dnsRecord');;
+            my $dns_blob=$entry->get_value('dnsRecord');
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord'}=$dns_blob;
+            my $blob = decode_base64($dns_blob);
+	    print "HERE: $blob\n";
+            my ($dataLength,    # 2 bytes
+                $type,          # 2 bytes
+                $version,       # 1 byte
+                $rank,          # 1 byte
+                $flags,         # 2 bytes 
+                $serial,        # 4 bytes 
+                $ttl,           # 4 bytes 
+                $reserved,      # 4 bytes 
+                $timestamp,     # 4 bytes
+                $data ) = unpack( 'S S C C S L N L L a*', $dns_blob );
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_DataLength'}=$dataLength;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Type'}=$type;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Version'}=$version;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Rank'}=$rank;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Flags'}=$flags;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Serial'}=$serial;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_TtlSeconds'}=$ttl;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Reserved'}=$reserved;
+            $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_TimeStamp'}=$timestamp;
+            #$devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord_Data'}=inet_ntoa($data);
+
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'name'}=
                 $entry->get_value('name');;
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'sophomorixAdminFile'}=
