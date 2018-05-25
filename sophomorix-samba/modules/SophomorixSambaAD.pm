@@ -5733,6 +5733,13 @@ sub AD_get_full_groupdata {
         $groups{'GROUPS'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
         $groups{'GROUPS'}{$sam}{'cn'}=$entry->get_value('cn');
         $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
+
+        # sid
+        $groups{'GROUPS'}{$sam}{'objectSid_BINARY'}=$entry->get_value('objectSid');
+        my $sid = Net::LDAP::SID->new($entry->get_value('objectSid'));
+        $groups{'GROUPS'}{$sam}{'objectSid'}=$sid->as_string;
+
+
         $groups{'GROUPS'}{$sam}{'gidNumber'}=$entry->get_value('gidNumber');
         $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
         $groups{'GROUPS'}{$sam}{'mail'}=$entry->get_value('mail');

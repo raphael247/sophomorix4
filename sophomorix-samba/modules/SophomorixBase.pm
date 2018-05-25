@@ -275,50 +275,53 @@ sub json_dump {
     # json 
     if ($json==0){
         if ($jsoninfo eq "SESSIONS"){
-            &_console_print_sessions($hash_ref,$log_level,$ref_sophomorix_config)
+            &_console_print_sessions($hash_ref,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "ONESESSION"){
-            &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_onesession($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "DEVICE"){
-            &_console_print_device_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_device_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "DEVICES"){
-            &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_devices($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "ADMINS_V"){
-            &_console_print_admins_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_admins_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "USERS_V"){
-            &_console_print_users_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_users_v($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "USERS_OVERVIEW"){
-            &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_users_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "USER"){
             # incl. administrators            
-            &_console_print_user_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_user_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
-            &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECT"){
-            &_console_print_project_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_project_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+		print "############### SEP ###################\n";
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"project");
         } elsif ($jsoninfo eq "CLASSES_OVERVIEW"){
-            &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type)
+            &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type);
         } elsif ($jsoninfo eq "CLASS"){
-            &_console_print_class_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            #&_console_print_class_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+	    #	print "############### SEP ###################\n";
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"class");
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
-            &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "GROUP"){
             # see MANAGEMENTGROUP
-            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"sophomorix-group");
         } elsif ($jsoninfo eq "MANAGEMENTGROUPS_OVERVIEW"){
-            &_console_print_managementgroups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_managementgroups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "MANAGEMENTGROUP"){
-            # see GROUP
-            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"managementgroup");
         } elsif ($jsoninfo eq "MAIL"){
-            &_console_print_mail_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_mail_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "SHARES"){
-            &_console_print_shares($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_shares($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "UI"){
-            &_console_print_ui($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_ui($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "SCHEMA_ATTRIBUTE"){
-            &_console_print_schema_attribute($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_schema_attribute($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PRINTDATA"){
-            &_console_print_printdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config)
+            &_console_print_printdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         }
     } elsif ($json==1){
         # pretty output
@@ -941,7 +944,7 @@ sub _console_print_users_overview {
 
 
 
-sub _console_print_class_full {
+sub _console_print_class_full_old {
     my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $line1="#####################################################################\n";
     my $line= "---------------------------------------------------------------------\n";
@@ -975,7 +978,9 @@ sub _console_print_class_full {
         # attributes
         printf "%25s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
         printf "%25s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
+        printf "%25s: %-40s\n","sAMAccountName",$ref_groups->{'GROUPS'}{$group}{'sAMAccountName'};
         printf "%25s: %-40s\n","sAMAccountType",$ref_groups->{'GROUPS'}{$group}{'sAMAccountType'};
+        printf "%25s: %-40s\n","objectSid",$ref_groups->{'GROUPS'}{$group}{'objectSid'};
         printf "%25s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
         print $line;
         # sophomorix attributes
@@ -1042,7 +1047,7 @@ sub _console_print_class_full {
 
 
 sub _console_print_group_full {
-    my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config,$type)=@_;
     my $line1="#####################################################################\n";
     my $line= "---------------------------------------------------------------------\n";
     my $line2="+---------------------------------+---------------------------------+\n";
@@ -1059,22 +1064,30 @@ sub _console_print_group_full {
         ############################################################
         # header
         print $line1;
-        print "Group $group_count/$ref_groups->{'COUNTER'}{'TOTAL'}: ",
-              "$group in school $ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}\n";
+        print $ref_groups->{'GROUPS'}{$group}{'sophomorixType'}." ".
+              $group_count."/".$ref_groups->{'COUNTER'}{'TOTAL'}.": ",
+              $group." in school ".$ref_groups->{'GROUPS'}{$group}{'sophomorixSchoolname'}."\n";
         print "$ref_groups->{'GROUPS'}{$group}{'dn'}\n";
         print $line1;
 
         # attributes
         printf "%25s: %-40s\n","cn",$ref_groups->{'GROUPS'}{$group}{'cn'};
         printf "%25s: %-40s\n","description",$ref_groups->{'GROUPS'}{$group}{'description'};
+        printf "%25s: %-40s\n","sAMAccountName",$ref_groups->{'GROUPS'}{$group}{'sAMAccountName'};
         printf "%25s: %-40s\n","sAMAccountType",$ref_groups->{'GROUPS'}{$group}{'sAMAccountType'};
+        printf "%25s: %-40s\n","objectSid",$ref_groups->{'GROUPS'}{$group}{'objectSid'};
         printf "%25s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
         print $line;
 
         # sophomorix attributes
-        printf "%25s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
         printf "%25s: %-40s\n","sophomorixType",$ref_groups->{'GROUPS'}{$group}{'sophomorixType'};
-
+        printf "%25s: %-40s\n","sophomorixCreationDate",$ref_groups->{'GROUPS'}{$group}{'sophomorixCreationDate'};
+        if ($type eq "class"){
+            printf "%25s: %-40s\n","sophomorixHidden",$ref_groups->{'GROUPS'}{$group}{'sophomorixHidden'};
+            printf "%25s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
+            printf "%25s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
+            printf "%25s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
+        }
         # intrinsic
         if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixIntrinsic1'}){
             printf "%25s: %-40s\n","sophomorixIntrinsic1",$ref_groups->{'GROUPS'}{$group}{'sophomorixIntrinsic1'};
@@ -1143,47 +1156,149 @@ sub _console_print_group_full {
 
         # sophomorix mail attributes
         printf "%25s: %-40s\n","mail",$ref_groups->{'GROUPS'}{$group}{'mail'};
-        printf "%25s: %-40s\n","sophomorixAddMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixAddMailQuota'};
-        printf "%25s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
-        printf "%25s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
+        if ($type eq "class"){
+            printf "%25s: %-40s\n","sophomorixMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailQuota'};
+            printf "%25s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
+            printf "%25s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
+        } elsif ($type eq "project" or $type eq "sophomorix-group"){
+            printf "%25s: %-40s\n","sophomorixAddMailQuota",$ref_groups->{'GROUPS'}{$group}{'sophomorixAddMailQuota'};
+            printf "%25s: %-40s\n","sophomorixMailAlias",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailAlias'};
+            printf "%25s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
+        } elsif ($type eq "managementgroup"){
+            # show nothing
+        } else {
+            print "ERROR: group type not known}n";
+            exit 88;
+        }
+
         print $line;
 
         # sophomorix quota attributes
-        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixAddQuota'} } ){
-            printf "%25s: %-40s\n","sophomorixAddQuota",$item;
-	}
+        if ($type eq "class"){
+             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixQuota'} } ){
+                 printf "%25s: %-40s\n","sophomorixQuota",$item;
+	     }
+        } elsif ($type eq "project" or $type eq "sophomorix-group"){
+             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixAddQuota'} } ){
+                 printf "%25s: %-40s\n","sophomorixAddQuota",$item;
+	     }
+        } elsif ($type eq "managementgroup"){
+             # show nothing
+        } else {
+             print "ERROR: group type not known}n";
+             exit 88;
+        }
+
+
 
         # memberships
-        print $line;
-        print "memberOf:\n";
-        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-            print "$item\n";
-	}
-        print $line;
-        print "member:\n";
-        foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-            print "$item\n";
-	}
-        print $line;
+        if ($type eq "class"){
+            ##### class #####
+            # calculate max entries for column height
+            my $max=1; # display at least one line, even if no members are there
+            if ($ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'} > $max){
+	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'};
+            }
+            if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'} > $max){
+	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
+            }
+            print $line2;
+            print "| Admins:                         | Members:                        |\n";
+            print $line2;
+            for (my $i=0;$i<$max;$i++){
+	        # default display values:
+                my $admin="";
+                my $member="";
+                # modify defaults if defined:
+                if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins'}[$i]){
+                    $admin=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins'}[$i];
+                }
+                if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers'}[$i]){
+                    $member=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers'}[$i];
+                }
+                printf "|%32s |%32s |\n",$admin,$member;
+	    }
+            print $line2;
+            # sum up
+            printf "| Number of Admins:  %12s | Number of Members: %12s |\n",
+                $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'},
+                $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
+            print $line2;
+
+            # optional -v : memberships
+            if ($log_level>1){
+                print "memberOf:\n";
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
+                    print "$item\n";
+	        }
+                print $line;
+                print "member:\n";
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
+                    print "$item\n";
+	        }
+                print $line;
+            }
+        } elsif ($type eq "project" or $type eq "sophomorix-group"){
+            ##### project/sophomorix-group #####
+
+        } elsif ($type eq "managementgroup"){
+            ##### managementgroup ####
+            if ($log_level>1){
+                print "memberOf:\n";
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
+                    print "$item\n";
+	        }
+                print $line;
+                print "member:\n";
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
+                    print "$item\n";
+	        }
+            }
+        } else {
+             print "ERROR: group type not known}n";
+             exit 88;
+        }
+
+
+
+
+
+
+
+        # # memberships
+        # print $line;
+        # print "memberOf:\n";
+        # foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
+        #     print "$item\n";
+	# }
+        # print $line;
+        # print "member:\n";
+        # foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
+        #     print "$item\n";
+	# }
+
 
         # room additions
-        if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'}){
-            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'} } ){
-                printf "%25s: %-40s\n","sophomorixRoomComputers",$item;
-	    }
+        if ($type eq "room"){
             print $line;
-        }
-        if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'}){
-            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'} } ){
-                printf "%25s: %-40s\n","sophomorixRoomIPs",$item;
-	    }
-            print $line;
-        }
-        if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'}){
-            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'} } ){
-                printf "%25s: %-40s\n","sophomorixRoomMACs",$item;
-	    }
-            print $line;
+            if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'}){
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'} } ){
+                    printf "%25s: %-40s\n","sophomorixRoomComputers",$item;
+	        }
+                print $line;
+            }
+            if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'}){
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'} } ){
+                    printf "%25s: %-40s\n","sophomorixRoomIPs",$item;
+	        }
+                print $line;
+            }
+            if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'}){
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'} } ){
+                    printf "%25s: %-40s\n","sophomorixRoomMACs",$item;
+	        }
+                print $line;
+             }
         }
 
 	print "\n";
