@@ -4,29 +4,11 @@
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
-
-## --print
-# add this to doku and man page:
-# 1. Die Ergebnisdatei entsteht in /var/lib/sophomorix/print-data
-
-# 2. Formatieren Sie /etc/linuxmuster/workstations mit Kommentaren:
-#      # Das wird eine Überschrift     (1 #-Zeichen)
-#      ## Das bleibt unberücksichtigt  (2 #-Zeichen) 
-
-# Todo für ML 7.0
-# oneside/twoside konfigurierbar
-# Text in lang-Datei auslagern
-
-# show italcrooms/teacherhosts and classrooms at --print
-
 # modules
 use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
-use Term::ANSIColor qw(:constants); # farbiger Text RED, BLUE, ...
-# nach jedem Printbefehl wieder auf Standardfarbe zurücksetzen
-$Term::ANSIColor::AUTORESET = 1;
 use Net::LDAP;
 use Net::DNS;
 use Net::MAC;
@@ -131,15 +113,6 @@ my $password="";
 my @domcomputers_file=(); # list ordered
 my %devices_file=();
 
-# classrooms
-my %class_rooms=();
-# ?????????????ß configure classrooms from other
-$class_rooms{'j1010'}="seen";
-$class_rooms{'j1008'}="seen";
-$class_rooms{'bsz-j1010'}="seen";
-$class_rooms{'bsz-j1008'}="seen";
-
-#my $set_computer_passwords=0;
 my $dns_test=0;
 my $dns_show=0;
 my $dns_kill=0;
@@ -215,7 +188,6 @@ my $testopt=GetOptions(
        "dump-AD" => \$dump_AD,
        "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
-#       "set-computer-passwords" => \$set_computer_passwords,
        "dns-test" => \$dns_test,
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
@@ -285,10 +257,6 @@ Just show what would be done (but do not do it):
 
 Show and append example device line:
   --add-example-line /path/to/devices.csv
-
-Managing accounts  (Test if that works???):
-  --set-computer-passwords  (set computer passwords to 12345678)
-  --password password       (use password instead of 12345678)
 
 Managing DNS 
   --dns-test  (Do DNS queries for devices in *.devices.csv)
@@ -1020,25 +988,6 @@ if ($dump_files==1){
 if($no_sync==1){
     # show info about what will be done
     my $count=0;
-    # # ExamAccounts
-    # print "\n";
-    # $count=$#killing_examaccounts+1;
-    # &print_title("ExamAccounts that must be killed ($count):");
-    # foreach my $ws (@killing_examaccounts){
-    #     print "KILL: $ws\n";
-    # }
-    # print "\n";
-    # $count=$#adding_examaccounts+1;
-    # &print_title("ExamAccounts that must be added ($count):");
-    # foreach my $ws (@adding_examaccounts){
-    #     print "ADD: $ws\n";
-    # }
-    # print "\n";
-    # $count=$#killing_examaccount_rooms+1;
-    # &print_title("ExamAccounts rooms that must be killed ($count):");
-    # foreach my $room (@killing_examaccount_rooms){
-    #     print "KILL: $room\n";
-    # }
 
     # computer rooms
     print "\n";
@@ -1177,18 +1126,14 @@ if($no_sync==1){
     exit;
 } 
 
-
-
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-# ===========================================================================
-# Modifying System
-# ===========================================================================
+
+
+############################################################
+# Synchronizing 
+############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
-
-# ===========================================================================
-# Synchronizing ExamAccounts and Workstations
-# ===========================================================================
 
 if ($no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
@@ -1599,34 +1544,6 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
-
-
-# # ===========================================================================
-# # --set-computer-passwords (setting computer passwords)
-# # ===========================================================================
-# if ($set_computer_passwords==1){
-#     print "Setting password for all Computer accounts:\n";
-#     my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
-#                                                  root_dse=>$root_dse,
-#                                                  root_dns=>$root_dns,
-#                                                  sophomorix_config=>\%sophomorix_config,
-#                                                });
-#     my $count=1;
-#     foreach my $comp (keys %{$ref_AD_device->{'computer'}}) {
-#         my $pw;
-#         if ($password ne ""){
-#             # password by option
-#             $pw=$password;
-#         } else {
-#             # default password
-#             $pw=$pass;
-#         }
-#         print "\n*** $count: $comp  --> $pw\n";
-#         system("/usr/sbin/sophomorix-passwd --force -u $comp --pass $pw");
-#         $count++;
-#     }
-#     &log_script_exit("",0,1,0,\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-# }
 
 
 
@@ -2042,26 +1959,6 @@ sub check_option {
 
 
 
-# sub push_add_examaccount {
-#     my ($add) = @_;
-#     push @adding_examaccounts, $add;
-# }
-
-
-
-# sub push_kill_examaccount {
-#     my ($kill) = @_;
-#     push @killing_examaccounts, $kill;
-# }
-
-
-
-# sub push_kill_examaccount_room {
-#     my ($kill) = @_;
-#     push @killing_examaccount_rooms, $kill;
-# }
-
-
 sub push_kill_computer_room {
     my ($kill) = @_;
     push @killing_computer_rooms, $kill;
@@ -2287,116 +2184,4 @@ sub print_devices_latex {
 # }
 
 }
-
-
-# sub get_classrooms {
-#     &print_title("Fetching classrooms from $host_classrooms:");
-#     if (not -e $host_classrooms){
-#         print "   * File $host_classrooms does not exist!\n";
-#         return;
-#     } else {
-#         print "   * File $host_classrooms exists\n";
-#     }
-#     open(CLASSROOM, "<$host_classrooms");
-#     while(<CLASSROOM>){
-#         chomp();
-#         s/ //g;
-#         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-#             next;
-#         }
-#         my $line=$_;
-#         if($Conf::log_level>=2){
-#             print "   * $line\n";
-#         }
-# 	print "CLASS <$line>\n";
-#         push @class_rooms, $line;
-#         $class_rooms{$line}="seen";
-#     }
-#     close(CLASSROOM);
-# }
-
-
-
-# sub get_italcrooms {
-#     print "* Fetching italc rooms from $italc_conf:\n";
-#     #if (not -e $italc_conf_dir){
-#     #    system("mkdir -p $italc_conf_dir");
-#     #}
-#     if (not -e $italc_conf){
-#         &log_script_exit("$italc_conf is missing",1,1,0,\@arguments,\%sophomorix_result,$json);
-#         exit;
-#     } 
-#     if (not -e $italc_key_dir_admin){
-#         system("mkdir -p $italc_key_dir_admin");
-#     }
-#     if (not -e $italc_key_dir_supporter){
-#         system("mkdir -p $italc_key_dir_supporter");
-#     }
-#     if (not -e $italc_key_dir_teacher){
-#         system("mkdir -p $italc_key_dir_teacher");
-#     }
-#     open(ITALCROOM, "<$italc_conf");
-#     while(<ITALCROOM>){
-#         chomp();
-#         s/ //g;
-#         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-#             next;
-#         }
-#         if($_ eq ""){ 
-#             next;
-#         }
-
-#         my $line=$_;
-#         my ($room,$italc_classroom_name,
-#             $host_string,$invisible_host_string) = split(/:/,$line);
-#         if($Conf::log_level>=2){
-#             print "   * $room\n";
-#         }
-
-#         # room
-#         push @italc_rooms, $room;
-
-#         # classroom name
-#         if ($italc_classroom_name eq ""){
-#             $italc_classroom_name=$room;
-#         } 
-#         $italc_rooms{$room}{'NAME'}=$italc_classroom_name;
-
-#         # hosts that can use italc
-#         if (not defined $host_string or $host_string eq ""){
-#             $italc_rooms{$room}="seen";
-#             # ERROR: italc rooms must have a master
-#             &log_script_exit("$room without master (italc)",1,1,0,\@arguments,\%sophomorix_result,$json);
-#         } else {
-#             my @teacher_hosts = split(/,/,$host_string);
-#             my $i=1;
-#             foreach my $host (@teacher_hosts){
-#                 if($Conf::log_level>=2){
-#                     print "      * $host is teacher host (type=1)\n";
-#                 }
-#                 $italc_rooms{$room}{"$host"}{'TYPE'}="teacher host";
-#                 if ($i==1){
-#                     #remember first entry
-#                     $italc_rooms{$room}{'MASTER'}="$host";
-#                 }
-#                 $i++;
-#             }
-#         }
-
-#         # invisible hosts
-#         if (not defined $invisible_host_string or 
-#                         $invisible_host_string eq ""){
-#             # do nothing
-#         } else {
-#             my @invisible_hosts = split(/,/,$invisible_host_string);
-#             foreach my $host (@invisible_hosts){
-#                 if($Conf::log_level>=2){
-#                     print "      * $host is an invisible host (visible=no)\n";
-#                 }
-#                 $italc_rooms{$room}{"$host"}{'INVISIBLE'}="yes";
-#             }
-#         }
-#     }
-#     close(ITALCROOM);
-# }
 
