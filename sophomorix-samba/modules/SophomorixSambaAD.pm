@@ -11,6 +11,7 @@ use Unicode::Map8;
 use Unicode::String qw(utf16);
 use Net::LDAP;
 use Net::LDAP::Control::Sort;
+use Net::LDAP::SID;
 use List::MoreUtils qw(uniq);
 use File::Basename;
 use Math::Round;
@@ -5920,8 +5921,15 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'lastLogoff'}=$entry->get_value('lastLogoff');
         $users{'USERS'}{$sam}{'lastLogon'}=$entry->get_value('lastLogon');
         $users{'USERS'}{$sam}{'logonCount'}=$entry->get_value('logonCount');
-        $users{'USERS'}{$sam}{'objectSid'}=$entry->get_value('objectSid');
-        $users{'USERS'}{$sam}{'objectGUID'}=$entry->get_value('objectGUID');
+
+        # sid
+        $users{'USERS'}{$sam}{'objectSid_BINARY'}=$entry->get_value('objectSid');
+        my $sid = Net::LDAP::SID->new($entry->get_value('objectSid'));
+        $users{'USERS'}{$sam}{'objectSid'}=$sid->as_string;
+
+        # GUID
+        $users{'USERS'}{$sam}{'objectGUID_BINARY'}=$entry->get_value('objectGUID');
+
         $users{'USERS'}{$sam}{'pwdLastSet'}=$entry->get_value('pwdLastSet');
         $users{'USERS'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
         $users{'USERS'}{$sam}{'userPrincipalName'}=$entry->get_value('userPrincipalName');
@@ -6115,7 +6123,6 @@ sub AD_get_full_devicedata {
             my $dns_blob=$entry->get_value('dnsRecord');
             $devices{'DEVICES'}{$cn}{'dnsNode'}{$cn}{'dnsRecord'}=$dns_blob;
             my $blob = decode_base64($dns_blob);
-	    print "HERE: $blob\n";
             my ($dataLength,    # 2 bytes
                 $type,          # 2 bytes
                 $version,       # 1 byte

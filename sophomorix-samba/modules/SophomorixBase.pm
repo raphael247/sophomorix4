@@ -1780,7 +1780,6 @@ sub _console_print_user_full {
             }
             print $line;
         }
-
         printf "%30s: %-40s\n","displayName",$ref_users->{'USERS'}{$user}{'displayName'};
         printf "%30s: %-40s\n","sn",$ref_users->{'USERS'}{$user}{'sn'};
         printf "%30s: %-40s\n","givenName",$ref_users->{'USERS'}{$user}{'givenName'};
@@ -1908,6 +1907,8 @@ sub _console_print_user_full {
         # samba stuff:
         print $line;
         if ($log_level>=2){
+            printf "%19s: %-50s\n","objectSid",$ref_users->{'USERS'}{$user}{'objectSid'};
+            printf "%19s: %-50s\n","objectGUID","(binary)";
             printf "%19s: %-50s\n","homeDirectory",$ref_users->{'USERS'}{$user}{'homeDirectory'};
             printf "%19s: %-50s\n","homeDrive",$ref_users->{'USERS'}{$user}{'homeDrive'};
 
@@ -1919,17 +1920,6 @@ sub _console_print_user_full {
             printf "%19s: %-50s\n","lastLogoff",$ref_users->{'USERS'}{$user}{'lastLogoff'};
             printf "%19s: %-50s\n","lastLogon",$ref_users->{'USERS'}{$user}{'lastLogon'};
             printf "%19s: %-50s\n","logonCount",$ref_users->{'USERS'}{$user}{'logonCount'};
-
-            if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "17.10"){
-                #my $sid = Net::LDAP::SID->new($ref_users->{'USERS'}{$user}{'objectSid'});
-
-                printf "%19s: %-50s\n","objectSid",$ref_users->{'USERS'}{$user}{'objectSid'};
-                printf "%19s: %-50s\n","objectGUID","(binary)";
-            } else {
-                printf "%19s: %-50s\n","objectSid","(binary)";
-                printf "%19s: %-50s\n","objectGUID","(binary)";
-            }
-
             printf "%19s: %-50s\n","sAMAccountType",$ref_users->{'USERS'}{$user}{'sAMAccountType'};
             printf "%19s: %-50s\n","userPrincipalName",$ref_users->{'USERS'}{$user}{'userPrincipalName'};
 
