@@ -5717,6 +5717,7 @@ sub AD_get_full_groupdata {
 
         $groups{'GROUPS'}{$sam}{'dn'}=$entry->dn();
         $groups{'GROUPS'}{$sam}{'sAMAccountName'}=$entry->get_value('sAMAccountName');
+        $groups{'GROUPS'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
         $groups{'GROUPS'}{$sam}{'cn'}=$entry->get_value('cn');
         $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
         $groups{'GROUPS'}{$sam}{'gidNumber'}=$entry->get_value('gidNumber');
@@ -5752,6 +5753,37 @@ sub AD_get_full_groupdata {
 
         @{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} } = sort $entry->get_value('sophomorixMemberGroups');
         $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups_count'} = $#{ $groups{'GROUPS'}{$sam}{'sophomorixMemberGroups'} }+1;
+
+        # intrinsic
+        $groups{'GROUPS'}{$sam}{'sophomorixIntrinsic1'}=$entry->get_value('sophomorixIntrinsic1');
+        $groups{'GROUPS'}{$sam}{'sophomorixIntrinsic2'}=$entry->get_value('sophomorixIntrinsic2');
+        $groups{'GROUPS'}{$sam}{'sophomorixIntrinsic3'}=$entry->get_value('sophomorixIntrinsic3');
+        $groups{'GROUPS'}{$sam}{'sophomorixIntrinsic4'}=$entry->get_value('sophomorixIntrinsic4');
+        $groups{'GROUPS'}{$sam}{'sophomorixIntrinsic5'}=$entry->get_value('sophomorixIntrinsic5');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixIntrinsicMulti1'} } = sort $entry->get_value('sophomorixIntrinsicMulti1');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixIntrinsicMulti2'} } = sort $entry->get_value('sophomorixIntrinsicMulti2');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixIntrinsicMulti3'} } = sort $entry->get_value('sophomorixIntrinsicMulti3');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixIntrinsicMulti4'} } = sort $entry->get_value('sophomorixIntrinsicMulti4');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixIntrinsicMulti5'} } = sort $entry->get_value('sophomorixIntrinsicMulti5');
+
+        # custom
+        $groups{'GROUPS'}{$sam}{'sophomorixCustom1'}=$entry->get_value('sophomorixCustom1');
+        $groups{'GROUPS'}{$sam}{'sophomorixCustom2'}=$entry->get_value('sophomorixCustom2');
+        $groups{'GROUPS'}{$sam}{'sophomorixCustom3'}=$entry->get_value('sophomorixCustom3');
+        $groups{'GROUPS'}{$sam}{'sophomorixCustom4'}=$entry->get_value('sophomorixCustom4');
+        $groups{'GROUPS'}{$sam}{'sophomorixCustom5'}=$entry->get_value('sophomorixCustom5');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixCustomMulti1'} } = sort $entry->get_value('sophomorixCustomMulti1');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixCustomMulti2'} } = sort $entry->get_value('sophomorixCustomMulti2');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixCustomMulti3'} } = sort $entry->get_value('sophomorixCustomMulti3');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixCustomMulti4'} } = sort $entry->get_value('sophomorixCustomMulti4');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixCustomMulti5'} } = sort $entry->get_value('sophomorixCustomMulti5');
+
+        # room stuff
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixRoomComputers'} } = sort $entry->get_value('sophomorixRoomComputers');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixRoomIPs'} } = sort $entry->get_value('sophomorixRoomIPs');
+        @{ $groups{'GROUPS'}{$sam}{'sophomorixRoomMACs'} } = sort $entry->get_value('sophomorixRoomMACs');
+
+
     }
     $groups{'COUNTER'}{'TOTAL'}=$max;
     if ($max>0){

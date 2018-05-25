@@ -80,6 +80,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_get_AD_for_device
                                  AD_get_full_devicedata
+                                 AD_get_full_groupdata
                                  AD_object_search
                                  AD_user_kill
                                  AD_computer_kill
@@ -509,14 +510,25 @@ if ($print==1){
 if ($info==1 and $room ne ""){
     ##################################################
     # --info --room <room>
-    #my $ref_devices=&AD_get_full_roomdata({ldap=>$ldap,
-    #                                       root_dse=>$root_dse,
-    #                                       root_dns=>$root_dns,
-    #                                       roomlist=>$room,
-    #                                       sophomorix_config=>\%sophomorix_config,
-    #                                      });
+    my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           grouplist=>$room,
+                                           sophomorix_config=>\%sophomorix_config,
+                                          });
 
     print "HERE: show room $room\n";
+    print Dumper($ref_groups);
+    my $jsoninfo="GROUP";
+    my $jsoncomment="Group";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_groups,
+                sophomorix_config => \%sophomorix_config,
+               });
 
 
     exit;
