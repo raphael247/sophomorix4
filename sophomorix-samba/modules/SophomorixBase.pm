@@ -839,92 +839,98 @@ sub _console_print_users_overview {
     } else {
         @school_list=($school_opt);
     }
-
+    my $line0= "+----------------------------------------------------------------+\n";
+    my $line = "+-----------+---+------+------+------+------++------+------+-----+\n";
     foreach my $school (@school_list){
-        print "\n";
-        &print_title("$ref_users_v->{'COUNTER'}{$school}{'TOTAL'} users in school $school:");
         if ($ref_users_v->{'COUNTER'}{$school}{'TOTAL'}==0){
-            next;
+            print "\n";
+            print $line0;
+            printf "| %-62s |\n",
+                $ref_users_v->{'COUNTER'}{$school}{'TOTAL'}." users in school ".$school.":";
+                print $line0;
+                next;
+        } else {
+            print "\n";
+            print $line0;
+            printf "| %-42s|| global            |\n",
+                $ref_users_v->{'COUNTER'}{$school}{'TOTAL'}." users in school ".$school.":";
         }
-        my $line="+-----------+---+------+------+------+------+------++------+------+-----+\n";
+
+        print "| status          stud   teach  sadm   sbin || gadm   gbin   oth |\n";
         print $line;
-        print "| status    |   | stud | teach| sadm | sbin | comp || gadm | gbin | oth |\n";
-        print $line;
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "permanent | P",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'P'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'P'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'},
-               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'computer'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'OTHER'};
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "usable    | U",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'U'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'U'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "activated | A",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'A'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'A'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "enabled   | E",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'E'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'E'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "selfactiv.| S",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'S'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'S'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "tolerated | T",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'T'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'T'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "disabled  | D",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'D'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'D'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "locked    | L",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'L'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'L'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "frozen    | F",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'F'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'F'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "removable | R",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'R'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'R'},
-            "","","","","","";
-        printf "| %-13s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "killable  | K",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'K'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'K'},
-            "","","","","","";
+            "","","","","";
         print $line;
-        printf "| %-10s|%2s |%5s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+        printf "| %-10s|%2s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
                "sum: ".$ref_users_v->{'COUNTER'}{$school}{'TOTAL'},
                "",
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'teacher'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schooladministrator'},
                $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'},
-               $ref_users_v->{'COUNTER'}{$school}{'by_role'}{'computer'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globaladministrator'},
                $ref_users_v->{'COUNTER'}{'global'}{'by_role'}{'globalbinduser'},
                $ref_users_v->{'COUNTER'}{'OTHER'};
         print $line;
         print "(stud=student,teach=teacher,sadm=schooladministrator,sbin=schoolbinduser,\n";
-        print " comp=computer,gadm=globaladministrator,gbin=globalbinduser,oth=other)\n";
+        print " gadm=globaladministrator,gbin=globalbinduser,oth=other)\n";
     }
     print "\nOther (oth) user objects (objectclass=user):\n";
     foreach my $user ( @{ $ref_users_v->{'LISTS'}{'USER_by_SCHOOL'}{'OTHER'}{'OTHER'} }  ){

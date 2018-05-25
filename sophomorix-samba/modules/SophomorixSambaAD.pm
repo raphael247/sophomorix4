@@ -6390,12 +6390,11 @@ sub AD_get_users_v {
         $users{'COUNTER'}{$school}{'by_role'}{'teacher'}=0;
         $users{'COUNTER'}{$school}{'by_role'}{'schooladministrator'}=0;
         $users{'COUNTER'}{$school}{'by_role'}{'schoolbinduser'}=0;
-        $users{'COUNTER'}{$school}{'by_role'}{'computer'}=0;
         $users{'COUNTER'}{$school}{'TOTAL'}=0;
     }
 
     ##################################################
-    # search for all users and computers
+    # search for all users but not computers
     # Setting the filters
     my $filter;
     if ($admins_only eq "TRUE"){
@@ -6405,7 +6404,7 @@ sub AD_get_users_v {
                 "(sophomorixRole=schooladministrator) ".
                 "(sophomorixRole=globaladministrator)) )";
     } else {
-        $filter="( |(objectClass=user) (objectClass=computer) )"; 
+        $filter="( &(objectClass=user) (!(objectClass=computer)) )"; 
     }
     # print "Filter: $filter\n";
     my $mesg = $ldap->search(
@@ -6425,7 +6424,7 @@ sub AD_get_users_v {
     my $max = $mesg->count;
 
     ##################################################
-    # walk through all users/computers
+    # walk through all users
     # save results in lists
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
