@@ -4507,7 +4507,17 @@ sub AD_get_AD_for_device {
         }
     } # BLOCK dnsNode end
     &Sophomorix::SophomorixBase::print_title("Sorting lists ...");
-    # sort some room lists
+
+    # sort LISTS
+    foreach my $key (keys %{ $AD{'LISTS'} }) {
+        foreach my $school (keys %{ $AD{'LISTS'}{$key} }) {
+            foreach my $list (keys %{ $AD{'LISTS'}{$key}{$school} }) {
+		@{ $AD{'LISTS'}{$key}{$school}{$list} } = sort @{ $AD{'LISTS'}{$key}{$school}{$list} };
+            }
+        }
+    }
+
+    # sort some lists under 'room'
     foreach my $room (keys %{$AD{'room'}}) {
         if($#{ $AD{'room'}{$room}{'sophomorixRoomComputers'} }>0){
            @{ $AD{'room'}{$room}{'sophomorixRoomComputers'} } = 
