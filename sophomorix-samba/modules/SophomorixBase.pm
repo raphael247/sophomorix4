@@ -305,6 +305,8 @@ sub json_dump {
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"class");
         } elsif ($jsoninfo eq "GROUPS_OVERVIEW"){
             &_console_print_groups_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "ROOM"){
+            &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"room");
         } elsif ($jsoninfo eq "GROUP"){
             # see MANAGEMENTGROUP
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"sophomorix-group");
@@ -1054,7 +1056,7 @@ sub _console_print_group_full {
     my $line3="+----------------+----------------+---------------------+---------------------+\n"; #project
     my $group_count=0;
     if ($ref_groups->{'COUNTER'}{'TOTAL'}==0){
-        print "0 sophomorix-groups can be displayed\n";
+        print "0 groups can be displayed\n";
         return;
     }
     foreach my $group (@{ $ref_groups->{'LISTS'}{'GROUPS'} }){
@@ -1094,9 +1096,11 @@ sub _console_print_group_full {
             printf "%25s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
             printf "%25s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
         } elsif ($type eq "managementgroup"){
-
+            # nothing to show
+        } elsif ($type eq "room"){
+            # nothing to show
         } else {
-             print "ERROR: group type not known}n";
+             print "ERROR: group type not known\n";
              exit 88;
         }
         # intrinsic
@@ -1162,7 +1166,6 @@ sub _console_print_group_full {
         foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixCustomMulti5'} } ){
             printf "%25s: %-40s\n","sophomorixCustomMulti5",$item;
 	}
-
         print $line;
 
         # sophomorix mail attributes
@@ -1177,8 +1180,10 @@ sub _console_print_group_full {
             printf "%25s: %-40s\n","sophomorixMailList",$ref_groups->{'GROUPS'}{$group}{'sophomorixMailList'};
         } elsif ($type eq "managementgroup"){
             # show nothing
+        } elsif ($type eq "room"){
+            # show nothing
         } else {
-            print "ERROR: group type not known}n";
+            print "ERROR: group type not known\n";
             exit 88;
         }
 
@@ -1195,12 +1200,12 @@ sub _console_print_group_full {
 	     }
         } elsif ($type eq "managementgroup"){
              # show nothing
+        } elsif ($type eq "room"){
+             # show nothing
         } else {
-             print "ERROR: group type not known}n";
+             print "ERROR: group type not known\n";
              exit 88;
         }
-
-
 
         # memberships
         if ($type eq "class"){
@@ -1236,20 +1241,6 @@ sub _console_print_group_full {
                 $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'},
                 $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
             print $line2;
-
-            # optional -v : memberships
-            if ($log_level>1){
-                print "memberOf:\n";
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-                    print "$item\n";
-	        }
-                print $line;
-                print "member:\n";
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-                    print "$item\n";
-	        }
-                print $line;
-            }
         } elsif ($type eq "project" or $type eq "sophomorix-group"){
             ##### project/sophomorix-group #####
             # calculate max entries for column height
@@ -1299,80 +1290,43 @@ sub _console_print_group_full {
                 $ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'},
                 $ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
             print $line3;
-
-            # optional -v : memberships
-            if ($log_level>1){
-                print "memberOf:\n";
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-                    print "$item\n";
-	        }
-                print $line;
-                print "member:\n";
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-                    print "$item\n";
-	        }
-                print $line;
-            }
         } elsif ($type eq "managementgroup"){
             ##### managementgroup ####
-            if ($log_level>1){
-                print "memberOf:\n";
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-                    print "$item\n";
-	        }
-                print $line;
-                print "member:\n";
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-                    print "$item\n";
-	        }
-            }
+            # nothing to show
+        } elsif ($type eq "room"){
+            ##### room  ####
+            print $line;
+            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'} } ){
+                printf "%25s: %-40s\n","sophomorixRoomComputers",$item;
+	    }
+            print $line;
+            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'} } ){
+                printf "%25s: %-40s\n","sophomorixRoomIPs",$item;
+	    }
+            print $line;
+            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'} } ){
+                printf "%25s: %-40s\n","sophomorixRoomMACs",$item;
+	    }
+            print $line;
         } else {
-             print "ERROR: group type not known}n";
+             print "ERROR: group type not known\n";
              exit 88;
         }
 
-
-
-
-
-
-
-        # # memberships
-        # print $line;
-        # print "memberOf:\n";
-        # foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
-        #     print "$item\n";
-	# }
-        # print $line;
-        # print "member:\n";
-        # foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
-        #     print "$item\n";
-	# }
-
-
-        # room additions
-        if ($type eq "room"){
+        ############################################################
+        # optional -v : show memberships
+        if ($log_level>1){
+            print "memberOf:\n";
+            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
+                print "$item\n";
+            }
             print $line;
-            if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'}){
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomComputers'} } ){
-                    printf "%25s: %-40s\n","sophomorixRoomComputers",$item;
-	        }
-                print $line;
-            }
-            if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'}){
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomIPs'} } ){
-                    printf "%25s: %-40s\n","sophomorixRoomIPs",$item;
-	        }
-                print $line;
-            }
-            if (exists $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'}){
-                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'sophomorixRoomMACs'} } ){
-                    printf "%25s: %-40s\n","sophomorixRoomMACs",$item;
-	        }
-                print $line;
-             }
+            print "member:\n";
+            foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
+                print "$item\n";
+	    }
+            print $line;
         }
-
 	print "\n";
     }
 }
