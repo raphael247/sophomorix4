@@ -294,8 +294,8 @@ sub json_dump {
         } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
             &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECT"){
-            &_console_print_project_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
-		print "############### SEP ###################\n";
+            #&_console_print_project_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+	    #	print "############### SEP ###################\n";
             &_console_print_group_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config,"project");
         } elsif ($jsoninfo eq "CLASSES_OVERVIEW"){
             &_console_print_classes_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config,$type);
@@ -1050,7 +1050,8 @@ sub _console_print_group_full {
     my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config,$type)=@_;
     my $line1="#####################################################################\n";
     my $line= "---------------------------------------------------------------------\n";
-    my $line2="+---------------------------------+---------------------------------+\n";
+    my $line2="+---------------------------------+---------------------------------+\n"; # class
+    my $line3="+----------------+----------------+---------------------+---------------------+\n"; #project
     my $group_count=0;
     if ($ref_groups->{'COUNTER'}{'TOTAL'}==0){
         print "0 sophomorix-groups can be displayed\n";
@@ -1087,6 +1088,16 @@ sub _console_print_group_full {
             printf "%25s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
             printf "%25s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
             printf "%25s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
+        } elsif ($type eq "project" or $type eq "sophomorix-group"){
+            printf "%25s: %-40s\n","sophomorixHidden",$ref_groups->{'GROUPS'}{$group}{'sophomorixHidden'};
+            printf "%25s: %-40s\n","sophomorixJoinable",$ref_groups->{'GROUPS'}{$group}{'sophomorixJoinable'};
+            printf "%25s: %-40s\n","sophomorixMaxMembers",$ref_groups->{'GROUPS'}{$group}{'sophomorixMaxMembers'};
+            printf "%25s: %-40s\n","sophomorixStatus",$ref_groups->{'GROUPS'}{$group}{'sophomorixStatus'};
+        } elsif ($type eq "managementgroup"){
+
+        } else {
+             print "ERROR: group type not known}n";
+             exit 88;
         }
         # intrinsic
         if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixIntrinsic1'}){
@@ -1202,6 +1213,7 @@ sub _console_print_group_full {
             if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'} > $max){
 	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
             }
+            # printout
             print $line2;
             print "| Admins:                         | Members:                        |\n";
             print $line2;
@@ -1240,7 +1252,67 @@ sub _console_print_group_full {
             }
         } elsif ($type eq "project" or $type eq "sophomorix-group"){
             ##### project/sophomorix-group #####
+            # calculate max entries for column height
+            my $max=1; # display at least one line, even if no members are there
+            if ($ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'} > $max){
+	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'};
+            }
+            if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'} > $max){
+	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
+            }
+            if ($ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'} > $max){
+	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'};
+            }
+            if ($ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'} > $max){
+	        $max=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
+            }
 
+            print $line3;
+            print "| Admins:        | Members:       | AdminGroups:        | MemberGroups:       |\n";
+            print $line3;
+            for (my $i=0;$i<$max;$i++){
+	        # default display values:
+                my $admin="";
+                my $member="";
+                my $admingroup="";
+                my $membergroup="";
+                # modify defaults if defined:
+                if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins'}[$i]){
+                    $admin=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins'}[$i];
+                }
+                if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers'}[$i]){
+                    $member=$ref_groups->{'GROUPS'}{$group}{'sophomorixMembers'}[$i];
+                }
+                if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups'}[$i]){
+                    $admingroup=$ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups'}[$i];
+                }
+                if (defined $ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups'}[$i]){
+                    $membergroup=$ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups'}[$i];
+                }
+                printf "|%15s |%15s |%20s |%20s |\n",$admin,$member,$admingroup,$membergroup;
+	    }
+            print $line3;
+            # sum up
+            printf "| Admins: %6s | Members:%6s | AdminGroups: %6s | MemberGroups:%6s |\n",
+                $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'},
+                $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'},
+                $ref_groups->{'GROUPS'}{$group}{'sophomorixAdminGroups_count'},
+                $ref_groups->{'GROUPS'}{$group}{'sophomorixMemberGroups_count'};
+            print $line3;
+
+            # optional -v : memberships
+            if ($log_level>1){
+                print "memberOf:\n";
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'memberOf'} } ){
+                    print "$item\n";
+	        }
+                print $line;
+                print "member:\n";
+                foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
+                    print "$item\n";
+	        }
+                print $line;
+            }
         } elsif ($type eq "managementgroup"){
             ##### managementgroup ####
             if ($log_level>1){
@@ -1307,7 +1379,7 @@ sub _console_print_group_full {
 
 
 
-sub _console_print_project_full {
+sub _console_print_project_full_old {
     my ($ref_groups,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $line1="###############################################################################\n";
     my $line= "-------------------------------------------------------------------------------\n";
