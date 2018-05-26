@@ -2723,7 +2723,6 @@ sub AD_user_setquota {
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
-    &Sophomorix::SophomorixBase::print_title("Setting Quota for user $user on share $share ($share_count/$max_share_count start):");
 
     # calculate limits
     my $hard_bytes;
@@ -2741,40 +2740,62 @@ sub AD_user_setquota {
                           " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                           $smb_admin_pass."'".
                           " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //$root_dns/$share";
-    print "$smbcquotas_command\n";
-    my $stdout=`$smbcquotas_command`;
-    my $return=${^CHILD_ERROR_NATIVE}; # return of value of $smbcquotas_command
-        if ($return==0){
-            chomp($return);
-            my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$stdout);
-            my ($unused,$quota_user)=split(/\\/,$full_user);
-            $used=~s/\/$//;
-            $hard_limit=~s/\/$//;
-            if ($hard_limit eq "NO"){
-                $hard_limit="NO LIMIT";
-            }
-            print "QUOTA COMMAND RETURNED: $quota_user has used $used of $hard_limit\n";
-            # update the sophomorixQuota entry at the user
-	    my $share_quota=$share.":".$quota;
-            print "Updating quota for user $user to $share_quota:\n";
-            my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
-            &AD_user_update({ldap=>$ldap,
-                             root_dse=>$root_dse,
-                             dn=>$dn,
-                             user=>$user,
-                             quota=>$share_quota,     # <share>:<quota_on_share>
-                             quota_calc=>$quota,      # what was calculated (same as quota_on_share)
-                             quota_info=>$hard_limit, # what was set
-                             user_count=>$user_count,
-                             max_user_count=>$max_user_count,
-                             json=>$json,
-                             sophomorix_config=>$ref_sophomorix_config,
-                             sophomorix_result=>$ref_sophomorix_result,
-                           });
-	} else {
-            print "ERROR: Setting quota on share $share for user $user failed\n";
+    ############################################################
+    # run the command
+    $smbcquotas_out=`$smbcquotas_command`;
+    my $smbcquotas_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+
+    ############################################################
+    # display result
+    my $display_command=$smbcquotas_command;
+    # hide password
+    $display_command=~s/$smb_admin_pass/***/;
+    my $smbcquotas_out_ident=&Sophomorix::SophomorixBase::ident_output($smbcquotas_out,8);
+    if($smbcquotas_return==0){
+        print "OK: $display_command\n";
+        if($Conf::log_level>1){
+            print "     RETURN VALUE: $smbcquotas_return\n";
+            print "     ERROR MESSAGE:\n";
+            print $smbcquotas_out_ident;
         }
-    &Sophomorix::SophomorixBase::print_title("Setting Quota of user $user on share $share (end)");
+        #chomp($smbcquotas_return);
+        my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$smbcquotas_out);
+        my ($unused,$quota_user)=split(/\\/,$full_user);
+        $used=~s/\/$//;
+        $hard_limit=~s/\/$//;
+        if ($hard_limit eq "NO"){
+            $hard_limit="NO LIMIT";
+        }
+
+        # update the sophomorixQuota entry at the user
+        my $share_quota=$share.":".$quota;
+        if($Conf::log_level>2){
+            print "smbcquotas RETURNED: $quota_user has used $used of $hard_limit\n";
+            print "Updating quota for user $user to $share_quota:\n";
+        }
+        my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$dn,
+                         user=>$user,
+                         quota=>$share_quota,     # <share>:<quota_on_share>
+                         quota_calc=>$quota,      # what was calculated (same as quota_on_share)
+                         quota_info=>$hard_limit, # what was set
+                         user_count=>$user_count,
+                         max_user_count=>$max_user_count,
+                         json=>$json,
+                         sophomorix_config=>$ref_sophomorix_config,
+                         sophomorix_result=>$ref_sophomorix_result,
+                       });
+    } else {
+        print "ERROR: $display_command \n";
+        print "     RETURN VALUE: $smbcquotas_return\n";
+        print "     ERROR MESSAGE:\n";
+        print $smbcquotas_out_ident;
+        &Sophomorix::SophomorixBase::result_sophomorix_add($ref_sophomorix_result,
+                                                           "ERROR",-1,$ref_parameter,
+                                                           "FAILED ($smbcquotas_return): $display_command");
+    }
 }
 
 
