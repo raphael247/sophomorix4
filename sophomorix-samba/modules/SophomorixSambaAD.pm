@@ -8182,6 +8182,11 @@ sub AD_smbcquotas_queryuser {
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
         " -u $user //$root_dns/$share";
+    my $display_command=$smbcquotas_command;
+        # hide password
+        $display_command=~s/$smb_admin_pass/***/;
+        #print "$display_command\n";
+        #print "$smbcquotas_command\n";
     my $string=`$smbcquotas_command`;
     chomp($string);
     $string=~s/ //g; # remove whitespace
