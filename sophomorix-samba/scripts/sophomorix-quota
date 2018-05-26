@@ -213,7 +213,11 @@ if ($list==1){
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
                                " -L //$root_dns/$share";
-        print "$smbcquotas_command\n";
+        my $display_command=$smbcquotas_command;
+        # hide password
+        $display_command=~s/$smb_admin_pass/***/;
+        print "$display_command\n";
+        #print "$smbcquotas_command\n";
         system($smbcquotas_command);
     }
     exit;
@@ -229,7 +233,11 @@ if ($show==1){
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
                                " -F //$root_dns/$share";
-        print "$smbcquotas_command\n";
+        my $display_command=$smbcquotas_command;
+        # hide password
+        $display_command=~s/$smb_admin_pass/***/;
+        print "$display_command\n";
+        #print "$smbcquotas_command\n";
         system($smbcquotas_command);
     }
     exit;
@@ -245,7 +253,11 @@ if ($school ne "" and  $default_quota ne ""){
                                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                $smb_admin_pass."'".
                                " -S FSQLIM:".$default_quota." //$root_dns/$share";
-        print "$smbcquotas_command\n";
+        my $display_command=$smbcquotas_command;
+        # hide password
+        $display_command=~s/$smb_admin_pass/***/;
+        print "$display_command\n";
+        #print "$smbcquotas_command\n";
         system($smbcquotas_command);
     }
     exit;
