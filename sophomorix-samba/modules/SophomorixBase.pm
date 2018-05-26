@@ -4438,6 +4438,52 @@ sub backup_auk_file {
 
 
 
+# smb commands
+sub smbclient_command {
+    my ($smbclient_command,$smb_admin_pass)=@_;
+    ############################################################
+    # run the command
+    $smbclient_out=`$smbclient_command`;
+    chomp($smbclient_out);
+    my $smbclient_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    ############################################################
+    # display result
+    my $display_command=$smbclient_command;
+    # hide password
+    $display_command=~s/$smb_admin_pass/***/;
+    my $smbclient_out_ident=&ident_output($smbclient_out,8);
+
+    if($smbclient_return==0 and $smbclient_out eq ""){
+        print "OK: smbclient command ($smbclient_return)\n";
+        if($Conf::log_level>1){
+            print "     COMMAND:\n";
+            print "        $display_command\n";
+            print "     RETURN VALUE: $smbclient_return\n";
+            print "     ERROR MESSAGE:\n";
+            print $smbclient_out_ident;
+        }
+    } elsif ($smbclient_return==0 and $smbclient_out=~m/NT_STATUS_OBJECT_NAME_COLLISION/){
+        print "OK: smbclient command ($smbclient_return: NT_STATUS_OBJECT_NAME_COLLISION --> file existed already)\n";
+        if($Conf::log_level>1){
+            print "     COMMAND:\n";
+            print "        $display_command\n";
+            print "     RETURN VALUE: $smbclient_return\n";
+            print "     ERROR MESSAGE:\n";
+            print $smbclient_out_ident;
+        }
+    } else {
+        print "ERROR: smbclient command\n";
+        print "     COMMAND:\n";
+        print "        $display_command\n";
+        print "     RETURN VALUE: $smbclient_return\n";
+        print "     ERROR MESSAGE:\n";
+        print $smbclient_out_ident;
+        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbclient_return): $smbclient_command");
+    }
+}
+
+
+
 # acl stuff
 ######################################################################
 sub NTACL_set_file {
@@ -4454,7 +4500,9 @@ sub NTACL_set_file {
 
     my $ntacl_abs=$DevelConf::path_conf_devel_ntacl."/".$ntacl.".template";
     if ($ntacl eq "noacl" or $ntacl eq "nontacl"){
-        print "   Skipping ACL/NTACL creation for $smbpath\n";
+        if($Conf::log_level>1){
+            print "   Skipping ACL/NTACL creation for $smbpath (no acl file given)\n";
+        }
         return;
     } elsif (not -r $ntacl_abs){ # -r: readable
         print "\nERROR: $ntacl_abs not found/readable\n\n";
@@ -4520,22 +4568,22 @@ sub NTACL_set_file {
     $display_command=~s/$smb_admin_pass/***/;
     # add linebreak
     $display_command=~s/--set/\n      --set/;
-    my $smbcacls_out_ident=&ident_output($smbcacls_out,4);
+    my $smbcacls_out_ident=&ident_output($smbcacls_out,8);
     if($smbcacls_return==0){
         print "OK: smbcacls-NTACL on //$root_dns/$school $smbpath\n";
         if($Conf::log_level>1){
-            print "   * $display_command\n";
+            print "     COMMAND:\n";
+            print "        $display_command\n";
+            print "     RETURN VALUE: $smbcacls_return\n";
+            print "     ERROR MESSAGE:\n";
             print $smbcacls_out_ident;
         }
     } else {
-        # modify display_command
         print "ERROR: smbcacls on //$root_dns/$school $smbpath\n";
         print "     COMMAND:\n";
         print "        $display_command\n";
         print "     RETURN VALUE: $smbcacls_return\n";
         print "     ERROR MESSAGE:\n";
-        my $smbcacls_out_ident=&ident_output($smbcacls_out,8);
-        #print $smbcacls_out;
         print $smbcacls_out_ident;
         &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbcacls_return): $smbcacls_command");
     }

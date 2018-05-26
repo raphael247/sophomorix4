@@ -773,11 +773,10 @@ sub AD_repdir_using_file {
                         } else {
                             $group_typeout=$group;
                         }
-                        print "\nUser: $user_typeout in group $group_typeout in school $school (SHARE: $share)\n";
-                        print "---------------------------------------------------------------\n";
+                        #print "\nUser: $user_typeout in group $group_typeout in school $school (SHARE: $share)\n";
+                        #print "---------------------------------------------------------------\n";
                         if ($ntaclonly ne "ntaclonly"){
-                            print "* $smbclient_command\n";
-                            system($smbclient_command);
+                            &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
 		        } else {
                             print "* NOT executed (ntaclonly): $smbclient_command\n";
                         }
