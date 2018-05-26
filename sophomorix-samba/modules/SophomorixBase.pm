@@ -2382,6 +2382,24 @@ sub extract_initial {
 
 
 
+sub ident_output {
+    # idents multiline command output
+    my ($string,$ident)=@_;
+    my @lines=split(/\n/,$string);
+    my @ident_lines=();
+    foreach my $line (@lines){
+        chomp($line);
+        $line=~s/^(.*)/' ' x $ident . $1/e;
+        push @ident_lines,$line;
+    }
+    my $string_ident=join("\n",@ident_lines);
+    $string_ident=$string_ident."\n";
+    return $string_ident;
+}
+
+
+
+
 # time stamps
 ######################################################################
 sub ymdhms_to_date {
@@ -4442,9 +4460,6 @@ sub NTACL_set_file {
         print "\nERROR: $ntacl_abs not found/readable\n\n";
         exit 88;
     } 
-    print "\n";
-    &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (start)");
-    #print "Setting the NTACL for $smbpath from $ntacl (user=$user, group=$group, school=$school):\n";
     my $smbcacls_option="";
     open(NTACL,"<$ntacl_abs");
     my $line_count=0;
@@ -4455,7 +4470,7 @@ sub NTACL_set_file {
         }
         if (/^CONTROL:/){
             # do something special for CONTROL line
-            print "*** skipping $_\n";
+            #print "*** skipping $_\n";
             next;
         }
         
@@ -4489,18 +4504,41 @@ sub NTACL_set_file {
                               " -U ".$DevelConf::sophomorix_file_admin."%'".
                               $smb_admin_pass."' //$root_dns/$school $smbpath --set ";
     my $smbcacls_command=$smbcacls_base_command.$smbcacls_option;
-    print "* $smbcacls_base_command\n";
-    print "  $smbcacls_option\n";
-    my $smbcacls_return=system("$smbcacls_command");
-    if($smbcacls_return==0){
- 	print "NTACLS set successfully ($smbcacls_return)\n";
-    } else {
-        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbcacls_return): $smbcacls_command");
-	print "ERROR setting NTACLS ($smbcacls_return)\n";
-    }
+    #print "* $smbcacls_base_command\n";
+    #print "  $smbcacls_option\n";
+
+    ############################################################
+    # run the command
+    $smbcacls_out=`$smbcacls_command`;
+    my $smbcacls_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
     close(NTACL);
-    &Sophomorix::SophomorixBase::print_title("Set NTACL ($smbpath from $ntacl), user=$user,group=$group,school=$school (end)");
-    print "\n";
+
+    ############################################################
+    # display result
+    my $display_command=$smbcacls_command;
+    # hide password
+    $display_command=~s/$smb_admin_pass/***/;
+    # add linebreak
+    $display_command=~s/--set/\n      --set/;
+    my $smbcacls_out_ident=&ident_output($smbcacls_out,4);
+    if($smbcacls_return==0){
+        print "OK: smbcacls-NTACL on //$root_dns/$school $smbpath\n";
+        if($Conf::log_level>1){
+            print "   * $display_command\n";
+            print $smbcacls_out_ident;
+        }
+    } else {
+        # modify display_command
+        print "ERROR: smbcacls on //$root_dns/$school $smbpath\n";
+        print "     COMMAND:\n";
+        print "        $display_command\n";
+        print "     RETURN VALUE: $smbcacls_return\n";
+        print "     ERROR MESSAGE:\n";
+        my $smbcacls_out_ident=&ident_output($smbcacls_out,8);
+        #print $smbcacls_out;
+        print $smbcacls_out_ident;
+        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbcacls_return): $smbcacls_command");
+    }
 }
 
 
