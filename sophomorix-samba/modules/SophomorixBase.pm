@@ -4480,6 +4480,7 @@ sub smbclient_command {
         print $smbclient_out_ident;
         &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbclient_return): $smbclient_command");
     }
+    return $smbclient_return;
 }
 
 
