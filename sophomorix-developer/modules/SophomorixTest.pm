@@ -1156,7 +1156,6 @@ sub smbcquotas_test {
     my ($user,$share,$quota_expected,$root_dns,$smb_pass)=@_;
     my $smbcquotas_command="/usr/bin/smbcquotas -mNT1 --debuglevel=0 -U administrator%'".$smb_pass."'".
                            " --user ".$user." //".$root_dns."/".$share;
-    #print "$smbcquotas_command\n";
     my $stdout=`$smbcquotas_command`;
     my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$stdout);
     my ($unused,$quota_user)=split(/\\/,$full_user);
@@ -1198,7 +1197,9 @@ sub NTACL_test {
         $abs_path_linux=~s/\/$//; # remove trailing /
     }
     my $command="/usr/bin/smbcacls -U administrator"."%".$smb_pass." ".$unc_path." ".$smb_rel;
-    print "****** Run $ref_fs_test_result->{'testnumber'} NTACL-test $testnum: $command\n";
+    my $display_command=$command;
+    $display_command=~s/$smb_pass/***/;
+    print "****** Run $ref_fs_test_result->{'testnumber'} NTACL-test $testnum: $display_command\n";
     # print "****** $share $smb_rel $abs_path_linux\n";
     # remember in list
     push @{ $ref_fs_test_result->{'NTACL_test'} }, $abs_path_linux;
