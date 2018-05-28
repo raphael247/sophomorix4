@@ -778,7 +778,7 @@ sub AD_repdir_using_file {
                         if ($ntaclonly ne "ntaclonly"){
                             &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
 		        } else {
-                            print "* NOT executed (ntaclonly): $smbclient_command\n";
+                            print "* NOT executed (ntaclonly): smbclient command\n";
                         }
 
                         # smbcacls
@@ -805,7 +805,7 @@ sub AD_repdir_using_file {
                 } # user loop end 
             } # group loop end 
         } # school loop end
-        print "--- DONE with $entry_num) Line $line_num:  $line ---\n";
+        print "DONE with $entry_num) Line $line_num:  $line ---\n";
     }
     close(REPDIRFILE);
     &Sophomorix::SophomorixBase::print_title("Repairing from file: $repdir_file (end)");
