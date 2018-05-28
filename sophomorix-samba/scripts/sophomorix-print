@@ -517,7 +517,7 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
 # ===========================================================================
 # --caller-copy (do the copy stuff)
 if ($caller_copy ne ""){
-    &print_title("Copying files to user $caller_copy");
+    &print_title("Copying files to user $caller_copy in school $school_AD");
     my $smb_dir_home=$home_directory_AD;
     $smb_dir_home=~s/\\/\//g;
     my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home); # to home
@@ -528,8 +528,7 @@ if ($caller_copy ne ""){
                           " //$root_dns/$school_AD ".
                           " -c 'md $rel_path_home; cd $rel_path_home; lcd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'};".
                           " prompt; mput $output_file_basename*; exit;'";
-    print "$smbclient_command\n";
-    system($smbclient_command);
+    &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
 }
 
 

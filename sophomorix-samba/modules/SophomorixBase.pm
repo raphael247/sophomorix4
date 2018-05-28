@@ -4463,7 +4463,7 @@ sub smbclient_command {
             print $smbclient_out_ident;
         }
     } elsif ($smbclient_return==0 and $smbclient_out=~m/NT_STATUS_OBJECT_NAME_COLLISION/){
-        print "OK: smbclient command ($smbclient_return: NT_STATUS_OBJECT_NAME_COLLISION --> file existed already)\n";
+        print "OK: smbclient command ($smbclient_return: NT_STATUS_OBJECT_NAME_COLLISION --> file(s) existed already)\n";
         if($Conf::log_level>1){
             print "     COMMAND:\n";
             print "        $display_command\n";
