@@ -3132,8 +3132,9 @@ sub AD_user_move {
         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                               " -U ".$DevelConf::sophomorix_file_admin."%'".$smb_admin_pass."'".
                               " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
-        print "$smbclient_command\n";
-        system($smbclient_command);
+        #print "$smbclient_command\n";
+        #system($smbclient_command);
+        &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
     } else {
         # this is dirty and works only if the shares are on the same server
         # ????????????????????????????
