@@ -4444,8 +4444,10 @@ sub smbclient_command {
     ############################################################
     # run the command
     $smbclient_out=`$smbclient_command`;
-    chomp($smbclient_out);
     my $smbclient_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    my @returned_lines=split("\n",$smbclient_out);
+    
+    chomp($smbclient_out);
     ############################################################
     # display result
     my $display_command=$smbclient_command;
@@ -4480,7 +4482,7 @@ sub smbclient_command {
         print $smbclient_out_ident;
         &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbclient_return): $smbclient_command");
     }
-    return $smbclient_return;
+    return ($smbclient_return,@returned_lines);
 }
 
 
