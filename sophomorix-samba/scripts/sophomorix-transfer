@@ -650,7 +650,8 @@ sub smbclient_mput_recurse {
                                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                    $smb_admin_pass."'".
                                    " //$root_dns/$school_AD "." -c 'cd $cd_path; md $md_path'";
-                    system($md_command);
+                    #system($md_command);
+                    &Sophomorix::SophomorixBase::smbclient_command($md_command,$smb_admin_pass);
                 }
             }
 
@@ -661,8 +662,9 @@ sub smbclient_mput_recurse {
                                       $smb_admin_pass."'".
                                       " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; lcd $localdir;".
                                       " prompt; recurse; mput *; exit;'";
-                print "$smbclient_command\n";
-                system($smbclient_command);
+                #print "$smbclient_command\n";
+                #system($smbclient_command);
+                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
             } else {
                 # including md_commands  
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -670,8 +672,9 @@ sub smbclient_mput_recurse {
                                       $smb_admin_pass."'".
                                       " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
                                       " prompt; recurse; mput *; exit;'";
-                print "$smbclient_command\n";
-                system($smbclient_command);
+                #print "$smbclient_command\n";
+                #system($smbclient_command);
+                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
             }
         } else {
             print "\nERROR: cannot upload to nonexisting user $user\n\n";
