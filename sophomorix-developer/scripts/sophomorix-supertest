@@ -121,7 +121,7 @@ foreach my $script (@scriptlist){
     print "\n";
     &printline();
     print "TEST: $command \n";
-    system($command);
+    #system($command);
     print "\n";
 }
 
@@ -130,17 +130,25 @@ foreach my $script (@scriptlist){
 # typeout
 foreach my $script (@scriptlist){
     my (@parts)=split(/ /,$script);
+    my $logfile_abs="/tmp/".$parts[0].".log";
+    my $errfile_abs="/tmp/".$parts[0].".error";
     &printline();
     print "TEST: $script \n";
     &printline();
-    my $res1_command="tail -n 3 /tmp/".$parts[0].".log";
+    my $res1_command="tail -n 3 $logfile_abs";
     print "SHOW STDOUT: $res1_command\n";
     system($res1_command);
     &printline();
-    my $res2_command="cat /tmp/".$parts[0].".error | grep -v \"Domain=\" | grep -v \"OS=\" | grep -v \"Server=\"";
+    my $res2_command="cat $errfile_abs | grep -v \"Domain=\" | grep -v \"OS=\" | grep -v \"Server=\"";
     print "SHOW ERRORS: $res2_command\n";
     system($res2_command);
     &printline();
+    my $password_hits_log= `grep \`cat /etc/linuxmuster/.secret/administrator\` $logfile_abs | wc -l`;
+    chomp($password_hits_log);
+    my $password_hits_err= `grep \`cat /etc/linuxmuster/.secret/administrator\` $errfile_abs | wc -l`;
+    chomp($password_hits_err);
+    print "Password hits in $logfile_abs: $password_hits_log (should be 0)\n";
+    print "Password hits in $errfile_abs: $password_hits_err (should be 0)\n";
     print "\n";
 }
 
