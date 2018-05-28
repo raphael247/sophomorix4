@@ -513,8 +513,9 @@ sub smbclient_mget_recurse {
                                       $smb_admin_pass."'".
                                       " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
                                       " prompt; recurse; get $filename; exit;'";
-                print "$smbclient_command\n";
-                system($smbclient_command);
+                #print "$smbclient_command\n";
+                #system($smbclient_command);
+                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
                 if ($type eq "move"){
                     # remove file that was collected
                     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -522,8 +523,9 @@ sub smbclient_mget_recurse {
                                           $smb_admin_pass."'".
                                           " //$root_dns/$school_AD "." -c 'cd $cd_path;".
                                           " prompt; rm $filename; exit;'";
-                    print "$smbclient_command\n";
-                    system($smbclient_command);
+                    #print "$smbclient_command\n";
+                    #system($smbclient_command);
+                    &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
                 }
                 last;
             } elsif ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
@@ -539,9 +541,9 @@ sub smbclient_mget_recurse {
                                       $smb_admin_pass."'".
                                       " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
                                       " prompt; recurse; mget *; exit;'";
-                print "$smbclient_command\n";
-                system($smbclient_command);
-
+                #print "$smbclient_command\n";
+                #system($smbclient_command);
+                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
                 if ($type eq "move"){
                     # remove the dir that was collected
                     if ($filename eq $transfer and $dirname eq "."){
