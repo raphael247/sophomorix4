@@ -4438,6 +4438,64 @@ sub backup_auk_file {
 
 
 
+# run smb commands
+sub smb_command {
+    my ($smb_display_command,$smb_admin_pass)=@_;
+    # Parameter:
+    # $smb_display_command contains: ****** (6 asterisks) as password placeholder
+    # $smb_admin_pass replaces ******
+    my $smb_command=$smb_display_command;
+ 
+    # assemble real command
+    $smb_command=~s/\*\*\*\*\*\*/$smb_admin_pass/;
+
+    ############################################################
+    # run the command
+    $smb_command_out=`$smb_command`;
+    my $smb_command_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    my @returned_lines=split("\n",$smb_command_out);
+    chomp($smb_command_out);
+    my $smb_command_out_ident=&ident_output($smb_command_out,8);
+
+    print "";
+
+    if( 
+        ($smb_command_return==0 and $smb_command_out eq "") or
+        ($smb_command_return==0 and $smb_command_out=~m/successfully/)
+      ){
+        # empty output or "succesfully" in samba-tool
+        print "OK ($smb_command_return): $smb_display_command\n";
+        if($Conf::log_level>1){
+            print "     COMMAND:\n";
+            print "        $smb_display_command\n";
+            print "     RETURN VALUE: $smb_command_return\n";
+            print "     MESSAGE:\n";
+            print $smb_command_out_ident;
+        }
+    } elsif ($smb_command_return==0 and $smb_command_out=~m/NT_STATUS_OBJECT_NAME_COLLISION/){
+        # Errors that are warnings: smbclient NT_STATUS_OBJECT_NAME_COLLISION  -> file exists already
+        print "OK: smb command ($smb_command_return: NT_STATUS_OBJECT_NAME_COLLISION --> file(s) existed already)\n";
+        if($Conf::log_level>1){
+            print "     COMMAND:\n";
+            print "        $smb_display_command\n";
+            print "     RETURN VALUE: $smb_command_return\n";
+            print "     MESSAGE:\n";
+            print $smb_command_out_ident;
+        }
+    } else {
+        print "ERROR: smb command\n";
+        print "     COMMAND:\n";
+        print "        $smb_display_command\n";
+        print "     RETURN VALUE: $smb_command_return\n";
+        print "     ERROR MESSAGE:\n";
+        print $smb_command_out_ident;
+        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smb_command_return): $smb_display_command");
+    }
+    return ($smb_command_return,@returned_lines);
+}
+
+
+
 # smb commands
 sub smbclient_command {
     my ($smbclient_command,$smb_admin_pass)=@_;

@@ -427,11 +427,8 @@ sub AD_dns_zonecreate {
 
     ############################################################
     # adding dnsNode with samba-tool
-    my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    print "   * $command\n";
-    #system($command);
-    my $res=`$command`;
-    print "       -> $res";
+    my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
+    &Sophomorix::SophomorixBase::smb_command($command,$smb_pwd);
 
     ############################################################
     # adding comments to recognize the dnsZone as created by sophomorix
@@ -505,9 +502,13 @@ sub AD_dns_zonekill {
         $dns_server="localhost";
     }
 
-    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    print "   * $command\n";
-    system($command);
+    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
+    &Sophomorix::SophomorixBase::smb_command($command,$smb_pwd);
+
+    # old:
+    #my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
+    #print "   * $command\n";
+    #system($command);
 }
 
 
