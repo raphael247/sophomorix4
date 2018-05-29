@@ -344,11 +344,8 @@ sub AD_dns_nodecreate_update {
     # adding dnsNode with samba-tool
     if ($create eq "TRUE"){
         my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
-                    " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-        print "   * $command\n";
-        # system($command);
-        my $res=`$command`;
-        print "       -> $res";
+                    " --password='******' -U $DevelConf::sophomorix_AD_admin";
+        &Sophomorix::SophomorixBase::smb_command($command,$smb_pwd);
     }
 
     ############################################################
@@ -375,10 +372,8 @@ sub AD_dns_nodecreate_update {
         my $dns_type="PTR";
         # adding reverse lookup with samba-tool
         my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet $dns_type $dns_node ".
-                            " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-        print "   * $command_reverse\n";
-        my $res2=`$command_reverse`;
-        print "       -> $res2";
+                            " --password='******' -U $DevelConf::sophomorix_AD_admin";
+        &Sophomorix::SophomorixBase::smb_command($command_reverse,$smb_pwd);
     }
     ############################################################
     # add/update comments to recognize the dnsNode reverse lookup as created by sophomorix
@@ -471,9 +466,8 @@ sub AD_dns_kill {
         # delete dnsNode
         my $command="samba-tool dns delete $dns_server ".
                     "$dns_zone $dns_node $dns_type $dns_ipv4 ".
-                    "--password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-        print "   * $command\n";
-        system($command);
+                    "--password='******' -U $DevelConf::sophomorix_AD_admin";
+        &Sophomorix::SophomorixBase::smb_command($command,$smb_pwd);
 
         # delete reverse lookup
         my @octets=split(/\./,$dns_ipv4);
@@ -481,10 +475,8 @@ sub AD_dns_kill {
         my $dns_last_octet=$octets[3];
         my $dns_type="PTR";
         my $command_reverse="samba-tool dns delete $dns_server $dns_zone_reverse $dns_last_octet $dns_type $dns_node ".
-                            " --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-        print "   * $command_reverse\n";
-        my $res2=`$command_reverse`;
-        print "       -> $res2";
+                            " --password='******' -U $DevelConf::sophomorix_AD_admin";
+        &Sophomorix::SophomorixBase::smb_command($command_reverse,$smb_pwd);
     }
 }
 
@@ -502,13 +494,9 @@ sub AD_dns_zonekill {
         $dns_server="localhost";
     }
 
+    # deleting zone with samba-tool
     my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
     &Sophomorix::SophomorixBase::smb_command($command,$smb_pwd);
-
-    # old:
-    #my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin";
-    #print "   * $command\n";
-    #system($command);
 }
 
 
