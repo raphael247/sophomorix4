@@ -523,12 +523,11 @@ if ($caller_copy ne ""){
     my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home); # to home
     $rel_path_home=$rel_path_home."/".$sophomorix_config{'INI'}{'LATEX'}{'PRINT_HOME_SUBDIR'};
     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                          " -U ".$DevelConf::sophomorix_file_admin."%'".
-                          $smb_admin_pass."'".
-                          " //$root_dns/$school_AD ".
-                          " -c 'md $rel_path_home; cd $rel_path_home; lcd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'};".
-                          " prompt; mput $output_file_basename*; exit;'";
-    &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+        " -U ".$DevelConf::sophomorix_file_admin."%'******'".
+        " //$root_dns/$school_AD ".
+        " -c 'md $rel_path_home; cd $rel_path_home; lcd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'};".
+        " prompt; mput $output_file_basename*; exit;'";
+    &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 }
 
 

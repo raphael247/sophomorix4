@@ -495,31 +495,31 @@ sub smbclient_mget_recurse {
         $cd_path=~s/\/\.$//; # remove /. in the end
         # file or dir
         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                              " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                              $smb_admin_pass."'".
-                              " //$root_dns/$school_AD "." ".
-                              $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-                              " -c 'cd $cd_path; stat $filename; exit;'";
-        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$school_AD "." ".
+            $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+            " -c 'cd $cd_path; stat $filename; exit;'";
+        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
         foreach my $stat (@out_lines){
             if ($stat=~m/regular file/ and $stat=~m/Blocks/ and $stat=~m/Size/){
                 # file
                 print "   * $filename is a file ($file_path)\n";
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                      $smb_admin_pass."'".
-                                      " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
-                                      " prompt; recurse; get $filename; exit;'";
-                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                    "%'******'".
+                    " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
+                    " prompt; recurse; get $filename; exit;'";
+                &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                 if ($type eq "move"){
                     # remove file that was collected
                     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                          " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                          $smb_admin_pass."'".
-                                          " //$root_dns/$school_AD "." -c 'cd $cd_path;".
-                                          " prompt; rm $filename; exit;'";
-                    &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+                        " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                        "%'******'".
+                        " //$root_dns/$school_AD "." -c 'cd $cd_path;".
+                        " prompt; rm $filename; exit;'";
+                    &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                 }
                 last;
             } elsif ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
@@ -531,11 +531,11 @@ sub smbclient_mget_recurse {
                 $lcd_path=$lcd_path."/".$filename;
                 system("mkdir $lcd_path");
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                      $smb_admin_pass."'".
-                                      " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
-                                      " prompt; recurse; mget *; exit;'";
-                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                    "%'******'".
+                    " //$root_dns/$school_AD "." -c 'cd $cd_path; lcd $lcd_path;".
+                    " prompt; recurse; mget *; exit;'";
+                &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                 if ($type eq "move"){
                     # remove the dir that was collected
                     if ($filename eq $transfer and $dirname eq "."){
@@ -641,29 +641,29 @@ sub smbclient_mput_recurse {
                     # Dirty fix:  #### for ech subdir a smbclient command (which can fail)
                     my $cd_path=$rel_path_home;
                     my $md_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                   " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                   $smb_admin_pass."'".
-                                   " //$root_dns/$school_AD "." -c 'cd $cd_path; md $md_path'";
-                    &Sophomorix::SophomorixBase::smbclient_command($md_command,$smb_admin_pass);
+                        " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                        "%'******'".
+                        " //$root_dns/$school_AD "." -c 'cd $cd_path; md $md_path'";
+                    &Sophomorix::SophomorixBase::smb_command($md_command,$smb_admin_pass);
                 }
             }
 
             if ($sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_RELY_ON_MKDIR_IGNORE_ERROR'} eq "FALSE"){
                 # without md_commands (dirty fix above needed)
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                      $smb_admin_pass."'".
-                                      " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; lcd $localdir;".
-                                      " prompt; recurse; mput *; exit;'";
-                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                    "%'******'".
+                    " //$root_dns/$school_AD "." -c 'cd $rel_path_sub; lcd $localdir;".
+                    " prompt; recurse; mput *; exit;'";
+                &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
             } else {
                 # including md_commands  
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                                      " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                                      $smb_admin_pass."'".
-                                      " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
-                                      " prompt; recurse; mput *; exit;'";
-                &Sophomorix::SophomorixBase::smbclient_command($smbclient_command,$smb_admin_pass);
+                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                    "%'******'".
+                    " //$root_dns/$school_AD "." -c '$md_commands cd $rel_path_sub; lcd $localdir;".
+                    " prompt; recurse; mput *; exit;'";
+                &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
             }
         } else {
             print "\nERROR: cannot upload to nonexisting user $user\n\n";

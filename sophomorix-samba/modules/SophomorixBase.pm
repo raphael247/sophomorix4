@@ -4457,8 +4457,6 @@ sub smb_command {
     chomp($smb_command_out);
     my $smb_command_out_ident=&ident_output($smb_command_out,8);
 
-    print "";
-
     if( 
         ($smb_command_return==0 and $smb_command_out eq "") or
         ($smb_command_return==0 and $smb_command_out=~m/successfully/)
@@ -4610,12 +4608,13 @@ sub NTACL_set_file {
     }
     $smbcacls_option="\"".$smbcacls_option."\"";
     my $smbcacls_base_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCACLS'}.
-                              " -U ".$DevelConf::sophomorix_file_admin."%'".
-                              $smb_admin_pass."' //$root_dns/$school $smbpath --set ";
-    my $smbcacls_command=$smbcacls_base_command.$smbcacls_option;
-    #print "* $smbcacls_base_command\n";
-    #print "  $smbcacls_option\n";
-
+                              " -U ".$DevelConf::sophomorix_file_admin."%'******'".
+                              " //$root_dns/$school $smbpath --set ";
+    my $smbcacls_display_command=$smbcacls_base_command.$smbcacls_option;
+ 
+    # assemble real command
+    my $smbcacls_command=$smbcacls_display_command;
+    $smbcacls_command=~s/\*\*\*\*\*\*/$smb_admin_pass/;
     ############################################################
     # run the command
     $smbcacls_out=`$smbcacls_command`;
@@ -4623,18 +4622,14 @@ sub NTACL_set_file {
     close(NTACL);
 
     ############################################################
-    # display result
-    my $display_command=$smbcacls_command;
-    # hide password
-    $display_command=~s/$smb_admin_pass/***/;
-    # add linebreak
-    $display_command=~s/--set/\n      --set/;
+    # add linebreak to display
+    $smbcacls_display_command=~s/--set/\n      --set/;
     my $smbcacls_out_ident=&ident_output($smbcacls_out,8);
     if($smbcacls_return==0){
         print "OK: smbcacls-NTACL on //$root_dns/$school $smbpath\n";
         if($Conf::log_level>1){
             print "     COMMAND:\n";
-            print "        $display_command\n";
+            print "        $smbcacls_display_command\n";
             print "     RETURN VALUE: $smbcacls_return\n";
             print "     ERROR MESSAGE:\n";
             print $smbcacls_out_ident;
@@ -4642,7 +4637,7 @@ sub NTACL_set_file {
     } else {
         print "ERROR: smbcacls on //$root_dns/$school $smbpath\n";
         print "     COMMAND:\n";
-        print "        $display_command\n";
+        print "        $smbcacls_display_command\n";
         print "     RETURN VALUE: $smbcacls_return\n";
         print "     ERROR MESSAGE:\n";
         print $smbcacls_out_ident;
