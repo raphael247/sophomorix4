@@ -343,8 +343,9 @@ sub AD_dns_nodecreate_update {
     ############################################################
     # adding dnsNode with samba-tool
     if ($create eq "TRUE"){
-        my $command="samba-tool dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
-                    " --password='******' -U $DevelConf::sophomorix_AD_admin";
+        my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+            " dns add $dns_server $root_dns $dns_node $dns_type $dns_ipv4".
+            " --password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
     }
 
@@ -371,8 +372,9 @@ sub AD_dns_nodecreate_update {
     if ($create eq "TRUE"){
         my $dns_type="PTR";
         # adding reverse lookup with samba-tool
-        my $command_reverse="samba-tool dns add $dns_server $dns_zone $dns_last_octet $dns_type $dns_node ".
-                            " --password='******' -U $DevelConf::sophomorix_AD_admin";
+        my $command_reverse=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+            " dns add $dns_server $dns_zone $dns_last_octet $dns_type $dns_node ".
+            " --password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command_reverse,$smb_admin_pass);
     }
     ############################################################
@@ -422,7 +424,8 @@ sub AD_dns_zonecreate {
 
     ############################################################
     # adding dnsNode with samba-tool
-    my $command="samba-tool dns zonecreate $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
+    my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+        " dns zonecreate $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
     &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 
     ############################################################
@@ -454,6 +457,7 @@ sub AD_dns_kill {
     my $dns_node = $arg_ref->{dns_node};
     my $dns_ipv4 = $arg_ref->{dns_ipv4};
     my $dns_type = $arg_ref->{dns_type};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $dns_server){
         $dns_server="localhost";
@@ -464,9 +468,10 @@ sub AD_dns_kill {
 
     if ($dns_ipv4 ne "NXDOMAIN" and $dns_ipv4 ne "NOERROR"){
         # delete dnsNode
-        my $command="samba-tool dns delete $dns_server ".
-                    "$dns_zone $dns_node $dns_type $dns_ipv4 ".
-                    "--password='******' -U $DevelConf::sophomorix_AD_admin";
+        my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+            " dns delete $dns_server ".
+            "$dns_zone $dns_node $dns_type $dns_ipv4 ".
+            "--password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 
         # delete reverse lookup
@@ -474,8 +479,9 @@ sub AD_dns_kill {
         my $dns_zone_reverse=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
         my $dns_last_octet=$octets[3];
         my $dns_type="PTR";
-        my $command_reverse="samba-tool dns delete $dns_server $dns_zone_reverse $dns_last_octet $dns_type $dns_node ".
-                            " --password='******' -U $DevelConf::sophomorix_AD_admin";
+        my $command_reverse=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+            " dns delete $dns_server $dns_zone_reverse $dns_last_octet $dns_type $dns_node ".
+            " --password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command_reverse,$smb_admin_pass);
     }
 }
@@ -489,13 +495,15 @@ sub AD_dns_zonekill {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $dns_server = $arg_ref->{dns_server};
     my $dns_zone = $arg_ref->{dns_zone};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     if (not defined $dns_server){
         $dns_server="localhost";
     }
 
     # deleting zone with samba-tool
-    my $command="samba-tool dns zonedelete $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
+    my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+        " dns zonedelete $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
     &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 }
 
@@ -856,9 +864,9 @@ sub AD_user_kill {
         my $home_delete=-1;
         my $home_delete_string="";
 
-        my $command="samba-tool user delete ". $user;
-        print "   # $command\n";
-        $kill_return=system($command);
+        my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+            " user delete ". $user;
+        ($kill_return)=&Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 
         # deleting home
         if ($role_AD eq "student" or 
@@ -1125,9 +1133,10 @@ sub AD_group_kill {
                     if($return2==1 or $return2==256){
                         print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                         # deleting the AD account
-                        my $command="samba-tool group delete ". $group;
-                        print "   # $command\n";
-                        system($command);
+
+                        my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                            " group delete ". $group;
+                        &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
                     } else {
                         print "ERROR: deltree $unc $smb_rel_path $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     }
@@ -1147,9 +1156,9 @@ sub AD_group_kill {
                 if($return1==1){
                     print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     # deleting the AD account
-                    my $command="samba-tool group delete ". $group;
-                    print "   # $command\n";
-                    system($command);
+                    my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                        " group delete ". $group;
+                    &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
                 } else {
                     print "ERROR: rmdir_recurse $smb_share $!\n";
                 }
@@ -1157,26 +1166,26 @@ sub AD_group_kill {
 	} elsif ($type eq "room"){
             ### rooms from sophomorix-device #####################################
             # there is no share, just delete the group
-            my $command="samba-tool group delete ". $group;
-            print "   # $command\n";
-            system($command);
+            my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " group delete ". $group;
+            &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 	} elsif ($type eq "sophomorix-group"){
             ### sophomorix-group #####################################
             # there is no share, just delete the group
-            my $command="samba-tool group delete ". $group;
-            print "   # $command\n";
-            system($command);
+            my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " group delete ". $group;
+            &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 	} elsif ($type eq "hardwareclass"){
             ### hardwareclass #####################################
             # just delete the group
-            my $command="samba-tool group delete ". $group;
-            print "   # $command\n";
-            system($command);
+            my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " group delete ". $group;
+            &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 	} elsif (exists $ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'}{$type}){
             # just delete the host group
-            my $command="samba-tool group delete ". $group;
-            print "   # $command   ($ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'}{$type})\n";
-            system($command);
+            my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " group delete ". $group;
+            &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
         } else {
             print "ERROR: Not killing Group of unknown type $type\n";
         }
@@ -7641,9 +7650,6 @@ sub AD_group_addmember {
                                      }
                                     );
             &AD_debug_logdump($mesg,2,(caller(0))[3]);
-            #my $command="samba-tool group addmembers ". $group." ".$adduser;
-            #print "   # $command\n";
-            #system($command);
             return;
 	} else {
             # user does not exist -> exit with warning
@@ -7719,9 +7725,6 @@ sub AD_group_removemember {
                                   member => $dn_exist,
                                   }
                               );
-            #my $command="samba-tool group removemembers ". $group." ".$removeuser;
-            #print "   # $command\n";
-            #system($command);
             return;
         } else {
             # user does not exist -> exit with warning
@@ -8072,9 +8075,9 @@ sub AD_examuser_kill {
         }
 
         # deleting user
-        my $command="samba-tool user delete ". $examuser;
-        print "   # $command\n";
-        system($command);
+        my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+            " user delete ". $examuser;
+        &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 
         # deleting home
         my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,

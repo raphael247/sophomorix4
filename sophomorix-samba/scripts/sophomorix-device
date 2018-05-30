@@ -206,7 +206,6 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-device");
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
-#my $smb_admin_pass=&AD_get_passwd($DevelConf::sophomorix_AD_admin,$DevelConf::secret_file_sophomorix_AD_admin); # needed for using samba-tool
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
@@ -423,6 +422,7 @@ if ($dns_show==1 or $dns_kill==1){
                               dns_node=>$name,
                               dns_ipv4=>$ipv4,
                               smb_admin_pass=>$smb_admin_pass,
+                              sophomorix_config=>\%sophomorix_config,
                             });
            }
         }
@@ -434,6 +434,7 @@ if ($dns_show==1 or $dns_kill==1){
                                   root_dse=>$root_dse,
                                   dns_zone=>$zone,
                                   smb_admin_pass=>$smb_admin_pass,
+                                  sophomorix_config=>\%sophomorix_config,
                                 });
             }
         }
@@ -1366,6 +1367,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                       dns_node=>$dns_node,
                       dns_ipv4=>$ref_AD_device->{'dnsNode'}{$sophomorix_config{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
                       smb_admin_pass=>$smb_admin_pass,
+                      sophomorix_config=>\%sophomorix_config,
                     });
         $dns_node_count++;
     }
@@ -1383,6 +1385,7 @@ if ($no_sync==0){ # $no_sync==0 -> SYNC
                           dns_server=>"localhost",
                           dns_zone=>$dns_zone,
                           smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
                         });
         $dns_zone_count++;
     }
