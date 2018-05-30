@@ -2674,7 +2674,7 @@ sub config_sophomorix_read {
     my ($ldap,$root_dse,$ref_result,$json)=@_;
     my %sophomorix_config=();
 
-    my ($smb_pwd)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
+    my ($smb_admin_pass)=&Sophomorix::SophomorixSambaAD::AD_get_passwd($DevelConf::sophomorix_AD_admin,
                                                                 $DevelConf::secret_file_sophomorix_AD_admin);
     # # UTC Time
     # # all UTC time values are derived from the same date call
@@ -2729,7 +2729,7 @@ sub config_sophomorix_read {
     &read_smb_conf(\%sophomorix_config,$ref_result);
     # read more samba stuff
     &read_smb_net_conf_list(\%sophomorix_config,$ref_result);
-    &read_smb_domain_passwordsettings(\%sophomorix_config,$smb_pwd,$ref_result);
+    &read_smb_domain_passwordsettings(\%sophomorix_config,$smb_admin_pass,$ref_result);
 
     #my %encodings_set = map {lc $_ => undef} @encodings_arr;
 
@@ -3294,9 +3294,9 @@ sub read_smb_net_conf_list {
 
 
 sub read_smb_domain_passwordsettings {
-    my ($ref_sophomorix_config,$smb_pwd,$ref_result)=@_;
+    my ($ref_sophomorix_config,$smb_admin_pass,$ref_result)=@_;
     &print_title("Asking domain passwordsettings from samba");
-    my $string=`samba-tool domain passwordsettings show --password='$smb_pwd' -U $DevelConf::sophomorix_AD_admin`;
+    my $string=`samba-tool domain passwordsettings show --password='$smb_admin_pass' -U $DevelConf::sophomorix_AD_admin`;
     my @lines=split(/\n/,$string);
     foreach my $line (@lines){
         my ($key,$value)=split(/:/,$line);
