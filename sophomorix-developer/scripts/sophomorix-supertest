@@ -147,8 +147,8 @@ foreach my $script (@scriptlist){
     chomp($password_hits_log);
     my $password_hits_err= `grep \`cat /etc/linuxmuster/.secret/administrator\` $errfile_abs | wc -l`;
     chomp($password_hits_err);
-    print "Password hits in $logfile_abs: $password_hits_log (should be 0)\n";
-    print "Password hits in $errfile_abs: $password_hits_err (should be 0)\n";
+    print "$password_hits_log password hits in $logfile_abs (should be 0)\n";
+    print "$password_hits_err password hits in $errfile_abs (should be 0)\n";
     print "\n";
 }
 
