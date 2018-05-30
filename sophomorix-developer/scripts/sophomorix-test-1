@@ -309,6 +309,11 @@ if ($cp_add==1){
 
 if ($add==1 or $test_add==1){
     if ($add==1){
+        # run some commands (password should not be seen)
+        &run_command("sophomorix-quota -L $all_options");
+        &run_command("sophomorix-quota -F $all_options");
+        &run_command("sophomorix-quota --share default-school --default-quota 2000/8000 $all_options");
+
         # copy sophomorix.add
         &run_command("cp -v $file_add_test $file_add");
         &run_command("sophomorix-add -i $all_options");
