@@ -4494,55 +4494,6 @@ sub smb_command {
 
 
 
-# smb commands
-sub smbclient_command {
-    my ($smbclient_command,$smb_admin_pass)=@_;
-    ############################################################
-    # run the command
-    $smbclient_out=`$smbclient_command`;
-    my $smbclient_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
-    my @returned_lines=split("\n",$smbclient_out);
-    
-    chomp($smbclient_out);
-    ############################################################
-    # display result
-    my $display_command=$smbclient_command;
-    # hide password
-    $display_command=~s/$smb_admin_pass/***/;
-    my $smbclient_out_ident=&ident_output($smbclient_out,8);
-
-    if($smbclient_return==0 and $smbclient_out eq ""){
-        print "OK: smbclient command ($smbclient_return)\n";
-        if($Conf::log_level>1){
-            print "     COMMAND:\n";
-            print "        $display_command\n";
-            print "     RETURN VALUE: $smbclient_return\n";
-            print "     ERROR MESSAGE:\n";
-            print $smbclient_out_ident;
-        }
-    } elsif ($smbclient_return==0 and $smbclient_out=~m/NT_STATUS_OBJECT_NAME_COLLISION/){
-        print "OK: smbclient command ($smbclient_return: NT_STATUS_OBJECT_NAME_COLLISION --> file(s) existed already)\n";
-        if($Conf::log_level>1){
-            print "     COMMAND:\n";
-            print "        $display_command\n";
-            print "     RETURN VALUE: $smbclient_return\n";
-            print "     ERROR MESSAGE:\n";
-            print $smbclient_out_ident;
-        }
-    } else {
-        print "ERROR: smbclient command\n";
-        print "     COMMAND:\n";
-        print "        $display_command\n";
-        print "     RETURN VALUE: $smbclient_return\n";
-        print "     ERROR MESSAGE:\n";
-        print $smbclient_out_ident;
-        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbclient_return): $smbclient_command");
-    }
-    return ($smbclient_return,@returned_lines);
-}
-
-
-
 # acl stuff
 ######################################################################
 sub NTACL_set_file {
