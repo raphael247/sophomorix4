@@ -39,6 +39,7 @@ use Sophomorix::SophomorixBase qw(
                                  console_print_mailquota_user
                                  remove_from_list    
                                  json_dump
+                                 smb_command
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -209,16 +210,11 @@ if ($school ne ""){
 if ($list==1){
     foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
-                               " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
-                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                               $smb_admin_pass."'".
-                               " -L //$root_dns/$share";
-        my $display_command=$smbcquotas_command;
-        # hide password
-        $display_command=~s/$smb_admin_pass/***/;
-        print "$display_command\n";
-        #print "$smbcquotas_command\n";
-        system($smbcquotas_command);
+            " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " -L //$root_dns/$share";
+        &smb_command($smbcquotas_command,$smb_admin_pass);
     }
     exit;
 }
@@ -229,16 +225,11 @@ if ($list==1){
 if ($show==1){
     foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
-                               " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
-                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                               $smb_admin_pass."'".
-                               " -F //$root_dns/$share";
-        my $display_command=$smbcquotas_command;
-        # hide password
-        $display_command=~s/$smb_admin_pass/***/;
-        print "$display_command\n";
-        #print "$smbcquotas_command\n";
-        system($smbcquotas_command);
+            " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " -F //$root_dns/$share";
+        &smb_command($smbcquotas_command,$smb_admin_pass);
     }
     exit;
 }
@@ -249,16 +240,11 @@ if ($show==1){
 if ($school ne "" and  $default_quota ne ""){
     foreach my $share (@sharelist){
         my $smbcquotas_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
-                               " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
-                               " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-                               $smb_admin_pass."'".
-                               " -S FSQLIM:".$default_quota." //$root_dns/$share";
-        my $display_command=$smbcquotas_command;
-        # hide password
-        $display_command=~s/$smb_admin_pass/***/;
-        print "$display_command\n";
-        #print "$smbcquotas_command\n";
-        system($smbcquotas_command);
+            " ".$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " -S FSQLIM:".$default_quota." //$root_dns/$share";
+        &smb_command($smbcquotas_command,$smb_admin_pass);
     }
     exit;
 }

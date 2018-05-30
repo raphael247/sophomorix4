@@ -7819,12 +7819,10 @@ sub AD_login_test {
         return -1;
     }
 
-    # smbclient test
     #my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
     #            " -L localhost --user=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
     #print "   # $command\n";
     #my $result=system($command);
-
 
     if ($firstpassword eq "---"){
         print "   * $sam_account($status,$user_account_control,$exammode):".
@@ -8158,10 +8156,9 @@ sub AD_smbcquotas_queryuser {
         $smb_admin_pass."'".
         " -u $user //$root_dns/$share";
     my $display_command=$smbcquotas_command;
-        # hide password
-        $display_command=~s/$smb_admin_pass/***/;
-        #print "$display_command\n";
-        #print "$smbcquotas_command\n";
+
+    # hide password
+    $display_command=~s/$smb_admin_pass/******/;
     my $string=`$smbcquotas_command`;
     chomp($string);
     $string=~s/ //g; # remove whitespace
@@ -8217,7 +8214,6 @@ sub AD_smbcquotas_testshare {
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
         " -F //$root_dns/$share";
-        #print "$smbcquotas_command\n";
         my $return_quota=system("$smbcquotas_command > /dev/null");
         if ($return_quota==0){
             $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";

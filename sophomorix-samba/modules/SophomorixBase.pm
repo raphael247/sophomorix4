@@ -71,6 +71,7 @@ $Data::Dumper::Terse = 1;
             string_to_latex
             get_lang_from_config
             run_hook_scripts
+            smb_command
             );
 
 
@@ -4459,7 +4460,8 @@ sub smb_command {
 
     if( 
         ($smb_command_return==0 and $smb_command_out eq "") or
-        ($smb_command_return==0 and $smb_command_out=~m/successfully/)
+        ($smb_command_return==0 and $smb_command_out=~m/successfully/) or
+        ($smb_command_return==0 and $smb_command_out=~m/Default Soft Limit/)
       ){
         # empty output or "succesfully" in samba-tool
         print "OK ($smb_command_return): $smb_display_command\n";
