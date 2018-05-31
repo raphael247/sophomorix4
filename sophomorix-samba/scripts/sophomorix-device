@@ -89,8 +89,6 @@ my $list_files=0;
 my $no_sync=0;
 my $birthdate="1970-01-01";
 my $add_example_line="";
-my @password_chars=&get_passwd_charlist();
-my $sophomorix_first_password="";
 
 # schools that have been created in this script
 my $role="";
@@ -106,8 +104,6 @@ my %room_created=();
 my $dump_files=0;
 my $dump_AD=0;
 my $print=0;
-my $pass="12345678";
-my $password="";
 
 # where data from workstation file is saved
 my @domcomputers_file=(); # list ordered
@@ -191,7 +187,6 @@ my $testopt=GetOptions(
        "dns-test" => \$dns_test,
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
-       "password=s" => \$password,
        "device|d=s" => \$device,
        "room|r=s" => \$room,
        "add-example-line=s" => \$add_example_line,

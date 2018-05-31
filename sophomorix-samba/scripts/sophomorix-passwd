@@ -48,6 +48,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_login_test
                                  AD_debug_logdump
                                  AD_dns_get
+                                 AD_computer_update
                                     );
 
 my @arguments = @ARGV;
@@ -64,6 +65,7 @@ my $test_firstpassword=0;
 my $set_firstpassword=0;
 
 my $user="";
+my $computer="";
 my $clone_from_user="";
 my $clone_to_user="";
 my $classes="";
@@ -108,6 +110,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "users|user|u=s" => \$user,
+           "computer=s" => \$computer,
            "clone-from-user=s" => \$clone_from_user,
            "clone-to-user=s" => \$clone_to_user,
 #           "class|classes|c=s" => \$classes,
@@ -187,8 +190,9 @@ Create a password:
   --interactive
 
 Create userlist:
-  -u user1,user2,...   /  --users  user1,user2,...
-
+  -u <user1>,<user2>,...  /  --users  <user1>,<user2>,...
+Create computerlist
+  --computer <computer1>,<computer2>,...
 
 Console examples:
 Interactively change password of a user (Always with --hide and --nofirstpassupdate)
@@ -312,7 +316,6 @@ if ($info==1 and $user ne "") {
 
 
 
-
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 ################################################################################
 # Start
@@ -331,7 +334,6 @@ if ( ($clone_from_user ne "" and $clone_to_user eq "") or
     &AD_set_unicodepwd($clone_to_user,$unicodepwd,\%sophomorix_config);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
-
 
 
 
@@ -439,21 +441,6 @@ if ($set_firstpassword==1){
 
 
 
-
-
-
-
-############################################################
-# create userlist from options
-############################################################
-my @userlist=();
-# --user
-if ($user ne ""){
-    @userlist=split(",",$user);
-}
-my $userlist_count=$#userlist+1;
-
-
 ############################################################
 # Setting passwords interacive
 ############################################################
@@ -520,10 +507,16 @@ if ($interactive==1){
 
 
 
-
 ############################################################
 # setting passwords from userlist
 ############################################################
+my @userlist=();
+# --user
+if ($user ne ""){
+    @userlist=split(",",$user);
+}
+my $userlist_count=$#userlist+1;
+
 # set a password from userlist
 if ($password ne "" and $userlist_count>0){
     my $user_count=0;
@@ -582,13 +575,65 @@ if ($password ne "" and $userlist_count>0){
 
 
 
+############################################################
+# setting passwords from computerlist
+############################################################
+my @computerlist=();
+# --computer
+if ($computer ne ""){
+    @computerlist=split(",",$computer);
+}
+my $computerlist_count=$#computerlist+1;
 
+# set a password from computerlist
+if ($password ne "" and $computerlist_count>0){
+    my $computer_count=0;
+    foreach my $computerlist_user (@computerlist){
+	$computer_count++;
+        $computerlist_user=~tr/a-z/A-Z/;
+        $computerlist_user=&Sophomorix::SophomorixBase::append_dollar($computerlist_user);
+        my %update_computer=();
+        $update_computer{$computerlist_user}{'REPLACE'}{'unicodePwd'}=$password;
+        $update_computer{$computerlist_user}{'COUNT'}=1;
+	my $filter="( &(objectclass=user) (sAMAccountName=$computerlist_user) )";
+        my $mesg = $ldap->search(
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attr => ['sAMAccountName','cn','dn','sophomorixFirstPassword']
+                                );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        my $max = $mesg->count;
+	if ($max==1){
+            my $entry = $mesg->entry(0);
+            my $dn=$entry->dn();
+        &AD_computer_update({ldap=>$ldap,
+                             root_dse=>$root_dse,
+                             computer=>$computerlist_user,
+                             computer_count=>$computer_count,
+                             attrs_count=>$update_computer{$computerlist_user}{'COUNT'},
+                             replace=>\%update_computer,
+                             sophomorix_first_password=>$password,
+                             hide_pwd=>$hide,
+                             max_computer_count=>$computerlist_count,
+                             json=>$json,
+                             sophomorix_config=>\%sophomorix_config,
+                             sophomorix_result=>\%sophomorix_result,
+                           });
+	} else {
+            print "\nERROR: $max users $computerlist_user found instead of 1\n\n";
+	}
+    }
+} elsif ($password eq "" and $computerlist_count>0) {
+    print "\n";
+    print "WARNING: No password given, but $computerlist_count users in computerlist\n";
+    print "         I do not know what password you want!\n\n";
+}
 
 
 
 # # use the charlist of SophomorixBase
 # my @chars=&get_passwd_charlist();
-
 
 # #
 # # Create a password

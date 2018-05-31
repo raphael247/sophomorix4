@@ -1013,10 +1013,18 @@ sub AD_computer_update {
     my $computer_count = $arg_ref->{computer_count};
     my $attrs_count = $arg_ref->{attrs_count};
     my $ref_replace = $arg_ref->{replace};
+    my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
+    my $hide_pwd = $arg_ref->{hide_pwd};
     my $max_computer_count = $arg_ref->{max_computer_count};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    # add password to $ref_replace
+    if (defined $sophomorix_first_password){
+        my $uni_password=&_unipwd_from_plainpwd($sophomorix_first_password);
+        $ref_replace->{$computer}{'REPLACE'}{'unicodePwd'}=$uni_password;
+    }
 
     print "\n";
     &Sophomorix::SophomorixBase::print_title(
@@ -1033,7 +1041,15 @@ sub AD_computer_update {
         my $dn = $entry->dn();
         print "   DN: $dn\n";
         foreach my $attr (keys  %{ $ref_replace->{$computer}{'REPLACE'} }){
-            print "     Update $attr to \"$ref_replace->{$computer}{'REPLACE'}{$attr}\"\n";
+            if ($attr eq "unicodePwd"){
+                if ($hide_pwd==1){
+	            print "     Update $attr to \"******\" (omitted by --hide)\n";
+	        } else {
+	            print "     Update $attr to  $sophomorix_first_password\n";
+	        }
+            } else {
+                print "     Update $attr to \"$ref_replace->{$computer}{'REPLACE'}{$attr}\"\n";
+            }
         }
         # modify
         my $mesg = $ldap->modify( $dn,
@@ -1044,9 +1060,6 @@ sub AD_computer_update {
         print "\nNot updating, $max results found for computer $computer\n\n";
         exit 88;
     }
-
-
-#print Dumper($ref_replace);
     &Sophomorix::SophomorixBase::print_title(
           "Updating computer ${computer_count}/$max_computer_count: $computer (end)");
 }
@@ -8517,32 +8530,6 @@ sub _unipwd_from_plainpwd{
 
 
 
-sub _append_dollar {
-    my ($string)=@_;
-    if ($string=~m/\$$/){
-        # OK, ends with \$
-    } else {
-        # append $
-        $string=$string."\$";
-    } 
-    return $string; 
-}
-
-
-
-sub _detach_dollar {
-    my ($string)=@_;
-    if ($string=~m/\$$/){
-        # detach $
-        $string=~s/\$$//;
-    } else {
-        # OK, no $ at the end
-    } 
-    return $string;    
-}
-
-
-
 sub _create_filter_alldevices {
     my ($ref_devicelist,$ref_sophomorix_config,$objectclass,$attribute)=@_;
     my $objectclass_filter="(objectClass=".$objectclass.")";
@@ -8558,18 +8545,18 @@ sub _create_filter_alldevices {
     } elsif ($#{ $ref_devicelist }==0){ # one name, counter 0
         my $sam;
         if ($objectclass eq "computer"){
-            $sam=&_append_dollar(${ $ref_devicelist }[0]);
+            $sam=&Sophomorix::SophomorixBase::append_dollar(${ $ref_devicelist }[0]);
         } else {
-            $sam=&_detach_dollar(${ $ref_devicelist }[0]);
+            $sam=&Sophomorix::SophomorixBase::detach_dollar(${ $ref_devicelist }[0]);
         }
         $sam_filter="(".$attribute."=".$sam.")"; 
     } else {
         $sam_filter="(|";
         foreach my $sam ( @{ $ref_devicelist } ){
             if ($objectclass eq "computer"){
-                $sam=&_append_dollar($sam);
+                $sam=&Sophomorix::SophomorixBase::append_dollar($sam);
             } else {
-                $sam=&_detach_dollar($sam);
+                $sam=&Sophomorix::SophomorixBase::detach_dollar($sam);
             }
             $sam_filter=$sam_filter."(".$attribute."=".$sam.")";
         } 

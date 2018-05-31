@@ -5152,6 +5152,35 @@ sub string_to_latex { # old name: latexize_string
 }
 
 
+
+# string
+############################################################
+sub append_dollar {
+    my ($string)=@_;
+    if ($string=~m/\$$/){
+        # OK, ends with \$
+    } else {
+        # append $
+        $string=$string."\$";
+    }
+    return $string;
+}
+
+
+
+sub detach_dollar {
+    my ($string)=@_;
+    if ($string=~m/\$$/){
+        # detach $
+        $string=~s/\$$//;
+    } else {
+        # OK, no $ at the end
+    }
+    return $string;
+}
+
+
+
 # encoding, recoding stuff
 ######################################################################
 sub recode_utf8_to_ascii {
