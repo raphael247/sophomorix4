@@ -441,71 +441,6 @@ if ($set_firstpassword==1){
 
 
 
-############################################################
-# Setting passwords interacive
-############################################################
-if ($interactive==1){
-    if ($userlist_count==1){
-        # ask for password
-        use Term::ReadKey;
-        ReadMode('noecho');
-        # ask once
-        print "New password : ";
-        my $password_1 = ReadLine(0);
-        print "\n";
-        chomp($password_1);
-
-        # ask again
-        print "Retype new password : ";
-        my $password_2 = ReadLine(0);
-        print "\n";
-        chomp($password_2);
-        # reset to echo
-        ReadMode('normal');
-
-        # Look if they match
-        if ($password_1 eq $password_2){
-            print "New passwords match!\n";
- 	    my $filter="( &(objectclass=user) (sAMAccountName=$user) )"; 
-            my $mesg = $ldap->search(
-                              base   => $root_dse,
-                              scope => 'sub',
-                              filter => $filter,
-                              attr => ['sAMAccountName','dn']
-                                     );
-            &AD_debug_logdump($mesg,2,(caller(0))[3]);
-            my $max = $mesg->count;
-	    if ($max==1){
-                my $entry = $mesg->entry(0);
-                my $dn=$entry->dn();
-                &AD_user_update({ldap=>$ldap,
-                                 root_dse=>$root_dse,
-                                 dn=>$dn,
-                                 user=>$user,
-                                 user_count=>"1",
-                                 max_user_count=>"1",
-                                 hide_pwd=>"1",
-                                 sophomorix_first_password=>$password_1,
-                                 # firstpassword=>$password, # not updated
-                                 json=>$json,
-                                 sophomorix_config=>\%sophomorix_config,
-                                 sophomorix_result=>\%sophomorix_result,
-                                });
-	    }
-            exit 0;
-         } else {
-             print "\nERROR: New passwords don't match!\n\n";
-             exit 88;
-         }
-     } else {
-         print "\nERROR: I can set password interactively only for one user\n";
-         print "Unable to change password\n\n";
-         exit 88;
-     }
-
-}
-
-
 
 ############################################################
 # setting passwords from userlist
@@ -629,6 +564,75 @@ if ($password ne "" and $computerlist_count>0){
     print "WARNING: No password given, but $computerlist_count users in computerlist\n";
     print "         I do not know what password you want!\n\n";
 }
+
+
+
+
+
+############################################################
+# Setting passwords interacive
+############################################################
+if ($interactive==1){
+    if ($userlist_count==1){
+        # ask for password
+        use Term::ReadKey;
+        ReadMode('noecho');
+        # ask once
+        print "New password : ";
+        my $password_1 = ReadLine(0);
+        print "\n";
+        chomp($password_1);
+
+        # ask again
+        print "Retype new password : ";
+        my $password_2 = ReadLine(0);
+        print "\n";
+        chomp($password_2);
+        # reset to echo
+        ReadMode('normal');
+
+        # Look if they match
+        if ($password_1 eq $password_2){
+            print "New passwords match!\n";
+ 	    my $filter="( &(objectclass=user) (sAMAccountName=$user) )"; 
+            my $mesg = $ldap->search(
+                              base   => $root_dse,
+                              scope => 'sub',
+                              filter => $filter,
+                              attr => ['sAMAccountName','dn']
+                                     );
+            &AD_debug_logdump($mesg,2,(caller(0))[3]);
+            my $max = $mesg->count;
+	    if ($max==1){
+                my $entry = $mesg->entry(0);
+                my $dn=$entry->dn();
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$dn,
+                                 user=>$user,
+                                 user_count=>"1",
+                                 max_user_count=>"1",
+                                 hide_pwd=>"1",
+                                 sophomorix_first_password=>$password_1,
+                                 # firstpassword=>$password, # not updated
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                                });
+	    }
+            exit 0;
+         } else {
+             print "\nERROR: New passwords don't match!\n\n";
+             exit 88;
+         }
+     } else {
+         print "\nERROR: I can set password interactively only for one user\n";
+         print "Unable to change password\n\n";
+         exit 88;
+     }
+
+}
+
 
 
 
