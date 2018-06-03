@@ -186,7 +186,7 @@ Options:
   --hide (hide display of password in console output, when updating)
 
 Create a password:
-  --pass password, --password password
+  --pass <password>, --password <password>
   --interactive
 
 Create userlist:
@@ -198,33 +198,28 @@ Console examples:
 Interactively change password of a user (Always with --hide and --nofirstpassupdate)
   sophomorix-passwd --user schneima42 --interactive
 
-Schukonsole examples:
+Webui examples:
 Change password for a user:
-   sophomorix-passwd --user schneima42 --pass \'Muster!7\' --hide (--nofirstpassupdate) 
+   sophomorix-passwd --user <user> --pass \'Muster!7\' --hide (--nofirstpassupdate) 
 Reset a password for a user from Schulkonsole:
-    sophomorix-passwd --set-firstpassword -u schneima42
+    sophomorix-passwd --set-firstpassword -u <user1>,<user2>,...
 Test if the sophomorixFirstPassword is the valid password:
-    sophomorix-passwd --test-firstpassword -u schneima42
+    sophomorix-passwd --test-firstpassword -u <user1>,<user2>,...
 
 
 Todo:
 
 Create a password:
-  --config  (use sophomorix.conf)
-  --common
-  --reset
-  --random
-  --plength number
-  --hide
+  --config  (use sophomorix.conf to create individual password)
+  --random <num>  random password of <num> characters
+  --config --common         (create password once and apply it to all users)
+  --random <num> --common   (create password once and apply it to all users)
 
 Password change:
   --samba-pwd-must-change/nosamba-pwd-must-change
+  --show-password-charlist
   --all-characters    (allow all characters in passwords,
                        only for developers, be careful!)
-
-Shell:
-  --shell /bin/bash
-
 Create userlist:
   -s / --students
   -t / --teachers

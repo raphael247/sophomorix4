@@ -28,6 +28,79 @@ AD_login test:
 add more tests (as shown in the comments of the sub: smbclient, kerberos, ...)
 
 
+------------------------------------------------------------
+create userlist/computerlist command: vgl. sophomorix-passwd
+allgemeine Umsetzung:
+
+sortiert:
+1) es gibt 'userlist_create' optionen,
+um für eine größereListe von usern etwas zu machen, 
+alt: --students/teachers/...   
+  --> neu --role student 
+      * ohne diese option: keine user
+      * mehrfach verwendbar, akkumulierend
+  --> neu --school 
+      * suchbereich
+      * ohne diese option: sucht in allen Schulen
+      * mehrfach verwendbar, sucht in mehreren Schulen
+  --> neu --type <adminclass> (USER in Gruppenn des typs ...., )
+      * ohne diese option: keine user
+      * mehrfach verwendbar, akkumulierend
+alt  --class      
+  --> neu --group <name>
+      * 
+      * mehrfach verwendbar, akkumulierend
+
+evtl. Zusatzoptionen:
+  --allschool  (einfach alle, admin???, lehrer????)-> gefährlich
+  besser --school global 
+
+Idee: soll role mandatory sein?
+      Ja:
+      --role addc, ....
+      --computer (option für ALLE ROLES_DEVICE mit computeraccount) 
+      nur wenn --role da, kann auch --school --class --type angegeben werden
+      nur manche Rollen erlaubt:
+      wenn Rolle nicht mandatory, wirds kompliziert, z.B. in einem Projekt/Klasse
+      --> passwortänderung incl. lehrer?
+      --> passwortänderung admins?
+
+Beispiele:
+  --role student : alle students aller Schulen
+    LISTS->GLOBAL->ROLE-> user1,2,3
+  --role student --school bsz : students der Schulen ...
+    LISTS->SCHOOL->ROLE-> user1,2,3
+  --group 7a --role student
+    LISTS->GLOBAL->GROUP->ROLE->user1,2,3 
+  --type extraclass --role student
+  --computer (one of the roles for computeraccount)
+
+
+2) sobald irgendeine 'userlist_create' option gesetzt ist,
+   triggert sie das erstellen von Listen:
+    AD_get_userlists (inclusive computer)
+    (AD_get_computerlists)
+
+    geht alle user durch (incl. computer)
+      * ordnet nach schule UND Rolle      LISTS->SCHOOL/GLOBAL->ROLE-> user1,2,3
+      * ordnet nach Gruppe UND Rolle      LISTS->SCHOOL/GLOBAL->GROUP->ROLE->user1,2,3
+      (* ordnet nach Gruppentyp UND Rolle  LISTS->SCHOOL/GLOBAL->GROUPTYPE->ROLE->user1,2,3)
+    + LOOKUP -> USER -> ROLE
+
+3) wird nun ein Befehl benutzt der einen oder mehrere user braucht
+   (z.B. sophomorix-passwd --user a,b,c,...
+   wird --user verwendet UND akkumulativ eine gesamt user list erzeugt (ohne doppelungen)
+   und der Befehl darauf angewendet 
+
+option --showlist
+zeigt die Liste der user an
+
+------------------------------------------------------------
+
+
+
+ 
+
 take care about ./changelog-sophomorix-source
 
 school.conf:   
