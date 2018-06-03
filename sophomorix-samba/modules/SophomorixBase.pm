@@ -4579,7 +4579,7 @@ sub NTACL_set_file {
     $smbcacls_display_command=~s/--set/\n      --set/;
     my $smbcacls_out_ident=&ident_output($smbcacls_out,8);
     if($smbcacls_return==0){
-        print "OK: smbcacls-NTACL on //$root_dns/$school $smbpath\n";
+        print "OK ($smbcacls_return): smbcacls-NTACL on //$root_dns/$school $smbpath\n";
         if($Conf::log_level>1){
             print "     COMMAND:\n";
             print "        $smbcacls_display_command\n";
