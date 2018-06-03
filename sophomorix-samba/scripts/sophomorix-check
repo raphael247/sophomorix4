@@ -48,6 +48,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_print
                                  filelist_fetch
                                  remove_whitespace
+                                 remove_embracing_whitespace
                                  json_dump
                                  recode_utf8_to_ascii
                                  );
@@ -1663,6 +1664,7 @@ sub analyze_user_line {
         # or contains only whitespace
         return 0;
     } else {
+        ########## Analyze the line ##########
         my $line_raw=$line;
         chomp($line);
         my $semikolon_count=$line=~tr/;//;
@@ -1677,7 +1679,7 @@ sub analyze_user_line {
             }
             exit 88;
         }
-        $line=&remove_whitespace($line);
+        $line=&remove_embracing_whitespace($line); # leading and trailing
         # add trailing ; if not there
         if (not $line=~m/;$/){
             $line=$line.";";
@@ -1879,7 +1881,7 @@ sub check_class {
     my $error_strg="";
     my ($class,$filename,$type)=@_;
     # type is USER_FILE OR CLASS_FILE
-    $class=&remove_whitespace($class);
+    $class=&remove_whitespace($class); # remove all whitespace
     # convert to small letters
     $class=~tr/A-Z/a-z/; 
     # sternchenklassen filtern ?????
@@ -1910,7 +1912,7 @@ sub check_first {
     my $first_valid=1;
     my $error_strg="";
     my ($first)=@_;
-    $first=&remove_whitespace($first);
+    $first=&remove_embracing_whitespace($first);
     # allowed ASCII: ;'`-._  (; leads to errors anyway)
     if ($first=~/[!\\"#\$%&()*+,\/:<>=@?\{\}|\^~]/) { 
         $error_strg="special char in given name $first";
@@ -1925,7 +1927,7 @@ sub check_last {
     my $last_valid=1;
     my $error_strg="";
     my ($last)=@_;
-    $last=&remove_whitespace($last);
+    $last=&remove_embracing_whitespace($last);
     # allowed ASCII: ;'`-._  (; leads to errors anyway)
     if ($last=~/[!\\"#\$%&()*+,\/:<>=@?\{\}|\^~]/) { 
         $error_strg="special char in surname $last";
@@ -1942,7 +1944,7 @@ sub check_birthdate {
     my $birthdate_ok="";
 
     my ($birthdate)=@_;
-    $birthdate=&remove_whitespace($birthdate);
+    $birthdate=&remove_embracing_whitespace($birthdate);
 
     # Test 1
     my $dot_count=$birthdate=~tr/\.//;
@@ -2005,7 +2007,7 @@ sub check_birthdate {
 
 sub check_unid {
     my ($unid)=@_;
-    $unid=&remove_whitespace($unid);
+    $unid=&remove_embracing_whitespace($unid);
     return $unid;
 }
 
@@ -2013,7 +2015,7 @@ sub check_unid {
 
 sub check_login {
     my ($login)=@_;
-    $login=&remove_whitespace($login);
+    $login=&remove_embracing_whitespace($login);
     return $login;
 }
 

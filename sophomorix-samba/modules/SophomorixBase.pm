@@ -57,6 +57,7 @@ $Data::Dumper::Terse = 1;
             dir_listing_user
             dns_query_ip
             remove_whitespace
+            remove_embracing_whitespace
             json_progress_print
             json_dump
             console_print_mail_user
@@ -2358,10 +2359,18 @@ sub remove_from_list {
 
 
 
-sub remove_whitespace {
+sub remove_embracing_whitespace {
     my ($string)=@_;
     $string=~s/^\s+//g;# remove leading whitespace
     $string=~s/\s+$//g;# remove trailing whitespace
+    return $string;    
+}
+
+
+
+sub remove_whitespace {
+    my ($string)=@_;
+    $string=~s/\s+//g;# remove whitespace anywhere
     return $string;    
 }
 
@@ -3011,7 +3020,7 @@ sub config_sophomorix_read {
                         $sophomorix_config{'INI'}{$section}{'GROUP_TYPE'};
                     # GROUP_OU
 #                    $sophomorix_config{'INI'}{$section}{'GROUP_OU'}=
-#                        &remove_whitespace($sophomorix_config{'INI'}{$section}{'GROUP_OU'});
+#                        &remove_embracing_whitespace($sophomorix_config{'INI'}{$section}{'GROUP_OU'});
                     $sophomorix_config{'FILES'}{$file_type}{$filename}{'GROUP_OU'}=
                         $sophomorix_config{'INI'}{$section}{'GROUP_OU'};
                     # field5
@@ -3302,11 +3311,11 @@ sub read_smb_domain_passwordsettings {
     foreach my $line (@lines){
         my ($key,$value)=split(/:/,$line);
         if (defined $value){
-            $key=&remove_whitespace($key);
+            $key=&remove_embracing_whitespace($key);
             $key=~s/\)//g;
             $key=~s/\(//g;
             $key=~s/ /_/g;
-            $value=&remove_whitespace($value);
+            $value=&remove_embracing_whitespace($value);
             if($Conf::log_level>=3){
                 print "   * <$key> ---> <$value>\n";
             }
@@ -3680,7 +3689,7 @@ sub load_sophomorix_ini {
                             # ignore this, already configured
                             next;
                         }
-                        $school=&remove_whitespace($school);
+                        $school=&remove_embracing_whitespace($school);
                         push @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }, $school; 
                         $ref_sophomorix_config->{'SCHOOLS'}{$school}{'CONF_FILE'}=
                             $DevelConf::path_conf_sophomorix."/".$school."/".$school.".school.conf";
