@@ -557,7 +557,11 @@ foreach my $class_file (@class_filelist){
             print "\nERROR: Number of users $course_count contains non numbers\n";
             print "   LINE: $_\n";
             print "   FILE: $class_file\n";
-            exit 88;
+            &result_sophomorix_add(\%sophomorix_result,
+                "ERROR",
+                -1,
+                \@arguments,
+                "$filename ($_): Usernumber $course_count contains non-numbers");
         }
         # exit if course is double ???
         # what about password ??? 
@@ -615,6 +619,10 @@ if ($follow ne ""){
         print "   * LINE UTF8: $users_file{'identifier_ascii'}{$identifier}{LINE_NEW}\n";
     }
 }
+
+
+# After reading all files, exit if there are errors
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 
 
 
@@ -1671,13 +1679,20 @@ sub analyze_user_line {
         if ($semikolon_count<3){
             print "\n";
             if ($injected eq "yes"){
-               print "ERROR: Not 3 semicolons in option: $line\n";
-               print "       Example: --injectlie \"students.csv:7a;Darwin;Charles;12.02.1809;\"\n";
+               &result_sophomorix_add(\%sophomorix_result,
+                   "ERROR",
+                   -1,
+                   \@arguments,
+                   "$filename (Line: $count): Not 3 semicolons in --injectline: $line");
+	       return;
             } else {
-               print "ERROR: Not 3 semicolons in $line\n";
-               print " File: $file_abs\n";
+               &result_sophomorix_add(\%sophomorix_result,
+                   "ERROR",
+                   -1,
+                   \@arguments,
+                   "$filename (Line: $count): Not 3 semicolons in option: $line");
+	       return;
             }
-            exit 88;
         }
         $line=&remove_embracing_whitespace($line); # leading and trailing
         # add trailing ; if not there
@@ -1783,8 +1798,11 @@ sub analyze_user_line {
 	    $unid="---";
         }
         if ($unid ne "---" and exists $unid_seen{$filename}{$unid}){
-            print "\nERROR: Unid $unid is double in $filename\n\n";
-            exit 88;
+            &result_sophomorix_add(\%sophomorix_result,
+                                   "ERROR",
+                                   -1,
+                                   \@arguments,
+                                   "$filename (Line: $count): Unid (Field5) is double: $unid ");
         } else {
             $unid_seen{$filename}{$unid}="seen";
         }
@@ -2153,21 +2171,20 @@ sub get_encoding {
 
     # misconfigured *.school.conf: exit
     if ($enc eq "ERROR_ENCODING"){
-        print "   * Misconfigured ENCODING in configuration file, see \"iconv --list\"\n";
-        exit 88;
+        &log_script_exit("Misconfigured ENCODING in configuration file, see \"iconv --list\"",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }   
     if ($enc_force eq "ERROR_ENCODING_FORCE"){
-        print "   * Misconfigured ENCODING_FORCE in configuration file\n";
-        exit 88;
+        &log_script_exit("Misconfigured ENCODING_FORCE in configuration file",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }   
  
     # auto setting
     if ($enc eq "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
         # auto
         if ($enc_checked eq "unknown"){
-            print "   * ENCODING could not be checked automatically\n";
-            print "   * Set ENCODING to the desired value and ENCODING_FORCE to \"True\"\n";
-            exit 88;
+            &log_script_exit("ENCODING=auto failed: Set ENCODING to the desired value and ENCODING_FORCE to \"True\"",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
         $enc_used=$enc_checked;
     } elsif ($enc ne "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
@@ -2175,7 +2192,8 @@ sub get_encoding {
         print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
         print "   * Set A) ENCODING_FORCE to \"True\" if you know better than sophomorix\n";
         print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
-        exit 88;
+        &log_script_exit("ENCODING configuration failed: see script printout",1,1,0,
+            \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     } elsif ($enc ne "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_TRUE'}){
         $enc_used=$enc;
     }
@@ -2234,10 +2252,8 @@ sub analyze_encoding {
         chomp($line);
         my $semikolon_count=$line=~tr/;//;
         if ($semikolon_count<3){
-            print "\n";
-            print "   ERROR: Not 3 Semicolons in $line\n";
-            print "          File corrupt: $file\n\n";
-            exit 88;
+            &log_script_exit("$filename: Not 3 Semicolons in $line",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
  
         # add trailing ; if not there
