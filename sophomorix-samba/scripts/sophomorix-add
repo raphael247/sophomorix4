@@ -65,6 +65,9 @@ my $status;
 my $creationdate;
 my $tolerationdate;
 my $deactivationdate;
+my $sambantpassword;
+my $userpassword;
+my $webui_permissions_calculated_string;
 my $unid;
 my $login_check_ok="";
 my $sophomorix_first_password="";
@@ -317,9 +320,13 @@ while(<SOPHOMORIXADD>){
      $creationdate,
      $tolerationdate,
      $deactivationdate,
+     $sambantpassword,
+     $userpassword,
+     $webui_permissions_calculated_string,
     )=split("::");
 
     ($surname_ascii,$firstname_ascii,$birthdate)=split(";", $identifier);
+    my @webui_permissions_calculated=split(",", $webui_permissions_calculated_string);
 
     # login
     if ($login_wish eq "---" or $login_wish eq ""){
@@ -469,6 +476,7 @@ while(<SOPHOMORIXADD>){
                      file=>$file,  
                      smb_admin_pass=>$smb_admin_pass,
                      json=>$json,
+                     webui_permissions_calculated=>\@webui_permissions_calculated,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
                    });

@@ -1571,6 +1571,7 @@ sub AD_user_create {
     my $file = $arg_ref->{file};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
+    my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
@@ -1769,6 +1770,12 @@ sub AD_user_create {
                    "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:");
     }
 
+    # create SophomorixWebuiPermissionsCalculated
+    my @webui_permissions_calculated=("---");
+    if (not $#{ $ref_webui_permissions_calculated }==-1){
+        @webui_permissions_calculated=@{ $ref_webui_permissions_calculated };
+    }
+
     # add the user
     my $result = $ldap->add( $dn,
                    attr => [
@@ -1805,7 +1812,8 @@ sub AD_user_create {
                    sophomorixTolerationDate => $tolerationdate, 
                    sophomorixDeactivationDate => $deactivationdate, 
                    sophomorixComment => "created by sophomorix", 
-                   sophomorixWebuiDashboard => "---", 
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissionsCalculated=> [@webui_permissions_calculated],
                    sophomorixExamMode => "---", 
                    userAccountControl => $user_account_control,
                    uidNumber => $uidnumber_wish,
