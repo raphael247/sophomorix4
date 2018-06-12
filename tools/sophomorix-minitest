@@ -61,7 +61,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_addmember
                                  AD_get_name_tokened
                                  AD_login_test
-                                 AD_get_AD
                                  AD_repdir_using_file
                                  AD_get_schoolname
                                  AD_dns_zonecreate
@@ -87,6 +86,9 @@ my $testopt=GetOptions (\%opt, 'length|l=i',
 print Dumper (\%opt);
 
 
+
+
+
 # Parsen der Optionen
 my $testopt2=GetOptions(
            "verbose|v+" => \$Conf::log_level,
@@ -109,143 +111,7 @@ my @filelist=&filelist_fetch({filetype=>"users",
 # BEGIN: Test code goes here
 ############################################################
 
-print STDOUT "Test STDOUT\n";
-print STDERR "Test STDERR\n";
-exit 88;
-
-#my $cfg = Config::IniFiles->new( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
-#                                 -handle_trailing_comment => 1
-#                               );
-
-# show errors
-#print @Config::IniFiles::errors;
-
-#print "The value is >" . $cfg->val( 'school', 'MAILQUOTA_DEFAULT_TEACHER' ) . "<\n" 
-#    if $cfg->val( 'school', 'MAILQUOTA_DEFAULT_TEACHER' );
-
-#print "The value is >" . $cfg->val( 'managementgroup.wifi', 'allow_group' ) . "<.\n" 
-#   if $cfg->val( 'managementgroup.wifi', 'allow_group' );
-
-#my %ini;
-#tie %ini, 'Config::IniFiles', ( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
-#                                -handle_trailing_comment => 1
-#                              );
-#print Dumper(\%ini);
-
-
-# my %master=();
-# &read_ini_file("/usr/share/sophomorix/devel/master/school.conf.master");
-
-# print Dumper(\%master);
-
-# print "We have >".$master{'managementgroup.wifi'}{'allow_group'}."<\n";
-# # if ${managementgroup.wifi}{allow_group};
-
-
-# # walk through all parameters
-# foreach my $section ( keys %master ) {
-#     print "Section: $section\n";
-#     foreach my $parameter ( keys %{$master{$section}} ) {
-#         print "    Parameter: $parameter -> >$master{$section}{$parameter}<\n";
-#     }
-# }
-
-# foreach my $parameter ( keys %{$master{'managementgroup.wifi'}} ) {
-#     print "Parameter: $parameter\n";
-# }
-
-
-# sub read_ini_file {
-#     my ($filename)=@_;
-#     tie %master, 'Config::IniFiles', ( -file => "/usr/share/sophomorix/devel/master/school.conf.master", 
-#                                        -handle_trailing_comment => 1
-#                                      );
-# }
-
-#&file_test_lines("/etc/linuxmuster/sophomorix/sophomorix.conf",11,"ltg","bsz");
-
-# my @list=("one","two");
-
-# foreach my $num (@list){
-#     my $update=0;
-#     my $stat="---";
-
-#     print "$num UP1: $update $stat\n";
-#     &increase_update(\$update,\$stat);
-#     print "$num UP2: $update $stat\n";
-# }
-
-# sub increase_update {
-#     my ($update,$stat_ref)=@_;
-#     ${$update}++;
-#     ${$stat_ref}="T";
-# }
-
-
-
-
-
-#my $object="halldoha";
-#my $object="7a";
-
-#&AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$object);
-
-# my ($ref_AD) = &AD_get_AD({ldap=>$ldap,
-#                            root_dse=>$root_dse,
-#                            root_dns=>$root_dns,
-#                            computers=>"FALSE",
-#                            rooms=>"FALSE",
-#                            administratorclasses=>"TRUE",
-#                            teacherclasses=>"FALSE",
-# #                           examaccounts=>"TRUE",
-#                            users=>"TRUE",
-#                            dnszones=>"FALSE",
-#                            dnsnodes=>"FALSE",
-#              });
-# my %AD= %$ref_AD; 
-
-
-# #creating ONE administrator home in ONE school:
-#               &AD_repdir_using_file({root_dns=>$root_dns,
-#                                    repdir_file=>"repdir.teacher_home",
-#                                    school=>"bsz",
-#                                    administrator_home=>"uli",
-#                                    teacherclass=>"teachers",
-#                                    sophomorix_config=>\%sophomorix_config,
-#                                  });
-
-# my ($homedirectory_new,$unix_home_new)=
-#        &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
-#                                                       $school_new,
-#                                                       $group_new_basename,
-#                                                       $user,
-#                                                       $role_new);
-# my ($homedirectory_new,$unix_home_new,$unc,$smb_rel_path)=
-#        &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
-#                                                       "bsz",
-#                                                       "7a",
-#                                                       "maierle",
-#                                                       "teacher");
-
-
-
-
-#print "$homedirectory_new\n";
-#print "$unix_home_new\n";
-#print "$unc\n";
-#print "$smb_rel_path\n";
-
-# my $smb = new Filesys::SmbClient(username  => "administrator",
-#                                    password  => "Muster!",
-# #                                   workgroup => "alian",
-#                                    debug     => 1);
-
-
-
-#   $smb->rmdir_recurse("smb://linuxmuster.local/bsz/students/alumni/homes/oe42")
-#     or print "Error rmdir_recurse: ", $!, "\n";
-
-
+print "HERE\n";
 
 
 ############################################################
