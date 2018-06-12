@@ -64,6 +64,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_project_sync_members
                                  AD_dn_fetch_multivalue
                                  AD_get_passwd
+                                 AD_get_ui
                                  AD_get_users_v
                                  AD_get_full_userdata
                                     );
@@ -80,11 +81,11 @@ my $create_school_binduser="";
 my $create_global_binduser="";
 my $school="";
 my $admin="";
+my $abs_path_ui_ini="";
 
 my $password="";
 my $random_password_save=0;
 my $random_password_show=0;
-my @webui_permissions_calculated=("---");
 
 my $kill="";
 my $reset_class="";
@@ -103,6 +104,7 @@ my $testopt=GetOptions(
            "create-global-binduser=s" => \$create_global_binduser,
            "school|s=s" => \$school,
            "admin|a=s" => \$admin,
+           "abs-path-ui-ini=s" => \$abs_path_ui_ini,
            "password|passwd=s" => \$password,
            "random-passwd-save|random-password-save" => \$random_password_save,
            "random-passwd-show|random-password-show" => \$random_password_show,
@@ -119,7 +121,13 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
-
+# ui configuration
+my $ref_ui=&AD_get_ui({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       abs_path_ui_ini=>$abs_path_ui_ini,
+                       sophomorix_config=>\%sophomorix_config,
+                     });
 
 # --help
 if ($help==1) {
@@ -135,8 +143,9 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info           one user per line
- --info --admin <user1>,<user2>         detailed view of user            
+  --info --admin <user1>,<user2>         detailed view of user            
 
+  --abs-path-ui-ini /path/to/ini  (use another ini file for webui permissions, for tests only)
 
 
 Administrators:
@@ -378,7 +387,7 @@ if ($create_school_admin ne "" and $school ne ""){
                      });
 
     $password=&choose_password($create_school_admin,"administrator.school",$password,$random_password_save,$random_password_show);
-  
+    my $role=$sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'};
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
                     root_dns => $root_dns, 
@@ -394,7 +403,7 @@ if ($create_school_admin ne "" and $school ne ""){
                     birthdate => "---",
                     sophomorix_first_password => $password,
                     unid => "---",
-                    role => $sophomorix_config{'INI'}{'administrator.school'}{'USER_ROLE'},
+                    role => $role,
                     type => "sophomorixadmin",
                     school => $school,
                     tolerationdate => "---",
@@ -403,7 +412,7 @@ if ($create_school_admin ne "" and $school ne ""){
                     file => $sophomorix_config{'INI'}{'administrator.school'}{'ADMINFILE'},
                     smb_admin_pass=>$smb_admin_pass,
                     json=>$json,
-                    webui_permissions_calculated=>\@webui_permissions_calculated,
+                    webui_permissions_calculated=>$ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'},
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
@@ -431,7 +440,7 @@ if ($create_global_admin){
                      });
 
     $password=&choose_password($create_global_admin,"administrator.global",$password,$random_password_save,$random_password_show);
-
+    my $role=$sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'};
     &AD_user_create({ldap=>$ldap,
                     root_dse => $root_dse, 
                     root_dns => $root_dns, 
@@ -447,7 +456,7 @@ if ($create_global_admin){
                     birthdate => "---",
                     sophomorix_first_password => $password,
                     unid => "---",
-                    role => $sophomorix_config{'INI'}{'administrator.global'}{'USER_ROLE'},
+                    role => $role,
                     type => "sophomorixadmin",
                     school => $school,
                     tolerationdate => "---",
@@ -456,7 +465,7 @@ if ($create_global_admin){
                     file => $sophomorix_config{'INI'}{'administrator.global'}{'ADMINFILE'},
                     smb_admin_pass=>$smb_admin_pass,
                     json=>$json,
-                    webui_permissions_calculated=>\@webui_permissions_calculated,
+                    webui_permissions_calculated=>$ref_ui->{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'},
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
@@ -524,7 +533,6 @@ if ($create_school_binduser ne "" and $school ne ""){
                     file => $sophomorix_config{'INI'}{'binduser.school'}{'BINDUSERFILE'},
                     smb_admin_pass=>$smb_admin_pass,
                     json=>$json,
-                    webui_permissions_calculated=>\@webui_permissions_calculated,
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
@@ -577,7 +585,6 @@ if ($create_global_binduser ne ""){
                     file => $sophomorix_config{'INI'}{'binduser.global'}{'BINDUSERFILE'},
                     smb_admin_pass=>$smb_admin_pass,
                     json=>$json,
-                    webui_permissions_calculated=>\@webui_permissions_calculated,
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });
