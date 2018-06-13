@@ -4062,6 +4062,8 @@ sub AD_get_AD_for_check {
                                 'sophomorixType',
                                 'sophomorixTolerationDate',
                                 'sophomorixDeactivationDate',
+                                'SophomorixWebuiPermissions',
+                                'SophomorixWebuiPermissionsCalculated',
                                 'objectClass',
                                ]);
     my $max = $mesg8->count; 
@@ -4111,6 +4113,12 @@ sub AD_get_AD_for_check {
                    $entry->get_value('sophomorixBirthdate');
                # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
                # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+               # save ui stuff
+               @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'} } = 
+                   sort $entry->get_value('sophomorixWebuiPermissions');
+               @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } = 
+                   sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
 
                # LOOKUP
                $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;

@@ -2737,6 +2737,8 @@ sub config_sophomorix_read {
     &read_lsbrelease(\%sophomorix_config,$ref_result);
     # read smb.conf
     &read_smb_conf(\%sophomorix_config,$ref_result);
+    # read default-ui-permissions.ini
+    &read_ui(\%sophomorix_config,$ref_result);
     # read more samba stuff
     &read_smb_net_conf_list(\%sophomorix_config,$ref_result);
     &read_smb_domain_passwordsettings(\%sophomorix_config,$smb_admin_pass,$ref_result);
@@ -3202,7 +3204,62 @@ sub read_smb_conf {
     $domain_dns = join(',DC=', @dns);
     $domain_dns="DC=".$domain_dns;
     $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'DomainDNS'}=$domain_dns;
-    
+}
+
+
+
+sub read_ui {
+    my ($ref_sophomorix_config,$ref_result)=@_;
+    my $file=$ref_sophomorix_config->{'INI'}{'WEBUI'}{'INI'};
+    &print_title("Reading $file");
+    if (-f $file){
+        tie %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI'} }, 'Config::IniFiles',
+            ( -file => $file, 
+              -handle_trailing_comment => 1,
+            );
+    } else {
+        print "\n";
+        print "ERROR: UI config file not found:\n";
+        print "       $file\n";
+        print "\n";
+        exit;
+    }
+
+    # Test config file for double module paths
+    foreach my $role (keys %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI'} }) {
+        my %seen=();
+        my @items=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'});
+        foreach my $item (@items){
+            $item=~s/\s+$//g;# remove trailing whitespace
+            my $mod_path=$item;
+            my $setting;
+            if ($item=~m/true$/){
+                $mod_path=~s/true$//g;# remove true
+                $setting="true";
+            } elsif ($item=~m/false$/){
+                $mod_path=~s/false$//g;# remove false
+                $setting="false";
+            } else {
+                print "File: $path_abs:\n";
+                print "   >$item< (contains neither false nor true at the end!\n\n";
+                exit 88;
+            }
+
+            # remember $mod_path
+            $mod_path=~s/\s+$//g;# remove trailing whitespace
+            if (exists $seen{$mod_path}){
+                print "\nERROR: Module path $mod_path double in role $role\n\n";
+                exit 88;
+            } else {
+                $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_LOOKUP'}{$role}{$mod_path}=$setting;
+                $seen{$mod_path}="seen";
+            }
+ 
+            # fill LOOKUP
+            $ref_sophomorix_config->{'UI'}{'LOOKUP'}{'MODULES'}{$role}{$mod_path}="OK";
+            $ref_sophomorix_config->{'UI'}{'LOOKUP'}{'MODULES'}{'ALL'}{$mod_path}="OK";
+        }
+    }
 }
 
 

@@ -213,7 +213,6 @@ my $dump_AD=0;
 my $dump_login_avoid=0;
 
 my $list_files=0;
-my $abs_path_ui_ini="";
 my $lock=0;
 my $unlock=0;
 my $analyze_encoding="";
@@ -241,7 +240,6 @@ my $testopt=GetOptions(
            "follow=s" => \$follow,
            "injectline=s" => \@injectlines,
            "show-special-char-lines" => \$show_special_char_lines,
-           "abs-path-ui-ini=s" => \$abs_path_ui_ini,
            "non-umlaut|nonumlaut" => \$non_umlaut,
           );
 
@@ -275,15 +273,6 @@ my @filelist=&filelist_fetch({filetype=>"users",
 my @class_filelist=&filelist_fetch({filetype=>"classes",
                                     sophomorix_config=>\%sophomorix_config,
                                   });
-# ui configuration
-my $ref_ui=&AD_get_ui({ldap=>$ldap,
-                       root_dse=>$root_dse,
-                       root_dns=>$root_dns,
-                       abs_path_ui_ini=>$abs_path_ui_ini,
-                       sophomorix_config=>\%sophomorix_config,
-                     });
-
-#print Dumper $ref_ui;
 
 # --help
 if ($help==1) {
@@ -307,8 +296,6 @@ Options:
   --lock / --unlock
 
   --follow filename:linenumber     (show what happens to this line)
-
-  --abs-path-ui-ini /path/to/ini  (use another ini file for webui permissions, for tests only)
 
 Analyze the encoding of a file:
   --analyze-encoding /path/to/students.csv
@@ -1445,7 +1432,8 @@ sub write_add_file {
                                  \%sophomorix_config);
 
     my $webui_permissions_string=join(",",
-        @{ $ref_ui->{'CONFIG'}{'WEBUI'}{$Match{'ACTION'}{$line_new}{'role'}}{'WEBUI_PERMISSIONS'} });
+        @{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI'}{$Match{'ACTION'}{$line_new}{'role'}}{'WEBUI_PERMISSIONS'} });
+#        @{ $ref_ui->{'CONFIG'}{'WEBUI'}{$Match{'ACTION'}{$line_new}{'role'}}{'WEBUI_PERMISSIONS'} });
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
                  $Match{'ACTION'}{$line_new}{'class'}."::".
                  $Match{'ACTION'}{$line_new}{'identifier_ascii'}."::".
