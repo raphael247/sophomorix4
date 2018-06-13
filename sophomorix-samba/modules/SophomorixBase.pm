@@ -2835,7 +2835,7 @@ sub config_sophomorix_read {
         }   
 
         # cp ui stuff from UI to ROLES
-        foreach my $ui_role (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI'} }){
+        foreach my $ui_role (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} }){
             foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role} }){
                 $sophomorix_config{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}=
                     $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role}{$mod};
@@ -3221,7 +3221,7 @@ sub read_ui {
     my $file=$ref_sophomorix_config->{'INI'}{'WEBUI'}{'INI'};
     &print_title("Reading $file");
     if (-f $file){
-        tie %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI'} }, 'Config::IniFiles',
+        tie %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} }, 'Config::IniFiles',
             ( -file => $file, 
               -handle_trailing_comment => 1,
             );
@@ -3234,9 +3234,9 @@ sub read_ui {
     }
 
     # Test config file for double module paths
-    foreach my $role (keys %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI'} }) {
+    foreach my $role (keys %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} }) {
         my %seen=();
-        my @items=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI'}{$role}{'WEBUI_PERMISSIONS'});
+        my @items=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'}{$role}{'WEBUI_PERMISSIONS'});
         foreach my $item (@items){
             $item=~s/\s+$//g;# remove trailing whitespace
             my $mod_path=$item;
