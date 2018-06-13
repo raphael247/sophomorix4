@@ -3726,29 +3726,6 @@ sub load_school_ini {
                                                                        "override",
                                                                        $school,
                                                                        $role);
-#                        $item=~s/\s+$//g;# remove trailing whitespace
-#                        my $mod_path=$item;
-#                        my $setting;
-#                        if ($item=~m/true$/){
-#                            $mod_path=~s/true$//g;# remove true
-#                            $setting="true";
-#                        } elsif ($item=~m/false$/){
-#                            $mod_path=~s/false$//g;# remove false
-#                            $setting="false";
-#                        } else {
-#                            print "File: $path_abs:\n";
-#                            print "   >$item< (contains neither false nor true at the end!\n\n";
-#                            exit 88;
-#                        }
-#                        $mod_path=~s/\s+$//g;# remove trailing whitespace
-
-#			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}){
-#                            # override the school value
-#                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}=$setting;
-#		        } else {
-#			    print "\nERROR: Misconfigured WEBUI_PERMISSIONS module path <$mod_path>\n\n";
-#                            exit 88;
-#       	        }
 		    }
                 }
             }

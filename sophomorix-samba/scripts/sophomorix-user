@@ -1756,23 +1756,3 @@ if ($enable==1){
 ############################################################
 # subs
 ############################################################
-
-sub test_webui_permission_old {
-    my ($perm,$ref_sophomorix_config)=@_;
-    print "Testing $perm\n";
-    my ($ui,$module,$switch)=split(/:/,$perm);
-    if (not exists $ref_sophomorix_config->{'INI'}{'UI'}{$ui}){
-        print "\n";
-        print "ERROR in parameter $perm:\n";
-        print "      $ui is not an UI\n";
-        print "\n";
-        exit 88;
-    }   
-    if ($switch ne "TRUE" and $switch ne "FALSE"){
-        print "\n";
-        print "ERROR in parameter $perm:\n";
-        print "      $switch must be TRUE or FALSE\n";
-        print "\n";
-        exit 88;
-    }
-}
