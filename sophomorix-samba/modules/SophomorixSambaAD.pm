@@ -1770,10 +1770,7 @@ sub AD_user_create {
                    "$school:---:---:$ref_sophomorix_config->{'INI'}{'QUOTA'}{'NEWUSER'}:---:");
     }
 
-
     # add the user
-
-    # new
     my $add_array = [
         objectClass => ['top','person','organizationalPerson','user'],
         sAMAccountName => $login,
@@ -1810,7 +1807,6 @@ sub AD_user_create {
         sophomorixDeactivationDate => $deactivationdate, 
         sophomorixComment => "created by sophomorix", 
         sophomorixWebuiDashboard => "---",
-   #     sophomorixWebuiPermissionsCalculated=> [@webui_permissions_calculated],
         sophomorixExamMode => "---", 
         userAccountControl => $user_account_control,
         uidNumber => $uidnumber_wish,
@@ -1822,55 +1818,9 @@ sub AD_user_create {
     }
 
 
+    # do it
     my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
 
-#    # old
-#     my $result = $ldap->add( $dn,
-#                    attr => [
-#                    sAMAccountName => $login,
-#                    givenName => $firstname_utf8,
-#                    sn => $surname_utf8,
-#                    displayName => [$display_name],
-#                    userPrincipalName => $user_principal_name,
-#                    mail => $mail,
-#                    unicodePwd => $uni_password,
-#                    homeDrive => "H:",
-#                    homeDirectory => $homedirectory,
-#                    unixHomeDirectory => $unix_home,
-#                    sophomorixExitAdminClass => "unknown", 
-#                    sophomorixUnid => $unid,
-#                    sophomorixStatus => $status,
-#                    sophomorixAdminClass => $group,    
-#                    sophomorixAdminFile => $file,    
-#                    sophomorixFirstPassword => $sophomorix_first_password, 
-#                    sophomorixFirstnameASCII => $firstname_ascii,
-#                    sophomorixSurnameASCII  => $surname_ascii,
-#                    sophomorixBirthdate  => $birthdate,
-#                    sophomorixRole => $role,
-#                    sophomorixUserToken => "---",
-#                    sophomorixFirstnameInitial => $firstname_initial_utf8,
-#                    sophomorixSurnameInitial => $surname_initial_utf8,
-#                    sophomorixQuota=> [@quotalist],
-#                    sophomorixMailQuota=>"---:---:",
-#                    sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'MAILQUOTA'}{'CALCULATED_DEFAULT'},
-#                    sophomorixCloudQuotaCalculated=>"---",
-#                    sophomorixSchoolPrefix => $prefix,
-#                    sophomorixSchoolname => $school,
-#                    sophomorixCreationDate => $creationdate_ok, 
-#                    sophomorixTolerationDate => $tolerationdate, 
-#                    sophomorixDeactivationDate => $deactivationdate, 
-#                    sophomorixComment => "created by sophomorix", 
-#                    sophomorixWebuiDashboard => "---",
-#                    sophomorixWebuiPermissionsCalculated=> [@webui_permissions_calculated],
-#                    sophomorixExamMode => "---", 
-#                    userAccountControl => $user_account_control,
-#                    uidNumber => $uidnumber_wish,
-#                    objectclass => ['top', 'person',
-#                                      'organizationalPerson',
-#                                      'user' ],
-# #                   'objectClass' => \@objectclass,
-#                            ]
-#                            );
     my $add_result=&AD_debug_logdump($result,2,(caller(0))[3]);
     if ($add_result!=0){ # add was succesful
         # log the killing of a user 
