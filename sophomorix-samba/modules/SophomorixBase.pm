@@ -3691,7 +3691,6 @@ sub load_school_ini {
                             exit 88;
                         }
                         $mod_path=~s/\s+$//g;# remove trailing whitespace
-                        print "   <$mod_path> <$setting>\n";
 			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LOOKUP'}{$mod_path}){
                             # override the school value
                             $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LOOKUP'}{$mod_path}=$setting;

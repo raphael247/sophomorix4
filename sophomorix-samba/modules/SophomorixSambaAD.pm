@@ -1721,6 +1721,11 @@ sub AD_user_create {
         print "   File:               $file\n";
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
+        if (defined $ref_webui_permissions_calculated){
+            foreach my $item ( @{ $ref_webui_permissions_calculated } ){
+                print "   WebuiPermCalc:      $item\n";
+            }
+        }
     }
 
     if ($json>=1){
