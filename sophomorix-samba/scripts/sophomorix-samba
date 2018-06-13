@@ -74,6 +74,7 @@ my $show_all_attributes=0;
 my $show_sophomorix_attributes=0;
 my $show_attribute="";
 my $show_roletype=0;
+my $show_webui_permissions=0;
 my $show_lang=0;
 
 my $samba_private="/var/lib/samba/private";
@@ -91,6 +92,7 @@ my $testopt=GetOptions(
            "show-attribute=s" => \$show_attribute,
            "show-all-attributes" => \$show_all_attributes,
            "show-sophomorix-attributes" => \$show_sophomorix_attributes,
+           "show-webui-permissions" => \$show_webui_permissions,
            "show-roletype" => \$show_roletype,
            "show-lang" => \$show_lang,
            "editor=s" => \$editor,
@@ -499,6 +501,32 @@ if ($show_roletype==1){
             print "   * $type\n";
         }
         print "\n";
+}
+
+
+
+# --show-webui-permissions
+if ($show_webui_permissions==1){
+    print "\n";
+    print "########## allowed module paths for sophomorix-webui-permissions ################\n";
+    my $ref_sophomorix_config=\%sophomorix_config;
+    my @rolelist=();
+    foreach my $role (keys %{$ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} } ) {
+        push @rolelist,$role;
+    }
+    @rolelist = sort @rolelist;
+    foreach my $role (@rolelist){
+        print "   * $role\n";
+        my @modlist=();
+        foreach my $mod_path (keys %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$role} } ){
+            push @modlist,$mod_path;
+	}
+        @modlist = sort @modlist;
+        foreach my $mod_path (@modlist){
+            print "      --->  $mod_path\n";
+        }
+    }
+    print "\n";
 }
 
 
