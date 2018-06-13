@@ -39,12 +39,14 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  remove_from_list
+                                 test_webui_permission
                                  json_dump
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
                                  AD_bind_admin
                                  AD_unbind_admin
+                                 AD_get_user
                                  AD_user_create
                                  AD_user_update
                                  AD_group_create
@@ -1337,9 +1339,22 @@ if ($user ne "" and defined $webui_dashboard){
 # webui-permissions
 # --webui-permissions permission1,permission2,permission3, ... 
 if (defined $webui_permissions and $user ne ""){
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+        &AD_get_user({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$user,
+                    });
    my @permissions=split(/,/,$webui_permissions);
     foreach my $perm (@permissions){
-        &test_webui_permission($perm,\%sophomorix_config);
+        my ($mod_path,$setting)=&test_webui_permission($perm,
+                                                       \%sophomorix_config,
+                                                       "Option",
+                                                       "check",
+                                                       $school_AD,
+                                                       $role_AD);
     }
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
@@ -1358,9 +1373,22 @@ if (defined $webui_permissions and $user ne ""){
 
 # --add-webui-permissions permission1,permission2,permission3, ...
 if (defined $add_webui_permissions and $user ne ""){
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+        &AD_get_user({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      user=>$user,
+                    });
     my @add_webui_permissions=split(/,/,$add_webui_permissions);
     foreach my $perm (@add_webui_permissions){
-        &test_webui_permission($perm,\%sophomorix_config);
+        my ($mod_path,$setting)=&test_webui_permission($perm,
+                                                       \%sophomorix_config,
+                                                       "Option",
+                                                       "check",
+                                                       $school_AD,
+                                                       $role_AD);
     }
     my @old_webui_permissions = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixWebuiPermissions");
     my @webui_permissions = uniq(@old_webui_permissions,@add_webui_permissions); 
@@ -1728,11 +1756,6 @@ if ($enable==1){
 ############################################################
 # subs
 ############################################################
-
-sub test_webui_permission {
-    my ($perm,$ref_sophomorix_config)=@_;
-    print "Testing omited for: $perm\n";
-}
 
 sub test_webui_permission_old {
     my ($perm,$ref_sophomorix_config)=@_;

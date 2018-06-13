@@ -68,6 +68,7 @@ $Data::Dumper::Terse = 1;
             get_group_basename
             recode_utf8_to_ascii
             read_smb_conf
+            test_webui_permission
             call_sophomorix_command
             string_to_latex
             get_lang_from_config
@@ -2865,7 +2866,7 @@ sub config_sophomorix_read {
         my $conf_school=$sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'};
         # modify the master
         my $ref_modmaster=&check_config_ini($ref_master,$conf_school,$ref_result,\%sophomorix_config);
-        &load_school_ini($root_dse,$school,$ref_modmaster,\%sophomorix_config,$ref_result);
+        &load_school_ini($root_dse,$school,$conf_school,$ref_modmaster,\%sophomorix_config,$ref_result);
         # mountpoint
         $sophomorix_config{'SCHOOLS'}{$school}{'MOUNTPOINT'}=
             $sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}."/schools/".$school;
@@ -3236,25 +3237,9 @@ sub read_ui {
     # Test config file for double module paths
     foreach my $role (keys %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} }) {
         my %seen=();
-        my @items=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'}{$role}{'WEBUI_PERMISSIONS'});
-        foreach my $item (@items){
-            $item=~s/\s+$//g;# remove trailing whitespace
-            my $mod_path=$item;
-            my $setting;
-            if ($item=~m/true$/){
-                $mod_path=~s/true$//g;# remove true
-                $setting="true";
-            } elsif ($item=~m/false$/){
-                $mod_path=~s/false$//g;# remove false
-                $setting="false";
-            } else {
-                print "File: $path_abs:\n";
-                print "   >$item< (contains neither false nor true at the end!\n\n";
-                exit 88;
-            }
-
-            # remember $mod_path
-            $mod_path=~s/\s+$//g;# remove trailing whitespace
+        my @perms=&Sophomorix::SophomorixBase::ini_list($ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'}{$role}{'WEBUI_PERMISSIONS'});
+        foreach my $perm (@perms){
+            my ($mod_path,$setting)=&test_webui_permission($perm,$ref_sophomorix_config,$file,"none","","");
             if (exists $seen{$mod_path}){
                 print "\nERROR: Module path $mod_path double in role $role\n\n";
                 exit 88;
@@ -3268,6 +3253,65 @@ sub read_ui {
             $ref_sophomorix_config->{'UI'}{'LOOKUP'}{'MODULES'}{'ALL'}{$mod_path}="OK";
         }
     }
+}
+
+
+
+sub test_webui_permission {
+    my ($perm,$ref_sophomorix_config,$file,$mode,$school,$role)=@_;
+    $perm=~s/\s+$//g;# remove trailing whitespace
+    my $mod_path=$perm;
+    my $setting;
+    if ($perm=~m/true$/){
+        $mod_path=~s/true$//g;# remove true
+        $setting="true";
+    } elsif ($perm=~m/false$/){
+        $mod_path=~s/false$//g;# remove false
+        $setting="false";
+    } else {
+        print "\n";
+        print "ERROR in $file:\n";
+        print "   WEBUI_PERMISSIONS=$perm (neither false nor true at the end!\n\n";
+        exit 88;
+    }
+    $mod_path=~s/\s+$//g;# remove trailing whitespace
+
+    # do some more checks
+    if ($mode eq "override"){
+        # check if modpath is valid
+        if (not exists $ref_sophomorix_config->{'UI'}{'LOOKUP'}{'MODULES'}{'ALL'}{$mod_path}){
+            print "\n";
+	    print "ERROR in $file:\n";
+            print "    WEBUI_PERMISSIONS: <$mod_path> is not a valid module name\n\n";
+            exit 88;
+        }
+
+        if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}){
+            # override the school value
+            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}=$setting;
+	} else {
+            print "\n";
+	    print "ERROR in $file:\n";
+            print "    WEBUI_PERMISSIONS: <$mod_path> not allowed in user role $role\n\n";
+            exit 88;
+	}
+    } elsif ($mode eq "check"){
+        # check if modpath is valid
+        if (not exists $ref_sophomorix_config->{'UI'}{'LOOKUP'}{'MODULES'}{'ALL'}{$mod_path}){
+            print "\n";
+	    print "ERROR in $file:\n";
+            print "    WEBUI_PERMISSIONS: <$mod_path> is not a valid module name\n\n";
+            exit 88;
+        }
+
+        if (not exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}){
+            print "\n";
+	    print "ERROR in $file:\n";
+            print "    <$mod_path> cannot be configured for a user with role $role\n\n";
+            exit 88;
+        }
+    }
+    return($mod_path,$setting);
 }
 
 
@@ -3495,7 +3539,7 @@ sub check_config_ini {
 
 
 sub load_school_ini {
-    my ($root_dse,$school,$ref_modmaster,$ref_sophomorix_config,$ref_result)=@_;
+    my ($root_dse,$school,$conf_school,$ref_modmaster,$ref_sophomorix_config,$ref_result)=@_;
     foreach my $section ( keys %{ $ref_modmaster } ) {
 	if ($section eq "school"){
             ##### school section ########################################################################
@@ -3673,31 +3717,38 @@ sub load_school_ini {
                     $ref_modmaster->{$section}{$parameter};
                 if ($parameter eq "WEBUI_PERMISSIONS"){
                     # override WEBUI_PERMISSIONS ##############################
-                    my @items=split(/,/,$ref_modmaster->{$section}{$parameter});
+                    my @perms=split(/,/,$ref_modmaster->{$section}{$parameter});
                     # override value in 
-                    foreach my $item (@items){
-                        $item=~s/\s+$//g;# remove trailing whitespace
-                        my $mod_path=$item;
-                        my $setting;
-                        if ($item=~m/true$/){
-                            $mod_path=~s/true$//g;# remove true
-                            $setting="true";
-                        } elsif ($item=~m/false$/){
-                            $mod_path=~s/false$//g;# remove false
-                            $setting="false";
-                        } else {
-                            print "File: $path_abs:\n";
-                            print "   >$item< (contains neither false nor true at the end!\n\n";
-                            exit 88;
-                        }
-                        $mod_path=~s/\s+$//g;# remove trailing whitespace
-			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}){
-                            # override the school value
-                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}=$setting;
-		        } else {
-			    print "\nERROR: Misconfigured WEBUI_PERMISSIONS module path <$mod_path>\n\n";
-                            exit 88;
-		        }
+                    foreach my $perm (@perms){
+                        my ($mod_path,$setting)=&test_webui_permission($perm,
+                                                                       $ref_sophomorix_config,
+                                                                       $conf_school,
+                                                                       "override",
+                                                                       $school,
+                                                                       $role);
+#                        $item=~s/\s+$//g;# remove trailing whitespace
+#                        my $mod_path=$item;
+#                        my $setting;
+#                        if ($item=~m/true$/){
+#                            $mod_path=~s/true$//g;# remove true
+#                            $setting="true";
+#                        } elsif ($item=~m/false$/){
+#                            $mod_path=~s/false$//g;# remove false
+#                            $setting="false";
+#                        } else {
+#                            print "File: $path_abs:\n";
+#                            print "   >$item< (contains neither false nor true at the end!\n\n";
+#                            exit 88;
+#                        }
+#                        $mod_path=~s/\s+$//g;# remove trailing whitespace
+
+#			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}){
+#                            # override the school value
+#                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}=$setting;
+#		        } else {
+#			    print "\nERROR: Misconfigured WEBUI_PERMISSIONS module path <$mod_path>\n\n";
+#                            exit 88;
+#       	        }
 		    }
                 }
             }
