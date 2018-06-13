@@ -40,6 +40,7 @@ use Sophomorix::SophomorixBase qw(
                                  get_passwd_charlist
                                  get_plain_password
                                  check_options
+                                 test_webui_permission
                                  config_sophomorix_read
                                  result_sophomorix_init
                                  result_sophomorix_add
@@ -824,6 +825,12 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     my $old_class=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
     $old_class=~s/^$old_school-//;
     
+   # old webui string is sorted already
+   my $old_webui_string=join(",",@{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} });
+   # new webui string
+   my $new_webui_string="---";
+
+
     ##################################################
     # check status update for users in AD
     &test_UEAS_T_update($sam,\$update,\$new_status);
@@ -847,6 +854,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                           \$new_role,
                           \$new_class,
 	                  \$new_school,
+                          \$old_webui_string,
+                          \$new_webui_string,
                          );
     }
 
@@ -879,6 +888,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                         $new_surname_initial_utf8."::".
                         $old_firstname_initial_utf8."::".
                         $new_firstname_initial_utf8."::".
+                        $old_webui_string."::".
+                        $new_webui_string."::".
                         "\n";
         print UPDATE $update_line;
         # create result
@@ -1248,6 +1259,8 @@ sub test_user_update {
         $new_role_ref,
         $new_class_ref,
         $new_school_ref,
+        $old_webui_string_ref,
+        $new_webui_string_ref,
        )=@_;
     my $line_new=$Match{'action_BY_sAMAccountName'}{$sam};
    
@@ -1402,6 +1415,53 @@ sub test_user_update {
         } else {
             print "$sam not uploading new unid: identifier or class changed\n";
         }
+    }
+
+    # webui_string
+    # assembble new webui_string
+    my %new_webui=();
+    my @new_webui=();
+    my $school=$Match{'ACTION'}{$line_new}{'school'};
+    my $role=$Match{'ACTION'}{$line_new}{'role'};
+    foreach my $mod (keys %{ $sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'} }){
+        #print "     $mod ---> $sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}\n";
+        $new_webui{'UI'}{$mod}=$sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
+    }
+    #print Dumper (\%new_webui);
+    # overwrite with individual settings from  AD (sophomorixWebuiPermissions)
+    foreach my $perm ( @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'}  } ){ 
+        #print "$sam: $perm\n";
+        my ($mod_path,$setting)=&test_webui_permission($perm,
+                                                       \%sophomorix_config,
+                                                       "sophomorixWebuiPermissions",
+                                                       "check",
+                                                       $school,
+                                                       $role);
+        #print "$mod_path --> $setting\n";
+        $new_webui{'UI'}{$mod_path}=$setting;
+    }
+    #print Dumper (\%new_webui);
+
+    # create new string
+    foreach my $mod_path ( keys %{ $new_webui{'UI'} } ){
+        push @new_webui,$mod_path." ".$new_webui{'UI'}{$mod_path};
+    }
+    @new_webui = sort @new_webui;
+    ${$new_webui_string_ref}=join(",",@new_webui);
+    #print "\n";
+    #print "$sam -> ${$old_webui_string_ref}\n";
+    #print "        ${$new_webui_string_ref}\n";
+
+    # test for update
+    if ( ${$new_webui_string_ref} eq  ${$old_webui_string_ref} ){
+        # no update
+        ${$new_webui_string_ref}="---";
+    } else {
+        # update
+        print "update of $sam:\n";
+        print "   ${$old_webui_string_ref}\n";
+        print "   ${$new_webui_string_ref}\n";
+        ${$update_ref}++;
     }
 }
 

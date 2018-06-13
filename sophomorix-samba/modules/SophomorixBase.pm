@@ -4540,8 +4540,8 @@ sub create_test_login {
 # backup stuff before modifying
 ######################################################################
 # option 2: add, move, kill, update
-# option 3 before, after
-# optopn 4: cp should be correct
+# option 3: before, after
+# option 4: cp should be correct
 #  what is this mv for: &backup_auk_file($zeit,"add","after","mv");
 sub backup_auk_file {
     my ($str,$str2,$ref_sophomorix_config) = @_;
