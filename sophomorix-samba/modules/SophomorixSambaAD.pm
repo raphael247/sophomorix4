@@ -4633,7 +4633,7 @@ sub AD_get_ui {
                 print "\nERROR: Module path $mod_path double in role $role\n\n";
                 exit 88;
             } else {
-                $ref_ui->{'CONFIG'}{'WEBUI_LOOKUP'}{$role}{$mod_path}=$setting;
+                $ref_ui->{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$role}{$mod_path}=$setting;
                 $seen{$mod_path}="seen";
             }
  
@@ -4692,9 +4692,9 @@ sub AD_get_ui {
         push @{ $ui{'LISTS'}{'USERS'} },$sam;
 
         # create CALC hash at every user (copy the package maintainer default)
-        foreach my $mod_path (keys %{ $ref_ui->{'CONFIG'}{'WEBUI_LOOKUP'}{$role} }) {
+        foreach my $mod_path (keys %{ $ref_ui->{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$role} }) {
             $ui{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path}=
-                $ref_ui->{'CONFIG'}{'WEBUI_LOOKUP'}{$role}{$mod_path};  
+                $ref_ui->{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$role}{$mod_path};  
         }
 
         # override from schooladmin/update CALC hash ???

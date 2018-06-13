@@ -404,7 +404,7 @@ if ($create_school_admin ne "" and $school ne ""){
                     file => $sophomorix_config{'INI'}{'administrator.school'}{'ADMINFILE'},
                     smb_admin_pass=>$smb_admin_pass,
                     json=>$json,
-                    webui_permissions_calculated=>$sophomorix_config{'ROLES'}{$school}{$role}{'UI'},
+                    webui_permissions_calculated=>$sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS'},
                     sophomorix_config=>\%sophomorix_config,
                     sophomorix_result=>\%sophomorix_result,
                   });

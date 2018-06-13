@@ -1433,7 +1433,7 @@ sub write_add_file {
 #    my $webui_permissions_string=join(",",
 #        @{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI'}{$Match{'ACTION'}{$line_new}{'role'}}{'WEBUI_PERMISSIONS'} });
     my $webui_permissions_string=join(",",
-        @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'UI'} });
+        @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
 
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
                  $Match{'ACTION'}{$line_new}{'class'}."::".

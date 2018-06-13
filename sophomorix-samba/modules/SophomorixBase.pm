@@ -2836,9 +2836,9 @@ sub config_sophomorix_read {
 
         # cp ui stuff from UI to ROLES
         foreach my $ui_role (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI'} }){
-            foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_LOOKUP'}{$ui_role} }){
-                $sophomorix_config{'ROLES'}{$school}{$ui_role}{'UI_LOOKUP'}{$mod}=
-                    $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_LOOKUP'}{$ui_role}{$mod};
+            foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role} }){
+                $sophomorix_config{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}=
+                    $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role}{$mod};
             }
         }
 
@@ -3259,7 +3259,7 @@ sub read_ui {
                 print "\nERROR: Module path $mod_path double in role $role\n\n";
                 exit 88;
             } else {
-                $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_LOOKUP'}{$role}{$mod_path}=$setting;
+                $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$role}{$mod_path}=$setting;
                 $seen{$mod_path}="seen";
             }
  
@@ -3691,9 +3691,9 @@ sub load_school_ini {
                             exit 88;
                         }
                         $mod_path=~s/\s+$//g;# remove trailing whitespace
-			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LOOKUP'}{$mod_path}){
+			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}){
                             # override the school value
-                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LOOKUP'}{$mod_path}=$setting;
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod_path}=$setting;
 		        } else {
 			    print "\nERROR: Misconfigured WEBUI_PERMISSIONS module path <$mod_path>\n\n";
                             exit 88;
@@ -3745,13 +3745,13 @@ sub load_school_ini {
     }
     # create ui lists from UI_LOOKUP to UI
     foreach my $ui_role (keys %{ $ref_sophomorix_config->{'ROLES'}{$school} }){
-        foreach my $mod (keys %{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI_LOOKUP'} }){
-           push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'} },
-               $mod." ".$ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI_LOOKUP'}{$mod};
+        foreach my $mod (keys %{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'} }){
+           push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} },
+               $mod." ".$ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
         }
         # sort
-        @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'} } = 
-            sort @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'} };
+        @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} } = 
+            sort @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} };
     }
 }
 
