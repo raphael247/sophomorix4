@@ -2834,6 +2834,14 @@ sub config_sophomorix_read {
 	    exit;
         }   
 
+        # cp ui stuff from UI to ROLES
+        foreach my $ui_role (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI'} }){
+            foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_LOOKUP'}{$ui_role} }){
+                $sophomorix_config{'ROLES'}{$school}{$ui_role}{'UI_LOOKUP'}{$mod}=
+                    $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_LOOKUP'}{$ui_role}{$mod};
+            }
+        }
+
 	# read the config
         $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'}=
             "OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
@@ -2901,7 +2909,7 @@ sub config_sophomorix_read {
             $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
         $sophomorix_config{'SCHOOLS'}{$school}{'HOOKS'}{'LOGDIR'}{'KILL_HOOK_DIR'}=
             $sophomorix_config{'INI'}{'HOOKS'}{'LOGDIR'}."/".$school."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
-    }
+    } # done with schools
 
     # GLOBAL
     $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'}=
@@ -3663,26 +3671,36 @@ sub load_school_ini {
                 }
                 $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
-		if (exists $ref_sophomorix_config->{'INI'}{'UI'}{$parameter}){
-                    # Parameter is an UI
-                    my @entries=split(/,/,$ref_modmaster->{$section}{$parameter});
-                    foreach my $entry (@entries){
-                        my ($module,$switch)=split(/:/,$entry);
-                        if ($switch eq "TRUE"){
-                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'TRUE'} }, $module;
-                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'MODULE_LIST'} }, $module;
-                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'TRUE'}{$module}="TRUE";
-                          
-                        } elsif ($switch eq "FALSE"){
-                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'FALSE'} }, $module;
-                            push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LIST'}{$parameter}{'MODULE_LIST'} }, $module;
-                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{$parameter}{'FALSE'}{$module}="FALSE";
+                if ($parameter eq "WEBUI_PERMISSIONS"){
+                    # override WEBUI_PERMISSIONS ##############################
+                    my @items=split(/,/,$ref_modmaster->{$section}{$parameter});
+                    # override value in 
+                    foreach my $item (@items){
+                        $item=~s/\s+$//g;# remove trailing whitespace
+                        my $mod_path=$item;
+                        my $setting;
+                        if ($item=~m/true$/){
+                            $mod_path=~s/true$//g;# remove true
+                            $setting="true";
+                        } elsif ($item=~m/false$/){
+                            $mod_path=~s/false$//g;# remove false
+                            $setting="false";
                         } else {
-                            print "\nERROR: $switch must be TRUE/FALSE in school $school, role $role for $parameter\n\n";
+                            print "File: $path_abs:\n";
+                            print "   >$item< (contains neither false nor true at the end!\n\n";
                             exit 88;
                         }
-                    }
-                }    
+                        $mod_path=~s/\s+$//g;# remove trailing whitespace
+                        print "   <$mod_path> <$setting>\n";
+			if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LOOKUP'}{$mod_path}){
+                            # override the school value
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI_LOOKUP'}{$mod_path}=$setting;
+		        } else {
+			    print "\nERROR: Misconfigured WEBUI_PERMISSIONS module path <$mod_path>\n\n";
+                            exit 88;
+		        }
+		    }
+                }
             }
 	} elsif ($section=~m/^type\./){ 
             ##### type.* section ########################################################################
@@ -3725,6 +3743,16 @@ sub load_school_ini {
             #print "ERROR: Section $section: unknown, not processed\n\n";
             #exit 88;
         }
+    }
+    # create ui lists from UI_LOOKUP to UI
+    foreach my $ui_role (keys %{ $ref_sophomorix_config->{'ROLES'}{$school} }){
+        foreach my $mod (keys %{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI_LOOKUP'} }){
+           push @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'} },
+               $mod." ".$ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI_LOOKUP'}{$mod};
+        }
+        # sort
+        @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'} } = 
+            sort @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'} };
     }
 }
 
