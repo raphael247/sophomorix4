@@ -203,6 +203,7 @@ my @loglines=();
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
+my $level=0;
 my $json=0;
 my %Match=();
 
@@ -226,6 +227,7 @@ my @injectlines=(); # list of injected lines
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
+           "level+" => \$level,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "lock" => \$lock,
@@ -243,10 +245,17 @@ my $testopt=GetOptions(
            "non-umlaut|nonumlaut" => \$non_umlaut,
           );
 
-
 my %sophomorix_result=&result_sophomorix_init("sophomorix-check");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
+
+
+# --level
+if ($level>2){
+    print "\nERROR: Max 2 levels allowed\n\n";
+    exit;
+}
+
 
 # --follow
 my $follow_file="";
@@ -254,6 +263,7 @@ my $follow_line="";
 if ($follow ne ""){
     ($follow_file,$follow_line)=split(/:/,$follow);
 }
+
 
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
@@ -290,6 +300,8 @@ Options:
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
+  -i --level 
+  -i --level --level
 
   --list-files                     (list processed files and exit)
   --lock / --unlock
@@ -344,8 +356,11 @@ if ($lock==1) {
 }
 
 
+
 # --info
-if ($info==1) {
+# --info --level
+# --info --level --level 
+if ($info==1 and $level==0) {
     &json_dump({json => $json,
                 jsoninfo => "CONFIG",
                 jsoncomment => "The sophomorix configuration",
@@ -362,7 +377,50 @@ if ($info==1) {
         print "   * $file\n";
     }
     exit;
-}
+} elsif ($info==1 and $level==1) {
+    # LEVEL 1 ########################################
+    &print_title("Showing 1 level of the config hash:");
+    my @list=();
+    foreach my $key (keys %sophomorix_config) {
+        push @list,$key;
+    }
+    @list = sort @list;
+    foreach my $item (@list){
+        print "   * $item\n";
+    }
+    exit;
+} elsif ($info==1 and $level==2) {
+    # LEVEL 2 ########################################
+    &print_title("Showing 2 levels of the config hash:");
+    my @list=();
+    foreach my $key (keys %sophomorix_config) {
+        push @list,$key;
+    }
+    @list = sort @list;
+    foreach my $item (@list){
+        my @sublist=();
+        print "   * $item\n";
+        if ($item eq "ENCODINGS" or 
+            $item eq "REPDIR_FILES" or 
+            $item eq "INI" or 
+            $item eq "GLOBAL" or 
+            $item eq "SCHOOLS"){
+            print "      -> ... omitted ...\n";
+            next;
+        }
+        foreach my $subkey (keys %{ $sophomorix_config{$item} }) {
+            push @sublist,$subkey;
+        }
+        @sublist = sort @sublist;
+        foreach my $item (@sublist){
+            print "      -> $item\n";
+        }
+    }
+    exit;
+
+    exit;
+} 
+
 
 
 # --list-files
