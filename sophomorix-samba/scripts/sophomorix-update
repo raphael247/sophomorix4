@@ -209,6 +209,8 @@ if ($info==1) {
            $surname_initial_utf8_new,
            $firstname_initial_utf8_old,
            $firstname_initial_utf8_new,
+           $webui_string_old,
+           $webui_string_new,
           )=split(/::/,$line);
     my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
     my $name_utf8_new=$surname_utf8_new.", ".$firstname_utf8_new;
@@ -252,6 +254,12 @@ if ($info==1) {
     }
     if ($school_new ne "---"){
         print " $login.sophomorixSchoolname:       $school_old  --> $school_new\n";
+    }
+    if ($webui_string_new ne "---"){
+        print " $login.sophomorixWebuiPermissionsCalculated:\n";
+        print "  $webui_string_old\n";
+        print "             -------->\n";
+        print "  $webui_string_new\n";
     }
 
     &print_line;
