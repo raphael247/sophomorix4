@@ -215,7 +215,7 @@ if ($info==1) {
     my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
     my $name_utf8_new=$surname_utf8_new.", ".$firstname_utf8_new;
     # Printout
-    print "Update user $count: $login\n";
+    print "Update user $count: $login (current school/role: $school_old/$role_old)\n";
     if ($unid_new ne "---"){
         print " $login.sophomorixUnid:             $unid_old  --> $unid_new:\n";
     }
@@ -338,7 +338,8 @@ while(<USERUPDATE>){
            $surname_initial_utf8_new,
            $firstname_initial_utf8_old,
            $firstname_initial_utf8_new,
-          )=split(/::/);
+           $webui_string_old,
+           $webui_string_new,          )=split(/::/);
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 
     if ($unid_new ne "---" or 
@@ -350,10 +351,15 @@ while(<USERUPDATE>){
         $surname_initial_utf8_new ne "---" or
         $firstname_initial_utf8_new ne "---"  or
         $filename_new ne "---" or
-        $status_new ne "---"  
+        $status_new ne "---" or
+        $webui_string_new ne "---" 
        ){
         # do NOT update move stuff: class,role,school 
         # leave it to AD_user_move
+        my @webui_calclist;
+        if ($webui_string_new ne "---"){
+            @webui_calclist=split(",",$webui_string_new);
+        }
         &AD_user_update({ldap=>$ldap,
                          root_dse=>$root_dse,
                          dn=>$dn,
@@ -367,6 +373,7 @@ while(<USERUPDATE>){
                          firstname_initial_utf8=>$firstname_initial_utf8_new,
                          filename=>$filename_new,
                          status=>$status_new,
+                         webui_permissions_calculated=>\@webui_calclist,
                          unid=>$unid_new,
                          user_count=>$user_count,
                          max_user_count=>$max_user_count,
