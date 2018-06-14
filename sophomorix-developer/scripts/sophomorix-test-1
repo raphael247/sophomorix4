@@ -3979,7 +3979,10 @@ if ($mod==1){
 
 
     &run_command("sophomorix-user $all_options --webui-permissions \"lm:printers: false\" --user maiersa42");
-    &run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+    &run_command("sophomorix-check $all_options");
+    &run_command("sophomorix-update -i $all_options");
+    &run_command("sophomorix-update $all_options");
+    #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4028,7 +4031,10 @@ if ($mod==1){
 
 
     &run_command("sophomorix-user $all_options --add-webui-permissions \"lm:quotas:apply: true\" --user maiersa42");
-    &run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+    &run_command("sophomorix-check $all_options");
+    &run_command("sophomorix-update -i $all_options");
+    &run_command("sophomorix-update $all_options");
+    #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4077,7 +4083,10 @@ if ($mod==1){
 
 
     &run_command("sophomorix-user $all_options --remove-webui-permissions \"lm:printers: false,lm:quotas:apply: true\" --user maiersa42");
-    &run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+    &run_command("sophomorix-check $all_options");
+    &run_command("sophomorix-update -i $all_options");
+    &run_command("sophomorix-update $all_options");
+    #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -6989,7 +6998,7 @@ if ($update==1 or $test_update==1){
         &run_command("cp -v $file_update_test $file_update");
         &run_command("sophomorix-update -i $all_options");
         &run_command("sophomorix-update $all_options");
-        &run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+        #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
     }
 
     ##### Testing the users
