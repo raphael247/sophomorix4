@@ -98,8 +98,29 @@ option --showlist
 zeigt die Liste der user an
 
 ------------------------------------------------------------
+Testscript ACL's :
+
+find /srv/samba/ -type d listet alle möglichen Verzeichnisse von samba
+
+Dann als ein bestimmter user, via smb: diese Verzeichnisse abarbeiten:
+   Darf man direct auflisten
+   Darf man cd und auflisten
+   Darf man file anlegen (danach löschen)
+   Darf man löschen (vorher Datei wegsichern und acl sichern)-->later
+
+Die ganzen Verzeichnisse dann in Verschiedene Dateien speichen
+   user.directlist
+   user.cdlist
+   user.filecreate
+   ... 
 
 
+
+
+
+
+
+------------------------------------------------------------
 
  
 

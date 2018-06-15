@@ -41,6 +41,37 @@ sophomorix-device würde dann die Hilfe zeigen:
 Problem: sophomorix-device läuft lange und doch immer wieder mal abgeschickt
 
 
+admin users acls:
+
+bisher: pgmadmin
+  - "Vorlagengeber" für das Default Profil diente.
+  - Programme im Netz installieren: 
+    NEU je Schule: 
+      /srv/samba/schools/<default-school>/program/
+      --> noch ohne ACL
+    ALT: hatte schreibzugriff auf das Share pgm (Pgrogramme) auf K: (früher P: genannt)
+
+? Als welcher admin macht man das jetzt?
+  --> global-admin ist dafür zu mächtig
+? Wie anlegen
+
+global: /srv/samba/global/program/
+  --> ist der global-admin dafür passend?
+
+Wunsch:jeweils 2 Programmshares:
+  1 readonly P: wie früher 
+  1 writeable für alle, schlechte Netzsoftware S: wie schreibbar/schlecht 
+
+
+
+sophomorix.conf
+   MASSIVE_MULTISCHOOL=TRUE/FALSE
+      TRUE: viele Schulen, keine absprache untereinander
+            schooladministratoren müssen mit dem Schulkürzel beginnen
+            user müssen mit dem schulkürzel beginnen
+            hardwareklassen müssen mit dem Schulkürzel beginnen
+      FALSE: schule mit vhs usw.
+
 
 
 
