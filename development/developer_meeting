@@ -17,11 +17,19 @@ sophomorix-print:
       school.conf: URLMOODLE not configured
       URLMOODLE=FALSE
       --> print 
-      
+
+
+--> Freifelder:
+
+    LOGINCHART_URL=Name|URL|Comment ... what more
+
+--> sophomorix-print --school bsz  --> alle Schüler der Schule
+
 
 
   JSON-Result object? see issue #14
   Was braucht die Schulkonsole
+  --> ausgefüllt
 
 
 devices.csv
@@ -35,8 +43,10 @@ wenn alle Rechner in einem raum ...
 wird bei linbo was rausgepatched um Zugang zu vermeiden
 --> linbo Zugriff auf AD? Abhängig davon patchen
 
+--> (noch) nicht benötigt
 
-sophomorix-device --sync-AD statt sophomorix-device
+
+sophomorix-device --sync statt sophomorix-device
 sophomorix-device würde dann die Hilfe zeigen:
 Problem: sophomorix-device läuft lange und doch immer wieder mal abgeschickt
 
@@ -75,6 +85,8 @@ sophomorix.conf
 
 
 
+
+
 default-zustand für managementgruppen konfigurierbar in school.conf? je Rolle?
 --wie setzt man das zurück?
   - nachts schulweit?
@@ -91,6 +103,10 @@ Lösung 1: sophomorix-device ruft import devices auf (nachdem alle checks ok)
 Lösung 2: sophomorix-device --checkonly
           ---> go (0) or notgo (1, bzw. errorcount)
 
+sophomorix-device --dry-run
+   --> 0, wenn syntax-check ok
+
+
 
 root-privileges von sophomorix, wenn von schulkonsole aufgerufen
 
@@ -104,6 +120,8 @@ z.B.
   student@linuxmuster.local
 
 alias-generation, was solls geben
+
+--> ja
 
 
 
