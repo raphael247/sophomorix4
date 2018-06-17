@@ -356,8 +356,10 @@ while(<USERUPDATE>){
        ){
         # do NOT update move stuff: class,role,school 
         # leave it to AD_user_move
-        my @webui_calclist;
-        if ($webui_string_new ne "---"){
+        my @webui_calclist=("---");
+        if ($webui_string_new eq "---"){
+            # leave @webui_calclist 
+        } else {
             @webui_calclist=split(",",$webui_string_new);
         }
         &AD_user_update({ldap=>$ldap,

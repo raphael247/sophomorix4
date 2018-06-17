@@ -2653,16 +2653,21 @@ sub AD_user_update {
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
 
-    if ( defined $ref_webui_permissions_calculated ){
-	print "   * Setting sophomorixWebuiPermissionsCalculated to:\n";
-        foreach my $entry (@{ $ref_webui_permissions_calculated }){
-            print "      $entry\n";
+    if (defined $ref_webui_permissions_calculated){
+        if ($#{ $ref_webui_permissions_calculated }==0 and ${ $ref_webui_permissions_calculated }[0] eq "---"){
+            # --- as the single entry means: don not do anything to sophomorixWebuiPermissionsCalculated
+        } else {
+	    print "   * Setting sophomorixWebuiPermissionsCalculated to:\n";
+            foreach my $entry (@{ $ref_webui_permissions_calculated }){
+                print "      $entry\n";
+            }
+            my $ref_webui_permissions_calculated_string=join("|",@{ $ref_webui_permissions_calculated });
+            $update_log_string=$update_log_string."\"sophomorixWebuiPermissionsCalculated=".
+                $ref_webui_permissions_calculated_string."\",";
+            my $mesg = $ldap->modify($dn,
+                replace => { sophomorixWebuiPermissionsCalculated => $ref_webui_permissions_calculated }); 
+            &AD_debug_logdump($mesg,2,(caller(0))[3]);
         }
-        my $ref_webui_permissions_calculated_string=join("|",@{ $ref_webui_permissions_calculated });
-        $update_log_string=$update_log_string."\"sophomorixWebuiPermissionsCalculated=".$ref_webui_permissions_calculated_string."\",";
-        my $mesg = $ldap->modify($dn,
-            replace => { sophomorixWebuiPermissionsCalculated => $ref_webui_permissions_calculated }); 
-        &AD_debug_logdump($mesg,2,(caller(0))[3]);
     } 
 
 
@@ -4663,6 +4668,7 @@ sub AD_get_ui {
                    attrs => ['sAMAccountName',
                              'sophomorixSchoolname',
                              'sophomorixRole',
+                             'sophomorixAdminClass',
                              'displayName',
                              'SophomorixWebuiPermissions',
                              'SophomorixWebuiPermissionsCalculated',
@@ -4675,6 +4681,7 @@ sub AD_get_ui {
      	my $dn=$entry->dn();
         my $sam=$entry->get_value('sAMAccountName');
         my $role=$entry->get_value('sophomorixRole');
+        my $adminclass=$entry->get_value('sophomorixAdminClass');
         my $schoolname=$entry->get_value('sophomorixSchoolname');
         my @webui = $entry->get_value('sophomorixWebuiPermissions');
         my @webui_calc = $entry->get_value('sophomorixWebuiPermissionsCalculated');
@@ -4683,6 +4690,7 @@ sub AD_get_ui {
         $ui{'UI'}{'USERS'}{$sam}{'dn'}=$dn;
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixSchoolname'}=$schoolname;
         $ui{'UI'}{'USERS'}{$sam}{'sophomorixRole'}=$role;
+        $ui{'UI'}{'USERS'}{$sam}{'sophomorixAdminClass'}=$adminclass;
         $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
         @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissions'} } = 
             sort $entry->get_value('sophomorixWebuiPermissions');

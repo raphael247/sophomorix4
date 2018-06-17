@@ -318,7 +318,7 @@ if ($add==1 or $test_add==1){
         &run_command("cp -v $file_add_test $file_add");
         &run_command("sophomorix-add -i $all_options");
         &run_command("sophomorix-add $all_options");
-        #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+        #&run_command("sophomorix-ui $all_options");
     }
 
 
@@ -3982,7 +3982,8 @@ if ($mod==1){
     &run_command("sophomorix-check $all_options");
     &run_command("sophomorix-update -i $all_options");
     &run_command("sophomorix-update $all_options");
-    #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+    #&run_command("sophomorix-ui -i $all_options");
+    #&run_command("sophomorix-ui $all_options");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4034,7 +4035,8 @@ if ($mod==1){
     &run_command("sophomorix-check $all_options");
     &run_command("sophomorix-update -i $all_options");
     &run_command("sophomorix-update $all_options");
-    #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+    #&run_command("sophomorix-ui -i $all_options");
+    #&run_command("sophomorix-ui $all_options");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -4086,7 +4088,8 @@ if ($mod==1){
     &run_command("sophomorix-check $all_options");
     &run_command("sophomorix-update -i $all_options");
     &run_command("sophomorix-update $all_options");
-    #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+    #&run_command("sophomorix-ui -i $all_options");
+    #&run_command("sophomorix-ui $all_options");
     # Testing change
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -6992,13 +6995,17 @@ if ($cp_update==1){
     &run_command("cp -v $file_update_test $file_update");
 }
 
+#print "Exit HERE\n";
+#exit;
+
 if ($update==1 or $test_update==1){
     if ($update==1){
         # copy sophomorix.update
         &run_command("cp -v $file_update_test $file_update");
         &run_command("sophomorix-update -i $all_options");
         &run_command("sophomorix-update $all_options");
-        #&run_command("sophomorix-ui $all_options --abs-path-ui-ini /usr/share/sophomorix/config-templates/test-ui-perm.ini");
+        &run_command("sophomorix-ui -i $all_options");
+        #&run_command("sophomorix-ui $all_options");
     }
 
     ##### Testing the users
