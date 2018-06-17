@@ -2265,8 +2265,14 @@ sub _console_print_ui {
                 print $line;
                 foreach my $user ( @{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} } ){
                     print " $user ($ref_ui->{'UI'}{'USERS'}{$user}{'displayName'}, $role):\n"; 
+                    print " sophomorixWebuiPermissionsCalculated: (old)\n";
+                    my @oldlist = sort @{ $ref_ui->{'UI'}{'USERS'}{$user}{'sophomorixWebuiPermissionsCalculated'} };
+                    foreach my $item ( @oldlist ){
+                        print "    $item\n";
+	            }
                     print " sophomorixWebuiPermissionsCalculated: (new)\n";
-                    foreach my $item ( @{ $ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'} } ){
+                    my @newlist = sort @{ $ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'} };
+                    foreach my $item ( @newlist ){
                         print "    $item\n";
 	            }
                     print $line;
