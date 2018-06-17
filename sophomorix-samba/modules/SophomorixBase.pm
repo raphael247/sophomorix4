@@ -2259,11 +2259,11 @@ sub _console_print_ui {
         print "\n";
         &print_title("SophomorixWebuiPermissionsCalculated updates in school $school:");
         foreach my $role (@rolelist){
-            if ($#{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} } >-1){
+            if ($#{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } >-1){
                 print $line;
                 printf "| %-70s|\n", $school." --> sophomorixRole: ".$role;
                 print $line;
-                foreach my $user ( @{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} } ){
+                foreach my $user ( @{ $ref_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school}{$role} } ){
                     print " $user ($ref_ui->{'UI'}{'USERS'}{$user}{'displayName'}, $role):\n"; 
                     print " sophomorixWebuiPermissionsCalculated: (old)\n";
                     my @oldlist = sort @{ $ref_ui->{'UI'}{'USERS'}{$user}{'sophomorixWebuiPermissionsCalculated'} };

@@ -4741,8 +4741,8 @@ sub AD_get_ui {
         }
 
         # always update for now ????
-        push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$schoolname} },$sam;
-        push @{ $ui{'LISTS_UPDATE'}{'USERS'} },$sam;
+        push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
+        push @{ $ui{'LISTS_UPDATE'}{'USERS'}{$role} },$sam;
     }
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");
     return(\%ui);

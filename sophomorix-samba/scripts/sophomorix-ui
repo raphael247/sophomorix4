@@ -218,22 +218,27 @@ if ($school ne ""){
     }
 } else {
     # walk through all users
-    $max_user_count=$#{ $ref_ui->{$list_type}{'USERS'} }+1;
-    foreach my $user (@{ $ref_ui->{$list_type}{'USERS'} }){
-        $user_count++;
-        &AD_user_update({ldap=>$ldap,
-                         root_dse=>$root_dse,
-                         dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
-                         user=>$user,
-                         webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'},
-                         user_count=>$user_count,
-                         max_user_count=>$max_user_count,
-                         json=>$json,
-                         sophomorix_config=>\%sophomorix_config,
-                         sophomorix_result=>\%sophomorix_result,
-                       });
+    my @rolelist=("globaladministrator","schooladministrator","teacher","student");
+    foreach my $role (@rolelist){
+        $user_count=0;
+        $max_user_count=$#{ $ref_ui->{$list_type}{'USERS'}{$role} }+1;
+        foreach my $user (@{ $ref_ui->{$list_type}{'USERS'}{$role} }){
+            $user_count++;
+            &AD_user_update({ldap=>$ldap,
+                             root_dse=>$root_dse,
+                             dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
+                             user=>$user,
+                             webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'},
+                             user_count=>$user_count,
+                             max_user_count=>$max_user_count,
+                             json=>$json,
+                             sophomorix_config=>\%sophomorix_config,
+                             sophomorix_result=>\%sophomorix_result,
+                           });
+        }
     }
 }
+
 
 
 &result_sophomorix_add_summary({
