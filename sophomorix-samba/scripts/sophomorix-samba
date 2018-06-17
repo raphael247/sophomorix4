@@ -138,6 +138,8 @@ Show all attribute names
   --show-all-attributes
 Show all sophomorix attribute names:
   --show-sophomorix-attributes 
+Show webui permissions
+--show-webui-permissions
 
 Show all user roles and group types:
   --show-roletype
@@ -508,8 +510,10 @@ if ($show_roletype==1){
 # --show-webui-permissions
 if ($show_webui_permissions==1){
     print "\n";
-    print "########## allowed module paths for sophomorix-webui-permissions ################\n";
     my $ref_sophomorix_config=\%sophomorix_config;
+    print "##### allowed module paths for sophomorix-webui-permissions #####################\n";
+    print "##### $ref_sophomorix_config->{'INI'}{'WEBUI'}{'INI'}\n";
+    print "##### webui maintainer defaults in ()\n";
     my @rolelist=();
     foreach my $role (keys %{$ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} } ) {
         push @rolelist,$role;
@@ -523,7 +527,7 @@ if ($show_webui_permissions==1){
 	}
         @modlist = sort @modlist;
         foreach my $mod_path (@modlist){
-            print "      --->  $mod_path\n";
+            print "      --->  $mod_path ($ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$role}{$mod_path})\n";
         }
     }
     print "\n";
