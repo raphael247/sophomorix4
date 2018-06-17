@@ -209,7 +209,7 @@ my %Match=();
 
 my $dump_matches=0;
 my $dump_files=0;
-my $dump_AD=0;
+my $dump_ad=0;
 my $dump_login_avoid=0;
 
 my $list_files=0;
@@ -232,7 +232,7 @@ my $testopt=GetOptions(
            "lock" => \$lock,
            "unlock" => \$unlock,
            "dump-files" => \$dump_files,
-           "dump-AD" => \$dump_AD,
+           "dump-ad" => \$dump_ad,
            "dump-login-avoid" => \$dump_login_avoid,
            "dump-matches" => \$dump_matches,
            "list-files" => \$list_files,
@@ -310,7 +310,7 @@ Show usable encodings in school.conf:
 Dumping data:                     
   -ij / --info --json              (dump configuration)
   --dump-files -j                  (dump contents of user files)
-  --dump-AD -j                     (dump AD data)
+  --dump-ad -j                     (dump AD data)
   --dump-login-avoid -j            (dump historic data from log files)
   --dump-matches -j                (dump matched users)
 
@@ -697,8 +697,8 @@ my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                    });
 
 
-# --dump-AD
-if ($dump_AD==1){
+# --dump-ad
+if ($dump_ad==1){
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",

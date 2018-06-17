@@ -1,3 +1,4 @@
+
 #!/usr/bin/perl -w
 # This script (sophomorix-device) is maintained by Rüdiger Beck
 # It is Free Software (License GPLv3)
@@ -102,7 +103,7 @@ my $error_in_files=0;
 # rooms that have been created while the script is running
 my %room_created=();
 my $dump_files=0;
-my $dump_AD=0;
+my $dump_ad=0;
 my $print=0;
 
 # where data from workstation file is saved
@@ -181,7 +182,7 @@ my $testopt=GetOptions(
        "school=s" => \$school,
        "list-files" => \$list_files,
        "p|print" => \$print,
-       "dump-AD" => \$dump_AD,
+       "dump-ad" => \$dump_ad,
        "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
        "dns-test" => \$dns_test,
@@ -259,7 +260,7 @@ Managing DNS
 
 Dumping data:                     
   --dump-files -j                  (dump contents of user files)
-  --dump-AD -j                     (dump AD data)
+  --dump-ad -j                     (dump AD data)
 
 
 Please see the sophomorix-device(8) man pages for full documentation
@@ -440,8 +441,8 @@ if ($dns_show==1 or $dns_kill==1){
 
 
 
-# --dump-AD
-if ($dump_AD==1){
+# --dump-ad
+if ($dump_ad==1){
     my ($ref_AD_device) = &AD_get_AD_for_device({ldap=>$ldap,
                                                  root_dse=>$root_dse,
                                                  root_dns=>$root_dns,

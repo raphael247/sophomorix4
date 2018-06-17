@@ -66,7 +66,7 @@ my $help=0;
 my $info=0;
 my $json=0;
 
-my $dump_AD=0;
+my $dump_ad=0;
 my $linux=0;
 my $global=0;
 my $school=0;
@@ -98,7 +98,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
-           "dump-AD" => \$dump_AD,
+           "dump-ad" => \$dump_ad,
            "linux|unix" => \$linux,
            "global" => \$global,
            "school" => \$school,
@@ -144,7 +144,7 @@ Options
   -vv / --verbose --verbose
   -i (not implemented)
 
-  -j --dump-AD
+  -j --dump-ad
 
 What to repair in the Filesystem:
 
@@ -208,8 +208,8 @@ my ($ref_AD) = &AD_get_AD_for_repair({ldap=>$ldap,
 #print Dumper ($ref_AD);
 #exit;
 
-# --dump-AD
-if ($dump_AD==1){
+# --dump-ad
+if ($dump_ad==1){
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
