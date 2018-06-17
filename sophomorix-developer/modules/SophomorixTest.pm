@@ -1297,7 +1297,7 @@ sub file_test_lines {
     close(FILE);
 
     # line num test
-    is ($line_num,$is_line_num,"  * File has $is_line_num lines");
+    is ($line_num,$is_line_num,"  * $is_line_num lines in $abs");
 
     # grep tests
     foreach my $grep (@lines){
