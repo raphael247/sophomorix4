@@ -91,7 +91,7 @@ my $project_script_output="/root/sophomorix-vampire-projects.sh";
 # --create-class-adminadd-script
 my $create_class_adminadd_script=0;
 my $class_adminadd_script_input="/data/root/sophomorix-dump-viewdumps/memberdata_view.sql";
-my $class_adminadd_script_output="/root/sophomorix-vampire-classes-adminadd.sh";
+my $class_adminadd_script_output="/root/sophomorix-vampire/sophomorix-vampire-classes-adminadd.sh";
 
 # --verify-uid-gid
 my $verify_uid_gid=0;
@@ -277,11 +277,14 @@ if ($restore_config_files==1){
 print "\n";
 
 
+
 # --info
 if ($info==1){
     
     exit;
 }
+
+
 
 # --analyze
 if ($analyze==1){
@@ -346,6 +349,7 @@ if ($analyze==1){
     close(USER);
     exit;
 }
+
 
 
 ##################################################
@@ -533,6 +537,8 @@ if ($create_class_script==1){
     system("chmod 755 $class_script_output");
 }
 
+
+
 ##################################################
 # --create-add-file
 # creating sophomorix.add
@@ -668,6 +674,7 @@ if ($create_add_file==1){
 }
 
 
+
 ##################################################
 # --import-user-password-hashes
 if ($import_user_password_hashes==1){
@@ -710,7 +717,11 @@ if ($import_user_password_hashes==1){
         print "  * $line";
     }
     &AD_unbind_admin($ldap);
+    # clean up
+    system("rm -f $import_user_pwd_ldif");
 }
+
+
 
 ##################################################
 # --create-class-adminadd-script
@@ -784,6 +795,7 @@ if ($create_class_adminadd_script==1){
     system("chmod 755 $class_adminadd_script_output");
 
 }
+
 
 
 ##################################################
@@ -916,7 +928,6 @@ if ($create_project_script==1){
 
 
 
-
 # --verify-uid
 if ($verify_uid==1){
     print "Verifying if uidNumbers are correct (using command: id)\n";
@@ -982,7 +993,6 @@ if ($verify_uid==1){
         print "  * $line";
     }
 }
-
 
 
 
