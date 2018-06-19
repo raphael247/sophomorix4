@@ -63,24 +63,24 @@ my $restore_config_files=0;
 
 # --analyze
 my $analyze=0;
-my $classes_map="/root/sophomorix-vampire-classes.map";
+my $classes_map="/root/sophomorix-vampire/sophomorix-vampire-classes.map";
 
 
 # --create-class-script
 my $create_class_script=0;
 my $class_script_input="/data/root/sophomorix-dump-viewdumps/classdata_view.sql";
-my $class_script_output="/root/sophomorix-vampire-classes.sh";
+my $class_script_output="/root/sophomorix-vampire/sophomorix-vampire-classes.sh";
 my $extrakurse="/data/etc/sophomorix/user/extrakurse.txt";
 
 # --create-add-file
 my $create_add_file=0;
 my $sophomorix_add_input_sql="/data/root/sophomorix-dump-viewdumps/userdata_view.sql";
-my $sophomorix_add_output="/root/sophomorix.add";
+my $sophomorix_add_output="/root/sophomorix-vampire/sophomorix.add";
 
 # --import-user-password-hashes
 my $import_user_password_hashes=0;
 my $import_user_pwd_ldif_template="/usr/share/sophomorix-vampire/ldif-pwdload.ldif.template";
-my $import_user_pwd_ldif="/root/sophomorix-vampire-import-pwd.ldif";
+my $import_user_pwd_ldif="/root/sophomorix-vampire/sophomorix-vampire-import-pwd.ldif";
 
 # --create-project-script
 my $create_project_script=0;
@@ -100,6 +100,9 @@ my $verify_gid=0;
 
 my $missig_files_count=0;
 my $overwriting_files_count=0;
+
+system("mkdir /root/sophomorix-vampire");
+
 # ===========================================================================
 # config
 # ==========================================================================
@@ -165,14 +168,21 @@ Vampire data into the new server V7:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --analyze
 2.  Create class script and run it:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-script
-    # /root/sophomorix-vampire-classes.sh
+    # /root/sophomorix-vampire/sophomorix-vampire-classes.sh
 3.  Create file sophomorix.add and add these users:
+    Allow simple passwords:
+    # samba-tool domain passwordsettings set --complexity=off
+    # samba-tool domain passwordsettings set --min-pwd-length=2
+    Create the users:
     # sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
     # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
     # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
     # sophomorix-add (Add the users)
 4.  Import the hashed passwords into AD (if you want users to keep their password) 
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --import-user-password-hashes
+    Force complex passwords (which is the default):
+    # samba-tool domain passwordsettings set --complexity=default
+    # samba-tool domain passwordsettings set --min-pwd-length=default
 5.  Create script for adminclasses and run it:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
     # /root/sophomorix-vampire-classes-adminadd.sh
@@ -636,7 +646,9 @@ if ($create_add_file==1){
                       $tolerationdate."::".
                       $deactivationdate."::".
                       $unicodePwd."::".
-                      $line{"userpassword"}."::\n";
+                      $line{"userpassword"}."::".
+                      "---"."::".
+                      "\n";
             if ($skip_line==0){
 	        print "LINE: $line";
 	        print SOPHOMORIXADD $line;

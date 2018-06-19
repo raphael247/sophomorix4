@@ -1,4 +1,8 @@
 #!/bin/bash
+# This is an example script how to migrate an 6.x linuxmuster.net server to 7.x
+# The data dump of the 6.x version is expected in ../sophomorix-dump
+# You can run this script by copying each step and run it 
+# or just run the script and see what happens
 
 rm -rf /tmp/LOGDIR
 rm -rf /tmp/ERRORDIR
@@ -24,7 +28,7 @@ cat /tmp/ERRORDIR/file-02.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Se
 # 25/20/27/36 min
 echo ""
 echo "/root/sophomorix-vampire-classes.sh"
-time /root/sophomorix-vampire-classes.sh 1> /tmp/LOGDIR/file-03.log 2> /tmp/ERRORDIR/file-03.err
+time /root/sophomorix-vampire/sophomorix-vampire-classes.sh 1> /tmp/LOGDIR/file-03.log 2> /tmp/ERRORDIR/file-03.err
 cat /tmp/ERRORDIR/file-03.err  | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 echo ""
@@ -36,7 +40,7 @@ echo ""
 echo ""
 echo "--create-add-file"
 time sophomorix-vampire --datadir ../sophomorix-dump --create-add-file 1> /tmp/LOGDIR/file-04.log 2> /tmp/ERRORDIR/file-04.err
-cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+cp /root/sophomorix-vampire/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
 cat /tmp/ERRORDIR/file-04.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
 # 63/58/65/110 min
