@@ -86,7 +86,7 @@ my $import_user_pwd_ldif="/root/sophomorix-vampire/sophomorix-vampire-import-pwd
 my $create_project_script=0;
 my $project_script_input_sql="/data/root/sophomorix-dump-viewdumps/projectdata_view.sql";
 my $project_script_input="/data/root/sophomorix-dump.projects";
-my $project_script_output="/root/sophomorix-vampire-projects.sh";
+my $project_script_output="/root/sophomorix-vampire/sophomorix-vampire-projects.sh";
 
 # --create-class-adminadd-script
 my $create_class_adminadd_script=0;
@@ -175,7 +175,7 @@ Vampire data into the new server V7:
     # samba-tool domain passwordsettings set --min-pwd-length=2
     Create the users:
     # sophomorix-vampire --datadir ../sophomorix4-migration-data --create-add-file
-    # cp /root/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
+    # cp /root/sophomorix-vampire/sophomorix.add /var/lib/sophomorix/check-result/sophomorix.add
     # sophomorix-add -i (Read ERRORS and WARNINGS, fix them manually)
     # sophomorix-add (Add the users)
 4.  Import the hashed passwords into AD (if you want users to keep their password) 
@@ -183,21 +183,30 @@ Vampire data into the new server V7:
     Force complex passwords (which is the default):
     # samba-tool domain passwordsettings set --complexity=default
     # samba-tool domain passwordsettings set --min-pwd-length=default
-5.  Create script for adminclasses and run it:
+5.  Create script to add administrators to classes and run it:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-class-adminadd-script
-    # /root/sophomorix-vampire-classes-adminadd.sh
+    # /root/sophomorix-vampire/sophomorix-vampire-classes-adminadd.sh
 6.  Create project script and run it:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --create-project-script
-    # /root/sophomorix-vampire-projects.sh
-7.  Verify uid and gid of created users ang groups
-    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-uid
-    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-gid
-8.  Copy configuration files into new server:
+    # /root/sophomorix-vampire/sophomorix-vampire-projects.sh
+7.  Copy configuration files into new server:
     # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --restore-config-files
+    YES, run it twice!
+8.  Do a sophomorix run to update utf8, webui-permissions and maybe more
+    sophomorix-check
+    sophomorix-add -i (should show no new users)
+    sophomorix-update
+    sophomorix-kill (this might delete some users that are oberdue to be deleted)
 9.  Import the workstations (later use linuxmuster command)
     # sophomorix-device
 10. Manually do the rest (will be automated):
     Copy files in /etc/linuxmuster/sophomorix/user/mail/* to new server.
+
+Do some tests:
+Verify uid and gid of created users ang groups
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-uid
+    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-gid
 
 Getting information:
   -i / --info
