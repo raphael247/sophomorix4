@@ -307,6 +307,12 @@ if ($info==1 and $user ne "") {
         print "   $user: $unicodepwd (unicodePwd)\n"
     }
     exit;
+} elsif ($info==1){
+    my $command="samba-tool domain passwordsettings show";
+    print "\n# $command\n\n";
+    system($command);
+    print "\n";
+    exit;
 }
 
 
