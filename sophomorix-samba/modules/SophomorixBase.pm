@@ -3785,8 +3785,10 @@ sub load_school_ini {
                $mod." ".$ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
         }
         # sort
-        @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} } = 
-            sort @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} };
+	if ($#{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'}  }>0 ){
+            @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} } = 
+                sort @{ $ref_sophomorix_config->{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS'} };
+	}
     }
 }
 
