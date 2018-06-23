@@ -1433,7 +1433,7 @@ sub test_user_update {
         #print "$sam: $perm\n";
         my ($mod_path,$setting)=&test_webui_permission($perm,
                                                        \%sophomorix_config,
-                                                       "sophomorixWebuiPermissions",
+                                                       "sophomorixWebuiPermissions of $sam in $school",
                                                        "check",
                                                        $school,
                                                        $role);
@@ -1458,9 +1458,9 @@ sub test_user_update {
         ${$new_webui_string_ref}="---";
     } else {
         # update
-        print "update of $sam:\n";
-        print "   ${$old_webui_string_ref}\n";
-        print "   ${$new_webui_string_ref}\n";
+        #print "update of $sam:\n";
+        #print "   ${$old_webui_string_ref}\n";
+        #print "   ${$new_webui_string_ref}\n";
         ${$update_ref}++;
     }
 }
