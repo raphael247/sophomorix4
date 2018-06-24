@@ -2841,6 +2841,11 @@ sub AD_get_user {
                               'sophomorixStatus',
                               'sophomorixFirstPassword',
                               'sophomorixUnid',
+			      'sophomorixFirstnameASCII',
+			      'sophomorixSurnameASCII',
+                              'sophomorixFirstnameInitial', 
+			      'sophomorixSurnameInitial',
+			      'sophomorixUserToken',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -2852,6 +2857,10 @@ sub AD_get_user {
     } else {
         my $firstname = $entry->get_value('givenName');
         my $lastname = $entry->get_value('sn');
+        my $firstname_ASCII = $entry->get_value('sophomorixFirstnameASCII');
+        my $lastname_ASCII = $entry->get_value('sophomorixSurnameASCII');
+        my $firstname_initial = $entry->get_value('sophomorixFirstnameInitial');
+        my $lastname_initial = $entry->get_value('sophomorixSurnameInitial');
         my $class = $entry->get_value('sophomorixAdminClass');
         my $role = $entry->get_value('sophomorixRole');
         my $exammode = $entry->get_value('sophomorixExamMode');
@@ -2863,10 +2872,13 @@ sub AD_get_user {
         my $status = $entry->get_value('sophomorixStatus');
         my $firstpassword = $entry->get_value('sophomorixFirstPassword');
         my $unid = $entry->get_value('sophomorixUnid');
+        my $user_token = $entry->get_value('sophomorixUserToken');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,
                 $home_directory,$user_account_control,$toleration_date,
-                $deactivation_date,$school,$status,$firstpassword,$unid);
+                $deactivation_date,$school,$status,$firstpassword,$unid,
+                $firstname_ASCII,$lastname_ASCII,
+                $firstname_initial,$lastname_initial,$user_token);
     }
 }
 
@@ -7909,14 +7921,30 @@ sub AD_examuser_create {
 
     &Sophomorix::SophomorixBase::print_title("Creating examuser for user: $participant (start)");
     # get data from (non-exam-)user
-    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
-        &AD_get_user({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      user=>$participant,
-                    });
+    my ($firstname_utf8_AD,
+        $lastname_utf8_AD,
+        $adminclass_AD,
+        $existing_AD,
+        $exammode_AD,
+        $role_AD,
+        $home_directory_AD,
+        $user_account_control_AD,
+        $toleration_date_AD,
+        $deactivation_date_AD,
+        $school_AD,
+        $status_AD,
+        $firstpassword_AD,
+        $unid_AD,
+        $firstname_ASCII_AD,
+        $lastname_ASCII_AD,
+        $firstname_initial_AD,
+        $lastname_initial_AD,
+        $user_token_AD,
+        )=&AD_get_user({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        root_dns=>$root_dns,
+                        user=>$participant,
+                      });
     my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".
                        $firstname_utf8_AD." ".$lastname_utf8_AD;
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
@@ -8019,10 +8047,16 @@ sub AD_examuser_create {
                    sophomorixAdminClass => "---",    
                    sophomorixAdminFile => $file,    
                    sophomorixFirstPassword => $DevelConf::student_password_default, 
-                   sophomorixFirstnameASCII => "---",
-                   sophomorixSurnameASCII  => "---",
+                   sophomorixFirstnameASCII => $firstname_ASCII_AD,
+                   sophomorixSurnameASCII  => $lastname_ASCII_AD,
                    sophomorixBirthdate  => "01.01.1970",
                    sophomorixRole => "examuser",
+                   sophomorixUserToken => $user_token_AD,
+                   sophomorixFirstnameInitial => $firstname_initial_AD,
+                   sophomorixSurnameInitial => $lastname_initial_AD,
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_MAILQUOTA_CALC'},
+                   sophomorixCloudQuotaCalculated=>$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_CLOUDQUOTA_CALC'},
                    sophomorixSchoolPrefix => $prefix,
                    sophomorixSchoolname => $school_AD,
                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
