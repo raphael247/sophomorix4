@@ -248,6 +248,9 @@ if ($unset_exam_mode==1){
     my $user_count=0;
     my $max_user_count=$#participants+1;
     foreach my $participant (@participants){
+        if ($participant=~m/-exam$/){
+            $participant=~s/-exam$//; 
+        }
         $user_count++;
         # collect data
         if ($sophomorix_config{'INI'}{'EXAMMODE'}{'COLLECT_BEFORE_KILL'} eq "TRUE"){
