@@ -20,12 +20,28 @@ upload to fleischsalat: scp sophomorix*3.42.1-3* fleischsalat:bionic-testing
 ############################################################
 Todo:
 ############################################################
+
+sophomorix-ui
+
 Migration Bugs:
 
 classen.map
+ - man sollte sehen, ob es bei der gruppe um eine klasse oder raum handelt (oder ...)
  - nach analyze solte das änderbar sein.
    (testen bei gruppen usw. bei räumen tuts nicht)
+ --> devices.csv room feld editieren, bei devices rewrite
 
+
+migration entries in devices.csv mit tagged line beginnen
+beim nochmaligen anlegen sollte NICHT zusätzlich angehängt werden
+(incl. tagged line nicht lesen)
+
+
+
+performance: sophomorix-class --create 
+--> option --skip-school-creation
+use option when creating classes
+dito at project creation
 
 we need to copy these files, so that students.csv and teachers.csv
 can be created (rewritten)
@@ -34,6 +50,28 @@ cp /root/sophomorix-dump/data/etc/sophomorix/user/lehrer.txt
         /root/sophomorix-dump/data/var/lib/sophomorix/tmp/lehrer.txt.tmp
 cp /root/sophomorix-dump/data/etc/sophomorix/user/schueler.txt
           /root/sophomorix-dump/data/var/lib/sophomorix/tmp/schueler.txt.filter.tmp
+
+fixes: 
+    sophomorix-check aufrufen? damit 
+    lehrer.txt.tmp
+    schueler.txt.filter.tmp
+entstehen
+
+letztes Feld, must und may benutzen in migration-6-7.conf 
+
+--> warum entstehen diese files?
+bsz: /var/lib/sophomorix/tmp/ enthält:
+   lehrer.txt.tmp             # entsteht, wenn kein filter script definiert ist (copy lehrer.txt)
+                              (andert 1. Spalte lehrer --> teachers)
+                              die lehrer.txt.tmp zum migrieren nehmen
+                              (alternativ)
+   (schueler.txt.filter.tmp)    # marked as tmp in filter script (von filter script erzeugt)
+                              (gibts nur am bsz, weil dessen filter script das erzeugt)
+                              --> NICHT zum Migrieren nehmen
+   schueler.txt.tmp           # entsteht, wenn kein filter script definiert ist (copy), 
+                              # ODER: target in filter script
+                              --> zum Migrieren nehmen
+
 
 
 sophomorix-passwd --test-passwd
