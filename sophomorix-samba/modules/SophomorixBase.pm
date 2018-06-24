@@ -4590,6 +4590,7 @@ sub smb_command {
 
     if( 
         ($smb_command_return==0 and $smb_command_out eq "") or
+        ($smb_command_return==0 and $smb_command_out=~m/Deleted user /) or
         ($smb_command_return==0 and $smb_command_out=~m/successfully/) or
         ($smb_command_return==0 and $smb_command_out=~m/Default Soft Limit/)
       ){

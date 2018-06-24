@@ -835,7 +835,7 @@ sub AD_user_kill {
     $home_directory_AD=~s/\\/\//g;
     my $smb_home="smb:".$home_directory_AD;
 
-    &Sophomorix::SophomorixBase::print_title("Killing User $user ($user_count):");
+    &Sophomorix::SophomorixBase::print_title("Killing user $user ($user_count):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
     &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$user);
 
