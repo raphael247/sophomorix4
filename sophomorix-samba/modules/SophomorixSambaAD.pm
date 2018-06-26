@@ -4783,6 +4783,7 @@ sub AD_check_ui {
     my $root_dns = $arg_ref->{root_dns};
     my $ref_AD_check = $arg_ref->{ref_AD_check};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $force = $arg_ref->{force};
 
     foreach my $sam (keys %{ $ref_AD_check->{'sAMAccountName'} }){
         #print "SAM: $sam\n";
@@ -4791,9 +4792,9 @@ sub AD_check_ui {
         my ($new_webui_string,$role,$school)=&AD_create_new_webui_string($sam,$ref_sophomorix_config,$ref_AD_check,$role,$school);
         #print "OLD: $old_webui_string\n";
         #print "NEW: $new_webui_string\n";
-        if ($new_webui_string ne $old_webui_string){
-            print "   ---> update $sam\n";
-            #print Dumper($ref_AD_check->{'sAMAccountName'}{$sam});
+        if ($new_webui_string ne $old_webui_string or $force==1){
+            # update
+            print "update $sam\n";
             $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'displayName'};
             $ui{'UI'}{'USERS'}{$sam}{'dn'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
             $ui{'UI'}{'USERS'}{$sam}{'sophomorixAdminClass'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
@@ -4804,25 +4805,10 @@ sub AD_check_ui {
             push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} },$sam;
             push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} },$sam;
             push @{ $ui{'LISTS_UPDATE'}{'USERS'}{$role}  },$sam;
+        } else {
+            # do not update
         }
     }
-    #     # create CALC*LISTs from CALC hash
-    #     @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} }=();
-    #     @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} }=();
-    #     @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} }=();
-    #     foreach my $mod_path (keys %{ $ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'} }) {
-    #         my $item=$mod_path." ".$ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path};
-    #         push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
-    #         if ($ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path} eq "true"){
-    #             push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
-    #         } elsif ($ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path} eq "false"){
-    #             push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} },$item;
-    #         }
-    #     }
-
-    #     # always update for now ????
-    #     push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
-    #     push @{ $ui{'LISTS_UPDATE'}{'USERS'}{$role} },$sam;
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");
     return(\%ui);
 }

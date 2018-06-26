@@ -112,10 +112,18 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
-  -i  (show what would be updated)
-  --school <school1>,<school2>,...
+Update what has changed:
+  sophomorix-ui
 
-  --force  (update every user)
+Update every user:
+  sophomorix-ui --force
+
+Show what would be changed:
+  sophomorix-ui -i
+  sophomorix-ui -ij
+
+Limit changes to one school:
+  --school <school>
 
 Please see the sophomorix-ui(8) man pages for full documentation
 ');
@@ -141,16 +149,18 @@ if ($school ne ""){
     @schoollist=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
 }
 
-
+# get user data from AD
 my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                            root_dse=>$root_dse,
                                            root_dns=>$root_dns,
                                            sophomorix_config=>\%sophomorix_config,
                                          });
 
+# verify user data against old values
 my $ref_AD_check_ui=&AD_check_ui({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
+                                  force=>$force,
                                   ref_AD_check=>$ref_AD_check,
                                   sophomorix_config=>\%sophomorix_config,
                                  });
@@ -168,15 +178,6 @@ if ($info==1){
 }
 
 
-# --force
-my $list_type="LISTS_UPDATE"; # use update lists
-if ($force==1){
-    # use lists with all users
-    $list_type="LISTS";
-}
-
-
-
 
 # ===========================================================================
 # Start
@@ -191,8 +192,8 @@ if ($school eq ""){
     # walk through all users
     foreach my $role (@rolelist){
         $user_count=0;
-        $max_user_count=$#{ $ref_AD_check_ui->{$list_type}{'USERS'}{$role} }+1;
-        foreach my $user (@{ $ref_AD_check_ui->{$list_type}{'USERS'}{$role} }){
+        $max_user_count=$#{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS'}{$role} }+1;
+        foreach my $user (@{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS'}{$role} }){
             $user_count++;
             &AD_user_update({ldap=>$ldap,
                              root_dse=>$root_dse,
@@ -211,8 +212,8 @@ if ($school eq ""){
     # walk through all schools, count by school
     foreach my $school (@schoollist){
         &Sophomorix::SophomorixBase::print_title("Setting sophomorixWebuiPermissionsCalculated in $school");
-        if ( exists $ref_AD_check_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} ){
-	    $max_user_count=$#{ $ref_AD_check_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} }+1;
+        if ( exists $ref_AD_check_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} ){
+	    $max_user_count=$#{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} }+1;
             }
         if ($max_user_count==0){
             print "\n0 SophomorixWebuiPermissionsCalculated updates in school $school\n\n";
@@ -220,7 +221,7 @@ if ($school eq ""){
         }
         foreach my $role (@rolelist){
             &Sophomorix::SophomorixBase::print_title("   * sophomorixRole: $role");
-            foreach my $user (@{ $ref_AD_check_ui->{$list_type}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} }){
+            foreach my $user (@{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} }){
                 $user_count++;
                 &AD_user_update({ldap=>$ldap,
                                  root_dse=>$root_dse,
