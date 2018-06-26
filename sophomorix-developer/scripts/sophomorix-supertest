@@ -159,6 +159,11 @@ sub prepare_smb {
     my $templates="/usr/share/sophomorix-developer/testtemplates";
     my $config="/etc/linuxmuster/sophomorix";
 
+    # webui permissions test file
+    system("install -d -m755 -oroot -groot /usr/lib/linuxmuster-webui/etc/");
+    system("cp /usr/share/sophomorix/config-templates/test-ui-perm.ini /usr/lib/linuxmuster-webui/etc/default-ui-permissions.ini");
+
+
     # sophomorix.conf
     system("install -d -m755 -oroot -groot $config");
     system("install -v -oroot -groot --mode=0644 $templates/sophomorix.conf.template.ini.test $config/sophomorix.conf");
