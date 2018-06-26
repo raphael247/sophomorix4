@@ -3782,6 +3782,7 @@ sub AD_get_sessions {
                 }
 
                 foreach $participant (@participants){
+                    my $exammode_boolean;
                     # get userinfo
                     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
@@ -3799,6 +3800,7 @@ sub AD_get_sessions {
                         next;
 		    }
                     if ($exammode_AD ne "---"){
+                        $exammode_boolean="TRUE";
                         # display exam-account
                         $participant=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
                         
@@ -3811,6 +3813,8 @@ sub AD_get_sessions {
                                       root_dns=>$root_dns,
                                       user=>$participant,
                                     });
+                    } else {
+                        $exammode_boolean="FALSE";
                     }
 
                     # calculate smb_dir
@@ -3821,6 +3825,8 @@ sub AD_get_sessions {
                     $smb_dir="smb:".$smb_dir."/".$transfer;
 		    #print "SMB: $smb_dir\n";
 
+
+                    $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'exammode_boolean'}=$exammode_boolean;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'givenName'}=$firstname_utf8_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sn'}=$lastname_utf8_AD;
                     $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixAdminClass'}=$adminclass_AD;
