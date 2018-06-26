@@ -68,6 +68,7 @@ $Data::Dumper::Terse = 1;
             AD_get_AD_for_check
             AD_get_AD_for_device
             AD_get_ui
+            AD_check_ui
             AD_get_quota
             AD_get_users_v
             AD_get_groups_v
@@ -4076,6 +4077,7 @@ sub AD_get_AD_for_check {
                                 'sophomorixBirthdate',
                                 'sn',
                                 'givenName',
+                                'displayName',
                                 'sophomorixSurnameInitial',
                                 'sophomorixFirstnameInitial',
                                 'sophomorixAdminFile',
@@ -4104,6 +4106,7 @@ sub AD_get_AD_for_check {
               ){
                # save needed stuff             
                $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
+               $AD{'sAMAccountName'}{$sam}{'dn'}=$entry->dn();
                $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
                $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
                $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
@@ -4112,6 +4115,7 @@ sub AD_get_AD_for_check {
                $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
                $AD{'sAMAccountName'}{$sam}{'sn'}=$entry->get_value('sn');
                $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
+               $AD{'sAMAccountName'}{$sam}{'displayName'}=$entry->get_value('displayName');
                $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
                $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
@@ -4769,7 +4773,109 @@ sub AD_get_ui {
 }
 
 
- 
+
+sub AD_check_ui {
+    my %ui=();
+    my $ref_ui=\%ui;
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $ref_AD_check = $arg_ref->{ref_AD_check};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    foreach my $sam (keys %{ $ref_AD_check->{'sAMAccountName'} }){
+        #print "SAM: $sam\n";
+        my @old = sort @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} };
+        my $old_webui_string=join(",",@old);
+        my ($new_webui_string,$role,$school)=&AD_create_new_webui_string($sam,$ref_sophomorix_config,$ref_AD_check,$role,$school);
+        #print "OLD: $old_webui_string\n";
+        #print "NEW: $new_webui_string\n";
+        if ($new_webui_string ne $old_webui_string){
+            print "   ---> update $sam\n";
+            #print Dumper($ref_AD_check->{'sAMAccountName'}{$sam});
+            $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'displayName'};
+            $ui{'UI'}{'USERS'}{$sam}{'dn'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
+            $ui{'UI'}{'USERS'}{$sam}{'sophomorixAdminClass'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+            @{ $ui{'UI'}{'USERS'}{$sam}{'sophomorixWebuiPermissionsCalculated'} }=
+                @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} };
+            # create CALC*LISTs from CALC hash
+            @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} }=split(/,/,$new_webui_string);
+            push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} },$sam;
+            push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} },$sam;
+            push @{ $ui{'LISTS_UPDATE'}{'USERS'}{$role}  },$sam;
+        }
+    }
+    #     # create CALC*LISTs from CALC hash
+    #     @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} }=();
+    #     @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} }=();
+    #     @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} }=();
+    #     foreach my $mod_path (keys %{ $ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'} }) {
+    #         my $item=$mod_path." ".$ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path};
+    #         push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} },$item;
+    #         if ($ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path} eq "true"){
+    #             push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCTRUELIST'} },$item;
+    #         } elsif ($ref_ui->{'UI'}{'USERS'}{$sam}{'CALC'}{$mod_path} eq "false"){
+    #             push @{ $ui{'UI'}{'USERS'}{$sam}{'CALCFALSELIST'} },$item;
+    #         }
+    #     }
+
+    #     # always update for now ????
+    #     push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
+    #     push @{ $ui{'LISTS_UPDATE'}{'USERS'}{$role} },$sam;
+    &Sophomorix::SophomorixBase::print_title("Query AD (end)");
+    return(\%ui);
+}
+
+
+
+sub AD_create_new_webui_string {
+    my ($sam,$ref_sophomorix_config,$ref_AD_check,$role_file,$school_file) = @_;
+    my $role;
+    my $school;
+    my %new_webui=();
+    my @new_webui=();
+    if (not defined $role){
+        # existing user
+        $role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
+        $school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+    } else {
+        # nonexisting user 
+        $role=$role_file;
+        $school=$school_file;
+    }
+
+    # 1) set the webui according to school and role
+    foreach my $mod (keys %{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'} }){
+        #print "     $mod ---> $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}\n";
+        $new_webui{'UI'}{$mod}=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
+    }
+
+    # 2) with individual settings from  AD (sophomorixWebuiPermissions)
+    foreach my $perm ( @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'}  } ){ 
+        #print "    $sam (individual): $perm\n";
+        my ($mod_path,$setting)=&Sophomorix::SophomorixBase::test_webui_permission($perm,
+            $ref_sophomorix_config,
+            "sophomorixWebuiPermissions of $sam in $school",
+            "check",
+            $school,
+            $role);
+        #print "        $mod_path --> $setting\n";
+        $new_webui{'UI'}{$mod_path}=$setting;
+    }
+    
+    # create new webui string
+    foreach my $mod_path ( keys %{ $new_webui{'UI'} } ){
+        push @new_webui,$mod_path." ".$new_webui{'UI'}{$mod_path};
+    }
+    @new_webui = sort @new_webui;
+    my $new_webui_string=join(",",@new_webui);
+
+    return ($new_webui_string,$role,$school);
+}
+
+
+
 sub AD_get_ui_old {
     my %ui=();
     my $ref_ui=\%ui;

@@ -45,7 +45,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_dns_get
                                  AD_get_user
-                                 AD_get_ui
+                                 AD_get_AD_for_check
+                                 AD_check_ui
                                  AD_user_kill
                                  AD_unbind_admin
                                  AD_object_search
@@ -72,7 +73,6 @@ my $json=0;
 my $school="";
 my $force=0;
 my $user="";
-my $abs_path_ui_ini="";
 
 $Conf::log_level=1;
 
@@ -83,7 +83,6 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "school=s" => \$school,
-           "abs-path-ui-ini=s" => \$abs_path_ui_ini,
            "force|f" => \$force,
           );
 
@@ -116,8 +115,6 @@ Options
   -i  (show what would be updated)
   --school <school1>,<school2>,...
 
-  --abs-path-ui-ini /path/to/ini  (use another ini file, for tests only)
-
   --force  (update every user)
 
 Please see the sophomorix-ui(8) man pages for full documentation
@@ -145,15 +142,18 @@ if ($school ne ""){
 }
 
 
+my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           sophomorix_config=>\%sophomorix_config,
+                                         });
 
-
-my $ref_ui=&AD_get_ui({ldap=>$ldap,
-                       root_dse=>$root_dse,
-                       root_dns=>$root_dns,
-                       abs_path_ui_ini=>$abs_path_ui_ini,
-                       sophomorix_config=>\%sophomorix_config,
-                     });
-
+my $ref_AD_check_ui=&AD_check_ui({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  ref_AD_check=>$ref_AD_check,
+                                  sophomorix_config=>\%sophomorix_config,
+                                 });
 
 if ($info==1){
     &json_dump({json => $json,
@@ -161,7 +161,7 @@ if ($info==1){
                 jsoncomment => "sophomorix ui",
                 object_name => $school,
                 log_level => $Conf::log_level,
-                hash_ref=>$ref_ui,
+                hash_ref=>$ref_AD_check_ui,
                 sophomorix_config=>\%sophomorix_config,
               });
     exit;
@@ -185,29 +185,20 @@ if ($force==1){
 
 my $max_user_count=0;
 my $user_count=0;
-if ($school ne ""){
-    # walk through all schools, count by schools
-    # count users
-    foreach my $school (@schoollist){
-        if (exists $ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school}){
-	    print "$ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school}\n";
-	    $max_user_count=$max_user_count
-		            +$#{ $ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} }
-                            +1;
-        }
-    }
-    if ($max_user_count==0){
-        print "\n0 SophomorixWebuiPermissionsCalculated updates in schools $school\n\n";
-    }
-    foreach my $school (@schoollist){
-        &Sophomorix::SophomorixBase::print_title("Setting ui attribute for school $school:");
-        foreach my $user (@{ $ref_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} }){
+my @rolelist=("globaladministrator","schooladministrator","teacher","student");
+
+if ($school eq ""){
+    # walk through all users
+    foreach my $role (@rolelist){
+        $user_count=0;
+        $max_user_count=$#{ $ref_AD_check_ui->{$list_type}{'USERS'}{$role} }+1;
+        foreach my $user (@{ $ref_AD_check_ui->{$list_type}{'USERS'}{$role} }){
             $user_count++;
             &AD_user_update({ldap=>$ldap,
                              root_dse=>$root_dse,
-                             dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
+                             dn=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'dn'},
                              user=>$user,
-                             webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'},
+                             webui_permissions_calculated=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'},
                              user_count=>$user_count,
                              max_user_count=>$max_user_count,
                              json=>$json,
@@ -217,24 +208,32 @@ if ($school ne ""){
         }
     }
 } else {
-    # walk through all users
-    my @rolelist=("globaladministrator","schooladministrator","teacher","student");
-    foreach my $role (@rolelist){
-        $user_count=0;
-        $max_user_count=$#{ $ref_ui->{$list_type}{'USERS'}{$role} }+1;
-        foreach my $user (@{ $ref_ui->{$list_type}{'USERS'}{$role} }){
-            $user_count++;
-            &AD_user_update({ldap=>$ldap,
-                             root_dse=>$root_dse,
-                             dn=>$ref_ui->{'UI'}{'USERS'}{$user}{'dn'},
-                             user=>$user,
-                             webui_permissions_calculated=>$ref_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'},
-                             user_count=>$user_count,
-                             max_user_count=>$max_user_count,
-                             json=>$json,
-                             sophomorix_config=>\%sophomorix_config,
-                             sophomorix_result=>\%sophomorix_result,
-                           });
+    # walk through all schools, count by school
+    foreach my $school (@schoollist){
+        &Sophomorix::SophomorixBase::print_title("Setting sophomorixWebuiPermissionsCalculated in $school");
+        if ( exists $ref_AD_check_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} ){
+	    $max_user_count=$#{ $ref_AD_check_ui->{$list_type}{'USER_by_sophomorixSchoolname'}{$school} }+1;
+            }
+        if ($max_user_count==0){
+            print "\n0 SophomorixWebuiPermissionsCalculated updates in school $school\n\n";
+            next;
+        }
+        foreach my $role (@rolelist){
+            &Sophomorix::SophomorixBase::print_title("   * sophomorixRole: $role");
+            foreach my $user (@{ $ref_AD_check_ui->{$list_type}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} }){
+                $user_count++;
+                &AD_user_update({ldap=>$ldap,
+                                 root_dse=>$root_dse,
+                                 dn=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'dn'},
+                                 user=>$user,
+                                 webui_permissions_calculated=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'CALCLIST'},
+                                 user_count=>$user_count,
+                                 max_user_count=>$max_user_count,
+                                 json=>$json,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+                              });
+            }
         }
     }
 }
@@ -249,7 +248,7 @@ if ($school ne ""){
                      DESCRIPTION_PRE => " user ui updated", 
                      FORMAT_TYPE => 1,
                      sophomorix_result=>\%sophomorix_result,
-			       });
+ 		               });
 
 
 
