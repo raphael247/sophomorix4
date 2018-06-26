@@ -87,6 +87,7 @@ my $info=0;
 my $json=0;
 my $list_files=0;
 my $no_sync=0;
+my $sync=0;
 my $birthdate="1970-01-01";
 my $add_example_line="";
 
@@ -184,6 +185,7 @@ my $testopt=GetOptions(
        "dump-ad" => \$dump_ad,
        "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
+       "sync" => \$sync,
        "dns-test" => \$dns_test,
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
@@ -244,7 +246,7 @@ Full information about one/some devices:
 
 
 Synchronize the devices:
-  sophomorix-device
+  sophomorix-device --sync
 
 Just show what would be done (but do not do it):
   sophomorix-device --no-sync
@@ -1129,8 +1131,9 @@ if($no_sync==1){
 ############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
-
-if ($no_sync==0){ # $no_sync==0 -> SYNC
+# ???????? First line is the future
+#if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
+if (($sync==1 or $sync==0) and $no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill the rooms of computers
     print "\n";

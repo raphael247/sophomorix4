@@ -158,14 +158,14 @@ Step by step Test:
   Copy devices.csv/classrooms file (Step 1):
       sophomorix-test-2 --copy-devfile-1
   Import the file:
-      sophomorix-device
+      sophomorix-device --sync
   Run the tests:
       sophomorix-test-2 --test-dev-1
 
   Copy devices.csv/classrooms file (Step 2):
       sophomorix-test-2 --copy-devfile-2
   Import the file:
-      sophomorix-device
+      sophomorix-device --sync
   Run the tests:
       sophomorix-test-2 --test-dev-2
 
@@ -174,7 +174,7 @@ Step 3-4 are missing
   Copy EMPTY devices.csv/classrooms file (Step 5):
       sophomorix-test-2 --copy-devfile-5
   Import the file:
-      sophomorix-device
+      sophomorix-device --sync
   Run the tests:
       sophomorix-test-2 --test-dev-5
 ');
@@ -245,7 +245,7 @@ if ($copy_devfile_1==1){
 }
 
 if ($full==1){
-    &run_command("sophomorix-device $all_options");
+    &run_command("sophomorix-device --sync $all_options");
 }
 
 if ($test_ws_1==1){
@@ -1966,7 +1966,7 @@ if ($copy_devfile_2==1){
 }
 
 if ($full==1){
-    &run_command("sophomorix-device $all_options");
+    &run_command("sophomorix-device --sync $all_options");
 }
 
 
@@ -3717,7 +3717,7 @@ if ($copy_devfile_5==1){
 }
 
 if ($full==1){
-    &run_command("sophomorix-device $all_options");
+    &run_command("sophomorix-device --sync $all_options");
 }
 
 if ($test_ws_5==1){
