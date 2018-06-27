@@ -4801,7 +4801,7 @@ sub AD_check_ui {
         #print "NEW: $new_webui_string\n";
         if ($new_webui_string ne $old_webui_string or $force==1){
             # update
-            print "update $sam\n";
+            #print "update $sam\n";
             $ui{'UI'}{'USERS'}{$sam}{'displayName'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'displayName'};
             $ui{'UI'}{'USERS'}{$sam}{'dn'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
             $ui{'UI'}{'USERS'}{$sam}{'sophomorixAdminClass'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
