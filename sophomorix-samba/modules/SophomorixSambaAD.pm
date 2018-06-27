@@ -4057,6 +4057,7 @@ sub AD_get_AD_for_check {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
+    my $admins = $arg_ref->{admins};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     # forbidden login names
@@ -4070,8 +4071,10 @@ sub AD_get_AD_for_check {
     ############################################################
     # SEARCH FOR ALL
     &Sophomorix::SophomorixBase::print_title("Query AD (begin)");
+
+    # get all objects (for forbidden logins)
     my $filter="(| (objectClass=user) (objectClass=group) (objectClass=computer) )";
-    my $mesg8 = $ldap->search( # perform a search
+    my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
                       scope => 'sub',
                       filter => $filter,
@@ -4097,15 +4100,17 @@ sub AD_get_AD_for_check {
                                 'SophomorixWebuiPermissionsCalculated',
                                 'objectClass',
                                ]);
-    my $max = $mesg8->count; 
+    my $max = $mesg->count;
     for( my $index = 0 ; $index < $max ; $index++) {
-       my $entry = $mesg8->entry($index);
+       my $entry = $mesg->entry($index);
        my $sam=$entry->get_value('sAMAccountName');
        #my $objectclass=$entry->get_value('objectClass');
        my $role;
        my $type;
-       my $forbidden_warn;
+       my $forbidden_warn; # what to save as warn message
+
        if (defined $entry->get_value('sophomorixRole')){
+           ##### a sophomorix user #####
            $role=$entry->get_value('sophomorixRole');
            $forbidden_warn="$sam forbidden, $sam is a sophomorix user";
            if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'} or
@@ -4113,73 +4118,77 @@ sub AD_get_AD_for_check {
                $role eq "schooladministrator" or 
                $role eq "globaladministrator"
               ){
-               # save needed stuff             
-               $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
-               $AD{'sAMAccountName'}{$sam}{'dn'}=$entry->dn();
-               $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
-               $AD{'sAMAccountName'}{$sam}{'sn'}=$entry->get_value('sn');
-               $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
-               $AD{'sAMAccountName'}{$sam}{'displayName'}=$entry->get_value('displayName');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
-               $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
+               if ($admins eq "FALSE" and ($role eq "schooladministrator" or $role eq "globaladministrator") ){
+                   # do nothing
+               } else {
+                   # save needed stuff
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
+                   $AD{'sAMAccountName'}{$sam}{'dn'}=$entry->dn();
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}=$entry->get_value('sophomorixBirthdate');
+                   $AD{'sAMAccountName'}{$sam}{'sn'}=$entry->get_value('sn');
+                   $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
+                   $AD{'sAMAccountName'}{$sam}{'displayName'}=$entry->get_value('displayName');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
 
-               my $identifier_ascii=
-                   $entry->get_value('sophomorixSurnameASCII').
-                   ";".
-                   $entry->get_value('sophomorixFirstnameASCII').
-                   ";".
-                   $entry->get_value('sophomorixBirthdate');
-               $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+                   my $identifier_ascii=
+                       $entry->get_value('sophomorixSurnameASCII').
+                       ";".
+                       $entry->get_value('sophomorixFirstnameASCII').
+                       ";".
+                       $entry->get_value('sophomorixBirthdate');
+                   $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}=$identifier_ascii;
 
-               my $identifier_utf8=
-                   $entry->get_value('sn').
-                   ";".
-                   $entry->get_value('givenName').
-                   ";".
-                   $entry->get_value('sophomorixBirthdate');
-               # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
-               # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+                   my $identifier_utf8=
+                       $entry->get_value('sn').
+                       ";".
+                       $entry->get_value('givenName').
+                       ";".
+                       $entry->get_value('sophomorixBirthdate');
+                   # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
+                   # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
-               # save ui stuff
-               @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'} } = 
-                   sort $entry->get_value('sophomorixWebuiPermissions');
-               @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } = 
-                   sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
+                   # save ui stuff
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'} } =
+                       sort $entry->get_value('sophomorixWebuiPermissions');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } =
+                       sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
 
-               # LOOKUP
-               $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
-               $AD{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
-               $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
-               $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
-               if ($entry->get_value('sophomorixUnid') ne "---"){
-                   # no lookup for unid '---'
-                   $AD{'LOOKUP'}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
-                   # $AD{'LOOKUP'}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
-                   #     $identifier_utf8;
-                   $AD{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
-                       $identifier_ascii;
+                   # LOOKUP
+                   $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
+                   $AD{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
+                   $AD{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+                   $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
+                   if ($entry->get_value('sophomorixUnid') ne "---"){
+                       # no lookup for unid '---'
+                       $AD{'LOOKUP'}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
+                       # $AD{'LOOKUP'}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       #     $identifier_utf8;
+                       $AD{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                           $identifier_ascii;
+                   }
                }
-           } else {
-               # not a sophomorix role
            }
        } elsif (defined $entry->get_value('sophomorixType')){
+           ##### a sophomorix group #####
            $type=$entry->get_value('sophomorixType');
            $forbidden_warn="$sam forbidden, $sam is a sophomorix group";
        } else {
-           $forbidden_warn="$sam forbidden, $sam is a non-sophomorix user";
+           ##### a non sophomorix object #####
+           $forbidden_warn="$sam forbidden, $sam is a non-sophomorix object";
        }
 
        $AD{'FORBIDDEN'}{$sam}=$forbidden_warn;
-       #print "$forbidden_warn: $sam\n"; 
+       #print "$sam: $forbidden_warn\n";
     }
 
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");

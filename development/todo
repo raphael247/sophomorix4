@@ -30,7 +30,6 @@ sophomorix-device
     ---> sophomorix-device zeigt dann die Hilfe
          See line # ???????? First line is the future in sophomorix-device
 
-sophomorix-ui
 
 Migration Bugs:
 
@@ -44,8 +43,6 @@ classen.map
 migration entries in devices.csv mit tagged line beginnen
 beim nochmaligen anlegen sollte NICHT zusätzlich angehängt werden
 (incl. tagged line nicht lesen)
-
-
 
 performance: sophomorix-class --create 
 --> option --skip-school-creation
@@ -225,25 +222,6 @@ smbcquotas:
 smbcquotas Tests von einer Schule auf alle erweitern (script für shareerstellung fehlt noch)
 
 sophomorix-ui:
-   - add school.conf override 
-   - test school.conf override 
-   - test user oberride further
-   - AD_get_ui splitten: part 1: read_config
-                         part_2: create calculated field 
-   - integration in sophomorix-add, update
-       Todo:
-         AD_get_ui in AD_get_AD_for_check integrieren !
-         sophomorix-check ermittelt ui settings
-           * from WEBUI package (done) 
-           * school.conf (todo)
-         sophomorix.add
-         sophomorix-.update          
-
-         sophomorix-ui nutzt dann AD_get_AD_for_check
-         wird nach einer Anpassung von school.conf oder user setting mit sophomorix-user aufgerufen
-
-     - schreiben der Liste in sophomorix.add
-     - schreiben der Liste in sophomorix.update
        (bei Rollenwechsel individuelle settings löschen)
 
 Anmelden an exam account: einmalpasswort forcen, geht das. Konfigurierbar
@@ -258,7 +236,7 @@ sophomorix-device : creating DNSNode,DNSreverse und DNSZone:
   - dnsnode zusatzdate erkennen und updaten
 
 
-sophomorix-ui --> Zeilen aus school.conf auslesen
+sophomorix-ui
 code cleanup: subs mit _old löschen -> besser: neues programm, das die custom felder befüllt?
 
 DNS:
