@@ -69,6 +69,7 @@ $Data::Dumper::Terse = 1;
             AD_get_AD_for_device
             AD_get_ui
             AD_check_ui
+            AD_create_new_webui_string
             AD_get_quota
             AD_get_users_v
             AD_get_groups_v
@@ -4795,7 +4796,7 @@ sub AD_check_ui {
         #print "SAM: $sam\n";
         my @old = sort @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} };
         my $old_webui_string=join(",",@old);
-        my ($new_webui_string,$role,$school)=&AD_create_new_webui_string($sam,$ref_sophomorix_config,$ref_AD_check,$role,$school);
+        my ($new_webui_string,$role,$school)=&AD_create_new_webui_string($sam,$ref_sophomorix_config,$ref_AD_check);
         #print "OLD: $old_webui_string\n";
         #print "NEW: $new_webui_string\n";
         if ($new_webui_string ne $old_webui_string or $force==1){
@@ -4827,15 +4828,17 @@ sub AD_create_new_webui_string {
     my $school;
     my %new_webui=();
     my @new_webui=();
-    if (not defined $role){
+    if (not defined $role_file){
         # existing user
         $role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
         $school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
     } else {
-        # nonexisting user 
+        # called from sophomorix-check to look for updates:
+        # use NEW role and NEW school
         $role=$role_file;
         $school=$school_file;
     }
+    #print "Working on $sam in school $school with role $role\n";
 
     # 1) set the webui according to school and role
     foreach my $mod (keys %{ $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'} }){
@@ -4843,7 +4846,7 @@ sub AD_create_new_webui_string {
         $new_webui{'UI'}{$mod}=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
     }
 
-    # 2) with individual settings from  AD (sophomorixWebuiPermissions)
+    # 2) set the webui with individual settings from  AD (sophomorixWebuiPermissions)
     foreach my $perm ( @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'}  } ){ 
         #print "    $sam (individual): $perm\n";
         my ($mod_path,$setting)=&Sophomorix::SophomorixBase::test_webui_permission($perm,
@@ -4862,7 +4865,7 @@ sub AD_create_new_webui_string {
     }
     @new_webui = sort @new_webui;
     my $new_webui_string=join(",",@new_webui);
-
+    #print "NEW: $new_webui_string\n";
     return ($new_webui_string,$role,$school);
 }
 

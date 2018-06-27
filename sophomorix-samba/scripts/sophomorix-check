@@ -66,6 +66,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_get_AD_for_check
                                  AD_dns_get
+                                 AD_create_new_webui_string
                                  AD_object_search
                                     );
 
@@ -1423,6 +1424,12 @@ sub test_user_update {
     my @new_webui=();
     my $school=$Match{'ACTION'}{$line_new}{'school'};
     my $role=$Match{'ACTION'}{$line_new}{'role'};
+
+
+
+    my $a=0;
+    if ($a==1){
+    
     foreach my $mod (keys %{ $sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'} }){
         #print "     $mod ---> $sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}\n";
         $new_webui{'UI'}{$mod}=$sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
@@ -1448,9 +1455,19 @@ sub test_user_update {
     }
     @new_webui = sort @new_webui;
     ${$new_webui_string_ref}=join(",",@new_webui);
+    } else {
+
+
+    # creating webui string with NEW role and NEW school
+    (${$new_webui_string_ref})=&AD_create_new_webui_string($sam,\%sophomorix_config,$ref_AD_check,$role,$school);
+
+
+
+    }
+
     #print "\n";
-    #print "$sam -> ${$old_webui_string_ref}\n";
-    #print "        ${$new_webui_string_ref}\n";
+    #print "$sam -> OLD: ${$old_webui_string_ref}\n";
+    #print "        NEW: ${$new_webui_string_ref}\n";
 
     # test for update
     if ( ${$new_webui_string_ref} eq  ${$old_webui_string_ref} ){
