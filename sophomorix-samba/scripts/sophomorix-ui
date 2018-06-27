@@ -188,6 +188,7 @@ my $max_user_count=0;
 my $user_count=0;
 my @rolelist=("globaladministrator","schooladministrator","teacher","student");
 
+
 if ($school eq ""){
     # walk through all users
     foreach my $role (@rolelist){
@@ -195,6 +196,7 @@ if ($school eq ""){
         $max_user_count=$#{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS'}{$role} }+1;
         foreach my $user (@{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS'}{$role} }){
             $user_count++;
+	    
             &AD_user_update({ldap=>$ldap,
                              root_dse=>$root_dse,
                              dn=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'dn'},

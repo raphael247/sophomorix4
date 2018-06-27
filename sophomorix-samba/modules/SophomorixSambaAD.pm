@@ -4109,7 +4109,9 @@ sub AD_get_AD_for_check {
            $role=$entry->get_value('sophomorixRole');
            $forbidden_warn="$sam forbidden, $sam is a sophomorix user";
            if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'} or
-               $role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'}
+               $role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'} or
+               $role eq "schooladministrator" or 
+               $role eq "globaladministrator"
               ){
                # save needed stuff             
                $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
@@ -4166,6 +4168,8 @@ sub AD_get_AD_for_check {
                    $AD{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
                        $identifier_ascii;
                }
+           } else {
+               # not a sophomorix role
            }
        } elsif (defined $entry->get_value('sophomorixType')){
            $type=$entry->get_value('sophomorixType');
@@ -4797,8 +4801,8 @@ sub AD_check_ui {
         my @old = sort @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} };
         my $old_webui_string=join(",",@old);
         my ($new_webui_string,$role,$school)=&AD_create_new_webui_string($sam,$ref_sophomorix_config,$ref_AD_check);
-        #print "OLD: $old_webui_string\n";
-        #print "NEW: $new_webui_string\n";
+        #print "  OLD: $old_webui_string\n";
+        #print "  NEW: $new_webui_string\n";
         if ($new_webui_string ne $old_webui_string or $force==1){
             # update
             #print "update $sam\n";
