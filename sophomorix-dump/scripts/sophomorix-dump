@@ -97,19 +97,16 @@ if ($clean==1){
 
 if (-e $target_topdir){
     print "\nERROR: The  directory for the dump exists already: $target_topdir\n";
-    print "       Please remove $target_topdir for a clean dump\n\n";
     exit;
 }
 
 if (-e $project_dump){
     print "\nERROR: The  directory for the project dump exists already: $project_dump\n";
-    print "       Please remove $project_dump for a clean dump\n\n";
     exit;
 }
 
 if (-e $view_dumps_dir){
     print "\nERROR: The  directory for the view dumps exists already: $view_dumps_dir\n";
-    print "       Please remove $view_dumps_dir for a clean dump\n\n";
     exit;
 }
 
@@ -180,7 +177,9 @@ sub copy_files {
         if ($type eq "dir"){
             # directory
             system("mkdir -p $old_path_dump");
-            system("cp -r $old_path $old_path_dump");
+            my $command="cp -r $old_path $old_path_dump";
+            print "$command\n";
+            system($command);
         } elsif ($type eq "file"){
             # file
             system("install -D   $old_path $old_path_dump");
@@ -188,7 +187,7 @@ sub copy_files {
 
         # testing if copy was secessful
         if ($type eq "dir" and -d $old_path_dump){
-            print "   * Dump OK: dir $old_path_dump\n";
+            print "   * Diretory Dump OK: $old_path_dump\n";
             push @log, "    * Dump OK: dir $old_path_dump\n";
 	} elsif (-f $old_path_dump and -s $old_path_dump){
             print "   * Dump OK: $old_path_dump\n";
