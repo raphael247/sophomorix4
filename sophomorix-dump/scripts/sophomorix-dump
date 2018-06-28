@@ -96,17 +96,20 @@ if ($clean==1){
 
 
 if (-e $target_topdir){
-    print "\nERROR: The  directory for the dump exists already: $target_topdir\n";
+    print "\nERROR: The  directory for the dump exists already: $target_topdir\n\n";
+    print "         Use: \"sophomorix-dump --clean\" to delete the previous dump\n\n";
     exit;
 }
 
 if (-e $project_dump){
-    print "\nERROR: The  directory for the project dump exists already: $project_dump\n";
+    print "\nERROR: The  directory for the project dump exists already: $project_dump\n\n";
+    print "         Use: \"sophomorix-dump --clean\" to delete the previous dump\n\n";
     exit;
 }
 
 if (-e $view_dumps_dir){
-    print "\nERROR: The  directory for the view dumps exists already: $view_dumps_dir\n";
+    print "\nERROR: The  directory for the view dumps exists already: $view_dumps_dir\\n";
+    print "         Use: \"sophomorix-dump --clean\" to delete the previous dump\n\n";
     exit;
 }
 
@@ -141,9 +144,6 @@ foreach my $line (@log){
 print "########### End: Results of dump ##########\n";
 print "WARNINGs in Results of dump are OK:\n";
 print "\n";
-print "  /etc/sophomorix/user/mail/*\n";
-print "    is only needed, if you had added exernal mail addresses to your mailinglists\n";
-print "\n";
 print "  /etc/sophomorix/virusscan/sophomorix-virusscan-excludes.conf\n";
 print "  /etc/sophomorix/virusscan/sophomorix-virusscan.conf\n";
 print "  /var/lib/sophomorix/virusscan/penalty.db\n";
@@ -177,7 +177,7 @@ sub copy_files {
         if ($type eq "dir"){
             # directory
             system("mkdir -p $old_path_dump");
-            my $command="cp -r $old_path $old_path_dump";
+            my $command="cp -r $old_path/. $old_path_dump";
             print "$command\n";
             system($command);
         } elsif ($type eq "file"){
