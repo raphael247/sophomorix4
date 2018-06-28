@@ -34,11 +34,13 @@ my $view_dumps_dir = "/root/sophomorix-dump-viewdumps";
 # Variablen für Optionen
 my $help=0;
 my $verbose=0;
+my $clean=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$verbose,
+           "clean" => \$clean,
          );
 
 # Prüfen, ob Optionen erkannt wurden
@@ -55,7 +57,13 @@ sophomorix-dump dumps users, classes, projects and workstations from a linuxmust
 
 Usage:
 
-sophomorix-dump
+Dump the data:
+
+   sophomorix-dump
+
+Clean up after dump:
+
+   sophomorix-dump --clean
 
 Options
   -h  / --help
@@ -66,6 +74,25 @@ Options
    print "\n";
    exit;
 }
+
+
+
+if ($clean==1){
+    print "Cleaning up dump\n";
+    my $command="rm -rf /root/sophomorix-dump";
+    print "   $command\n";
+    system($command);
+    my $command2="rm -f /root/sophomorix-dump.projects";
+    print "   $command2\n";
+    system($command2);
+    my $command3="rm -rf /root/sophomorix-dump-viewdumps";
+    print "   $command3\n";
+    system($command3);
+   
+
+    exit;
+}
+
 
 
 if (-e $target_topdir){
@@ -110,10 +137,21 @@ system("/usr/sbin/sophomorix-project --dump $project_dump");
 # print results
 ############################################################
 print "\n";
-print "########### Results of dump ##########\n";
+print "########### Start: Results of dump ##########\n";
 foreach my $line (@log){
     print $line;
 }
+print "########### End: Results of dump ##########\n";
+print "WARNINGs in Results of dump are OK:\n";
+print "\n";
+print "  /etc/sophomorix/user/mail/*\n";
+print "    is only needed, if you had added exernal mail addresses to your mailinglists\n";
+print "\n";
+print "  /etc/sophomorix/virusscan/sophomorix-virusscan-excludes.conf\n";
+print "  /etc/sophomorix/virusscan/sophomorix-virusscan.conf\n";
+print "  /var/lib/sophomorix/virusscan/penalty.db\n";
+print "    are only needed, if you had configured sophomorix for scanning viruses\n";
+print "\n";
 
 exit;
 
@@ -127,23 +165,35 @@ exit;
 
 sub copy_files {
     #system("mkdir -p");
-    open(CONFIG,"<$config") || die;
+    open(CONFIG,"<$config") || die "$config not found";
     while(<CONFIG>){
         if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
 	    next;
         }
         chomp();
-        my ($old_path,$new_path)=split(/::/);
+        my ($old_path,$new_path,$new_permissions,$type)=split(/::/);
         my $old_path_dump=$target_dir.$old_path;
         print "   * Saving: $old_path\n";
         print "        to : $old_path_dump\n";
         system("install -D   $old_path $old_path_dump");
-	if (-f $old_path_dump && -s $old_path_dump){
+	if (-f $old_path_dump and -s $old_path_dump){
             print "   * Dump OK: $old_path_dump\n";
             push @log, "    * Dump OK: $old_path_dump\n";
+	} elsif (-f $old_path_dump and -s $old_path_dump and $type eq "may") {
+            print "WARNING, not dumped: $old_path_dump\n";
+            print "   This may be the result of an unused feature\n";
 	} else {
-            print "ERROR dumping $old_path_dump\n";
-            push @log, "ERROR dumping: $old_path_dump\n";
+            if ($type eq "must"){
+                print "$type\n";
+                print "ERROR dumping $old_path_dump\n";
+                push @log, "ERROR dumping: $old_path_dump\n";
+	    } elsif ($type eq "may"){
+                print "$type\n";
+                print "WARNING dumping $old_path_dump (may be an unused feature)\n";
+                push @log, "WARNING dumping: $old_path_dump\n";
+            } else {
+                print "ERROR IN SCRIPT: $type -> $old_path needs must/may entry\n";
+            }
         }
    }
     close(CONFIG);
