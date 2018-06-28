@@ -96,20 +96,23 @@ if ($clean==1){
 
 
 if (-e $target_topdir){
-    print "\nERROR: The  directory for the dump exists already: $target_topdir\n\n";
-    print "         Use: \"sophomorix-dump --clean\" to delete the previous dump\n\n";
+    print "\n";
+    print "ERROR: The  directory for the dump exists already: $target_topdir\n\n";
+    print "       Use  \"sophomorix-dump --clean\"  to delete the previous dump\n\n";
     exit;
 }
 
 if (-e $project_dump){
-    print "\nERROR: The  directory for the project dump exists already: $project_dump\n\n";
-    print "         Use: \"sophomorix-dump --clean\" to delete the previous dump\n\n";
+    print "\n";
+    print "ERROR: The  directory for the project dump exists already: $project_dump\n\n";
+    print "       Use  \"sophomorix-dump --clean\"  to delete the previous dump\n\n";
     exit;
 }
 
 if (-e $view_dumps_dir){
-    print "\nERROR: The  directory for the view dumps exists already: $view_dumps_dir\\n";
-    print "         Use: \"sophomorix-dump --clean\" to delete the previous dump\n\n";
+    print "\n";
+    print "ERROR: The  directory for the view dumps exists already: $view_dumps_dir\\n";
+    print "       Use  \"sophomorix-dump --clean\"  to delete the previous dump\n\n";
     exit;
 }
 
@@ -188,7 +191,7 @@ sub copy_files {
         # testing if copy was secessful
         if ($type eq "dir" and -d $old_path_dump){
             print "   * Diretory Dump OK: $old_path_dump\n";
-            push @log, "    * Dump OK: dir $old_path_dump\n";
+            push @log, "    * Directory Dump OK: $old_path_dump\n";
 	} elsif (-f $old_path_dump and -s $old_path_dump){
             print "   * Dump OK: $old_path_dump\n";
             push @log, "    * Dump OK: $old_path_dump\n";
