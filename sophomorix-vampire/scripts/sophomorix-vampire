@@ -277,7 +277,8 @@ if ($restore_config_files==1){
     &teachers_rewrite("/etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp",
                       "/etc/linuxmuster/sophomorix/default-school/teachers.csv");
     &devices_rewrite("/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
-                     "/etc/linuxmuster/sophomorix/default-school/devices.csv");
+                     "/etc/linuxmuster/sophomorix/default-school/devices.csv",
+                     "/etc/linuxmuster/sophomorix/default-school/devices.csv.tmp");
     &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
   		           "/etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
     &killog_rewrite("/var/log/sophomorix/user-modify-archive.log.migrated.orig",
@@ -1223,11 +1224,30 @@ sub extrastudents_rewrite {
 
 
 sub devices_rewrite {
-    my ($in,$out)=@_;
+    my ($in,$out,$tmp)=@_;
+    open(TMP,">$tmp") || die "Cannot create $out \n";
+    my $special_line="######################### The following devices were migrated #########################";
     print "\n";
-    print "### Writing $out\n";
+
+    # reading existing devices.csv until special_line
+    print "### Reading $out\n";
+    open(OUT,"<$out") || die "Cannot create $out \n";
+    while(<OUT>){
+        my $line=$_;
+        chomp($line);
+        if ($line eq $special_line){
+            last;
+        }
+        
+        print TMP $line."\n";
+    }
+    # finalize with special line
+    print TMP $special_line."\n";
+    print TMP "\n";
+    close(OUT);
+
+    print "### Writing $tmp\n";
     open(IN,"<$in") || die "Cannot create $in \n";
-    open(OUT,">$out") || die "Cannot create $out \n";
     while(<IN>){
         my $line=$_;
         my $new_line;
@@ -1329,10 +1349,12 @@ sub devices_rewrite {
                   "\n";
         }
 
-        print OUT "$new_line";
+        print TMP "$new_line";
     }
     close(IN);
-    close(OUT);
+    close(TMP);
+    print "### Copying $out\n";
+    system("cp $tmp $out");
 }
 
 

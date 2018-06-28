@@ -86,7 +86,11 @@ my $info=0;
 
 my $json=0;
 my $list_files=0;
+
+my $dry_run=0;
 my $no_sync=0;
+my $sync=0;
+
 my $birthdate="1970-01-01";
 my $add_example_line="";
 
@@ -184,6 +188,8 @@ my $testopt=GetOptions(
        "dump-ad" => \$dump_ad,
        "dump-files" => \$dump_files,
        "no-sync|nosync" => \$no_sync,
+       "sync" => \$sync,
+       "dry-run" => \$dry_run,
        "dns-test" => \$dns_test,
        "dns-kill" => \$dns_kill,
        "dns-show" => \$dns_show,
@@ -244,7 +250,10 @@ Full information about one/some devices:
 
 
 Synchronize the devices:
-  sophomorix-device
+  sophomorix-device --sync
+
+Just do a syntax check:
+  sophomorix-device --dry-run  (returns a json object with syntax check results)
 
 Just show what would be done (but do not do it):
   sophomorix-device --no-sync
@@ -598,7 +607,12 @@ if ($error_in_files > 0){
     &log_script_exit("ERROR parsing device files: $error_in_files errors.",1,1,0,
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } else {
+    # no syntax errors
     &result_sophomorix_add_log(\%sophomorix_result,"All *.devices.csv files without syntax error");
+    if ($dry_run==1){
+        &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+        &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    }
 }
 
 
@@ -1129,8 +1143,9 @@ if($no_sync==1){
 ############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
-
-if ($no_sync==0){ # $no_sync==0 -> SYNC
+# ???????? First line is the future
+#if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
+if (($sync==1 or $sync==0) and $no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill the rooms of computers
     print "\n";

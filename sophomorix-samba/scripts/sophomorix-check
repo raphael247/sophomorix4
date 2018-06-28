@@ -66,6 +66,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_get_AD_for_check
                                  AD_dns_get
+                                 AD_create_new_webui_string
                                  AD_object_search
                                     );
 
@@ -693,6 +694,7 @@ if ($follow ne ""){
 my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                      root_dse=>$root_dse,
                                      root_dns=>$root_dns,
+                                     admins=>"FALSE",
                                      sophomorix_config=>\%sophomorix_config,
                                    });
 
@@ -1418,39 +1420,15 @@ sub test_user_update {
     }
 
     # webui_string
-    # assembble new webui_string
-    my %new_webui=();
-    my @new_webui=();
+    # creating webui string with NEW role and NEW school
     my $school=$Match{'ACTION'}{$line_new}{'school'};
     my $role=$Match{'ACTION'}{$line_new}{'role'};
-    foreach my $mod (keys %{ $sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'} }){
-        #print "     $mod ---> $sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}\n";
-        $new_webui{'UI'}{$mod}=$sophomorix_config{'ROLES'}{$school}{$role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod};
-    }
-    #print Dumper (\%new_webui);
-    # overwrite with individual settings from  AD (sophomorixWebuiPermissions)
-    foreach my $perm ( @{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'}  } ){ 
-        #print "$sam: $perm\n";
-        my ($mod_path,$setting)=&test_webui_permission($perm,
-                                                       \%sophomorix_config,
-                                                       "sophomorixWebuiPermissions of $sam in $school",
-                                                       "check",
-                                                       $school,
-                                                       $role);
-        #print "$mod_path --> $setting\n";
-        $new_webui{'UI'}{$mod_path}=$setting;
-    }
-    #print Dumper (\%new_webui);
+    (${$new_webui_string_ref})=&AD_create_new_webui_string($sam,\%sophomorix_config,$ref_AD_check,$role,$school);
 
-    # create new string
-    foreach my $mod_path ( keys %{ $new_webui{'UI'} } ){
-        push @new_webui,$mod_path." ".$new_webui{'UI'}{$mod_path};
-    }
-    @new_webui = sort @new_webui;
-    ${$new_webui_string_ref}=join(",",@new_webui);
     #print "\n";
-    #print "$sam -> ${$old_webui_string_ref}\n";
-    #print "        ${$new_webui_string_ref}\n";
+    #print "$sam:\n";
+    #print "  OLD: ${$old_webui_string_ref}\n";
+    #print "  NEW: ${$new_webui_string_ref}\n";
 
     # test for update
     if ( ${$new_webui_string_ref} eq  ${$old_webui_string_ref} ){
