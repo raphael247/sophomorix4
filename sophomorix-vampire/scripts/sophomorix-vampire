@@ -228,11 +228,15 @@ while(<CONFIG>){
 	next;
     }
     chomp();
-    my ($old_path,$new_path,$permissions)=split(/::/);
+    my ($old_path,$new_path,$permissions,$may_must,$type)=split(/::/);
     my $old_path_dump=$datadir."/data".$old_path;
-    if (not -f $old_path_dump){
+    if ($type eq "file" and not -f $old_path_dump){
         $missig_files_count++;
         print "ERROR: Missing file $old_path_dump\n"; 
+    }
+    if ($type eq "dir" and not -d $old_path_dump){
+        $missig_files_count++;
+        print "ERROR: Missing directory $old_path_dump\n"; 
     }
     if ($new_path eq "---"){
         # files that must exist
@@ -338,25 +342,35 @@ if ($analyze==1){
             # skip;
         } else {
             my $group=$attrs[8];
+            my $type=$attrs[5];
             $group=~s/^\s+//g;# remove leading whitespace
             $group=~s/\s+$//g;# remove trailing whitespace
+            $type=~s/^\s+//g;# remove leading whitespace
+            $type=~s/\s+$//g;# remove trailing whitespace
             #print "<$group>\n";
-            $groupnames{$group}="group";
+            $groupnames{$group}=$type;
         }
     }
     }
-    print "INFO: The following groupnames will be converted:\n";
+    print "\n";
+    print "INFO: The following groupnames will be converted (old ---> new):\n";
     foreach my $key (keys %groupnames) {
         my $value = $groupnames{$key};
         if (exists $login{$key}){
             my $new_group=$key."-grp";
             #print "$key  ---> $new_group\n";
-            printf "  %-20s --> %-26s\n",$key,$new_group;
-            print MAP $key."::".$new_group."::\n";
+            printf "  %-20s ---> %-26s\n",$key,$new_group;
+            print MAP $key."::".$new_group."::".$value."::\n";
         }
     }
+    print "\n";
+    print "The group renaming is saved in the file:\n";
+    print "    $classes_map\n";
+    print "You can edit the new group name in this file, but make sure to use an unused object name\n";
+    print "\n";
     close(MAP);
     close(USER);
+    print Dumper (\%groupnames);
     exit;
 }
 
@@ -1098,8 +1112,8 @@ sub killog_rewrite {
 
     print "\n";
     print "### Writing $out\n";
-    open(IN,"<$in") || die "Cannot create $in \n";
-    open(OUT,">$out") || die "Cannot create $out \n";
+    open(IN,"<$in") || die "Cannot open input $in \n";
+    open(OUT,">$out") || die "Cannot create output $out \n";
     while(<IN>){
         my $line=$_;
         my $new_line;
@@ -1185,8 +1199,8 @@ sub extrastudents_rewrite {
 
     print "\n";
     print "### Writing $out\n";
-    open(IN,"<$in") || die "Cannot create $in \n";
-    open(OUT,">$out") || die "Cannot create $out \n";
+    open(IN,"<$in") || die "Cannot create input $in \n";
+    open(OUT,">$out") || die "Cannot create output $out \n";
     while(<IN>){
         my $line=$_;
         my $new_line;
@@ -1225,28 +1239,33 @@ sub extrastudents_rewrite {
 
 sub devices_rewrite {
     my ($in,$out,$tmp)=@_;
-    open(TMP,">$tmp") || die "Cannot create $out \n";
+    open(TMP,">$tmp") || die "Cannot create $tmp \n";
     my $special_line="######################### The following devices were migrated #########################";
     print "\n";
 
     # reading existing devices.csv until special_line
-    print "### Reading $out\n";
-    open(OUT,"<$out") || die "Cannot create $out \n";
-    while(<OUT>){
-        my $line=$_;
-        chomp($line);
-        if ($line eq $special_line){
-            last;
+    if (-f $out){
+        print "### Reading already existing $out\n";
+        open(OUT,"<$out") || die "Cannot create $out \n";
+        while(<OUT>){
+            my $line=$_;
+            chomp($line);
+            if ($line eq $special_line){
+                last;
+            }
+            print TMP $line."\n";
         }
-        
-        print TMP $line."\n";
+        # finalize with special line
+        print TMP $special_line."\n";
+        print TMP "\n";
+        close(OUT);
+    } else {
+        print "### Not reading nonexisting: $out\n";
+        print TMP $special_line."\n";
+        print TMP "\n";
     }
-    # finalize with special line
-    print TMP $special_line."\n";
-    print TMP "\n";
-    close(OUT);
 
-    print "### Writing $tmp\n";
+    print "### Writing temp file $tmp\n";
     open(IN,"<$in") || die "Cannot create $in \n";
     while(<IN>){
         my $line=$_;
@@ -1353,7 +1372,7 @@ sub devices_rewrite {
     }
     close(IN);
     close(TMP);
-    print "### Copying $out\n";
+    print "### Copying temp file to $out\n";
     system("cp $tmp $out");
 }
 
