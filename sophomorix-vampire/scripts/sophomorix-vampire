@@ -276,11 +276,13 @@ print "\n";
 if ($missig_files_count > 0){
     print "ERROR:    $missig_files_count file(s) is missing in the dump!\n";
 }
-if ($restore_config_files==1){ 
+if ($restore_config_files==1){
+    my %classes_map=&read_classes_map();
     print "$overwriting_files_count file(s) were overwritten!\n";
     &teachers_rewrite("/etc/linuxmuster/sophomorix/default-school/teachers.csv.tmp",
                       "/etc/linuxmuster/sophomorix/default-school/teachers.csv");
-    &devices_rewrite("/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
+    &devices_rewrite(\%classes_map,
+                     "/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
                      "/etc/linuxmuster/sophomorix/default-school/devices.csv",
                      "/etc/linuxmuster/sophomorix/default-school/devices.csv.tmp");
     &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
@@ -1238,11 +1240,12 @@ sub extrastudents_rewrite {
 
 
 sub devices_rewrite {
-    my ($in,$out,$tmp)=@_;
+    my ($ref_classes_map,$in,$out,$tmp)=@_;
     open(TMP,">$tmp") || die "Cannot create $tmp \n";
     my $special_line="######################### The following devices were migrated #########################";
     print "\n";
 
+    print Dumper ($ref_classes_map);
     # reading existing devices.csv until special_line
     if (-f $out){
         print "### Reading already existing $out\n";
@@ -1282,6 +1285,9 @@ sub devices_rewrite {
         } else {
         my (@items)=split(/;/,$line);
 
+
+
+
         # field 6 / $item[5]
         # MS office key --> ---
         # Todo ??????: if netmask/ip --> ---
@@ -1307,9 +1313,16 @@ sub devices_rewrite {
             $items[5]="---";
         }
 
+        # field 1 (group)
+        my $new_group;
+        if (exists $ref_classes_map->{$items[0]}){
+            print "Rename group $items[0] ---> $ref_classes_map->{$items[0]}\n";
+            $new_group=$ref_classes_map->{$items[0]};
+        } else {
+            $new_group=$items[0];
+        }
 
-        # field 7
-        # mS windows key
+        # field 7 (MS windows key)
         if ($items[6] eq "" or $items[6] eq "1"){## ???? why 1?
         #if ($items[6] eq ""){## 
             $items[6]="---";
@@ -1349,7 +1362,7 @@ sub devices_rewrite {
         # account_flag field 10 not used anymore
         $items[9]="---";
 
-        $new_line=$items[0].";".
+        $new_line=$new_group.";".
                   $items[1].";".
                   $items[2].";".
                   $items[3].";".
