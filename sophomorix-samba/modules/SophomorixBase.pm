@@ -1831,7 +1831,7 @@ sub _console_print_user_full {
         print $line;
         if ($log_level>=2){
             printf "%19s: %-50s\n","objectSid",$ref_users->{'USERS'}{$user}{'objectSid'};
-            printf "%19s: %-50s\n","objectGUID","(binary)";
+            #printf "%19s: %-50s\n","objectGUID","(binary)";
             #printf "%19s: %-50s\n","objectGUID",$ref_users->{'USERS'}{$user}{'objectGUID_BINARY'};
             printf "%19s: %-50s\n","homeDirectory",$ref_users->{'USERS'}{$user}{'homeDirectory'};
             printf "%19s: %-50s\n","homeDrive",$ref_users->{'USERS'}{$user}{'homeDrive'};

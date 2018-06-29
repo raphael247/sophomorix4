@@ -5485,10 +5485,9 @@ sub AD_get_full_groupdata {
         $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
 
         # sid
-        $groups{'GROUPS'}{$sam}{'objectSid_BINARY'}=$entry->get_value('objectSid');
+        #$groups{'GROUPS'}{$sam}{'objectSid_BINARY'}=$entry->get_value('objectSid');
         my $sid = Net::LDAP::SID->new($entry->get_value('objectSid'));
         $groups{'GROUPS'}{$sam}{'objectSid'}=$sid->as_string;
-
 
         $groups{'GROUPS'}{$sam}{'gidNumber'}=$entry->get_value('gidNumber');
         $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
@@ -5680,12 +5679,12 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'logonCount'}=$entry->get_value('logonCount');
 
         # sid
-        $users{'USERS'}{$sam}{'objectSid_BINARY'}=$entry->get_value('objectSid');
+        #$users{'USERS'}{$sam}{'objectSid_BINARY'}=$entry->get_value('objectSid');
         my $sid = Net::LDAP::SID->new($entry->get_value('objectSid'));
         $users{'USERS'}{$sam}{'objectSid'}=$sid->as_string;
 
         # GUID
-        $users{'USERS'}{$sam}{'objectGUID_BINARY'}=$entry->get_value('objectGUID');
+        #$users{'USERS'}{$sam}{'objectGUID_BINARY'}=$entry->get_value('objectGUID');
 
         $users{'USERS'}{$sam}{'pwdLastSet'}=$entry->get_value('pwdLastSet');
         $users{'USERS'}{$sam}{'sAMAccountType'}=$entry->get_value('sAMAccountType');
