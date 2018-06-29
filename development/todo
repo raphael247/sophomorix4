@@ -34,21 +34,33 @@ sophomorix-device
 Migration Bugs:
 
 classen.map
- - man sollte sehen, ob es bei der gruppe um eine klasse oder raum handelt (oder ...)
+ - OK: man sollte sehen, ob es bei der gruppe um eine klasse oder raum handelt (oder ...)
  - nach analyze solte das änderbar sein.
-   (testen bei gruppen usw. bei räumen tuts nicht)
- --> devices.csv room feld editieren, bei devices rewrite
+   (testen bei gruppen usw. 
 
+   OK: in extrastudents.csv with adminclasses
+   OK: in devices.csv with rooms --> devices.csv room feld editieren, bei devices rewrite
 
-migration entries in devices.csv mit tagged line beginnen
-beim nochmaligen anlegen sollte NICHT zusätzlich angehängt werden
-(incl. tagged line nicht lesen)
+   --> BSZ problems: group areca nicht in irgendeiner Datei
+                     group vm01
+
+Am Ende:
+--analyze: write file 
+  * with users that should be added
+  * with groups that should be added
+--test-migration
+  durchgehen, welche wirklich anglegt wurde (OK)
+  und welche nicht (not OK)
+   
 
 performance: sophomorix-class --create 
 --> option --skip-school-creation
 use option when creating classes
 dito at project creation
 
+
+------------------------------------------------------------
+SEEMS to be fixed:
 we need to copy these files, so that students.csv and teachers.csv
 can be created (rewritten)
 
@@ -63,8 +75,6 @@ fixes:
     schueler.txt.filter.tmp
 entstehen
 
-letztes Feld, must und may benutzen in migration-6-7.conf 
-
 --> warum entstehen diese files?
 bsz: /var/lib/sophomorix/tmp/ enthält:
    lehrer.txt.tmp             # entsteht, wenn kein filter script definiert ist (copy lehrer.txt)
@@ -77,8 +87,7 @@ bsz: /var/lib/sophomorix/tmp/ enthält:
    schueler.txt.tmp           # entsteht, wenn kein filter script definiert ist (copy), 
                               # ODER: target in filter script
                               --> zum Migrieren nehmen
-
-
+------------------------------------------------------------
 
 sophomorix-passwd --test-passwd
 This tests also global-admin (is this needed? Passwoord is shown?)

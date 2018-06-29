@@ -308,6 +308,7 @@ if ($analyze==1){
     my %groupnames=();
     print "Analyzing ...\n";
     {
+    # USERNAMES
     print "   * Fetching loginnames of users ...\n";
     my $line_number=0;
     open(USER,"<$sophomorix_add_input_sql") || die "ERROR: $!";
@@ -332,6 +333,7 @@ if ($analyze==1){
     print "   * Fetching classnames ...\n";
     my $line_number=0;
 
+    # GROUPNAMES
     open(MAP,">$classes_map") || die "ERROR: $!";
     open(USER,"<$class_script_input") || die "ERROR: $!";
     while(<USER>){
@@ -354,17 +356,30 @@ if ($analyze==1){
         }
     }
     }
-    print "\n";
-    print "INFO: The following groupnames will be converted (old ---> new):\n";
-    foreach my $key (keys %groupnames) {
-        my $value = $groupnames{$key};
-        if (exists $login{$key}){
-            my $new_group=$key."-grp";
-            #print "$key  ---> $new_group\n";
-            printf "  %-20s ---> %-26s\n",$key,$new_group;
-            print MAP $key."::".$new_group."::".$value."::\n";
+
+
+    # OUTPUT
+    # create file/output lines (and order them) 
+    my @file_lines=();
+    foreach my $old_group (keys %groupnames) {
+        my $value = $groupnames{$old_group};
+        if (exists $login{$old_group}){
+            my $new_group=$old_group."-grp";
+            my $entry=$old_group."::".$new_group."::".$value."::\n";
+            push @file_lines, $entry;
         }
     }
+    @file_lines = sort @file_lines;
+
+    # printout
+    print "\n";
+    print "INFO: The following groupnames will be converted (old (old type of group) ---> new):\n";
+    foreach my $line (@file_lines){
+        print MAP $line;
+        my ($old_group,$new_group,$type)=split(/::/,$line);
+        printf "  %-30s---> %-26s\n",$old_group." (".$type.")",$new_group;
+    }
+
     print "\n";
     print "The group renaming is saved in the file:\n";
     print "    $classes_map\n";
@@ -372,7 +387,7 @@ if ($analyze==1){
     print "\n";
     close(MAP);
     close(USER);
-    print Dumper (\%groupnames);
+    #print Dumper (\%groupnames);
     exit;
 }
 
