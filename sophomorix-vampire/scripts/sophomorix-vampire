@@ -1030,7 +1030,7 @@ if ($verify_uid==1){
     while (<USERMIGRATE>){
         my $line=$_;
         chomp($line);
-        print $line."\n";
+        #print $line."\n";
         my ($user,$uidnumber,$status,$samba_account_flags,$gidnumber)=split(/::/,$line);
 
         # testing user -> uidNumber
@@ -1042,9 +1042,14 @@ if ($verify_uid==1){
             my $uid_full_sys = getpwuid($uidnumber);
             if (not defined $uid_full_sys){
                 $errors++;
-                print "     Uidnumber for $user not found: $uidnumber\n";
-                push @loglines, 
-                    "user $user: uidnumber not found\n";
+                # No uidnumber found
+                if ($status eq "D"){
+                    print "     WARNING: User $user was deacivated, now it has been removed\n";
+                    push @loglines, "WARNING: User $user was deacivated, now it has been removed\n";
+                } else {
+                    print "     ERROR: Uidnumber for $user not found: $uidnumber\n";
+                    push @loglines, "ERROR: $user: uidnumber not found\n";
+                }
             } else {
                 my ($string,$uid_sys)=split(/\\/,$uid_full_sys);
                 if ($uid_sys eq $user){
@@ -1052,8 +1057,7 @@ if ($verify_uid==1){
                 } else {
                     $errors++;
                     print "     ERROR: $uidnumber and $user\n";
-                    push @loglines, 
-                        "user $user and uidNumber $uidnumber with problems (check with: # id $user)\n";
+                    push @loglines, "ERROR: user $user and uidNumber $uidnumber with problems\n";
                 }
             }
         } 
@@ -1065,67 +1069,10 @@ if ($verify_uid==1){
     # are all groups there (other sub), to many groups?
 
 
-
-    # open(MEMBER,"<$class_adminadd_script_input") || die "ERROR: $!";
-    # while (<MEMBER>){
-    #     my $line=$_;
-    #     chomp();
-    #     my ($user,$uidnumber,$gecos,$adminclass,,$status,$group,$gidnumber)=split(/\|/,$line);
-    #     $user=~s/^\s+//g;# remove leading whitespace
-    #     $user=~s/\s+$//g;# remove trailing whitespace
-    #     $uidnumber=~s/^\s+//g;# remove leading whitespace
-    #     $uidnumber=~s/\s+$//g;# remove trailing whitespace
-    #     $gecos=~s/^\s+//g;# remove leading whitespace
-    #     $gecos=~s/\s+$//g;# remove trailing whitespace
-    #     $group=~s/^\s+//g;# remove leading whitespace
-    #     $group=~s/\s+$//g;# remove trailing whitespace
-    #     $gidnumber=~s/^\s+//g;# remove leading whitespace
-    #     $gidnumber=~s/\s+$//g;# remove trailing whitespace
-
-    #     if ($lines==0 or
-    #         $gecos eq "Computer" or 
-    #         $gecos eq "ExamAccount" or
-    #         $user eq "wwwadmin" or
-    #         $user eq "pgmadmin" or
-    #         $user eq "domadmin" or
-    #         $user eq "NextFreeUnixId" or
-    #         $user eq "administrator"){
-    #             print "Skipping $user\n";
-    #             # header is line 0, add to counter to avoid loop
-    #             if ($lines==0){
-    #                 $lines=1;
-    #             }
-    #             next;
-    #     }
-
-    #     #system("id $user > /dev/null");
-
-    #     # testing user -> uidNumber
-    #     if (not exists $uid_seen{$uidnumber}){
-    #         print "$lines) Testing user $user($uidnumber) in group $group($gidnumber)\n";
-    #         $uid_seen{$uidnumber}="seen";
-    #         $lines++;
-
-    #         my $uid_full_sys = getpwuid($uidnumber);
-    #         if (not defined $uid_full_sys){
-    #             print "   Uidnumber for $user not found: $uidnumber\n";
-    #         } else {
-    #             my ($string,$uid_sys)=split(/\\/,$uid_full_sys);
-    #             if ($uid_sys eq $user){
-    #                 print "   OK: uidNumber $uidnumber is user $uid_sys\n";
-    #             } else {
-    #                 $errors++;
-    #                 print "   ERROR: $uidnumber and $user\n";
-    #                 push @loglines, 
-    #                     "user $user and uidNumber $uidnumber with problems (check with: # id $user)\n";
-    #             }
-    #         }
-    #     } 
-    # }
-
-    print "\n$errors ERRORS:\n";
+    print "\nSummary: Which users are missing on the new lmn server?\n";
+    print "   $errors WARNINGS/ERRORS:\n";
     foreach my $line (@loglines){
-        print "  * $line";
+        print "     * $line";
     }
 }
 
