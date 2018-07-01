@@ -2140,6 +2140,11 @@ sub _console_print_users_v {
             }
             print $line;
         }
+        print "$ref_users_v->{'COUNTER'}{$school}{'TOTAL'} user in $school",
+              " (",
+              "$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'teacher'} Teachers, ",
+              "$ref_users_v->{'COUNTER'}{$school}{'by_role'}{'student'} Students",
+              ")\n";
     } # school end 
 }
 
