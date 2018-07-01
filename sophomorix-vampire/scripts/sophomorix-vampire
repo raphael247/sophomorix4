@@ -337,6 +337,10 @@ if ($analyze==1){
             $gidnumber=~s/^\s+//g;# remove leading whitespace
             $gidnumber=~s/\s+$//g;# remove trailing whitespace
 
+            my $gecos=$attrs[7];
+            $gecos=~s/^\s+//g;# remove leading whitespace
+            $gecos=~s/\s+$//g;# remove trailing whitespace
+
             my $status=$attrs[52];
             $status=~s/^\s+//g;# remove leading whitespace
             $status=~s/\s+$//g;# remove trailing whitespace
@@ -353,7 +357,7 @@ if ($analyze==1){
                 $status eq "T"
                 ){
                 # this are stati that lead to an account on a lmn7 server
-                if ( $samba_account_flag=~m/U/ ){
+                if ( $samba_account_flag=~m/U/ and $gecos ne "ExamAccount"){
                     # U: User account
                     # W: Workstation Account
                     print USERMIGRATE $login."::".$uidnumber."::".$status."::".$samba_account_flag."::".$gidnumber."::\n";
@@ -1037,9 +1041,10 @@ if ($verify_uid==1){
 
             my $uid_full_sys = getpwuid($uidnumber);
             if (not defined $uid_full_sys){
+                $errors++;
                 print "     Uidnumber for $user not found: $uidnumber\n";
-                    push @loglines, 
-                        "user $user: uidnumber not found\n";
+                push @loglines, 
+                    "user $user: uidnumber not found\n";
             } else {
                 my ($string,$uid_sys)=split(/\\/,$uid_full_sys);
                 if ($uid_sys eq $user){
@@ -1054,6 +1059,11 @@ if ($verify_uid==1){
         } 
     }
     close(USERMIGRATE);
+
+    # Test: are all users there?
+    # are there to many users in AD?
+    # are all groups there (other sub), to many groups?
+
 
 
     # open(MEMBER,"<$class_adminadd_script_input") || die "ERROR: $!";
