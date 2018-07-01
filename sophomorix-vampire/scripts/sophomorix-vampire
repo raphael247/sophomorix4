@@ -1026,14 +1026,21 @@ if ($verify_uid==1){
     my $lines=0;
     my $errors=0;
 
+    my %reverse_test=();
+
+
     open(USERMIGRATE,"<$users_to_migrate") || die "ERROR: $!";
     while (<USERMIGRATE>){
         my $line=$_;
         chomp($line);
         #print $line."\n";
         my ($user,$uidnumber,$status,$samba_account_flags,$gidnumber)=split(/::/,$line);
+        $reverse_test{$user}{'UIDNUMBER'}=$uidnumber;
+        $reverse_test{$user}{'STATUS'}=$status;
+        $reverse_test{$user}{'FLAG'}=$samba_account_flags;
+        $reverse_test{$user}{'GIDNUMBER'}=$gidnumber;
 
-        # testing user -> uidNumber
+        # Test 1: Users on old server that are not on new server
         if (not exists $uid_seen{$uidnumber}){
             print "  $lines) Testing user $user($uidnumber) in group ($gidnumber)\n";
             $uid_seen{$uidnumber}="seen";
@@ -1057,7 +1064,7 @@ if ($verify_uid==1){
                 } else {
                     $errors++;
                     print "     ERROR: $uidnumber and $user\n";
-                    push @loglines, "ERROR: user $user and uidNumber $uidnumber with problems\n";
+                    push @loglines, "ERROR: user $user should have uidNumber $uidnumber, but $uidnumber was given to $uid_sys\n";
                 }
             }
         } 
@@ -1068,12 +1075,80 @@ if ($verify_uid==1){
     # are there to many users in AD?
     # are all groups there (other sub), to many groups?
 
+    # Test 2: Reverse Test: Users on new server that are not on old server
+    #print Dumper(\%reverse_test);
+    my $entries=0;
+    my ($ldap,$root_dse) = &AD_bind_admin();
 
-    print "\nSummary: Which users are missing on the new lmn server?\n";
+    my $filter="(& (objectClass=user) (sophomorixRole=*) )";
+    my $mesg = $ldap->search( # perform a search
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attrs => ['sAMAccountName',
+                                'sophomorixStatus',
+                                'sophomorixUnid',
+                                'uidNumber',
+                                'objectClass',
+                               ]);
+    my $max = $mesg->count;
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $uidnumber=$entry->get_value('uidNumber');
+        my $unid=$entry->get_value('sophomorixUnid');
+        my $status=$entry->get_value('sophomorixStatus');
+
+        my $computer=0;
+        # computer accounts ausnehmen?
+        my @object_classes = $entry->get_value('objectClass');
+        foreach my $object_class (@object_classes){
+            if ($object_class eq "computer"){
+                # skip this entry
+                $computer=1;
+            }
+	}
+
+        if ($computer==0){
+            $entries++;
+            # test this entry if its not a computer
+            print "  $entries) Testing user $sam (Status=$status, uidNumber=$uidnumber, Unid=$unid) \n";
+            if (exists $reverse_test{$sam} and 
+                $reverse_test{$sam}{'UIDNUMBER'} eq $uidnumber and
+                $reverse_test{$sam}{'STATUS'} eq $status
+               ){
+                # OK
+                print "     OK: user $sam correctly migrated ($reverse_test{$sam}{'UIDNUMBER'} --> $uidnumber)\n";
+            } elsif (exists $reverse_test{$sam} and 
+                    ($status eq "T" or ($reverse_test{$sam}{'STATUS'} eq "T" and $status eq "D"))){
+                # should be OK
+                print "     WARNING: $sam migrated to new status: $reverse_test{$sam}{'STATUS'}->$status (Should be OK)\n";
+                $errors++; 
+                push @loglines, "WARNING: $sam migrated to new status: $reverse_test{$sam}{'STATUS'}->$status (Should be OK)\n";
+            } elsif (exists $reverse_test{$sam}){
+                # Not with correct data
+                $errors++; 
+                print "     ERROR: user $sam incorrectly migrated\n";
+                print "        $reverse_test{$sam}{'UIDNUMBER'}  ---> $uidnumber\n";
+                print "        $reverse_test{$sam}{'STATUS'}  ---> $status\n";
+                push @loglines, "ERROR: $sam incorrectly migrated\n";
+            } else {
+                $errors++;
+                print "     ERROR: $sam should not exist on the new server\n";
+                push @loglines, "ERROR: $sam should not exist on the new server\n";
+            }
+        }
+     }
+   
+    # SUMMARY
+    print "\nSummary:\n";
     print "   $errors WARNINGS/ERRORS:\n";
     foreach my $line (@loglines){
         print "     * $line";
     }
+
+    
+
 }
 
 
