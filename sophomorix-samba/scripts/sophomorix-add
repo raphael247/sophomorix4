@@ -173,15 +173,7 @@ if ($lock==1) {
 
 # --info
 if ($info==1) {
-    my $count=0;
-    # (not -e "$add_file"){
-    #   print "$add_file does not exist!\n"; 
-    #    print "Nothing to add: sophomorix.add does not exist!\n"; 
-    #    exit;
-    #}
-    my $ref_add=&read_sophomorix_add({
-                        sophomorix_config=>\%sophomorix_config,
-                        });
+    my $ref_add=&read_sophomorix_add({sophomorix_config=>\%sophomorix_config});
 
     &json_dump({json => $json,
                 jsoninfo => "ADDFILE",
