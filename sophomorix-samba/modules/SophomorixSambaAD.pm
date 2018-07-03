@@ -1820,9 +1820,13 @@ sub AD_user_create {
 
     # add sophomorixWebuiPermissionsCalculated only if defined
     if (defined $ref_webui_permissions_calculated){
-        push @{ $add_array },"sophomorixWebuiPermissionsCalculated",$ref_webui_permissions_calculated;
+        if ($#{ $ref_webui_permissions_calculated  } > -1){
+            # array not empty, use it
+            push @{ $add_array },"sophomorixWebuiPermissionsCalculated",$ref_webui_permissions_calculated;
+        } else {
+            # empty array cannot be uploaded in AD, do not use it
+        }
     }
-
 
     # do it
     my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
