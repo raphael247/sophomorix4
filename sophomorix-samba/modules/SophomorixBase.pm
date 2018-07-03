@@ -4740,7 +4740,7 @@ sub NTACL_set_file {
         print "     RETURN VALUE: $smbcacls_return\n";
         print "     ERROR MESSAGE:\n";
         print $smbcacls_out_ident;
-        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbcacls_return): $smbcacls_command");
+        &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smbcacls_return): $smbcacls_display_command");
     }
 }
 
