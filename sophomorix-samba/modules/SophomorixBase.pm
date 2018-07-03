@@ -2847,11 +2847,15 @@ sub config_sophomorix_read {
 	    exit;
         }   
 
-        # cp ui stuff from UI to ROLES
+        # cp ui stuff from UI to ROLES (schools)
         foreach my $ui_role (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} }){
-            foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role} }){
-                $sophomorix_config{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}=
-                    $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role}{$mod};
+            if ($ui_role eq "globaladministrator"){
+                # skip, because its saved in $school
+            } else {
+                foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role} }){
+                    $sophomorix_config{'ROLES'}{$school}{$ui_role}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}=
+                        $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{$ui_role}{$mod};
+                }
             }
         }
 
@@ -2941,7 +2945,6 @@ sub config_sophomorix_read {
     $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'LOGDIR'}{'ADD_HOOK_DIR'}=
         $sophomorix_config{'INI'}{'HOOKS'}{'LOGDIR'}."/".$sophomorix_config{'INI'}{'HOOKS'}{'ADD_HOOK_DIR'};
 
-
     $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'DIR'}{'UPDATE_HOOK_DIR'}=
         $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'UPDATE_HOOK_DIR'};
     $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'LOGDIR'}{'UPDATE_HOOK_DIR'}=
@@ -2951,6 +2954,12 @@ sub config_sophomorix_read {
         $abs_hook_dir."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
     $sophomorix_config{$DevelConf::AD_global_ou}{'HOOKS'}{'LOGDIR'}{'KILL_HOOK_DIR'}=
         $sophomorix_config{'INI'}{'HOOKS'}{'LOGDIR'}."/".$sophomorix_config{'INI'}{'HOOKS'}{'KILL_HOOK_DIR'};
+
+    # cp ui stuff from UI to ROLES (global)
+    foreach my $mod (keys %{ $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{'globaladministrator'} }){
+        $sophomorix_config{'ROLES'}{'global'}{'globaladministrator'}{'UI'}{'WEBUI_PERMISSIONS_LOOKUP'}{$mod}=
+            $sophomorix_config{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS_LOOKUP'}{'globaladministrator'}{$mod};
+    }
 
     # SCHOOL
     $sophomorix_config{'SCHOOLS'}{$DevelConf::name_default_school}{'OU_TOP'}=
