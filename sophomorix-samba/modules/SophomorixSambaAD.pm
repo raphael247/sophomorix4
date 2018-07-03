@@ -4644,11 +4644,14 @@ sub AD_check_ui {
             @{ $ui{'UI'}{'USERS'}{$sam}{'CALCLIST'} }=split(/,/,$new_webui_string);
             push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} },$sam;
             push @{ $ui{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname'}{$school} },$sam;
-            push @{ $ui{'LISTS_UPDATE'}{'USERS'}{$role}  },$sam;
+            push @{ $ui{'LISTS_UPDATE'}{'USERS_by_sophomorixRole'}{$role} },$sam;
+            push @{ $ui{'LISTS_UPDATE'}{'USERS'} },$sam;
         } else {
             # do not update
         }
     }
+    # set total counter
+    $ui{'LOOKUP'}{'COUNTER'}{'TOTAL'}=$#{ $ui{'LISTS_UPDATE'}{'USERS'} }+1;
     &Sophomorix::SophomorixBase::print_title("Query AD (end)");
     return(\%ui);
 }

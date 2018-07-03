@@ -166,7 +166,7 @@ my $ref_AD_check_ui=&AD_check_ui({ldap=>$ldap,
                                   ref_AD_check=>$ref_AD_check,
                                   sophomorix_config=>\%sophomorix_config,
                                  });
-
+#print Dumper($ref_AD_check_ui);
 if ($info==1){
     &json_dump({json => $json,
                 jsoninfo => "UI",
@@ -188,6 +188,8 @@ if ($info==1){
 
 my $max_user_count=0;
 my $user_count=0;
+my $user_count_total=0;
+
 my @rolelist=("globaladministrator","schooladministrator","teacher","student");
 
 
@@ -195,10 +197,10 @@ if ($school eq ""){
     # walk through all users
     foreach my $role (@rolelist){
         $user_count=0;
-        $max_user_count=$#{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS'}{$role} }+1;
-        foreach my $user (@{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS'}{$role} }){
+        $max_user_count=$#{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS_by_sophomorixRole'}{$role} }+1;
+        foreach my $user (@{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USERS_by_sophomorixRole'}{$role} }){
             $user_count++;
-	    
+            $user_count_total++;
             &AD_user_update({ldap=>$ldap,
                              root_dse=>$root_dse,
                              dn=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'dn'},
@@ -227,6 +229,7 @@ if ($school eq ""){
             &Sophomorix::SophomorixBase::print_title("   * sophomorixRole: $role");
             foreach my $user (@{ $ref_AD_check_ui->{'LISTS_UPDATE'}{'USER_by_sophomorixSchoolname_by_sophomorixRole'}{$school}{$role} }){
                 $user_count++;
+                $user_count_total++;
                 &AD_user_update({ldap=>$ldap,
                                  root_dse=>$root_dse,
                                  dn=>$ref_AD_check_ui->{'UI'}{'USERS'}{$user}{'dn'},
@@ -247,7 +250,7 @@ if ($school eq ""){
 
 &result_sophomorix_add_summary({
                      NAME=>"UPDATED UI", 
-                     RESULT=>$user_count, 
+                     RESULT=>$user_count_total, 
                      RESULT_TYPE => "integer",
                      DESCRIPTION_POST => "user ui updated", 
                      DESCRIPTION_PRE => " user ui updated", 

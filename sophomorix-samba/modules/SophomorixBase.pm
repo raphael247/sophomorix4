@@ -2286,6 +2286,7 @@ sub _console_print_ui {
 	    }
         }
     } # end $school
+    print "$ref_ui->{'LOOKUP'}{'COUNTER'}{'TOTAL'} users SophomorixWebuiPermissionsCalculated would be updated\n";
 }
 
 
