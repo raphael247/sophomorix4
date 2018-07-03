@@ -85,7 +85,8 @@ my $testopt=GetOptions (\%opt, 'length|l=i',
 
 print Dumper (\%opt);
 
-
+my $json=0;
+my @arguments = @ARGV;
 
 
 
@@ -110,6 +111,7 @@ my @filelist=&filelist_fetch({filetype=>"users",
 ############################################################
 # BEGIN: Test code goes here
 ############################################################
+
 
 print "HERE\n";
 
