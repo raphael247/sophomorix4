@@ -424,9 +424,6 @@ if ($list_files==1) {
 }
 
 
-&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
-
 # --analyze-encoding
 # analyze one file
 if ($analyze_encoding ne ""){
@@ -469,6 +466,10 @@ if ($analyze_encoding ne ""){
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
+
+
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 
 ################################################################################
