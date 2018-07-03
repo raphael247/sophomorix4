@@ -72,6 +72,9 @@ $Data::Dumper::Terse = 1;
             call_sophomorix_command
             string_to_latex
             get_lang_from_config
+            read_sophomorix_add
+            read_sophomorix_update
+            read_sophomorix_kill
             run_hook_scripts
             smb_command
             );
@@ -322,6 +325,8 @@ sub json_dump {
             &_console_print_schema_attribute($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PRINTDATA"){
             &_console_print_printdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "ADDFILE"){
+            &_console_print_addfile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         }
     } elsif ($json==1){
         # pretty output
@@ -830,6 +835,68 @@ sub _console_print_printdata {
         $back_in_time_count++;
     }
     print $line;
+}
+
+
+
+sub _console_print_addfile {
+    my ($ref_addfile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    print "\n";
+    print "The following users can be added:\n";
+    print "\n";
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+    my $line0= "+----------------------------------------------------------------+\n";
+    my $line = "+-+-------------+-------------+------------------------------------+---------------+-----------------+\n";
+    foreach my $school (@school_list){
+        if (not defined $ref_addfile->{'COUNTER'}{'SCHOOL'}{$school} or
+            $ref_addfile->{'COUNTER'}{'SCHOOL'}{$school}==0){
+            print "School: $school (0  users can be added)\n";
+            print "\n";
+            next;
+        } else {
+            print "School: $school ($ref_addfile->{'COUNTER'}{'SCHOOL'}{$school} users can be added)\n";
+        }
+
+        print $line;
+        printf "|%-1s| %-12s| %-12s| %-35s| %-14s| %-16s|\n",
+               "R",
+               "Login",
+               "adminclass",
+               "Identifier",
+               "unid",
+               "Password";
+        print $line;
+
+        foreach my $sam ( @{ $ref_addfile->{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} } ){
+
+            my $role_display;
+            if ($ref_addfile->{'USER'}{$sam}{'ROLE'} eq "student"){
+                $role_display="s";
+            } elsif ($ref_addfile->{'USER'}{$sam}{'ROLE'} eq "teacher"){
+                $role_display="t";
+            } else {
+                $role_display="?";
+            }
+            printf "|%-1s| %-12s| %-12s| %-35s| %-14s| %-16s|\n",
+                   $role_display,
+                   $sam,
+                   $ref_addfile->{'USER'}{$sam}{'ADMINCLASS'},
+                   $ref_addfile->{'USER'}{$sam}{'IDENTIFIER'},
+                   $ref_addfile->{'USER'}{$sam}{'UNID'},
+                   $ref_addfile->{'USER'}{$sam}{'PWD_WISH'};
+        }
+        print $line;
+        print "$ref_addfile->{'COUNTER'}{'SCHOOL'}{$school} users can be added in $school\n";
+        print "\n";
+    } 
+    print "--> Total number of users to be added: $ref_addfile->{'COUNTER'}{'TOTAL'}\n\n";   
+    print "Fields with --- are automatically created by sophomorix-add\n";
+    print "R: sophomorixRole (s=student, t=teacher)\n";
 }
 
 
@@ -2557,6 +2624,97 @@ sub read_lockfile {
     my $locking_script=$lock[3];
     my $locking_pid=$lock[4];
     return ($locking_script,$locking_pid);
+}
+
+# read file into json object
+######################################################################
+sub read_sophomorix_add {
+    my ($arg_ref) = @_;
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my %add=();
+    my $ref_add=\%add;
+    my @lines=();
+
+    my $add_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
+    if (not -e "$add_file"){
+        print "Nothing to add: nonexisting $add_file\n";
+        $add{'COUNTER'}{'TOTAL'}=0; 
+        return $ref_add;
+    }
+
+    # read lines
+    open(SOPHOMORIXADD,"$add_file") || die "ERROR: sophomorix.add not found!";
+    while(<SOPHOMORIXADD>){
+       if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+	   next;
+       }
+       push @lines, $_;
+    }
+    close(SOPHOMORIXADD);
+
+    # sort lines
+    my @sorted_lines = sort {
+        my @a_fields = split /::/, $a;
+        my @aa_fields = split /;/, $a_fields[2];
+
+        my @b_fields = split /::/, $b;
+        my @bb_fields = split /;/, $b_fields[2];
+
+        $a_fields[1] cmp $b_fields[1]  # string sort on 1st field, then
+            ||
+        $aa_fields[2] cmp $bb_fields[2]  # string sort on 2nd field
+            ||
+        $aa_fields[1] cmp $bb_fields[1]  # string sort on 3rd field
+    } @lines;
+
+   foreach my $line (@sorted_lines){
+       chomp($line);
+       $count++;
+       ($file,
+       $class_group,
+       $identifier,
+       $sam,
+       $password_wish,
+       $uidnumber_wish,
+       $gidnumber_wish,
+       $unid,
+       $school,
+       $role)=split("::",$line);
+
+       push @{ $add{'LISTS'}{'ORDERED'} },$sam;
+       push @{ $add{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} },$sam;
+
+       $add{'USER'}{$sam}{'FILE'}=$file;
+       $add{'USER'}{$sam}{'ADMINCLASS'}=$class_group;
+       $add{'USER'}{$sam}{'IDENTIFIER'}=$identifier;
+       $add{'USER'}{$sam}{'SAM'}=$sam;
+       $add{'USER'}{$sam}{'PWD_WISH'}=$password_wish;
+       $add{'USER'}{$sam}{'UID_WISH'}=$uidnumber_wish;
+       $add{'USER'}{$sam}{'GID_WISH'}=$gidnumber_wish;
+       $add{'USER'}{$sam}{'UNID'}=$unid;
+       $add{'USER'}{$sam}{'SCHOOL'}=$school;
+       $add{'USER'}{$sam}{'ROLE'}=$role;
+    }
+
+    # counters
+    $add{'COUNTER'}{'TOTAL'}=$#{ $add{'LISTS'}{'ORDERED'} }+1;
+    foreach my $school (keys %{ $add{'LISTS'}{'ORDERED_by_sophomorixSchoolname'} }) {
+        $add{'COUNTER'}{'SCHOOL'}{$school}=$#{ $add{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} }+1;
+    }
+    return $ref_add;
+}
+
+
+
+sub read_sophomorix_update {
+
+}
+
+
+
+sub read_sophomorix_kill {
+
 }
 
 
