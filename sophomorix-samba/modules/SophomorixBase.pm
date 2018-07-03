@@ -11,8 +11,8 @@ use Time::Local;
 use Config::IniFiles;
 #use Unicode::GCString;
 use Encode qw(decode encode);
-use Data::Dumper;
 use LaTeX::Encode ':all';
+use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useqq = 1;
@@ -327,6 +327,8 @@ sub json_dump {
             &_console_print_printdata($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "ADDFILE"){
             &_console_print_addfile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "UPDATEFILE"){
+            &_console_print_updatefile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         }
     } elsif ($json==1){
         # pretty output
@@ -850,7 +852,6 @@ sub _console_print_addfile {
     } else {
         @school_list=($school_opt);
     }
-    my $line0= "+----------------------------------------------------------------+\n";
     my $line = "+-+-------------+-------------+------------------------------------+---------------+-----------------+\n";
     foreach my $school (@school_list){
         if (not defined $ref_addfile->{'COUNTER'}{'SCHOOL'}{$school} or
@@ -897,6 +898,129 @@ sub _console_print_addfile {
     print "--> Total number of users to be added: $ref_addfile->{'COUNTER'}{'TOTAL'}\n\n";   
     print "Fields with --- are automatically created by sophomorix-add\n";
     print "R: sophomorixRole (s=student, t=teacher)\n";
+}
+
+
+
+
+sub _console_print_updatefile {
+    my ($ref_updatefile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    print "\n";
+    print "The following users can be updated:\n";
+    print "\n";
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+    my $line = "+---------------------------------------------------------------------------------+\n";
+    my $line2= "===================================================================================\n";
+    foreach my $school (@school_list){
+        if (not defined $ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} or
+            $ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school}==0){
+            print "School: $school (0  users can be updated)\n";
+            print "\n";
+            next;
+        } else {
+            print $line2;
+            print "School: $school ($ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can be updated)\n";
+            print $line2;
+        }
+
+        print $line;
+        foreach my $sam ( @{ $ref_updatefile->{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} } ){
+            my $name_ascii_new=$ref_updatefile->{'USER'}{$sam}{'SURNAME_ASCII_NEW'}.
+                               ", ".
+                               $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_ASCII_NEW'};
+            my $name_utf8_new=$ref_updatefile->{'USER'}{$sam}{'SURNAME_UTF8_NEW'}.
+                              ", ".
+                              $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_NEW'};
+            printf "| %-80s|\n",$sam.
+                               " (current school/role: ".
+                               $ref_updatefile->{'USER'}{$sam}{'SCHOOL_OLD'}.
+                               "/".
+                               $ref_updatefile->{'USER'}{$sam}{'ROLE_OLD'}.
+                               "):";
+            print $line;
+            if ($ref_updatefile->{'USER'}{$sam}{'UNID_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixUnid",$ref_updatefile->{'USER'}{$sam}{'UNID_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'UNID_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'SURNAME_ASCII_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixSurnameASCII",$ref_updatefile->{'USER'}{$sam}{'SURNAME_ASCII_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'SURNAME_ASCII_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_ASCII_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixFirstnameASCII",$ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_ASCII_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_ASCII_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'BIRTHDATE_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixBirthdate",$ref_updatefile->{'USER'}{$sam}{'BIRTHDATE_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'BIRTHDATE_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'SURNAME_UTF8_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sn",$ref_updatefile->{'USER'}{$sam}{'SURNAME_UTF8_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'SURNAME_UTF8_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_NEW'} ne "---"){
+                printf " %27s: %-53s\n","givenName",$ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'SURNAME_INITIAL_UTF8_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixSurnameInitial",$ref_updatefile->{'USER'}{$sam}{'SURNAME_INITIAL_UTF8_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'SURNAME_INITIAL_UTF8_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_INITIAL_UTF8_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixFirstnameInitial",$ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_INITIAL_UTF8_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_INITIAL_UTF8_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'FILE_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixAdminFile",$ref_updatefile->{'USER'}{$sam}{'FILE_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'FILE_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'STATUS_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixStatus",$ref_updatefile->{'USER'}{$sam}{'STATUS_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'STATUS_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'ROLE_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixRole",$ref_updatefile->{'USER'}{$sam}{'ROLE_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'ROLE_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'CLASS_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixAdminClass",$ref_updatefile->{'USER'}{$sam}{'CLASS_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'CLASS_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'SCHOOL_NEW'} ne "---"){
+                printf " %27s: %-53s\n","sophomorixSchoolname",$ref_updatefile->{'USER'}{$sam}{'SCHOOL_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'SCHOOL_NEW'}; 
+            }
+            if ($ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_NEW'} ne "---"){
+                printf "  %-82s\n","sophomorixWebuiPermissionsCalculated:";
+                printf "    %-80s\n",$ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_OLD'};
+                printf "         %-75s\n","----->";
+                printf "    %-80s\n",$ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_NEW'};
+            }
+            print $line;
+            print "\n";
+        }
+        print "$ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can be updated in $school\n";
+        print "\n";
+    } 
+    print "--> Total number of users to be updated: $ref_updatefile->{'COUNTER'}{'TOTAL'}\n\n";   
 }
 
 
@@ -2708,7 +2832,123 @@ sub read_sophomorix_add {
 
 
 sub read_sophomorix_update {
+    my ($arg_ref) = @_;
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
+    my %update=();
+    my $ref_update=\%update;
+    my @lines=();
+
+    my $update_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.update";
+    if (not -e "$update_file"){
+        print "Nothing to update: nonexisting $update_file\n";
+        $update{'COUNTER'}{'TOTAL'}=0; 
+        return $ref_update;
+    }
+
+    # read lines
+    open(SOPHOMORIXUPDATE,"$update_file") || die "ERROR: sophomorix.update not found!";
+    while(<SOPHOMORIXUPDATE>){
+       if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+	   next;
+       }
+       push @lines, $_;
+    }
+    close(SOPHOMORIXUPDATE);
+
+
+    my @sorted_lines = sort {
+        my @a_fields = split /::/, $a;
+        my @b_fields = split /::/, $b;
+ 
+        $a_fields[1] cmp $b_fields[1]  # string sort on 1st field, then
+          ||
+        $a_fields[0] cmp $b_fields[0]  # string sort on 2nd field
+    } @lines;
+
+    foreach my $line (@sorted_lines){
+        chomp($line);
+        $count++;
+        my ($sam,
+            $unid_old,
+            $unid_new,
+            $surname_ascii_old,
+            $surname_ascii_new,
+            $firstname_ascii_old,
+            $firstname_ascii_new,
+            $birthdate_old,
+            $birthdate_new,
+            $surname_utf8_old,
+            $surname_utf8_new,
+            $firstname_utf8_old,
+            $firstname_utf8_new,
+            $filename_old,
+            $filename_new,
+            $status_old,
+            $status_new,
+            $role_old,
+            $role_new,
+            $class_old,
+            $class_new,
+            $school_old,
+            $school_new,
+            $surname_initial_utf8_old,
+            $surname_initial_utf8_new,
+            $firstname_initial_utf8_old,
+            $firstname_initial_utf8_new,
+            $webui_string_old,
+            $webui_string_new,
+           )=split(/::/,$line);
+
+        my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
+        my $name_utf8_new=$surname_utf8_new.", ".$firstname_utf8_new;
+
+        push @{ $update{'LISTS'}{'ORDERED'} },$sam;
+        if ($school_old eq $school_new or $school_new eq "---"){
+            # add only if users stays in its school
+            push @{ $update{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school_old} },$sam;
+        }
+
+        $update{'USER'}{$sam}{'UNID_OLD'}=$unid_old;
+        $update{'USER'}{$sam}{'UNID_NEW'}=$unid_new;
+        $update{'USER'}{$sam}{'BIRTHDATE_OLD'}=$birthdate_old;
+        $update{'USER'}{$sam}{'BIRTHDATE_NEW'}=$birthdate_new;
+
+        $update{'USER'}{$sam}{'SURNAME_ASCII_OLD'}=$surname_ascii_old;
+        $update{'USER'}{$sam}{'SURNAME_ASCII_NEW'}=$surname_ascii_new;
+        $update{'USER'}{$sam}{'FIRSTNAME_ASCII_OLD'}=$firstname_ascii_old;
+        $update{'USER'}{$sam}{'FIRSTNAME_ASCII_NEW'}=$firstname_ascii_new;
+
+        $update{'USER'}{$sam}{'SURNAME_UTF8_OLD'}=$surname_utf8_old;
+        $update{'USER'}{$sam}{'SURNAME_UTF8_NEW'}=$surname_utf8_new;
+        $update{'USER'}{$sam}{'FIRSTNAME_UTF8_OLD'}=$firstname_utf8_old;
+        $update{'USER'}{$sam}{'FIRSTNAME_UTF8_NEW'}=$firstname_utf8_new;
+
+        $update{'USER'}{$sam}{'SURNAME_INITIAL_UTF8_OLD'}=$surname_initial_utf8_old;
+        $update{'USER'}{$sam}{'SURNAME_INITIAL_UTF8_NEW'}=$surname_initial_utf8_new;
+        $update{'USER'}{$sam}{'FIRSTNAME_INITIAL_UTF8_OLD'}=$firstname_initial_utf8_old;
+        $update{'USER'}{$sam}{'FIRSTNAME_INITIAL_UTF8_NEW'}=$firstname_initial_utf8_new;
+
+        $update{'USER'}{$sam}{'FILE_OLD'}=$filename_old;
+        $update{'USER'}{$sam}{'FILE_NEW'}=$filename_new;
+        $update{'USER'}{$sam}{'STATUS_OLD'}=$status_old;
+        $update{'USER'}{$sam}{'STATUS_NEW'}=$status_new;
+        $update{'USER'}{$sam}{'ROLE_OLD'}=$role_old;
+        $update{'USER'}{$sam}{'ROLE_NEW'}=$role_new;
+        $update{'USER'}{$sam}{'CLASS_OLD'}=$class_old;
+        $update{'USER'}{$sam}{'CLASS_NEW'}=$class_new;
+        $update{'USER'}{$sam}{'SCHOOL_OLD'}=$school_old;
+        $update{'USER'}{$sam}{'SCHOOL_NEW'}=$school_new;
+        $update{'USER'}{$sam}{'WEBUI_STRING_OLD'}=$webui_string_old;
+        $update{'USER'}{$sam}{'WEBUI_STRING_NEW'}=$webui_string_new;
+    }
+
+    # counters
+    $update{'COUNTER'}{'TOTAL'}=$#{ $update{'LISTS'}{'ORDERED'} }+1;
+    foreach my $school (keys %{ $update{'LISTS'}{'ORDERED_by_sophomorixSchoolname'} }) {
+        $update{'COUNTER'}{'SCHOOL'}{$school}=$#{ $update{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} }+1;
+    }
+    return $ref_update;  
 }
 
 
