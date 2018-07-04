@@ -905,44 +905,57 @@ sub _console_print_addfile {
 
 sub _console_print_updatefile {
     my ($ref_updatefile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $count=0;
     print "\n";
     print "The following users can be updated:\n";
     print "\n";
     my @school_list;
     if ($school_opt eq ""){
-        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+        @school_list=(@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} },
+                      $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'});
     } else {
         @school_list=($school_opt);
     }
-    my $line = "+---------------------------------------------------------------------------------+\n";
-    my $line2= "===================================================================================\n";
+    my $line= "===================================================================================\n";
     foreach my $school (@school_list){
         if (not defined $ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} or
             $ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school}==0){
-            print "School: $school (0  users can be updated)\n";
+            # typout
+            print "\n";
+            if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+                print "School: $school (0  users can change school)\n";
+            } else {
+                print "School: $school (0  users can be updated)\n";
+            }
+
             print "\n";
             next;
         } else {
-            print $line2;
-            print "School: $school ($ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can be updated)\n";
-            print $line2;
+            print "\n";
+            print $line;
+            if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+                print "School: $school ($ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can change school)\n";
+            } else {
+                print "School: $school ($ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can be updated)\n";
+            }
         }
 
-        print $line;
         foreach my $sam ( @{ $ref_updatefile->{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} } ){
+            $count++;
+            print $line;
             my $name_ascii_new=$ref_updatefile->{'USER'}{$sam}{'SURNAME_ASCII_NEW'}.
                                ", ".
                                $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_ASCII_NEW'};
             my $name_utf8_new=$ref_updatefile->{'USER'}{$sam}{'SURNAME_UTF8_NEW'}.
                               ", ".
                               $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_NEW'};
-            printf "| %-80s|\n",$sam.
+            printf " %-82s\n", "User ".$count."/".$ref_updatefile->{'COUNTER'}{'TOTAL'}.": ".
+                               $sam.
                                " (current school/role: ".
                                $ref_updatefile->{'USER'}{$sam}{'SCHOOL_OLD'}.
                                "/".
                                $ref_updatefile->{'USER'}{$sam}{'ROLE_OLD'}.
                                "):";
-            print $line;
             if ($ref_updatefile->{'USER'}{$sam}{'UNID_NEW'} ne "---"){
                 printf " %27s: %-53s\n","sophomorixUnid",$ref_updatefile->{'USER'}{$sam}{'UNID_OLD'}.
                                                               " --> ".
@@ -1014,10 +1027,13 @@ sub _console_print_updatefile {
                 printf "         %-75s\n","----->";
                 printf "    %-80s\n",$ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_NEW'};
             }
-            print $line;
-            print "\n";
         }
-        print "$ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can be updated in $school\n";
+        print $line;
+        if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
+            print "$ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can change school\n";
+        } else {
+            print "$ref_updatefile->{'COUNTER'}{'SCHOOL'}{$school} users can be updated in $school\n";
+        }
         print "\n";
     } 
     print "--> Total number of users to be updated: $ref_updatefile->{'COUNTER'}{'TOTAL'}\n\n";   
@@ -2907,6 +2923,9 @@ sub read_sophomorix_update {
         if ($school_old eq $school_new or $school_new eq "---"){
             # add only if users stays in its school
             push @{ $update{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school_old} },$sam;
+        } else {
+            # school change
+            push @{ $update{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{'global'} },$sam;
         }
 
         $update{'USER'}{$sam}{'UNID_OLD'}=$unid_old;
