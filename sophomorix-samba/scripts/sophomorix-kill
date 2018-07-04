@@ -166,67 +166,9 @@ if ($info==1) {
                 sophomorix_config=>\%sophomorix_config,
               });
     exit;
-
-
-
-
-    my $count=0;
-    # Ausgabe der loeschbaren user
-    print "\nThe following users can be killed:\n\n";
-    printf "%-14s%-12s%-47s%-5s\n",
-           "Loginname",
-           "AdminClass",
-           "Identifier",
-           "School";
-    &print_line;
-
-    my @lines=();
-    open(KILL,"$kill_file") || die "ERROR: $!";
-    while(<KILL>){
-       if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-	   next;
-       }
-       chomp();
-       # Klasse ermitteln
-       ($identifier_to_kill, 
-        $login_name_to_kill,
-        $linux_gruppe_to_kill,
-        $school)=split(/::/);
-       #($linux_gruppe_to_kill)=&pg_get_group_list($login_name_to_kill);
-       push @lines, "$_"."::"."$linux_gruppe_to_kill"."\n";
-    }
-    close(KILL);
-
-    my @sorted_lines = sort {
-        my @a_fields = split /::/, $a;
-        my @b_fields = split /::/, $b;
- 
-        $a_fields[2] cmp $b_fields[2]  # string sort on 1st field, then
-          ||
-        $a_fields[1] cmp $b_fields[1]  # string sort on 2nd field
-    } @lines;
-
-    foreach my $line (@sorted_lines){
-       chomp($line);
-       $count++;
-       ($identifier_to_kill,
-        $login_name_to_kill,
-        $linux_gruppe_to_kill,
-        $school
-       )=split(/::/,$line);
-       my $group_token=&AD_get_name_tokened($linux_gruppe_to_kill,$school,"---");
-
-       printf "%-14s%-12s%-47s%-5s\n",
-              $login_name_to_kill,
-              $group_token,
-              $identifier_to_kill,
-              $school;
-    }
-
-    &print_line;
-    print "$count users can be killed\n";
-    exit;
 }
+
+
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 
