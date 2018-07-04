@@ -70,12 +70,16 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
-my $loginname="";
-my $group="";
 my $password="";
 my $lock=0;
 my $unlock=0;
-my $school="";
+
+# selection lookup hash
+my $school_opt="";
+my $class_opt="";
+my $user_opt="";
+my %selection=();
+
 
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -84,10 +88,10 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "lock" => \$lock,
            "unlock" => \$unlock,
-           "users|user|u=s" => \$loginname,
-           "class|classes|c=s" => \$group,
            "password" => \$password,
-           "school" => \$school,
+           "user=s" => \$user_opt,
+           "class=s" => \$class_opt,
+           "school=s" => \$school_opt,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-add");
@@ -129,6 +133,9 @@ Add users from some schools only:
 Add some users only:
   sophomorix-add --user <user1>,<user2>, ...
 
+Add some classes only:
+  sophomorix-add --class <class1>,<class2>, ...
+
 Please see the sophomorix-add(8) man pages for full documentation
 ');
    print "\n";
@@ -161,7 +168,7 @@ if ($info==1) {
                 jsoninfo => "ADDFILE",
                 jsoncomment => "sophomorix.add",
                 log_level => $Conf::log_level,
-                object_name => $school,
+                object_name => $school_opt,
                 hash_ref=>$ref_add,
                 sophomorix_config=>\%sophomorix_config,
               });
@@ -170,16 +177,32 @@ if ($info==1) {
 
 
 
-# --loginname
-if ($loginname ne "") {
-  print "Loginname $loginname given as option.\n";
+# --user
+if ($user_opt ne ""){
+    my @users=split(/,/,$user_opt);
+    foreach my $us (@users){
+        $selection{'SELECTION'}{'USER'}{$us}="adduser";
+    }
 }
 
 
 
-# --group
-if ($group ne "") {
-  print "Group $group given as option.\n";
+# --school
+if ($school_opt ne ""){
+    my @schools=split(/,/,$school_opt);
+    foreach my $sch (@schools){
+        $selection{'SELECTION'}{'SCHOOL'}{$sch}="addschool";
+    }
+}
+
+
+
+# --class
+if ($class_opt ne "") {
+    my @classes=split(/,/,$class_opt);
+    foreach my $cl (@classes){
+        $selection{'SELECTION'}{'CLASS'}{$cl}="addclass";
+    }
 }
 
 
@@ -266,19 +289,27 @@ while(<SOPHOMORIXADD>){
         $login_check_ok=$login_wish;
     }
 
-    # skip users that are not  given by option 
-    if ($loginname ne "") {
-        if ($login_check_ok ne $loginname) {
-            print "##### $login_check_ok wird nicht angelegt!\n";
+
+    # deselecting users
+    if ($user_opt ne ""){
+        if (not exists $selection{'SELECTION'}{'USER'}{$login_wish}){
+            print "   * Skipping $login_wish in $class_group in $school (Reason: $login_wish)\n";
             print STILLTOADD "$_\n";
             next;
         }
     }
 
-    # skip users that are not in the class given by option 
-    if ($group ne "") {
-        if ($class_group ne $group) {
-            print "$login_check_ok ($class_group) wird nicht angelegt!\n";
+    if ($class_opt ne ""){
+        if (not exists $selection{'SELECTION'}{'CLASS'}{$class_group}){
+            print "   * Skipping $login_wish in $class_group in $school (Reason: $class_group)\n";
+            print STILLTOADD "$_\n";
+            next;
+        }
+    }
+
+    if ($school_opt ne ""){
+        if (not exists $selection{'SELECTION'}{'SCHOOL'}{$school}){
+            print "   * Skipping $login_wish in $class_group in $school (Reason: $school)\n";
             print STILLTOADD "$_\n";
             next;
         }

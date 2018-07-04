@@ -1155,7 +1155,7 @@ sub AD_group_kill {
                         print "ERROR: deltree $unc $smb_rel_path $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     }
                 } else {
-                    print "ERROR($return): rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    print "ERROR($return1): rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                 }
 
             }
