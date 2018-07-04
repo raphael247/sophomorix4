@@ -80,7 +80,6 @@ my $class_opt="";
 my $user_opt="";
 my %selection=();
 
-
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,
@@ -105,6 +104,8 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 my $add_file=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add";
 my $add_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.add.new";
+
+
 
 # --help
 if ($help==1) {
@@ -133,7 +134,7 @@ Add users from some schools only:
 Add some users only:
   sophomorix-add --user <user1>,<user2>, ...
 
-Add some classes only:
+Add users in some classes only:
   sophomorix-add --class <class1>,<class2>, ...
 
 Please see the sophomorix-add(8) man pages for full documentation
@@ -163,7 +164,6 @@ if ($lock==1) {
 # --info
 if ($info==1) {
     my $ref_add=&read_sophomorix_add({sophomorix_config=>\%sophomorix_config});
-
     &json_dump({json => $json,
                 jsoninfo => "ADDFILE",
                 jsoncomment => "sophomorix.add",
@@ -243,19 +243,17 @@ if (not -f $add_file){
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.add | wc -l`;
 chomp($max_user_count);
 
-
 # open add file
 open(SOPHOMORIXADD,"$add_file") 
     || die "ERROR: $!";
 
 # loop through all users in sophomorix.add
 while(<SOPHOMORIXADD>){
-    if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+    if(/^\#/){ # skip commented lines
         next;
     }
 
     chomp();
-    # split data
     my ($file,
         $class_group,
         $identifier,
@@ -438,6 +436,7 @@ while(<SOPHOMORIXADD>){
 close(SOPHOMORIXADD);
 close(STILLTOADD);
 
+# logging sophomorix.add
 &backup_auk_file("add","after",\%sophomorix_config);
 rename("$add_file_new","$add_file" );
 
@@ -460,7 +459,3 @@ if ($user_count>0){
 }
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-
-############################################################
-# sub
-############################################################
