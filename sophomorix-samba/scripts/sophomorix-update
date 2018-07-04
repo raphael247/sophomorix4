@@ -50,29 +50,6 @@ my @arguments = @ARGV;
 
 my $user_count=0;
 
-#my $alte_klasse;
-#my $neue_klasse;
-#my $login;
-#my $old_status;
-
-#my $identifier;
-#my $alte_zeile="";
-#my $neue_zeile="";
-#my $new_home="";
-#my $new_homedir_above="";
-#my $old_home="";
-#my $school="";
-
-#my $altes_www="";
-#my $neues_www="";
-#my $www_link="";
-
-
-#my @users_for_quota=();
-
-#my $k;
-#my $v;
-#my $key;
 
 ############################################################
 # options
@@ -86,7 +63,8 @@ my $unlock=0;
 
 # selection lookup hash
 my $school_opt="";
-my $class_opt="";
+my $class_old_opt="";
+my $class_new_opt="";
 my $user_opt="";
 my %selection=();
 
@@ -97,6 +75,10 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "lock" => \$lock,
            "unlock" => \$unlock,
+           "user=s" => \$user_opt,
+           "class-old=s" => \$class_old_opt,
+           "class-new=s" => \$class_new_opt,
+           "school=s" => \$school_opt,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-update");
@@ -130,14 +112,21 @@ Options
 Update all users:
   sophomorix-update
 
-Update users from some schools only:   ???????????????????
+Update users WITHIN their schools only:
   sophomorix-update --school <schoolname1>,<schoolname2>, ...
+
+Update users that change schools only:
+  sophomorix-update --school global
+
 
 Update some users only:
   sophomorix-update --user <user1>,<user2>, ...
 
-Update users in some classes only:
-  sophomorix-update --class <class1>,<class2>, ...
+Update users that ARE in some classes (old class) only:
+  sophomorix-update --class-old <class1>,<class2>, ...
+
+Update users that WILL BE in some classes (new class) only:
+  sophomorix-update --class-new <class1>,<class2>, ...
 
 Please see the sophomorix-update(8) man pages for full documentation
 ');
@@ -175,6 +164,46 @@ if ($info==1) {
                 sophomorix_config=>\%sophomorix_config,
               });
     exit;
+}
+
+
+
+# --user
+if ($user_opt ne ""){
+    my @users=split(/,/,$user_opt);
+    foreach my $us (@users){
+        $selection{'SELECTION'}{'USER'}{$us}="updateuser";
+    }
+}
+
+
+
+# --school
+if ($school_opt ne ""){
+    my @schools=split(/,/,$school_opt);
+    foreach my $sch (@schools){
+        $selection{'SELECTION'}{'SCHOOL'}{$sch}="updateschool";
+    }
+}
+
+
+
+# --class-old
+if ($class_old_opt ne "") {
+    my @classes=split(/,/,$class_old_opt);
+    foreach my $cl (@classes){
+        $selection{'SELECTION'}{'CLASS_OLD'}{$cl}="updateclass";
+    }
+}
+
+
+
+# --class-new
+if ($class_new_opt ne "") {
+    my @classes=split(/,/,$class_new_opt);
+    foreach my $cl (@classes){
+        $selection{'SELECTION'}{'CLASS_NEW'}{$cl}="updateclass";
+    }
 }
 
 
@@ -253,6 +282,57 @@ while(<USERUPDATE>){
            $firstname_initial_utf8_new,
            $webui_string_old,
            $webui_string_new,          )=split(/::/);
+
+
+    # deselecting users
+    if ($user_opt ne ""){
+        if (not exists $selection{'SELECTION'}{'USER'}{$user}){
+            print "   * Skipping $user in $class_old/$class_new in $school_old/$school_new (Reason: $user)\n";
+            print STILLTOUPDATE "$_\n";
+            next;
+        }
+    }
+
+    if ($class_old_opt ne ""){
+        if (not exists $selection{'SELECTION'}{'CLASS_OLD'}{$class_old}){
+            print "   * Skipping $user in $class_old/$class_new in $school_old/$school_new (Reason: $class_old)\n";
+            print STILLTOUPDATE "$_\n";
+            next;
+        }
+    }
+
+    if ($class_new_opt ne ""){
+        if (not exists $selection{'SELECTION'}{'CLASS_NEW'}{$class_new}){
+            print "   * Skipping $user in $class_old/$class_new in $school_old/$school_new (Reason: $class_new)\n";
+            print STILLTOUPDATE "$_\n";
+            next;
+        }
+    }
+
+    if ($school_opt ne "" and $school_opt ne "global"){
+        # option is a school
+        # update as long as school does not change
+        #   skip if oldschool is not in option
+        #   OR
+        #   skip if school is not changed (new school = "---")
+        if (not exists $selection{'SELECTION'}{'SCHOOL'}{$school_old} or 
+            $school_new ne "---"
+           ){
+            print "   * Skipping $user in $class_old/$class_new in $school_old (Reason: $school_old/$school_new)\n";
+            print STILLTOUPDATE "$_\n";
+            next;
+        }
+    } elsif ($school_opt ne "" and $school_opt eq "global"){
+        # option is global
+        # skip when oldschool=newschool
+        if ($school_new eq "---"){
+            print "   * Skipping $user in $class_old/$class_new in $school_old/$school_new (Reason: within a school)\n";
+            print STILLTOUPDATE "$_\n";
+            next;
+        }
+    }
+
+
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 
     if ($unid_new ne "---" or 
