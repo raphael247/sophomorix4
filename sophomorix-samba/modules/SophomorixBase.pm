@@ -329,6 +329,8 @@ sub json_dump {
             &_console_print_addfile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "UPDATEFILE"){
             &_console_print_updatefile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "KILLFILE"){
+            &_console_print_killfile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         }
     } elsif ($json==1){
         # pretty output
@@ -844,7 +846,7 @@ sub _console_print_printdata {
 sub _console_print_addfile {
     my ($ref_addfile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     print "\n";
-    print "The following users can be added:\n";
+    print "The following $ref_addfile->{'COUNTER'}{'TOTAL'} users can be added:\n";
     print "\n";
     my @school_list;
     if ($school_opt eq ""){
@@ -907,7 +909,7 @@ sub _console_print_updatefile {
     my ($ref_updatefile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $count=0;
     print "\n";
-    print "The following users can be updated:\n";
+    print "The following $ref_updatefile->{'COUNTER'}{'TOTAL'} users can be updated:\n";
     print "\n";
     my @school_list;
     if ($school_opt eq ""){
@@ -1037,6 +1039,52 @@ sub _console_print_updatefile {
         print "\n";
     } 
     print "--> Total number of users to be updated: $ref_updatefile->{'COUNTER'}{'TOTAL'}\n\n";   
+}
+
+
+
+sub _console_print_killfile {
+    my ($ref_killfile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $count=0;
+    print "\n";
+    print "The following $ref_killfile->{'COUNTER'}{'TOTAL'} users can be killed:\n";
+    print "\n";
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+    my $line= "+---------------+--------------+--------------------------------------------------------+\n";
+    foreach my $school (@school_list){
+        if (not defined $ref_killfile->{'COUNTER'}{'SCHOOL'}{$school} or
+            $ref_killfile->{'COUNTER'}{'SCHOOL'}{$school}==0){
+            print "School: $school (0 users can be killed)\n";
+            print "\n";
+            next;
+        } else {
+            #print "\n\n";
+            print "School: $school ($ref_killfile->{'COUNTER'}{'SCHOOL'}{$school} users can be killed)\n";
+        }
+        print $line;
+        printf "| %-14s| %-13s| %-55s|\n",
+           "Loginname",
+           "AdminClass",
+           "Identifier";
+        print $line;
+        foreach my $sam ( @{ $ref_killfile->{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} } ){
+            $count++;
+        printf "| %-14s| %-13s| %-55s|\n",
+               $sam,
+               $ref_killfile->{'USER'}{$sam}{'sophomorixAdminClass'},
+               $ref_killfile->{'USER'}{$sam}{'IDENTIFIER'};
+
+        }
+        print $line;
+        print "$ref_killfile->{'COUNTER'}{'SCHOOL'}{$school} users can be killed in $school\n";
+        print "\n";
+    }
+    print "--> Total number of users to be killed: $ref_killfile->{'COUNTER'}{'TOTAL'}\n\n";  
 }
 
 
@@ -2973,7 +3021,62 @@ sub read_sophomorix_update {
 
 
 sub read_sophomorix_kill {
+    my ($arg_ref) = @_;
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
+    my %kill=();
+    my $ref_kill=\%kill;
+    my @lines=();
+
+    my $kill_file=$ref_sophomorix_config->{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomorix.kill";
+    if (not -e "$kill_file"){
+        print "Nothing to kill: nonexisting $kill_file\n";
+        $kill{'COUNTER'}{'TOTAL'}=0; 
+        return $ref_kill;
+    }
+
+    # read lines
+    open(SOPHOMORIXKILL,"$kill_file") || die "ERROR: sophomorix.kill not found!";
+    while(<SOPHOMORIXKILL>){
+       if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+	   next;
+       }
+       push @lines, $_;
+    }
+    close(SOPHOMORIXKILL);
+
+    my @sorted_lines = sort {
+        my @a_fields = split /::/, $a;
+        my @b_fields = split /::/, $b;
+ 
+        $a_fields[2] cmp $b_fields[2]  # string sort on 1st field, then
+          ||
+        $a_fields[1] cmp $b_fields[1]  # string sort on 2nd field
+    } @lines;
+
+    foreach my $line (@sorted_lines){
+        chomp($line);
+        my ($identifier,
+            $sam,
+            $adminclass,
+            $school
+           )=split(/::/,$line);
+
+        push @{ $kill{'LISTS'}{'ORDERED'} },$sam;
+        push @{ $kill{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} },$sam;
+
+        $kill{'USER'}{$sam}{'IDENTIFIER'}=$identifier;
+        $kill{'USER'}{$sam}{'sophomorixSchoolname'}=$school;
+        $kill{'USER'}{$sam}{'sophomorixAdminClass'}=$adminclass;
+    }
+
+    # counters
+    $kill{'COUNTER'}{'TOTAL'}=$#{ $kill{'LISTS'}{'ORDERED'} }+1;
+    foreach my $school (keys %{ $kill{'LISTS'}{'ORDERED_by_sophomorixSchoolname'} }) {
+        $kill{'COUNTER'}{'SCHOOL'}{$school}=$#{ $kill{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} }+1;
+    }
+
+    return $ref_kill;
 }
 
 

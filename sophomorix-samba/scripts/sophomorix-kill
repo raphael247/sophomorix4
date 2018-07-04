@@ -30,6 +30,8 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  run_hook_scripts
+                                 json_dump
+                                 read_sophomorix_kill
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
@@ -154,6 +156,20 @@ if ($loginname ne "") {
 
 # --info
 if ($info==1) {
+    my $ref_kill=&read_sophomorix_kill({sophomorix_config=>\%sophomorix_config});
+    &json_dump({json => $json,
+                jsoninfo => "KILLFILE",
+                jsoncomment => "sophomorix.kill",
+                log_level => $Conf::log_level,
+                object_name => $school,
+                hash_ref=>$ref_kill,
+                sophomorix_config=>\%sophomorix_config,
+              });
+    exit;
+
+
+
+
     my $count=0;
     # Ausgabe der loeschbaren user
     print "\nThe following users can be killed:\n\n";
