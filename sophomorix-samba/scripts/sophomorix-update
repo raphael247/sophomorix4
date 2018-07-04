@@ -4,7 +4,6 @@
 # If you find errors, contact the author
 # jeffbeck@web.de  or  jeffbeck@linuxmuster.net
 
-
 # modules
 use strict;
 use Getopt::Long;
@@ -51,36 +50,33 @@ my @arguments = @ARGV;
 
 my $user_count=0;
 
-my $alte_klasse;
-my $neue_klasse;
-my $login;
-my $old_status;
+#my $alte_klasse;
+#my $neue_klasse;
+#my $login;
+#my $old_status;
 
-my $identifier;
-my $alte_zeile="";
-my $neue_zeile="";
-my $new_home="";
-my $new_homedir_above="";
-my $old_home="";
-my $school="";
+#my $identifier;
+#my $alte_zeile="";
+#my $neue_zeile="";
+#my $new_home="";
+#my $new_homedir_above="";
+#my $old_home="";
+#my $school="";
 
-my $altes_www="";
-my $neues_www="";
-my $www_link="";
-
-
-my @users_for_quota=();
-
-my $k;
-my $v;
-my $key;
+#my $altes_www="";
+#my $neues_www="";
+#my $www_link="";
 
 
-# ===========================================================================
-# Optionen verarbeiten
-# ==========================================================================
+#my @users_for_quota=();
 
-# Variablen für Optionen
+#my $k;
+#my $v;
+#my $key;
+
+############################################################
+# options
+############################################################
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
@@ -88,7 +84,12 @@ my $json=0;
 my $lock=0;
 my $unlock=0;
 
-# Parsen der Optionen
+# selection lookup hash
+my $school_opt="";
+my $class_opt="";
+my $user_opt="";
+my %selection=();
+
 my $testopt=GetOptions(
            "help|h" => \$help,
            "info|i" => \$info,           
@@ -99,7 +100,6 @@ my $testopt=GetOptions(
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-update");
-# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
 
 # Reading Configuration
@@ -115,10 +115,9 @@ my $update_file_new=$sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}."/sophomo
 
 # --help
 if ($help==1) {
-   # Scriptname ermitteln
+   # get scriptname
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
-   # Befehlsbeschreibung
    print('
 sophomorix-update updates the ldap entry of a user
 
@@ -127,6 +126,18 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
   -i  / --info
+
+Update all users:
+  sophomorix-update
+
+Update users from some schools only:   ???????????????????
+  sophomorix-update --school <schoolname1>,<schoolname2>, ...
+
+Update some users only:
+  sophomorix-update --user <user1>,<user2>, ...
+
+Update users in some classes only:
+  sophomorix-update --class <class1>,<class2>, ...
 
 Please see the sophomorix-update(8) man pages for full documentation
 ');
@@ -155,12 +166,11 @@ if ($lock==1) {
 # --info
 if ($info==1) {
     my $ref_update=&read_sophomorix_update({sophomorix_config=>\%sophomorix_config});
-
     &json_dump({json => $json,
                 jsoninfo => "UPDATEFILE",
                 jsoncomment => "sophomorix.update",
                 log_level => $Conf::log_level,
-                object_name => $school,
+                object_name => $school_opt,
                 hash_ref=>$ref_update,
                 sophomorix_config=>\%sophomorix_config,
               });
@@ -170,19 +180,21 @@ if ($info==1) {
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
-# ===========================================================================
-# start
-# ===========================================================================
+
+################################################################################
+# Start
+################################################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 
-# sophomorix.update mitloggen
+# logging sophomorix.update
 &backup_auk_file("update","before",\%sophomorix_config);
 
-# file for usrs that are not updated
+# file for users that are NOT updated
 open(STILLTOUPDATE,">$update_file_new") 
      || die "ERROR: $!";
 
+# the update file
 if (not -f $update_file){
     &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,"",$update_file." not found!");
     &result_sophomorix_add_summary({
@@ -205,8 +217,9 @@ chomp($max_user_count);
 open(USERUPDATE,"$update_file") 
      || die "ERROR: $!";
 
+# loop through all users in sophomorix.update
 while(<USERUPDATE>){
-    if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+    if(/^\#/){ # skip commented lines
         next;
     }
     chomp();
@@ -285,7 +298,7 @@ while(<USERUPDATE>){
                        });
     }
 
-    # test if user mustbe moved
+    # test if user must be moved
     if ($school_new ne "---" or $class_new ne "---" or $role_new ne "---"){
         if ($school_new eq "---"){
             $school_new=$school_old;
@@ -328,15 +341,8 @@ while(<USERUPDATE>){
 close(USERUPDATE);
 close(STILLTOUPDATE);
 
-
-# sophomorix.update mitloggen
+# logging sophomorix.update
 &backup_auk_file("update","after",\%sophomorix_config);
-
-
-
-# ===========================================================================
-# Nicht verarbeitete User nach sophomorix.update kopieren
-# ===========================================================================
 rename("$update_file_new","$update_file");
 
 &result_sophomorix_add_summary({
@@ -348,7 +354,6 @@ rename("$update_file_new","$update_file");
                      FORMAT_TYPE => 1,
                      sophomorix_result=>\%sophomorix_result,
 			       });
-
 
 &AD_unbind_admin($ldap);
 
