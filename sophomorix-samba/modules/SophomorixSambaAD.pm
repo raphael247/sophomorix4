@@ -1112,7 +1112,7 @@ sub AD_group_kill {
     if ($count > 0){
         if ($type eq "adminclass"){
             ### adminclass #####################################
-            # deleting share if possible, when succesful  the account
+            # deleting share if possible, when succesful also the account
             # do not delete ./homes if not empty !
             if ($smb_share ne  "unknown"){
                 #my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,

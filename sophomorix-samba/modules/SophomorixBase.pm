@@ -5126,7 +5126,10 @@ sub smb_command {
     if( 
         ($smb_command_return==0 and $smb_command_out eq "") or
         ($smb_command_return==0 and $smb_command_out=~m/Deleted user /) or
+        ($smb_command_return==0 and $smb_command_out=~m/Deleted group /) or
         ($smb_command_return==0 and $smb_command_out=~m/successfully/) or
+        ($smb_command_return==0 and $smb_command_out=~m/directory/) or
+        ($smb_command_return==0 and $smb_command_out=~m/blocks available/) or
         ($smb_command_return==0 and $smb_command_out=~m/Default Soft Limit/)
       ){
         # empty output or "succesfully" in samba-tool
@@ -5141,6 +5144,16 @@ sub smb_command {
     } elsif ($smb_command_return==0 and $smb_command_out=~m/NT_STATUS_OBJECT_NAME_COLLISION/){
         # Errors that are warnings: smbclient NT_STATUS_OBJECT_NAME_COLLISION  -> file exists already
         print "OK: smb command ($smb_command_return: NT_STATUS_OBJECT_NAME_COLLISION --> file(s) existed already)\n";
+        if($Conf::log_level>1){
+            print "     COMMAND:\n";
+            print "        $smb_display_command\n";
+            print "     RETURN VALUE: $smb_command_return\n";
+            print "     MESSAGE:\n";
+            print $smb_command_out_ident;
+        }
+    } elsif ($smb_command_return==256 and $smb_command_out=~m/NT_STATUS_NO_SUCH_FILE listing/){
+        # This is OK
+        print "OK: smb command ($smb_command_return: NT_STATUS_NO_SUCH_FILE listing--> made sure file nonexisting)\n";
         if($Conf::log_level>1){
             print "     COMMAND:\n";
             print "        $smb_display_command\n";
