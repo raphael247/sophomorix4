@@ -846,7 +846,7 @@ sub _console_print_printdata {
 sub _console_print_addfile {
     my ($ref_addfile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     print "\n";
-    print "The following $ref_addfile->{'COUNTER'}{'TOTAL'} users can be added:\n";
+    print "A total of $ref_addfile->{'COUNTER'}{'TOTAL'} users can be added:\n";
     print "\n";
     my @school_list;
     if ($school_opt eq ""){
@@ -909,7 +909,7 @@ sub _console_print_updatefile {
     my ($ref_updatefile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $count=0;
     print "\n";
-    print "The following $ref_updatefile->{'COUNTER'}{'TOTAL'} users can be updated:\n";
+    print "A total of $ref_updatefile->{'COUNTER'}{'TOTAL'} users can be updated:\n";
     print "\n";
     my @school_list;
     if ($school_opt eq ""){
@@ -1047,7 +1047,7 @@ sub _console_print_killfile {
     my ($ref_killfile,$school_opt,$log_level,$ref_sophomorix_config)=@_;
     my $count=0;
     print "\n";
-    print "The following $ref_killfile->{'COUNTER'}{'TOTAL'} users can be killed:\n";
+    print "A total of $ref_killfile->{'COUNTER'}{'TOTAL'} users can be killed:\n";
     print "\n";
     my @school_list;
     if ($school_opt eq ""){

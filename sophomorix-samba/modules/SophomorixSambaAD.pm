@@ -1105,7 +1105,7 @@ sub AD_group_kill {
     my ($smb_share,$unix_dir,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_sharedirectory($root_dns,$school,$group,$type,$ref_sophomorix_config);
 
-    &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school):");
+    &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school) (start):");
     &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"group",$group);
 
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
@@ -1155,7 +1155,7 @@ sub AD_group_kill {
                         print "ERROR: deltree $unc $smb_rel_path $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     }
                 } else {
-                    print "ERROR: rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+                    print "ERROR($return): rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                 }
 
             }
@@ -1203,9 +1203,11 @@ sub AD_group_kill {
         } else {
             print "ERROR: Not killing Group of unknown type $type\n";
         }
+        &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school) (end)");
         return;
     } else {
        print "   * Group $group nonexisting ($count results)\n";
+       &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school) (end)");
        return;
     }
 }
