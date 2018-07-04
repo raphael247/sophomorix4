@@ -368,8 +368,7 @@ while(<SOPHOMORIXADD>){
         # remember group
         $sophomorix_config{'RUNTIME'}{'GROUPS_CREATED'}{$group_token}="created by sophomorix-add";
     } else {
-        print "   * group $class_group in school $school already created\n";
-
+        print "   * group $group_token in school $school already created RUNTIME\n";
     }
     &AD_user_create({ldap=>$ldap,
                      root_dse=>$root_dse, 
