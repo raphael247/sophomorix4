@@ -62,13 +62,10 @@ my $login_check_ok="";
 my $sophomorix_first_password="";
 my @users_for_quota=();
 
-# groups that have been created while the script is running
-my %group_created=();
 
 ############################################################
 # options
 ############################################################
-
 $Conf::log_level=1;
 my $help=0;
 my $info=0;
@@ -351,7 +348,7 @@ while(<SOPHOMORIXADD>){
         $type=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'sophomorixType'};
     }
 
-    if (not exists $group_created{$school}{$class_group}){
+    if (not exists $sophomorix_config{'RUNTIME'}{'GROUPS_CREATED'}{$group_token}){
         &AD_group_create({ldap=>$ldap,
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
@@ -369,7 +366,7 @@ while(<SOPHOMORIXADD>){
                           sophomorix_result=>\%sophomorix_result,
                         });
         # remember group
-        $group_created{$school}{$class_group}="already created";
+        $sophomorix_config{'RUNTIME'}{'GROUPS_CREATED'}{$group_token}="created by sophomorix-add";
     } else {
         print "   * group $class_group in school $school already created\n";
 

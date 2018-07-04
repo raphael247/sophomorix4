@@ -7069,6 +7069,14 @@ sub AD_group_create {
         $file="none";    
     }
 
+#    if (exists $ref_sophomorix_config->{'RUNTIME'}{'GROUPS_CREATED'}{$group}){
+#        print "   * group $group in school $school already created RUNTIME\n";
+#        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+#        return;
+#    } else {
+#        print "   * $group must be created RUNTIME\n";
+#        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+#    }
     print "\n";
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (begin):");
 
@@ -7369,6 +7377,8 @@ sub AD_group_create {
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     print "\n";
+#    # remember group
+#    $ref_sophomorix_config->{'RUNTIME'}{'GROUPS_CREATED'}{$group}="created by AD_group_create";
     return;
 }
 
