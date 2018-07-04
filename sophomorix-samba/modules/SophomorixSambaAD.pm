@@ -3563,7 +3563,14 @@ sub AD_create_school_groups {
                             });
         }
     } else {
+        # *-admin groups must be created FIRST (NTACLs of other groups contain *-admin)
+        # this can be done as a hack by an ascibetic sort
+        my @dn_list=();
         foreach my $dn (keys %{$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}}) {
+            push @dn_list,$dn;
+        }
+        @dn_list = sort @dn_list;
+        foreach my $dn (@dn_list) {
             # create ou for group
             my $group=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'GROUP_CN'}{$dn};
             my $description="LMN Group, change if you like";
