@@ -1,0 +1,31 @@
+This is the README for the migration-<oldnum>-to-<newnum>.conf
+
+
+The config files has the following fields, seperated by ::
+
+1) old_abs_path
+Which file/directory is collected from the old server
+
+
+2) new_abs_path
+Where is the file restored (as a unmodified copy) 
+on the new server. (add .orig when the file will be modified)
+
+
+3) new_permissions
+The permissions that the file will have on the new server
+
+
+4) may/must
+may:  The file is not really needed for migration
+      (i.e. virusscan configuration)
+      --> This results in a WARNING
+must: The file has to exist for migration
+      If missing theis results in an ERROR
+
+
+5) dir/file
+dir:  The old_abs_path is a directory and has to be dumped
+      recursively
+file: The old_abs_path is a file
+
