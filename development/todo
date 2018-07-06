@@ -21,6 +21,48 @@ upload to fleischsalat: scp sophomorix*3.42.1-3* fleischsalat:bionic-testing
 Todo:
 ############################################################
 
+------------------------------------------------------------
+checken:
+beim anlegen einer Schule werden die klassen 2x angelegt: AD_create_schoolgroups
+erstesmal hat bisher gefailed (ACL setzen), wenn admins nach anderen angelegt wurde (nun gefixt)
+zweitesmal war OK, da die Gruppen existieren
+--
+zweiten Aufruf erstetzen und schauen, ob es tut
+
+--> bisher hat RUNTIME den zweiten Aufruf abgebrochen
+    --> deshalb Fehler?
+--> nochmal testen, ob RUNTIME Info in AD_school_create reinkommt
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+uid/uidreal in options has speichern? ist vielleicht schon so?
+------------------------------------------------------------
+
+------------------------------------------------------------
+-> neuer branch
+ALLE scripte auf neue checkoptions umstellen
+-> zuerst alle Kombinationen erlauben
+-> loglevel in options-hash schreiben
+
+------------------------------------------------------------
+
+------------------------------------------------------------
+---> Alle scripte müssen auf neuen hash umgestellt sein
+typeout reduzieren, je funktion
+options-hash übergeben
+  verbosity im options-hash nachschauen
+AD_school_create
+ohne -v:
+-> * School $school must be created RUNTIME (Start)
+-> * School $school already created RUNTIME (Start/End)
+-> * School $school must be created RUNTIME (End)
+mit -v wie bisher
+dito mit AD_group_create
+usw...
+------------------------------------------------------------
+
+
 sophomorix-device
 --> OK: Zusatzoption --sync
     macht dasselbe wie sophomorix-device
