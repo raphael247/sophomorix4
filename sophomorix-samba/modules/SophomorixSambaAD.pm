@@ -6396,11 +6396,18 @@ sub AD_get_shares_v {
     }
     
     # sort some shares
-    @{ $shares{'LISTS'}{'OTHER_SHARES'} } = sort @{ $shares{'LISTS'}{'OTHER_SHARES'} };
-    @{ $shares{'LISTS'}{'GLOBAL'} } = sort @{ $shares{'LISTS'}{'GLOBAL'} };
-    @{ $shares{'LISTS'}{'SHARES'} } = sort @{ $shares{'LISTS'}{'SHARES'} };
-    @{ $shares{'LISTS'}{'SCHOOLS'} } = sort @{ $shares{'LISTS'}{'SCHOOLS'} };
-
+    if ($#{ $shares{'LISTS'}{'OTHER_SHARES'} }>0){
+        @{ $shares{'LISTS'}{'OTHER_SHARES'} } = sort @{ $shares{'LISTS'}{'OTHER_SHARES'} };
+    }
+    if ($#{ $shares{'LISTS'}{'GLOBAL'} }>0){
+        @{ $shares{'LISTS'}{'GLOBAL'} } = sort @{ $shares{'LISTS'}{'GLOBAL'} };
+    }
+    if ($#{ $shares{'LISTS'}{'SHARES'} }>0){
+        @{ $shares{'LISTS'}{'SHARES'} } = sort @{ $shares{'LISTS'}{'SHARES'} };
+    }
+    if ($#{ $shares{'LISTS'}{'SCHOOLS'} }>0){
+        @{ $shares{'LISTS'}{'SCHOOLS'} } = sort @{ $shares{'LISTS'}{'SCHOOLS'} };
+    }
     return \%shares;
 }
 
