@@ -88,7 +88,9 @@ sophomorix-cacls accepts one ore more unix paths as the option and connects via 
 Options:
   -h  / --help
 
-  --append-to-file /abs/file.txt   # appends >> the diffable result to /abs/file.txt
+  --append-to-file /abs/file.txt   
+    appends >> the diffable result to /abs/file.txt
+    (this is used for sophomorix-repair to make an ACL snapshot)
 
 ');
    print "\n";
@@ -126,6 +128,18 @@ foreach my $linux_path (@linux_paths){
     my $command="";
     my $command_append="";
     my $is_smb=0;
+
+    # rewrite path if it is under /srv/samba/mount
+    if ($linux_path=~m/^$sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}/){
+        my $old_linux_path=$linux_path;
+        $linux_path=~s/^$sophomorix_config{'INI'}{'PATHS'}{'MOUNTPOINT'}/$sophomorix_config{'INI'}{'PATHS'}{'REPAIR_SNAPSHOT_SOURCE'}/;
+        print "=============================================================\n";
+        print "Rewriting mount path to smb path:\n";
+        print "   $old_linux_path\n";
+        print "    --->\n";
+        print "   $linux_path\n";
+    }
+
     foreach my $path (keys %share_by_path) {
         # if unix path starts with a known share path
         my $share=$share_by_path{$path};
