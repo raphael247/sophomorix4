@@ -3485,7 +3485,7 @@ sub AD_school_create {
     }
 
     &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
-                             $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
+                             $DevelConf::AD_global_ou,$ref_sophomorix_config);
 
     # all groups created, add some memberships from GLOBAL
     foreach my $group (keys %{$ref_sophomorix_config->{'GLOBAL'}{'GROUP_MEMBEROF'}}) {
@@ -3503,13 +3503,6 @@ sub AD_school_create {
                              addgroup => $group,
                             }); 
     }
-
-    # school
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
-                             $school,$ref_sophomorix_config);
-    # global
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
-                             $DevelConf::AD_global_ou,$ref_sophomorix_config,$root_dse);
 
     # creating fileystem at last, because groups are needed beforehand for the ACL's 
     # creating filesystem for school
