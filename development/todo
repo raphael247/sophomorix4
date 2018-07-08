@@ -31,30 +31,42 @@ MAIL_DOMAIN=mail.bszleo.de   --> user@mail.bszleo.de
 
 
 ------------------------------------------------------------
-checken:
-beim anlegen einer Schule werden die klassen 2x angelegt: AD_create_schoolgroups
-erstesmal hat bisher gefailed (ACL setzen), wenn admins nach anderen angelegt wurde (nun gefixt)
-zweitesmal war OK, da die Gruppen existieren
---
-zweiten Aufruf erstetzen und schauen, ob es tut
---> Ergebnis OK
-
-
---> bisher hat RUNTIME den zweiten Aufruf abgebrochen
-    --> deshalb Fehler?
---> nochmal testen, ob RUNTIME Info in AD_school_create reinkommt
-------------------------------------------------------------
-
-
-------------------------------------------------------------
-uid/uidreal in options has speichern? ist vielleicht schon so?
-------------------------------------------------------------
-
-------------------------------------------------------------
 -> neuer branch
 ALLE scripte auf neue checkoptions umstellen
 -> zuerst alle Kombinationen erlauben
 -> loglevel in options-hash schreiben
+
+Vorgehensweise:
+
+1 ==========
+alt:
+
+$help=0;
+
+my $testopt=GetOptions(
+           "help|h" => \$help,
+...
+
+neu:
+############################################################
+# Option handling
+############################################################
+my %options=();
+my $testopt=GetOptions(\%options, 
+                       "help|h",
+
+
+Vorgehensweise:
+1) my $testopt kopieren und auskommentieren
+2) jeweils für 1 option durchgehen:
+   A) my $help auskommentieren
+   B) testopt hash umstellen
+   c) Aufrufe ersetzen:
+      ALT:   #if ($help==1) {
+      NEU:   if (defined $options{'help'}) {
+
+      ALT: if ($addasmins ne ""){
+      NEU: if (defined $options{'addadmins'}){
 
 ------------------------------------------------------------
 

@@ -377,28 +377,23 @@ while(<SOPHOMORIXADD>){
         $type=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$file}{'sophomorixType'};
     }
 
-    if (not exists $sophomorix_config{'RUNTIME'}{'GROUPS_CREATED'}{$group_token}){
-        &AD_group_create({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          group=>$group_token,
-                          group_basename=>$class_group,
-                          school=>$school,
-                          status=>"P",
-                          type=>$type,
-                          joinable=>"TRUE",
-                          description=>$group_token,
-                          gidnumber_wish=>$gidnumber_wish,
-                          file=>$file,
-                          smb_admin_pass=>$smb_admin_pass,
-                          sophomorix_config=>\%sophomorix_config,
-                          sophomorix_result=>\%sophomorix_result,
-                        });
-        # remember group
-        $sophomorix_config{'RUNTIME'}{'GROUPS_CREATED'}{$group_token}="created by sophomorix-add";
-    } else {
-        print "   * group $group_token in school $school already created RUNTIME\n";
-    }
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      group=>$group_token,
+                      group_basename=>$class_group,
+                      school=>$school,
+                      status=>"P",
+                      type=>$type,
+                      joinable=>"TRUE",
+                      description=>$group_token,
+                      gidnumber_wish=>$gidnumber_wish,
+                      file=>$file,
+                      smb_admin_pass=>$smb_admin_pass,
+                      sophomorix_config=>\%sophomorix_config,
+                      sophomorix_result=>\%sophomorix_result,
+                    });
+
     &AD_user_create({ldap=>$ldap,
                      root_dse=>$root_dse, 
                      root_dns=>$root_dns, 

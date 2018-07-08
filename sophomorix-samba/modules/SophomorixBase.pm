@@ -5530,11 +5530,37 @@ sub get_group_basename {
 # error, when options are not given correctly
 sub check_options{
     my ($parse_ergebnis,$ref_sophomorix_result,$json,$ref_options) = @_;
+    # $ref_options contains 
+    #   * all options given on command line (lowercase top level keys)
+    #   * CONFIG-key: info about options from the script source:
+    #
+    #     CONFIG-->ACTION--><object>="create,update"
+    #        defines actions in this script and what object they need, i.e. a group
+    #        Example: $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,update";
+    #           options create/update are options that need a GROUP object
+    #
+    #     CONFIG-->ONE_OF--><object>="opt1,opt2"
+    #        defines by which options an object MUST be defined
+    #        Example: $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class,group";
+    #           options class/group are options that MUST provide a GROUP object
+    #
+    #     CONFIG-->SOME_OF--><object>="opt1,opt2"
+    #        defines by which option CAN be given to an object
+    #
+    #     CONFIG-->DEPENDS--><option>="opt"
+    #        defines that option <option> needs option opt
+    #        Example: $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
+    #           option set-gidnumber is only useful, when option create is also given
+
+
     # get effective/real userID
-    my $uid_effective=$<;
-    my $uid_real=$>;
-    print "Effective User ID: $uid_effective\n";
-    print "Real User ID:      $uid_real\n";
+    $ref_options->{'RUNTIME'}{'EFFECTIVE_UID'}=$<;
+    $ref_options->{'RUNTIME'}{'REAL_UID'}=$>;
+
+    print "Command line::\n";
+    print Dumper ($ref_options);
+
+    
 
     if (not defined $Conf::log_level){
 	$Conf::log_level=1;
@@ -5654,16 +5680,20 @@ sub check_options{
 	}
     }
     
-    print Dumper (\%tmp);
-    print Dumper ($ref_options);
+    #print "tmp_hash:\n";
+    #print Dumper (\%tmp);
+    #print "options_hash:\n";
+    #print Dumper ($ref_options);
 
     my $action_count=0;
     foreach my $opt_given (keys %{$ref_options}) {
+        # go through all option given on command line
 	if ($opt_given eq "CONFIG" or
             $opt_given eq "CONFIGURED" or
             $opt_given eq "ACTIONS" or
             $opt_given eq "MODIFIER_OPTIONS" or
-            $opt_given eq "DEPENDENCIES"){
+            $opt_given eq "DEPENDENCIES" or
+            $opt_given eq "RUNTIME"){
             next;
 	}
 	if (not exists $ref_options->{'CONFIGURED'}{$opt_given}){
@@ -5750,8 +5780,20 @@ sub check_options{
     }
 
     print "Option combinations successfully checked\n";
+    # delete unneeded stuff
+    delete $ref_options->{'DEPENDENCIES'};
+    delete $ref_options->{'MAYBE'};
+    delete $ref_options->{'CONFIGURED'};
+    delete $ref_options->{'CONFIG'};
+    delete $ref_options->{'ACTIONS'};
+    delete $ref_options->{'MODIFIER_OPTIONS'};
+    print "options_hash:\n";
+    print Dumper ($ref_options);
+
     #exit; # ??????????
 }
+
+
 
 # dns queries
 ######################################################################

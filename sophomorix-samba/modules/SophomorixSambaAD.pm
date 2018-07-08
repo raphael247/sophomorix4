@@ -3524,8 +3524,8 @@ sub AD_school_create {
                          });
     &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (end) ...");
     print "\n";
-    # update runtime hash
-    $ref_sophomorix_config->{'RUNTIME'}{'SCHOOLS_CREATED'}{$school}="created by AD_school_create";
+    # remember the school in RUNTIME hash
+    $ref_sophomorix_config->{'RUNTIME'}{'SCHOOLS_CREATED'}{$school}="created by AD_school_create RUNTIME";
 }
 
 
@@ -7078,6 +7078,17 @@ sub AD_group_create {
         $file="none";    
     }
 
+    print Dumper($ref_sophomorix_config->{'RUNTIME'});
+
+    if (exists $ref_sophomorix_config->{'RUNTIME'}{'GROUPS_CREATED'}{$group}){
+        print "   * $group already created RUNTIME\n";
+        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+        return;
+    } else {
+        print "   * $group must be created RUNTIME\n";
+        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+    }
+
     print "\n";
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (begin):");
 
@@ -7378,6 +7389,8 @@ sub AD_group_create {
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");
     print "\n";
+    # remember the group in RUNTIME hash
+    $ref_sophomorix_config->{'RUNTIME'}{'GROUPS_CREATED'}{$group}="created by AD_group_create RUNTIME";
     return;
 }
 
