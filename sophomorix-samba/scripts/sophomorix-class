@@ -133,8 +133,8 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
 &check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
 
 # defaults
-if (not defined $options{'gidnumber_wish'}){
-    $options{'gidnumber_wish'}="---";
+if (not defined $options{'set-gidnumber'}){
+    $options{'set-gidnumber'}="---";
 }
 if (not defined $options{'school'}){
     $options{'school'}="---";
@@ -311,7 +311,7 @@ if (defined $options{'create'} and defined $options{'class'}){
 		     sub_ou=>"OU=".$options{'class'}.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
                      joinable=>"TRUE",
                      hidden=>"FALSE",
-                     gidnumber_wish=>$options{'gidnumber'},
+                     gidnumber_wish=>$options{'set-gidnumber'},
                      smb_admin_pass=>$smb_admin_pass,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
