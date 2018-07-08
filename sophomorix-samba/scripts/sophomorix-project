@@ -65,106 +65,7 @@ use Sophomorix::SophomorixSambaAD qw(
 
 my @arguments = @ARGV;
 
-# option vars
-#$Conf::log_level=1;
-#my $help=0;
-#my $tree=0;
-#my $info=0;
-#my $json=0;
-
-#my $user_info=0;
-#my $admininfo=0;
-
-#$Conf::log_level=1;
-
-#my $project="";
-#my $create=0;
-#my $gidnumber=-1;
 my $gidnumber_wish;
-#my $kill=0;
-#my $school="---";
-
-#my $description;
-#my $addquota;
-#my $addmailquota;
-#my $mailalias;
-#my $maillist;
-#my $status;
-#my $join;
-#my $hide;
-#my $maxmembers;
-#my $creationdate;
-
-#my $members;
-#my $addmembers;
-#my $removemembers;
-
-#my $admins;
-#my $addadmins;
-#my $removeadmins;
-
-#my $membergroups;
-#my $addmembergroups;
-#my $removemembergroups;
-
-#my $admingroups;
-#my $addadmingroups;
-#my $removeadmingroups;
-
-#my $sync_all_memberships;
-
-#my $caller="";
-#my $curr_member="";
-#my $new_member="";
-
-#my $dump_all_projects=""; 
-#my $create_from_file="";
-#my $update_from_file="";
-
-#my $update=0;
-
-#my %all_projects=(); # hash with projects and their options
-
-#my %seen_projects=();   # projects sorted into @addorder_list
-#my %unseen_projects=(); # projects still to sort in @addorder_list
-#my @addorder_list=();   # order in which projects have to be added
-
-# # old
-# # Parsen der Optionen
-# my $testopt=GetOptions(
-#            "help|h" => \$help,
-#            "info|i" => \$info,
-#            "json|j+" => \$json,
-#            "verbose|v+" => \$Conf::log_level,
-#            "create" => \$create,
-#            "gidnumber=i" => \$gidnumber,
-#            "kill" => \$kill,
-#            "join!" => \$join,
-#            "hide!" => \$hide,
-#            "school=s" => \$school,
-#            "description=s" => \$description,
-#            "status=s" => \$status,
-#            "members=s" => \$members,
-#            "addmembers=s" => \$addmembers,
-#            "removemembers=s" => \$removemembers,
-#            "admins=s" => \$admins,
-#            "addadmins=s" => \$addadmins,
-#            "removeadmins=s" => \$removeadmins,
-#            "membergroups=s" => \$membergroups,
-#            "addmembergroups=s" => \$addmembergroups,
-#            "removemembergroups=s" => \$removemembergroups,
-#            "admingroups=s" => \$admingroups,
-#            "addadmingroups=s" => \$addadmingroups,
-#            "removeadmingroups=s" => \$removeadmingroups,
-#            "sync-all-memberships" => \$sync_all_memberships,
-#            "name|project|p=s" => \$project,
-#            "addquota=s" => \$addquota,
-#            "addmailquota=s" => \$addmailquota,
-#            "maxmembers=s" => \$maxmembers,
-#            "creationdate=s" => \$creationdate,
-#            "mailalias!" => \$mailalias,
-#            "maillist!" => \$maillist,
-#          );
 
 ############################################################
 # Option handling
@@ -264,7 +165,6 @@ if (defined $options{'project'} and not defined $options{'create'} and not defin
 
 
 # --help
-#if ($help==1) {
 if (defined $options{'help'}) {
    # Scriptname ermitteln
    my @list = split(/\//,$0);
