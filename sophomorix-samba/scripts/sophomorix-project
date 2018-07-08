@@ -66,138 +66,206 @@ use Sophomorix::SophomorixSambaAD qw(
 my @arguments = @ARGV;
 
 # option vars
-$Conf::log_level=1;
-my $help=0;
-my $tree=0;
-my $info=0;
-my $json=0;
+#$Conf::log_level=1;
+#my $help=0;
+#my $tree=0;
+#my $info=0;
+#my $json=0;
 
-my $user_info=0;
-my $admininfo=0;
+#my $user_info=0;
+#my $admininfo=0;
 
-$Conf::log_level=1;
+#$Conf::log_level=1;
 
-my $project="";
-my $create=0;
-my $gidnumber=-1;
+#my $project="";
+#my $create=0;
+#my $gidnumber=-1;
 my $gidnumber_wish;
-my $kill=0;
-my $school="---";
+#my $kill=0;
+#my $school="---";
 
-my $description;
-my $addquota;
-my $addmailquota;
-my $mailalias;
-my $maillist;
-my $status;
-my $join;
-my $hide;
-my $maxmembers;
-my $creationdate;
+#my $description;
+#my $addquota;
+#my $addmailquota;
+#my $mailalias;
+#my $maillist;
+#my $status;
+#my $join;
+#my $hide;
+#my $maxmembers;
+#my $creationdate;
 
-my $members;
-my $addmembers;
-my $removemembers;
+#my $members;
+#my $addmembers;
+#my $removemembers;
 
-my $admins;
-my $addadmins;
-my $removeadmins;
+#my $admins;
+#my $addadmins;
+#my $removeadmins;
 
-my $membergroups;
-my $addmembergroups;
-my $removemembergroups;
+#my $membergroups;
+#my $addmembergroups;
+#my $removemembergroups;
 
-my $admingroups;
-my $addadmingroups;
-my $removeadmingroups;
+#my $admingroups;
+#my $addadmingroups;
+#my $removeadmingroups;
 
-my $sync_all_memberships;
+#my $sync_all_memberships;
 
-my $caller="";
-my $curr_member="";
-my $new_member="";
+#my $caller="";
+#my $curr_member="";
+#my $new_member="";
 
-my $dump_all_projects=""; 
-my $create_from_file="";
-my $update_from_file="";
+#my $dump_all_projects=""; 
+#my $create_from_file="";
+#my $update_from_file="";
 
-my $update=0;
+#my $update=0;
 
-my %all_projects=(); # hash with projects and their options
+#my %all_projects=(); # hash with projects and their options
 
-my %seen_projects=();   # projects sorted into @addorder_list
-my %unseen_projects=(); # projects still to sort in @addorder_list
-my @addorder_list=();   # order in which projects have to be added
+#my %seen_projects=();   # projects sorted into @addorder_list
+#my %unseen_projects=(); # projects still to sort in @addorder_list
+#my @addorder_list=();   # order in which projects have to be added
+
+# # old
+# # Parsen der Optionen
+# my $testopt=GetOptions(
+#            "help|h" => \$help,
+#            "info|i" => \$info,
+#            "json|j+" => \$json,
+#            "verbose|v+" => \$Conf::log_level,
+#            "create" => \$create,
+#            "gidnumber=i" => \$gidnumber,
+#            "kill" => \$kill,
+#            "join!" => \$join,
+#            "hide!" => \$hide,
+#            "school=s" => \$school,
+#            "description=s" => \$description,
+#            "status=s" => \$status,
+#            "members=s" => \$members,
+#            "addmembers=s" => \$addmembers,
+#            "removemembers=s" => \$removemembers,
+#            "admins=s" => \$admins,
+#            "addadmins=s" => \$addadmins,
+#            "removeadmins=s" => \$removeadmins,
+#            "membergroups=s" => \$membergroups,
+#            "addmembergroups=s" => \$addmembergroups,
+#            "removemembergroups=s" => \$removemembergroups,
+#            "admingroups=s" => \$admingroups,
+#            "addadmingroups=s" => \$addadmingroups,
+#            "removeadmingroups=s" => \$removeadmingroups,
+#            "sync-all-memberships" => \$sync_all_memberships,
+#            "name|project|p=s" => \$project,
+#            "addquota=s" => \$addquota,
+#            "addmailquota=s" => \$addmailquota,
+#            "maxmembers=s" => \$maxmembers,
+#            "creationdate=s" => \$creationdate,
+#            "mailalias!" => \$mailalias,
+#            "maillist!" => \$maillist,
+#          );
+
+############################################################
+# Option handling
+############################################################
+my %options=();
+$options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
+                                      "kill,".
+                                      "description,".
+                                      "quota,".
+                                      "mailquota,".
+                                      "status,".
+                                      "maxmembers,".
+                                      "creationdate,".
+                                      "set-gidnumber,".
+                                      "mailalias,".
+                                      "maillist,".
+                                      "join,".
+                                      "hide,".
+                                      "admins,".
+                                      "addadmins,".
+                                      "removeadmins,".
+                                      "members,".
+                                      "addmembers,".
+                                      "admingroups,".
+                                      "addadmingroups,".
+                                      "removeadmingroups,".
+                                      "removemembers,".
+                                      "membergroups,".
+                                      "addmembergroups,".
+                                      "removemembergroups,".
+                                      "addquota,".
+                                      "addmailquota";
+
+# define which options deliver which object
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="project";
+
+# define more dependencies
+$options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
 
 # Parsen der Optionen
-my $testopt=GetOptions(
-           "help|h" => \$help,
-           "info|i" => \$info,
-           "json|j+" => \$json,
-           "verbose|v+" => \$Conf::log_level,
-#           "user|user-info|u" => \$user_info,
-#           "admininfo" => \$admininfo,
-           "create" => \$create,
-           "gidnumber=i" => \$gidnumber,
-           "kill" => \$kill,
-           "join!" => \$join,
-           "hide!" => \$hide,
-#           "tree" => \$tree,
-           "school=s" => \$school,
-           "description=s" => \$description,
-           "status=s" => \$status,
-#           "caller=s" => \$caller,
-           "members=s" => \$members,
-           "addmembers=s" => \$addmembers,
-           "removemembers=s" => \$removemembers,
-           "admins=s" => \$admins,
-           "addadmins=s" => \$addadmins,
-           "removeadmins=s" => \$removeadmins,
-           "membergroups=s" => \$membergroups,
-           "addmembergroups=s" => \$addmembergroups,
-           "removemembergroups=s" => \$removemembergroups,
-           "admingroups=s" => \$admingroups,
-           "addadmingroups=s" => \$addadmingroups,
-           "removeadmingroups=s" => \$removeadmingroups,
-           "sync-all-memberships" => \$sync_all_memberships,
-           "name|project|p=s" => \$project,
-           "addquota=s" => \$addquota,
-           "addmailquota=s" => \$addmailquota,
-           "maxmembers=s" => \$maxmembers,
-           "creationdate=s" => \$creationdate,
-           "mailalias!" => \$mailalias,
-           "maillist!" => \$maillist,
-#           "dump=s" => \$dump_all_projects,
-#           "create-from-file=s" => \$create_from_file,
-#           "update-from-file=s" => \$update_from_file,
-#           "update" => \$update,
-#           "curr-member|current-member=s" => \$curr_member,
-#           "new-member|newmember=s" => \$new_member,
-         );
+my $testopt=GetOptions(\%options, 
+                       "help|h",
+                       "info|i",
+                       "json|j+",
+                       "verbose|v+",
+                       "create",
+                       "set-gidnumber=i",
+                       "kill",
+                       "join!",
+                       "hide!",
+                       "school=s",
+                       "description=s",
+                       "status=s",
+                       "members=s",
+                       "addmembers=s",
+                       "removemembers=s",
+                       "admins=s",
+                       "addadmins=s",
+                       "removeadmins=s",
+                       "membergroups=s",
+                       "addmembergroups=s",
+                       "removemembergroups=s",
+                       "admingroups=s",
+                       "addadmingroups=s",
+                       "removeadmingroups=s",
+                       "sync-all-memberships",
+                       "project|p=s",
+                       "addquota=s",
+                       "addmailquota=s",
+                       "maxmembers=s",
+                       "creationdate=s",
+                       "mailalias!",
+                       "maillist!",
+                      );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-project");
 # Prüfen, ob Optionen erkannt wurden
-&check_options($testopt,\%sophomorix_result,$json);
+&check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
+if (not defined $options{'school'}){
+    $options{'school'}="---";
+}
 
 # Reading Configuration
-my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$options{'json'});
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
-
-if ($project ne "" and $create==0 and $kill==0){
+if (defined $options{'project'} and not defined $options{'create'} and not defined $options{'kill'}){
     # append p_ if omitted
-    unless ($project =~ m/^p\_/) { 
-        $project="p_".$project;
+    unless ($options{'project'} =~ m/^p\_/) { 
+        $options{'project'}="p_".$options{'project'};
     }
 }
 
 
 
 # --help
-if ($help==1) {
+#if ($help==1) {
+if (defined $options{'help'}) {
    # Scriptname ermitteln
    my @list = split(/\//,$0);
    my $scriptname = pop @list;
@@ -223,7 +291,7 @@ Getting information:
 
 Changing/creating/killing a project:
   --create -p projectname
-  --create -p projectname --gidnumber num  (for migration only)
+  --create -p projectname --set-gidnumber num  (for migration only)
   --kill -p projectname
 
   -p <project>, / --project <project> 
@@ -254,18 +322,8 @@ Changing/creating/killing a project:
     --addmembergroups group1,group2,group3, ...
     --removemembergroups group1,group2,group3, ...
 
-Dumping data into a file:
-  --dump file
-  --create-from-file file
-  --update-from-file file
-
 Syncing memberships of all projects (sophomorix* -> members):
   --sync-all-memberships
-
-Listing or replacing a users memberships:
-  --current-member user  (List meberships (admin,member) of user)
-  --current-member user --new-member newuser   
-    (replace membeships of user with newuser interactively)
 
 Please see the sophomorix-project(8) man pages for full documentation
 ');
@@ -274,25 +332,24 @@ Please see the sophomorix-project(8) man pages for full documentation
 }
 
 
-
 # --info
 # show all projects when no specific projects is given
-if ($info==1 and $project eq "" ){
+if ($options{'info'}==1 and not defined $options{'project'} ){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
-                                   school=>$school,
+                                   school=>$options{'school'},
                                    sophomorix_config=>\%sophomorix_config,
                                  });
     #print Dumper($ref_group_v);
     #print Dumper($ref_group_v->{'GROUPS'}{'p_Chemie-AG23'});
     my $jsoninfo="PROJECTS_OVERVIEW";
     my $jsoncomment="All Groups";
-    &json_dump({json => $json,
+    &json_dump({json => $options{'json'},
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
-                object_name => $school,
-                log_level => $Conf::log_level,
+                object_name => $options{'school'},
+                log_level => $options{'verbose'},
                 hash_ref => $ref_group_v,
                 sophomorix_config => \%sophomorix_config,
                });
@@ -303,243 +360,56 @@ if ($info==1 and $project eq "" ){
 
 # --info --project <project>
 # list project(s) and exit
-if ($info==1 and $project ne ""){
+if ($options{'info'}==1 and defined $options{'project'}){
     my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
                                            root_dse=>$root_dse,
                                            root_dns=>$root_dns,
-                                           grouplist=>$project,
+                                           grouplist=>$options{'project'},
                                            sophomorix_config=>\%sophomorix_config,
                                       });
     #print Dumper($ref_groups);
     my $jsoninfo="PROJECT";
     my $jsoncomment="Project";
-    &json_dump({json => $json,
+    &json_dump({json => $options{'json'},
                 jsoninfo => $jsoninfo,
                 jsoncomment => $jsoncomment,
-                object_name => $school,
-                log_level => $Conf::log_level,
+                object_name => $options{'school'},
+                log_level => $options{'verbose'},
                 hash_ref => $ref_groups,
                 sophomorix_config => \%sophomorix_config,
                });
     exit;
 }
 
-
-# --admininfo
-if ($admininfo==1){
-#    if ($project eq ""){
-#        &show_project_admin_list();
-#        exit;
-#    } else {
-#        print "\n   Option --admininfo cannot be used together with a project\n\n";
-#        exit;
-#    }
-}
-
-
-# --user-info --project name
-if ($user_info==1){
-#    if ($project ne ""){
-#        &show_project_userinfo($project);
-#        exit;
-#        #&log_script_exit("Project $project showed!",
-#        #                  1,1,0,\@arguments,\%sophomorix_result,$json);
-#    } else {
-#        print "\n   Option --userinfo has be used together with a project\n\n";
-#        exit;
-#    }
-}
-
-
-&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$options{'json'});
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
-
-# --current-member
-# --new-member
-if ($curr_member ne ""){
-    # # fetch all projects
-    # my @projects=&fetchprojects_from_school();
-    #     foreach my $pro (@projects){
-    # 	    #print "checking $pro\n"; 
-    #         # check if curr_menber is admin
-    #         # list or replace replace
-    #         my @admins=&fetchadmins_from_project($pro);
-    #         foreach my $adm (@admins){
-    # 		if ($adm eq $curr_member){
-    #                 print " *** $curr_member is admin in $pro\n";
-    #                 &replace_membership("admin",$pro,$curr_member,$new_member);
-    #             }
-    #         }
-    #         # check if curr_menber is member
-    #         # list or replace replace
-    #         my @users=&fetchmembers_by_option_from_project($pro);
-    #         foreach my $user (@users){
-    # 		if ($user eq $curr_member){
-    #                 print "   * $curr_member is member in $pro\n";
-    #                 &replace_membership("member",$pro,$curr_member,$new_member);
-    #             }
-    #         }
-    # }
-    exit;
-}
-
-
-# --caller and --nojoin
-# if ($project ne "" and $create==0
-#     and 
-#     ($addmembers ne ""
-#      or $removemembers ne ""
-#      or $addadmins ne ""
-#      or $removeadmins ne ""
-#      or $addmembergroups ne ""
-#      or $removemembergroups ne ""
-#      or $addmemberprojects ne ""
-#      or $removememberprojects ne ""
-#      or defined $p_admins
-#      or defined $p_members
-#      or defined $p_groups
-#      or defined $p_projects
-#      or defined $join)
-#     ){
-#     # print "Changing something, eh ----\n";
-#     # my ($a1,$a2,$a3,$a4,$join_val) = &fetchinfo_from_project($project);
-#     # if ($join_val==0){
-#     #     print "Project is NOT joinable $join_val\n";
-#     #     if ($caller eq ""){
-#     #        print "You must use --caller name to modify such a project!\n";
-#     #        &Sophomorix::SophomorixBase::log_script_exit(
-#     #            "Request to modify nojoin project without --caller!",
-#     #            1,1,0,\@arguments,\%sophomorix_result,$json);
-
-#     #     } else {
-#     #        print "I must check if $caller is allowed\n";
-#     #        my @admins_val=&fetchadmins_from_project($project);
-#     #        my $go_on=0;
-#     #        if ($caller eq "root"){
-#     # 	       $go_on=1;
-#     #            print "$caller is root!\n";
-#     #        } else {
-#     #            foreach my $admin_val (@admins_val){
-#     #                #print "Checking ---$admin_val--- and ---$caller---\n";
-#     #                if ($caller eq $admin_val){
-#     #                    $go_on=1;
-#     #                    print "$caller is admin!\n";
-#     #                    last;
-#     #                }
-#     #            }
-#     #        }
-#     #        if ($go_on==0){
-#     #            print "$caller is NOT admin of $project\n";
-#     #            print "$caller is NOT allowed to change userlist\n";
-#     #            &Sophomorix::SophomorixBase::log_script_exit(
-#     #            "Nonadmin tried to change nojoin project!",
-#     #            1,1,0,\@arguments,\%sophomorix_result,$json);
-#     #        }
-#     #     }
-#     # }
-# }
-
-
-
-
-
-
-# writing/reading to/from a file
-
-# --dump filename
-if ($project eq "" and $dump_all_projects ne ""){
-#    &dump_all_projects("$dump_all_projects",@arguments);
-#    &Sophomorix::SophomorixBase::log_script_exit(
-#    "All projects dumped!",
-#    0,1,0,\@arguments,\%sophomorix_result,$json);
-}
-
-
-# --create-from-file filename
-if ($project eq "" and $create_from_file ne ""){
-#    &project_from_file($create_from_file,"--create",@arguments);
-#    &Sophomorix::SophomorixBase::log_script_exit(
-#    "All projects created!",
-#    0,1,0,\@arguments,\%sophomorix_result,$json);
-}
-
-
-# --update-from-file filename
-if ($project eq "" and $update_from_file ne ""){
-#    &project_from_file($update_from_file,"",@arguments);
-#    &Sophomorix::SophomorixBase::log_script_exit(
-#    "All projects updated!",
-#    0,1,0,\@arguments,\%sophomorix_result,$json);
-}
-
-
-
-
-# parse arguments
-#if (defined $p_long_name) {
-#   unless ($p_long_name =~ m/^([\w-]{6,32})$/) { 
-#       print "\nArgument of --longname\n";
-#       print "   contains invalid characters. \n";
-#       print "   or is too short or too long (6-32 characters). \n\n";
-#       &log_script_exit("Invalid characters in argument!",
-#                         1,1,0,\@arguments,\%sophomorix_result,$json);
-#   }
-#}
-
-# if (defined $project) {
-#    # append p_
-#    unless ($project =~ m/^p\_/) { 
-#        $project="p_".$project;
-#    }
-#    # parse name WITH p_ in the beginning
-#    unless ($project =~ m/^([\w-]{3,16})$/) { 
-#        print "\nArgument of --project\n";
-#        print "   contains invalid characters. \n";
-#        print "   or is too short or too long (3-14 characters after p_). \n\n";
-#        &log_script_exit("Invalid characters in argument!",
-#                          1,1,0,\@arguments,\%sophomorix_result,$json);
-#    }
-# }
-
-
-
-
-
-
-
-
-# ===========================================================================
-# Programmbeginn
-# ===========================================================================
-
-
 
 
 # --create --project <name>
 ############################################################
-if ($create==1 and $project ne ""){
-    # --gidnumber
+if (defined $options{'create'} and defined $options{'project'}){
+    # --set-gidnumber
     ############################################################
-    if ($gidnumber==-1){
-       $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+    if (defined $options{'set-gidnumber'}){
+        $gidnumber_wish=$options{'set-gidnumber'};
     } else {
-	$gidnumber_wish=$gidnumber;
+        $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     }
    &AD_school_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
-                      school=>$school,
+                      school=>$options{'school'},
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
                       sophomorix_result=>\%sophomorix_result,
                     });
-   my $group_token=&AD_get_name_tokened($project,$school,"project");
+   my $group_token=&AD_get_name_tokened($options{'project'},$options{'school'},"project");
    &AD_group_create({ldap=>$ldap,
                      root_dse=>$root_dse,
                      root_dns=>$root_dns,
-                     school=>$school,
+                     school=>$options{'school'},
                      group=>$group_token,
-                     group_basename=>$project,
+                     group_basename=>$options{'project'},
                      description=>$group_token,
                      type=>"project",
                      status=>"P",
@@ -555,8 +425,8 @@ if ($create==1 and $project ne ""){
 
 # --kill --project <name>
 ############################################################
-if ($kill==1 and $project ne ""){
-    my $group_token=&AD_get_name_tokened($project,$school,"project");
+if (defined $options{'kill'} and defined $options{'project'}){
+    my $group_token=&AD_get_name_tokened($options{'project'},$options{'school'},"project");
     &AD_group_kill({ldap=>$ldap,
                     root_dse=>$root_dse,
                     root_dns=>$root_dns,
@@ -565,32 +435,16 @@ if ($kill==1 and $project ne ""){
                     type=>"project",
                     sophomorix_config=>\%sophomorix_config,
                   });
-    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
     exit;
 }
 
 
 ##################################################
-# --sync_all_memberships
-if (defined $sync_all_memberships){
-   #my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
-   #                                root_dse=>$root_dse,
-   #                                root_dns=>$root_dns,
-   #                                school=>$school,
-   #                                sophomorix_config=>\%sophomorix_config,
-   #                              });
-   # print Dumper($ref_group_v);
-   #my @school_list;
-   # if ($school eq "" or $school_opt eq "---"){
-   #     @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
-   # } else {
-   #     @school_list=($school_opt);
-   # }
-
+# --sync-all-memberships
+if (defined $options{'sync-all-memberships'}){
     print "Syncing memberships of the following projects:\n";
     my @projects_dn=&AD_group_list($ldap,$root_dse,"project",0);
-
-
 
     foreach my $pro_dn (@projects_dn){
         &AD_project_sync_members($ldap,$root_dse,$pro_dn);
@@ -604,17 +458,17 @@ if (defined $sync_all_memberships){
 
 # get dn if project exists and continue
 ############################################################
-my ($dn_pro,$count,$school_AD)=&AD_project_fetch($ldap,$root_dse,$project,$school,$info);
+my ($dn_pro,$count,$school_AD)=&AD_project_fetch($ldap,$root_dse,$options{'project'},$options{'school'},$options{'info'});
 
 if ($count>1){
     print "\n$count Projects found.\n";
     print "Specify the school-token to choose a project\n\n";
     &log_script_exit("Specify the school-token to choose a project",$count,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 } elsif ($count==0){
-    print "\nERROR retrieving project $project: $count project found.\n\n";
-    &log_script_exit("ERROR retrieving project $project: $count project found.",$count,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    print "\nERROR retrieving project $options{'project'}: $count project found.\n\n";
+    &log_script_exit("ERROR retrieving project $options{'project'}: $count project found.",$count,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 }
 
 
@@ -624,124 +478,124 @@ if ($count>1){
 ############################################################
 
 # --description <strg>
-if (defined $description){
+if (defined $options{'description'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      description=>$description,
+                      description=>$options{'description'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 
 # --addquota <strg>
-if (defined $addquota){
+if (defined $options{'addquota'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      addquota=>$addquota,
+                      addquota=>$options{'addquota'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 
 # --addmailquota <strg>
-if (defined $addmailquota){
+if (defined $options{'addmailquota'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      addmailquota=>$addmailquota,
+                      addmailquota=>$options{'addmailquota'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 
 # --mailalias/nomailalias
-if (defined $mailalias){
+if (defined $options{'mailalias'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      mailalias=>$mailalias,
+                      mailalias=>$options{'mailalias'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --maillist/--nomaillist
-if (defined $maillist){
+if (defined $options{'maillist'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      maillist=>$maillist,
+                      maillist=>$options{'maillist'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --status <P>
-if (defined $status){
+if (defined $options{'status'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      status=>$status,
+                      status=>$options{'status'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --join/--nojoin
-if (defined $join){
+if (defined $options{'join'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      join=>$join,
+                      join=>$options{'join'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --hide/--nohide
-if (defined $hide){
+if (defined $options{'hide'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      hide=>$hide,
+                      hide=>$options{'hide'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --maxmembers <strg>
-if (defined $maxmembers){
+if (defined $options{'maxmembers'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      maxmembers=>$maxmembers,
+                      maxmembers=>$options{'maxmembers'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --creationdate <strg>
-if (defined $creationdate){
+if (defined $options{'creationdate'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      creationdate=>$creationdate,
+                      creationdate=>$options{'creationdate'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
@@ -749,20 +603,20 @@ if (defined $creationdate){
 ##################################################
 # members
 # --members <user1,user2>
-if (defined $members){
+if (defined $options{'members'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      members=>$members,
+                      members=>$options{'members'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --addmembers <user1,user2>
-if (defined $addmembers){
-    my @addmembers=split(/,/,$addmembers);
+if (defined $options{'addmembers'}){
+    my @addmembers=split(/,/,$options{'addmembers'});
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
     my @members = uniq(@old_members,@addmembers); 
     my $members=join(",",@members);
@@ -777,9 +631,9 @@ if (defined $addmembers){
 }
  
 # --removemembers <user1,user2>
-if (defined $removemembers){
+if (defined $options{'removemembers'}){
     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMembers");
-    my @members = &remove_from_list($removemembers,@old_members);
+    my @members = &remove_from_list($options{'removemembers'},@old_members);
     my $members=join(",",@members);
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
@@ -796,20 +650,20 @@ if (defined $removemembers){
 ##################################################
 # admins
 # --admins <user1,user2>
-if (defined $admins){
+if (defined $options{'admins'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      admins=>$admins,
+                      admins=>$options{'admins'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --addadmins <user1,user2>
-if (defined $addadmins){
-    my @addadmins=split(/,/,$addadmins);
+if (defined $options{'addadmins'}){
+    my @addadmins=split(/,/,$options{'addadmins'});
     my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
     my @admins = uniq(@old_admins,@addadmins); 
     my $admins=join(",",@admins);
@@ -824,9 +678,9 @@ if (defined $addadmins){
 }
 
 # --removeadmins <user1,user2>
-if (defined $removeadmins){
+if (defined $options{'removeadmins'}){
     my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdmins");
-    my @admins = &remove_from_list($removeadmins,@old_admins);
+    my @admins = &remove_from_list($options{'removeadmins'},@old_admins);
     my $admins=join(",",@admins);
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
@@ -843,20 +697,20 @@ if (defined $removeadmins){
 ##################################################
 # membergroups
 # --membergroups <group1,group2>
-if (defined $membergroups){
+if (defined $options{'membergroups'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      membergroups=>$membergroups,
+                      membergroups=>$options{'membergroups'},
                       sophomorix_config=>\%sophomorix_config,
                     });
 }
 
 # --addmembergroups <group1,group2>
-if (defined $addmembergroups){
-    my @addmembergroups=split(/,/,$addmembergroups);
+if (defined $options{'addmembergroups'}){
+    my @addmembergroups=split(/,/,$options{'addmembergroups'});
     my @old_membergroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
     my @membergroups = uniq(@old_membergroups,@addmembergroups); 
     my $membergroups=join(",",@membergroups);
@@ -871,9 +725,9 @@ if (defined $addmembergroups){
 }
 
 # --removemembergroups <user1,user2>
-if (defined $removemembergroups){
+if (defined $options{'removemembergroups'}){
     my @old_membergroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixMemberGroups");
-    my @membergroups = &remove_from_list($removemembergroups,@old_membergroups);
+    my @membergroups = &remove_from_list($options{'removemembergroups'},@old_membergroups);
     my $membergroups=join(",",@membergroups);
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
@@ -890,19 +744,19 @@ if (defined $removemembergroups){
 ##################################################
 # admingroups
 # --admingroups <group1,group2>
-if (defined $admingroups){
+if (defined $options{'admingroups'}){
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
                       dn=>$dn_pro,
 		      school=>$school_AD,
                       type=>"project",
-                      admingroups=>$admingroups,
+                      admingroups=>$options{'admingroups'},
                     });
 }
 
 # --addadmingroups <group1,group2>
-if (defined $addadmingroups){
-    my @addadmingroups=split(/,/,$addadmingroups);
+if (defined $options{'addadmingroups'}){
+    my @addadmingroups=split(/,/,$options{'addadmingroups'});
     my @old_admingroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
     my @admingroups = uniq(@old_admingroups,@addadmingroups); 
     my $admingroups=join(",",@admingroups);
@@ -917,9 +771,9 @@ if (defined $addadmingroups){
 }
 
 # --removeadmingroups <user1,user2>
-if (defined $removeadmingroups){
+if (defined $options{'removeadmingroups'}){
     my @old_admingroups = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_pro,"sophomorixAdminGroups");
-    my @admingroups = &remove_from_list($removeadmingroups,@old_admingroups);
+    my @admingroups = &remove_from_list($options{'removeadmingroups'},@old_admingroups);
     my $admingroups=join(",",@admingroups);
     &AD_group_update({ldap=>$ldap,
                       root_dse=>$root_dse,
@@ -933,85 +787,5 @@ if (defined $removeadmingroups){
 
 
 
-
-
-
-
-# # repair.directories einlesen
-# &get_alle_verzeichnis_rechte();
-
-# # fetch permission for all homes
-# &fetch_repairhome();
-
-# # create/update project
-# if ($kill==0 and $update==0){
-#     &create_project($project,$create,$p_long_name,
-#                     $p_add_quota,$p_add_mail_quota,
-#                     $p_status,$p_join,$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-#                     $p_max_members,$p_members,$p_admins,
-#                     $p_groups,$p_projects,
-#                     $p_mailalias,$p_maillist);
-# } elsif  ($kill==1 and $update==0){
-#     # remove all users from project
-#     # (BEFORE removing project)
-#     print "Preparing Project $project to kill (remove users)!\n";
-#     &create_project($project,0,$p_long_name,
-#                     0,0,
-#                     "K","FALSE",$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'},
-#                     0,"","",
-#                     "","",
-#                     0,0);
-
-#     # project_details: Eintrag löschen
-#     # und files loeschen 
-#     # (BEFORE removing group)
-#     &remove_project($project);
-
-#     # gruppe entfernen
-#     &remove_class_db_entry($project);
-# }
-
-# if ($update==1 and $project ne ""){
-#     print "updating project $project:\n";
-#     &update_project($project,$sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'});
-# }
-
-
-# # Setting Quota if necessary
-# if ($Conf::quota_use eq "yes" 
-#       and (
-#          defined $p_admins
-#          or defined $p_groups
-#          or defined $p_members
-#          or defined $p_projects
-#          or defined $p_add_quota
-#          or defined $p_add_mail_quota
-#          or $kill==1
-#         ) 
-#     ) {
-#     # system("sophomorix-quota --students --teachers --noninteractive");
-#     system("${DevelConf::executable_pfad}/sophomorix-quota --project $project --noninteractive");
-#     &nscd_stop();
-# } else {
-#     &titel("NOT setting quota (nothing quota related changed)");
-# }
-
-
-# # Creating Mailing Aliases and Lists
-# if (defined $p_admins
-#     or defined $p_groups
-#     or defined $p_members
-#     or defined $p_projects
-#     or defined $p_long_name
-#     or defined $mailalias
-#     or defined $maillist
-#     or $kill==1
-#    ) {
-#     system("${DevelConf::executable_pfad}/sophomorix-mail");
-#     &nscd_stop();
-# } else {
-#     &titel("NOT creating mailaliases/lists (nothing mail related changed)");
-# }
-
 &AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
