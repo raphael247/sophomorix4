@@ -5556,6 +5556,8 @@ sub check_options{
     # get effective/real userID
     $ref_options->{'RUNTIME'}{'EFFECTIVE_UID'}=$<;
     $ref_options->{'RUNTIME'}{'REAL_UID'}=$>;
+    $ref_options->{'SCRIPTNAME'}=$0;
+
 
     print "Command line::\n";
     print Dumper ($ref_options);
@@ -5578,6 +5580,8 @@ sub check_options{
         }
     }
 
+
+    my $warn_count=0;
     my %tmp=();
     ############################################################
     # known options
@@ -5606,6 +5610,10 @@ sub check_options{
     if (not defined $ref_options->{'info'}){
        $ref_options->{'info'}=0;
     }
+
+    ############################################################
+    # school option is an modifier option
+    $ref_options->{'CONFIGURED'}{'school'}="TRUE";
    
     ############################################################
     # work on MAYBE
@@ -5693,11 +5701,13 @@ sub check_options{
             $opt_given eq "ACTIONS" or
             $opt_given eq "MODIFIER_OPTIONS" or
             $opt_given eq "DEPENDENCIES" or
-            $opt_given eq "RUNTIME"){
+            $opt_given eq "RUNTIME" or
+            $opt_given eq "SCRIPTNAME"){
             next;
 	}
 	if (not exists $ref_options->{'CONFIGURED'}{$opt_given}){
 	    print "\nWARNING OF UNCONFIGURED OPTION: $opt_given\n\n";
+	    $warn_count++;
 	} elsif (exists $ref_options->{'MODIFIER_OPTIONS'}{$opt_given}){
 	    print "Option $opt_given is a modifier option\n";
 	} elsif (exists $ref_options->{'ACTIONS'}{$opt_given}){
@@ -5787,9 +5797,13 @@ sub check_options{
     delete $ref_options->{'CONFIG'};
     delete $ref_options->{'ACTIONS'};
     delete $ref_options->{'MODIFIER_OPTIONS'};
-    print "options_hash:\n";
-    print Dumper ($ref_options);
-
+    if ($warn_count>0){
+        print "options_hash:\n";
+        print STDERR Dumper ($ref_options);
+        print "\nERROR: The options you gave are considered insane/bullshit\n\n";
+        print STDERR "\nERROR: The options you gave are considered insane/bullshit\n\n";
+        exit 88;
+    }
     #exit; # ??????????
 }
 
