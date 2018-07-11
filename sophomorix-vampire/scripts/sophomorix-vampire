@@ -1092,7 +1092,6 @@ if ($verify_uid==1){
     # Test 2: Reverse Test: Users on new server that are not on old server
     #print Dumper(\%reverse_test);
     my $entries=0;
-    my ($ldap,$root_dse) = &AD_bind_admin();
 
     my $filter="(& (objectClass=user) (sophomorixRole=*) )";
     my $mesg = $ldap->search( # perform a search
