@@ -880,6 +880,22 @@ sub AD_user_kill {
                                                debug     => 0);
               #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
               $home_delete=$smb->rmdir_recurse($smb_home);
+
+              # smbclient deltree ?????
+              my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
+                  &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                                 $school_AD,
+                                                                 $adminclass_AD,
+                                                                 $user,
+                                                                 $role_AD,
+                                                                 $ref_sophomorix_config);
+
+              my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                        " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
+                        $unc." -c 'deltree $smb_rel_path;'";
+              print "HERE: $smbclient_command\n"
+              my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+
               if($home_delete==1){
                   $home_delete_string="TRUE";
                   print "OK: Deleted with succes $smb_home\n";
