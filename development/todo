@@ -27,6 +27,78 @@ werden NICHT per netlogon scripte gemountet sonder über Gruppenrichtlinien
 
 
 
+Befehle für 
+
+root@server /usr/lib/linuxmuster-webui/plugins (git)-[alpha] # grep -R sophomorix-
+lmn_settings/views.py:        sophomorixCommand = ['sophomorix-check', '--analyze-encoding', fileToCheck, '-jj']
+Binary file lmn_settings/views.pyc matches
+lm_quotas/views.py:            lines = subprocess.check_output(['sophomorix-class', '-i']).splitlines()
+lm_quotas/views.py:                    subprocess.check_call(['sophomorix-class', '-c', cls['name'], '--quota', '%s+%s' % (cls['quota']['home'], cls['quota']['var'])])
+lm_quotas/views.py:                    subprocess.check_call(['sophomorix-class', '-c', cls['name'], '--mailquota', cls['mailquota']])
+lm_quotas/views.py:            lines = subprocess.check_output(['sophomorix-project', '-i']).splitlines()
+lm_quotas/views.py:                    subprocess.check_call(['sophomorix-project', '-c', project['name'], '--addquota', '%s+%s' % (project['quota']['home'], project['quota']['var'])])
+lm_quotas/views.py:            subprocess.check_call('sophomorix-quota > /tmp/apply-sophomorix.log', shell=True)
+Binary file lm_quotas/views.pyc matches
+Binary file lmn_users/.views.py.swp matches
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--teacher', '--schoolbase', schoolname, '--user-full', '-jj']
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--student', '--schoolbase', schoolname, '--user-full', '-jj']
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--schooladministrator', '--user-full', '-jj']
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--globaladministrator', '--user-full', '-jj']
+lmn_users/views.py:        sophomorixCommand = ['sophomorix-check', '-jj']
+lmn_users/views.py:            script += 'sophomorix-add >> %s;' % path
+lmn_users/views.py:            script += 'sophomorix-move >> %s;' % path
+lmn_users/views.py:            script += 'sophomorix-kill >> %s;' % path
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-user', '--info', '-jj', '-u', user]
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-passwd', '--set-firstpassword', '-jj', '-u', user]
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-passwd', '-u', user, '--pass', password, '-jj']
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-passwd', '-u', user, '--pass', password, '-jj']
+lmn_users/views.py:                for l in subprocess.check_output('sophomorix-print --info', shell=True).splitlines()
+lmn_users/views.py:            cmd = 'sophomorix-print'
+lmn_users/resources/partial/check.modal.html:    <lm-log path="'/tmp/sophomorix-check.log'"></lm-log>
+Binary file lmn_users/views.pyc matches
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-session', '-i', '-jj']
+lmn_session/views.py:                        sophomorixCommand = ['sophomorix-session', '-i', '-jj']
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '-j', '--session', session, '--kill']
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '-j', '--session', session, '--comment', comment]
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '--create', '--supervisor', supervisor,  '-j', '--comment', comment]
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--unset', '--subdir', session, '-j', '--participants', participant]
+lmn_session/views.py:                    raise Exception('Error:\n' + str('sophomorix-exam-mode --set --supervisor ' + supervisor + ' -j --participants ' + participant))
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--set', '--supervisor', supervisor, '-j', '--participants', participant]
+lmn_session/views.py:                    raise Exception('Error:\n' + str('sophomorix-exam-mode --unset --subdir ' + session + ' -j --participants ' + participant))
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-managementgroup', \
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-managementgroup \
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '--session', session,  '-j', '--participants', participantsCSV]
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-session --session ' + session + ' -j --participants ' + participantsCSV))
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--set', '--supervisor', supervisor, '-j', '--participants', examModeListCSV]
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-exam-mode --set --supervisor ' + supervisor + ' -j --participants ' + examModeListCSV))
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--unset', '--subdir', session, '-j', '--participants', noExamModeListCSV]
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-exam-mode --unset --subdir ' + session + ' -j --participants ' + noExamModeListCSV))
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-query', '-jj', '--schoolbase', 'default-school', '--student', '--user-full', '--anyname', '*'+http_context.query['q']+'*']
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-query', '-jj', '--schoolbase', 'default-school', '--sam', '*'+http_context.query['q']+'*']
+Binary file lmn_session/views.pyc matches
+Binary file lm_auth/api.pyc matches
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 KA-user deaktivieren statt löschen 
 
