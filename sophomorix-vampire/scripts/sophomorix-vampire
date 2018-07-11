@@ -270,10 +270,14 @@ while(<CONFIG>){
             system($mkdir_command);
             my $command="cp $old_path_dump $new_path";
             print "     $command\n";
-            system($command);
+            if (-f $old_path_dump){
+                system($command);
+            }
             my $permission_command="chmod $permissions $new_path";
             print "     $permission_command\n";
-            system($permission_command);
+            if (-f $new_path){
+                system($permission_command);
+            }
         }
     }
 
