@@ -100,7 +100,8 @@ my $verify_uid_gid=0;
 my $verify_uid=0;
 my $verify_gid=0;
 
-my $missig_files_count=0;
+my $missig_files_error_count=0;
+my $missig_files_warn_count=0;
 my $overwriting_files_count=0;
 
 system("mkdir -p /root/sophomorix-vampire");
@@ -233,12 +234,22 @@ while(<CONFIG>){
     my ($old_path,$new_path,$permissions,$may_must,$type)=split(/::/);
     my $old_path_dump=$datadir."/data".$old_path;
     if ($type eq "file" and not -f $old_path_dump){
-        $missig_files_count++;
-        print "ERROR: Missing file $old_path_dump\n"; 
+        if ($may_must eq "must"){
+            $missig_files_error_count++;
+            print "ERROR: Missing file $old_path_dump\n";
+        } elsif ($may_must eq "may"){
+            $missig_files_warn_count++;
+            print "WARNING: Missing file $old_path_dump\n";
+        }
     }
     if ($type eq "dir" and not -d $old_path_dump){
-        $missig_files_count++;
-        print "ERROR: Missing directory $old_path_dump\n"; 
+        if ($may_must eq "must"){
+            $missig_files_error_count++;
+            print "ERROR: Missing directory $old_path_dump\n"; 
+        } elsif ($may_must eq "may") {
+            $missig_files_warn_count++;
+            print "WARNING: Missing directory $old_path_dump\n"; 
+        }
     }
     if ($new_path eq "---"){
         # files that must exist
@@ -275,8 +286,11 @@ close(CONFIG);
 ##################################################
 # print ERRORS and WARNINGS
 print "\n";
-if ($missig_files_count > 0){
-    print "ERROR:    $missig_files_count file(s) is missing in the dump!\n";
+if ($missig_files_warn_count > 0){
+    print "WARNING:  $missig_files_warn_count file(s) are missing in the dump. Might be an unused feature. Please check!\n";
+}
+if ($missig_files_error_count > 0){
+    print "ERROR:    $missig_files_error_count file(s) are missing in the dump! You don't have all data in the dump!\n";
 }
 if ($restore_config_files==1){
     my %classes_map=&read_classes_map();
