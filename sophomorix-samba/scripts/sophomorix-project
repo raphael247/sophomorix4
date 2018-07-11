@@ -104,6 +104,7 @@ $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="project";
 
 # define more dependencies
 $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
+$options{'CONFIG'}{'DEPENDS'}{'skip-school-creation'}="create";
 
 # Parsen der Optionen
 my $testopt=GetOptions(\%options, 
@@ -114,6 +115,7 @@ my $testopt=GetOptions(\%options,
                        "create",
                        "set-gidnumber=i",
                        "kill",
+                       "skip-school-creation",
                        "join!",
                        "hide!",
                        "school=s",
@@ -187,12 +189,11 @@ Getting information:
   --tree
   -i / --info
   -i -p projectname
-  -u  / --user / --user-info -p project
+  -u  / --user / --user-info -p <project>
 
 Changing/creating/killing a project:
-  --create -p projectname
-  --create -p projectname --set-gidnumber num  (for migration only)
-  --kill -p projectname
+  --create -p <project>
+  --kill -p <project>
 
   -p <project>, / --project <project> 
     --description \'multiple words possible\'
@@ -224,6 +225,10 @@ Changing/creating/killing a project:
 
 Syncing memberships of all projects (sophomorix* -> members):
   --sync-all-memberships
+
+This is for migration/testing/fixing only:
+  sophomorix-project --skip-school-creation --create --project <project> --set-gidnumber <num>
+
 
 Please see the sophomorix-project(8) man pages for full documentation
 ');
@@ -295,30 +300,34 @@ if (defined $options{'create'} and defined $options{'project'}){
     } else {
         $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
     }
-   &AD_school_create({ldap=>$ldap,
+    if (defined $options{'skip-school-creation'}){
+        # do nothing
+    } else {
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$options{'school'},
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         });
+    }
+    my $group_token=&AD_get_name_tokened($options{'project'},$options{'school'},"project");
+    &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
                       school=>$options{'school'},
+                      group=>$group_token,
+                      group_basename=>$options{'project'},
+                      description=>$group_token,
+                      type=>"project",
+                      status=>"P",
+                      sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
+                      gidnumber_wish=>$gidnumber_wish,
                       smb_admin_pass=>$smb_admin_pass,
                       sophomorix_config=>\%sophomorix_config,
                       sophomorix_result=>\%sophomorix_result,
                     });
-   my $group_token=&AD_get_name_tokened($options{'project'},$options{'school'},"project");
-   &AD_group_create({ldap=>$ldap,
-                     root_dse=>$root_dse,
-                     root_dns=>$root_dns,
-                     school=>$options{'school'},
-                     group=>$group_token,
-                     group_basename=>$options{'project'},
-                     description=>$group_token,
-                     type=>"project",
-                     status=>"P",
-                     sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
-                     gidnumber_wish=>$gidnumber_wish,
-                     smb_admin_pass=>$smb_admin_pass,
-                     sophomorix_config=>\%sophomorix_config,
-                     sophomorix_result=>\%sophomorix_result,
-                  });
 }
 
 
