@@ -893,7 +893,7 @@ sub AD_user_kill {
               my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                         " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
                         $unc." -c 'deltree $smb_rel_path;'";
-              print "HERE: $smbclient_command\n"
+              print "HERE: $smbclient_command\n";
               my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
               if($home_delete==1){
