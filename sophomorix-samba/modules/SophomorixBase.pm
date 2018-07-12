@@ -5614,7 +5614,13 @@ sub check_options{
     ############################################################
     # school option is an modifier option
     $ref_options->{'CONFIGURED'}{'school'}="TRUE";
-   
+    $ref_options->{'MODIFIER_OPTIONS'}{'school'}="TRUE";
+
+    ############################################################
+    # skip-school-creation option is an modifier option
+    $ref_options->{'CONFIGURED'}{'skip-school-creation'}="TRUE";
+    $ref_options->{'MODIFIER_OPTIONS'}{'skip-school-creation'}="TRUE";
+
     ############################################################
     # work on MAYBE
     foreach my $object (keys %{ $ref_options->{'CONFIG'}{'MAYBE'} }){
