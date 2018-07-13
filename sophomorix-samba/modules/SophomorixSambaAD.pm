@@ -862,9 +862,7 @@ sub AD_user_kill {
 
         # deleting user
 	my $kill_return=-1;
-        my $home_delete=-1;
         my $home_delete_string="";
-
         my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
             " user delete ". $user;
         ($kill_return)=&Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
@@ -875,13 +873,7 @@ sub AD_user_kill {
             $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'} or
             $role_AD eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}
            ){
-              my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
-                                               password  => $smb_admin_pass,
-                                               debug     => 0);
-              #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-              $home_delete=$smb->rmdir_recurse($smb_home);
-
-              # smbclient deltree ?????
+              # smbclient deltree
               my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
                   &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                                  $school_AD,
@@ -893,10 +885,9 @@ sub AD_user_kill {
               my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                         " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
                         $unc." -c 'deltree $smb_rel_path;'";
-              print "HERE: $smbclient_command\n";
               my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
-              if($home_delete==1){
+              if($smbclient_return==0){
                   $home_delete_string="TRUE";
                   print "OK: Deleted with succes $smb_home\n";
               } else {
