@@ -4082,6 +4082,7 @@ sub check_config_ini {
 
 sub load_school_ini {
     my ($root_dse,$school,$conf_school,$ref_modmaster,$ref_sophomorix_config,$ref_result)=@_;
+    my $root_dns=&Sophomorix::SophomorixSambaAD::AD_dns_get($root_dse);
     foreach my $section ( keys %{ $ref_modmaster } ) {
 	if ($section eq "school"){
             ##### school section ########################################################################
@@ -4255,8 +4256,8 @@ sub load_school_ini {
                     print "   * ROLE $role: $parameter ---> <".
                           $ref_modmaster->{$section}{$parameter}.">\n";
                 }
-                $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
-                    $ref_modmaster->{$section}{$parameter};
+#                $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
+#                    $ref_modmaster->{$section}{$parameter};
                 if ($parameter eq "WEBUI_PERMISSIONS"){
                     # override WEBUI_PERMISSIONS ##############################
                     my @perms=split(/,/,$ref_modmaster->{$section}{$parameter});
@@ -4269,6 +4270,16 @@ sub load_school_ini {
                                                                        $school,
                                                                        $role);
 		    }
+                } elsif ($parameter eq "MAILDOMAIN"){
+                    if ($ref_modmaster->{$section}{$parameter} eq ""){
+                        $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=$root_dns;
+		    } else {
+                        $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
+                            $ref_modmaster->{$section}{$parameter};
+                    }
+                } else {
+                    $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
+                        $ref_modmaster->{$section}{$parameter};
                 }
             }
 	} elsif ($section=~m/^type\./){ 
