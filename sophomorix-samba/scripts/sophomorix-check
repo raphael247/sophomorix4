@@ -2280,23 +2280,34 @@ sub get_encoding {
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }   
  
-    # auto setting
-    if ($enc eq "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
-        # auto
+    if ($enc eq "auto"){
         if ($enc_checked eq "unknown"){
+            # auto failed
             &log_script_exit("ENCODING=auto failed: Set ENCODING to the desired value and ENCODING_FORCE to \"True\"",1,1,0,
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+        } else {
+            # auto was succesful
+            $enc_used=$enc_checked;
+	}
+    } else {
+        # encoding configured (NOT auto)
+        if ($enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
+            # encoding NOT forced
+            if ($enc eq $enc_checked){
+                # configured as checked: OK
+                $enc_used=$enc;
+            } else {
+                # configured different than checked
+                print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
+                print "   * Set A) ENCODING_FORCE to \"True\" if you know better than sophomorix\n";
+                print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
+                &log_script_exit("ENCODING configuration failed: see script printout",1,1,0,
+                    \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+            }
+        } else {
+            # encoding forced -> use it
+            $enc_used=$enc;
         }
-        $enc_used=$enc_checked;
-    } elsif ($enc ne "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_FALSE'}){
-        # auto mismatch configure
-        print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
-        print "   * Set A) ENCODING_FORCE to \"True\" if you know better than sophomorix\n";
-        print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
-        &log_script_exit("ENCODING configuration failed: see script printout",1,1,0,
-            \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-    } elsif ($enc ne "auto" and $enc_force eq $sophomorix_config{'INI'}{'VARS'}{'BOOLEAN_TRUE'}){
-        $enc_used=$enc;
     }
 
     print "           ---> Using:  $enc_used\n";
