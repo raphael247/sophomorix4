@@ -68,6 +68,7 @@ $Data::Dumper::Terse = 1;
             AD_get_AD_for_check
             AD_get_AD_for_device
             AD_check_ui
+            AD_create_new_mail
             AD_create_new_webui_string
             AD_get_quota
             AD_get_users_v
@@ -887,9 +888,7 @@ sub AD_user_kill {
               my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                         " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
                         $unc." -c 'deltree $smb_rel_path;'";
-              print "HERE: $smbclient_command\n";
               my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-
               if($smbclient_return==0){
                   $home_delete_string="TRUE";
                   print "OK: Deleted with succes $smb_home\n";
@@ -2126,6 +2125,7 @@ sub AD_user_update {
     my $intrinsic_multi_4 = $arg_ref->{intrinsic_multi_4};
     my $intrinsic_multi_5 = $arg_ref->{intrinsic_multi_5};
     #
+    my $mail = $arg_ref->{mail};
     my $webui_dashboard = $arg_ref->{webui_dashboard};
     my $webui_permissions = $arg_ref->{webui_permissions};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
@@ -2221,6 +2221,10 @@ sub AD_user_update {
     if (defined $filename and $filename ne "---"){
         $replace{'sophomorixAdminFile'}=$filename;
         print "   sophomorixAdminFile:        $filename\n";
+    }
+    if (defined $mail and $mail ne "---"){
+        $replace{'mail'}=$mail;
+        print "   mail:                       $mail\n";
     }
     if (defined $unid and $unid ne "---"){
         if ($unid eq ""){
@@ -4103,6 +4107,7 @@ sub AD_get_AD_for_check {
                                 'sn',
                                 'givenName',
                                 'displayName',
+                                'mail',
                                 'sophomorixSurnameInitial',
                                 'sophomorixFirstnameInitial',
                                 'sophomorixAdminFile',
@@ -4148,6 +4153,7 @@ sub AD_get_AD_for_check {
                    $AD{'sAMAccountName'}{$sam}{'sn'}=$entry->get_value('sn');
                    $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
                    $AD{'sAMAccountName'}{$sam}{'displayName'}=$entry->get_value('displayName');
+                   $AD{'sAMAccountName'}{$sam}{'mail'}=$entry->get_value('mail');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
@@ -4672,6 +4678,24 @@ sub AD_check_ui {
     return(\%ui);
 }
 
+
+
+sub AD_create_new_mail {
+    my ($sam,$ref_sophomorix_config,$role_file,$school_file) = @_;
+    if (not defined $role_file){
+        # existing user
+        $role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
+        $school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+    } else {
+        # called from sophomorix-check to look for updates:
+        # use NEW role and NEW school
+        $role=$role_file;
+        $school=$school_file;
+    }
+    my $mail=$sam."@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+    return $mail;
+}
+ 
 
 
 sub AD_create_new_webui_string {

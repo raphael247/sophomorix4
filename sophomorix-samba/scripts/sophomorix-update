@@ -280,6 +280,8 @@ while(<USERUPDATE>){
            $surname_initial_utf8_new,
            $firstname_initial_utf8_old,
            $firstname_initial_utf8_new,
+           $mail_old,
+           $mail_new,
            $webui_string_old,
            $webui_string_new,          )=split(/::/);
 
@@ -345,6 +347,7 @@ while(<USERUPDATE>){
         $firstname_initial_utf8_new ne "---"  or
         $filename_new ne "---" or
         $status_new ne "---" or
+        $mail_new ne "---" or
         $webui_string_new ne "---" 
        ){
         # do NOT update move stuff: class,role,school 
@@ -368,6 +371,7 @@ while(<USERUPDATE>){
                          firstname_initial_utf8=>$firstname_initial_utf8_new,
                          filename=>$filename_new,
                          status=>$status_new,
+                         mail=>$mail_new,
                          webui_permissions_calculated=>\@webui_calclist,
                          unid=>$unid_new,
                          user_count=>$user_count,

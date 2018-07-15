@@ -1023,6 +1023,11 @@ sub _console_print_updatefile {
                                                               " --> ".
                                                               $ref_updatefile->{'USER'}{$sam}{'SCHOOL_NEW'}; 
             }
+            if ($ref_updatefile->{'USER'}{$sam}{'MAIL_NEW'} ne "---"){
+                printf " %27s: %-53s\n","mail",$ref_updatefile->{'USER'}{$sam}{'MAIL_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'MAIL_NEW'}; 
+            }
             if ($ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_NEW'} ne "---"){
                 printf "  %-82s\n","sophomorixWebuiPermissionsCalculated:";
                 printf "    %-80s\n",$ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_OLD'};
@@ -2974,6 +2979,8 @@ sub read_sophomorix_update {
             $surname_initial_utf8_new,
             $firstname_initial_utf8_old,
             $firstname_initial_utf8_new,
+            $mail_old,
+            $mail_new,
             $webui_string_old,
             $webui_string_new,
            )=split(/::/,$line);
@@ -3020,6 +3027,8 @@ sub read_sophomorix_update {
         $update{'USER'}{$sam}{'CLASS_NEW'}=$class_new;
         $update{'USER'}{$sam}{'SCHOOL_OLD'}=$school_old;
         $update{'USER'}{$sam}{'SCHOOL_NEW'}=$school_new;
+        $update{'USER'}{$sam}{'MAIL_OLD'}=$mail_old;
+        $update{'USER'}{$sam}{'MAIL_NEW'}=$mail_new;
         $update{'USER'}{$sam}{'WEBUI_STRING_OLD'}=$webui_string_old;
         $update{'USER'}{$sam}{'WEBUI_STRING_NEW'}=$webui_string_new;
     }

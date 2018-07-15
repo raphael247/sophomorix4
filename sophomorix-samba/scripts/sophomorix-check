@@ -67,6 +67,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_AD_for_check
                                  AD_dns_get
                                  AD_create_new_webui_string
+                                 AD_create_new_mail
                                  AD_object_search
                                     );
 
@@ -824,6 +825,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     my $old_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
     my $new_school="---";
 
+    my $old_mail=$ref_AD_check->{'sAMAccountName'}{$sam}{'mail'};
+    my $new_mail="---";
     # dirty fix to have class without
     my $old_class=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
     $old_class=~s/^$old_school-//;
@@ -857,6 +860,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                           \$new_role,
                           \$new_class,
 	                  \$new_school,
+                          \$old_mail,
+                          \$new_mail,
                           \$old_webui_string,
                           \$new_webui_string,
                          );
@@ -891,6 +896,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                         $new_surname_initial_utf8."::".
                         $old_firstname_initial_utf8."::".
                         $new_firstname_initial_utf8."::".
+                        $old_mail."::".
+                        $new_mail."::".
                         $old_webui_string."::".
                         $new_webui_string."::".
                         "\n";
@@ -1262,6 +1269,8 @@ sub test_user_update {
         $new_role_ref,
         $new_class_ref,
         $new_school_ref,
+        $old_mail_ref,
+        $new_mail_ref,
         $old_webui_string_ref,
         $new_webui_string_ref,
        )=@_;
@@ -1420,10 +1429,31 @@ sub test_user_update {
         }
     }
 
-    # webui_string
-    # creating webui string with NEW role and NEW school
+
+    ############################################################
+    # role/school dependant
+    # school and role for mail webui 
     my $school=$Match{'ACTION'}{$line_new}{'school'};
     my $role=$Match{'ACTION'}{$line_new}{'role'};
+
+
+    # mail
+    (${$new_mail_ref})=&AD_create_new_mail($sam,\%sophomorix_config,$role,$school);
+    # test for update
+    if ( ${$new_mail_ref} eq  ${$old_mail_ref} ){
+        # no update
+        ${$new_mail_ref}="---";
+    } else {
+        # update
+        print "update of $sam:\n";
+        print "   ${$old_mail_ref}\n";
+        print "   ${$new_mail_ref}\n";
+        ${$update_ref}++;
+    }
+
+
+    # webui_string
+    # creating webui string with NEW role and NEW school
     (${$new_webui_string_ref})=&AD_create_new_webui_string($sam,\%sophomorix_config,$ref_AD_check,$role,$school);
 
     #print "\n";
