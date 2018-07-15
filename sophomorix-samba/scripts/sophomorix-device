@@ -122,12 +122,6 @@ my %host_seen=();
 my %mac_seen=();
 my %ip_seen=();
 
-# # ExamAccounts
-# my @adding_examaccounts=();
-# my @killing_examaccounts=();
-# my @killing_examaccount_rooms=();
-
-
 
 # Computers
 my @adding_computers=();
@@ -1604,14 +1598,14 @@ sub analyze_device_line {
         $option=&check_option($option,$line);
 
         # use tokened names 
-        my $host_token=&AD_get_name_tokened($host,$school,"examaccount");
+        my $dnsnode_name=&AD_get_name_tokened($host,$school,"dnsnode");
 
         my $room_token=&AD_get_name_tokened($room,$school,"roomws");
         my $ws_token=&AD_get_name_tokened($host,$school,"computer");
         my $ws_token_account=$ws_token."\$";
         if($Conf::log_level>=3){
             print "\n$line\n";
-            print "ExamAccount: $host  -->  $host_token\n";
+            print "DNSName:     $host  -->  $dnsnode_name\n";
             print "Room:        $room  -->  $room_token\n";
             print "Computer:    $host  -->  $ws_token\n";
             print "Computer\$:  $host  -->  $ws_token_account\n";
@@ -1620,33 +1614,33 @@ sub analyze_device_line {
 
         # some things are nor allowed to be double:
         # name
-        if (exists $devices_file{'device'}{$host_token}){
-            print "Device Name (Field2) is double: $host_token\n";
+        if (exists $devices_file{'device'}{$dnsnode_name}){
+            print "Device Name (Field2) is double: $dnsnode_name\n";
             &result_sophomorix_add(\%sophomorix_result,
                                    "ERROR",
                                    -1,
                                    \@arguments,
-                                   "$filename (Line: $device_line_count): Device Name (Field2) is double: $host_token");
+                                   "$filename (Line: $device_line_count): Device Name (Field2) is double: $dnsnode_name");
             $error_in_files++;
         }
 
         # save data into hash for reuse
-        push @domcomputers_file, $host_token;
-        $devices_file{'device'}{$host_token}{'ROOM_BASENAME'}=$room;            # 01
-        $devices_file{'device'}{$host_token}{'HWK'}=$hwk;                       # 03
-        $devices_file{'hardwareclass'}{$hwk}{$ws_token}=$host_token;
+        push @domcomputers_file, $dnsnode_name;
+        $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
+        $devices_file{'device'}{$dnsnode_name}{'HWK'}=$hwk;                       # 03
+        $devices_file{'hardwareclass'}{$hwk}{$ws_token}=$dnsnode_name;
 
-        $devices_file{'device'}{$host_token}{'MAC'}=$mac;                       # 04
-        $devices_file{'device'}{$host_token}{'IPv4'}=$ip;                       # 05
-        $devices_file{'device'}{$host_token}{'MS_OFFICE_KEY'}=$ms_office_key;   # 06
-        $devices_file{'device'}{$host_token}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
-        $devices_file{'device'}{$host_token}{'ROOM'}=$room_token;
-        $devices_file{'device'}{$host_token}{'ACCOUNT'}=$account_flag;
-        $devices_file{'device'}{$host_token}{'COMPUTER'}=$ws_token;
-        $devices_file{'device'}{$host_token}{'COMPUTER_DOLLAR'}=$ws_token_account;
-        $devices_file{'device'}{$host_token}{'SCHOOL'}=$school;
-        $devices_file{'device'}{$host_token}{'PATH_ABS'}=$device_file;
-        $devices_file{'device'}{$host_token}{'FILENAME'}=$filename;
+        $devices_file{'device'}{$dnsnode_name}{'MAC'}=$mac;                       # 04
+        $devices_file{'device'}{$dnsnode_name}{'IPv4'}=$ip;                       # 05
+        $devices_file{'device'}{$dnsnode_name}{'MS_OFFICE_KEY'}=$ms_office_key;   # 06
+        $devices_file{'device'}{$dnsnode_name}{'MS_WINDOWS_KEY'}=$ms_windows_key; # 07
+        $devices_file{'device'}{$dnsnode_name}{'ROOM'}=$room_token;
+        $devices_file{'device'}{$dnsnode_name}{'ACCOUNT'}=$account_flag;
+        $devices_file{'device'}{$dnsnode_name}{'COMPUTER'}=$ws_token;
+        $devices_file{'device'}{$dnsnode_name}{'COMPUTER_DOLLAR'}=$ws_token_account;
+        $devices_file{'device'}{$dnsnode_name}{'SCHOOL'}=$school;
+        $devices_file{'device'}{$dnsnode_name}{'PATH_ABS'}=$device_file;
+        $devices_file{'device'}{$dnsnode_name}{'FILENAME'}=$filename;
 
         if (not defined $option){
             $option="";
@@ -1660,12 +1654,12 @@ sub analyze_device_line {
         if (not defined $sophomorix_comment){
             $sophomorix_comment="";
         }       
-        $devices_file{'device'}{$host_token}{'sophomorixDnsNodename'}=$host_token;
-        $devices_file{'device'}{$host_token}{'sophomorixRole'}=$sophomorix_role;       # 09
-        $devices_file{'device'}{$host_token}{'OPTION'}=$option;                        # 12
-        $devices_file{'device'}{$host_token}{'FIELD_13'}=$field_13;
-        $devices_file{'device'}{$host_token}{'FIELD_14'}=$field_14;
-        $devices_file{'device'}{$host_token}{'sophomorixComment'}=$sophomorix_comment; # 15
+        $devices_file{'device'}{$dnsnode_name}{'sophomorixDnsNodename'}=$dnsnode_name;
+        $devices_file{'device'}{$dnsnode_name}{'sophomorixRole'}=$sophomorix_role;       # 09
+        $devices_file{'device'}{$dnsnode_name}{'OPTION'}=$option;                        # 12
+        $devices_file{'device'}{$dnsnode_name}{'FIELD_13'}=$field_13;
+        $devices_file{'device'}{$dnsnode_name}{'FIELD_14'}=$field_14;
+        $devices_file{'device'}{$dnsnode_name}{'sophomorixComment'}=$sophomorix_comment; # 15
 
         # dnsZone
         my @octets=split(/\./,$ip);
@@ -1674,24 +1668,24 @@ sub analyze_device_line {
         $devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'}=$school;
 
         # dnsNode
-        $devices_file{'dnsNode'}{$host_token}=$ip;
+        $devices_file{'dnsNode'}{$dnsnode_name}=$ip;
 
         # decide if host group is needed 
         if ($host_group eq "TRUE"){
-            $devices_file{'host_group'}{$host_token}{'sophomorixType'}=$host_group_type;
-            $devices_file{'host_group'}{$host_token}{'sophomorixSchoolname'}=$school;
-            $devices_file{'host_group'}{$host_token}{'HOST_BASENAME'}=$host;
-            $devices_file{'host_group'}{$host_token}{'COMPUTER_DOLLAR'}=$ws_token_account;
-            $devices_file{'host_group'}{$host_token}{'ROOM'}=$room_token;
-            $devices_file{'host_group'}{$host_token}{'ROOM_BASENAME'}=$room;
-            $devices_file{'host_group'}{$host_token}{'SUB_OU'}="OU=".$host_group_type."-groups";
+            $devices_file{'host_group'}{$dnsnode_name}{'sophomorixType'}=$host_group_type;
+            $devices_file{'host_group'}{$dnsnode_name}{'sophomorixSchoolname'}=$school;
+            $devices_file{'host_group'}{$dnsnode_name}{'HOST_BASENAME'}=$host;
+            $devices_file{'host_group'}{$dnsnode_name}{'COMPUTER_DOLLAR'}=$ws_token_account;
+            $devices_file{'host_group'}{$dnsnode_name}{'ROOM'}=$room_token;
+            $devices_file{'host_group'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;
+            $devices_file{'host_group'}{$dnsnode_name}{'SUB_OU'}="OU=".$host_group_type."-groups";
         }
-        $devices_file{'room'}{$room_token}{'HOSTS'}{$host_token}="seen";
+        $devices_file{'room'}{$room_token}{'HOSTS'}{$dnsnode_name}="seen";
         $devices_file{'room'}{$room_token}{'MAC'}{$mac}="seen";
         $devices_file{'room'}{$room_token}{'IPv4'}{$ip}="seen";
 
         # lists at room
-        push @{ $devices_file{'room'}{$room_token}{'HOSTLIST'} }, $host_token;
+        push @{ $devices_file{'room'}{$room_token}{'HOSTLIST'} }, $dnsnode_name;
         push @{ $devices_file{'room'}{$room_token}{'MACLIST'} }, $mac;
         push @{ $devices_file{'room'}{$room_token}{'IPv4LIST'} }, $ip;
 

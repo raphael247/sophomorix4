@@ -3232,7 +3232,7 @@ sub AD_get_name_tokened {
         $role eq "all" or
         $role eq "room" or 
         $role eq "roomws" or
-        $role eq "examaccount" or
+        $role eq "dnsnode" or
         $role eq "computer" or
         $role eq "project" or
         $role eq "management" or
