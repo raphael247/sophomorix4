@@ -1137,9 +1137,7 @@ if($no_sync==1){
 ############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
-# ???????? First line is the future
-#if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
-if (($sync==1 or $sync==0) and $no_sync==0){ # $no_sync==0 -> SYNC
+if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill the rooms of computers
     print "\n";
@@ -1548,6 +1546,9 @@ if (($sync==1 or $sync==0) and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+} else {
+    print "\nNothing changed. Use --sync to synchronise devices\n\n";
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
