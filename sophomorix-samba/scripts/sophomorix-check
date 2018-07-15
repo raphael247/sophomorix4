@@ -1469,6 +1469,8 @@ sub write_add_file {
                                  \%users_file,
                                  \%sophomorix_config);
 
+    my $mail=$login."@".
+        $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'MAILDOMAIN'};
     my $webui_permissions_string=join(",",
         @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
@@ -1489,6 +1491,8 @@ sub write_add_file {
                  "---::". # deactivationdate
                  "---::". # sambantpassword
                  "---::". # userpassword
+                 $mail."::". # mail
+                 $webui_permissions_string."::".
                  $webui_permissions_string."::".
                  "\n";
     if ($login ne "---"){

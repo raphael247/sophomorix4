@@ -2860,15 +2860,26 @@ sub read_sophomorix_add {
        chomp($line);
        $count++;
        ($file,
-       $class_group,
-       $identifier,
-       $sam,
-       $password_wish,
-       $uidnumber_wish,
-       $gidnumber_wish,
-       $unid,
-       $school,
-       $role)=split("::",$line);
+        $class_group,
+        $identifier,
+        $sam,
+        $password_wish,
+        $uidnumber_wish,
+        $gidnumber_wish,
+        $unid,
+        $school,
+        $role,
+        $surname_utf8,
+        $firstname_utf8,
+        $status,
+        $creationdate,
+        $tolerationdate,
+        $deactivationdate,
+        $sambantpassword,
+        $userpassword,
+        $mail,
+        $webui_permissions_calculated_string,
+       )=split("::",$line);
 
        push @{ $add{'LISTS'}{'ORDERED'} },$sam;
        push @{ $add{'LISTS'}{'ORDERED_by_sophomorixSchoolname'}{$school} },$sam;
@@ -2883,6 +2894,9 @@ sub read_sophomorix_add {
        $add{'USER'}{$sam}{'UNID'}=$unid;
        $add{'USER'}{$sam}{'SCHOOL'}=$school;
        $add{'USER'}{$sam}{'ROLE'}=$role;
+       $add{'USER'}{$sam}{'FIRSTNAME_UTF8'}=$firstname_utf8;
+       $add{'USER'}{$sam}{'SURNAME_UTF8'}=$surname_utf8;
+       $add{'USER'}{$sam}{'MAIL'}=$mail;
     }
 
     # counters
