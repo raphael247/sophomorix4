@@ -20,6 +20,41 @@ devices.csv aufsplittbar in mehrere Dateien, wird zusammengehängt -> mehr Über
 ScriptPath
 
 GPO
+
+sophomorix rollt bei school anlegen ein acl set aus
+(doppeltes ausrollen abfangen)
+dann wird eine environmentvariable SCHOOLNAME gesetz mit dem Wert aus
+sophomorixSchoolname
+
+per win tool anlegen
+per samba tool exportieren -> ins Paket
+samba-tool importiert dann die GPO
+
+
+TODO:
+--> sophomorix beim anlegen der Schule
+
+
+sophomorix-samba
+sophomorix-school
+--> jedesmal die
+
+
+samba-tool gpo ....
+setlink -> wo greift die
+
+
+Laufwerksbuchstaben
+- verlinken mit dfs
+
+Ordner:
+1) beim homepfad der user fällt homes raus
+2) projekt tausch nach 
+
+
+
+
+
 - windows client standard set: cortana off
 -> client installieren
 
@@ -30,12 +65,18 @@ devices.csv: welche doppelungen zulässig?
 Notebooks: zulassen, dass hosts mit derselben mac und verschienner IP ???
 
 
+--> devices.csv
+mehrfachzeilen:
+1 Zeile -> 1 Netzwerdevice
+
+2x gleiche mac zulassen?
+2x gleiche IP zulassen
+2x gleiche name
+   --> verheiratet mehrere Zeilen
+
+
 E-Mail migration:
 cyrus2dovecot
-
-
-
-
 
 
 sophomorix-print:
@@ -91,6 +132,9 @@ bisher: pgmadmin
       /srv/samba/schools/<default-school>/program/
       --> noch ohne ACL
     ALT: hatte schreibzugriff auf das Share pgm (Pgrogramme) auf K: (früher P: genannt)
+--> schooladmin
+
+
 
 ? Als welcher admin macht man das jetzt?
   --> global-admin ist dafür zu mächtig
