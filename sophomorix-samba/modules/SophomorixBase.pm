@@ -5463,13 +5463,13 @@ sub get_homedirectory {
     my $unc="//".$root_dns."/".$school_smbshare;
 
     if ($role eq "student"){
-        $smb_rel_path="students/".$group_basename."/homes/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\students\\".$group_basename."\\homes\\".$user;
-        $unix_home=$DevelConf::homedir_all_schools."/".$school."/students/".$group_basename."/homes/".$user;
+        $smb_rel_path="students/".$group_basename."/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\students\\".$group_basename."\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/students/".$group_basename."/".$user;
     } elsif ($role eq "teacher"){
-        $smb_rel_path="teachers/homes/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\teachers\\homes\\".$user;
-        $unix_home=$DevelConf::homedir_all_schools."/".$school."/teachers/homes/".$user;
+        $smb_rel_path="teachers/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\teachers\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/teachers/".$user;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_ROLE'}){
         # examuser
         if ($group_basename eq ""){
@@ -5504,9 +5504,9 @@ sub get_homedirectory {
         $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
     } else {
-        $smb_rel_path="unknown/".$group_basename."/homes/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\unknown\\".$group_basename."\\homes\\".$user;
-        $unix_home=$DevelConf::homedir_all_schools."/".$school."/unknown/".$group_basename."/homes/".$user;
+        $smb_rel_path="unknown/".$group_basename."/".$user;
+        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\unknown\\".$group_basename."\\".$user;
+        $unix_home=$DevelConf::homedir_all_schools."/".$school."/unknown/".$group_basename."/".$user;
     }
     return ($homedirectory,$unix_home,$unc,$smb_rel_path);
 }

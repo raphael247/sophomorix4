@@ -1128,21 +1128,21 @@ sub AD_group_kill {
                 #                                 password  => $smb_admin_pass,
                 #                                 debug     => 3);
                 ## trying to delete homes (success only if it is empty)
-                my $smb_share_homes=$smb_share."/homes";
+#                my $smb_share_homes=$smb_share."/homes";
                 #my $return1=$smb->rmdir($smb_share_homes);
-                my $homes=$smb_rel_path."/homes";
-                my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                    " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' "
-                    .$unc." -c 'rmdir $homes;'";
-                my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+#                my $homes=$smb_rel_path."/homes";
+#                my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+#                    " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' "
+#                    .$unc." -c 'rmdir $homes;'";
+#                my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
-                my $smbclient_command_ls=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                    " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
-                    $unc." -c 'ls $homes;'";
-                my $return1=&Sophomorix::SophomorixBase::smb_command($smbclient_command_ls,$smb_admin_pass);
+#                my $smbclient_command_ls=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+#                    " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
+#                    $unc." -c 'ls $homes;'";
+#                my $return1=&Sophomorix::SophomorixBase::smb_command($smbclient_command_ls,$smb_admin_pass);
 
-                if($return1==1 or $return1==256){
-                    print "OK: Deleted empty dir with success $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+#                if($return1==1 or $return1==256){
+#                    print "OK: Deleted empty dir with success $smb_share_homes\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     # go on an recursively delete group/share and
                     #my $return2=$smb->rmdir_recurse($smb_share);
                     my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -1163,9 +1163,9 @@ sub AD_group_kill {
                     } else {
                         print "ERROR: deltree $unc $smb_rel_path $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
                     }
-                } else {
-                    print "ERROR($return1): rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-                }
+#                } else {
+#                    print "ERROR($return1): rmdir $unc $homes $!\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
+#                }
 
             }
 	} elsif ($type eq "project"){
@@ -1174,7 +1174,6 @@ sub AD_group_kill {
                 my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                  password  => $smb_admin_pass,
                                                  debug     => 0);
-                # trying to delete homes (success only if it is empty)
                 my $return1=$smb->rmdir_recurse($smb_share);
                 if($return1==1){
                     print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
