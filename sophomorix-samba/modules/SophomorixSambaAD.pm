@@ -630,6 +630,7 @@ sub AD_repdir_using_file {
             $dir=~s/>\$directory_examusers</${DevelConf::directory_examusers}/;
             $dir=~s/>\$directory_share</${DevelConf::directory_share}/;
             $dir=~s/>\$directory_program</${DevelConf::directory_program}/;
+            $dir=~s/>\$directory_iso</${DevelConf::directory_iso}/;
             # remove <,>
             $dir=~s/^>//g;
             $dir=~s/<$//g;
