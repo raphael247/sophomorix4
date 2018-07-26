@@ -3,6 +3,8 @@
 ############################################################
 # teacher groups
 ############################################################
+# For the homes
 SMB::@@SCHOOL@@/@@TEACHERCLASS@@/::root::root::0755::teachers.ntacl::
-SMB::@@SCHOOL@@/@@TEACHERCLASS@@/share/::root::root::0755::teachers.share.ntacl::
-#SMB::$homedir_global/@@TEACHERCLASS@/::root::root::0755::noacl::
+# For the share
+SMB::@@SCHOOL@@/$directory_share/@@TEACHERCLASS@@/::root::root::0755::teachers.share.ntacl::
+
