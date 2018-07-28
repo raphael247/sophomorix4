@@ -8342,7 +8342,7 @@ if ($update==1 or $test_update==1){
 #                         "/srv/samba/schools/bsz/students/m7ab/muellegr42/transfer",              # moved away
 ##                         "/srv/samba/schools/bsz/students/m7ab/muellegr42/_einsammeln",             # moved away
                          "/srv/samba/schools/lin/students/attic",                                          # ntacl
-                         "/srv/samba/schools/lin/students/attic/share",                                    # ntacl
+                         "/srv/samba/schools/lin/share/classes/attic",                                    # ntacl
                          "/srv/samba/schools/lin/students/attic/muellegr42",                         # ntacl, moved to here
                          "/srv/samba/schools/lin/students/attic/muellegr42/transfer",              #        moved to here
 #                         "/srv/samba/schools/lin/students/attic/muellegr42/_einsammeln",             #        moved to here
@@ -8355,7 +8355,7 @@ if ($update==1 or $test_update==1){
 #                         "/srv/samba/schools/bsz/students/m8cd/samardze42/transfer",              # moved away
 ##                         "/srv/samba/schools/bsz/students/m8cd/samardze42/_einsammeln",             # moved away
                          "/srv/samba/schools/bsz/students/m9cd",                                           # ntacl
-                         "/srv/samba/schools/bsz/students/m9cd/share",                                     # ntacl
+                         "/srv/samba/schools/bsz/share/classes/m9cd",                                     # ntacl
                          "/srv/samba/schools/bsz/students/m9cd/jonsonad42",                          # ntacl, moved to here
                          "/srv/samba/schools/bsz/students/m9cd/jonsonad42/transfer",               #        moved to here
 #                         "/srv/samba/schools/bsz/students/m9cd/jonsonad42/_einsammeln",              #        moved to here
@@ -8391,6 +8391,9 @@ if ($update==1 or $test_update==1){
                          "/srv/samba/schools/lin/students",                                                # ntacl
                          "/srv/samba/schools/lin/teachers",                                                # ntacl
                          "/srv/samba/schools/lin/share/teachers",                                          # ntacl
+                         "/srv/samba/schools/lin/share/classes",                                      # ntacl
+                         "/srv/samba/schools/lin/share/management",                                      # ntacl
+                         "/srv/samba/schools/lin/share/global",                                      # ntacl
                          "/srv/samba/schools/lin/teachers/blackmri42",                               # ntacl, moved to here
                          "/srv/samba/schools/lin/teachers/blackmri42/transfer",                    #        moved to here
 #                         "/srv/samba/schools/lin/teachers/blackmri42/_einsammeln",                   #        moved to here
@@ -8425,6 +8428,9 @@ if ($update==1 or $test_update==1){
 #                         "/srv/samba/schools/ghs/students/alumni/gal42/_einsammeln",                 #        moved to here
                          "/srv/samba/schools/ghs/teachers",                                                # ntacl
                          "/srv/samba/schools/ghs/share/teachers",                                          # ntacl
+                         "/srv/samba/schools/ghs/share/classes",                                          # ntacl
+                         "/srv/samba/schools/ghs/share/management",                                      # ntacl
+                         "/srv/samba/schools/ghs/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",                                              # ntacl
                          "/srv/samba/schools/default-school/management",                                   # ntacl
                          "/srv/samba/schools/default-school/share",
@@ -8439,7 +8445,7 @@ if ($update==1 or $test_update==1){
 #                         "/srv/samba/schools/default-school/students/s6ade/schneima42/transfer",  # moved away
 ##                         "/srv/samba/schools/default-school/students/s6ade/schneima42/_einsammeln",  # moved away
                          "/srv/samba/schools/default-school/students/s7ade",                               # ntacl
-                         "/srv/samba/schools/default-school/students/s7ade/share",                         # ntacl
+                         "/srv/samba/schools/default-school/share/classes/s7ade",                         # ntacl
                          "/srv/samba/schools/default-school/students/s7ade/schneima42",              # ntacl, moved to here
                          "/srv/samba/schools/default-school/students/s7ade/schneima42/transfer",   #        moved to here
 ##                         "/srv/samba/schools/default-school/students/s7ade/schneima42/_einsammeln",  #        moved to here
@@ -8641,9 +8647,9 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-attic:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/bsz/students/attic/share
+    # /srv/samba/schools/bsz/share/classes/attic
     &NTACL_test ("bsz",
-                 "/students/attic/share",
+                 "/share/classes/attic",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -8682,9 +8688,9 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\lin-attic:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/lin/students/attic/share
+    # /srv/samba/schools/lin/share/classes/attic
     &NTACL_test ("lin",
-                 "/students/attic/share",
+                 "/share/classes/attic",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -8750,9 +8756,9 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/bsz/students/m9cd/share
+    # /srv/samba/schools/bsz/share/classes/m9cd
     &NTACL_test ("bsz",
-                 "/students/m9cd/share",
+                 "/share/classes/m9cd",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -9256,9 +9262,9 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\s7ade:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/default-school/students/s7ade/share
+    # /srv/samba/schools/default-school/share/classes/s7ade
     &NTACL_test ("default-school",
-                 "/students/s7ade/share",
+                 "/share/classes/s7ade",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -9782,13 +9788,13 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/bsz/students/m7ab",                                     # ntacl
                          "/srv/samba/schools/bsz/share/classes/m7ab",                               # ntacl
                          "/srv/samba/schools/bsz/students/attic",                                    # ntacl
-                         "/srv/samba/schools/bsz/students/attic/share",                              # ntacl
+                         "/srv/samba/schools/bsz/share/classes/attic",                              # ntacl
                          "/srv/samba/schools/lin/students/attic",                                    # ntacl
-                         "/srv/samba/schools/lin/students/attic/share",                              # ntacl
+                         "/srv/samba/schools/lin/share/classes/attic",                              # ntacl
                          "/srv/samba/schools/bsz/students/m8cd",                                     # ntacl
                          "/srv/samba/schools/bsz/share/classes/m8cd",                               # ntacl
                          "/srv/samba/schools/bsz/students/m9cd",                                     # ntacl
-                         "/srv/samba/schools/bsz/students/m9cd/share",                               # ntacl
+                         "/srv/samba/schools/bsz/share/classes/m9cd",                               # ntacl
                          "/srv/samba/schools/uni",                                                   # ntacl
                          "/srv/samba/schools/uni/management",                                        # ntacl
                          "/srv/samba/schools/uni/share",
@@ -9809,6 +9815,9 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/lin/students",                                          # ntacl
                          "/srv/samba/schools/lin/teachers",                                          # ntacl
                          "/srv/samba/schools/lin/share/teachers",                                    # ntacl
+                         "/srv/samba/schools/lin/share/classes",                                      # ntacl
+                         "/srv/samba/schools/lin/share/management",                                      # ntacl
+                         "/srv/samba/schools/lin/share/global",                                      # ntacl
                          "/srv/samba/schools/uni/teachers",                                          # ntacl
                          "/srv/samba/schools/uni/share/teachers",                                    # ntacl
                          "/srv/samba/schools/uni/share/classes",                                      # ntacl
@@ -9828,6 +9837,9 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/ghs/share/classes/alumni",                             # ntacl
                          "/srv/samba/schools/ghs/teachers",                                          # ntacl
                          "/srv/samba/schools/ghs/share/teachers",                                    # ntacl
+                         "/srv/samba/schools/ghs/share/classes",                                    # ntacl
+                         "/srv/samba/schools/ghs/share/management",                                      # ntacl
+                         "/srv/samba/schools/ghs/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",                                        # ntacl
                          "/srv/samba/schools/default-school/management",                             # ntacl
                          "/srv/samba/schools/default-school/share",
@@ -9839,7 +9851,7 @@ if ($kill==1 or $test_kill==1){
                          "/srv/samba/schools/default-school/students/s6ade",                         # ntacl
                          "/srv/samba/schools/default-school/share/classes/s6ade",                   # ntacl
                          "/srv/samba/schools/default-school/students/s7ade",                         # ntacl
-                         "/srv/samba/schools/default-school/students/s7ade/share",                   # ntacl
+                         "/srv/samba/schools/default-school/share/classes/s7ade",                   # ntacl
                          "/srv/samba/schools/default-school/teachers",                               # ntacl
                          "/srv/samba/schools/default-school/share/teachers",                         # ntacl
                          "/srv/samba/schools/default-school/share/classes",                           # ntacl
@@ -10004,9 +10016,9 @@ if ($kill==1 or $test_kill==1){
                  'ACL:LINUXMUSTER\bsz-attic:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/bsz/students/attic/share
+    # /srv/samba/schools/bsz/share/classes/attic
     &NTACL_test ("bsz",
-                 "/students/attic/share",
+                 "/share/classes/attic",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -10031,9 +10043,9 @@ if ($kill==1 or $test_kill==1){
                  'ACL:LINUXMUSTER\lin-attic:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/lin/students/attic/share
+    # /srv/samba/schools/lin/share/classes/attic
     &NTACL_test ("lin",
-                 "/students/attic/share",
+                 "/share/classes/attic",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -10085,9 +10097,9 @@ if ($kill==1 or $test_kill==1){
                  'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/bsz/students/m9cd/share
+    # /srv/samba/schools/bsz/share/classes/m9cd
     &NTACL_test ("bsz",
-                 "/students/m9cd/share",
+                 "/share/classes/m9cd",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -10513,9 +10525,9 @@ if ($kill==1 or $test_kill==1){
                  'ACL:LINUXMUSTER\s7ade:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/default-school/students/s7ade/share
+    # /srv/samba/schools/default-school/share/classes/s7ade
     &NTACL_test ("default-school",
-                 "/students/s7ade/share",
+                 "/share/classes/s7ade",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -10770,6 +10782,9 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                          "/srv/samba/schools/lin/students",                       # ntacl
                          "/srv/samba/schools/lin/teachers",                       # ntacl
                          "/srv/samba/schools/lin/share/teachers",                 # ntacl
+                         "/srv/samba/schools/lin/share/classes",                                      # ntacl
+                         "/srv/samba/schools/lin/share/management",                                      # ntacl
+                         "/srv/samba/schools/lin/share/global",                                      # ntacl
                          "/srv/samba/schools/uni",                                # ntacl
                          "/srv/samba/schools/uni/management",                     # ntacl
                          "/srv/samba/schools/uni/share",
@@ -10796,6 +10811,9 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                          "/srv/samba/schools/ghs/students",                       # ntacl
                          "/srv/samba/schools/ghs/teachers",                       # ntacl
                          "/srv/samba/schools/ghs/share/teachers",                 # ntacl
+                         "/srv/samba/schools/ghs/share/classes",                 # ntacl
+                         "/srv/samba/schools/ghs/share/management",                                      # ntacl
+                         "/srv/samba/schools/ghs/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",                     # ntacl
                          "/srv/samba/schools/default-school/management",          # ntacl
                          "/srv/samba/schools/default-school/share",
@@ -11455,6 +11473,9 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                          "/srv/samba/schools/lin/students",
                          "/srv/samba/schools/lin/teachers",
                          "/srv/samba/schools/lin/share/teachers",
+                         "/srv/samba/schools/lin/share/classes",                                      # ntacl
+                         "/srv/samba/schools/lin/share/management",                                      # ntacl
+                         "/srv/samba/schools/lin/share/global",                                      # ntacl
                          "/srv/samba/schools/uni/teachers",
                          "/srv/samba/schools/uni/share/teachers",
                          "/srv/samba/schools/uni/share/classes",                                      # ntacl
@@ -11470,6 +11491,9 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                          "/srv/samba/schools/ghs/students",
                          "/srv/samba/schools/ghs/teachers",
                          "/srv/samba/schools/ghs/share/teachers",
+                         "/srv/samba/schools/ghs/share/classes",
+                         "/srv/samba/schools/ghs/share/management",                                      # ntacl
+                         "/srv/samba/schools/ghs/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
