@@ -5532,14 +5532,14 @@ sub get_sharedirectory {
     my $unc="//".$root_dns."/".$school_smbshare;
 
     if ($type eq "project"){
-        $smb_rel_path="projects/".$group;
+        $smb_rel_path="/share/projects/".$group;
         $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path;
-        $unix_dir="/home/schools/".$school."/projects/".$group;
+        $unix_dir="/home/schools/".$school."/share/projects/".$group;
     } elsif  ($type eq "adminclass"){
         my $group_basename=&get_group_basename($group,$school);
-        $smb_rel_path="students/".$group_basename;
+        $smb_rel_path="share/classes/".$group_basename;
         $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path;
-        $unix_dir="/home/schools/".$school."/students/".$group_basename;
+        $unix_dir="/home/schools/".$school."/share/classes/".$group_basename;
     } else {
         $smb_rel_path="unknown";
         $smb_share="unknown";
