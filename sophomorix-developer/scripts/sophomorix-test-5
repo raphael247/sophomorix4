@@ -932,32 +932,41 @@ if ($test_add_admin==1){
                          "/srv/samba/schools/abc",
                          "/srv/samba/schools/abc/management",
                          "/srv/samba/schools/abc/share",     
+                         "/srv/samba/schools/abc/iso",     
                          "/srv/samba/schools/abc/program",     
                          "/srv/samba/schools/abc/examusers",
                          "/srv/samba/schools/abc/management/admin-abc-666",
                          "/srv/samba/schools/abc/management/admin-abc-666/schooladmindir1",
                          "/srv/samba/schools/abc/management/admin-abc-666/schooladmindir2",
-                         "/srv/samba/schools/abc/projects",
+                         "/srv/samba/schools/abc/share/projects",
                          "/srv/samba/schools/abc/students",
                          "/srv/samba/schools/abc/teachers",
-                         "/srv/samba/schools/abc/teachers/share",
+                         "/srv/samba/schools/abc/share/teachers",
+                         "/srv/samba/schools/abc/share/classes",                                      # ntacl
+                         "/srv/samba/schools/abc/share/management",                                      # ntacl
+                         "/srv/samba/schools/abc/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/lin",
                          "/srv/samba/schools/ghs",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",     
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
                          "/srv/samba/schools/bsz/management/admin-bsz-66",
                          "/srv/samba/schools/bsz/management/admin-bsz-66/schooladmindir1",
                          "/srv/samba/schools/bsz/management/admin-bsz-66/schooladmindir2",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",     
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
                          "/srv/samba/schools/default-school/management/admin-66",
@@ -966,10 +975,13 @@ if ($test_add_admin==1){
                          "/srv/samba/schools/default-school/management/admin-666",
                          "/srv/samba/schools/default-school/management/admin-666/schooladmindir1",
                          "/srv/samba/schools/default-school/management/admin-666/schooladmindir2",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/teachers",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                          "/srv/samba/schools/uni",
                         ); 
     # /srv/samba/schools/default-school
@@ -998,9 +1010,9 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\admins:ALLOWED/0x0/FULL',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
                 );
-    # /srv/samba/schools/default-school/projects
+    # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
-                 "/projects",
+                 "/share/projects",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1038,9 +1050,9 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
                 );
-    # /srv/samba/schools/default-school/teachers/share
+    # /srv/samba/schools/default-school/share/teachers
     &NTACL_test ("default-school",
-                 "/teachers/share",
+                 "/share/teachers",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1103,9 +1115,9 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/0x0/FULL',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
                 );
-    # /srv/samba/schools/bsz/projects
+    # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
-                 "/projects",
+                 "/share/projects",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1143,9 +1155,9 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
                 );
-    # /srv/samba/schools/bsz/teachers/share
+    # /srv/samba/schools/bsz/share/teachers
     &NTACL_test ("bsz",
-                 "/teachers/share",
+                 "/share/teachers",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1195,9 +1207,9 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/0x0/FULL',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
                 );
-    # /srv/samba/schools/abc/projects
+    # /srv/samba/schools/abc/share/projects
     &NTACL_test ("abc",
-                 "/projects",
+                 "/share/projects",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1235,9 +1247,9 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI/FULL', 
                 );
-    # /srv/samba/schools/abc/teachers/share
+    # /srv/samba/schools/abc/share/teachers
     &NTACL_test ("abc",
-                 "/teachers/share",
+                 "/share/teachers",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1279,7 +1291,9 @@ if ($test_add_admin==1){
                          "/srv/samba/global/management/global-admin-666",
                          "/srv/samba/global/management/global-admin-666/globaladmindir1",
                          "/srv/samba/global/management/global-admin-666/globaladmindir2",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         );
@@ -1295,9 +1309,9 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/0x0/FULL',
                 );
-    # /srv/samba/global/projects
+    # /srv/samba/global/share/projects
     &NTACL_test ("linuxmuster-global",
-                 "/projects",
+                 "/share/projects",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -1449,32 +1463,44 @@ if ($test_kill_admin==1){
                          "/srv/samba/schools/abc",
                          "/srv/samba/schools/abc/management",
                          "/srv/samba/schools/abc/share",     
+                         "/srv/samba/schools/abc/iso",     
                          "/srv/samba/schools/abc/program",     
                          "/srv/samba/schools/abc/examusers",
-                         "/srv/samba/schools/abc/projects",
+                         "/srv/samba/schools/abc/share/projects",
                          "/srv/samba/schools/abc/students",
                          "/srv/samba/schools/abc/teachers",
-                         "/srv/samba/schools/abc/teachers/share",
+                         "/srv/samba/schools/abc/share/teachers",
+                         "/srv/samba/schools/abc/share/classes",                                      # ntacl
+                         "/srv/samba/schools/abc/share/management",                                      # ntacl
+                         "/srv/samba/schools/abc/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/lin",
                          "/srv/samba/schools/ghs",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",     
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",     
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/teachers",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                          "/srv/samba/schools/uni",
                         ); 
     &end_fs_test(\%fs_test_result);
@@ -1489,7 +1515,9 @@ if ($test_kill_admin==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
