@@ -5517,7 +5517,7 @@ sub get_sharedirectory {
     my ($root_dns,$school,$group,$type,$ref_sophomorix_config)=@_;
     my $smb_share; # as needed for perl module 'homeDirectory (using //)
     my $unix_dir; # unix-path (works only if share is on the same server)
-    my $smb_rel_path; # option for smbclient
+    my $smb_rel_path_share; # option for smbclient
 
     my $school_smbshare=$school;
     if ($school eq "---"){
@@ -5532,21 +5532,24 @@ sub get_sharedirectory {
     my $unc="//".$root_dns."/".$school_smbshare;
 
     if ($type eq "project"){
-        $smb_rel_path="/share/projects/".$group;
-        $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path;
-        $unix_dir="/home/schools/".$school."/share/projects/".$group;
+        $smb_rel_path_share="/share/projects/".$group;
+        $smb_rel_path_homes=""; # not needed
+        $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path_share;
+        $unix_dir="/srv/samba/schools/".$school."/share/projects/".$group;
     } elsif  ($type eq "adminclass"){
         my $group_basename=&get_group_basename($group,$school);
-        $smb_rel_path="share/classes/".$group_basename;
-        $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path;
-        $unix_dir="/home/schools/".$school."/share/classes/".$group_basename;
+        $smb_rel_path_share="share/classes/".$group_basename;
+        $smb_rel_path_homes="students/".$group_basename;
+        $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path_share;
+        $unix_dir="/srv/samba/schools/".$school."/share/classes/".$group_basename;
     } else {
-        $smb_rel_path="unknown";
+        $smb_rel_path_share="unknown";
+        $smb_rel_path_homes="unknown";
         $smb_share="unknown";
         $unix_dir="unknown";
     }
 
-    return ($smb_share,$unix_dir,$unc,$smb_rel_path);
+    return ($smb_share,$unix_dir,$unc,$smb_rel_path_share,$smb_rel_path_homes);
 }
 
 
