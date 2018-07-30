@@ -613,9 +613,10 @@ if ($test_add_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
@@ -624,9 +625,12 @@ if ($test_add_users==1){
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
 #                         "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/_einsammeln",
@@ -634,7 +638,7 @@ if ($test_add_users==1){
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
 #                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72/_einsammeln",
@@ -644,12 +648,13 @@ if ($test_add_users==1){
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
                          "/srv/samba/schools/uni/program",     
                          "/srv/samba/schools/uni/examusers",
-                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/share/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/students/12abc",
-                         "/srv/samba/schools/uni/students/12abc/share",
+                         "/srv/samba/schools/uni/share/classes/12abc",
                          "/srv/samba/schools/uni/students/12abc/lordjo72",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                         "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -663,16 +668,20 @@ if ($test_add_users==1){
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                         "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                         "/srv/samba/schools/uni/share/management",                                      # ntacl
+                         "/srv/samba/schools/uni/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/students/s6ade",
-                         "/srv/samba/schools/default-school/students/s6ade/share",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                         "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -680,7 +689,10 @@ if ($test_add_users==1){
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                         "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                         ); 
     &end_fs_test(\%fs_test_result);
 
@@ -694,7 +706,9 @@ if ($test_add_users==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -1239,6 +1253,7 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
                          "/srv/samba/schools/bsz/examusers/subdir72",
@@ -1254,7 +1269,7 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/bsz/examusers/samardze72-exam",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
 #                         "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
@@ -1263,9 +1278,12 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
 #                         "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/_einsammeln",
@@ -1273,7 +1291,7 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
 #                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72/_einsammeln",
@@ -1283,12 +1301,13 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
                          "/srv/samba/schools/uni/program",     
                          "/srv/samba/schools/uni/examusers",
-                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/share/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/students/12abc",
-                         "/srv/samba/schools/uni/students/12abc/share",
+                         "/srv/samba/schools/uni/share/classes/12abc",
                          "/srv/samba/schools/uni/students/12abc/lordjo72",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                         "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -1302,16 +1321,20 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                         "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                         "/srv/samba/schools/uni/share/management",                                      # ntacl
+                         "/srv/samba/schools/uni/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/students/s6ade",
-                         "/srv/samba/schools/default-school/students/s6ade/share",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                         "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -1319,7 +1342,10 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                         "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                         ); 
     &end_fs_test(\%fs_test_result);
 
@@ -1333,7 +1359,9 @@ if ($test_exammode_users==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -1369,6 +1397,7 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/bsz",
                     "/srv/samba/schools/bsz/management",
                     "/srv/samba/schools/bsz/share",     
+                    "/srv/samba/schools/bsz/iso",
                     "/srv/samba/schools/bsz/program",     
                     "/srv/samba/schools/bsz/examusers",
                     "/srv/samba/schools/bsz/examusers/subdir72",
@@ -1416,7 +1445,7 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir2-level2",
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                    "/srv/samba/schools/bsz/projects",
+                    "/srv/samba/schools/bsz/share/projects",
                     "/srv/samba/schools/bsz/students",
                     "/srv/samba/schools/bsz/teachers",
                     "/srv/samba/schools/bsz/teachers/oe72",
@@ -1425,9 +1454,12 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/bsz/teachers/wu72",
                     "/srv/samba/schools/bsz/teachers/wu72/transfer",
 #                    "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                    "/srv/samba/schools/bsz/teachers/share",
+                    "/srv/samba/schools/bsz/share/teachers",
+                    "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/global",                                      # ntacl
                     "/srv/samba/schools/bsz/students/m7ab",
-                    "/srv/samba/schools/bsz/students/m7ab/share",
+                    "/srv/samba/schools/bsz/share/classes/m7ab",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer/file1-level1",
@@ -1451,7 +1483,7 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                    "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                     "/srv/samba/schools/bsz/students/m8cd",
-                    "/srv/samba/schools/bsz/students/m8cd/share",
+                    "/srv/samba/schools/bsz/share/classes/m8cd",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
 #                    "/srv/samba/schools/bsz/students/m8cd/jonsonad72/_einsammeln",
@@ -1461,12 +1493,13 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/uni",
                     "/srv/samba/schools/uni/management",
                     "/srv/samba/schools/uni/share",     
+                    "/srv/samba/schools/uni/iso",
                     "/srv/samba/schools/uni/program",     
                     "/srv/samba/schools/uni/examusers",
-                    "/srv/samba/schools/uni/projects",
+                    "/srv/samba/schools/uni/share/projects",
                     "/srv/samba/schools/uni/students",
                     "/srv/samba/schools/uni/students/12abc",
-                    "/srv/samba/schools/uni/students/12abc/share",
+                    "/srv/samba/schools/uni/share/classes/12abc",
                     "/srv/samba/schools/uni/students/12abc/lordjo72",
                     "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                    "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -1480,16 +1513,20 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/uni/teachers/gal72",
                     "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                    "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                    "/srv/samba/schools/uni/teachers/share",
+                    "/srv/samba/schools/uni/share/teachers",
+                    "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                    "/srv/samba/schools/uni/share/management",                                      # ntacl
+                    "/srv/samba/schools/uni/share/global",                                      # ntacl
                     "/srv/samba/schools/default-school",
                     "/srv/samba/schools/default-school/management",
                     "/srv/samba/schools/default-school/share",
+                    "/srv/samba/schools/default-school/iso",
                     "/srv/samba/schools/default-school/program",
                     "/srv/samba/schools/default-school/examusers",
-                    "/srv/samba/schools/default-school/projects",
+                    "/srv/samba/schools/default-school/share/projects",
                     "/srv/samba/schools/default-school/students",
                     "/srv/samba/schools/default-school/students/s6ade",
-                    "/srv/samba/schools/default-school/students/s6ade/share",
+                    "/srv/samba/schools/default-school/share/classes/s6ade",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                    "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -1497,7 +1534,10 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/default-school/teachers/sch72",
                     "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                    "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                    "/srv/samba/schools/default-school/teachers/share",
+                    "/srv/samba/schools/default-school/share/teachers",
+                    "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                    "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                    "/srv/samba/schools/default-school/share/global",                                      # ntacl
                    ); 
     &end_fs_test(\%fs_test_result);
 
@@ -1511,7 +1551,9 @@ if ($test_file_transfer_share==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -1550,6 +1592,7 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/bsz",
                     "/srv/samba/schools/bsz/management",
                     "/srv/samba/schools/bsz/share",     
+                    "/srv/samba/schools/bsz/iso",
                     "/srv/samba/schools/bsz/program",     
                     "/srv/samba/schools/bsz/examusers",
                     "/srv/samba/schools/bsz/examusers/subdir72",
@@ -1597,7 +1640,7 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir2-level2",
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                    "/srv/samba/schools/bsz/projects",
+                    "/srv/samba/schools/bsz/share/projects",
                     "/srv/samba/schools/bsz/students",
                     "/srv/samba/schools/bsz/teachers",
                     "/srv/samba/schools/bsz/teachers/oe72",
@@ -1620,9 +1663,12 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/bsz/teachers/wu72",
                     "/srv/samba/schools/bsz/teachers/wu72/transfer",
 #                    "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                    "/srv/samba/schools/bsz/teachers/share",
+                    "/srv/samba/schools/bsz/share/teachers",
+                    "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/global",                                      # ntacl
                     "/srv/samba/schools/bsz/students/m7ab",
-                    "/srv/samba/schools/bsz/students/m7ab/share",
+                    "/srv/samba/schools/bsz/share/classes/m7ab",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer/file1-level1",
@@ -1646,7 +1692,7 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                    "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                     "/srv/samba/schools/bsz/students/m8cd",
-                    "/srv/samba/schools/bsz/students/m8cd/share",
+                    "/srv/samba/schools/bsz/share/classes/m8cd",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
 #                    "/srv/samba/schools/bsz/students/m8cd/jonsonad72/_einsammeln",
@@ -1656,12 +1702,13 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/uni",
                     "/srv/samba/schools/uni/management",
                     "/srv/samba/schools/uni/share",     
+                    "/srv/samba/schools/uni/iso",
                     "/srv/samba/schools/uni/program",     
                     "/srv/samba/schools/uni/examusers",
-                    "/srv/samba/schools/uni/projects",
+                    "/srv/samba/schools/uni/share/projects",
                     "/srv/samba/schools/uni/students",
                     "/srv/samba/schools/uni/students/12abc",
-                    "/srv/samba/schools/uni/students/12abc/share",
+                    "/srv/samba/schools/uni/share/classes/12abc",
                     "/srv/samba/schools/uni/students/12abc/lordjo72",
                     "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                    "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -1693,16 +1740,20 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/uni/teachers/gal72",
                     "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                    "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                    "/srv/samba/schools/uni/teachers/share",
+                    "/srv/samba/schools/uni/share/teachers",
+                    "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                    "/srv/samba/schools/uni/share/management",                                      # ntacl
+                    "/srv/samba/schools/uni/share/global",                                      # ntacl
                     "/srv/samba/schools/default-school",
                     "/srv/samba/schools/default-school/management",
                     "/srv/samba/schools/default-school/share",
+                    "/srv/samba/schools/default-school/iso",
                     "/srv/samba/schools/default-school/program",
                     "/srv/samba/schools/default-school/examusers",
-                    "/srv/samba/schools/default-school/projects",
+                    "/srv/samba/schools/default-school/share/projects",
                     "/srv/samba/schools/default-school/students",
                     "/srv/samba/schools/default-school/students/s6ade",
-                    "/srv/samba/schools/default-school/students/s6ade/share",
+                    "/srv/samba/schools/default-school/share/classes/s6ade",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                    "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -1710,7 +1761,10 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/default-school/teachers/sch72",
                     "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                    "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                    "/srv/samba/schools/default-school/teachers/share",
+                    "/srv/samba/schools/default-school/share/teachers",
+                    "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                    "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                    "/srv/samba/schools/default-school/share/global",                                      # ntacl
                    ); 
     &end_fs_test(\%fs_test_result);
 
@@ -1724,7 +1778,9 @@ if ($test_file_transfer_collect_copy==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -1763,6 +1819,7 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/bsz",
                     "/srv/samba/schools/bsz/management",
                     "/srv/samba/schools/bsz/share",     
+                    "/srv/samba/schools/bsz/iso",
                     "/srv/samba/schools/bsz/program",     
                     "/srv/samba/schools/bsz/examusers",
                     "/srv/samba/schools/bsz/examusers/subdir72",
@@ -1810,7 +1867,7 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir2-level2",
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                    "/srv/samba/schools/bsz/projects",
+                    "/srv/samba/schools/bsz/share/projects",
                     "/srv/samba/schools/bsz/students",
                     "/srv/samba/schools/bsz/teachers",
                     "/srv/samba/schools/bsz/teachers/oe72",
@@ -1847,9 +1904,12 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/bsz/teachers/wu72/transfer/maiersa72/transfer/subdir2-level1/subdir2-level2",
                     "/srv/samba/schools/bsz/teachers/wu72/transfer/maiersa72/transfer/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                    "/srv/samba/schools/bsz/teachers/share",
+                    "/srv/samba/schools/bsz/share/teachers",
+                    "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/global",                                      # ntacl
                     "/srv/samba/schools/bsz/students/m7ab",
-                    "/srv/samba/schools/bsz/students/m7ab/share",
+                    "/srv/samba/schools/bsz/share/classes/m7ab",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
 #                    "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer/file1-level1",
@@ -1873,7 +1933,7 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                    "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                     "/srv/samba/schools/bsz/students/m8cd",
-                    "/srv/samba/schools/bsz/students/m8cd/share",
+                    "/srv/samba/schools/bsz/share/classes/m8cd",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
 #                    "/srv/samba/schools/bsz/students/m8cd/jonsonad72/_einsammeln",
@@ -1883,12 +1943,13 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/uni",
                     "/srv/samba/schools/uni/management",
                     "/srv/samba/schools/uni/share",     
+                    "/srv/samba/schools/uni/iso",
                     "/srv/samba/schools/uni/program",     
                     "/srv/samba/schools/uni/examusers",
-                    "/srv/samba/schools/uni/projects",
+                    "/srv/samba/schools/uni/share/projects",
                     "/srv/samba/schools/uni/students",
                     "/srv/samba/schools/uni/students/12abc",
-                    "/srv/samba/schools/uni/students/12abc/share",
+                    "/srv/samba/schools/uni/share/classes/12abc",
                     "/srv/samba/schools/uni/students/12abc/lordjo72",
                     "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                    "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -1942,16 +2003,20 @@ if ($test_file_transfer_collect_move==1){
 
 
 #                    "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                    "/srv/samba/schools/uni/teachers/share",
+                    "/srv/samba/schools/uni/share/teachers",
+                    "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                    "/srv/samba/schools/uni/share/management",                                      # ntacl
+                    "/srv/samba/schools/uni/share/global",                                      # ntacl
                     "/srv/samba/schools/default-school",
                     "/srv/samba/schools/default-school/management",
                     "/srv/samba/schools/default-school/share",
+                    "/srv/samba/schools/default-school/iso",
                     "/srv/samba/schools/default-school/program",
                     "/srv/samba/schools/default-school/examusers",
-                    "/srv/samba/schools/default-school/projects",
+                    "/srv/samba/schools/default-school/share/projects",
                     "/srv/samba/schools/default-school/students",
                     "/srv/samba/schools/default-school/students/s6ade",
-                    "/srv/samba/schools/default-school/students/s6ade/share",
+                    "/srv/samba/schools/default-school/share/classes/s6ade",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                    "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -1959,7 +2024,10 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/default-school/teachers/sch72",
                     "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                    "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                    "/srv/samba/schools/default-school/teachers/share",
+                    "/srv/samba/schools/default-school/share/teachers",
+                    "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                    "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                    "/srv/samba/schools/default-school/share/global",                                      # ntacl
                    ); 
     &end_fs_test(\%fs_test_result);
 
@@ -1973,7 +2041,9 @@ if ($test_file_transfer_collect_move==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -2010,6 +2080,7 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
                          "/srv/samba/schools/bsz/examusers/subdir72",
@@ -2041,7 +2112,7 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir2-level2",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir3-level2",
 #                         "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
@@ -2050,9 +2121,12 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
 #                         "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/_einsammeln",
@@ -2060,7 +2134,7 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
 #                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72/_einsammeln",
@@ -2070,12 +2144,13 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
                          "/srv/samba/schools/uni/program",     
                          "/srv/samba/schools/uni/examusers",
-                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/share/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/students/12abc",
-                         "/srv/samba/schools/uni/students/12abc/share",
+                         "/srv/samba/schools/uni/share/classes/12abc",
                          "/srv/samba/schools/uni/students/12abc/lordjo72",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                         "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -2089,16 +2164,20 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                         "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                         "/srv/samba/schools/uni/share/management",                                      # ntacl
+                         "/srv/samba/schools/uni/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/students/s6ade",
-                         "/srv/samba/schools/default-school/students/s6ade/share",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                         "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -2106,7 +2185,10 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                         "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                         ); 
     &end_fs_test(\%fs_test_result);
 
@@ -2120,7 +2202,9 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -2157,6 +2241,7 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/bsz",
                     "/srv/samba/schools/bsz/management",
                     "/srv/samba/schools/bsz/share",     
+                    "/srv/samba/schools/bsz/iso",
                     "/srv/samba/schools/bsz/program",     
                     "/srv/samba/schools/bsz/examusers",
                     "/srv/samba/schools/bsz/examusers/subdir72",
@@ -2206,7 +2291,7 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir2-level2",
                     "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir3-level2",
 #                    "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                    "/srv/samba/schools/bsz/projects",
+                    "/srv/samba/schools/bsz/share/projects",
                     "/srv/samba/schools/bsz/students",
                     "/srv/samba/schools/bsz/teachers",
                     "/srv/samba/schools/bsz/teachers/oe72",
@@ -2216,9 +2301,12 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/bsz/teachers/wu72/transfer",
 
 #                    "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                    "/srv/samba/schools/bsz/teachers/share",
+                    "/srv/samba/schools/bsz/share/teachers",
+                    "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                    "/srv/samba/schools/bsz/share/global",                                      # ntacl
                     "/srv/samba/schools/bsz/students/m7ab",
-                    "/srv/samba/schools/bsz/students/m7ab/share",
+                    "/srv/samba/schools/bsz/share/classes/m7ab",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
                     "/srv/samba/schools/bsz/students/m7ab/maiersa72/file1-level1",
@@ -2242,7 +2330,7 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                    "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                     "/srv/samba/schools/bsz/students/m8cd",
-                    "/srv/samba/schools/bsz/students/m8cd/share",
+                    "/srv/samba/schools/bsz/share/classes/m8cd",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
                     "/srv/samba/schools/bsz/students/m8cd/jonsonad72/file1-level1",
@@ -2268,12 +2356,13 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/uni",
                     "/srv/samba/schools/uni/management",
                     "/srv/samba/schools/uni/share",     
+                    "/srv/samba/schools/uni/iso",
                     "/srv/samba/schools/uni/program",     
                     "/srv/samba/schools/uni/examusers",
-                    "/srv/samba/schools/uni/projects",
+                    "/srv/samba/schools/uni/share/projects",
                     "/srv/samba/schools/uni/students",
                     "/srv/samba/schools/uni/students/12abc",
-                    "/srv/samba/schools/uni/students/12abc/share",
+                    "/srv/samba/schools/uni/share/classes/12abc",
                     "/srv/samba/schools/uni/students/12abc/lordjo72",
                     "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                    "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -2287,16 +2376,20 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/uni/teachers/gal72",
                     "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                    "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                    "/srv/samba/schools/uni/teachers/share",
+                    "/srv/samba/schools/uni/share/teachers",
+                    "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                    "/srv/samba/schools/uni/share/management",                                      # ntacl
+                    "/srv/samba/schools/uni/share/global",                                      # ntacl
                     "/srv/samba/schools/default-school",
                     "/srv/samba/schools/default-school/management",
                     "/srv/samba/schools/default-school/share",
+                    "/srv/samba/schools/default-school/iso",
                     "/srv/samba/schools/default-school/program",
                     "/srv/samba/schools/default-school/examusers",
-                    "/srv/samba/schools/default-school/projects",
+                    "/srv/samba/schools/default-school/share/projects",
                     "/srv/samba/schools/default-school/students",
                     "/srv/samba/schools/default-school/students/s6ade",
-                    "/srv/samba/schools/default-school/students/s6ade/share",
+                    "/srv/samba/schools/default-school/share/classes/s6ade",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72",
                     "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                    "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -2304,7 +2397,10 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/default-school/teachers/sch72",
                     "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                    "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                    "/srv/samba/schools/default-school/teachers/share",
+                    "/srv/samba/schools/default-school/share/teachers",
+                    "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                    "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                    "/srv/samba/schools/default-school/share/global",                                      # ntacl
                    ); 
     &end_fs_test(\%fs_test_result);
 
@@ -2318,7 +2414,9 @@ if ($test_file_transfer_home==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -2356,6 +2454,7 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
                          "/srv/samba/schools/bsz/examusers/subdir72",
@@ -2387,7 +2486,7 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir2-level2",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/subdir2-level1/subdir3-level2",
 #                         "/srv/samba/schools/bsz/examusers/samardze72-exam/_einsammeln",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
@@ -2396,9 +2495,12 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
 #                         "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/_einsammeln",
@@ -2406,7 +2508,7 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/file1-level1",
@@ -2432,12 +2534,13 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
                          "/srv/samba/schools/uni/program",     
                          "/srv/samba/schools/uni/examusers",
-                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/share/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/students/12abc",
-                         "/srv/samba/schools/uni/students/12abc/share",
+                         "/srv/samba/schools/uni/share/classes/12abc",
                          "/srv/samba/schools/uni/students/12abc/lordjo72",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                         "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -2451,16 +2554,20 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                         "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                         "/srv/samba/schools/uni/share/management",                                      # ntacl
+                         "/srv/samba/schools/uni/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/students/s6ade",
-                         "/srv/samba/schools/default-school/students/s6ade/share",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                         "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -2468,7 +2575,10 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                         "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                         ); 
     &end_fs_test(\%fs_test_result);
 
@@ -2482,7 +2592,9 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -2888,9 +3000,10 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
@@ -2929,9 +3042,12 @@ if ($test_nonexammode_users==1){
 
 
 #                         "/srv/samba/schools/bsz/teachers/wu72/_einsammeln",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/bsz/students/m7ab",
-                         "/srv/samba/schools/bsz/students/m7ab/share",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/_einsammeln",
@@ -2939,7 +3055,7 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
 #                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/_einsammeln",
                          "/srv/samba/schools/bsz/students/m8cd",
-                         "/srv/samba/schools/bsz/students/m8cd/share",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
                          "/srv/samba/schools/bsz/students/m8cd/jonsonad72/file1-level1",
@@ -2965,12 +3081,13 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
                          "/srv/samba/schools/uni/program",     
                          "/srv/samba/schools/uni/examusers",
-                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/share/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/students/12abc",
-                         "/srv/samba/schools/uni/students/12abc/share",
+                         "/srv/samba/schools/uni/share/classes/12abc",
                          "/srv/samba/schools/uni/students/12abc/lordjo72",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
 #                         "/srv/samba/schools/uni/students/12abc/lordjo72/_einsammeln",
@@ -2984,16 +3101,20 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                         "/srv/samba/schools/uni/teachers/gal72/_einsammeln",
-                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                         "/srv/samba/schools/uni/share/management",                                      # ntacl
+                         "/srv/samba/schools/uni/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/students/s6ade",
-                         "/srv/samba/schools/default-school/students/s6ade/share",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72",
                          "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
 #                         "/srv/samba/schools/default-school/students/s6ade/schneima72/_einsammeln",
@@ -3001,7 +3122,10 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
 #                         "/srv/samba/schools/default-school/teachers/sch72/_einsammeln",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                         ); 
     &end_fs_test(\%fs_test_result);
 
@@ -3015,7 +3139,9 @@ if ($test_nonexammode_users==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
@@ -3091,30 +3217,42 @@ if ($test_kill_users==1){
                          "/srv/samba/schools/bsz",
                          "/srv/samba/schools/bsz/management",
                          "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
                          "/srv/samba/schools/bsz/program",     
                          "/srv/samba/schools/bsz/examusers",
-                         "/srv/samba/schools/bsz/projects",
+                         "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
-                         "/srv/samba/schools/bsz/teachers/share",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/management",                                      # ntacl
+                         "/srv/samba/schools/bsz/share/global",                                      # ntacl
                          "/srv/samba/schools/uni",
                          "/srv/samba/schools/uni/management",
                          "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
                          "/srv/samba/schools/uni/program",     
                          "/srv/samba/schools/uni/examusers",
-                         "/srv/samba/schools/uni/projects",
+                         "/srv/samba/schools/uni/share/projects",
                          "/srv/samba/schools/uni/students",
                          "/srv/samba/schools/uni/teachers",
-                         "/srv/samba/schools/uni/teachers/share",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",                                      # ntacl
+                         "/srv/samba/schools/uni/share/management",                                      # ntacl
+                         "/srv/samba/schools/uni/share/global",                                      # ntacl
                          "/srv/samba/schools/default-school",
                          "/srv/samba/schools/default-school/management",
                          "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
                          "/srv/samba/schools/default-school/program",
                          "/srv/samba/schools/default-school/examusers",
-                         "/srv/samba/schools/default-school/projects",
+                         "/srv/samba/schools/default-school/share/projects",
                          "/srv/samba/schools/default-school/students",
                          "/srv/samba/schools/default-school/teachers",
-                         "/srv/samba/schools/default-school/teachers/share",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",                           # ntacl
+                         "/srv/samba/schools/default-school/share/management",                                      # ntacl
+                         "/srv/samba/schools/default-school/share/global",                                      # ntacl
                         ); 
     &end_fs_test(\%fs_test_result);
 
@@ -3128,7 +3266,9 @@ if ($test_kill_users==1){
                          "/srv/samba/global/management",
                          "/srv/samba/global/share",
                          "/srv/samba/global/program",
-                         "/srv/samba/global/projects",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
