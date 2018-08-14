@@ -73,7 +73,6 @@ my $school=0;
 my $project=0;
 my $globaladministrator_home=0;
 my $schooladministrator_home=0;
-my $teacherclass=0;
 my $teacher_home=0;
 my $adminclass=0;
 my $extraclass=0;
@@ -105,7 +104,6 @@ my $testopt=GetOptions(
            "project" => \$project,
            "globaladministrator-home" => \$globaladministrator_home,
            "schooladministrator-home" => \$schooladministrator_home,
-           "teacherclass" => \$teacherclass,
            "teacher-home" => \$teacher_home,
            "adminclass" => \$adminclass,
            "extraclass" => \$extraclass,
@@ -236,7 +234,6 @@ if ($all==1) {
     $project=1;
     $globaladministrator_home=1;
     $schooladministrator_home=1;
-    $teacherclass=1;
     $teacher_home=1;
     $adminclass=1;
     $extraclass=1;
@@ -321,20 +318,6 @@ if ($schooladministrator_home==1) {
                          root_dse=>$root_dse,
                          root_dns=>$root_dns,
                          repdir_file=>"repdir.schooladministrator_home",
-                         AD=>$ref_AD,
-                         smb_admin_pass=>$smb_admin_pass,
-                         sophomorix_config=>\%sophomorix_config,
-                         sophomorix_result=>\%sophomorix_result,
-                        });
-}
-
-
-# --teacherclass
-if ($teacherclass==1) {
-   &AD_repdir_using_file({ldap=>$ldap,
-                         root_dse=>$root_dse,
-                         root_dns=>$root_dns,
-                         repdir_file=>"repdir.teacherclass",
                          AD=>$ref_AD,
                          smb_admin_pass=>$smb_admin_pass,
                          sophomorix_config=>\%sophomorix_config,

@@ -150,17 +150,6 @@ When creating/repairing ONE user-home, group-share, school then:
                         });
 
 
-#creating ONE teacherclass in ONE school: ( --teacherclass (dark-green) in repdir-hierarchy.png)
-   &AD_repdir_using_file({root_dns=>$root_dns,
-                         repdir_file=>"repdir.teacherclass",
-                         school=>"abc",
-                         teacherclass=>"teachers",
-                         smb_admin_pass=>$smb_admin_pass,
-                         sophomorix_config=>\%sophomorix_config,
-                         sophomorix_result=>\%sophomorix_result,
-                        });
-
-
 #creating ONE teacher_home in ONE teacherclass in ONE school: ( --teacher-home (dark-magenta) in repdir-hierarchy.png)
    &AD_repdir_using_file({root_dns=>$root_dns,
                          repdir_file=>"repdir.teacher_home",

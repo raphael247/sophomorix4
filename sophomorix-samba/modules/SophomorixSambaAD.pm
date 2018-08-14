@@ -7365,14 +7365,15 @@ sub AD_group_create {
                              group => $ref_sophomorix_config->{'INI'}{'VARS'}{'HIERARCHY_PREFIX'}."-".$DevelConf::teacher,
                              addgroup => $group,
                            });
-        &AD_repdir_using_file({root_dns=>$root_dns,
-                               repdir_file=>"repdir.teacherclass",
-                               school=>$school,
-                               teacherclass=>$group,
-                               smb_admin_pass=>$smb_admin_pass,
-                               sophomorix_config=>$ref_sophomorix_config,
-                               sophomorix_result=>$ref_sophomorix_result,
-                             });
+        # not needed anymore. is provided by school
+        #&AD_repdir_using_file({root_dns=>$root_dns,
+        #                       repdir_file=>"repdir.teacherclass",
+        #                       school=>$school,
+        #                       teacherclass=>$group,
+        #                       smb_admin_pass=>$smb_admin_pass,
+        #                       sophomorix_config=>$ref_sophomorix_config,
+        #                       sophomorix_result=>$ref_sophomorix_result,
+        #                     });
     } elsif ($type eq "room"){
         #my $token_examaccounts=&AD_get_name_tokened($DevelConf::examaccount,$school,"examaccount");
         ## add the room to <token>-examaccounts
