@@ -2041,7 +2041,8 @@ sub check_class {
     # klassen filtern ?????
 
     # replacements in classnames
-    if ($sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_SLASH_TO_HYPHEN} eq "TRUE"){
+    if (defined $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_SLASH_TO_HYPHEN} and
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_SLASH_TO_HYPHEN} eq "TRUE"){
         $class=~s/\//-/g;
     } else {
         $class=~s/\//$DevelConf::replace_slash_with/g;
