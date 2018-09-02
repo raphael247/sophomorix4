@@ -8037,7 +8037,7 @@ sub AD_sophomorix_schema_update {
     my ($root_dns)=@_;
     print "\n";
     print "* Testing for sophomorix schema update\n";
-    my $AD_version=&AD_sophomorix_schema_version();
+    my $AD_version=&AD_sophomorix_schema_version($root_dns);
     if (not $AD_version==0){
         # Version in AD found, checking for updates
         print "   * Installed Sophomorix-Schema-Version:  $AD_version\n";
@@ -8108,8 +8108,10 @@ sub AD_sophomorix_schema_update {
 
 
 sub AD_sophomorix_schema_version {
+    my ($root_dns) = @_;
     my $ldbsearch_command="ldbsearch -H /var/lib/samba/private/sam.ldb ".
-                          "-b CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,DC=linuxmuster,DC=local ".
+                          "-b CN=Sophomorix-Schema-Version,CN=Schema,CN=Configuration,".
+                          $root_dns." ".
                           "rangeUpper | grep rangeUpper";
     my $stdout=`$ldbsearch_command`;
     my $return=${^CHILD_ERROR_NATIVE}; # return of value of last command

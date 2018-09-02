@@ -14,7 +14,8 @@ $Conf::log_level=1;
 my %smb_conf=();
 my $ref_result;
 &read_smb_conf(\%smb_conf,$ref_result);
-
+use Data::Dumper;
+print Dumper(\%smb_conf);
 my $conf_dir="/etc/linuxmuster/sophomorix";
 my $conf_file=$conf_dir."/sophomorix.conf";
 my $conf_file_source="/usr/share/sophomorix/config-templates/sophomorix.conf.template.ini";
