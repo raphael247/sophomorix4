@@ -2041,7 +2041,11 @@ sub check_class {
     # klassen filtern ?????
 
     # replacements in classnames
-    $class=~s/\//$DevelConf::replace_slash_with/g;
+    if ($sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_SLASH_TO_HYPHEN} eq "TRUE"){
+        $class=~s/\//-/g;
+    } else {
+        $class=~s/\//$DevelConf::replace_slash_with/g;
+    }
 
     if ($class=~/[^a-z0-9-_]/) { 
         $error_strg="special char in class $class";
