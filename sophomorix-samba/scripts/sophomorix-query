@@ -753,6 +753,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
                               attrs => $query_attrs,
                              );
             my $max = $mesg->count;
+
             # fill the result hash 
             # only none (ipdevice in room) OR one result possible (index=0):
             if ($max==0){
@@ -766,6 +767,17 @@ for( my $index = 0 ; $index < $max ; $index++) {
                 # work on multi value attributes
                 foreach my $attribute ( @{ $multi_attrs } ){
                     @{ $search{$top_key_members}{$sam}{$usersam}{$attribute} }=$entry->get_value($attribute);
+                }
+            }
+
+            # managementgroups
+            if ($search_object eq "group"){
+                foreach my $member_of (@{ $search{'MEMBERS'}{$sam}{$usersam}{'memberOf'} }){
+	            if ($member_of=~m/OU=Management/){
+	                my ($name,@other)=split(/,/,$member_of);
+	                $name=~s/^CN=//;
+                        $search{'MEMBERS'}{$sam}{$usersam}{'MANAGEMENTGROUPS'}{$name}="TRUE";
+	            }
                 }
             }
         }
@@ -865,12 +877,12 @@ sub json_printout {
         if ($#{ $ref_search->{'LISTS'}{'GROUP'} }>-1){
             my $counter=0;
             print $line;
-            print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS:\n";
+            print "$ref_search->{'COUNTERS'}{'GROUPCOUNT'} GROUPS:\n";
             foreach my $group (@{ $ref_search->{'LISTS'}{'GROUP'} }){
                 $counter++;
                 printf "  %4s:  %-60s\n",$counter,$group;
             }
-            print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS\n";
+            print "$ref_search->{'COUNTERS'}{'GROUPCOUNT'} GROUPS\n";
         }
         # ROOM
         if ($#{ $ref_search->{'LISTS'}{'ROOM'} }>-1){
