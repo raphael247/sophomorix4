@@ -809,6 +809,8 @@ if ($#{ $search{'LISTS'}{'COMPUTER'} }>0){
     $search{'COUNTERS'}{'COMPUTER'}=$#{ $search{'LISTS'}{'COMPUTER'} }+1;
 }
 
+# show the json object
+#print Dumper(\%search);
 
 
 # print JSON Object
@@ -833,7 +835,7 @@ sub setup_json_return {
         $multi_attrs=$multi_user_attrs;
     } elsif ($search_object eq "group"){
         $top_key="GROUP";
-        $top_count_key="GROUPCOUNT";
+        $top_count_key="GROUP";
         $objectclass_filter="(objectClass=group)";
         $single_attrs=$single_group_attrs;
         $multi_attrs=$multi_group_attrs;
@@ -877,12 +879,12 @@ sub json_printout {
         if ($#{ $ref_search->{'LISTS'}{'GROUP'} }>-1){
             my $counter=0;
             print $line;
-            print "$ref_search->{'COUNTERS'}{'GROUPCOUNT'} GROUPS:\n";
+            print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS:\n";
             foreach my $group (@{ $ref_search->{'LISTS'}{'GROUP'} }){
                 $counter++;
                 printf "  %4s:  %-60s\n",$counter,$group;
             }
-            print "$ref_search->{'COUNTERS'}{'GROUPCOUNT'} GROUPS\n";
+            print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS\n";
         }
         # ROOM
         if ($#{ $ref_search->{'LISTS'}{'ROOM'} }>-1){
