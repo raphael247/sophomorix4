@@ -44,7 +44,14 @@ my $testopt=GetOptions(\%options,
                         "schooladministrator",
                         "globalbinduser",
                         "schoolbinduser",
-                        "computer",
+                        "addc",
+                        "classroom-studentcomputer|csc",
+                        "classroom-teachercomputer|ctc",
+                        "faculty-teachercomputer|ftc",
+                        "mobile",
+                        "printer",
+                        "server",
+                        "staffcomputer|sc",
                         "adminclass",
                         "extraclass",
                         "teacherclass",
@@ -52,6 +59,7 @@ my $testopt=GetOptions(\%options,
                         "project",
                         "sophomorix-group",
                         "room",
+                        "printergroup",
                         "schoolbase=s",
                         "user-minimal",
                         "user-basic",
@@ -119,14 +127,24 @@ OR
 
 Limit the query for sophomorix users to a certain sophomorixRole:
 (multiple options are connected with | to accumulate the results)
---student               (sophomorixRole=student)
---teacher               (sophomorixRole=teacher)
---examuser              (sophomorixRole=examuser)
---globaladministrator   (sophomorixRole=globaladministrator)
---schooladministrator   (sophomorixRole=schooladministrator)
---globalbinduser        (sophomorixRole=globalbinduser)
---schoolbinduser        (sophomorixRole=schoolbinduser)
---computer              (sophomorixRole=computer)
+--student                       (sophomorixRole=student)
+--teacher                       (sophomorixRole=teacher)
+--examuser                      (sophomorixRole=examuser)
+--globaladministrator           (sophomorixRole=globaladministrator)
+--schooladministrator           (sophomorixRole=schooladministrator)
+--globalbinduser                (sophomorixRole=globalbinduser)
+--schoolbinduser                (sophomorixRole=schoolbinduser)
+
+Limit the query for sophomorix computers to a certain sophomorixRole:
+(multiple options are connected with | to accumulate the results)
+--addc                          (sophomorixRole=addc)
+--classroom-studentcomputer|csc (sophomorixRole=classroom-studentcomputer)
+--classroom-teachercomputer|ctc (sophomorixRole=classroom-teachercomputer)
+--faculty-teachercomputer|ftc   (sophomorixRole=faculty-teachercomputer)
+--mobile                        (sophomorixRole=mobile)
+--printer                       (sophomorixRole=printer)
+--server                        (sophomorixRole=server)
+--staffcomputer|sc              (sophomorixRole=staffcomputer)
 
 Limit the query for sophomorix groups to a certain sophomorixType:
 (multiple options are connected with | to accumulate the results)
@@ -137,7 +155,7 @@ Limit the query for sophomorix groups to a certain sophomorixType:
 --project             (sophomorixType=project)
 --sophomorix-group    (sophomorixType=sophomorix-group)
 --room                (sophomorixType=room)
-
+--printergroup        (sophomorixType=printer)
 Performance improvements:
 
 Limit the searchbase (this is faster):
@@ -170,6 +188,12 @@ Examples:
 
   Search for all users (with data for listing) in a group with the name <7a>:
   sophomorix-query --schoolbase <school> --sam 7a --class --group-minimal --group-members --user-full
+
+  Search for printers (with data for listing):
+  sophomorix-query --schoolbase <school> --printer --comp-full
+
+ Search for printergroups (with data and members for listing):
+  sophomorix-query --schoolbase <school> --printergroup --group-full --group-members --sam <printername>
 
 Please see the sophomorix-query(8) man pages for full documentation
 ');
@@ -290,7 +314,15 @@ if (defined $options{'student'} or
     defined $options{'schooladministrator'} or 
     defined $options{'globalbinduser'} or 
     defined $options{'schoolbinduser'} or 
-    defined $options{'computer'}){
+    defined $options{'addc'} or
+    defined $options{'classroom-studentcomputer'} or
+    defined $options{'classroom-teachercomputer'} or
+    defined $options{'faculty-teachercomputer'} or
+    defined $options{'mobile'} or
+    defined $options{'printer'} or
+    defined $options{'server'} or
+    defined $options{'staffcomputer'}
+   ){
     ###
     $role_filter=$role_filter."(| ";
     if (defined $options{'student'}){
@@ -321,8 +353,36 @@ if (defined $options{'student'} or
         $role_filter=$role_filter."(sophomorixRole=schoolbinduser)";
         $search_object="user";
     }
-    if (defined $options{'computer'}){
-        $role_filter=$role_filter."(sophomorixRole=computer)";
+    if (defined $options{'addc'}){
+        $role_filter=$role_filter."(sophomorixRole=addc)";
+        $search_object="computer";
+    }
+    if (defined $options{'classroom-studentcomputer'}){
+        $role_filter=$role_filter."(sophomorixRole=classroom-studentcomputer)";
+        $search_object="computer";
+    }
+    if (defined $options{'classroom-teachercomputer'}){
+        $role_filter=$role_filter."(sophomorixRole=classroom-teachercomputer)";
+        $search_object="computer";
+    }
+    if (defined $options{'faculty-teachercomputer'}){
+        $role_filter=$role_filter."(sophomorixRole=faculty-teachercomputer)";
+        $search_object="computer";
+    }
+    if (defined $options{'mobile'}){
+        $role_filter=$role_filter."(sophomorixRole=mobile)";
+        $search_object="computer";
+    }
+    if (defined $options{'printer'}){
+        $role_filter=$role_filter."(sophomorixRole=printer)";
+        $search_object="computer";
+    }
+    if (defined $options{'server'}){
+        $role_filter=$role_filter."(sophomorixRole=server)";
+        $search_object="computer";
+    }
+    if (defined $options{'staffcomputer'}){
+        $role_filter=$role_filter."(sophomorixRole=staffcomputer)";
         $search_object="computer";
     }
     $role_filter=$role_filter." )";
@@ -337,7 +397,9 @@ if (defined $options{'adminclass'} or
     defined $options{'teacherclass'} or 
     defined $options{'project'} or 
     defined $options{'sophomorix-group'} or 
-    defined $options{'room'}){
+    defined $options{'room'} or
+    defined $options{'printergroup'}
+   ){
      ###
     $type_filter=$type_filter."(| ";
     if (defined $options{'adminclass'}){
@@ -362,7 +424,11 @@ if (defined $options{'adminclass'} or
     }
     if (defined $options{'room'}){
         $type_filter=$type_filter."(sophomorixType=room)";
-        $search_object="room";
+        $search_object="group";
+    }
+    if (defined $options{'printergroup'}){
+        $type_filter=$type_filter."(sophomorixType=printer)";
+        $search_object="group";
     }
     $type_filter=$type_filter." )";
 }
@@ -783,7 +849,7 @@ for( my $index = 0 ; $index < $max ; $index++) {
         }
     }
     
-    if (defined $search{'LISTS'}{$top_list_key_members}){
+    if (defined $search{'LISTS'}{$top_list_key_members}{$sam}){
         @{ $search{'LISTS'}{$top_list_key_members}{$sam} } = sort @{ $search{'LISTS'}{$top_list_key_members}{$sam} };
     }
 }
