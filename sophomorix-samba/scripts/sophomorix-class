@@ -189,8 +189,8 @@ Options
   -i --extraclass       (displays extraclass)
   -i --all              (displays adminclass/teacherclass/extraclass)
 
-Changing an admin-/extra-/teacherclass:
-  -c <class>, / --class <class> 
+Changing one/multiple admin-/extra-/teacherclass:
+  -c <class>,<class2>,... / --class <class1>,<class2>,... 
   (can set values also for the group teachers with --class teachers)
     --description \'multiple words possible\'
     --quota <share1>:<quota1 in MiB>:<comment1>,<share2>:<quota2 in MiB>:<comment2>,...
@@ -206,7 +206,7 @@ Changing an admin-/extra-/teacherclass:
     --addadmins user1,user2,user3, ...
     --removeadmins user1,user2,user3, ...
 
-This is for migration/testing/fixing only:
+This is for migration/testing/fixing only (only one class allowed as option):
   --create --skip-school-creation --class <class> --set-gidnumber <num>
   --creationdate <20150529093330.0Z> (only for migration)
   --set-gidnumber <num>
@@ -346,180 +346,250 @@ if (defined $options{'kill'} and defined $options{'class'}){
 
 # get dn if class exists and continue ($info=0)
 ############################################################
-my ($dn_class,
-    $count,
-    $school_AD)=&AD_class_fetch($ldap,
+# list of ALL options
+my @classes_option=split(/,/,$options{'class'});
+my %classes=();
+foreach my $class_option (@classes_option){
+    my ($dn_class,
+        $count,
+        $school_AD)=&AD_class_fetch($ldap,
                                 $root_dse,
-                                $options{'class'},
+                                $class_option,
                                 $options{'school'},
                                 $class_type,
                                 \%sophomorix_config,
                                );
-
-if ($count>1){
-    print "\n$count classes found.\n";
-    print "Specify the school-token to choose a project\n\n";
-    &log_script_exit("Specify the school-token to choose a class",$count,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
-} elsif ($count==0){
-    print "\nERROR retrieving class $options{'class'}: $count class found.\n\n";
-    &log_script_exit("ERROR retrieving class $options{'class'}: $count class found.",$count,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    if ($count==1){
+        $classes{'CLASS_VALID_DATA'}{$class_option}{'DN'}=$dn_class;
+        $classes{'CLASS_VALID_DATA'}{$class_option}{'COUNT'}=$count;
+        $classes{'CLASS_VALID_DATA'}{$class_option}{'SCHOOL'}=$school_AD;
+        # push in the list of valid classes
+        push @{ $classes{'CLASS_VALID_LIST'} }, $class_option;
+    } else {
+        print "Skipping class $class_option ($count matching classes found)\n";
+        push @{ $classes{'CLASS_UNVALID_LIST'} }, $class_option;
+        print "\nERROR retrieving class $options{'class'}: $count class found.\n\n";
+        &log_script_exit("ERROR retrieving class $class_option: $count class found.",$count,1,0,
+                         \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
 }
+
+# my ($dn_class,
+#     $count,
+#     $school_AD)=&AD_class_fetch($ldap,
+#                                 $root_dse,
+#                                 $options{'class'},
+#                                 $options{'school'},
+#                                 $class_type,
+#                                 \%sophomorix_config,
+#                                );
+#my $dn_class;
+#my $count;
+#my $school_AD;
+
+#print "@classes_option\n";
+#print Dumper (\%classes);
+#exit;
+
+# if ($count>1){
+#     print "\n$count classes found.\n";
+#     print "Specify the school-token to choose a project\n\n";
+#     &log_script_exit("Specify the school-token to choose a class",$count,1,0,
+#                      \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+# } elsif ($count==0){
+#     print "\nERROR retrieving class $options{'class'}: $count class found.\n\n";
+#     &log_script_exit("ERROR retrieving class $options{'class'}: $count class found.",$count,1,0,
+#                      \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+# }
 
 ##################################################
 # ??? --sync_all_memberships for classes? ???
 
+# # --description <strg>
+# if (defined $options{'description'}){
+#     &AD_group_update({ldap=>$ldap,
+#                       root_dse=>$root_dse,
+#                       dn=>$dn_class,
+# 		      school=>$school_AD,
+#                       type=>$class_type,
+#                       description=>$options{'description'},
+#                       sophomorix_config=>\%sophomorix_config,
+#                     });
+# }
+
+
 # --description <strg>
 if (defined $options{'description'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      description=>$options{'description'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          description=>$options{'description'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --quota <strg>
 if (defined $options{'quota'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      quota=>$options{'quota'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+	       	          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          quota=>$options{'quota'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --mailquota <strg>
 if (defined $options{'mailquota'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      mailquota=>$options{'mailquota'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          mailquota=>$options{'mailquota'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --mailalias/nomailalias
 if (defined $options{'mailalias'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      mailalias=>$options{'mailalias'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          mailalias=>$options{'mailalias'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --maillist/--nomaillist
 if (defined $options{'maillist'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      maillist=>$options{'maillist'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          maillist=>$options{'maillist'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --status <P>
 if (defined $options{'status'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      status=>$options{'status'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          status=>$options{'status'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --join/--nojoin
 if (defined $options{'join'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      join=>$options{'join'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          join=>$options{'join'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --hide/--nohide
 if (defined $options{'hide'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      hide=>$options{'hide'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          hide=>$options{'hide'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --maxmembers <strg>
 if (defined $options{'maxmembers'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      maxmembers=>$options{'maxmembers'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          maxmembers=>$options{'maxmembers'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --creationdate <strg>
 if (defined $options{'creationdate'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      creationdate=>$options{'creationdate'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          creationdate=>$options{'creationdate'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --set-gidnumber <num>
 if (defined $options{'set-gidnumber'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      gidnumber=>$options{'set-gidnumber'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          gidnumber=>$options{'set-gidnumber'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
@@ -528,49 +598,79 @@ if (defined $options{'set-gidnumber'}){
 # members
 # --members <user1,user2>
 if (defined $options{'members'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      members=>$options{'members'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          members=>$options{'members'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
+# # --addmembers <user1,user2>
+# if (defined $options{'addmembers'}){
+#     my @addmembers=split(/,/,$options{'addmembers'});
+#     my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
+#     my @members = uniq(@old_members,@addmembers); 
+#     my $members=join(",",@members);
+#     &AD_group_update({ldap=>$ldap,
+#                       root_dse=>$root_dse,
+#                       dn=>$dn_class,
+# 		      school=>$school_AD,
+#                       type=>$class_type,
+#                       members=>$members,
+#                       sophomorix_config=>\%sophomorix_config,
+#                     });
+# }
+
+
+ 
 # --addmembers <user1,user2>
 if (defined $options{'addmembers'}){
     my @addmembers=split(/,/,$options{'addmembers'});
-    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
-    my @members = uniq(@old_members,@addmembers); 
-    my $members=join(",",@members);
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      members=>$members,
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        my @old_members = &AD_dn_fetch_multivalue($ldap,
+                                                  $root_dse,
+                                                  $classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                                                  "sophomorixMembers");
+        my @members = uniq(@old_members,@addmembers); 
+        my $members=join(",",@members);
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          members=>$members,
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
  
 # --removemembers <user1,user2>
 if (defined $options{'removemembers'}){
-    my @old_members = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixMembers");
-    my @members = &remove_from_list($options{'removemembers'},@old_members);
-    my $members=join(",",@members);
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      members=>$members,
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        my @old_members = &AD_dn_fetch_multivalue($ldap,
+                                                  $root_dse,
+                                                  $classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                                                  "sophomorixMembers");
+        my @members = &remove_from_list($options{'removemembers'},@old_members);
+        my $members=join(",",@members);
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          members=>$members,
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
@@ -581,14 +681,16 @@ if (defined $options{'removemembers'}){
 
 # --admins <user1,user2>
 if (defined $options{'admins'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      admins=>$options{'admins'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          admins=>$options{'admins'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
@@ -596,32 +698,44 @@ if (defined $options{'admins'}){
 # --addadmins <user1,user2>
 if (defined $options{'addadmins'}){
     my @addadmins=split(/,/,$options{'addadmins'});
-    my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixAdmins");
-    my @admins = uniq(@old_admins,@addadmins); 
-    my $admins=join(",",@admins);
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      admins=>$admins,
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        my @old_admins = &AD_dn_fetch_multivalue($ldap,
+                                                 $root_dse,
+                                                 $classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                                                 "sophomorixAdmins");
+        my @admins = uniq(@old_admins,@addadmins); 
+        my $admins=join(",",@admins);
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          admins=>$admins,
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
+
+
 
 # --removeadmins <user1,user2>
 if (defined $options{'removeadmins'}){
-    my @old_admins = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn_class,"sophomorixAdmins");
-    my @admins = &remove_from_list($options{'removeadmins'},@old_admins);
-    my $admins=join(",",@admins);
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_class,
-		      school=>$school_AD,
-                      type=>$class_type,
-                      admins=>$admins,
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+    foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
+        my @old_admins = &AD_dn_fetch_multivalue($ldap,
+                                                 $root_dse,
+                                                 $classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+                                                 "sophomorixAdmins");
+        my @admins = &remove_from_list($options{'removeadmins'},@old_admins);
+        my $admins=join(",",@admins);
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
+		          school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
+                          type=>$class_type,
+                          admins=>$admins,
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
