@@ -12,6 +12,7 @@ use Config::IniFiles;
 #use Unicode::GCString;
 use Encode qw(decode encode);
 use LaTeX::Encode ':all';
+use File::Temp qw/ tempfile /;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -3958,8 +3959,8 @@ sub ini_list {
 
 sub read_smb_net_conf_list {
     my ($ref_sophomorix_config,$ref_result)=@_;
-    my $tmpfile="/tmp/net_conf_list";
     &print_title("Parsing: net conf list");
+    my ($fh, $tmpfile) = tempfile( DIR => "/tmp" );
     system("net conf list > $tmpfile");
     tie %{ $ref_sophomorix_config->{'samba'}{'net_conf_list'} }, 'Config::IniFiles',
         ( -file => $tmpfile, 
