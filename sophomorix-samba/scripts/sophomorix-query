@@ -457,7 +457,6 @@ if (defined $options{'status'}){
 
 
 
-
 ############################################################
 # user attributes to display
 ############################################################
@@ -913,11 +912,8 @@ if ($#{ $search{'LISTS'}{'COMPUTER'} }>0){
 # show the json object
 #print Dumper(\%search);
 
-
 # print JSON Object
 &json_printout($options{'json'},\%search);
-
-
 
 # disconnect
 &AD_unbind_admin($ldap);
@@ -986,6 +982,9 @@ sub json_printout {
                 printf "  %4s:  %-60s\n",$counter,$group;
             }
             print "$ref_search->{'COUNTERS'}{'GROUP'} GROUPS\n";
+        } else {
+            print $line;
+            print "   * No GROUPS found\n";
         }
         # ROOM
         if ($#{ $ref_search->{'LISTS'}{'ROOM'} }>-1){
@@ -997,6 +996,9 @@ sub json_printout {
                 printf "  %4s:  %-60s\n",$counter,$room;
             }
             print "$ref_search->{'COUNTERS'}{'ROOM'} ROOMS\n";
+        } else {
+            print $line;
+            print "   * No ROOMS found\n";
         }
         # USER
         if ($#{ $ref_search->{'LISTS'}{'USER'} }>-1){
@@ -1008,6 +1010,9 @@ sub json_printout {
                 printf "  %4s:  %-60s\n",$counter,$user;
             }
             print "$ref_search->{'COUNTERS'}{'USER'} USERS\n";
+        } else {
+            print $line;
+            print "   * No USERS found\n";
         }
         # COMPUTER
         if ($#{ $ref_search->{'LISTS'}{'COMPUTER'} }>-1){
@@ -1019,6 +1024,9 @@ sub json_printout {
                 printf "  %4s:  %-60s\n",$counter,$computer;
             }
             print "$ref_search->{'COUNTERS'}{'COMPUTER'} COMPUTERS\n";
+        } else {
+            print $line;
+            print "   * No COMPUTERS found\n";
         }
     } elsif ($json==1){
         # pretty output
