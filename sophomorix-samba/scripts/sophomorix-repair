@@ -152,7 +152,6 @@ What to repair in the Filesystem:
   --project                  (use repdir.project, repairs projects)
   --globaladministrator-home (use repdir.globaladministrator_home, repairs homes of globaladministrators)
   --schooladministrator-home (use repdir.schooladministrator_home, repairs homes of schooladministrators)
-  --teacherclass             (use repdir.teacherclass, repairs teacherclasses)
   --teacher-home             (use repdir.teacher_home, repairs homes of teachers)
   --adminclass               (use repdir.adminclass, repairs adminclasses)
   --extraclass               (use repdir.extraclass, repairs extraclasses)
@@ -183,28 +182,12 @@ Please see the sophomorix-repair(8) man pages for full documentation
 &print_title("Asking the system for users ...");
 
 # fetch system data
-#my ($ref_AD) = &AD_get_AD_for_repair({ldap=>$ldap,
-#                                      root_dse=>$root_dse,
-#                                      root_dns=>$root_dns,
-#                                      computers=>"TRUE",
-#                                      rooms=>"FALSE",
-#                                      management=>"TRUE",
-#                                      adminclasses=>"FALSE",
-#                                      administratorclasses=>"TRUE",
-#                                      teacherclasses=>"FALSE",
-#                                      projects=>"TRUE",
-#                                      users=>"TRUE",
-#                                      dnszones=>"TRUE",
-#                                      dnsnodes=>"TRUE",
-#                                      sophomorix_config=>\%sophomorix_config,
-#                                    });
 my ($ref_AD) = &AD_get_AD_for_repair({ldap=>$ldap,
                                       root_dse=>$root_dse,
                                       root_dns=>$root_dns,
                                       sophomorix_config=>\%sophomorix_config,
                                     });
-#print Dumper ($ref_AD);
-#exit;
+
 
 # --dump-ad
 if ($dump_ad==1){
