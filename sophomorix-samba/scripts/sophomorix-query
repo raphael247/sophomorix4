@@ -71,6 +71,7 @@ my $testopt=GetOptions(\%options,
                         "comp-minimal",
                         "comp-basic",
                         "comp-full",
+                        "status=s"
     );
 
 
@@ -156,6 +157,11 @@ Limit the query for sophomorix groups to a certain sophomorixType:
 --sophomorix-group    (sophomorixType=sophomorix-group)
 --room                (sophomorixType=room)
 --printergroup        (sophomorixType=printer)
+
+Limit the query to one or more sophomorixStatus:
+--status T            (sophomorixStatus=T)
+--status T,D          (| (sophomorixStatus=T)(sophomorixStatus=D) )
+
 Performance improvements:
 
 Limit the searchbase (this is faster):
@@ -218,6 +224,7 @@ my $top_count_key;
 my $attr_filter="";
 my $role_filter="";
 my $type_filter="";
+my $status_filter="";
 
 # the search parameters
 my $filter;
@@ -251,7 +258,7 @@ if (defined $options{'schoolbase'}){
 
 
 ############################################################
-# set the filter: ( & (attr_filter) (role_filter) (type_filter) ) 
+# set the filter: ( & (attr_filter) (role_filter) (type_filter) (status_filter) ) 
 ############################################################
 $filter="(& ";
 
@@ -432,6 +439,22 @@ if (defined $options{'adminclass'} or
     }
     $type_filter=$type_filter." )";
 }
+
+
+########################################
+# set the status filter (combined with |)
+########################################
+if (defined $options{'status'}){
+    $status_filter=$status_filter."(| ";
+    my @stati=split(/,/,$options{'status'});
+    foreach my $stat (@stati){
+        $status_filter=$status_filter."(sophomorixStatus=$stat)";
+    }
+    $status_filter=$status_filter." )";
+} else {
+    $status_filter="";
+} 
+
 
 
 
@@ -634,6 +657,7 @@ $filter="(& ".
         "".$attr_filter."".
         "".$role_filter."".
         "".$type_filter."".
+        "".$status_filter."".
         " )";
 
 
