@@ -234,6 +234,12 @@ my $search_object="all"; # all is the default if nothing is specified
 
 # the search results, displayed as JSON object
 my %search=();
+$search{'COUNTERS'}{'ALL'}=0;
+$search{'COUNTERS'}{'GROUP'}=0;
+$search{'COUNTERS'}{'ROOM'}=0;
+$search{'COUNTERS'}{'USER'}=0;
+$search{'COUNTERS'}{'COMPUTER'}=0;
+
 my $max;
 my $mesg;
 
@@ -880,30 +886,26 @@ for( my $index = 0 ; $index < $max ; $index++) {
 #print Dumper(\%search{'LISTS'});
 
 # sort and count some lists
-if ($#{ $search{'LISTS'}{$top_key} }>0){
+if ($#{ $search{'LISTS'}{$top_key} }>-1){
     @{ $search{'LISTS'}{$top_key} } = sort @{ $search{'LISTS'}{$top_key} };
 }
 
-$search{'COUNTERS'}{'GROUP'}=0;
-if ($#{ $search{'LISTS'}{'GROUP'} }>0){
+if ($#{ $search{'LISTS'}{'GROUP'} }>-1){
     @{ $search{'LISTS'}{'GROUP'} } = sort @{ $search{'LISTS'}{'GROUP'} };
     $search{'COUNTERS'}{'GROUP'}=$#{ $search{'LISTS'}{'GROUP'} }+1;
 }
 
-$search{'COUNTERS'}{'ROOM'}=0;
-if ($#{ $search{'LISTS'}{'ROOM'} }>0){
+if ($#{ $search{'LISTS'}{'ROOM'} }>-1){
     @{ $search{'LISTS'}{'ROOM'} } = sort @{ $search{'LISTS'}{'ROOM'} };
     $search{'COUNTERS'}{'ROOM'}=$#{ $search{'LISTS'}{'ROOM'} }+1;
 }
 
-$search{'COUNTERS'}{'USER'}=0;
-if ($#{ $search{'LISTS'}{'USER'} }>0){
+if ($#{ $search{'LISTS'}{'USER'} }>-1){
     @{ $search{'LISTS'}{'USER'} } = sort @{ $search{'LISTS'}{'USER'} };
     $search{'COUNTERS'}{'USER'}=$#{ $search{'LISTS'}{'USER'} }+1;
 }
 
-$search{'COUNTERS'}{'COMPUTER'}=0;
-if ($#{ $search{'LISTS'}{'COMPUTER'} }>0){
+if ($#{ $search{'LISTS'}{'COMPUTER'} }>-1){
     @{ $search{'LISTS'}{'COMPUTER'} } = sort @{ $search{'LISTS'}{'COMPUTER'} };
     $search{'COUNTERS'}{'COMPUTER'}=$#{ $search{'LISTS'}{'COMPUTER'} }+1;
 }
@@ -926,7 +928,7 @@ sub setup_json_return {
     my ($search_object)=@_;
     if ($search_object eq "user"){
         $top_key="USER";
-        $top_count_key="USERCOUNT";
+        $top_count_key="USER";
         $objectclass_filter="(objectClass=user)";
         $single_attrs=$single_user_attrs;
         $multi_attrs=$multi_user_attrs;
@@ -938,13 +940,13 @@ sub setup_json_return {
         $multi_attrs=$multi_group_attrs;
     } elsif ($search_object eq "room"){
         $top_key="ROOM";
-        $top_count_key="ROOMCOUNT";
+        $top_count_key="ROOM";
         $objectclass_filter="(objectClass=group)";
         $single_attrs=$single_group_attrs;
         $multi_attrs=$multi_group_attrs;
     } elsif ($search_object eq "computer"){
         $top_key="COMPUTER";
-        $top_count_key="COMPUTERCOUNT";
+        $top_count_key="COMPUTER";
         $objectclass_filter="(objectClass=computer)";
         $single_attrs=$single_comp_attrs;
         $multi_attrs=$multi_comp_attrs;
@@ -952,7 +954,7 @@ sub setup_json_return {
         # no objectClass filter
         # this is the default
         $top_key="ALL";
-        $top_count_key="ALLCOUNT";
+        $top_count_key="ALL";
         $objectclass_filter="";
         $single_attrs=[
           'sAMAccountName',
