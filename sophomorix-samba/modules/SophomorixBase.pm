@@ -4852,7 +4852,7 @@ sub log_script_exit {
         if ($return==1){
             # use message given by option 1)
         } else {
-            $message = &Sophomorix::SophomorixAPI::fetch_error_string($return);
+            #$message = &Sophomorix::SophomorixAPI::fetch_error_string($return);
         }
     } 
     foreach my $arg ( @{ $ref_arguments}  ){  
