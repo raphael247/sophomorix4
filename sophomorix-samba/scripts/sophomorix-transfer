@@ -824,6 +824,7 @@ sub list_home_subdir {
  
     my %dirlist=();
     foreach my $user (@users){
+        push @{ $dirlist{'LISTS'}{'sAMAccountName'} },$user;
         my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
                         $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
@@ -853,6 +854,7 @@ sub list_home_subdir {
             print "\nERROR: cannot list home of nonexisting user $user\n\n";
         }
     }
+    @{ $dirlist{'LISTS'}{'sAMAccountName'} } = sort @{ $dirlist{'LISTS'}{'sAMAccountName'} };
     my $jsoninfo="DIRLISTING";
     my $jsoncomment="Listing of subdirs in homes";
     &json_dump({json => $json,

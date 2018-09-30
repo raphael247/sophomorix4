@@ -332,6 +332,8 @@ sub json_dump {
             &_console_print_updatefile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "KILLFILE"){
             &_console_print_killfile($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "DIRLISTING"){
+            &_console_print_dirlisting($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         }
     } elsif ($json==1){
         # pretty output
@@ -2613,6 +2615,65 @@ sub _console_print_mail_full {
 }
 
 
+sub _console_print_dirlisting {
+    my ($ref_dirlist,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    my $line1="#####################################################################\n";
+    my $line2="---------------------------------------------------------------------\n";
+    my $header="    owner gowner size/bytes            mod_time name\n";
+    foreach my $sam (@{ $ref_dirlist->{'LISTS'}{'sAMAccountName'} }){
+        print $line1;
+        print "$sam: $ref_dirlist->{'sAMAccountName'}{$sam}{'SMB_PATH'}\n";
+        my @dirlist=();
+        my @filelist=();
+        my @other=();
+        foreach my $name (keys %{$ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'} }){
+            if ($ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$name}{'TYPE'} eq "directory"){
+                push @dirlist, $name;
+	    } elsif ($ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$name}{'TYPE'} eq "file"){
+                push @filelist, $name;
+            }
+        }
+        @dirlist = sort @dirlist;
+        @filelist = sort @filelist;
+
+        print $line2;
+        print "$ref_dirlist->{'sAMAccountName'}{$sam}{'COUNT'}{'directories'} Directories:\n";
+        print $line2;
+        print $header;
+        foreach my $dir (@dirlist){
+            my $mod=&epoch_to_ymdhms($ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$dir}{'TIME_MOD'});
+            printf " %-1s %6s %6s %10s %19s %-35s\n",
+                "d",
+                $ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$dir}{'OWNER_ID'},
+                $ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$dir}{'GOWNER_ID'},
+                "---",
+                $mod,
+	        $dir;
+        }
+     
+        print $line2;
+        print "$ref_dirlist->{'sAMAccountName'}{$sam}{'COUNT'}{'files'} Files:\n";
+        print $line2;
+        print $header;
+        foreach my $file (@filelist){
+            my $mod=&epoch_to_ymdhms($ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$file}{'TIME_MOD'});
+            printf " %-1s %6s %6s %10s %19s %-35s\n",
+                "-",
+                $ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$file}{'OWNER_ID'},
+                $ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$file}{'GOWNER_ID'},
+                $ref_dirlist->{'sAMAccountName'}{$sam}{'TREE'}{$file}{'SIZE_BYTES'},
+                $mod,
+	        $file;
+#            print "  $file\n";
+        }     
+ 
+
+ 
+    }
+}
+
+
+
 # helper stuff
 ######################################################################
 sub remove_from_list {
@@ -2706,6 +2767,18 @@ sub ymdhms_to_epoch {
     my $epoch=timelocal($second, $minute, $hour, $day , ($month-1), $year);
     #print "epoch of $string is $epoch\n";
     return $epoch;
+}
+
+
+
+sub epoch_to_ymdhms {
+    my ($epoch)=@_;
+    
+    my ($sec,$min,$hour,$day,$month,$year) = (localtime($epoch))[0,1,2,3,4,5];
+    $year=$year+1900;
+    $month=$month+1;
+    my $string=$year."-".$month."-".$day."_".$hour.":".$min.":".$sec;
+    return $string;
 }
 
 
