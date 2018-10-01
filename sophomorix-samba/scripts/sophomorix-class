@@ -87,6 +87,7 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "removemembers";
 # define which options deliver which object
 $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
+$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes";
 # define option that can modify which object
 $options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
                                      "teacherclass,".
@@ -128,6 +129,7 @@ my $testopt=GetOptions(\%options,
                        "members=s",
                        "addmembers=s",
                        "removemembers=s",
+                       "delete-all-empty-classes",
                       );    
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
@@ -214,8 +216,13 @@ This is for migration/testing/fixing only (only one class allowed as option):
   --addmembers user1,user2,user3, ...
   --removemembers user1,user2,user3, ...
 
-Be careful with this command:
-  --kill --class <class>
+
+
+Be careful with this commands:
+  Delete empty classes (no students and no teachers)
+    --delete-all-empty-classes
+  Delete a class
+    --kill --class <class>,<class2>,...
 
 
 Please see the sophomorix-class(8) man pages for full documentation
@@ -286,6 +293,11 @@ if ($options{'info'}==1 and defined $options{'class'}){
 # ===========================================================================
 
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+
+if (defined $options{'delete-all-empty-classes'}){
+    print "HERE\n";
+    exit;
+}
 
 
 ############################################################

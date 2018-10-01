@@ -5733,6 +5733,18 @@ sub check_options{
     $ref_options->{'MODIFIER_OPTIONS'}{'skip-school-creation'}="TRUE";
 
     ############################################################
+    # work on SINGLE
+    #print STDERR Dumper($ref_options->{'CONFIG'});
+    foreach my $sub (keys %{ $ref_options->{'CONFIG'}{'SINGLE'} }){
+        my $option_string=$ref_options->{'CONFIG'}{'SINGLE'}{$sub};
+	my @options=split(/,/,$option_string);
+	foreach my $option (@options){
+            $ref_options->{'CONFIGURED'}{$option}="TRUE";
+            $ref_options->{'ACTIONS'}{$option}="SINGLE";
+        }
+    }
+
+    ############################################################
     # work on MAYBE
     foreach my $object (keys %{ $ref_options->{'CONFIG'}{'MAYBE'} }){
 	my $option_string=$ref_options->{'CONFIG'}{'MAYBE'}{$object};
@@ -5829,7 +5841,21 @@ sub check_options{
 	    print "Option $opt_given is a modifier option\n";
 	} elsif (exists $ref_options->{'ACTIONS'}{$opt_given}){
 	    $action_count++;
-	    print "Option $opt_given is an ACTION  option\n";
+	    print "Option $opt_given is an ACTION  option ($ref_options->{'ACTIONS'}{$opt_given})\n";
+
+            # test if single action is the only action
+            if ($ref_options->{'ACTIONS'}{$opt_given} eq "SINGLE"){
+                foreach my $act (keys %{$ref_options->{'ACTIONS'} }) {
+                    if ($act eq $opt_given){
+                        next;
+                    }
+                    if (exists $ref_options->{$act}){
+                        print "\nERROR: SINGLE ACTION OPTION $opt_given does not allow other ACTION OPTION $act\n\n";
+                        exit;
+                    }
+                }
+            } 
+
 	    # do some dependency tests ???
             foreach my $test (keys %{$ref_options->{'DEPENDENCIES'}{$opt_given} }) {
 	        print "Working on $test\n";
@@ -5905,7 +5931,7 @@ sub check_options{
 	print "* forcing info mode\n";
         $ref_options->{'info'}=1;
     }
-
+print STDERR Dumper ($ref_options);
     print "Option combinations successfully checked\n";
     # delete unneeded stuff
     delete $ref_options->{'DEPENDENCIES'};
@@ -5913,6 +5939,7 @@ sub check_options{
     delete $ref_options->{'CONFIGURED'};
     delete $ref_options->{'CONFIG'};
     delete $ref_options->{'ACTIONS'};
+    delete $ref_options->{'SINGLE'};
     delete $ref_options->{'MODIFIER_OPTIONS'};
     if ($warn_count>0){
         print "options_hash:\n";
