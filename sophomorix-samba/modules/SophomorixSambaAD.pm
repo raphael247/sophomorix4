@@ -827,22 +827,22 @@ sub AD_user_kill {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
-    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
-        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
-        &AD_get_user({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      user=>$user,
-                    });
-    $home_directory_AD=~s/\\/\//g;
-    my $smb_home="smb:".$home_directory_AD;
-
-    &Sophomorix::SophomorixBase::print_title("Killing user $user ($user_count):");
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"user",$user);
-    &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$user);
-
     if ($count > 0){
+        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+            $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+            &AD_get_user({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          user=>$user,
+                        });
+        $home_directory_AD=~s/\\/\//g;
+        my $smb_home="smb:".$home_directory_AD;
+
+        &Sophomorix::SophomorixBase::print_title("Killing user $user ($user_count):");
+        &AD_remove_sam_from_sophomorix_attributes($ldap,$root_dse,"user",$user);
+
         if ($json>=1){
             # prepare json object
             my %json_progress=();
