@@ -209,7 +209,7 @@ if ($options{'info'}==1 and defined $options{'group'}){
 
 ############################################################
 # nonexisting group action:
-# --create --group <name>
+# --create --group <group1>,<group2>,...
 ############################################################
 if (defined $options{'create'} and defined $options{'group'}){
     my @groups_option=split(/,/,$options{'group'});
@@ -254,34 +254,34 @@ if (defined $options{'create'} and defined $options{'group'}){
 # existing group actions
 # get dn if group exists and continue
 ############################################################
-
 my @groups_option=split(/,/,$options{'group'});
 my %groups=();
 foreach my $group_option (@groups_option){
+    my $group_token=&AD_get_name_tokened($group_option,$options{'school'},"sophomorix-group");
     my ($dn_group,
         $count,
         $school_AD)=&AD_group_fetch($ldap,
                                 $root_dse,
-                                $group_option,
+                                $group_token,
                                );
     if ($count==1){
-        $groups{'GROUP_VALID_DATA'}{$group_option}{'DN'}=$dn_group;
-        $groups{'GROUP_VALID_DATA'}{$group_option}{'COUNT'}=$count;
-        $groups{'GROUP_VALID_DATA'}{$group_option}{'SCHOOL'}=$school_AD;
+        $groups{'GROUP_VALID_DATA'}{$group_token}{'DN'}=$dn_group;
+        $groups{'GROUP_VALID_DATA'}{$group_token}{'COUNT'}=$count;
+        $groups{'GROUP_VALID_DATA'}{$group_token}{'SCHOOL'}=$school_AD;
         # push in the list of valid groups
-        push @{ $groups{'GROUP_VALID_LIST'} }, $group_option;
+        push @{ $groups{'GROUP_VALID_LIST'} }, $group_token;
     } else {
-        print "Skipping group $group_option ($count matching groups found)\n";
-        push @{ $groups{'GROUP_UNVALID_LIST'} }, $group_option;
+        print "Skipping group $group_token ($count matching groups found)\n";
+        push @{ $groups{'GROUP_UNVALID_LIST'} }, $group_token;
         print "\nERROR retrieving group $options{'group'}: $count group found.\n\n";
-        &log_script_exit("ERROR retrieving group $group_option: $count group found.",$count,1,0,
+        &log_script_exit("ERROR retrieving group $group_token: $count group found.",$count,1,0,
                          \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
     }
 }
 
 
 
-# --description <strg>
+# --description <strg> --group <group1>,<group2>,...
 if (defined $options{'description'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_update({ldap=>$ldap,
@@ -297,7 +297,7 @@ if (defined $options{'description'}){
 
 
 
-# --addquota <strg>
+# --addquota <strg> --group <group1>,<group2>,...
 if (defined $options{'addquota'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_update({ldap=>$ldap,
@@ -313,7 +313,7 @@ if (defined $options{'addquota'}){
 
 
 
-# --addmailquota <strg>
+# --addmailquota <strg> --group <group1>,<group2>,...
 if (defined $options{'addmailquota'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_update({ldap=>$ldap,
@@ -329,7 +329,7 @@ if (defined $options{'addmailquota'}){
 
 
 
-# --mailalias/nomailalias
+# --mailalias/nomailalias --group <group1>,<group2>,...
 if (defined $options{'mailalias'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_update({ldap=>$ldap,
@@ -345,7 +345,7 @@ if (defined $options{'mailalias'}){
 
 
 
-# --maillist/--nomaillist
+# --maillist/--nomaillist --group <group1>,<group2>,...
 if (defined $options{'maillist'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_update({ldap=>$ldap,
@@ -361,7 +361,7 @@ if (defined $options{'maillist'}){
 
 
 
-# --removemembers member
+# --removemembers member --group <group1>,<group2>,...
 if (defined $options{'removemembers'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_removemember({ldap => $ldap, 
@@ -374,7 +374,7 @@ if (defined $options{'removemembers'}){
 
 
 
-# --addmembers member
+# --addmembers member --group <group1>,<group2>,...
 if (defined $options{'addmembers'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_addmember({ldap => $ldap, 
@@ -387,7 +387,7 @@ if (defined $options{'addmembers'}){
 
 
 
-# --removemembergroups group
+# --removemembergroups group --group <group1>,<group2>,...
 if (defined $options{'removemembergroups'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_removemember({ldap => $ldap, 
@@ -400,7 +400,7 @@ if (defined $options{'removemembergroups'}){
 
 
 
-# --addmembergroups group
+# --addmembergroups group --group <group1>,<group2>,...
 if (defined $options{'addmembergroups'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
         &AD_group_addmember({ldap => $ldap, 
@@ -413,14 +413,13 @@ if (defined $options{'addmembergroups'}){
 
 
 
-# --kill --group <name>
+# --kill --group --group <group1>,<group2>,...
 if (defined $options{'kill'} and defined $options{'group'}){
     foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
-        my $group_token=&AD_get_name_tokened($group_valid,$options{'school'},"sophomorix-group");
         &AD_group_kill({ldap=>$ldap,
                         root_dse=>$root_dse,
                         root_dns=>$root_dns,
-                        group=>$group_token,
+                        group=>$group_valid,
                         smb_admin_pass=>$smb_admin_pass,
                         type=>"sophomorix-group",
                         sophomorix_config=>\%sophomorix_config,
