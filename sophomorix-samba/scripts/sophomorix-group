@@ -121,29 +121,29 @@ Options:
   -vv / --verbose --verbose
   -i  / --info
 
-  --create --group <name>
-  --create --group <name>  --school <school>
+  --create --group <name1>,<name2>, ...
+  --create --group <name1>,<name2>, ...  --school <school>
 
-  --kill --group --group <name>
+  --kill --group --group <name1>,<name2>, ...
 
-  --addmembers <user> --group <name>
-  --removemembers <user> --group <name>
+  --addmembers <user> --group <name1>,<name2>, ...
+  --removemembers <user> --group <name1>,<name2>, ...
 
-  --addmembergroups group --group <name>
-  --removemembergroups group --group <name>
+  --addmembergroups group --group <name1>,<name2>, ...
+  --removemembergroups group --group <name1>,<name2>, ...
 
-  --description \'multiple words possible\' --group <name>
+  --description \'multiple words possible\' --group <name1>,<name2>, ...
 
-  --addquota <share1>:<quota1 in MiB>:<comment1>,<share2>:<quota2 in MiB>:<comment2>,... --group <name>
-  --addmailquota <mailquota in MiB>:<Comment> --group <name>
+  --addquota <share1>:<quota1 in MiB>:<comment1>,<share2>:<quota2 in MiB>:<comment2>,... --group <name1>,<name2>, ...
+  --addmailquota <mailquota in MiB>:<Comment> --group <name1>,<name2>, ...
 
-  --mailalias --group <name>, --nomailalias --group <name>
-  --maillist --group <name>, --nomaillist --group <name>
+  --mailalias --group <name>, --nomailalias --group <name1>,<name2>, ...
+  --maillist --group <name>, --nomaillist --group <name1>,<name2>, ...
 
 Examples:
   Add/remove a user to/from a group:
-  sophomorix-group --addmembers <user> --group <internet|wifi|*-internet|*-wifi>
-  sophomorix-group --removemembers <user> --group <internet|wifi|*-internet|*-wifi>
+  sophomorix-group --addmembers <user> --group <name1>,<name2>, ...
+  sophomorix-group --removemembers <user> --group <name1>,<name2>, ...
 
 Please see the sophomorix-group(8) man pages for full documentation
 ');
@@ -207,169 +207,225 @@ if ($options{'info'}==1 and defined $options{'group'}){
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 
-
-
+############################################################
+# nonexisting group action:
 # --create --group <name>
 ############################################################
 if (defined $options{'create'} and defined $options{'group'}){
-    # avoid names beginning with p_
-    if ($options{'group'}=~ m/^p\_/){
-        print "\n";
-        print "ERROR: Not creating group $options{'group'}\n";
-        print "       group names beginning with p_ are reserved for projects\n";
-        print "\n";
-        exit 88;
+    my @groups_option=split(/,/,$options{'group'});
+    foreach my $group_option (@groups_option){
+        # avoid names beginning with p_
+        if ($group_option=~ m/^p\_/){
+            print "\n";
+            print "ERROR: Not creating group $group_option\n";
+            print "       group names beginning with p_ are reserved for projects\n";
+            print "\n";
+            exit 88;
+        }
+        &AD_school_create({ldap=>$ldap,
+                           root_dse=>$root_dse,
+                           root_dns=>$root_dns,
+                           school=>$options{'school'},
+                           smb_admin_pass=>$smb_admin_pass,
+                           sophomorix_config=>\%sophomorix_config,
+                           sophomorix_result=>\%sophomorix_result,
+                         }); 
+        my $group_token=&AD_get_name_tokened($group_option,$options{'school'},"sophomorix-group");
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse, 
+                          root_dns=>$root_dns,
+                          school=>$options{'school'},
+                          group=>$group_token,
+                          group_basename=>$group_option,
+                          description=>"Created by sophomorix-group",
+                          type=>"sophomorix-group",
+                          status=>"P",
+		          sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>\%sophomorix_config,
+                          sophomorix_result=>\%sophomorix_result,
+                        });
     }
-    &AD_school_create({ldap=>$ldap,
-                       root_dse=>$root_dse,
-                       root_dns=>$root_dns,
-                       school=>$options{'school'},
-                       smb_admin_pass=>$smb_admin_pass,
-                       sophomorix_config=>\%sophomorix_config,
-                       sophomorix_result=>\%sophomorix_result,
-                     }); 
-    my $group_token=&AD_get_name_tokened($options{'group'},$options{'school'},"sophomorix-group");
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse, 
-                      root_dns=>$root_dns,
-                      school=>$options{'school'},
-                      group=>$group_token,
-                      group_basename=>$options{'group'},
-                      description=>"Created by sophomorix-group",
-                      type=>"sophomorix-group",
-                      status=>"P",
-		      sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
-                      smb_admin_pass=>$smb_admin_pass,
-                      sophomorix_config=>\%sophomorix_config,
-                      sophomorix_result=>\%sophomorix_result,
-                    });
 }
 
 
-# --kill --group <name>
+
 ############################################################
-if (defined $options{'kill'} and defined $options{'group'}){
-  my $group_token=&AD_get_name_tokened($options{'group'},$options{'school'},"sophomorix-group");
-  &AD_group_kill({ldap=>$ldap,
-                  root_dse=>$root_dse,
-                  root_dns=>$root_dns,
-                  group=>$group_token,
-                  smb_admin_pass=>$smb_admin_pass,
-                  type=>"sophomorix-group",
-                  sophomorix_config=>\%sophomorix_config,
-                  });
+# existing group actions
+# get dn if group exists and continue
+############################################################
+
+my @groups_option=split(/,/,$options{'group'});
+my %groups=();
+foreach my $group_option (@groups_option){
+    my ($dn_group,
+        $count,
+        $school_AD)=&AD_group_fetch($ldap,
+                                $root_dse,
+                                $group_option,
+                               );
+    if ($count==1){
+        $groups{'GROUP_VALID_DATA'}{$group_option}{'DN'}=$dn_group;
+        $groups{'GROUP_VALID_DATA'}{$group_option}{'COUNT'}=$count;
+        $groups{'GROUP_VALID_DATA'}{$group_option}{'SCHOOL'}=$school_AD;
+        # push in the list of valid groups
+        push @{ $groups{'GROUP_VALID_LIST'} }, $group_option;
+    } else {
+        print "Skipping group $group_option ($count matching groups found)\n";
+        push @{ $groups{'GROUP_UNVALID_LIST'} }, $group_option;
+        print "\nERROR retrieving group $options{'group'}: $count group found.\n\n";
+        &log_script_exit("ERROR retrieving group $group_option: $count group found.",$count,1,0,
+                         \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
+}
+
+
+
+# --description <strg>
+if (defined $options{'description'}){
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'DN'},
+		          school=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'SCHOOL'},
+                          type=>"sophomotix-group",
+                          description=>$options{'description'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
+}
+
+
+
+# --addquota <strg>
+if (defined $options{'addquota'}){
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'DN'},
+		          school=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'SCHOOL'},
+                          type=>"sophomotix-group",
+                          addquota=>$options{'addquota'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
+}
+
+
+
+# --addmailquota <strg>
+if (defined $options{'addmailquota'}){
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'DN'},
+		          school=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'SCHOOL'},
+                          type=>"sophomotix-group",
+                          addmailquota=>$options{'addmailquota'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
+}
+
+
+
+# --mailalias/nomailalias
+if (defined $options{'mailalias'}){
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'DN'},
+                          school=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'SCHOOL'},
+                          type=>"sophomotix-group",
+                          mailalias=>$options{'mailalias'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
+}
+
+
+
+# --maillist/--nomaillist
+if (defined $options{'maillist'}){
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_update({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          dn=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'DN'},
+		          school=>$groups{'GROUP_VALID_DATA'}{$group_valid}{'SCHOOL'},
+                          type=>"sophomotix-group",
+                          maillist=>$options{'maillist'},
+                          sophomorix_config=>\%sophomorix_config,
+                        });
+    }
 }
 
 
 
 # --removemembers member
 if (defined $options{'removemembers'}){
-    &AD_group_removemember({ldap => $ldap, 
-                            root_dse => $root_dse, 
-                            group => $options{'group'},
-                            removemember => $options{'removemembers'},
-                          });   
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_removemember({ldap => $ldap, 
+                                root_dse => $root_dse, 
+                                group => $group_valid,
+                                removemember => $options{'removemembers'},
+                              });   
+    }
 }
+
 
 
 # --addmembers member
 if (defined $options{'addmembers'}){
-    &AD_group_addmember({ldap => $ldap, 
-                         root_dse => $root_dse, 
-                         group => $options{'group'},
-                         addmember => $options{'addmembers'},
-                       });   
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_addmember({ldap => $ldap, 
+                             root_dse => $root_dse, 
+                             group => $group_valid,
+                             addmember => $options{'addmembers'},
+                           });   
+    }
 }
+
+
 
 # --removemembergroups group
 if (defined $options{'removemembergroups'}){
-    &AD_group_removemember({ldap => $ldap, 
-                            root_dse => $root_dse, 
-                            group => $options{'group'},
-                            removegroup => $options{'removemembergroups'},
-                          });   
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_removemember({ldap => $ldap, 
+                                root_dse => $root_dse, 
+                                group => $group_valid,
+                                removegroup => $options{'removemembergroups'},
+                              });   
+    }
 }
+
 
 
 # --addmembergroups group
 if (defined $options{'addmembergroups'}){
-    &AD_group_addmember({ldap => $ldap, 
-                         root_dse => $root_dse, 
-                         group => $options{'group'},
-                         addgroup => $options{'addmembergroups'},
-                       });   
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        &AD_group_addmember({ldap => $ldap, 
+                             root_dse => $root_dse, 
+                             group => $group_valid,
+                             addgroup => $options{'addmembergroups'},
+                           });   
+    }
 }
 
 
 
-
-
-# get dn if project exists and continue
-############################################################
-my ($dn_group,$count,$school_AD)=&AD_group_fetch($ldap,$root_dse,$options{'group'});
-
-# --description <strg>
-if (defined $options{'description'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_group,
-		      school=>$school_AD,
-                      type=>"sophomotix-group",
-                      description=>$options{'description'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
-}
-
-
-# --addquota <strg>
-if (defined $options{'addquota'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_group,
-		      school=>$school_AD,
-                      type=>"sophomotix-group",
-                      addquota=>$options{'addquota'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
-}
-
-
-# --addmailquota <strg>
-if (defined $options{'addmailquota'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_group,
-		      school=>$school_AD,
-                      type=>"sophomotix-group",
-                      addmailquota=>$options{'addmailquota'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
-}
-
-
-# --mailalias/nomailalias
-if (defined $options{'mailalias'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_group,
-		      school=>$school_AD,
-                      type=>"sophomotix-group",
-                      mailalias=>$options{'mailalias'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
-}
-
-
-# --maillist/--nomaillist
-if (defined $options{'maillist'}){
-    &AD_group_update({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      dn=>$dn_group,
-		      school=>$school_AD,
-                      type=>"sophomotix-group",
-                      maillist=>$options{'maillist'},
-                      sophomorix_config=>\%sophomorix_config,
-                    });
+# --kill --group <name>
+if (defined $options{'kill'} and defined $options{'group'}){
+    foreach my $group_valid (@{ $groups{'GROUP_VALID_LIST'} }){
+        my $group_token=&AD_get_name_tokened($group_valid,$options{'school'},"sophomorix-group");
+        &AD_group_kill({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        root_dns=>$root_dns,
+                        group=>$group_token,
+                        smb_admin_pass=>$smb_admin_pass,
+                        type=>"sophomorix-group",
+                        sophomorix_config=>\%sophomorix_config,
+                      });
+    }
 }
 
 
