@@ -2300,6 +2300,52 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                 );
+
+
+# # prepared for check, but not working on test
+#     # /srv/samba/schools/abc
+#     &NTACL_test ("abc",
+#                  "/",
+#                  $root_dns,
+#                  $smb_admin_pass,
+#                  \%fs_test_result,
+#                  "REVISION:1",
+#                  "CONTROL:SR|DP",
+#                  'OWNER:LINUXMUSTER\Administrator', 
+#                  'GROUP:S-1-22-2-0',
+#                  'ACL:LINUXMUSTER\abc:ALLOWED/0x0/READ',
+#                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|IO/FULL',
+#                 );
+#     # /srv/samba/schools/lin
+#     &NTACL_test ("lin",
+#                  "/",
+#                  $root_dns,
+#                  $smb_admin_pass,
+#                  \%fs_test_result,
+#                  "REVISION:1",
+#                  "CONTROL:SR|DP",
+#                  'OWNER:LINUXMUSTER\Administrator', 
+#                  'GROUP:S-1-22-2-0',
+#                  'ACL:LINUXMUSTER\lin:ALLOWED/0x0/READ',
+#                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|IO/FULL',
+#                 );
+#     # /srv/samba/schools/ghs
+#     &NTACL_test ("ghs",
+#                  "/",
+#                  $root_dns,
+#                  $smb_admin_pass,
+#                  \%fs_test_result,
+#                  "REVISION:1",
+#                  "CONTROL:SR|DP",
+#                  'OWNER:LINUXMUSTER\Administrator', 
+#                  'GROUP:S-1-22-2-0',
+#                  'ACL:LINUXMUSTER\ghs:ALLOWED/0x0/READ',
+#                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|IO/FULL',
+#                 );
+#
+#
+
+
     # # /srv/samba/schools/bsz/students
     # &ACL_test ("/srv/samba/schools/bsz/students",
     #            "d",
