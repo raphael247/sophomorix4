@@ -37,9 +37,11 @@ Tut nicht auf testsystem
   3: No NTACL-test: /srv/samba/schools/lin
   4: No NTACL-test: /srv/samba/schools/ghs
 NTACL ändert sich, wenn user angelegt werden in Schule
+Maybe add school creation to supertest, an check the school???
 
 
-
+SCHRITT 1:
+bsz:
   5: No NTACL-test: /srv/samba/schools/bsz/share
   9: No NTACL-test: /srv/samba/schools/bsz/share/classes
   10: No NTACL-test: /srv/samba/schools/bsz/share/management
@@ -47,14 +49,7 @@ NTACL ändert sich, wenn user angelegt werden in Schule
   6: No NTACL-test: /srv/samba/schools/bsz/iso
   7: No NTACL-test: /srv/samba/schools/bsz/program
   8: No NTACL-test: /srv/samba/schools/bsz/examusers
-
-  12: No NTACL-test: /srv/samba/schools/bsz/teachers/oe42/transfer
-  13: No NTACL-test: /srv/samba/schools/bsz/teachers/wu42/transfer
-  14: No NTACL-test: /srv/samba/schools/bsz/students/m7ab/maiersa42/transfer
-  15: No NTACL-test: /srv/samba/schools/bsz/students/m7ab/muellegr42/transfer
-  16: No NTACL-test: /srv/samba/schools/bsz/students/m8cd/jonsonad42/transfer
-  17: No NTACL-test: /srv/samba/schools/bsz/students/m8cd/samardze42/transfer
-
+uni:
   18: No NTACL-test: /srv/samba/schools/uni/share
   24: No NTACL-test: /srv/samba/schools/uni/share/classes
   25: No NTACL-test: /srv/samba/schools/uni/share/management
@@ -62,20 +57,35 @@ NTACL ändert sich, wenn user angelegt werden in Schule
   19: No NTACL-test: /srv/samba/schools/uni/iso
   20: No NTACL-test: /srv/samba/schools/uni/program
   21: No NTACL-test: /srv/samba/schools/uni/examusers
-
-  22: No NTACL-test: /srv/samba/schools/uni/students/12abc/lordjo42/transfer
-  23: No NTACL-test: /srv/samba/schools/uni/students/12abc/blackmri42/transfer
-  27: No NTACL-test: /srv/samba/schools/uni/teachers/kep42/transfer
-  28: No NTACL-test: /srv/samba/schools/uni/teachers/gal42/transfer
-
+default-school:
   29: No NTACL-test: /srv/samba/schools/default-school/share
-  30: No NTACL-test: /srv/samba/schools/default-school/iso
-  31: No NTACL-test: /srv/samba/schools/default-school/program
-  32: No NTACL-test: /srv/samba/schools/default-school/examusers
   44: No NTACL-test: /srv/samba/schools/default-school/share/classes
   45: No NTACL-test: /srv/samba/schools/default-school/share/management
   46: No NTACL-test: /srv/samba/schools/default-school/share/school
+  30: No NTACL-test: /srv/samba/schools/default-school/iso
+  31: No NTACL-test: /srv/samba/schools/default-school/program
+  32: No NTACL-test: /srv/samba/schools/default-school/examusers
 
+
+
+SCHRITT 2:
+  12: No NTACL-test: /srv/samba/schools/bsz/teachers/oe42/transfer
+  13: No NTACL-test: /srv/samba/schools/bsz/teachers/wu42/transfer
+
+  27: No NTACL-test: /srv/samba/schools/uni/teachers/kep42/transfer
+  28: No NTACL-test: /srv/samba/schools/uni/teachers/gal42/transfer
+
+  47: No NTACL-test: /srv/samba/schools/default-school/teachers/sch42/transfer
+
+
+SCHRITT 3:
+  14: No NTACL-test: /srv/samba/schools/bsz/students/m7ab/maiersa42/transfer
+  15: No NTACL-test: /srv/samba/schools/bsz/students/m7ab/muellegr42/transfer
+  16: No NTACL-test: /srv/samba/schools/bsz/students/m8cd/jonsonad42/transfer
+  17: No NTACL-test: /srv/samba/schools/bsz/students/m8cd/samardze42/transfer
+
+  22: No NTACL-test: /srv/samba/schools/uni/students/12abc/lordjo42/transfer
+  23: No NTACL-test: /srv/samba/schools/uni/students/12abc/blackmri42/transfer
 
   33: No NTACL-test: /srv/samba/schools/default-school/students/s6ade/schneima42/transfer
   34: No NTACL-test: /srv/samba/schools/default-school/students/s6ade/fisch42/transfer
@@ -88,7 +98,6 @@ NTACL ändert sich, wenn user angelegt werden in Schule
   41: No NTACL-test: /srv/samba/schools/default-school/students/s6ade/frosch42/transfer
   42: No NTACL-test: /srv/samba/schools/default-school/students/s6ade/hamster42/transfer
   43: No NTACL-test: /srv/samba/schools/default-school/students/s6ade/schwein42/transfer
-  47: No NTACL-test: /srv/samba/schools/default-school/teachers/sch42/transfer
 
 
  
