@@ -684,7 +684,7 @@ sub _console_print_groups_overview {
         }
         print $line;
         my $max_count=$#{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'sophomorix-group'} }+1;
-        printf "| %-78s|\n", $max_count." projects in ".$school;
+        printf "| %-78s|\n", $max_count." sophomorix-groups in ".$school;
         print $line2;
         print "AQ=AddQuota  AMQ=AddMailQuota A=MailAlias   L=MaiList\n";
         print " m=member-entries             t=teachers    s=students\n";
