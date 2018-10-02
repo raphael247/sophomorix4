@@ -5671,9 +5671,7 @@ sub check_options{
 
 
     print "Command line::\n";
-    print Dumper ($ref_options);
-
-    
+    #print Dumper ($ref_options);
 
     if (not defined $Conf::log_level){
 	$Conf::log_level=1;
@@ -5931,7 +5929,7 @@ sub check_options{
 	print "* forcing info mode\n";
         $ref_options->{'info'}=1;
     }
-print STDERR Dumper ($ref_options);
+
     print "Option combinations successfully checked\n";
     # delete unneeded stuff
     delete $ref_options->{'DEPENDENCIES'};
