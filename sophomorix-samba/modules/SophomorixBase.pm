@@ -432,25 +432,37 @@ sub _console_print_devices {
         @school_list=($school_opt);
     }
 
-    my $line0="+---------------------------------------------------------------------------------+\n";
-    my $line ="+----------------+----------------+------------+----------------------------------+\n";
-    my $line2="+--------------------------+------------------------------------------------------+\n";
+    my $line=     "+---------------------------------------------------------------------------------+\n";
+    my $line_dev ="+----------------+----------------+-------------+---------------------------------+\n";
+    my $head_dev ="| dnsNode          IPv4             Room          sophomorixComment               |\n";
+    my $line_room="+---------------------+-------+---------------------------------------------------+\n";
+    my $head_room="| Room                  Comp.   description                                       |\n";
+    my $line_hwk= "+------------------------+-------+------------------------------------------------+\n";
+    my $head_hwk= "| Hardwarclass             Comp.   description                                    |\n";
     foreach my $school (@school_list){
         # rooms
         my $school_rooms_count=$#{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }+1;
         print "\n";
-        print $line0;
+        print $line;
 	printf "| %-80s|\n",$school_rooms_count." Rooms in school $school:";
-        print $line0;
+        print $head_room;
+        print $line_room;
         foreach my $room (@{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }){
-            printf "| %-80s|\n",$room;
+            printf "| %-20s| %5s | %-50s|\n",
+                $room, 
+                $#{ $ref_devices->{'room'}{$room}{'sophomorixRoomComputers'} }+1,
+                $ref_devices->{'room'}{$room}{'description'};
         }
-
+        print $line_room;
+        print $head_room;
+	printf "| %-80s|\n"," ... ".$school_rooms_count." Rooms in school $school";
+        print $line;
+        print "\n";
 
         # devices
         my $school_devices_count=$#{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{'dnsNodes'} }+1;
         #print "\n";
-        print $line0;
+        print $line;
 	printf "| %-80s|\n",$school_devices_count." Devices in school $school:";
         foreach my $role (@{ $ref_sophomorix_config->{'LISTS'}{'ROLE_DEVICE'} }){
             my $role_alt=$ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$role};
@@ -476,11 +488,10 @@ sub _console_print_devices {
                 next;
             }
             # one device per line
-            print $line0;
-            printf "| %-80s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
-            #print "| dnsNode       | IPv4          | Room      | sophomorixComment               |\n";
-            print "| dnsNode          IPv4             Room         sophomorixComment                |\n";
             print $line;
+            printf "| %-80s|\n",$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string."):";
+            print $head_dev;
+            print $line_dev;
             foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
                 my $computer;
                 my $hwc;
@@ -515,12 +526,15 @@ sub _console_print_devices {
                 }
                 my $role_display=$comment.$role_short;
 
-                printf "| %-15s| %-15s| %-11s| %-33s|\n",
+                printf "| %-15s| %-15s| %-12s| %-32s|\n",
                        $dns_node,
                        $ref_devices->{'dnsNode'}{$ref_sophomorix_config->{'INI'}{'DNS'}{'DNSNODE_KEY'}}{$dns_node}{'IPv4'},
                        $adminclass,
                        $comment;
             }
+            print $line_dev;
+            print $head_dev;
+            printf "| %-80s|\n"," ... ".$number_of_devices." ".$role." (".$role_alt.", ".$device_string.$host_group_string.")";
             print $line;
             #print "    /-/#: sophomorixComment nonexisting/---/existing\n";
 
@@ -548,19 +562,28 @@ sub _console_print_devices {
             # }
         }
         if ($school_devices_count==0){
-	    print $line0;
+	    print $line;
         }
     }
 
     # global part
+    my $hwk_global_count=$#{ $ref_devices->{'LIST_HARDWARECLASSES'} }+1;
     print "\n";
-    print $line2;
-    print     "| Hardwareclasses (global) |                                                      |\n";
-    print $line2;
-        foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-            printf "| %-25s| %-53s|\n",$hwk,"";
+    print $line;
+    printf "| %-80s|\n","".$hwk_global_count." Hardwareclasses (global):";
+    print $head_hwk;
+    print $line_hwk;
+#        foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
+        foreach my $hwk (@{ $ref_devices->{'LIST_HARDWARECLASSES'} }) {
+            printf "| %-23s| %5s | %-46s |\n",
+                $hwk,
+                $#{ $ref_devices->{'hardwareclass'}{$hwk}{'member'} }+1,
+                $ref_devices->{'hardwareclass'}{$hwk}{'description'};
         }
-    print $line2;
+    print $line_hwk;
+    print $head_hwk;
+    printf "| %-80s|\n"," ... ".$hwk_global_count." Hardwareclasses (global)";
+    print $line;
 }
 
 

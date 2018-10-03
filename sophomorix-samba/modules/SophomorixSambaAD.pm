@@ -4401,6 +4401,7 @@ sub AD_get_AD_for_device {
                                  'sophomorixStatus',
                                  'sophomorixSchoolname',
                                  'sophomorixType',
+                                 'description',
                                  'member',
                                  'sophomorixRoomIPs',
                                  'sophomorixRoomMACs',
@@ -4419,10 +4420,12 @@ sub AD_get_AD_for_device {
             my $type=$entry->get_value('sophomorixType');
             my $stat=$entry->get_value('sophomorixStatus');
             my $schoolname=$entry->get_value('sophomorixSchoolname');
+            my $description=$entry->get_value('description');
 
             $AD{$type}{$sam}{'room'}=$sam;
             $AD{$type}{$sam}{'sophomorixStatus'}=$stat;
             $AD{$type}{$sam}{'sophomorixType'}=$type;
+            $AD{$type}{$sam}{'description'}=$description;
             # increase role counter 
             $AD{'RESULT'}{'group'}{$type}{'COUNT'}++;
 
@@ -4452,7 +4455,9 @@ sub AD_get_AD_for_device {
             # lists
             if ($type eq "room"){
                 push @{ $AD{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$schoolname}{'rooms'} }, $sam;
-            } 
+            } elsif ($type eq "hardwareclass"){
+                push @{ $AD{'LIST_HARDWARECLASSES'} }, $sam;
+            }
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
             #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
         }
@@ -4592,6 +4597,9 @@ sub AD_get_AD_for_device {
             }
         }
     }
+
+    # sort LIST_HARDWARECLASSES
+    @{ $AD{'LIST_HARDWARECLASSES'} } = sort @{ $AD{'LIST_HARDWARECLASSES'} };
 
     # sort some lists under 'room'
     foreach my $room (keys %{$AD{'room'}}) {
