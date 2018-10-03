@@ -1126,7 +1126,6 @@ sub AD_group_kill {
                 my $smbclient_command_rmdir_homes=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' "
                     .$unc." -c 'rmdir $smb_rel_path_homes;'";
-                print "HERE: $smbclient_command_rmdir_homes\n";
                 my $smbclient_return_rmdir_homes=&Sophomorix::SophomorixBase::smb_command($smbclient_command_rmdir_homes,
                                                                                            $smb_admin_pass);
                 my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
