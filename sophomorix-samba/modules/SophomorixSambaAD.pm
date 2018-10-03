@@ -4598,8 +4598,9 @@ sub AD_get_AD_for_device {
     }
 
     # sort LIST_HARDWARECLASSES
-    @{ $AD{'LIST_HARDWARECLASSES'} } = sort @{ $AD{'LIST_HARDWARECLASSES'} };
-
+    if($#{ $AD{'LIST_HARDWARECLASSES'} }>0){
+        @{ $AD{'LIST_HARDWARECLASSES'} } = sort @{ $AD{'LIST_HARDWARECLASSES'} };
+    }
     # sort some lists under 'room'
     foreach my $room (keys %{$AD{'room'}}) {
         if($#{ $AD{'room'}{$room}{'sophomorixRoomComputers'} }>0){

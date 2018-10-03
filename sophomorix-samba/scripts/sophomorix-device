@@ -211,6 +211,22 @@ my @filelist=&filelist_fetch({filetype=>"devices",
 # set linuxmuster.local as a dnsZone needed in files
 $devices_file{'dnsZone'}{$root_dns}="seen";
 
+if ($info==0 and 
+    $list_files==0 and 
+    $dry_run==0 and 
+    $no_sync==0 and 
+    $sync==0 and 
+    $add_example_line eq "" and
+    $dump_files==0 and 
+    $dump_ad==0 and
+    $print==0 and
+    $dns_test==0 and
+    $dns_kill==0 and
+    $dns_show==0
+    ){
+    $help=1;
+}
+
 ############################################################################
 # --help
 ############################################################################
@@ -583,7 +599,9 @@ foreach my $device_file (@filelist){
 ############################################################################
 # Stop if there were errors in the file
 ############################################################################
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 if ($error_in_files > 0){
+    # syntax errors -> terminate  
     print "\n";
     print "There were errors in the files.\n";
     print "Please fix them first\n";
@@ -601,10 +619,9 @@ if ($error_in_files > 0){
     &log_script_exit("ERROR parsing device files: $error_in_files errors.",1,1,0,
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } else {
-    # no syntax errors
+    # no syntax errors -> log and go on
     &result_sophomorix_add_log(\%sophomorix_result,"All *.devices.csv files without syntax error");
     if ($dry_run==1){
-        &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
 }
@@ -1126,7 +1143,7 @@ if($no_sync==1){
     }
 
     print "\n--no-sync  finished. Nothing changed!\n";
-    exit;
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
@@ -1135,7 +1152,6 @@ if($no_sync==1){
 ############################################################
 # Synchronizing 
 ############################################################
-&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
