@@ -4598,7 +4598,7 @@ sub AD_get_AD_for_device {
     }
 
     # sort LIST_HARDWARECLASSES
-    if($#{ $AD{'LIST_HARDWARECLASSES'} }>0){
+    if($#{ $AD{'LIST_HARDWARECLASSES'}        }>0){
         @{ $AD{'LIST_HARDWARECLASSES'} } = sort @{ $AD{'LIST_HARDWARECLASSES'} };
     }
     # sort some lists under 'room'
