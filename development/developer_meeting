@@ -1,6 +1,8 @@
 ###########################################################
 Nächstes Entwicklertreffen:
 -------------------------------
+1) Themen durchgehen.
+2) issues erstellen und taggen (urgent, later, ...)
 
 ------------------------------------------------------------
 Who creates the following directories:
@@ -8,10 +10,17 @@ Who creates the following directories:
 /var/lib/samba/printers
 /srv/linbo
 
+are not created by sophomorix
 are they smb-shares?
 are they part of global?
 ------------------------------------------------------------
+school share create script (incl. quota)
 
+Stand?
+Wenn fertig: quota tests erweitern
+
+
+------------------------------------------------------------
 Schultage-modul integrieren, wo?
 - Ziel: scripte können herausfinden, ob
   - Unterrichtstage sind (schulweit)
@@ -26,19 +35,20 @@ Besser: im AD zugänglich
    - Schulkonsolenzugriff
    - ...
 
-
 ------------------------------------------------------------
 hardwareclasses gruppen sind bei den schulen (LDAP-Baum)
 (wahrscheinlich dort, wo zum ersten mal die hwk aufgetaucht ist)
 
 -> eigentlich sind die global besser aufgehoben
-   --> automatische Umzug problematisch, leere devices.csv, dann erneut import
+   --> automatischer Umzug problematisch bei der alpha
+    Lösung 1: , leere devices.csv, dann erneut import
+    Lösung 2: , Hardwareklassegruppen aus Baum löschen, werden wieder angelegt
 
-TODO: (soll das upgedated werden???)
+TODO: (soll das upgedated werden bei hardwareklassen (ist bisher leer)???)
 sophomorixRoomComputers
 sophomorixRoomIPs
 sophomorixRoomMACs
-
+(bei rooms ist das vorhanden)
 
 ------------------------------------------------------------
 global projects:
@@ -48,7 +58,7 @@ global projects:
   dürfen in Schulprojecte nur user derselben schule?
    (von sophomorix gecheckt? von der Schulkonsole verhindert)
   (Lehrer an 2 schulen: In welche schulprojekte sollen die dürfen?)
-
+------------------------------------------------------------
 
 ScriptPath
 
@@ -86,13 +96,18 @@ Ordner:
 
 
 
-
-
 - windows client standard set: cortana off
 -> client installieren
 
+
 wo ist sysvol: /var/lib/samba
 samba-tool gpo dumpen und wieder anlegen
+
+------------------------------------------------------------
+
+devices.csv
+
+syntax-check(+ samaccountcompatibility) von T. eingebaut?
 
 devices.csv: welche doppelungen zulässig?
 Notebooks: zulassen, dass hosts mit derselben mac und verschienner IP ???
@@ -107,34 +122,16 @@ mehrfachzeilen:
 2x gleiche name
    --> verheiratet mehrere Zeilen
 
+statt spezialerror jSON-Error.
+Muss Andy Bescheid wissen? (11 spezialfehler)
+Alles auf einmal umsetzen?
 
-E-Mail migration:
-cyrus2dovecot
-
-
-sophomorix-print:
-  zeigt URL's für schulkonsole, moodle usw, ...
-  woher bekomme ich die Info?
-    * Domänennamen für Windowsanmeldung? ???
-    * URLSCHUKO (intranet)
-    * URLMAIL
-    * URLMOODLE
-    * more URLS
-  add them to school.conf? as 
-  [school]
-      URLMOODLE=
-      --> when empty, print in red: 
-      school.conf: URLMOODLE not configured
-      URLMOODLE=FALSE
-      --> print 
+############################################################
+# Ende Entwicklertreffen 5.10.
+############################################################
 
 
---> sophomorix-print --school bsz  --> alle Schüler der Schule
 
-
-  JSON-Result object? see issue #14
-  Was braucht die Schulkonsole
-  --> ausgefüllt
 
 
 devices.csv
