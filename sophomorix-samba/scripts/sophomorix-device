@@ -1595,13 +1595,13 @@ sub analyze_device_line {
             $field_14,
             $sophomorix_comment)=split(/;/,$line);
 
-        $room=&check_room($room,$line);
-        $host=&check_host($host,$line);
-        $hwk=&check_hwk($hwk,$line);
-        $mac=&check_mac($mac,$line);
+        $room=&check_room($room,$line,$filename,$device_file,$device_line_count);
+        $host=&check_host($host,$line,$filename,$device_file,$device_line_count);
+        $hwk=&check_hwk($hwk,$line,$filename,$device_file,$device_line_count);
+        $mac=&check_mac($mac,$line,$filename,$device_file,$device_line_count);
         $ip=&check_ip($ip,$line);
-        $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line);
-        $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line);
+        $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line,$filename,$device_file,$device_line_count);
+        $ms_windows_key=&check_ms_software_key($ms_windows_key,"MS-WINDOWS-KEY",$host,$line,$filename,$device_file,$device_line_count);
 
         my $account_flag;
         my $host_group;
@@ -1609,10 +1609,10 @@ sub analyze_device_line {
         ($sophomorix_role,
          $account_flag,
          $host_group,
-         $host_group_type)=&check_sophomorix_role($sophomorix_role,$line,$filename);
+         $host_group_type)=&check_sophomorix_role($sophomorix_role,$line,$filename,$device_file,$device_line_count);
 
-        $pxe=&check_pxe($pxe,$line);
-        $option=&check_option($option,$line);
+        $pxe=&check_pxe($pxe,$line,$filename,$device_file,$device_line_count);
+        $option=&check_option($option,$line,$filename,$device_file,$device_line_count);
 
         # use tokened names 
         my $dnsnode_name=&AD_get_name_tokened($host,$school,"dnsnode");
@@ -1725,16 +1725,15 @@ sub analyze_device_line {
 
 
 sub check_room {
-    my ($room,$line,$filename) = @_;
+    my ($room,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
         print "   ROOM:    $room\n";
     }
     # allow a-z0-9-_ lowercase
     if ( $room=~/[^A-Za-z0-9\-]/ ) {
-        print "\n";
-        print "LINE: $line\n";
-        print "  ERROR: $room contains invalid characters in $filename\n\n";
-        exit 88;
+        $error_in_files++;
+        my $message="$room (Field:1) contains invalid characters in LINE:$device_line_count of $device_file ";
+        &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,"",$message);
     } else {
 
     }
@@ -1744,7 +1743,7 @@ sub check_room {
 
 
 sub check_host {
-    my ($host,$line,$filename) = @_;
+    my ($host,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
         print "   HOST:    $host\n";
     }
@@ -1752,7 +1751,7 @@ sub check_host {
     if ( $host=~/[^A-Za-z0-9\-]/ ) {
         print "\n";
         print "LINE: $line\n";
-        print "  ERROR: $host contains invalid characters in $filename\n\n";
+        print "  ERROR: $host (Field2) contains invalid characters in $filename ($device_file)\n\n";
         exit 88;
     } else {
         $host=~tr/A-Z/a-z/; # in Kleinbuchstaben umwandeln
@@ -1765,7 +1764,7 @@ sub check_host {
 
 
 sub check_hwk {
-    my ($hwk,$line,$filename) = @_;
+    my ($hwk,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
         print "   HWK:     $hwk\n";
     }
@@ -1784,7 +1783,7 @@ sub check_hwk {
 
 
 sub check_mac {
-    my ($old_mac,$line,$filename) = @_;
+    my ($old_mac,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
        print "   MAC:     $old_mac\n";
     }
@@ -1819,7 +1818,7 @@ sub check_mac {
 
 
 sub check_ip {
-    my ($ip,$line,$filename) = @_;
+    my ($ip,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
         print "   IP:      $ip";
     }
@@ -1862,7 +1861,7 @@ sub check_ip {
 
 
 sub check_ms_software_key {
-    my ($ms_software_key,$name,$host,$line,$filename) = @_;
+    my ($ms_software_key,$name,$host,$line,$filename,$device_file,$device_line_count) = @_;
     if (exists $ms_key_ok{$ms_software_key}){
         # skip tests, when tagged as 'no key'
         return $ms_software_key;
@@ -1903,7 +1902,7 @@ sub check_ms_software_key {
 
 
 sub check_sophomorix_role {
-    my ($role,$line,$filename) = @_;
+    my ($role,$line,$filename,$device_file,$device_line_count) = @_;
     if ($role eq ""){
         $role=$sophomorix_config{'INI'}{'GLOBAL'}{'COMPUTERROLE_DEFAULT'};
     } elsif (not exists $sophomorix_config{'LOOKUP'}{'ROLES_DEVICE'}{$role}) {
@@ -1947,7 +1946,7 @@ sub check_sophomorix_role {
 
 
 sub check_pxe {
-    my ($pxe,$line,$filename) = @_;
+    my ($pxe,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
         print "   PXE:     $pxe\n";
     }
@@ -1967,7 +1966,7 @@ sub check_pxe {
 
 
 sub check_option {
-    my ($option,$line,$filename) = @_;
+    my ($option,$line,$filename,$device_file,$device_line_count) = @_;
     if (not defined $option){
         $option="";
         # ??? warning ???
