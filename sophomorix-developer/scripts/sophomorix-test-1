@@ -5628,6 +5628,22 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/uni/students/12abc/blackmri42/transfer
+    &NTACL_test ("uni",
+                 "/students/12abc/blackmri42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\blackmri42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\blackmri42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL', 
+                );
     # /srv/samba/schools/uni/teachers
     &NTACL_test ("uni",
                  "/teachers",
@@ -8095,6 +8111,22 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/uni/students/12abc/blackmri42/transfer
+    &NTACL_test ("uni",
+                 "/students/12abc/blackmri42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\blackmri42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\blackmri42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL', 
+                );
     # /srv/samba/schools/uni/teachers
     &NTACL_test ("uni",
                  "/teachers",
@@ -10555,6 +10587,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/bsz/students/alumni/oe42/transfer
+    &NTACL_test ("bsz",
+                 "/students/alumni/oe42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\oe42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\oe42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
     # /srv/samba/schools/uni/teachers/wu42
     &NTACL_test ("uni",
                  "/teachers/wu42",
@@ -10653,6 +10701,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/bsz/students/attic/maiersa42/transfer
+    &NTACL_test ("bsz",
+                 "/students/attic/maiersa42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\maiersa42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\maiersa42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                );
     # /srv/samba/schools/lin/students/attic
     &NTACL_test ("lin",
                  "/students/attic",
@@ -10680,7 +10744,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\lin-attic:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/lin/students/attic/maiersa42
+    # /srv/samba/schools/lin/students/attic/muellegr42
     &NTACL_test ("lin",
                  "/students/attic/muellegr42",
                  $root_dns,
@@ -10695,6 +10759,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/lin/students/attic/muellegr42/transfer
+    &NTACL_test ("lin",
+                 "/students/attic/muellegr42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\muellegr42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\muellegr42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI/FULL', 
                 );
     # /srv/samba/schools/bsz/students/m8cd
     &NTACL_test ("bsz",
@@ -10750,6 +10830,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-m9cd:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/bsz/students/m9cd/jonsonad42
     &NTACL_test ("bsz",
                  "/students/m9cd/jonsonad42",
                  $root_dns,
@@ -10764,6 +10845,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m9cd/jonsonad42/transfer
+    &NTACL_test ("bsz",
+                 "/students/m9cd/jonsonad42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\jonsonad42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\jonsonad42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
                 );
     # /srv/samba/schools/bsz/students/m9cd/samardze42
     &NTACL_test ("bsz",
@@ -10780,6 +10877,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/bsz/students/m9cd/samardze42/transfer
+    &NTACL_test ("bsz",
+                 "/students/m9cd/samardze42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\samardze42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\samardze42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
                 );
     # /srv/samba/schools/uni
     &NTACL_test ("uni",
@@ -11253,6 +11366,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    # /srv/samba/schools/uni/students/alumni/kep42/transfer
+    &NTACL_test ("uni",
+                 "/students/alumni/kep42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\kep42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\kep42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/FULL', 
+                );
     # /srv/samba/schools/ghs
     &NTACL_test ("ghs",
                  "/",
@@ -11441,6 +11570,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/ghs/students/alumni/gal42/transfer
+    &NTACL_test ("ghs",
+                 "/students/alumni/gal42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\gal42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\gal42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI/FULL', 
                 );
     # /srv/samba/schools/ghs/teachers
     &NTACL_test ("ghs",
@@ -11685,9 +11830,9 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
-    # /srv/samba/schools/uni/students/s6ade/schneima42/transfer
+    # /srv/samba/schools/default-school/students/s7ade/schneima42/transfer
     &NTACL_test ("default-school",
-                 "/students/s6ade/schneima42/transfer",
+                 "/students/s7ade/schneima42/transfer",
                  $root_dns,
                  $smb_admin_pass,
                  \%fs_test_result,
@@ -11770,6 +11915,22 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                );
+    # /srv/samba/schools/default-school/students/alumni/sch42/transfer
+    &NTACL_test ("default-school",
+                 "/students/alumni/sch42/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\sch42:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
                 );
     &end_fs_test(\%fs_test_result);
 
