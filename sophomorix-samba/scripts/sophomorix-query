@@ -171,9 +171,10 @@ Limit the searchbase (this is faster):
   --sub-projectbase (only works together with schoolbase)
 
 What user attributes to return:
---user-minimal      (i. e. for dropdown menues)
---user-basic        (default)
---user-full         (all attributes)
+--user-minimal              (i. e. for dropdown menues)
+--user-basic                (default)
+--user-full                 (all attributes)
+--user-full --quota-usage   (all attributes and smb share quota usage/softlimit/hardlimit)
 
 What group attributes to return:
 --group-minimal      (i. e. for dropdown menues)
@@ -816,9 +817,9 @@ for( my $index = 0 ; $index < $max ; $index++) {
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED'}=$used;
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT'}=$soft_limit;
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT'}=$hard_limit;
-            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED_MB'}=round(10*$used/1024/1024)/10;
-            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT_MB'}=round(10*$soft_limit/1024/1024)/10;;
-            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT_MB'}=round(10*$hard_limit/1024/1024)/10;;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED_MiB'}=round(10*$used/1024/1024)/10;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT_MiB'}=round(10*$soft_limit/1024/1024)/10;;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT_MiB'}=round(10*$hard_limit/1024/1024)/10;;
         }    
     }
 
