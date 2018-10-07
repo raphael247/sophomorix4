@@ -64,6 +64,7 @@ my $testopt=GetOptions(\%options,
                         "user-minimal",
                         "user-basic",
                         "user-full",
+                        "quota-usage",
                         "group-minimal",
                         "group-basic",
                         "group-full",
@@ -209,7 +210,11 @@ Please see the sophomorix-query(8) man pages for full documentation
 
 
 my ($ldap,$root_dse) = &AD_bind_admin();
-
+my $root_dns="";
+if (defined $options{'quota-usage'}){
+    $root_dns=&get_root_dns();
+    use Math::Round;
+}
 ############################################################
 
 my $single_attrs;
@@ -792,7 +797,31 @@ for( my $index = 0 ; $index < $max ; $index++) {
 	    }
         }
     }
-    
+
+    # if needed: query quota usage of user
+    if ($search_object eq "user" and defined $options{'quota-usage'}){
+        foreach my $sophomorix_quota (@{$search{$top_key}{$sam}{'sophomorixQuota'} }){
+            my ($share,$value,$oldcalc,$quotastatus,$comment)=split(/:/,$sophomorix_quota);
+            my $smbcquotas_command="/usr/bin/smbcquotas -mNT1 -U administrator%`cat /etc/linuxmuster/.secret/administrator`".
+                " -u $sam //".$root_dns."/".$share;
+            #print "   $smbcquotas_command\n";
+            # run the command
+            my $smbcquotas_out=`$smbcquotas_command`;
+            my $smbcquotas_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+            my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$smbcquotas_out);
+            $used=~s/\/$//;
+            $soft_limit=~s/\/$//;
+            $hard_limit=~s/\/$//;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'FULL_USER'}=$full_user;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED'}=$used;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT'}=$soft_limit;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT'}=$hard_limit;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED_MB'}=round(10*$used/1024/1024)/10;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT_MB'}=round(10*$soft_limit/1024/1024)/10;;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT_MB'}=round(10*$hard_limit/1024/1024)/10;;
+        }    
+    }
+
     # if needed: find group members (users/computers)
     my $top_key_members="";
     my $top_count_key_members="";
@@ -1046,4 +1075,16 @@ sub json_printout {
     } elsif ($json==3){
         print STDERR Dumper ($ref_search);
     }
+}
+
+
+
+sub get_root_dns {
+    my $realm_line =`cat /etc/samba/smb.conf | grep realm`;
+    chomp($realm_line);
+    my ($tmp,$root_dns)=split(/=/,$realm_line);
+    $root_dns=~s/^\s+//g;# remove leading whitespace
+    $root_dns=~s/\s+$//g;# remove trailing whitespace
+    $root_dns=~tr/A-Z/a-z/; # make lowercase
+    return $root_dns;
 }

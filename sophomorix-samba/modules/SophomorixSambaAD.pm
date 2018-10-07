@@ -43,6 +43,7 @@ $Data::Dumper::Terse = 1;
             AD_user_unset_exam_mode
             AD_user_create
             AD_user_update
+            AD_user_getquota_usage
             AD_user_setquota
             AD_get_user
             AD_get_group
@@ -2718,6 +2719,24 @@ sub AD_user_update {
 
 
 
+sub AD_user_getquota_usage {
+    my ($arg_ref) = @_; 
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $user = $arg_ref->{user};
+    my $share = $arg_ref->{share};
+
+    # what parameter?
+    # how to append to user data hash
+    # sophomorix-user --quota-usage
+
+    # see sophomorix-query, option --quota-usage
+
+}
+
+
+
 sub AD_user_setquota {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -5092,7 +5111,9 @@ sub AD_get_quota {
 	# @addquota contains addquota info of the group
         foreach my $member (@member){
 	    if (exists $seen{$member}){
-		print "skipping (seen already): $member\n";
+                if($Conf::log_level>=3){
+                    print "skipping (seen already): $member\n";
+                }
                 next;
 	    } else {
                 $seen{$member}="seen";
