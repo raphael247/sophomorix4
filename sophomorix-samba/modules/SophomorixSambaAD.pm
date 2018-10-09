@@ -2727,8 +2727,8 @@ sub AD_user_getquota_usage {
     my $user = $arg_ref->{user};
     my $share = $arg_ref->{share};
 
-    # what parameter?
-    # how to append to user data hash
+    # what parameter? user
+    # how to append to user data hash?
     # sophomorix-user --quota-usage
 
     # see sophomorix-query, option --quota-usage
@@ -7835,6 +7835,8 @@ sub AD_examuser_create {
                            ]
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
+    # clone the password
+
     &AD_repdir_using_file({root_dns=>$root_dns,
                            repdir_file=>"repdir.examuser_home",
                            school=>$school_AD,
