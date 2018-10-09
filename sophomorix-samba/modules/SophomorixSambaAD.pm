@@ -7648,8 +7648,8 @@ sub AD_login_test {
               " No password test possible (sophomorixFirstpassword: $firstpassword)\n";
         return 2;
     } elsif ( $exammode ne "---"){
-        print "   * $sam_account($status,$user_account_control,$exammode):".
-              " No password test possible (user should be in ExamMode/disabled)\n";
+        print "   * $sam_account ($status,$user_account_control,$exammode):".
+              " No password test possible (user is in ExamMode/disabled)\n";
         return 2;
     } else {
         # pam login
