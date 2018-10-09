@@ -1352,29 +1352,6 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/default-school/share/management",                                      # ntacl
                          "/srv/samba/schools/default-school/share/school",                                      # ntacl
                         ); 
-    &end_fs_test(\%fs_test_result);
-
-    ############################################################
-    # fs test
-    ############################################################
-    &start_fs_test(\%fs_test_result);
-    &directory_tree_test("/srv/samba/global",
-                         \%fs_test_result,
-                         "/srv/samba/global",
-                         "/srv/samba/global/management",
-                         "/srv/samba/global/share",
-                         "/srv/samba/global/program",
-                         "/srv/samba/global/iso",
-                         "/srv/samba/global/share/projects",
-                         "/srv/samba/global/share/management",         # ntacl
-                         "/srv/samba/global/share/global",         # ntacl
-                         "/srv/samba/global/students",
-                         "/srv/samba/global/teachers",
-                        ); 
-    &end_fs_test(\%fs_test_result);
-}
-
-
 # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
@@ -1500,6 +1477,27 @@ if ($test_exammode_users==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/share",
+                         "/srv/samba/global/program",
+                         "/srv/samba/global/iso",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",         # ntacl
+                         "/srv/samba/global/share/global",         # ntacl
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+}
 
 
 ############################################################
