@@ -5,20 +5,11 @@ Nächstes Entwicklertreffen:
 2) issues erstellen und taggen (urgent, later, ...)
 
 ------------------------------------------------------------
-Who creates the following directories:
-/var/tmp
-/var/lib/samba/printers
-/srv/linbo
-
-are not created by sophomorix
-are they smb-shares?
-are they part of global?
-------------------------------------------------------------
 school share create script (incl. quota)
 
 Stand?
 Wenn fertig: quota tests erweitern
-
+Later.
 
 ------------------------------------------------------------
 Schultage-modul integrieren, wo?
@@ -44,6 +35,13 @@ hardwareclasses gruppen sind bei den schulen (LDAP-Baum)
     Lösung 1: , leere devices.csv, dann erneut import
     Lösung 2: , Hardwareklassegruppen aus Baum löschen, werden wieder angelegt
 
+PROBLEM: schulübergreifende Hardwareklassen:
+         --> wie schulweit benutzen?
+	     --> je Schule eine hwk-gruppe mit computer der Gruppe
+	     --> bei mehreren Schulen: je schule und hwk eine Gruppe
+	         bsz-m18 (Rechner von schule bsz), vhs-m18(... vhs ...)
+		 und m18 (,global,alle Rechner)
+
 TODO: (soll das upgedated werden bei hardwareklassen (ist bisher leer)???)
 sophomorixRoomComputers
 sophomorixRoomIPs
@@ -60,9 +58,7 @@ global projects:
   (Lehrer an 2 schulen: In welche schulprojekte sollen die dürfen?)
 ------------------------------------------------------------
 
-ScriptPath
-
-GPO
+ScriptPath/GPO
 
 sophomorix rollt bei school anlegen ein acl set aus
 (doppeltes ausrollen abfangen)
@@ -95,7 +91,6 @@ Ordner:
 2) projekt tausch nach 
 
 
-
 - windows client standard set: cortana off
 -> client installieren
 
@@ -107,11 +102,8 @@ samba-tool gpo dumpen und wieder anlegen
 
 devices.csv
 
-syntax-check(+ samaccountcompatibility) von T. eingebaut?
-
 devices.csv: welche doppelungen zulässig?
-Notebooks: zulassen, dass hosts mit derselben mac und verschienner IP ???
-
+Notebooks: zulassen, dass hosts mit derselben mac und verschidener IP ???
 
 --> devices.csv
 mehrfachzeilen:
@@ -131,9 +123,6 @@ Alles auf einmal umsetzen?
 ############################################################
 
 
-
-
-
 devices.csv
 alle Rechner sind in Gruppen gruppiert, deren typ 'room' ist
 wenn alle Rechner in einem raum ... 
@@ -146,11 +135,6 @@ wird bei linbo was rausgepatched um Zugang zu vermeiden
 --> linbo Zugriff auf AD? Abhängig davon patchen
 
 --> (noch) nicht benötigt
-
-
-sophomorix-device --sync statt sophomorix-device
-sophomorix-device würde dann die Hilfe zeigen:
-Problem: sophomorix-device läuft lange und doch immer wieder mal abgeschickt
 
 
 admin users acls:
