@@ -27,6 +27,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_object_search
                                  AD_debug_logdump
                                  AD_get_name_tokened
+                                 AD_get_passwd
                                     );
 use Sophomorix::SophomorixTest qw(
                                  AD_object_nonexist
@@ -35,6 +36,7 @@ use Sophomorix::SophomorixTest qw(
                                  directory_tree_test
                                  start_fs_test
                                  end_fs_test
+                                 NTACL_test
                                  );
 
 $Conf::log_level=1;
@@ -129,6 +131,8 @@ if ($json==0){
 
 my ($ldap,$root_dse) = &AD_bind_admin();
 my $root_dns=&AD_dns_get($root_dse);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
 
 my $testdata="/usr/share/sophomorix-developer/testdata";
 
@@ -1369,6 +1373,133 @@ if ($test_exammode_users==1){
                         ); 
     &end_fs_test(\%fs_test_result);
 }
+
+
+# Testing NTACLs of exam users
+    # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
+    &NTACL_test ("bsz",
+                 "/examusers/subdir72/maiersa72-exam",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\maiersa72-exam', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\maiersa72-exam:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\maiersa72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer
+    &NTACL_test ("bsz",
+                 "/examusers/subdir72/maiersa72-exam/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\maiersa72-exam:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\maiersa72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam
+    &NTACL_test ("bsz",
+                 "/examusers/subdir72/muellegr72-exam",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\muellegr72-exam', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\muellegr72-exam:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\muellegr72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer
+    &NTACL_test ("bsz",
+                 "/examusers/subdir72/muellegr72-exam/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\muellegr72-exam:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\muellegr72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/jonsonad72-exam
+    &NTACL_test ("bsz",
+                 "/examusers/jonsonad72-exam",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\jonsonad72-exam', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\jonsonad72-exam:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\jonsonad72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer
+    &NTACL_test ("bsz",
+                 "/examusers/jonsonad72-exam/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\jonsonad72-exam:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\jonsonad72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/samardze72-exam
+    &NTACL_test ("bsz",
+                 "/examusers/samardze72-exam",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:LINUXMUSTER\samardze72-exam', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\samardze72-exam:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\samardze72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
+    # /srv/samba/schools/bsz/examusers/samardze72-exam/transfer
+    &NTACL_test ("bsz",
+                 "/examusers/samardze72-exam/transfer",
+                 $root_dns,
+                 $smb_admin_pass,
+                 \%fs_test_result,
+                 "REVISION:1",
+                 "CONTROL:SR|DP",
+                 'OWNER:BUILTIN\Administrators', 
+                 'GROUP:LINUXMUSTER\Domain Users',
+                 'ACL:LINUXMUSTER\samardze72-exam:ALLOWED/0x0/RWX',
+                 'ACL:LINUXMUSTER\samardze72-exam:ALLOWED/OI|CI|IO/FULL', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
+                );
 
 
 ############################################################
