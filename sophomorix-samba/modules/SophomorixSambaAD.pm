@@ -7816,7 +7816,7 @@ sub AD_examuser_create {
                    sophomorixStatus => $status,
                    sophomorixAdminClass => "---",    
                    sophomorixAdminFile => $file,    
-                   sophomorixFirstPassword => $DevelConf::student_password_default, 
+                   sophomorixFirstPassword => "---", 
                    sophomorixFirstnameASCII => $firstname_ASCII_AD,
                    sophomorixSurnameASCII  => $lastname_ASCII_AD,
                    sophomorixBirthdate  => "01.01.1970",

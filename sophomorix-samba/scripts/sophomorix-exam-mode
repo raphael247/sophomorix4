@@ -227,6 +227,7 @@ if ($set_exam_mode==1){
 
             if ($sophomorix_config{'INI'}{'EXAMMODE'}{'PASSWORDHASH_COPY'} eq "TRUE"){
                 my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
+                &print_title("Cloning password-hash of $participant to $examuser");
                 my $unicodepwd= &AD_get_unicodepwd($participant,\%sophomorix_config);
                 &AD_set_unicodepwd($examuser,$unicodepwd,\%sophomorix_config);
             }
