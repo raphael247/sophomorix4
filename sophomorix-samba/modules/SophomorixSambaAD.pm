@@ -7612,7 +7612,7 @@ sub AD_login_test {
     # return 0: success
     # return -1: nor firstpassword found
     # return >0: Error code of smbclient command
-    my ($ldap,$root_dse,$dn)=@_;
+    my ($ldap,$root_dse,$dn,$password_option)=@_;
     my $filter="(cn=*)";
     my $mesg = $ldap->search(
                       base   => $dn,
@@ -7625,41 +7625,45 @@ sub AD_login_test {
                             );
     my $entry = $mesg->entry(0);
     my $firstpassword = $entry->get_value('sophomorixFirstPassword');
+    my $testpassword=$firstpassword;
     my $exammode = $entry->get_value('sophomorixExamMode');
     my $status = $entry->get_value('sophomorixStatus');
     my $user_account_control = $entry->get_value('userAccountControl');
     my $sam_account = $entry->get_value('sAMAccountName');
 
-    if ($firstpassword eq "---" and -e "/etc/linuxmuster/.secret/$sam_account"){
+    if ($password_option ne ""){
+        # use password given by option a password
+	$testpassword=$password_option;
+    } elsif ($testpassword eq "---" and -e "/etc/linuxmuster/.secret/$sam_account"){
         print "   * Trying to fetch password from .secret/$sam_account\n";
-        $firstpassword = `cat /etc/linuxmuster/.secret/$sam_account`;
+        $testpassword = `cat /etc/linuxmuster/.secret/$sam_account`;
     }
-    if (not defined $firstpassword){
+    if (not defined $testpassword){
+        # no password found to test
         return -1;
     }
-
     #my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-    #            " -L localhost --user=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
+    #            " -L localhost --user=$sam_account%'$testpassword' > /dev/null 2>&1 ";
     #print "   # $command\n";
     #my $result=system($command);
 
-    if ($firstpassword eq "---"){
+    if ($testpassword eq "---"){
         print "   * $sam_account($status,$user_account_control,$exammode):".
-              " No password test possible (sophomorixFirstpassword: $firstpassword)\n";
+              " No password test possible (Password: $testpassword)\n";
         return 2;
-    } elsif ( $exammode ne "---"){
+    } elsif ( $exammode ne "---" and $password_option eq ""){
         print "   * $sam_account ($status,$user_account_control,$exammode):".
               " No password test possible (user is in ExamMode/disabled)\n";
         return 2;
     } else {
         # pam login
-        my $command="wbinfo --pam-logon=$sam_account%'$firstpassword' > /dev/null 2>&1 ";
+        my $command="wbinfo --pam-logon=$sam_account%'$testpassword' > /dev/null 2>&1 ";
         print "   # $sam_account: $command\n";
         my $result=system($command);
         return $result;
 
         # kerberos login
-        # my $command="wbinfo --krb5auth=$sam_account%'$firstpassword'' > /dev/null 2>&1 ";
+        # my $command="wbinfo --krb5auth=$sam_account%'$testpassword'' > /dev/null 2>&1 ";
         # print "   # $command\n";
         # my $result=system($command);
     }

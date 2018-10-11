@@ -61,6 +61,7 @@ my $info=0;
 my $json=0;
 
 my $school="";
+my $test_login=0;
 my $test_firstpassword=0;
 my $set_firstpassword=0;
 
@@ -132,6 +133,7 @@ my $testopt=GetOptions(
 #           "samba-pwd-must-change!" => \$smb_pw_m_change,
 #           "shell|loginshell=s" => \$shell,
 #           "force" => \$force,
+           "test-login" => \$test_login,
            "test-firstpassword" => \$test_firstpassword,
            "set-firstpassword" => \$set_firstpassword,
           );
@@ -176,10 +178,12 @@ Cloning a password-hash from one user to another:
 
 Testing stuff:
   --set-firstpassword 
-  --set-firstpassword -u user
+  --set-firstpassword -u <user>
+
+  --test-login <user> --pasword <password-to-test>
 
   --test-firstpassword 
-  --test-firstpassword -u user
+  --test-firstpassword -u <user>
 
 Options:
   --nofirstpassupdate (do not update AD attribute sophomorixFirstPassword)
@@ -339,8 +343,18 @@ if ( ($clone_from_user ne "" and $clone_to_user eq "") or
 
 
 ############################################################
-# --test-firstpassword
-if ($test_firstpassword==1){
+# --test-login
+#if ($test_login==1 and $password ne ""){
+#    print "HERE\n";
+#
+#    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+#}
+
+
+
+############################################################
+# --test-firstpassword / --test-login
+if ($test_firstpassword==1 or ($test_login==1 and $password ne "")){
     my $count_tested=0;
     my $count_success=0;
     my $count_fail=0;
@@ -368,7 +382,7 @@ if ($test_firstpassword==1){
         my $sam_account=$entry->get_value ('sAMAccountName');
         $count_tested++;
         print "* $count_tested) $sam_account: $dn\n";
-        my $res=&AD_login_test($ldap,$root_dse,$dn);
+        my $res=&AD_login_test($ldap,$root_dse,$dn,$password);
         if ($res==0){
             print "   * Login with firstpassword OK!\n";
             $count_success++;
