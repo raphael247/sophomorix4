@@ -1359,20 +1359,18 @@ sub AD_session_manage {
     my $session_string_new="";
     my $session_new="";        
 
-    if (not defined $new_comment or $new_comment eq ""){
-        $new_comment="---";
-    } else {
+    if (defined $new_comment){
         # remove ; from comment
         $new_comment=~s/;//g;
-    }
-    if (not defined $new_participants){
-        $new_participants="";
     }
 
     # creating the session string
     $session_string="---";
     $session_string_old="---";
     if ($create eq "TRUE"){
+        if (not defined $new_participants){
+            $new_participants="";
+        }
         if ($developer_session ne ""){
             # creating sessions with arbitrary names for testing
             $session_new=$developer_session;
@@ -1384,7 +1382,7 @@ sub AD_session_manage {
             $session_string_new=$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}.
                                 ";".$new_comment.";".$new_participants.";";
         }
-    } elsif (defined $session and defined $new_participants and defined $new_comment){
+    } elsif (defined $session and (defined $new_participants or defined $new_comment or $kill eq "TRUE")){
         # modifying the session
         if (defined $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}){
             # get data from session hash
@@ -1392,7 +1390,13 @@ sub AD_session_manage {
             $supervisor=$ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'};
             $session_string_old=$ref_sessions->{'ID'}{$session}{'sophomorixSessions'};
             my ($unused,$old_comment,$old_participants)=split(/;/,$session_string_old);
-	    if ($new_comment eq "---"){
+            if (not defined $new_participants){
+                $new_participants=$old_participants;
+            }
+            if (not defined $new_comment){
+                $new_comment=$old_comment;
+            }
+	    if (not defined $new_comment){
                 $new_comment=$old_comment;
 	    }
             $session_string_new=$session.";".$new_comment.";".$new_participants.";";

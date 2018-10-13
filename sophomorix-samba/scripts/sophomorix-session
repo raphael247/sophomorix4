@@ -79,8 +79,8 @@ my $kill_all_sessions=0;
 my $supervisor="";
 my $session="";
 my $developer_session="";
-my $comment="";
-my $participants=""; # undef: do not change participants
+my $comment;;
+my $participants; # undef: do not change participants
 my $add_participants="";
 my $remove_participants="";
 
@@ -139,8 +139,10 @@ Options:
 
 
   --supervisor <user>
-  --comment <string>              # ; are dropped in comment
+  --comment <string>                      # ; are dropped in comment
+    --comment ""                          # clear comment
   --participants <user1>,<user2>, ...
+    --participants ""                     # clear participant list
   --add-participants <user1>,<user2>, ...
   --remove-participants <user1>,<user2>, ...
   --create (user current time as session-id)
@@ -273,6 +275,12 @@ if ($session ne "" and $kill==1){
 
 if ($create==1 and $supervisor ne ""){
     # create a session in supervisor
+    if (not defined $participants){
+       $participants=""; 
+    }   
+    if (not defined $comment){
+       $comment=""; 
+    }   
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
                         supervisor=>$supervisor,
@@ -308,7 +316,7 @@ if ($session ne "" and defined $participants){
 
 
 # --comment
-if ($session ne "" and $comment ne ""){
+if ($session ne "" and defined $comment){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,
