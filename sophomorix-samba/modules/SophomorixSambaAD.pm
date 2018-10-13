@@ -82,7 +82,7 @@ $Data::Dumper::Terse = 1;
             AD_get_schema
             AD_class_fetch
             AD_project_fetch
-            AD_group_fetch
+            AD_sophomorix_group_fetch
             AD_dn_fetch_multivalue
             AD_project_sync_members
             AD_object_move
@@ -6566,13 +6566,14 @@ sub AD_class_fetch {
 
 
 
-sub AD_group_fetch {
+sub AD_sophomorix_group_fetch {
+    # fetch groups for sophomorix-group
     my ($ldap,$root_dse,$group) = @_;
     my $dn="";
     my $sam_account=""; # the search result i.e. p_abt3
     my $school_AD="";
 
-    my $filter="(&(objectClass=group)(sophomorixType=sophomorix-group)(sAMAccountName=".$group."))";
+    my $filter="(&(objectClass=group)(|(sophomorixType=sophomorix-group)(sophomorixType=printer))(sAMAccountName=".$group."))";
     print "Filter: $filter\n";
     my $mesg = $ldap->search( # perform a search
                    base   => $root_dse,

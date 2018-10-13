@@ -38,7 +38,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_group_create
                                  AD_group_update
-                                 AD_group_fetch
+                                 AD_sophomorix_group_fetch
                                  AD_group_kill
                                  AD_group_addmember
                                  AD_group_removemember
@@ -113,7 +113,10 @@ if (defined $options{'help'}) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-group adds/modifies/deletes a group in samba 4 AD
+sophomorix-group 
+
+1) adds/modifies/deletes a group in samba 4 AD with the sophomorixType=sophomorix-group
+2) modifies memberships of printer groups with the sophomorixType=printer
 
 Options:
   -h  / --help
@@ -260,7 +263,7 @@ foreach my $group_option (@groups_option){
     my $group_token=&AD_get_name_tokened($group_option,$options{'school'},"sophomorix-group");
     my ($dn_group,
         $count,
-        $school_AD)=&AD_group_fetch($ldap,
+        $school_AD)=&AD_sophomorix_group_fetch($ldap,
                                 $root_dse,
                                 $group_token,
                                );
@@ -273,7 +276,7 @@ foreach my $group_option (@groups_option){
     } else {
         print "Skipping group $group_token ($count matching groups found)\n";
         push @{ $groups{'GROUP_UNVALID_LIST'} }, $group_token;
-        print "\nERROR retrieving group $options{'group'}: $count group found.\n\n";
+        print "\nERROR retrieving group $options{'group'}($group_token): $count group found.\n\n";
         &log_script_exit("ERROR retrieving group $group_token: $count group found.",$count,1,0,
                          \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
     }
