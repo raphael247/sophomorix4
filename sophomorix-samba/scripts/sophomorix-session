@@ -290,7 +290,7 @@ if ($create==1 and $supervisor ne ""){
 
 
 # --participants
-if ($session ne "" and $participants ne ""){
+if ($session ne "" and defined $participants){
     # update the requested session
     &AD_session_manage({ldap=>$ldap,
                         root_dse=>$root_dse,

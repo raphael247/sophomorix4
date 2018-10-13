@@ -1395,9 +1395,6 @@ sub AD_session_manage {
 	    if ($new_comment eq "---"){
                 $new_comment=$old_comment;
 	    }
-            if($new_participants eq ""){
-                $new_participants=$old_participants;
-            }
             $session_string_new=$session.";".$new_comment.";".$new_participants.";";
         } else {
             print "\n Session $session not found\n\n";
