@@ -127,7 +127,7 @@ my $testopt=GetOptions(
            "password|passwd|pass=s" => \$password,
 #           "config" => \$config,
 #           "reset" => \$reset,
-#           "common" => \$common,
+           "common" => \$common,
            "random=i" => \$random,
            "interactive" => \$interactive,
 #           "all-characters" => \$all_characters,
@@ -197,7 +197,8 @@ Options:
 Create a password:
   --pass <password>, --password <password>
   --interactive
-  --random <num>     random password of <num> characters
+  --random <num>            (create random password of <num> characters for each user individually)
+  --random <num> --common   (create random password of <num> characters once and apply it to all users)
 
 Create userlist:
   -u <user1>,<user2>,...  /  --users  <user1>,<user2>,...
@@ -222,7 +223,6 @@ Todo:
 Create a password:
   --config  (use sophomorix.conf to create individual password)
   --config --common         (create password once and apply it to all users)
-  --random <num> --common   (create password once and apply it to all users)
 
 Password change:
   --samba-pwd-must-change/nosamba-pwd-must-change
@@ -427,6 +427,8 @@ if ($set_firstpassword==1){
 # creating passwords
 ############################################################
 my @password_chars=();
+
+# --random
 if ($random!=0){
     @password_chars=&get_passwd_charlist();
     if ($random<$sophomorix_config{'samba'}{'domain_passwordsettings'}{'Minimum_password_length'}){
@@ -436,6 +438,13 @@ if ($random!=0){
     }
 }
 
+
+
+# --common
+if ($common==1){
+    @password_chars=&get_passwd_charlist();
+    $password=&create_plain_password($random,@password_chars);
+}
 
 
 # --show-password-charlist
@@ -473,8 +482,8 @@ if ($userlist_count>0 and ($password ne "" or
                           filter => $filter,
                           attr => ['sAMAccountName','cn','dn','sophomorixFirstPassword']
                                 );
-        #create pasword if not given by option
-        if ($random!=0){
+        # create pasword for each user
+        if ($random!=0 and $common==0){
             $password=&create_plain_password($random,@password_chars);
         }
 
