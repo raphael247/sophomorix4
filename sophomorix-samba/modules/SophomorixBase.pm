@@ -5489,7 +5489,8 @@ sub get_passwd_charlist {
    my @zeichen=('a','b','c','d','e','f','g','h','i','j','k',
                 'm','n','o','p','q','r','s','t','u','v',
                 'w','x','y','z',
-                'A','B','D','E','F','G','H','L','M','N','Q','R','T',
+                'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T',
+                'U','V','W','X','Y','Z',
                 '2','3','4','5','6','7','8','9',
                 '!','$','&','(',')','=','?'
                 );
@@ -5523,8 +5524,7 @@ sub get_plain_password {
 
 
 sub create_plain_password {
-    my ($num)=shift;
-    my @password_chars=@_;
+    my ($num,@password_chars)=@_;
     my $password="";
     until ($password=~m/[!,\$,&,\(,\),=,?]/ and 
            $password=~m/[a-z]/ and 

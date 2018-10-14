@@ -23,6 +23,7 @@ use Sophomorix::SophomorixBase qw(
                                  backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
+                                 create_plain_password
                                  check_options
                                  config_sophomorix_read
                                  result_sophomorix_init
@@ -104,6 +105,9 @@ my $password_other="";
 
 my $info_line="";
 
+my $show_password_charlist=0;
+
+
 # Parsen der Optionen
 my $testopt=GetOptions(
            "help|h" => \$help,
@@ -124,7 +128,7 @@ my $testopt=GetOptions(
 #           "config" => \$config,
 #           "reset" => \$reset,
 #           "common" => \$common,
-#           "random" => \$random,
+           "random=i" => \$random,
            "interactive" => \$interactive,
 #           "all-characters" => \$all_characters,
            "nofirstpassupdate" => \$nofirstpassupdate,
@@ -136,6 +140,7 @@ my $testopt=GetOptions(
            "test-login" => \$test_login,
            "test-firstpassword" => \$test_firstpassword,
            "set-firstpassword" => \$set_firstpassword,
+           "show-password-charlist" => \$show_password_charlist,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
@@ -192,6 +197,7 @@ Options:
 Create a password:
   --pass <password>, --password <password>
   --interactive
+  --random <num>     random password of <num> characters
 
 Create userlist:
   -u <user1>,<user2>,...  /  --users  <user1>,<user2>,...
@@ -215,7 +221,6 @@ Todo:
 
 Create a password:
   --config  (use sophomorix.conf to create individual password)
-  --random <num>  random password of <num> characters
   --config --common         (create password once and apply it to all users)
   --random <num> --common   (create password once and apply it to all users)
 
@@ -243,63 +248,6 @@ my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 
-
-# # add teachers to classes if option is given
-# if ($teacher==1){
-#     if ($classes eq ""){
-#         $classes=${DevelConf::teacher};
-#     } else {
-#         $classes=$classes.",".${DevelConf::teacher};
-#     }
-# }
-
-
-# if ($user eq "domadmin"){
-
-# }
-
-
-# # create the list of users
-# if ($user eq "domadmin"){
-#    @users=("domadmin");
-# } elsif ($force==1){
-#    @users=&create_userlist($user,$classes,0,$projects,0,$student,
-#                            $rooms,$ws,0,0);
-# } else {
-#    # check the users
-#    if($Conf::log_level>=2){
-#       &titel("Checking login names ...");
-#    }
-#    @users=&create_userlist($user,$classes,0,$projects,0,$student,
-#                            $rooms,$ws,0,1);
-# }
-
-################################################################################
-# Exit
-################################################################################
-
-# # exit if no users specified
-# if ($#users+1==0){
-#     print "ERROR: No users specified. \n";
-#     exit;
-# }
-
-
-# # limit plength to 1 to 25
-# if ($char_num >=26 or $char_num < 0){
-#     print "Error: $char_num characters is too long/short for a password\n";
-#     exit;
-# }
-
-# if ($password ne "" and $char_num!=0){
-#     print "Error: What do you need --plength for? \n";  
-#     exit;
-# }
-
-# if ($char_num!=0 and($common==0 and $random==0)){
-#     print "Error: Options make no sense: add  --random or --common\n";  
-#     exit;
-# }
 
 
 # --info --user <>
@@ -475,6 +423,32 @@ if ($set_firstpassword==1){
 
 
 
+############################################################
+# creating passwords
+############################################################
+my @password_chars=();
+if ($random!=0){
+    @password_chars=&get_passwd_charlist();
+    if ($random<$sophomorix_config{'samba'}{'domain_passwordsettings'}{'Minimum_password_length'}){
+        print "\nERROR: Random password length $random is shorter than required minimun of ",
+              "$sophomorix_config{'samba'}{'domain_passwordsettings'}{'Minimum_password_length'}\n\n";
+        exit;
+    }
+}
+
+
+
+# --show-password-charlist
+if ($show_password_charlist==1){
+    @password_chars=&get_passwd_charlist();
+    print "Valid characters in a randomly generated password:\n";
+    foreach my $char (@password_chars){
+        print " $char";
+    }
+    print "\n";
+    exit;
+}
+
 
 ############################################################
 # setting passwords from userlist
@@ -487,7 +461,8 @@ if ($user ne ""){
 my $userlist_count=$#userlist+1;
 
 # set a password from userlist
-if ($password ne "" and $userlist_count>0){
+if ($userlist_count>0 and ($password ne "" or 
+                           $random!=0)){
     my $user_count=0;
     foreach my $userlist_user (@userlist){
 	$user_count++;
@@ -498,6 +473,11 @@ if ($password ne "" and $userlist_count>0){
                           filter => $filter,
                           attr => ['sAMAccountName','cn','dn','sophomorixFirstPassword']
                                 );
+        #create pasword if not given by option
+        if ($random!=0){
+            $password=&create_plain_password($random,@password_chars);
+        }
+
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         my $max = $mesg->count;
 	if ($max==1){
@@ -533,7 +513,7 @@ if ($password ne "" and $userlist_count>0){
 			        });
 	    }
 	} else {
-            print "\nERROR: $max users $userlist_user found instead of 1\n\n";
+            print "\nERROR: $max users \"$userlist_user\" found instead of 1\n\n";
 	}
     }
 } elsif ($password eq "" and $userlist_count>0) {
@@ -667,138 +647,6 @@ if ($interactive==1){
 
 }
 
-
-
-
-# # use the charlist of SophomorixBase
-# my @chars=&get_passwd_charlist();
-
-# #
-# # Create a password
-# #
-
-# # --password
-# if ($password ne ""){
-#    $info_line="Password will be '$password'";
-#    $password_given=1;
-# }
-
-# # --common
-# if ($common==1){
-#    if ($char_num==0){
-#       $password_lehrer=&get_plain_password(${DevelConf::teacher},$file,$random,$length,@chars);
-#       $password_other=&get_plain_password("",$file,$random,$length,@chars);
-#    } else {
-#       $password_lehrer=&get_random_password($char_num,${DevelConf::teacher},@chars);
-#       $password_other=&get_random_password($char_num,"",@chars);
-#    }
-#    $info_line="Passwords will be :\n".
-#               "   '$password_lehrer'  (for teachers) \n".
-#               "   '$password_other'  (for others) ";
-
-# }
-
-# # --reset
-# if ($reset==1){
-#    $info_line="Passwords will be looked up in the sophomorix database";
-# }
-
-# # --random
-# if ($random==1){
-#    $info_line="Every user will have its own a random password";
-# }
-
-
-
-# # without option
-# # Setting the passwords noninteractive
-# foreach my $user (@users){
-#     # gruppe ermitteln
-#     my ($home,$type,$gecos,$group)=
-#         &Sophomorix::SophomorixPgLdap::fetchdata_from_account($user);
-
-#     # --shell
-#     if ($shell ne ""){
-#        print "  Setting shell of $user in $group ($type) to $shell\n";
-#        &update_user_db_entry($user,"LoginShell=$shell");
-#     } else {
-#        if($Conf::log_level>=2){
-#           print "  Not changing shell for $user in $group ($type)\n";
-#        }
-#     }
-
-#     # --samba-pwd-must-change/samba-pwd-must-change
-#     if ($smb_pw_m_change==1){
-#        # Must change
-#        print "  Setting user $user to sambaPwdMustChange=Yes\n";
-#        &update_user_db_entry($user,"sambaPwdMustChange=Yes");
-#     } elsif ($smb_pw_m_change==0){
-#        # NOT Must change
-#        print "  Setting user $user to sambaPwdMustChange=No\n";
-#        &update_user_db_entry($user,"sambaPwdMustChange=No");
-#     } else {
-#        if($Conf::log_level>=2){
-#           print "  Not changing sambaPwdMustChange for $user in $group ($type)\n";
-#        }
-#     }
-
-#     # which password to set
-#     if ($password_given==1){
-#         # use $password, do nothing
-#     } elsif ($reset==1){
-#         # lookup old password
-#         $password=&get_first_password($user);
-#     } elsif ($common==1){
-#        # set password
-#        if ($group eq ${DevelConf::teacher}){ 
-#            $password=$password_lehrer;
-#        } else {
-# 	   $password=$password_other;
-#        }
-#     } elsif ($random==1){
-#        # set password randomly
-#        $password=&get_random_password($char_num,$group,@chars);
-#     } elsif ($config==1){
-#        # nothing specified: use sophomorix.conf
-#        $password=&get_plain_password($group,$file,$random,$length,@chars)
-#     } elsif ($shell eq "" and $smb_pw_m_change==2){
-#        $show_help=1;
-#        if($Conf::log_level>=2){
-#           print "  Not setting password for $user in $group ($type)\n";
-#        }
-#        next;
-#     } else {
-#        # no options at all
-#        next;
-#     }
-
-#     if ($hide==1){
-#        print "  Setting password for user $user in ".
-#              "$group ($type) to xxxxxxxx\n";
-#     } else {
-#        print "  Setting password for user $user in ".
-#              "$group ($type) to $password\n";
-#     }
-#     # check for invalid characters
-#     &validate_password($password);
-#     # Passwort für user setzen
-#     &set_sophomorix_passwd($user,$password);
-#     # updating the database
-#     if ($nofirstpassupdate==0){
-#         &update_user_db_entry($user,"FirstPass=$password");
-#     }
-# }
-
-# show mor help when no password could be generated
-# and no --shell option was given
-#if ($no_shell_no_pass==1 and $no_pw_m_change_no_pass=1){
-# if ($show_help==1){
-#     print "\nUse one of the following options:\n";
-#     print "   A) one of the password options\n";
-#     print "   B) the --shell option\n";
-#     print "   C) the --samba-pwd-must-change/nosamba-pwd-must-change option\n";
-#     print "\n";
-# }
 
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
