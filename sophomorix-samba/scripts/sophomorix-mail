@@ -131,7 +131,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlbeschreibung
    print('
-sophomorix-mail calcultes mailinglist and does  ... nothing so fal
+sophomorix-mail calcultes mailinglist and does  ... nothing so far
 
 Options
   -h  / --help
@@ -839,6 +839,7 @@ sub belwue_maildata_check {
                                 $file,
                                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'RANDOM_PWD'}, 
                                 $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}, # length of random pwd
+                                $ref_sophomorix_config,
                                 @password_chars);
                 # save password in file
                 open (PWD,">$pwd_file");
