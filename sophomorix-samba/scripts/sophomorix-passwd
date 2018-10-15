@@ -50,6 +50,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_debug_logdump
                                  AD_dns_get
                                  AD_computer_update
+                                 AD_get_user
                                     );
 
 my @arguments = @ARGV;
@@ -78,7 +79,7 @@ my $rooms="";
 my $ws=0;
 
 my $password="";
-my $config=0;
+my $configfile=0;
 my $reset=0;
 my $common=0;
 my $random=0;
@@ -125,7 +126,7 @@ my $testopt=GetOptions(
 #           "room|rooms|r=s" => \$rooms,
 #           "workstations|workstation|w" => \$ws,
            "password|passwd|pass=s" => \$password,
-#           "config" => \$config,
+           "configfile" => \$configfile,
 #           "reset" => \$reset,
            "common" => \$common,
            "random=i" => \$random,
@@ -182,13 +183,14 @@ Cloning a password-hash from one user to another:
   --clone-from-user <user1> --clone-to-user <user2>
 
 Testing stuff:
-  --set-firstpassword 
-  --set-firstpassword -u <user>
+  --show-password-charlist                     (show characters used to create random passwords)
+  --set-firstpassword                          (ALL users: set passwords back to sophomorixFirstPassword attribute)
+  --set-firstpassword -u <user1>,<user2>, ...  (set passwords back to sophomorixFirstPassword attribute)
 
   --test-login <user> --password <password-to-test>
 
-  --test-firstpassword            (Test ALL users)
-  --test-firstpassword -u <user>
+  --test-firstpassword                         (ALL users: Test sophomorixFirstPassword as password)
+  --test-firstpassword -u <user1>,<user2>, ... (Test sophomorixFirstPassword as password)
 
 Options:
   --nofirstpassupdate (do not update AD attribute sophomorixFirstPassword)
@@ -196,37 +198,35 @@ Options:
 
 Create a password:
   --pass <password>, --password <password>
-  --interactive
-  --random <num>            (create random password of <num> characters for each user individually)
-  --random <num> --common   (create random password of <num> characters once and apply it to all users)
+  --interactive              (query new password twice on console)
+  --random <num>             (create random password of <num> characters for each user individually)
+  --random <num> --common    (create random password of <num> characters once and apply it to all users)
+  --configfile               (use *.school.conf of the user to create individual password)
+
 
 Create userlist:
-  -u <user1>,<user2>,...  /  --users  <user1>,<user2>,...
+  -u <user1>,<user2>,...  /  --user  <user1>,<user2>,...
 Create computerlist
   --computer <computer1>,<computer2>,...
 
 Console examples:
-Interactively change password of a user (Always with --hide and --nofirstpassupdate)
-  sophomorix-passwd --user schneima42 --interactive
+  Interactively change password of a user (Always with --hide and --nofirstpassupdate)
+    sophomorix-passwd --user schneima42 --interactive
+  Create password according to *.school.conf settings
+    sophomorix-passwd --configfile --user 
 
 Webui examples:
-Change password for a user:
-   sophomorix-passwd --user <user> --pass \'Muster!7\' --hide (--nofirstpassupdate) 
-Reset a password for a user from Schulkonsole:
+  Change password for a user:
+    sophomorix-passwd --user <user> --pass \'Muster!7\' --hide (--nofirstpassupdate) 
+  Reset a password for a user from Schulkonsole:
     sophomorix-passwd --set-firstpassword -u <user1>,<user2>,...
-Test if the sophomorixFirstPassword is the valid password:
+  Test if the sophomorixFirstPassword is the valid password:
     sophomorix-passwd --test-firstpassword -u <user1>,<user2>,...
 
 
 Todo:
-
-Create a password:
-  --config  (use sophomorix.conf to create individual password)
-  --config --common         (create password once and apply it to all users)
-
 Password change:
   --samba-pwd-must-change/nosamba-pwd-must-change
-  --show-password-charlist
   --all-characters    (allow all characters in passwords,
                        only for developers, be careful!)
 Create userlist:
@@ -428,6 +428,8 @@ if ($set_firstpassword==1){
 ############################################################
 my @password_chars=();
 
+
+
 # --random
 if ($random!=0){
     @password_chars=&get_passwd_charlist();
@@ -440,11 +442,19 @@ if ($random!=0){
 
 
 
+# --configfile
+if ($configfile==1){
+    @password_chars=&get_passwd_charlist();
+}
+
+
+
 # --common
 if ($common==1){
     @password_chars=&get_passwd_charlist();
     $password=&create_plain_password($random,@password_chars);
 }
+
 
 
 # --show-password-charlist
@@ -459,6 +469,7 @@ if ($show_password_charlist==1){
 }
 
 
+
 ############################################################
 # setting passwords from userlist
 ############################################################
@@ -471,7 +482,8 @@ my $userlist_count=$#userlist+1;
 
 # set a password from userlist
 if ($userlist_count>0 and ($password ne "" or 
-                           $random!=0)){
+                           $random!=0 or
+                           $configfile==1)){
     my $user_count=0;
     foreach my $userlist_user (@userlist){
 	$user_count++;
@@ -482,14 +494,31 @@ if ($userlist_count>0 and ($password ne "" or
                           filter => $filter,
                           attr => ['sAMAccountName','cn','dn','sophomorixFirstPassword']
                                 );
-        # create pasword for each user
-        if ($random!=0 and $common==0){
-            $password=&create_plain_password($random,@password_chars);
-        }
 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
         my $max = $mesg->count;
 	if ($max==1){
+            # create pasword for each user
+            if ($random!=0 and $common==0){
+                $password=&create_plain_password($random,@password_chars);
+            } elsif ($configfile==1){
+                my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                    $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+                    $school_AD,$status_AD,$firstpassword_AD,$unid_AD,$firstname_ASCII_AD,$lastname_ASCII_AD,
+                    $firstname_initial_AD,$lastname_initial_AD,$user_token_AD,$file_AD)=
+                    &AD_get_user({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  user=>$userlist_user,
+                                });
+                    $password=&get_plain_password(
+                        $role_AD,
+                        $file_AD,
+                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file_AD}{'RANDOM_PWD'}, # yes|no
+                        $sophomorix_config{'FILES'}{'USER_FILE'}{$file_AD}{'PWD_LENGTH'}, # length of random pwd
+                        \%sophomorix_config,
+                        @password_chars);
+            }
             my $entry = $mesg->entry(0);
             my $dn=$entry->dn();
             if ($nofirstpassupdate==1){
@@ -522,7 +551,8 @@ if ($userlist_count>0 and ($password ne "" or
 			        });
 	    }
 	} else {
-            print "\nERROR: $max users \"$userlist_user\" found instead of 1\n\n";
+            print "\n";
+            print "WARNING: Skipping user \"$userlist_user\" ($max users found instead of 1)\n\n";
 	}
     }
 } elsif ($password eq "" and $userlist_count>0) {

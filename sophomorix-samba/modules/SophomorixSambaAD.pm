@@ -2864,6 +2864,7 @@ sub AD_get_user {
                               'sophomorixFirstnameInitial', 
 			      'sophomorixSurnameInitial',
 			      'sophomorixUserToken',
+			      'sophomorixAdminFile',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -2891,12 +2892,13 @@ sub AD_get_user {
         my $firstpassword = $entry->get_value('sophomorixFirstPassword');
         my $unid = $entry->get_value('sophomorixUnid');
         my $user_token = $entry->get_value('sophomorixUserToken');
+        my $file = $entry->get_value('sophomorixAdminFile');
         my $existing="TRUE";
         return ($firstname,$lastname,$class,$existing,$exammode,$role,
                 $home_directory,$user_account_control,$toleration_date,
                 $deactivation_date,$school,$status,$firstpassword,$unid,
                 $firstname_ASCII,$lastname_ASCII,
-                $firstname_initial,$lastname_initial,$user_token);
+                $firstname_initial,$lastname_initial,$user_token,$file);
     }
 }
 
