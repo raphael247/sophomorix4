@@ -376,7 +376,7 @@ sub AD_dns_nodecreate_update {
         my $dns_type="PTR";
         # adding reverse lookup with samba-tool
         my $command_reverse=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
-            " dns add $dns_server $dns_zone $dns_last_octet $dns_type $dns_node ".
+            " dns add $dns_server $dns_zone $dns_last_octet $dns_type $dns_node.$root_dns ".
             " --password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command_reverse,$smb_admin_pass);
     }
