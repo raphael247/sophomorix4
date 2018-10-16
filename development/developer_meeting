@@ -4,6 +4,48 @@ Nächstes Entwicklertreffen:
 1) Themen durchgehen.
 2) issues erstellen und taggen (urgent, later, ...)
 
+
+------------------------------------------------------------
+Räume: Problem:
+Namensollisionen vermeiden: r_
+(Problem bei Migration, evtl. nachträglich machbar)
+
+hardwareklassen:
+
+1) Kürzel hwc (englisch statt Deutsch: bbisher hwk)
+
+2) Neu: hwc werden Gruppen (bisher nicht?)
+   -> Namensdoppelungen vermeiden (Raum=hwc, Lehrer=hwc, ...)
+   --> hwc_ prefix, wie bei p_
+   (ansonsten komplexe kollisionsvermeidungsstaegien bis zum webui)
+
+3) global, oder schulweit: beides
+   pcs kommen in
+       1) SCHOOL: hwc_bsz-<hwc> bzw. hwc_<hwc>
+       (sophomorixType=hardwareclass)
+       UND
+       2) GLBAL: all-hwc_<hwc> (angelehnt an all-students, all-teachers, ...prüfen???)
+       (sophomorixType=hardwareclass) (oder globalhardwareclass???)
+
+
+4) wie beim raum: IPs,MACs,Computers in sophomorix-Felder
+   --> auch memberships einzeln. (also nicht hwc_bsz-m17 memberOf all-hwc_m17 /keine Gruppen von Gruppen)
+       sondern alle pcs member in all-hwc_m17
+   --> einfachere scripte
+    
+
+5) Speicherort im ldapbaum:
+   SCHOOL: bisher: mit räumen gemischt -> wenig überblick
+     neu: Unterverzeichnisse unter OU=Devíces: hardwareclasses
+          (parallel zu printers ???checken)
+	  (printers erforderlich um printer und seine Gruppe zu unterscheiden (cn))
+	  --> evtl. für rooms?
+   GLOBAL: neu anzulegen: OU=Devíces und auch unterordner hardwareclasses
+
+
+6) Tool um hwc zu löschen (und wieder komplett neu aufzubauen)
+7) dito für Räume
+
 ------------------------------------------------------------
 school share create script (incl. quota)
 
