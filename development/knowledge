@@ -12,6 +12,16 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 * wie geht das/geht das mit ldap-modify?
   --> einfach nur searchflag attribute ändern
 ############################################################
+Password cloning:
+
+Auslesen ALLER Werte aus einem Account
+  # ldbsearch --url /var/lib/samba/private/sam.ldb "sAMAccountName=lordjo42"
+
+Auslesen von unicodePwd:
+  # ldbsearch --url /var/lib/samba/private/sam.ldb "sAMAccountName=lordjo42" unicodePwd supplementalCredentials
+
+
+############################################################
 
 E-Mail migration:
 cyrus2dovecot

@@ -254,9 +254,11 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 if ($info==1 and $user ne "") {
     my @users=split(",",$user);
     foreach my $user (@users){
-        print "$user\n";
-        my ($unicodepwd) = &AD_get_unicodepwd($user,\%sophomorix_config);
-        print "   $user: $unicodepwd (unicodePwd)\n"
+        my ($unicodepwd,$supplemental_credentials) = &AD_get_unicodepwd($user,\%sophomorix_config);
+        print "\n";
+        print "##### $user: #####\n";
+        print "unicodePwd:: $unicodepwd\n";
+        print "$supplemental_credentials \n";
     }
     exit;
 } elsif ($info==1){
@@ -283,8 +285,8 @@ if ( ($clone_from_user ne "" and $clone_to_user eq "") or
     exit 88;
 } elsif ($clone_from_user ne "" and $clone_to_user ne ""){
     &print_title("Cloning password-hash of $clone_from_user to $clone_to_user");
-    my $unicodepwd= &AD_get_unicodepwd($clone_from_user,\%sophomorix_config);
-    &AD_set_unicodepwd($clone_to_user,$unicodepwd,\%sophomorix_config);
+    my ($unicodepwd,$supplemental_credentials)= &AD_get_unicodepwd($clone_from_user,\%sophomorix_config);
+    &AD_set_unicodepwd($clone_to_user,$unicodepwd,$supplemental_credentials,\%sophomorix_config);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 

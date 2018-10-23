@@ -110,8 +110,11 @@ $Data::Dumper::Terse = 1;
 
 sub AD_get_unicodepwd {
     my ($sam,$ref_sophomorix_config) = @_;
-    my $string=`ldbsearch --url $ref_sophomorix_config->{'INI'}{'PATHS'}{'SAM_LDB'} "sAMAccountName=$sam" unicodePwd`;
+    my $command="ldbsearch --url $ref_sophomorix_config->{'INI'}{'PATHS'}{'SAM_LDB'} ".
+                "\"sAMAccountName=$sam\" unicodePwd supplementalCredentials";
+    my $string=`$command`;
     my @lines=split("\n",$string);
+
     my $unicodepwd;
     foreach my $line (@lines){
         if ($line=~m/unicodePwd/){
@@ -120,13 +123,24 @@ sub AD_get_unicodepwd {
             last; # dont look further
         }
     }
-    return $unicodepwd;
+
+    my $supplemental_credentials="";
+    foreach my $line (@lines){
+        if ($line=~m/supplementalCredentials/ or $line=~m/^ /){
+            my ($attr,$supp)=split("::",$line);
+	    $supplemental_credentials=$supplemental_credentials.$line."\n";
+            if ($line eq ""){
+                last; # dont look further
+            }
+        }
+    }
+    return ($unicodepwd,$supplemental_credentials);
 }
 
 
 
 sub AD_set_unicodepwd {
-    my ($user,$unicodepwd,$ref_sophomorix_config) = @_;
+    my ($user,$unicodepwd,$supplemental_credentials,$ref_sophomorix_config) = @_;
 
     # ???
     my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
@@ -139,6 +153,7 @@ sub AD_set_unicodepwd {
     print LDIF "changetype: modify\n";
     print LDIF "replace: unicodePwd\n";
     print LDIF "unicodePwd:: $unicodepwd\n";
+    print LDIF "$supplemental_credentials\n";
     close(LDIF);
     # load ldif file
     my $com="ldbmodify -H /var/lib/samba/private/sam.ldb --controls=local_oid:1.3.6.1.4.1.7165.4.3.12:0 $ldif";
