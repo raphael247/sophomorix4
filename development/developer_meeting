@@ -16,19 +16,36 @@ Hardwareklassen:
 
 2) Neu: hwc werden Gruppen (bisher ist das nicht so, linbo etc. schauen in der Datei)
    -> Namensdoppelungen vorab vermeiden (Raum=hwc, Lehrer=hwc, ...)
-   --> hwc_ prefix, wie bei p_
+   --> h_ prefix, wie bei p_
    (ansonsten komplexe kollisionsvermeidungsstaegien bis zum webui)
 
 3) sind hardwareclasses global, oder schulweit?: beides!
    pcs kommen in
-       1) SCHOOL: hwc_bsz-<hwc> bzw. hwc_<hwc>
+       1) SCHOOL: h_bsz-<hwc> bzw. hwc_<hwc>
        (sophomorixType=hardwareclass)
        UND
-       2) GLBAL: all-hwc_<hwc> (angelehnt an all-students, all-teachers, ...)
+       2) GLBAL: all-h_<hwc> (angelehnt an all-students, all-teachers, ...)
        (sophomorixType=hardwareclass) (oder globalhardwareclass???)
 
 
-4) Wie beim raum: IPs,MACs,Computers in sophomorix-Multi-Value attribute
+4) Nochmal neu überdenken:
+   IP's/MAC's/Computers
+
+   A) auflösen mit sophomorix-query
+      --> geht nur als root
+      --> nicht vom client aus
+      --> keine Doppelungen zu Pflegen
+
+   B) eigenes attribut bei Räumen, Hardwareklassen, das
+      IP's,MAC,Computernamen auflöst
+      --> beim syncen mehr arbeit
+      --> kann per ldap abgefragt werden
+
+
+   Was ist besser? Wie funktioniert epoptes-Nachfolger?
+
+
+  Wie beim raum: IPs,MACs,Computers in sophomorix-Multi-Value attribute
    --> Memberships einzeln (auch bei globalen hwc) wie bei den managementgroups . (also nicht hwc_bsz-m17 memberOf all-hwc_m17 /keine Gruppen von Gruppen)
        sondern alle pcs direct member in all-hwc_m17 (wie auch beim Raum)
    --> einfachere scripte
