@@ -309,11 +309,11 @@ if ($test_login==1 and $password ne ""){
         my $dn=$entry->dn();
         my $sam_account=$entry->get_value ('sAMAccountName');
         print "* $sam_account: $dn\n";
-        my ($res,$testpassword)=&AD_login_test($ldap,$root_dse,$dn,$password);
+        my ($res,$testpassword,$res1,$res2)=&AD_login_test($ldap,$root_dse,$dn,$password);
         if ($res==0){
-            print "   * Login with password $password OK!\n";
+            print "   ---> Pam/Kerberos Login with password \"$password\" OK!\n";
         } else {
-            print "   * ERROR logging in with password $password: $res\n";
+            print "   ---> ERROR logging in with password \"$password\": $res (pam: $res1, kerberos: $res2)\n";
         }
     }
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);

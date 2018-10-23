@@ -869,7 +869,7 @@ sub AD_test_object {
              $s_status eq "X"
             ) 
            ){
-            my ($res,$tespassword)=&Sophomorix::SophomorixSambaAD::AD_login_test($ldap,$root_dse,$dn);
+            my ($res,$tespassword,$res1,$res2)=&Sophomorix::SophomorixSambaAD::AD_login_test($ldap,$root_dse,$dn);
             my $firstpass=$entry->get_value ('sophomorixFirstPassword');
             if ($firstpass eq "---" and -e "/etc/linuxmuster/.secret/$sam_account"){
                 $firstpass = `cat /etc/linuxmuster/.secret/$sam_account`;
@@ -877,8 +877,10 @@ sub AD_test_object {
             if ($res==2){
                 #skip test
             } else {
-                is ($res,0,"  * Login OK (pwd: $firstpass): $dn");
+                is ($res1,0,"  * Pam Login OK (pwd: $firstpass): $dn");
+                is ($res2,0,"  * Kerberos Login OK (pwd: $firstpass): $dn");
             }
+
 	} elsif ($objectclass eq "user") {
             print "  * Login test skipped (Status: $s_status):\n";
             print "    $dn\n";

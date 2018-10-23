@@ -7680,15 +7680,16 @@ sub AD_login_test {
     } else {
         # exammode account or normal account (not in exammode)
         # pam login
-        my $command="wbinfo --pam-logon=$sam_account%'$testpassword' > /dev/null 2>&1 ";
-        print "   # $sam_account: $command\n";
-        my $result=system($command);
-        return ($result,$testpassword);
+        my $command1="wbinfo --pam-logon=$sam_account%'$testpassword' > /dev/null 2>&1 ";
+        print "   # $command1\n";
+        my $result1=system($command1);
 
         # kerberos login
-        # my $command="wbinfo --krb5auth=$sam_account%'$testpassword'' > /dev/null 2>&1 ";
-        # print "   # $command\n";
-        # my $result=system($command);
+        my $command2="wbinfo --krb5auth=$sam_account%'$testpassword' > /dev/null 2>&1 ";
+        print "   # $command2\n";
+        my $result2=system($command2);
+        my $result=$result1+$result2;
+        return ($result,$testpassword,$result1,$result2);
     }
 }
 
