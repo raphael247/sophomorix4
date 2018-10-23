@@ -488,7 +488,7 @@ sub AD_dns_kill {
         # delete dnsNode
         my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
             " dns delete $dns_server ".
-            "$dns_zone $dns_node $dns_type $dns_ipv4 ".
+            "$dns_zone $dns_node.$dns_zone $dns_type $dns_ipv4 ".
             "--password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 
@@ -498,7 +498,7 @@ sub AD_dns_kill {
         my $dns_last_octet=$octets[3];
         my $dns_type="PTR";
         my $command_reverse=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
-            " dns delete $dns_server $dns_zone_reverse $dns_last_octet $dns_type $dns_node ".
+            " dns delete $dns_server $dns_zone_reverse $dns_last_octet $dns_type $dns_node.$dns_zone ".
             " --password='******' -U $DevelConf::sophomorix_AD_admin";
         &Sophomorix::SophomorixBase::smb_command($command_reverse,$smb_admin_pass);
     }
