@@ -14,10 +14,10 @@ ldbedit -H /var/lib/samba/private/sam.ldb CN=Sophomorix-First-Password searchfla
 ############################################################
 Password cloning:
 
-Auslesen ALLER Werte aus einem Account
+Auslesen fast ALLER Werte aus einem Account
   # ldbsearch --url /var/lib/samba/private/sam.ldb "sAMAccountName=lordjo42"
 
-Auslesen von unicodePwd:
+Manche attribute müssen explizit angefordert werden dass sie erscheinen:
   # ldbsearch --url /var/lib/samba/private/sam.ldb "sAMAccountName=lordjo42" unicodePwd supplementalCredentials
 
 
