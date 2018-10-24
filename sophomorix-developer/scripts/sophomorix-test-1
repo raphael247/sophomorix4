@@ -325,7 +325,7 @@ if ($add==1 or $test_add==1){
     &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
 
     ##### Testing the users
-
+    print "TEST STARTS: --test-add\n";
 
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -3822,6 +3822,7 @@ if ($migration_kill==1){
     &run_command("sophomorix-user $all_options -K --user schwein42");
     &run_command("sophomorix-check $all_options");
     &run_command("sophomorix-kill $all_options");
+    print "TEST STARTS: --migration-kill (Test Part)\n";
 
     # testing the users
     &AD_object_nonexist($ldap,$root_dse,"user","fisch42");
@@ -3844,7 +3845,11 @@ if ($mod==1){
     #&run_command("sophomorix-quota $all_options");
     &run_command("sophomorix-user $all_options -T --user maiersa42");
     &run_command("sophomorix-quota $all_options --school default-school");
+
+
     # Testing change
+    print "TEST STARTS: --mod (Test Part)\n";
+
     # maiersa42
     #&smbcquotas_test("maiersa42","bsz","2506",$root_dns,$smb_pass)
     &AD_test_object({ldap=>$ldap,
@@ -6144,6 +6149,10 @@ if ($ses==1){
     print "Session tests\n";
     &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 666");
     &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 777");
+
+
+    print "TEST STARTS: --ses (Test Part)\n";
+
     &AD_test_session_count($ldap,$root_dse,$root_dns,$smb_admin_pass,2);
     # maiersa42
     &AD_test_object({ldap=>$ldap,
@@ -8642,6 +8651,8 @@ if ($update==1 or $test_update==1){
     }
 
     ##### Testing the users
+    print "TEST STARTS: --test-update\n";
+
     # maiersa42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maiersa42,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -12103,6 +12114,7 @@ if ($kill==1 or $test_kill==1){
     ############################################################
     # checking if classes are really empty after deleting users
     # member, sophomorixMembers, sophomorixAdmins
+    print "TEST STARTS: --test-kill\n";
 
     # empty classes in default-school
     &AD_test_object({ldap=>$ldap,
@@ -13895,6 +13907,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
         &run_command("sophomorix-class --kill --class uni-alumni $all_options"); #checked above
     }
 
+    print "TEST STARTS: --test-groupkill1\n";
+
     &AD_dn_nonexist($ldap,$root_dse,"OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local");
 
 
@@ -15077,10 +15091,12 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
 if ($groupkill_2==1 or $test_groupkill_2==1){
     if ($groupkill_2==1){
         # remove files to allow deletion
-        &run_command("rm -f /srv/samba/schools/uni/students/alumni/fakeuser");
+        #&run_command("rm -f /srv/samba/schools/uni/students/alumni/fakeuser");
         # kill the class that could not be killed
         &run_command("sophomorix-class --kill --class uni-alumni $all_options");
     }
+
+    print "TEST STARTS: --test-groupkill2\n";
 
     &AD_object_nonexist($ldap,$root_dse,"group","uni-alumni");
 
