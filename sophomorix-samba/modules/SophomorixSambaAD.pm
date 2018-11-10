@@ -7632,9 +7632,9 @@ sub AD_debug_logdump {
 
 
 sub AD_login_test {
-    # return 0: success
+    # return 0: success for all tests
     # return -1: no firstpassword found
-    # return >0: Error code of smbclient command
+    # return >0: Error code of smbclient command (sum of all tests)
     my ($ldap,$root_dse,$dn,$password_option)=@_;
     my $filter="(cn=*)";
     my $mesg = $ldap->search(
@@ -7666,7 +7666,7 @@ sub AD_login_test {
     }
     if (not defined $testpassword){
         # no password found to test
-        return (-1,"");
+        return (-1,"","no password found to test","no password found to test");
     }
     #my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
     #            " -L localhost --user=$sam_account%'$testpassword' > /dev/null 2>&1 ";
@@ -7675,12 +7675,12 @@ sub AD_login_test {
     if ($testpassword eq "---"){
         print "   * $sam_account($status,$user_account_control,$exammode):".
               " No password test possible (Password: $testpassword)\n";
-        return (2,$testpassword);
+        return (2,$testpassword,"no password found to test","no password found to test");
     } elsif ( $exammode ne "---" and $role ne "examuser"){
         # this is a disabled account because of exammode
         print "   * $sam_account ($status,$user_account_control,$exammode):".
               " No password test possible ($sam_account is in ExamMode/disabled)\n";
-        return (2,$testpassword);
+        return (2,$testpassword,"not tested","not tested");
     } else {
         # exammode account or normal account (not in exammode)
         # pam login
