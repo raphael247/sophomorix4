@@ -1950,7 +1950,7 @@ if ($add==1 or $test_add==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "SCHOOLS",
-                   member => "bsz-teachers|bsz-students|bsz-admins",
+                   member => "bsz-teachers|bsz-students|bsz-admins|bsz-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1964,7 +1964,7 @@ if ($add==1 or $test_add==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "SCHOOLS",
-                   member => "teachers|students|admins",
+                   member => "teachers|students|admins|examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -1978,7 +1978,7 @@ if ($add==1 or $test_add==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "SCHOOLS",
-                   member => "uni-teachers|uni-students|uni-admins",
+                   member => "uni-teachers|uni-students|uni-admins|uni-examusers",
                   });
     # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
@@ -10002,7 +10002,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "SCHOOLS",
-                   member => "bsz-teachers|bsz-students|bsz-admins",
+                   member => "bsz-teachers|bsz-students|bsz-admins|bsz-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -10016,7 +10016,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "SCHOOLS",
-                   member => "teachers|students|admins",
+                   member => "teachers|students|admins|examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -10030,7 +10030,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "SCHOOLS",
-                   member => "uni-teachers|uni-students|uni-admins",
+                   member => "uni-teachers|uni-students|uni-admins|uni-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=ghs,OU=ghs,OU=SCHOOLS,".$root_dse,
@@ -10044,7 +10044,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "ghs",
                    memberOf => "SCHOOLS",
-                   member => "ghs-teachers|ghs-students|ghs-admins",
+                   member => "ghs-teachers|ghs-students|ghs-admins|ghs-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lin,OU=lin,OU=SCHOOLS,".$root_dse,
@@ -10058,7 +10058,7 @@ if ($update==1 or $test_update==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "lin",
                    memberOf => "SCHOOLS",
-                   member => "lin-teachers|lin-students|lin-admins",
+                   member => "lin-teachers|lin-students|lin-admins|lin-examusers",
                   });
     # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
@@ -15113,7 +15113,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
                    memberOf => "SCHOOLS",
-                   member => "bsz-teachers|bsz-students|bsz-admins",
+                   member => "bsz-teachers|bsz-students|bsz-admins|bsz-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -15127,7 +15127,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "SCHOOLS",
-                   member => "teachers|students|admins",
+                   member => "teachers|students|admins|examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=uni,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -15141,7 +15141,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "uni",
                    memberOf => "SCHOOLS",
-                   member => "uni-teachers|uni-students|uni-admins",
+                   member => "uni-teachers|uni-students|uni-admins|uni-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=ghs,OU=ghs,OU=SCHOOLS,".$root_dse,
@@ -15155,7 +15155,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "ghs",
                    memberOf => "SCHOOLS",
-                   member => "ghs-teachers|ghs-students|ghs-admins",
+                   member => "ghs-teachers|ghs-students|ghs-admins|ghs-examusers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lin,OU=lin,OU=SCHOOLS,".$root_dse,
@@ -15169,7 +15169,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "lin",
                    memberOf => "SCHOOLS",
-                   member => "lin-teachers|lin-students|lin-admins",
+                   member => "lin-teachers|lin-students|lin-admins|lin-examusers",
                   });
     # group SCHOOLS
     &AD_test_object({ldap=>$ldap,
