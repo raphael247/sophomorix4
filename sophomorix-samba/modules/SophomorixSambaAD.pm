@@ -616,6 +616,10 @@ sub AD_repdir_using_file {
             } elsif ($repdir_file eq "repdir.globaladministrator_home"){
                 $group_type="global-admins";
                 @schools = ($ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'});
+            } elsif ($repdir_file eq "repdir.school"){
+                $group_type="admins";
+            } elsif ($repdir_file eq "repdir.global"){
+                $group_type="admins";
             } else {
                 $group_type="admins";
                 print "WARNING: This else was not expected: $repdir_file\n";
