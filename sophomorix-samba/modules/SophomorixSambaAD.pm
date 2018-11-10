@@ -1479,7 +1479,6 @@ sub AD_session_manage {
 
 
 
-#sub AD_session_set_exam {
 sub AD_user_set_exam_mode {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -1516,7 +1515,6 @@ sub AD_user_set_exam_mode {
 
 
 
-#sub AD_session_unset_exam {
 sub AD_user_unset_exam_mode {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -3255,6 +3253,7 @@ sub AD_get_name_tokened {
         $role eq "project" or
         $role eq "management" or
         $role eq "administrator" or
+        $role eq "ouexamusers" or
         $role eq "sophomorix-group" or
         $role eq "group"){
         if ($school eq "---" 
@@ -7822,6 +7821,10 @@ sub AD_examuser_create {
                                                               sophomorix_config=>$ref_sophomorix_config,
                                                             });
         }
+ 
+    my $role="examuser";
+    my $group_basename="examusers";
+    my $group_type="ouexamusers";
 
     my $result = $ldap->add( $dn,
                    attr => [
@@ -7844,7 +7847,7 @@ sub AD_examuser_create {
                    sophomorixFirstnameASCII => $firstname_ASCII_AD,
                    sophomorixSurnameASCII  => $lastname_ASCII_AD,
                    sophomorixBirthdate  => "01.01.1970",
-                   sophomorixRole => "examuser",
+                   sophomorixRole => $role,
                    sophomorixUserToken => $user_token_AD,
                    sophomorixFirstnameInitial => $firstname_initial_AD,
                    sophomorixSurnameInitial => $lastname_initial_AD,
@@ -7867,7 +7870,14 @@ sub AD_examuser_create {
                            ]
                            );
     &AD_debug_logdump($result,2,(caller(0))[3]);
-    # clone the password
+    # clone the password ???
+
+    my $exam_group=&AD_get_name_tokened($group_basename,$school_AD,$group_type);
+    &AD_group_addmember({ldap => $ldap,
+                         root_dse => $root_dse, 
+                         group => $exam_group,
+                         addmember => $examuser,
+                       }); 
 
     &AD_repdir_using_file({root_dns=>$root_dns,
                            repdir_file=>"repdir.examuser_home",
