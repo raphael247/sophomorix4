@@ -558,7 +558,7 @@ sub smbclient_scopy_recurse {
                     });
     my $smb_dir_home_from_user=$home_directory_AD_from_user;
     $smb_dir_home_from_user=~s/\\/\//g;
-    my ($string1,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
+    my ($string_from_user,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
     $rel_path_home_from_user=~s/^\///g;
     # append subdir
     if ($from_subdir ne ""){
@@ -591,7 +591,7 @@ sub smbclient_scopy_recurse {
 
     my $smb_dir_home_to_user=$home_directory_AD_to_user;
     $smb_dir_home_to_user=~s/\\/\//g;
-    my ($string1,$rel_path_home_to_user)=split(/$school_AD_to_user/,$smb_dir_home_to_user);
+    my ($string_to_user,$rel_path_home_to_user)=split(/$school_AD_to_user/,$smb_dir_home_to_user);
     $rel_path_home_to_user=~s/^\///g;
     # append subdir
     if ($to_subdir ne ""){
@@ -606,25 +606,48 @@ sub smbclient_scopy_recurse {
         exit;
     }
 
-    # show help
-    my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-            "%'******'".
-            " //$root_dns/$school_AD_from_user "." ".
-            $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c 'help'";
-        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    # # show help
+    # my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+    #         " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+    #         "%'******'".
+    #         " //$root_dns/$school_AD_from_user "." ".
+    #         $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+    #         " -c 'help'";
+    #     my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
-
-
- 
     # copy file
     my $deltree="";
     if ($mode eq "deltree-target"){
-        $deltree="rm $rel_path_home_to_user;";
+        $deltree="deltree $rel_path_home_to_user;";
     } else {
         $deltree="";
     }
+
+    # mkdir parent
+    print "$rel_path_home_to_user\n";
+    my (@dirs)=split("/",$rel_path_home_to_user);
+    my @mkdir_paths=();
+    my $mkdir="";
+    foreach my $dir (@dirs){
+        $mkdir=$mkdir."/".$dir;
+        $mkdir=~s/^\///g;
+        push @mkdir_paths, $mkdir;
+    }
+    # remove last entry/copied later
+    my $last_one = pop @mkdir_paths;
+    foreach my $mkdir (@mkdir_paths){
+        print "$mkdir\n";    
+        my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$school_AD_to_user "." ".
+            $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+            " -c 'mkdir $mkdir'";
+        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    }
+
+
+    # copying
     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
