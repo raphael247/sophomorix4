@@ -607,13 +607,13 @@ sub smbclient_scopy_recurse {
     }
 
     # # show help
-    # my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-    #         " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-    #         "%'******'".
-    #         " //$root_dns/$school_AD_from_user "." ".
-    #         $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-    #         " -c 'help'";
-    #     my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+             "%'******'".
+             " //$root_dns/$school_AD_from_user "." ".
+             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+             " -c 'help'";
+         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
     # copy file
     my $deltree="";
@@ -647,16 +647,102 @@ sub smbclient_scopy_recurse {
     }
 
 
-    # copying
+    # copying recursively
+    #  1) scan source -> filelist, dirlist
+    my $ref_stat=&scan_smb_dir($root_dns,
+                               $school_AD_from_user,
+                               $rel_path_home_from_user,
+                               $ref_sophomorix_config,
+                               $ref_sophomorix_result);
+
+    print Dumper($ref_stat);
+
+    #  2) create target directories
+    #  3) copy target files with scopy
+
+
     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
             " //$root_dns/$school_AD_from_user "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c '$deltree scopy $rel_path_home_from_user $rel_path_home_to_user'";
-        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
 }
+
+
+
+sub scan_smb_dir {
+    my %stat=();
+    print "Scanning ...\n";
+    my ($root_dns,$school_AD_from_user,$rel_path_home_from_user,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
+    my @scanlist=($rel_path_home_from_user);
+
+    foreach my $item (@scanlist){
+        my $type=&get_type($root_dns,$school_AD_from_user,$item,$ref_sophomorix_config,$ref_sophomorix_result);
+        print "$item is a $type\n";
+        if ($type eq "dir"){
+            $stat{'LOOKUP'}{$item}="DIR";
+            push @{ $stat{'LISTS'}{'DIR'} },$item;
+            # scan the contents
+            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                "%'******'".
+                " //$root_dns/$school_AD_from_user "." ".
+                $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+                " -c 'cd $item; ls'";
+            my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+            foreach my $stat (@out_lines){
+                my ($dummy,$name,$smb_type,)=split(/\s+/,$stat);
+                if (not defined $name or not defined $smb_type){
+                    next;
+                }
+                if ($name eq "." or $name eq ".."){
+                    next;
+                }
+
+                # valid entries
+                my $dir_rel_path=$item."/".$name;
+                if ($smb_type eq "D"){
+                    # directory
+                    push @scanlist, $dir_rel_path;
+                } elsif ($smb_type eq "N"){
+                    # node/files
+                    push @{ $stat{'LISTS'}{'FILE'} },$dir_rel_path;
+                }
+            }
+        } elsif ($type eq "file"){
+            push @{ $stat{'LISTS'}{'FILE'} },$item;
+        }
+    }
+    return \%stat;
+}
+
+
+
+sub get_type {
+    my ($root_dns,$school_AD_from_user,$rel_path_home_from_user,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
+    my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$school_AD_from_user "." ".
+            $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+            " -c 'stat $rel_path_home_from_user; exit;'";
+    my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    my $type="file"; 
+    foreach my $stat (@out_lines){
+        if ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
+            $type="dir";
+            last;
+        } else {
+            # nothing
+        }
+    }
+    
+    return $type;
+}
+
 
 
 sub smbclient_mget_recurse {
