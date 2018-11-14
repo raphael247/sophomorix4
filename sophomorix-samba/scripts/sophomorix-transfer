@@ -647,6 +647,7 @@ sub smbclient_scopy_recurse {
 
     
     #  3) decide what to do
+
     # A) source nonexisting
     if ($ref_source->{OPTION_NODE} eq "NONEXISTING"){
         &log_script_exit("ERROR Source file/dir nonexisting: $ref_source->{OPTION_SCHOOL} -> $ref_source->{OPTION_REL_PATH}",1,1,0,
@@ -657,11 +658,10 @@ sub smbclient_scopy_recurse {
     if ($ref_source->{OPTION_NODE} eq "FILE" and 
            ($ref_target->{OPTION_NODE} eq "NONEXISTING" or $ref_target->{OPTION_NODE} eq "FILE")
         ){
-        my $deltree="";
+        my $rm="";
         if ($ref_target->{OPTION_NODE} eq "FILE"){
-            $deltree="deltree $rel_path_home_to_user;";
+            $rm="rm $rel_path_home_to_user;";
         }
-        print "HERE\n";
         &smb_mkdir_parent($root_dns,
                           $school_AD_to_user,
                           $rel_path_home_to_user,
@@ -673,7 +673,39 @@ sub smbclient_scopy_recurse {
             "%'******'".
             " //$root_dns/$school_AD_to_user "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c '$deltree scopy $rel_path_home_from_user $rel_path_home_to_user'";
+            " -c '$rm scopy $rel_path_home_from_user $rel_path_home_to_user'";
+        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+        &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    }
+
+    # C) file -> dir (copy into dir if no other dir is in the way)
+    if ($ref_source->{OPTION_NODE} eq "FILE" and $ref_target->{OPTION_NODE} eq "DIR"){
+        my $target;
+        if ($ref_target->{OPTION_NODE} eq "FILE"){
+            $target=$ref_target->{OPTION_REL_PATH};
+        } elsif ($ref_target->{OPTION_NODE} eq "DIR"){
+            my $filename  = basename($ref_source->{OPTION_REL_PATH}); 
+            $target=$ref_target->{OPTION_REL_PATH}."/".$filename;
+        }
+
+        my $rm;
+        if (not exists $ref_target->{LOOKUP}{$target}){
+            $rm="";
+        } elsif ($ref_target->{LOOKUP}{$target} eq "FILE"){
+            $rm="rm $target;";
+        } elsif ($ref_target->{LOOKUP}{$target} eq "DIR"){
+
+            &log_script_exit("ERROR Overwriting directory $ref_target->{OPTION_SCHOOL} -> $target with non-directory not possible",1,1,0,
+                     $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+        }
+
+        my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$school_AD_to_user "." ".
+            $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+            " -c '$rm scopy $rel_path_home_from_user $target'";
+        print "$smbclient_command\n";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
@@ -728,13 +760,13 @@ sub scan_smb_dir {
     my ($root_dns,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
     print "##### Scanning dir:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
+    $stat{'OPTION_REL_PATH'}=$rel_path;
+    $stat{'OPTION_SCHOOL'}=$school;
+    my $type=&get_type_inode($root_dns,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
+    $stat{'OPTION_NODE'}=$type;
 
     foreach my $rel_item (@scanlist){
         my $type=&get_type_inode($root_dns,$school,$rel_item,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
-        $stat{'OPTION_NODE'}=$type;
-        $stat{'OPTION_REL_PATH'}=$rel_item;
-        $stat{'OPTION_SCHOOL'}=$school;
-
         if ($type eq "DIR"){
             $stat{'LOOKUP'}{$rel_item}="DIR";
             push @{ $stat{'LISTS'}{'DIRS'} },$rel_item;
@@ -755,12 +787,13 @@ sub scan_smb_dir {
                     next;
                 }
 
+		print "$stat\n";
                 # valid entries
                 my $dir_rel_path=$rel_item."/".$name;
                 if ($smb_type eq "D"){
                     # directory
                     push @scanlist, $dir_rel_path;
-                } elsif ($smb_type eq "N"){
+                } elsif ($smb_type eq "N" or $smb_type eq "A"){
                     # node/files
                     $stat{'LOOKUP'}{$dir_rel_path}="FILE";
                     push @{ $stat{'LISTS'}{'FILES'} },$dir_rel_path;
