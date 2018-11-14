@@ -631,9 +631,10 @@ sub smbclient_scopy_recurse {
         $deltree="";
     }
 
-
-    # copying recursively
-    #  1) scan source -> filelist, dirlist
+    ############################################################
+    #  1) Scanning
+    ############################################################
+    #     scan source -> filelist, dirlist
     my $ref_source=&scan_smb_dir($root_dns,
                                  $school_AD_from_user,
                                  $rel_path_home_from_user,
@@ -642,7 +643,7 @@ sub smbclient_scopy_recurse {
                                  $ref_sophomorix_result);
     print Dumper($ref_source);
 
-    #  2) scan target -> filelist, dirlist
+    #     scan target -> filelist, dirlist
     my $ref_target=&scan_smb_dir($root_dns,
                                  $school_AD_to_user,
                                  $rel_path_home_to_user,
@@ -650,16 +651,20 @@ sub smbclient_scopy_recurse {
                                  $ref_sophomorix_config,
                                  $ref_sophomorix_result);
     print Dumper($ref_target);
-
     
-    #  3) decide what to do
+    ############################################################
+    #  2) decide what to do
+    ############################################################
 
+    ############################################################
     # A) source nonexisting
     if ($ref_source->{OPTION_NODE} eq "NONEXISTING"){
         &log_script_exit("ERROR Source file/dir nonexisting: $ref_source->{OPTION_SCHOOL} -> $ref_source->{OPTION_REL_PATH}",1,1,0,
                      $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
     }
 
+
+    ############################################################
     # B) file -> file/nonexisting (last path name is considered the filename)
     if ($ref_source->{OPTION_NODE} eq "FILE" and 
            ($ref_target->{OPTION_NODE} eq "NONEXISTING" or $ref_target->{OPTION_NODE} eq "FILE")
@@ -686,6 +691,8 @@ sub smbclient_scopy_recurse {
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
 
+
+    ############################################################
     # C) file -> dir (copy into dir if no other dir is in the way)
     if ($ref_source->{OPTION_NODE} eq "FILE" and $ref_target->{OPTION_NODE} eq "DIR"){
         my $target;
@@ -718,6 +725,8 @@ sub smbclient_scopy_recurse {
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
 
+
+    ############################################################
     # D) dir -> file (error)
     if ($ref_source->{OPTION_NODE} eq "DIR" and $ref_target->{OPTION_NODE} eq "FILE"){
         &log_script_exit("ERROR Overwriting file $ref_target->{OPTION_SCHOOL} -> $ref_target->{OPTION_REL_PATH} with directory $ref_source->{OPTION_SCHOOL} -> $ref_source->{OPTION_REL_PATH} not possible",1,1,0,
@@ -725,7 +734,7 @@ sub smbclient_scopy_recurse {
     }
 
 
-
+    ############################################################
     # E) dir -> dir (copy recursively)
     if ($ref_source->{OPTION_NODE} eq "DIR" and 
           ($ref_target->{OPTION_NODE} eq "DIR" or $ref_target->{OPTION_NODE} eq "NONEXISTING")  
@@ -778,7 +787,6 @@ sub smbclient_scopy_recurse {
             } else {
                 $target_file=~s/^$ref_source->{OPTION_REL_PATH}/$ref_target->{OPTION_REL_PATH}\/$last_source_dir/;
             }
-
 
             # decide if file must be removed before scopy
             my $rm="";
