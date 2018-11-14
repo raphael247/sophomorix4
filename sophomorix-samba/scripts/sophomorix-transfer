@@ -82,9 +82,10 @@ my $info=0;
 my $json=0;
 
 my $scopy=0;
+my $scopy_deltree_target=0;
 my $from_subdir="";
 my $to_subdir="";
-my $scopy_deltree_target=0;
+my $no_target_directory=0;
 
 my $from_unix_path="";
 my $to_user="";
@@ -115,6 +116,7 @@ my $testopt=GetOptions(
            "to-user=s" => \$to_user,
            "from-user=s" => \$from_user,
            "subdir=s" => \$subdir,
+           "no-target-directory|T" => \$no_target_directory,
            "file-list=s" => \$file_list,
            "collect-copy" => \$collect_copy,
            "collect-move" => \$collect_move,
@@ -154,11 +156,15 @@ Options:
   --debug-level  (debug level for smbclient)
 
 
-# serversite copy (universal recursive command)
+# serversite copy (universal recursive cp command)
   # do not overwrite existing files:
     sophomorix-transfer --scopy --from-user <user1> --from-subdir <fsubdir> --to-user <user2> --to-dir <tsubdir>
   # delete target files fist, then copy them
     sophomorix-transfer --scopy-deltree-target --from-user <user1> --from-subdir <fsubdir> --to-user <user2> --to-dir <tsubdir>
+  # modifiers
+    --no-target-directory  (cp contents of source directory only, but not directory itself)
+    
+
 
 # share data
   sophomorix-transfer --from-unix-path /srv/upload/... --to-user <user1>,<user2>-exam, ... --subdir <dir>
@@ -666,6 +672,8 @@ sub smbclient_scopy_recurse {
                           $school_AD_to_user,
                           $rel_path_home_to_user,
                           $smb_admin_pass,
+                          "ALL_BUT_LAST",
+                          $ref_target,
                           $ref_sophomorix_config,
                           $ref_sophomorix_result);
         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -710,47 +718,88 @@ sub smbclient_scopy_recurse {
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
 
-
-    exit;
-
-
-    #  4) create target directories
- 
-    # # mkdir parent
-    # print "$rel_path_home_to_user\n";
-    # my (@dirs)=split("/",$rel_path_home_to_user);
-    # my @mkdir_paths=();
-    # my $mkdir="";
-    # foreach my $dir (@dirs){
-    #     $mkdir=$mkdir."/".$dir;
-    #     $mkdir=~s/^\///g;
-    #     push @mkdir_paths, $mkdir;
-    # }
-    # # remove last entry/copied later
-    # my $last_one = pop @mkdir_paths;
-    # foreach my $mkdir (@mkdir_paths){
-    #     print "$mkdir\n";    
-    #     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-    #         " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-    #         "%'******'".
-    #         " //$root_dns/$school_AD_to_user "." ".
-    #         $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-    #         " -c 'mkdir $mkdir'";
-    #     my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-    # }
+    # D) dir -> file (error)
+    if ($ref_source->{OPTION_NODE} eq "DIR" and $ref_target->{OPTION_NODE} eq "FILE"){
+        &log_script_exit("ERROR Overwriting file $ref_target->{OPTION_SCHOOL} -> $ref_target->{OPTION_REL_PATH} with directory $ref_source->{OPTION_SCHOOL} -> $ref_source->{OPTION_REL_PATH} not possible",1,1,0,
+            $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+    }
 
 
-    #  5) copy target files with scopy
+
+    # E) dir -> dir (copy recursively)
+    if ($ref_source->{OPTION_NODE} eq "DIR" and 
+          ($ref_target->{OPTION_NODE} eq "DIR" or $ref_target->{OPTION_NODE} eq "NONEXISTING")  
+       ){
+        my (@source_parts)=split("/",$ref_source->{OPTION_REL_PATH});
+        my $last_source_dir = pop @source_parts;
+
+        ############################################################
+        # create parent dirs
+        print "##### Creating parent dirs\n";
+        &smb_mkdir_parent($root_dns,
+                          $school_AD_to_user,
+                          $rel_path_home_to_user,
+                          $smb_admin_pass,
+                          "ALL",
+                          $ref_target,
+                          $ref_sophomorix_config,
+                          $ref_sophomorix_result);
+
+        ############################################################
+        # copy DIRS
+        print "##### Creating dirs\n";
+        foreach my $source_dir (@{ $ref_source->{'LISTS'}{'DIRS'} }){
+            my $target_dir=$source_dir;
+            # --no-target-directory
+            if ($no_target_directory==1){
+                $target_dir=~s/^$ref_source->{OPTION_REL_PATH}/$ref_target->{OPTION_REL_PATH}/;
+            } else {
+                $target_dir=~s/^$ref_source->{OPTION_REL_PATH}/$ref_target->{OPTION_REL_PATH}\/$last_source_dir/;
+            }
+            
+            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                "%'******'".
+                " //$root_dns/$school_AD_to_user "." ".
+                $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+                " -c 'mkdir $target_dir'";
+            print "$smbclient_command\n";
+            my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+        }
+
+        ############################################################
+        # copy FILES
+        print "##### Copying files\n";
+        foreach my $source_file (@{ $ref_source->{'LISTS'}{'FILES'} }){
+            my $target_file=$source_file;
+            # --no-target-directory
+            if ($no_target_directory==1){
+                $target_file=~s/^$ref_source->{OPTION_REL_PATH}/$ref_target->{OPTION_REL_PATH}/;
+            } else {
+                $target_file=~s/^$ref_source->{OPTION_REL_PATH}/$ref_target->{OPTION_REL_PATH}\/$last_source_dir/;
+            }
 
 
-    my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-            "%'******'".
-            " //$root_dns/$school_AD_from_user "." ".
-            $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c '$deltree scopy $rel_path_home_from_user $rel_path_home_to_user'";
-    my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+            # decide if file must be removed before scopy
+            my $rm="";
+            if (exists $ref_target->{'LOOKUP'}{$target_file}){
+                if ($ref_target->{'LOOKUP'}{$target_file} eq "FILE"){
+                    $rm="rm $target_file;";
+                } elsif ($ref_target->{'LOOKUP'}{$target_file} eq "DIR"){
+                    $rm="deltree $target_file;";
+                }
+            }
 
+            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                "%'******'".
+                " //$root_dns/$school_AD_to_user "." ".
+                $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+                " -c '$rm scopy $source_file $target_file'";
+            print "$smbclient_command\n";
+            my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+        }
+    }
 }
 
 
@@ -840,7 +889,14 @@ sub get_type_inode {
 
 
 sub smb_mkdir_parent {
-    my ($root_dns,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
+    my ($root_dns,
+        $school,
+        $rel_path,
+        $smb_admin_pass,
+        $type,
+        $ref_target,
+        $ref_sophomorix_config,
+        $ref_sophomorix_result)=@_;
     # mkdir parent
     print "$rel_path\n";
     my (@dirs)=split("/",$rel_path);
@@ -851,8 +907,13 @@ sub smb_mkdir_parent {
         $mkdir=~s/^\///g;
         push @mkdir_paths, $mkdir;
     }
-    # remove last entry/copied later
-    my $last_one = pop @mkdir_paths;
+    if ($type eq "ALL"){
+        # do nothing
+    } else {
+        # remove last entry/copied later
+        my $last_one = pop @mkdir_paths;
+    }
+
     foreach my $mkdir (@mkdir_paths){
         print "$mkdir\n";    
         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
