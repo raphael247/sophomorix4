@@ -82,7 +82,6 @@ my $info=0;
 my $json=0;
 
 my $scopy=0;
-my $scopy_deltree_target=0;
 my $from_subdir="";
 my $to_subdir="";
 my $no_target_directory=0;
@@ -110,7 +109,6 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "from-unix-path=s" => \$from_unix_path,
            "scopy" => \$scopy,
-           "scopy-deltree-target" => \$scopy_deltree_target,
            "from-subdir=s" => \$from_subdir,
            "to-subdir=s" => \$to_subdir,
            "to-user=s" => \$to_user,
@@ -156,14 +154,11 @@ Options:
   --debug-level  (debug level for smbclient)
 
 
-# serversite copy (universal recursive cp command)
-  # do not overwrite existing files:
+# serverside copy (universal recursive cp command)
+  # overwrite dirs/files as the unix cp command would do
     sophomorix-transfer --scopy --from-user <user1> --from-subdir <fsubdir> --to-user <user2> --to-dir <tsubdir>
-  # delete target files fist, then copy them
-    sophomorix-transfer --scopy-deltree-target --from-user <user1> --from-subdir <fsubdir> --to-user <user2> --to-dir <tsubdir>
   # modifiers
     --no-target-directory  (cp contents of source directory only, but not directory itself)
-    
 
 
 # share data
@@ -215,21 +210,14 @@ if ($info==1) {
 ################################################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
-#print "$from_unix_path\n";
-#print "$to_user\n";
+
 
 # --scopy --from-user <user1> --from-subdir <fsubdir> --to-user <user2> --to-dir <tsubdir>
-if (($scopy==1 or $scopy_deltree_target==1) and $from_user ne "" and $to_user ne ""){
-    my $mode="";
-    if ($scopy==1){
-        $mode="scopy";
-    } elsif ($scopy_deltree_target==1){
-        $mode="deltree-target";
-    }
-
+if ($scopy==1 and $from_user ne "" and $to_user ne ""){
     &print_title("Copying ...");
     print "   * From user:  $from_user  $from_subdir \n";
     print "   * To user:    $to_user  $to_subdir\n";
+
     &smbclient_scopy_recurse({ldap=>$ldap,
                              root_dse=>$root_dse,
                              root_dns=>$root_dns,
@@ -238,15 +226,15 @@ if (($scopy==1 or $scopy_deltree_target==1) and $from_user ne "" and $to_user ne
                              from_subdir=>$from_subdir,
                              to_user=>$to_user,
                              to_subdir=>$to_subdir,
-                             mode=>$mode,
                              json=>$json,
                              arguments=>\@arguments,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,
                            });
-
     exit;
 }
+
+
 
 # --from-unix-path /srv/upload/... --to-user <user1>,<user2>-exam, ...
 if ($from_unix_path ne "" and $to_user ne ""){
@@ -538,7 +526,6 @@ sub smbclient_scopy_recurse {
     my $from_subdir = $arg_ref->{from_subdir};
     my $to_user = $arg_ref->{to_user};
     my $to_subdir = $arg_ref->{to_subdir};
-    my $mode = $arg_ref->{mode};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -615,21 +602,13 @@ sub smbclient_scopy_recurse {
     }
 
     # # show help
-     my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-             "%'******'".
-             " //$root_dns/$school_AD_from_user "." ".
-             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-             " -c 'help'";
-         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-
-    # copy file
-    my $deltree="";
-    if ($mode eq "deltree-target"){
-        $deltree="deltree $rel_path_home_to_user;";
-    } else {
-        $deltree="";
-    }
+    # my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+    #         " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+    #         "%'******'".
+    #         " //$root_dns/$school_AD_from_user "." ".
+    #         $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+    #         " -c 'help'";
+    #     my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
     ############################################################
     #  1) Scanning
