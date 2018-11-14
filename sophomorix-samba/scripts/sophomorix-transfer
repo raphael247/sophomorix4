@@ -126,7 +126,7 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
           );
 
-my %sophomorix_result=&result_sophomorix_init("sophomorix-exam-mode");
+my %sophomorix_result=&result_sophomorix_init("sophomorix-transfer");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
 
@@ -234,6 +234,7 @@ if (($scopy==1 or $scopy_deltree_target==1) and $from_user ne "" and $to_user ne
                              to_subdir=>$to_subdir,
                              mode=>$mode,
                              json=>$json,
+                             arguments=>\@arguments,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,
                            });
@@ -535,6 +536,7 @@ sub smbclient_scopy_recurse {
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+    my $ref_arguments = $arg_ref->{arguments};
 
     # from user
     my ($firstname_utf8_AD_from_user,
@@ -643,6 +645,11 @@ sub smbclient_scopy_recurse {
 
     
     #  3) decide what to do
+    if ($ref_source->{OPTION_NODE} eq "NONEXISTING"){
+        &log_script_exit("ERROR Source file/dir nonexisting: $ref_source->{OPTION_SCHOOL} -> $ref_source->{OPTION_REL_PATH}",1,1,0,
+                     $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+        exit 66;
+    }
     exit;
 
 
@@ -694,8 +701,10 @@ sub scan_smb_dir {
 
     foreach my $item (@scanlist){
         my $type=&get_type_inode($root_dns,$school_AD_from_user,$item,$ref_sophomorix_config,$ref_sophomorix_result);
-        print "$item is a $type\n";
         $stat{'OPTION_NODE'}=$type;
+        $stat{'OPTION_REL_PATH'}=$item;
+        $stat{'OPTION_SCHOOL'}=$school_AD_from_user;
+
         if ($type eq "DIR"){
             $stat{'LOOKUP'}{$item}="DIR";
             push @{ $stat{'LISTS'}{'DIRS'} },$item;
