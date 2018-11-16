@@ -40,6 +40,7 @@ $Data::Dumper::Terse = 1;
             start_fs_test
             end_fs_test
             directory_tree_test
+            test_file_content
             run_command
             file_test_lines
             file_test_chars
@@ -1093,6 +1094,17 @@ sub directory_tree_test {
     foreach my $dir (@untested){
         is (0,1, "* Existing, but not tested: $dir");
     } 
+}
+
+
+
+sub test_file_content {
+    # tests if the content of a file is as given
+    my ($path,$string)=@_;;
+    my $content=`cat $path`;
+    chomp($content);
+    #print "CONTENT: <$content> <$string>\n";
+    is ($content,$string,"  * content of $path is $string");
 }
 
 

@@ -902,7 +902,6 @@ sub smb_mkdir_parent {
     }
 
     foreach my $mkdir (@mkdir_paths){
-        print "HERE: $mkdir\n";    
         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".

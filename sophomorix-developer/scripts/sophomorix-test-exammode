@@ -34,6 +34,7 @@ use Sophomorix::SophomorixTest qw(
                                  AD_test_object
                                  run_command
                                  directory_tree_test
+                                 test_file_content
                                  start_fs_test
                                  end_fs_test
                                  NTACL_test
@@ -1926,9 +1927,18 @@ if ($file_transfer_scopy==1){
                         ); 
     &end_fs_test(\%fs_test_result);
 
+    &test_file_content("/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt","testfile-01-01.txt");
+    &test_file_content("/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir/to/new-filename.txt","testfile-01-01.txt");
+
+    # Test if overwriting of a file works
+    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01/testfile-01-02.txt --to-user jonsonad72-exam --to-path topfile.txt"); 
+    &test_file_content("/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt","testfile-01-02.txt");
+
     # delete created files from B)
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/jonsonad72-exam/dir");
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt");
+
+
 
     ############################################################
     # Test C)
