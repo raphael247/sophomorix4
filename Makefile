@@ -77,6 +77,7 @@ FILTER=$(DESTDIR)/usr/share/sophomorix/filter
 # Testfiles
 DEVELOPERDIR=$(DESTDIR)/usr/share/sophomorix-developer
 TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
+TESTFILES=$(DESTDIR)/usr/share/sophomorix-developer/testfiles
 TESTTEMPLATES=$(DESTDIR)/usr/share/sophomorix-developer/testtemplates
 
 
@@ -272,6 +273,15 @@ install-developer:
 # schema tols
 	@install -d -m755 -oroot -groot $(DEVELOPERDIR)/schema-tools
 	@install -oroot -groot --mode=0644 sophomorix-developer/schema-tools/sophomorix-schema-update-set-schema-version.ldif $(DEVELOPERDIR)/schema-tools
+
+# installing  testdata
+	@install -d $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-02.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-03.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01-01.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01-02.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01-03.txt $(TESTFILES)
 
 # installing  testdata
 	@install -d $(TESTDATA)
