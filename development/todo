@@ -25,13 +25,17 @@ sophomorix-transfer -scopy
 
 -> performance: smb_mkdir_parent just recreate dirs under home
 -> performance: do no recreate dirs found on scan
+-> copy to multiple users:
+   performance plus: scan source only once
+   problem: first check everything, then copy all or nothing
+   (option: --delete-target ???)
 
 Tests --scopy innerhalb Schule
    A) OK
    B) OK
    C) todo --> dir is in the way of a file testen
    D) OK
-   E) todo
+   E) OK --> todo dir is in the way of a file testen
 
 --scopy von Schule zu Schule umsetzen
    A) todo
@@ -60,7 +64,7 @@ Vorhanden:                                   Neu:
    - Listing of scans
    - Warnings: Target aleady there, ... command will fail
 
---scopy --delete-target (Vorsct)
+--scopy --delete-target (Vorsicht)
 ------------------------------------------------------------
 
 
