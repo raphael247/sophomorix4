@@ -1525,6 +1525,9 @@ if ($file_transfer_scopy==1){
     &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-03.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01");
 
     &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01-01.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01-02.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01");
+
     &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02");
     &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03");
 
@@ -1575,6 +1578,8 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-02",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-03",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-02.txt",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01",
@@ -1681,6 +1686,9 @@ if ($file_transfer_scopy==1){
     # E) dir -> dir (copy recursively)
     # copy into transfer (results in muellegr72-exam/transfer/testdir-01)
     &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01 --to-user muellegr72-exam --to-path transfer");
+    # use --no-target-directory 
+    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01 --to-user samardze72-exam --to-path transfer --no-target-directory");
+
 
     ############################################################
 
@@ -1709,6 +1717,8 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-01",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-01/testfile-01-01-02.txt",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-02",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-03",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testfile-01-01.txt",
@@ -1722,6 +1732,16 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01/testfile-01-01-02.txt",
+
+
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-02",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-03",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-02.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-03.txt",
                          "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
@@ -1736,6 +1756,8 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-02",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-03",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-02.txt",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01",
@@ -1845,8 +1867,13 @@ if ($file_transfer_scopy==1){
 
     # delete created files from E)
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01");
-
-
+    
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01");
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-02");
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-03");
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt");
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-02.txt");
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-03.txt");
 
     ############################################################
     # delete dirs/files at user wu72
