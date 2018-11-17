@@ -1513,7 +1513,7 @@ if ($test_exammode_users==1){
 # do the file transfer, scopy
 ############################################################
 if ($file_transfer_scopy==1){
-    # create some files at user wu72
+    # create some files/dirs at user wu72
     &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01.txt /srv/samba/schools/bsz/teachers/wu72");
     &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-02.txt /srv/samba/schools/bsz/teachers/wu72");
     &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-03.txt /srv/samba/schools/bsz/teachers/wu72");
@@ -1529,6 +1529,9 @@ if ($file_transfer_scopy==1){
     &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03");
 
     &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01");
+
+    # create some files at user maiersa72-exam
+    &run_command("touch /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt");
 
     # test file creation
     ############################################################
@@ -1549,6 +1552,7 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/examusers",
                          "/srv/samba/schools/bsz/examusers/subdir72",
                          "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt",
                          "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
@@ -1670,6 +1674,9 @@ if ($file_transfer_scopy==1){
     # C) file -> dir (copy into dir if no other dir is in the way)
     &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testfile-02.txt --to-user maiersa72-exam --to-path transfer");
 
+    # D) dir -> file (error)
+    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01 --to-user maiersa72-exam --to-path blockfile.txt");
+
     ############################################################
 
     ############################################################
@@ -1690,6 +1697,7 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/examusers",
                          "/srv/samba/schools/bsz/examusers/subdir72",
                          "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt",
                          "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
                          "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer/testfile-02.txt",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
@@ -1820,6 +1828,8 @@ if ($file_transfer_scopy==1){
 
     # delete created files from C)
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer/testfile-02.txt");
+    # delete created files from D)
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt");
 
     ############################################################
     # Test C)
