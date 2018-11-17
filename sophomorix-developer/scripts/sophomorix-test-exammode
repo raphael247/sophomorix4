@@ -1669,28 +1669,25 @@ if ($file_transfer_scopy==1){
 
     ############################################################
     # Test A) source nonexisting (within school)
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path transfer/77.txt --to-user jonsonad72-exam --to-path transfer"); 
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path transfer/77.txt --to-user jonsonad72-exam --to-path transfer"); 
 
     # Test B) cp file to NONEXISTING (within school)
     # copy file only
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user jonsonad72-exam --to-path dir/to/new-filename.txt");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user jonsonad72-exam --to-path dir/to/new-filename.txt");
     # create parent dir and copy file 
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user jonsonad72-exam --to-path topfile.txt"); 
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user jonsonad72-exam --to-path topfile.txt"); 
 
     # C) file -> dir (copy into dir if no other dir is in the way)
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testfile-02.txt --to-user maiersa72-exam --to-path transfer");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testfile-02.txt --to-user maiersa72-exam --to-path transfer");
 
     # D) dir -> file (error)
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01 --to-user maiersa72-exam --to-path blockfile.txt");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user maiersa72-exam --to-path blockfile.txt");
 
     # E) dir -> dir (copy recursively)
     # copy into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01 --to-user muellegr72-exam --to-path transfer");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user muellegr72-exam --to-path transfer");
     # use --no-target-directory 
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path testdir-01 --to-user samardze72-exam --to-path transfer --no-target-directory");
-
-
-    ############################################################
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user samardze72-exam --to-path transfer --no-target-directory");
 
     ############################################################
     # fs test
@@ -1735,8 +1732,6 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01/testfile-01-01-01.txt",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01/testfile-01-01-02.txt",
-
-
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-02",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-03",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt",
