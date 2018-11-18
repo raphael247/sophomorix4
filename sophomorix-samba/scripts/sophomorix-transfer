@@ -531,6 +531,16 @@ sub smbclient_scopy_recurse {
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
     my $ref_arguments = $arg_ref->{arguments};
 
+    my %copy=();
+
+    my (@from_user)=split(/,/,$from_user);
+    my (@to_user)=split(/,/,$to_user);
+
+    print "From user: @from_user\n";
+    print "To user:   @to_user\n";
+
+    # 
+
     # from user
     my ($firstname_utf8_AD_from_user,
         $lastname_utf8_AD_from_user,
@@ -566,6 +576,12 @@ sub smbclient_scopy_recurse {
     } else {
         $rel_path_from_user=$rel_path_home_from_user;
     }
+    
+    # save some stuff
+    $copy{'FROM'}{$from_user}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
+    $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'}=$rel_path_home_from_user;
+    $copy{'FROM'}{$from_user}{'SCHOOL'}=$school_AD_from_user;
+
 
 
     # to user
@@ -606,8 +622,14 @@ sub smbclient_scopy_recurse {
         $rel_path_to_user=$rel_path_home_to_user;
     }
 
+    # save some stuff
+    $copy{'TO'}{$to_user}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
+    $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}=$rel_path_home_to_user;
+    $copy{'TO'}{$to_user}{'SCHOOL'}=$school_AD_to_user;
 
-    if ($school_AD_to_user ne $school_AD_from_user){
+
+
+    if ($copy{'TO'}{$to_user}{'SCHOOL'} ne $copy{'FROM'}{$from_user}{'SCHOOL'}){
         # use mget and mput later
         print "ERROR: scopy not available to copy from school $school_AD_from_user to school $school_AD_to_user \n\n";
         exit;
@@ -628,7 +650,7 @@ sub smbclient_scopy_recurse {
     #     scan source -> filelist, dirlist
     my $ref_source=&scan_smb_dir($root_dns,
                                  $from_user,
-                                 $school_AD_from_user,
+                                 $copy{'FROM'}{$from_user}{'SCHOOL'},
                                  $rel_path_from_user,
                                  $smb_admin_pass,
                                  $ref_sophomorix_config,
@@ -638,13 +660,15 @@ sub smbclient_scopy_recurse {
     #     scan target -> filelist, dirlist
     my $ref_target=&scan_smb_dir($root_dns,
                                  $to_user,
-                                 $school_AD_to_user,
+                                 $copy{'TO'}{$to_user}{'SCHOOL'},
                                  $rel_path_to_user,
                                  $smb_admin_pass,                                 
                                  $ref_sophomorix_config,
                                  $ref_sophomorix_result);
     print Dumper($ref_target);
-    
+  
+
+    print Dumper(\%copy);  
     ############################################################
     #  2) decide what to do
     ############################################################
@@ -667,7 +691,7 @@ sub smbclient_scopy_recurse {
             $rm="rm $rel_path_to_user;";
         }
         &smb_mkdir_parent($root_dns,
-                          $school_AD_to_user,
+                          $copy{'TO'}{$to_user}{'SCHOOL'},
                           $rel_path_to_user,
                           $smb_admin_pass,
                           $rel_path_home_to_user, # start below from here
@@ -678,7 +702,7 @@ sub smbclient_scopy_recurse {
         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$school_AD_to_user "." ".
+            " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c '$rm scopy $rel_path_from_user $rel_path_to_user'";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
@@ -711,7 +735,7 @@ sub smbclient_scopy_recurse {
         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$school_AD_to_user "." ".
+            " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c '$rm scopy $rel_path_from_user $target'";
         print "$smbclient_command\n";
@@ -740,7 +764,7 @@ sub smbclient_scopy_recurse {
         # create parent dirs
         print "##### Creating parent dirs\n";
         &smb_mkdir_parent($root_dns,
-                          $school_AD_to_user,
+                          $copy{'TO'}{$to_user}{'SCHOOL'},
                           $rel_path_to_user,
                           $smb_admin_pass,
                           $rel_path_home_to_user, # start below from here
@@ -767,8 +791,10 @@ sub smbclient_scopy_recurse {
             if (exists $ref_target->{$to_user}{LOOKUP}{$target_dir}){
                 if ($ref_target->{$to_user}{LOOKUP}{$target_dir} eq "DIR"){
                     next;
-                } else {
-                    
+                } elsif ($ref_target->{$to_user}{LOOKUP}{$target_dir} eq "FILE"){
+                    # There is a file, where a dir should be created
+                    &log_script_exit("ERROR Overwriting file $target_dir with directory not possible",1,1,0,
+                     $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
                 }
             } else {
                 push @mkdir_list,$target_dir;
@@ -780,7 +806,7 @@ sub smbclient_scopy_recurse {
             my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                 "%'******'".
-                " //$root_dns/$school_AD_to_user "." ".
+                " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
                 $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
                 " -c 'mkdir $mkdir_dir'";
             print "$smbclient_command\n";
@@ -812,7 +838,7 @@ sub smbclient_scopy_recurse {
             my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                 "%'******'".
-                " //$root_dns/$school_AD_to_user "." ".
+                " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
                 $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
                 " -c '$rm scopy $source_file $target_file'";
             print "$smbclient_command\n";
