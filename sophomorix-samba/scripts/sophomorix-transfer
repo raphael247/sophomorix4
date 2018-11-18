@@ -811,15 +811,18 @@ sub smbclient_scopy_recurse {
 sub scan_smb_dir {
     my %stat=();
     my ($root_dns,$user,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
-    print "##### Scanning dir:  School: $school Subdir: $rel_path ...\n";
+    print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
     $stat{$user}{'OPTION_REL_PATH'}=$rel_path;
     $stat{$user}{'OPTION_SCHOOL'}=$school;
-    my $type=&get_type_inode($root_dns,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
-    $stat{$user}{'OPTION_NODE'}=$type;
 
+    my $num=0;
     foreach my $rel_item (@scanlist){
+        $num++;
         my $type=&get_type_inode($root_dns,$school,$rel_item,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
+        if ($num==1){
+            $stat{$user}{'OPTION_NODE'}=$type;   
+        }
         if ($type eq "DIR"){
             $stat{$user}{'LOOKUP'}{$rel_item}="DIR";
             push @{ $stat{$user}{'LISTS'}{'DIRS'} },$rel_item;
