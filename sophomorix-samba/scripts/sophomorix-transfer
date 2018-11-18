@@ -752,6 +752,9 @@ sub smbclient_scopy_recurse {
         ############################################################
         # copy DIRS
         print "##### Creating dirs\n";
+        my @mkdir_list=();
+
+        # Test which dirs must be created
         foreach my $source_dir (@{ $ref_source->{$from_user}{'LISTS'}{'DIRS'} }){
             my $target_dir=$source_dir;
             # --no-target-directory
@@ -760,16 +763,29 @@ sub smbclient_scopy_recurse {
             } else {
                 $target_dir=~s/^$ref_source->{$from_user}{OPTION_REL_PATH}/$ref_target->{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
             }
-            
+ 
+            if (exists $ref_target->{$to_user}{LOOKUP}{$target_dir}){
+                if ($ref_target->{$to_user}{LOOKUP}{$target_dir} eq "DIR"){
+                    next;
+                } else {
+                    
+                }
+            } else {
+                push @mkdir_list,$target_dir;
+            }
+        }
+
+        # create dirs
+        foreach my $mkdir_dir (@mkdir_list){
             my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                 "%'******'".
                 " //$root_dns/$school_AD_to_user "." ".
                 $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-                " -c 'mkdir $target_dir'";
+                " -c 'mkdir $mkdir_dir'";
             print "$smbclient_command\n";
             my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-        }
+	}
 
         ############################################################
         # copy FILES
