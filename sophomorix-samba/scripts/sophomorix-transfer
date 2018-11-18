@@ -554,10 +554,17 @@ sub smbclient_scopy_recurse {
     my $smb_dir_home_from_user=$home_directory_AD_from_user;
     $smb_dir_home_from_user=~s/\\/\//g;
     my ($string_from_user,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
+
+    # home relative to school
     $rel_path_home_from_user=~s/^\///g;
-    # append subdir
+
+    # path incl. subdir
+    my $rel_path_from_user;
     if ($from_path ne ""){
-        $rel_path_home_from_user=$rel_path_home_from_user."/".$from_path;
+        # append subdir
+        $rel_path_from_user=$rel_path_home_from_user."/".$from_path;
+    } else {
+        $rel_path_from_user=$rel_path_home_from_user;
     }
 
 
@@ -586,12 +593,18 @@ sub smbclient_scopy_recurse {
     my $smb_dir_home_to_user=$home_directory_AD_to_user;
     $smb_dir_home_to_user=~s/\\/\//g;
     my ($string_to_user,$rel_path_home_to_user)=split(/$school_AD_to_user/,$smb_dir_home_to_user);
-    $rel_path_home_to_user=~s/^\///g;
-    # append subdir
-    if ($to_path ne ""){
-        $rel_path_home_to_user=$rel_path_home_to_user."/".$to_path;
-    }
 
+    # home relative to school
+    $rel_path_home_to_user=~s/^\///g;
+
+    # path incl. subdir
+    my $rel_path_to_user;
+    if ($to_path ne ""){
+        # append subdir
+        $rel_path_to_user=$rel_path_home_to_user."/".$to_path;
+    } else {
+        $rel_path_to_user=$rel_path_home_to_user;
+    }
 
 
     if ($school_AD_to_user ne $school_AD_from_user){
@@ -616,7 +629,7 @@ sub smbclient_scopy_recurse {
     my $ref_source=&scan_smb_dir($root_dns,
                                  $from_user,
                                  $school_AD_from_user,
-                                 $rel_path_home_from_user,
+                                 $rel_path_from_user,
                                  $smb_admin_pass,
                                  $ref_sophomorix_config,
                                  $ref_sophomorix_result);
@@ -626,7 +639,7 @@ sub smbclient_scopy_recurse {
     my $ref_target=&scan_smb_dir($root_dns,
                                  $to_user,
                                  $school_AD_to_user,
-                                 $rel_path_home_to_user,
+                                 $rel_path_to_user,
                                  $smb_admin_pass,                                 
                                  $ref_sophomorix_config,
                                  $ref_sophomorix_result);
@@ -651,12 +664,13 @@ sub smbclient_scopy_recurse {
         ){
         my $rm="";
         if ($ref_target->{$to_user}{OPTION_NODE} eq "FILE"){
-            $rm="rm $rel_path_home_to_user;";
+            $rm="rm $rel_path_to_user;";
         }
         &smb_mkdir_parent($root_dns,
                           $school_AD_to_user,
-                          $rel_path_home_to_user,
+                          $rel_path_to_user,
                           $smb_admin_pass,
+                          $rel_path_home_to_user, # start below from here
                           "ALL_BUT_LAST",
                           $ref_target,
                           $ref_sophomorix_config,
@@ -666,7 +680,7 @@ sub smbclient_scopy_recurse {
             "%'******'".
             " //$root_dns/$school_AD_to_user "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c '$rm scopy $rel_path_home_from_user $rel_path_home_to_user'";
+            " -c '$rm scopy $rel_path_from_user $rel_path_to_user'";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
@@ -699,7 +713,7 @@ sub smbclient_scopy_recurse {
             "%'******'".
             " //$root_dns/$school_AD_to_user "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c '$rm scopy $rel_path_home_from_user $target'";
+            " -c '$rm scopy $rel_path_from_user $target'";
         print "$smbclient_command\n";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -727,8 +741,9 @@ sub smbclient_scopy_recurse {
         print "##### Creating parent dirs\n";
         &smb_mkdir_parent($root_dns,
                           $school_AD_to_user,
-                          $rel_path_home_to_user,
+                          $rel_path_to_user,
                           $smb_admin_pass,
+                          $rel_path_home_to_user, # start below from here
                           "ALL",
                           $ref_target,
                           $ref_sophomorix_config,
@@ -882,12 +897,13 @@ sub smb_mkdir_parent {
         $school,
         $rel_path,
         $smb_admin_pass,
+        $start_below,
         $type,
         $ref_target,
         $ref_sophomorix_config,
         $ref_sophomorix_result)=@_;
     # mkdir parent
-    print "$rel_path\n";
+    print "Start: Creating parent dirs for: $rel_path start below $start_below\n";
     my (@dirs)=split("/",$rel_path);
     my @mkdir_paths=();
     my $mkdir="";
@@ -904,6 +920,10 @@ sub smb_mkdir_parent {
     }
 
     foreach my $mkdir (@mkdir_paths){
+        if ($start_below=~m/^$mkdir/){
+            # skip above start dir
+            next;
+        }
         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
@@ -912,6 +932,7 @@ sub smb_mkdir_parent {
             " -c 'mkdir $mkdir'";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
     }
+    print "Done: Creating parent dirs\n";
 }
 
 

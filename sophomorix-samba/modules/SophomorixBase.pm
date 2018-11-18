@@ -5260,6 +5260,7 @@ sub smb_command {
         ($smb_command_return==0 and $smb_command_out=~m/Deleted group /) or
         ($smb_command_return==0 and $smb_command_out=~m/successfully/) or
         ($smb_command_return==0 and $smb_command_out=~m/directory/) or
+        ($smb_command_return==0 and $smb_command_out=~m/File:/) or
         ($smb_command_return==0 and $smb_command_out=~m/blocks available/) or
         ($smb_command_return==0 and $smb_command_out=~m/Default Soft Limit/)
       ){
