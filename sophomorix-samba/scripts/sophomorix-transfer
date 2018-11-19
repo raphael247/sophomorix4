@@ -82,6 +82,7 @@ my $info=0;
 my $json=0;
 
 my $scopy=0;
+my $move=0;
 my $from_path="";
 my $to_path="";
 my $no_target_directory=0;
@@ -109,6 +110,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "from-unix-path=s" => \$from_unix_path,
            "scopy" => \$scopy,
+           "move" => \$move,
            "from-path=s" => \$from_path,
            "to-path=s" => \$to_path,
            "to-user=s" => \$to_user,
@@ -157,6 +159,7 @@ Options:
 # serverside copy (universal recursive cp command)
   # overwrite dirs/files as the unix cp command would do
     sophomorix-transfer --scopy --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
+    sophomorix-transfer --move --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
   # modifiers
     --no-target-directory  (cp contents of source directory only, but not directory itself)
 
@@ -213,14 +216,16 @@ if ($info==1) {
 
 
 # --scopy --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
-if ($scopy==1 and $from_user ne "" and $to_user ne ""){
-    &print_title("Copying ...");
+if (($scopy==1 or $move==1) and $from_user ne "" and $to_user ne ""){
+    &print_title("Copying/Moving ...");
     print "   * From user:  $from_user  $from_path \n";
     print "   * To user:    $to_user  $to_path\n";
 
     &smbclient_scopy_recurse({ldap=>$ldap,
                              root_dse=>$root_dse,
                              root_dns=>$root_dns,
+                             scopy=>$scopy,
+                             move=>$move,
                              smb_admin_pass=>$smb_admin_pass,
                              from_user=>$from_user,
                              from_path=>$from_path,
@@ -521,6 +526,8 @@ sub smbclient_scopy_recurse {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
+    my $scopy = $arg_ref->{scopy};
+    my $move = $arg_ref->{move};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $from_user_option = $arg_ref->{from_user};
     my $from_path = $arg_ref->{from_path};
@@ -531,15 +538,21 @@ sub smbclient_scopy_recurse {
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
     my $ref_arguments = $arg_ref->{arguments};
 
+    my $scopy_move;
+    if ($scopy==1 and $move==0){
+	$scopy_move="scopy";
+    } elsif ($scopy==0 and $move==1){
+	$scopy_move="rename";        
+    } else {
+        &log_script_exit("Copy and move not allowed together",1,1,0,
+        $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+    }
+
     my %copy=();
+    @{ $copy{'LIST'}{'FROM'} }=split(/,/,$from_user_option);
+    @{ $copy{'LIST'}{'TO'} }=split(/,/,$to_user_option);
 
-    my (@from_user)=split(/,/,$from_user_option);
-    my (@to_user)=split(/,/,$to_user_option);
-
-    print "From user: @from_user\n";
-    print "To user:   @to_user\n";
-
-    foreach my $from_user (@from_user){
+    foreach my $from_user ( @{ $copy{'LIST'}{'FROM'} } ){
         # from user
         my ($firstname_utf8_AD_from_user,
             $lastname_utf8_AD_from_user,
@@ -582,7 +595,7 @@ sub smbclient_scopy_recurse {
         $copy{'FROM'}{$from_user}{'SCHOOL'}=$school_AD_from_user;
     }
 
-    foreach my $to_user (@to_user){
+    foreach my $from_user ( @{ $copy{'LIST'}{'TO'} } ){
         # to user
         my ($firstname_utf8_AD_to_user,
             $lastname_utf8_AD_to_user,
@@ -624,10 +637,7 @@ sub smbclient_scopy_recurse {
         $copy{'TO'}{$to_user}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
         $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}=$rel_path_to_user;
         $copy{'TO'}{$to_user}{'SCHOOL'}=$school_AD_to_user;
-
-
     }
-
 
     if ($copy{'TO'}{$to_user}{'SCHOOL'} ne $copy{'FROM'}{$from_user}{'SCHOOL'}){
         # use mget and mput later
@@ -679,7 +689,7 @@ sub smbclient_scopy_recurse {
     # A) source nonexisting
 #    if ($ref_source->{$from_user}{OPTION_NODE} eq "NONEXISTING"){
     if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "NONEXISTING"){
-        &log_script_exit("ERROR Source file/dir nonexisting: $copy{'FROM'}{$from_user}{OPTION_SCHOOL} -> $copy{'FROM'}{$from_user}{OPTION_REL_PATH}",1,1,0,
+        &log_script_exit("ERROR Source file/dir nonexisting: $copy{'FROM'}{$from_user}{SCHOOL} -> $copy{'FROM'}{$from_user}{OPTION_REL_PATH}",1,1,0,
                      $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
     }
 
@@ -706,7 +716,7 @@ sub smbclient_scopy_recurse {
             "%'******'".
             " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c '$rm scopy $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'} $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}'";
+            " -c '$rm $scopy_move $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'} $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}'";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
@@ -730,7 +740,7 @@ sub smbclient_scopy_recurse {
             $rm="rm $target;";
         } elsif ($copy{'TO'}{$to_user}{LOOKUP}{$target} eq "DIR"){
 
-            &log_script_exit("ERROR Overwriting directory $copy{'TO'}{$to_user}{OPTION_SCHOOL} -> $target with non-directory not possible",1,1,0,
+            &log_script_exit("ERROR Overwriting directory $copy{'TO'}{$to_user}{SCHOOL} -> $target with non-directory not possible",1,1,0,
                      $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
         }
 
@@ -739,7 +749,7 @@ sub smbclient_scopy_recurse {
             "%'******'".
             " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c '$rm scopy $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'} $target'";
+            " -c '$rm $scopy_move $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'} $target'";
         print "$smbclient_command\n";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -749,7 +759,7 @@ sub smbclient_scopy_recurse {
     ############################################################
     # D) dir -> file (error)
     if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "DIR" and $copy{'TO'}{$to_user}{OPTION_NODE} eq "FILE"){
-        &log_script_exit("ERROR Overwriting file $copy{'TO'}{$to_user}{OPTION_SCHOOL} -> $copy{'TO'}{$to_user}{OPTION_REL_PATH} with directory $copy{'FROM'}{$from_user}{OPTION_SCHOOL} -> $copy{'FROM'}{$from_user}{OPTION_REL_PATH} not possible",1,1,0,
+        &log_script_exit("ERROR Overwriting file $copy{'TO'}{$to_user}{SCHOOL} -> $copy{'TO'}{$to_user}{OPTION_REL_PATH} with directory $copy{'FROM'}{$from_user}{SCHOOL} -> $copy{'FROM'}{$from_user}{OPTION_REL_PATH} not possible",1,1,0,
             $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
     }
 
@@ -802,48 +812,52 @@ sub smbclient_scopy_recurse {
             }
         }
 
-        # create dirs
-        foreach my $mkdir_dir (@mkdir_list){
-            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-                "%'******'".
-                " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
-                $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-                " -c 'mkdir $mkdir_dir'";
-            print "$smbclient_command\n";
-            my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-	}
+        if ($scopy_move eq "move"){
 
-        ############################################################
-        # copy FILES
-        print "##### Copying files\n";
-        foreach my $source_file (@{ $copy{'FROM'}{$from_user}{'LISTS'}{'FILES'} }){
-            my $target_file=$source_file;
-            # --no-target-directory
-            if ($no_target_directory==1){
-                $target_file=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}/;
-            } else {
-                $target_file=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
-            }
+        } elsif ($scopy_move eq "scopy"){
+            # create dirs
+            foreach my $mkdir_dir (@mkdir_list){
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                    "%'******'".
+                    " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
+                    $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+                    " -c 'mkdir $mkdir_dir'";
+                print "$smbclient_command\n";
+                my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+	    }
 
-            # decide if file must be removed before scopy
-            my $rm="";
-            if (exists $copy{'TO'}{$to_user}{'LOOKUP'}{$target_file}){
-                if ($copy{'TO'}{$to_user}{'LOOKUP'}{$target_file} eq "FILE"){
-                    $rm="rm $target_file;";
-                } elsif ($copy{'TO'}{$to_user}{'LOOKUP'}{$target_file} eq "DIR"){
-                    $rm="deltree $target_file;";
+            ############################################################
+            # copy FILES
+            print "##### Copying files\n";
+            foreach my $source_file (@{ $copy{'FROM'}{$from_user}{'LISTS'}{'FILES'} }){
+                my $target_file=$source_file;
+                # --no-target-directory
+                if ($no_target_directory==1){
+                    $target_file=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}/;
+                } else {
+                    $target_file=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
                 }
-            }
 
-            my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
-                " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
-                "%'******'".
-                " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
-                $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-                " -c '$rm scopy $source_file $target_file'";
-            print "$smbclient_command\n";
-            my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+                # decide if file must be removed before scopy
+                my $rm="";
+                if (exists $copy{'TO'}{$to_user}{'LOOKUP'}{$target_file}){
+                    if ($copy{'TO'}{$to_user}{'LOOKUP'}{$target_file} eq "FILE"){
+                        $rm="rm $target_file;";
+                    } elsif ($copy{'TO'}{$to_user}{'LOOKUP'}{$target_file} eq "DIR"){
+                        $rm="deltree $target_file;";
+                    }
+                }
+
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                    " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+                    "%'******'".
+                    " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
+                    $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+                    " -c '$rm scopy $source_file $target_file'";
+                print "$smbclient_command\n";
+                my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+            }
         }
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
@@ -856,7 +870,6 @@ sub scan_smb_dir {
     print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
     $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
-    $ref_copy->{$location}{$user}{'OPTION_SCHOOL'}=$school;
 
     my $num=0;
     foreach my $rel_item (@scanlist){
