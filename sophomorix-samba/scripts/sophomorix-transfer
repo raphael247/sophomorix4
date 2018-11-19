@@ -624,6 +624,8 @@ sub smbclient_scopy_recurse {
         $copy{'TO'}{$to_user}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
         $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}=$rel_path_to_user;
         $copy{'TO'}{$to_user}{'SCHOOL'}=$school_AD_to_user;
+
+
     }
 
 
@@ -648,6 +650,8 @@ sub smbclient_scopy_recurse {
     ############################################################
     #     scan source -> filelist, dirlist
     my $ref_source=&scan_smb_dir($root_dns,
+                                 "FROM",
+                                 \%copy,
                                  $from_user_option,
                                  $copy{'FROM'}{$from_user}{'SCHOOL'},
                                  $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'},
@@ -658,6 +662,8 @@ sub smbclient_scopy_recurse {
 
     #     scan target -> filelist, dirlist
     my $ref_target=&scan_smb_dir($root_dns,
+                                 "TO",
+                                 \%copy,
                                  $to_user_option,
                                  $copy{'TO'}{$to_user}{'SCHOOL'},
                                  $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'},
@@ -674,19 +680,20 @@ sub smbclient_scopy_recurse {
 
     ############################################################
     # A) source nonexisting
-    if ($ref_source->{$from_user}{OPTION_NODE} eq "NONEXISTING"){
-        &log_script_exit("ERROR Source file/dir nonexisting: $ref_source->{$from_user}{OPTION_SCHOOL} -> $ref_source->{$from_user}{OPTION_REL_PATH}",1,1,0,
+#    if ($ref_source->{$from_user}{OPTION_NODE} eq "NONEXISTING"){
+    if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "NONEXISTING"){
+        &log_script_exit("ERROR Source file/dir nonexisting: $copy{'FROM'}{$from_user}{OPTION_SCHOOL} -> $copy{'FROM'}{$from_user}{OPTION_REL_PATH}",1,1,0,
                      $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
     }
 
 
     ############################################################
     # B) file -> file/nonexisting (last path name is considered the filename)
-    if ($ref_source->{$from_user}{OPTION_NODE} eq "FILE" and 
-           ($ref_target->{$to_user}{OPTION_NODE} eq "NONEXISTING" or $ref_target->{$to_user}{OPTION_NODE} eq "FILE")
+    if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "FILE" and 
+           ($copy{'TO'}{$to_user}{OPTION_NODE} eq "NONEXISTING" or $copy{'TO'}{$to_user}{OPTION_NODE} eq "FILE")
         ){
         my $rm="";
-        if ($ref_target->{$to_user}{OPTION_NODE} eq "FILE"){
+        if ($copy{'TO'}{$to_user}{OPTION_NODE} eq "FILE"){
             $rm="rm $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'};";
         }
         &smb_mkdir_parent($root_dns,
@@ -711,23 +718,23 @@ sub smbclient_scopy_recurse {
 
     ############################################################
     # C) file -> dir (copy into dir if no other dir is in the way)
-    if ($ref_source->{$from_user}{OPTION_NODE} eq "FILE" and $ref_target->{$to_user}{OPTION_NODE} eq "DIR"){
+    if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "FILE" and $copy{'TO'}{$to_user}{OPTION_NODE} eq "DIR"){
         my $target;
-        if ($ref_target->{$to_user}{OPTION_NODE} eq "FILE"){
-            $target=$ref_target->{$to_user}{OPTION_REL_PATH};
-        } elsif ($ref_target->{$to_user}{OPTION_NODE} eq "DIR"){
-            my $filename  = basename($ref_source->{$from_user}{OPTION_REL_PATH}); 
-            $target=$ref_target->{$to_user}{OPTION_REL_PATH}."/".$filename;
+        if ($copy{'TO'}{$to_user}{OPTION_NODE} eq "FILE"){
+            $target=$copy{'TO'}{$to_user}{OPTION_REL_PATH};
+        } elsif ($copy{'TO'}{$to_user}{OPTION_NODE} eq "DIR"){
+            my $filename  = basename($copy{'FROM'}{$from_user}{OPTION_REL_PATH}); 
+            $target=$copy{'TO'}{$to_user}{OPTION_REL_PATH}."/".$filename;
         }
 
         my $rm;
-        if (not exists $ref_target->{$to_user}{LOOKUP}{$target}){
+        if (not exists $copy{'TO'}{$to_user}{LOOKUP}{$target}){
             $rm="";
-        } elsif ($ref_target->{$to_user}{LOOKUP}{$target} eq "FILE"){
+        } elsif ($copy{'TO'}{$to_user}{LOOKUP}{$target} eq "FILE"){
             $rm="rm $target;";
-        } elsif ($ref_target->{$to_user}{LOOKUP}{$target} eq "DIR"){
+        } elsif ($copy{'TO'}{$to_user}{LOOKUP}{$target} eq "DIR"){
 
-            &log_script_exit("ERROR Overwriting directory $ref_target->{$to_user}{OPTION_SCHOOL} -> $target with non-directory not possible",1,1,0,
+            &log_script_exit("ERROR Overwriting directory $copy{'TO'}{$to_user}{OPTION_SCHOOL} -> $target with non-directory not possible",1,1,0,
                      $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
         }
 
@@ -745,18 +752,18 @@ sub smbclient_scopy_recurse {
 
     ############################################################
     # D) dir -> file (error)
-    if ($ref_source->{$from_user}{OPTION_NODE} eq "DIR" and $ref_target->{$to_user}{OPTION_NODE} eq "FILE"){
-        &log_script_exit("ERROR Overwriting file $ref_target->{$to_user}{OPTION_SCHOOL} -> $ref_target->{$to_user}{OPTION_REL_PATH} with directory $ref_source->{$from_user}{OPTION_SCHOOL} -> $ref_source->{$from_user}{OPTION_REL_PATH} not possible",1,1,0,
+    if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "DIR" and $copy{'TO'}{$to_user}{OPTION_NODE} eq "FILE"){
+        &log_script_exit("ERROR Overwriting file $copy{'TO'}{$to_user}{OPTION_SCHOOL} -> $copy{'TO'}{$to_user}{OPTION_REL_PATH} with directory $copy{'FROM'}{$from_user}{OPTION_SCHOOL} -> $copy{'FROM'}{$from_user}{OPTION_REL_PATH} not possible",1,1,0,
             $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
     }
 
 
     ############################################################
     # E) dir -> dir (copy recursively)
-    if ($ref_source->{$from_user}{OPTION_NODE} eq "DIR" and 
-          ($ref_target->{$to_user}{OPTION_NODE} eq "DIR" or $ref_target->{$to_user}{OPTION_NODE} eq "NONEXISTING")  
+    if ($copy{'FROM'}{$from_user}{OPTION_NODE} eq "DIR" and 
+          ($copy{'TO'}{$to_user}{OPTION_NODE} eq "DIR" or $copy{'TO'}{$to_user}{OPTION_NODE} eq "NONEXISTING")  
        ){
-        my (@source_parts)=split("/",$ref_source->{$from_user}{OPTION_REL_PATH});
+        my (@source_parts)=split("/",$copy{'FROM'}{$from_user}{OPTION_REL_PATH});
         my $last_source_dir = pop @source_parts;
 
         ############################################################
@@ -778,19 +785,19 @@ sub smbclient_scopy_recurse {
         my @mkdir_list=();
 
         # Test which dirs must be created
-        foreach my $source_dir (@{ $ref_source->{$from_user}{'LISTS'}{'DIRS'} }){
+        foreach my $source_dir (@{ $copy{'FROM'}{$from_user}{'LISTS'}{'DIRS'} }){
             my $target_dir=$source_dir;
             # --no-target-directory
             if ($no_target_directory==1){
-                $target_dir=~s/^$ref_source->{$from_user}{OPTION_REL_PATH}/$ref_target->{$to_user}{OPTION_REL_PATH}/;
+                $target_dir=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}/;
             } else {
-                $target_dir=~s/^$ref_source->{$from_user}{OPTION_REL_PATH}/$ref_target->{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
+                $target_dir=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
             }
  
-            if (exists $ref_target->{$to_user}{LOOKUP}{$target_dir}){
-                if ($ref_target->{$to_user}{LOOKUP}{$target_dir} eq "DIR"){
+            if (exists $copy{'TO'}{$to_user}{LOOKUP}{$target_dir}){
+                if ($copy{'TO'}{$to_user}{LOOKUP}{$target_dir} eq "DIR"){
                     next;
-                } elsif ($ref_target->{$to_user}{LOOKUP}{$target_dir} eq "FILE"){
+                } elsif ($copy{'TO'}{$to_user}{LOOKUP}{$target_dir} eq "FILE"){
                     # There is a file, where a dir should be created
                     &log_script_exit("ERROR Overwriting file $target_dir with directory not possible",1,1,0,
                      $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
@@ -815,21 +822,21 @@ sub smbclient_scopy_recurse {
         ############################################################
         # copy FILES
         print "##### Copying files\n";
-        foreach my $source_file (@{ $ref_source->{$from_user}{'LISTS'}{'FILES'} }){
+        foreach my $source_file (@{ $copy{'FROM'}{$from_user}{'LISTS'}{'FILES'} }){
             my $target_file=$source_file;
             # --no-target-directory
             if ($no_target_directory==1){
-                $target_file=~s/^$ref_source->{$from_user}{OPTION_REL_PATH}/$ref_target->{$to_user}{OPTION_REL_PATH}/;
+                $target_file=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}/;
             } else {
-                $target_file=~s/^$ref_source->{$from_user}{OPTION_REL_PATH}/$ref_target->{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
+                $target_file=~s/^$copy{'FROM'}{$from_user}{OPTION_REL_PATH}/$copy{'TO'}{$to_user}{OPTION_REL_PATH}\/$last_source_dir/;
             }
 
             # decide if file must be removed before scopy
             my $rm="";
-            if (exists $ref_target->{$to_user}{'LOOKUP'}{$target_file}){
-                if ($ref_target->{$to_user}{'LOOKUP'}{$target_file} eq "FILE"){
+            if (exists $copy{'TO'}{$to_user}{'LOOKUP'}{$target_file}){
+                if ($copy{'TO'}{$to_user}{'LOOKUP'}{$target_file} eq "FILE"){
                     $rm="rm $target_file;";
-                } elsif ($ref_target->{$to_user}{'LOOKUP'}{$target_file} eq "DIR"){
+                } elsif ($copy{'TO'}{$to_user}{'LOOKUP'}{$target_file} eq "DIR"){
                     $rm="deltree $target_file;";
                 }
             }
@@ -850,23 +857,23 @@ sub smbclient_scopy_recurse {
 
 
 sub scan_smb_dir {
-    my %stat=();
-    my ($root_dns,$user,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
+    my ($root_dns,$location,$ref_copy,$user,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
     print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
-    $stat{$user}{'OPTION_REL_PATH'}=$rel_path;
-    $stat{$user}{'OPTION_SCHOOL'}=$school;
+    $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
+    $ref_copy->{$location}{$user}{'OPTION_SCHOOL'}=$school;
 
     my $num=0;
     foreach my $rel_item (@scanlist){
         $num++;
         my $type=&get_type_inode($root_dns,$school,$rel_item,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
         if ($num==1){
-            $stat{$user}{'OPTION_NODE'}=$type;   
+            $ref_copy->{$location}{$user}{'OPTION_NODE'}=$type;   
         }
         if ($type eq "DIR"){
-            $stat{$user}{'LOOKUP'}{$rel_item}="DIR";
-            push @{ $stat{$user}{'LISTS'}{'DIRS'} },$rel_item;
+            $ref_copy->{$location}{$user}{'LOOKUP'}{$rel_item}="DIR";
+            push @{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'} },$rel_item;
+
             # scan the contents
             my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
@@ -892,17 +899,16 @@ sub scan_smb_dir {
                     push @scanlist, $dir_rel_path;
                 } elsif ($smb_type eq "N" or $smb_type eq "A"){
                     # node/files
-                    $stat{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
-                    push @{ $stat{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
+                    $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
+                    push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
                 }
             }
         } elsif ($type eq "FILE"){
-            push @{ $stat{$user}{'LISTS'}{'FILES'} },$rel_item;
+            push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$rel_item;
         }
     }
-    $stat{$user}{'COUNT'}{'FILES'}=$#{ $stat{$user}{'LISTS'}{'FILES'}  }+1;
-    $stat{$user}{'COUNT'}{'DIRS'}=$#{ $stat{$user}{'LISTS'}{'DIRS'}  }+1;
-    return \%stat;
+    $ref_copy->{$location}{$user}{'COUNT'}{'FILES'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'}  }+1;
+    $ref_copy->{$location}{$user}{'COUNT'}{'DIRS'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'}  }+1;
 }
 
 
