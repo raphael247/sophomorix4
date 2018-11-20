@@ -2163,6 +2163,9 @@ if ($file_transfer_move==1){
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user jonsonad72-exam --to-path dir/to/new-filename.txt");
      &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path testdir-01/testfile-01-02.txt --to-user jonsonad72-exam --to-path topfile-move.txt"); 
 
+    # C) file -> dir (move into dir if no other dir is in the way)
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path testfile-02.txt --to-user maiersa72-exam --to-path transfer");
+
 
     # test moved files
     ############################################################
@@ -2202,7 +2205,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
                          "/srv/samba/schools/bsz/teachers/wu72/testfile-01.txt",
-                         "/srv/samba/schools/bsz/teachers/wu72/testfile-02.txt",
+#                         "/srv/samba/schools/bsz/teachers/wu72/testfile-02.txt", # moved away
                          "/srv/samba/schools/bsz/teachers/wu72/testfile-03.txt",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-02",
@@ -2213,7 +2216,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01",
-#                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-01.txt", moved away
+#                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-01.txt", # moved away
 #                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-02.txt",
                          "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-03.txt",
                          "/srv/samba/schools/bsz/share/teachers",
@@ -2224,6 +2227,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/bsz/share/classes/m7ab",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72",
                          "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer/testfile-02.txt",
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72",
                          "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
                          "/srv/samba/schools/bsz/students/m8cd",
@@ -2356,6 +2360,8 @@ if ($file_transfer_move==1){
 
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/jonsonad72-exam/dir");
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile-move.txt");
+
+    &run_command("rm -rf /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer/testfile-02.txt");
 
     # Test file deletion
     ############################################################
