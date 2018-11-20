@@ -859,8 +859,7 @@ sub smbclient_scopy_recurse {
             # delete source dirs bottom up
             my @reversed_dirs = reverse(@{ $copy{'FROM'}{$from_user}{'LISTS'}{'DIRS'} }); 
             foreach my $source_dir (@reversed_dirs){
-                print "HERE 4: $source_dir\n";
-                    my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".
                     " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
