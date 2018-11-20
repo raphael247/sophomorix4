@@ -52,6 +52,8 @@ my $test_exammode_users=0;
 
 my $file_transfer_scopy=0;
 
+my $file_transfer_move=0;
+
 my $file_transfer_share=0;
 my $test_file_transfer_share=0;
 
@@ -91,6 +93,7 @@ my $testopt=GetOptions(
            "exammode-users" => \$exammode_users,
            "test-exammode-users" => \$test_exammode_users,
            "file-transfer-scopy" => \$file_transfer_scopy,
+           "file-transfer-move" => \$file_transfer_move,
            "file-transfer-share" => \$file_transfer_share,
            "test-file-transfer-share" => \$test_file_transfer_share,
            "file-transfer-collect-copy" => \$file_transfer_collect_copy,
@@ -162,6 +165,7 @@ Options
 
    File transfer:
     sophomorix-test-exammode --file-transfer-scopy  (includes tests) 
+    sophomorix-test-exammode --file-transfer-move  (includes tests) 
 
     sophomorix-test-exammode --file-transfer-share 
     sophomorix-test-exammode --test-file-transfer-share 
@@ -214,6 +218,7 @@ if ($full==1){
     $test_file_transfer_share=1;
 
     $file_transfer_scopy=1;
+    $file_transfer_move=1;
 
     $file_transfer_collect_copy=1;
     $test_file_transfer_collect_copy=1;
@@ -1513,28 +1518,9 @@ if ($test_exammode_users==1){
 # do the file transfer, scopy
 ############################################################
 if ($file_transfer_scopy==1){
-    # create some files/dirs at user wu72
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01.txt /srv/samba/schools/bsz/teachers/wu72");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-02.txt /srv/samba/schools/bsz/teachers/wu72");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-03.txt /srv/samba/schools/bsz/teachers/wu72");
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01");
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-02");
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-03");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-02.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-03.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01");
+    &create_files_at_user("wu72");
 
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01-01.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01");
-    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01-02.txt /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01");
-
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02");
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03");
-
-    &run_command("mkdir /srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01");
-
-    # create some files at user maiersa72-exam
-    # the blocking file to mail copying a dir to this place
+    # the blocking file to make copying a dir to this place
     &run_command("touch /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt");
 
     # test file creation
@@ -1870,6 +1856,406 @@ if ($file_transfer_scopy==1){
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt");
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-02.txt");
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-03.txt");
+
+    ############################################################
+    # delete dirs/files at user wu72
+    ############################################################
+    &run_command("rm -rf /srv/samba/schools/bsz/teachers/wu72/testdir-01");
+    &run_command("rm -rf /srv/samba/schools/bsz/teachers/wu72/testdir-02");
+    &run_command("rm -rf /srv/samba/schools/bsz/teachers/wu72/testdir-03");
+    &run_command("rm -f /srv/samba/schools/bsz/teachers/wu72/testfile-01.txt");
+    &run_command("rm -f /srv/samba/schools/bsz/teachers/wu72/testfile-02.txt");
+    &run_command("rm -f /srv/samba/schools/bsz/teachers/wu72/testfile-03.txt");
+
+    # Test file deletion
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
+    &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
+                         "/srv/samba/schools",
+                         "/srv/samba/schools/abc",
+                         "/srv/samba/schools/lin",
+                         "/srv/samba/schools/ghs",
+                         "/srv/samba/schools/bsz",
+                         "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
+                         "/srv/samba/schools/bsz/program",     
+                         "/srv/samba/schools/bsz/examusers",
+                         "/srv/samba/schools/bsz/examusers/subdir72",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+                         "/srv/samba/schools/bsz/share/projects",
+                         "/srv/samba/schools/bsz/students",
+                         "/srv/samba/schools/bsz/teachers",
+                         "/srv/samba/schools/bsz/teachers/oe72",
+                         "/srv/samba/schools/bsz/teachers/oe72/transfer",
+                         "/srv/samba/schools/bsz/teachers/wu72",
+                         "/srv/samba/schools/bsz/teachers/wu72/transfer",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",
+                         "/srv/samba/schools/bsz/share/management",
+                         "/srv/samba/schools/bsz/share/school",
+                         "/srv/samba/schools/bsz/students/m7ab",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
+                         "/srv/samba/schools/bsz/students/m7ab/maiersa72",
+                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
+                         "/srv/samba/schools/bsz/students/m7ab/muellegr72",
+                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
+                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
+                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd/samardze72",
+                         "/srv/samba/schools/bsz/students/m8cd/samardze72/transfer",
+                         "/srv/samba/schools/uni",
+                         "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
+                         "/srv/samba/schools/uni/program",     
+                         "/srv/samba/schools/uni/examusers",
+                         "/srv/samba/schools/uni/share/projects",
+                         "/srv/samba/schools/uni/students",
+                         "/srv/samba/schools/uni/students/12abc",
+                         "/srv/samba/schools/uni/share/classes/12abc",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
+                         "/srv/samba/schools/uni/teachers",
+                         "/srv/samba/schools/uni/teachers/kep72",
+                         "/srv/samba/schools/uni/teachers/kep72/transfer",
+                         "/srv/samba/schools/uni/teachers/gal72",
+                         "/srv/samba/schools/uni/teachers/gal72/transfer",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",
+                         "/srv/samba/schools/uni/share/management",
+                         "/srv/samba/schools/uni/share/school",
+                         "/srv/samba/schools/default-school",
+                         "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
+                         "/srv/samba/schools/default-school/program",
+                         "/srv/samba/schools/default-school/examusers",
+                         "/srv/samba/schools/default-school/share/projects",
+                         "/srv/samba/schools/default-school/students",
+                         "/srv/samba/schools/default-school/students/s6ade",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
+                         "/srv/samba/schools/default-school/students/s6ade/schneima72",
+                         "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
+                         "/srv/samba/schools/default-school/teachers",
+                         "/srv/samba/schools/default-school/teachers/sch72",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",
+                         "/srv/samba/schools/default-school/share/management",
+                         "/srv/samba/schools/default-school/share/school",
+                        ); 
+
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/share",
+                         "/srv/samba/global/program",
+                         "/srv/samba/global/iso",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",
+                         "/srv/samba/global/share/global",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+}
+
+
+
+############################################################
+# do the file transfer, move
+############################################################
+if ($file_transfer_move==1){
+    &create_files_at_user("wu72");
+
+    # test file creation
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
+    &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
+                         "/srv/samba/schools",
+                         "/srv/samba/schools/abc",
+                         "/srv/samba/schools/lin",
+                         "/srv/samba/schools/ghs",
+                         "/srv/samba/schools/bsz",
+                         "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
+                         "/srv/samba/schools/bsz/program",     
+                         "/srv/samba/schools/bsz/examusers",
+                         "/srv/samba/schools/bsz/examusers/subdir72",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+                         "/srv/samba/schools/bsz/share/projects",
+                         "/srv/samba/schools/bsz/students",
+                         "/srv/samba/schools/bsz/teachers",
+                         "/srv/samba/schools/bsz/teachers/oe72",
+                         "/srv/samba/schools/bsz/teachers/oe72/transfer",
+                         "/srv/samba/schools/bsz/teachers/wu72",
+                         "/srv/samba/schools/bsz/teachers/wu72/transfer",
+                         "/srv/samba/schools/bsz/teachers/wu72/testfile-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testfile-02.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testfile-03.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-02",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-03",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-02.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-02.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-03.txt",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",
+                         "/srv/samba/schools/bsz/share/management",
+                         "/srv/samba/schools/bsz/share/school",
+                         "/srv/samba/schools/bsz/students/m7ab",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
+                         "/srv/samba/schools/bsz/students/m7ab/maiersa72",
+                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
+                         "/srv/samba/schools/bsz/students/m7ab/muellegr72",
+                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
+                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
+                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd/samardze72",
+                         "/srv/samba/schools/bsz/students/m8cd/samardze72/transfer",
+                         "/srv/samba/schools/uni",
+                         "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
+                         "/srv/samba/schools/uni/program",     
+                         "/srv/samba/schools/uni/examusers",
+                         "/srv/samba/schools/uni/share/projects",
+                         "/srv/samba/schools/uni/students",
+                         "/srv/samba/schools/uni/students/12abc",
+                         "/srv/samba/schools/uni/share/classes/12abc",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
+                         "/srv/samba/schools/uni/teachers",
+                         "/srv/samba/schools/uni/teachers/kep72",
+                         "/srv/samba/schools/uni/teachers/kep72/transfer",
+                         "/srv/samba/schools/uni/teachers/gal72",
+                         "/srv/samba/schools/uni/teachers/gal72/transfer",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",
+                         "/srv/samba/schools/uni/share/management",
+                         "/srv/samba/schools/uni/share/school",
+                         "/srv/samba/schools/default-school",
+                         "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
+                         "/srv/samba/schools/default-school/program",
+                         "/srv/samba/schools/default-school/examusers",
+                         "/srv/samba/schools/default-school/share/projects",
+                         "/srv/samba/schools/default-school/students",
+                         "/srv/samba/schools/default-school/students/s6ade",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
+                         "/srv/samba/schools/default-school/students/s6ade/schneima72",
+                         "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
+                         "/srv/samba/schools/default-school/teachers",
+                         "/srv/samba/schools/default-school/teachers/sch72",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",
+                         "/srv/samba/schools/default-school/share/management",
+                         "/srv/samba/schools/default-school/share/school",
+                        ); 
+
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/share",
+                         "/srv/samba/global/program",
+                         "/srv/samba/global/iso",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",
+                         "/srv/samba/global/share/global",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+
+
+
+
+
+
+
+    # test moved files
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result); 
+    &directory_tree_test("/srv/samba/schools",
+                         \%fs_test_result,
+                         "/srv/samba/schools",
+                         "/srv/samba/schools/abc",
+                         "/srv/samba/schools/lin",
+                         "/srv/samba/schools/ghs",
+                         "/srv/samba/schools/bsz",
+                         "/srv/samba/schools/bsz/management",
+                         "/srv/samba/schools/bsz/share",     
+                         "/srv/samba/schools/bsz/iso",
+                         "/srv/samba/schools/bsz/program",     
+                         "/srv/samba/schools/bsz/examusers",
+                         "/srv/samba/schools/bsz/examusers/subdir72",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
+                         "/srv/samba/schools/bsz/share/projects",
+                         "/srv/samba/schools/bsz/students",
+                         "/srv/samba/schools/bsz/teachers",
+                         "/srv/samba/schools/bsz/teachers/oe72",
+                         "/srv/samba/schools/bsz/teachers/oe72/transfer",
+                         "/srv/samba/schools/bsz/teachers/wu72",
+                         "/srv/samba/schools/bsz/teachers/wu72/transfer",
+                         "/srv/samba/schools/bsz/teachers/wu72/testfile-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testfile-02.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testfile-03.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-02",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-03",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-01/testfile-01-01-02.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-02",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testdir-01-03",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-02/testdir-02-01",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-01.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-02.txt",
+                         "/srv/samba/schools/bsz/teachers/wu72/testdir-01/testfile-01-03.txt",
+                         "/srv/samba/schools/bsz/share/teachers",
+                         "/srv/samba/schools/bsz/share/classes",
+                         "/srv/samba/schools/bsz/share/management",
+                         "/srv/samba/schools/bsz/share/school",
+                         "/srv/samba/schools/bsz/students/m7ab",
+                         "/srv/samba/schools/bsz/share/classes/m7ab",
+                         "/srv/samba/schools/bsz/students/m7ab/maiersa72",
+                         "/srv/samba/schools/bsz/students/m7ab/maiersa72/transfer",
+                         "/srv/samba/schools/bsz/students/m7ab/muellegr72",
+                         "/srv/samba/schools/bsz/students/m7ab/muellegr72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd",
+                         "/srv/samba/schools/bsz/share/classes/m8cd",
+                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72",
+                         "/srv/samba/schools/bsz/students/m8cd/jonsonad72/transfer",
+                         "/srv/samba/schools/bsz/students/m8cd/samardze72",
+                         "/srv/samba/schools/bsz/students/m8cd/samardze72/transfer",
+                         "/srv/samba/schools/uni",
+                         "/srv/samba/schools/uni/management",
+                         "/srv/samba/schools/uni/share",     
+                         "/srv/samba/schools/uni/iso",
+                         "/srv/samba/schools/uni/program",     
+                         "/srv/samba/schools/uni/examusers",
+                         "/srv/samba/schools/uni/share/projects",
+                         "/srv/samba/schools/uni/students",
+                         "/srv/samba/schools/uni/students/12abc",
+                         "/srv/samba/schools/uni/share/classes/12abc",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
+                         "/srv/samba/schools/uni/teachers",
+                         "/srv/samba/schools/uni/teachers/kep72",
+                         "/srv/samba/schools/uni/teachers/kep72/transfer",
+                         "/srv/samba/schools/uni/teachers/gal72",
+                         "/srv/samba/schools/uni/teachers/gal72/transfer",
+                         "/srv/samba/schools/uni/share/teachers",
+                         "/srv/samba/schools/uni/share/classes",
+                         "/srv/samba/schools/uni/share/management",
+                         "/srv/samba/schools/uni/share/school",
+                         "/srv/samba/schools/default-school",
+                         "/srv/samba/schools/default-school/management",
+                         "/srv/samba/schools/default-school/share",
+                         "/srv/samba/schools/default-school/iso",
+                         "/srv/samba/schools/default-school/program",
+                         "/srv/samba/schools/default-school/examusers",
+                         "/srv/samba/schools/default-school/share/projects",
+                         "/srv/samba/schools/default-school/students",
+                         "/srv/samba/schools/default-school/students/s6ade",
+                         "/srv/samba/schools/default-school/share/classes/s6ade",
+                         "/srv/samba/schools/default-school/students/s6ade/schneima72",
+                         "/srv/samba/schools/default-school/students/s6ade/schneima72/transfer",
+                         "/srv/samba/schools/default-school/teachers",
+                         "/srv/samba/schools/default-school/teachers/sch72",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer",
+                         "/srv/samba/schools/default-school/share/teachers",
+                         "/srv/samba/schools/default-school/share/classes",
+                         "/srv/samba/schools/default-school/share/management",
+                         "/srv/samba/schools/default-school/share/school",
+                        ); 
+
+    &end_fs_test(\%fs_test_result);
+
+    ############################################################
+    # fs test
+    ############################################################
+    &start_fs_test(\%fs_test_result);
+    &directory_tree_test("/srv/samba/global",
+                         \%fs_test_result,
+                         "/srv/samba/global",
+                         "/srv/samba/global/management",
+                         "/srv/samba/global/share",
+                         "/srv/samba/global/program",
+                         "/srv/samba/global/iso",
+                         "/srv/samba/global/share/projects",
+                         "/srv/samba/global/share/management",
+                         "/srv/samba/global/share/global",
+                         "/srv/samba/global/students",
+                         "/srv/samba/global/teachers",
+                        ); 
+    &end_fs_test(\%fs_test_result);
+
+
+
 
     ############################################################
     # delete dirs/files at user wu72
@@ -4664,3 +5050,29 @@ if ($test_kill_users==1){
 
 
 &AD_unbind_admin($ldap);
+
+
+sub create_files_at_user {
+    my ($user)=@_;
+    # create some files/dirs at user $user
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01.txt /srv/samba/schools/bsz/teachers/$user");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-02.txt /srv/samba/schools/bsz/teachers/$user");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-03.txt /srv/samba/schools/bsz/teachers/$user");
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-01");
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-02");
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-03");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01.txt /srv/samba/schools/bsz/teachers/$user/testdir-01");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-02.txt /srv/samba/schools/bsz/teachers/$user/testdir-01");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-03.txt /srv/samba/schools/bsz/teachers/$user/testdir-01");
+
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-01/testdir-01-01");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01-01.txt /srv/samba/schools/bsz/teachers/$user/testdir-01/testdir-01-01");
+    &run_command("cp /usr/share/sophomorix-developer/testfiles/testfile-01-01-02.txt /srv/samba/schools/bsz/teachers/$user/testdir-01/testdir-01-01");
+
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-01/testdir-01-02");
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-01/testdir-01-03");
+
+    &run_command("mkdir /srv/samba/schools/bsz/teachers/$user/testdir-02/testdir-02-01");
+
+
+}
