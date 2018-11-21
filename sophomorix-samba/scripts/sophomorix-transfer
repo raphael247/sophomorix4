@@ -86,6 +86,7 @@ my $move=0;
 my $from_path="";
 my $to_path="";
 my $no_target_directory=0;
+my $keep_source_directory=0;
 
 my $from_unix_path="";
 my $to_user="";
@@ -117,6 +118,7 @@ my $testopt=GetOptions(
            "from-user=s" => \$from_user,
            "subdir=s" => \$subdir,
            "no-target-directory|T" => \$no_target_directory,
+           "keep-source-directory" => \$keep_source_directory,
            "file-list=s" => \$file_list,
            "collect-copy" => \$collect_copy,
            "collect-move" => \$collect_move,
@@ -161,7 +163,8 @@ Options:
     sophomorix-transfer --scopy --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
     sophomorix-transfer --move --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
   # modifiers
-    --no-target-directory  (cp contents of source directory only, but not directory itself)
+    --no-target-directory   (cp contents of source directory only, but not directory itself)
+    --keep-source-directory (do NOT delete source directory, when recursively moving a directory)
 
 
 # share data
@@ -824,7 +827,7 @@ sub smbclient_scopy_recurse {
         }
 
         ############################################################
-        # copy FILES
+        # scopy/rename FILES
         print "##### Copying files\n";
         foreach my $source_file (@{ $copy{'FROM'}{$from_user}{'LISTS'}{'FILES'} }){
             my $target_file=$source_file;
@@ -859,6 +862,12 @@ sub smbclient_scopy_recurse {
             # delete source dirs bottom up
             my @reversed_dirs = reverse(@{ $copy{'FROM'}{$from_user}{'LISTS'}{'DIRS'} }); 
             foreach my $source_dir (@reversed_dirs){
+                # Test if dir must be kept: --keep-source-directory
+                if ($source_dir eq $copy{'FROM'}{$from_user}{OPTION_REL_PATH} and
+                    $keep_source_directory==1){
+		    print "Keeping $copy{'FROM'}{$from_user}{OPTION_REL_PATH}\n";
+                    next;
+                }
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".

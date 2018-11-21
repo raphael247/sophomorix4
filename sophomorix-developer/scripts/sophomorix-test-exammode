@@ -2175,7 +2175,10 @@ if ($file_transfer_move==1){
     # E) dir -> dir (move recursively)
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path testdir-01 --to-user muellegr72-exam --to-path transfer");
+    # test --no-target-directory
     &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path testdir-01 --to-user blackmri72 --to-path transfer --no-target-directory");
+    # --keep-source-directory
+    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path transfer --to-user blackmri72 --to-path transfer/mydir --keep-source-directory");
 
 
     # test moved files
@@ -2269,6 +2272,8 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer",
                          "/srv/samba/schools/uni/students/12abc/blackmri72",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/mydir",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/mydir/transfer",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testdir-01-01",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testdir-01-01/testfile-01-01-01.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testdir-01-01/testfile-01-01-02.txt",
@@ -2403,6 +2408,8 @@ if ($file_transfer_move==1){
     &run_command("rm -rf /srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-01-01.txt");
     &run_command("rm -rf /srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-01-02.txt");
     &run_command("rm -rf /srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-01-03.txt");
+
+    &run_command("rm -rf /srv/samba/schools/uni/students/12abc/blackmri72/transfer/mydir");
  
 
     # Test file deletion
