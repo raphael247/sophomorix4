@@ -594,7 +594,7 @@ sub smbclient_scopy_recurse {
     
         # save some stuff
         $copy{'FROM'}{$from_user}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
-        $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'}=$rel_path_from_user;
+        $copy{'FROM'}{$from_user}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
         $copy{'FROM'}{$from_user}{'SCHOOL'}=$school_AD_from_user;
     }
 
@@ -638,7 +638,7 @@ sub smbclient_scopy_recurse {
 
         # save some stuff
         $copy{'TO'}{$to_user}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
-        $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}=$rel_path_to_user;
+        $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'}=$rel_path_to_user;
         $copy{'TO'}{$to_user}{'SCHOOL'}=$school_AD_to_user;
     }
 
@@ -667,7 +667,7 @@ sub smbclient_scopy_recurse {
                   \%copy,
                   $from_user_option,
                   $copy{'FROM'}{$from_user}{'SCHOOL'},
-                  $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'},
+                  $copy{'FROM'}{$from_user}{'PATH_REL_SCHOOL'},
                   $smb_admin_pass,
                   $ref_sophomorix_config,
                   $ref_sophomorix_result);
@@ -678,7 +678,7 @@ sub smbclient_scopy_recurse {
                   \%copy,
                   $to_user_option,
                   $copy{'TO'}{$to_user}{'SCHOOL'},
-                  $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'},
+                  $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'},
                   $smb_admin_pass,                                 
                   $ref_sophomorix_config,
                   $ref_sophomorix_result);
@@ -704,11 +704,11 @@ sub smbclient_scopy_recurse {
         ){
         my $rm="";
         if ($copy{'TO'}{$to_user}{OPTION_NODE} eq "FILE"){
-            $rm="rm $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'};";
+            $rm="rm $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'};";
         }
         &smb_mkdir_parent($root_dns,
                           $copy{'TO'}{$to_user}{'SCHOOL'},
-                          $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'},
+                          $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'},
                           $smb_admin_pass,
                           $copy{'TO'}{$to_user}{'HOME_REL_SCHOOL'}, # start below from here
                           "ALL_BUT_LAST",
@@ -721,12 +721,18 @@ sub smbclient_scopy_recurse {
                  "%'******'".
                 " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
                 $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-                " -c '$rm $scopy_move $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'} $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'}'";
+                " -c '$rm $scopy_move $copy{'FROM'}{$from_user}{'PATH_REL_SCHOOL'} $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'}'";
             my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         } else {
             # from school to another
-            # ???
-
+            &smb_get_put_copy($root_dns,
+                              $copy{'FROM'}{$from_user}{'PATH_REL_SCHOOL'},
+                              $from_user,
+                              $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'},
+                              $to_user,
+                              \%copy,
+                              $ref_sophomorix_config,
+                              $ref_sophomorix_result);
         }
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
@@ -760,13 +766,19 @@ sub smbclient_scopy_recurse {
                 "%'******'".
                 " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
                 $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-                " -c '$rm $scopy_move $copy{'FROM'}{$from_user}{'SOURCE_REL_SCHOOL'} $target'";
+                " -c '$rm $scopy_move $copy{'FROM'}{$from_user}{'PATH_REL_SCHOOL'} $target'";
             print "$smbclient_command\n";
             my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
         } else {
             # from school to another
-            # ???
-
+            &smb_get_put_copy($root_dns,
+                              $copy{'FROM'}{$from_user}{'PATH_REL_SCHOOL'},
+                              $from_user,
+                              $target,
+                              $to_user,
+                              \%copy,
+                              $ref_sophomorix_config,
+                              $ref_sophomorix_result);
         }
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
@@ -793,7 +805,7 @@ sub smbclient_scopy_recurse {
         print "##### Creating parent dirs\n";
         &smb_mkdir_parent($root_dns,
                           $copy{'TO'}{$to_user}{'SCHOOL'},
-                          $copy{'TO'}{$to_user}{'SOURCE_REL_SCHOOL'},
+                          $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'},
                           $smb_admin_pass,
                           $copy{'TO'}{$to_user}{'HOME_REL_SCHOOL'}, # start below from here
                           "ALL",
