@@ -315,7 +315,29 @@ teachers.csv: Erstpassword-Feld 6 wie bisher ??? (statt unid)
 
 
 Nextcloud-Integration:
+------------------------------------------------------------
+Zum erstellen von Klassentauschverzeichnissen in der Nextcloud erforderlich:
 
+Ziel:
+1) Lehrer shared ein Verzeichnis.
+   Daten der Schüler in diesem Verzeichnis werden dem Lehrer zugeschrieben (Quota),
+   da er beim un-sharen diese Daten 'einkassiert->auf sein Quota'
+   Nextcloud achtet darauf, dass er einkassieren kann.
+2) Lösung:
+   Anlegen dieser Tauschverzeichnisse von einem Leher der in allen Klassen ist,
+   und unbegrenzt/großes quota hat.
+   --> Schüler s
+
+je schule/global ein user
+anlegbar machen, der in dieser Gruppe ist
+(User: <bsz>-cloud, global-cloud?, anlegbar, falls gebraucht mit sophomorix-admin anlegbar)
+(Gruppe: adminclasses, bsz-adminclasses, global-adminclasses)
+
+dito: bsz-projects, ...?
+
+------------------------------------------------------------
+
+------------------------------------------------------------
 sophomorix-samba --nextcloud-config <schulname>
 Gibt auf Konsole das aus, was bei Nextcloud eingetragen werden muss
 [BaseDN:]  .....
@@ -324,7 +346,7 @@ Gibts da zu viele individuelle Einstellungen
   * Lehrer dürfen nicht mit ihrem Vornamen von Schülern gefunden werden
   * Bei Lehrer nur loginname anzeigen
 )
-
+------------------------------------------------------------
 
 
 
