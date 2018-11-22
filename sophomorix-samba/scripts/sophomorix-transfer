@@ -1075,18 +1075,20 @@ sub smb_get_put_copy {
             $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c 'lcd $tmp; cd $source_dirname; prompt; get $source_filename; exit;'";
         print "$smbclient_command_get\n";
-        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_get,$smb_admin_pass);
+        my ($return_value_get,@out_lines_get)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_get,$smb_admin_pass);
 
         # 2) upload target
         my $target_dirname  = dirname($target_file);
+        my $target_filename  = basename($target_file);
         my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
             " //$root_dns/$ref_copy->{'TO'}{$to_user}{'SCHOOL'} "." ".
             $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c 'lcd $tmp; cd $target_dirname; prompt; put $source_filename; exit;'";
+            " -c 'lcd $tmp; cd $target_dirname; prompt; put $source_filename $target_filename; exit;'";
         print "$smbclient_command_put\n";
-        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
+        my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
+
 }
 
 

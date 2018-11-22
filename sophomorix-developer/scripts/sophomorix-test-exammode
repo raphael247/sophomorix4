@@ -1693,6 +1693,12 @@ if ($file_transfer_scopy==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user samardze72-exam --to-path transfer --no-target-directory");
 
     # copy from one school to another
+    # create parent dir and copy file
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user lordjo72 --to-path dir/to/new-filename2.txt");
+    # move file only
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user lordjo72  --to-path topfile2.txt"); 
+
+
      # E) dir -> dir (copy recursively, bsz -> uni)
      &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user lordjo72 --to-path transfer");
     
@@ -1804,6 +1810,10 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer/testdir-01/testfile-01-01.txt",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer/testdir-01/testfile-01-02.txt",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer/testdir-01/testfile-01-03.txt",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/dir",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/dir/to",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/dir/to/new-filename2.txt",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/topfile2.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
                          "/srv/samba/schools/uni/teachers",
@@ -1900,6 +1910,10 @@ if ($file_transfer_scopy==1){
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt");
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-02.txt");
     &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-03.txt");
+
+    # delete created files from E) from school to school
+    &run_command("rm -rf /srv/samba/schools/uni/students/12abc/lordjo72/dir");
+    &run_command("rm -rf /srv/samba/schools/uni/students/12abc/lordjo72/topfile2.txt");
 
     # delete created files from E) from school to school
     &run_command("rm -rf /srv/samba/schools/uni/students/12abc/lordjo72/transfer/testdir-01");
