@@ -57,12 +57,15 @@ my $help=0;
 my $skip_warning=0;
 my $all_options="";
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
 my %fs_test_result=();
 
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl" => \$nontacl,
            "cp-add" => \$cp_add,
            "cp-update" => \$cp_update,
            "cp-kill" => \$cp_kill,
@@ -87,6 +90,10 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";
@@ -2278,6 +2285,8 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/schools/default-school/teachers/sch42/transfer",
 #                         "/srv/samba/schools/default-school/teachers/sch42/_einsammeln",
                         ); 
+
+    if ($ntacl==1){
     &ACL_test ("/srv/samba/schools",
                "d",
                \%fs_test_result,
@@ -3653,7 +3662,8 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\sch42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL',
-                );
+	        );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -3673,6 +3683,8 @@ if ($add==1 or $test_add==1){
                          "/srv/samba/global/students",         # ntacl
                          "/srv/samba/global/teachers",         # ntacl
                         );
+
+    if ($ntacl==1){
     # /srv/samba/global/share
     &NTACL_test ("linuxmuster-global",
                  "/share",
@@ -3799,7 +3811,8 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
-                );
+	        );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
@@ -4990,7 +5003,8 @@ if ($mod==1){
                "user::rwx",
                "group::r-x",
                "other::r-x",
-              );
+     	      );
+    if ($ntacl==1){
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -6138,6 +6152,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
@@ -7478,6 +7493,7 @@ if ($ses==1){
                "group::r-x",
                "other::r-x",
               );
+    if ($ntacl==1){
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -8479,6 +8495,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -8498,6 +8515,7 @@ if ($ses==1){
                          "/srv/samba/global/students",           # ntacl
                          "/srv/samba/global/teachers",           # ntacl
                         ); 
+    if ($ntacl==1){
     # /srv/samba/global/share
     &NTACL_test ("linuxmuster-global",
                  "/share",
@@ -8625,6 +8643,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
@@ -10381,6 +10400,7 @@ if ($update==1 or $test_update==1){
                "group::r-x",
                "other::r-x",
               );
+    if ($ntacl==1){
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -12089,6 +12109,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
@@ -12532,6 +12553,7 @@ if ($kill==1 or $test_kill==1){
                "group::r-x",
                "other::r-x",
               );
+    if ($ntacl==1){
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -13868,6 +13890,7 @@ if ($kill==1 or $test_kill==1){
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
@@ -14043,6 +14066,7 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                "group::r-x",
                "other::r-x",
               );
+    if ($ntacl==1){
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -15084,6 +15108,7 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
@@ -15271,6 +15296,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                "group::r-x",
                "other::r-x",
               );
+    if ($ntacl==1){
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
                  "/",
@@ -16136,6 +16162,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -16155,6 +16182,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         ); 
+    if ($ntacl==1){
     # /srv/samba/global/share
     &NTACL_test ("linuxmuster-global",
                  "/share",
@@ -16282,6 +16310,7 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
