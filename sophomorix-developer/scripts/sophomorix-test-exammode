@@ -1692,15 +1692,21 @@ if ($file_transfer_scopy==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user samardze72-exam --to-path transfer --no-target-directory");
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user samardze72-exam --to-path transfer --no-target-directory");
 
+
     # copy from one school to another
+    # Test A) not neded
+    # Test B) cp file to NONEXISTING
     # create parent dir and copy file
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user lordjo72 --to-path dir/to/new-filename2.txt");
     # move file only
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01/testfile-01-01.txt --to-user lordjo72  --to-path topfile2.txt"); 
+ 
+    # C) file -> dir (copy into dir if no other dir is in the way)
 
+    # D) dir -> file (error)
 
-     # E) dir -> dir (copy recursively, bsz -> uni)
-     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user lordjo72 --to-path transfer");
+    # E) dir -> dir (copy recursively, bsz -> uni)
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path testdir-01 --to-user lordjo72 --to-path transfer");
     
 
     ############################################################
