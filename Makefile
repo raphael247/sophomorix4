@@ -63,6 +63,9 @@ LATEX=$(DESTDIR)/usr/share/sophomorix/lang/latex
 # Filter
 FILTER=$(DESTDIR)/usr/share/sophomorix/filter
 
+# startscripts-skel
+STARTSCRIPTSSKEL=$(DESTDIR)/usr/share/sophomorix/devel/startscript-skel
+
 # SAMBADEBCONFDIR für Debian 
 #SAMBADEBCONFDIR=$(DESTDIR)/etc/samba
 
@@ -207,6 +210,22 @@ install-sophomorix-samba:
 # filter scripts
 	@install -d -m755 -oroot -groot $(FILTER)
 	@install -oroot -groot --mode=0755 sophomorix-samba/filter/*.filter $(FILTER)
+# startscripts
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/custom
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/custom/linux
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/custom/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/logoff.bat $(STARTSCRIPTSSKEL)/custom/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/logon.bat $(STARTSCRIPTSSKEL)/custom/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/sysstart.bat $(STARTSCRIPTSSKEL)/custom/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/sysstop.bat $(STARTSCRIPTSSKEL)/custom/windows
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/lmn
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/lmn/linux
+	@install -d -m755 -oroot -groot $(STARTSCRIPTSKEL)/lmn/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/windows/logoff.bat $(STARTSCRIPTSSKEL)/lmn/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/windows/logon.bat $(STARTSCRIPTSSKEL)/lmn/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/windows/sysstart.bat $(STARTSCRIPTSSKEL)/lmn/windows
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/windows/sysstop.bat $(STARTSCRIPTSSKEL)/lmn/windows
 
 
 install-virusscan:
