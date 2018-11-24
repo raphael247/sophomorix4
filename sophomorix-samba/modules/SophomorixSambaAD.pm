@@ -781,7 +781,7 @@ sub AD_repdir_using_file {
                         }
                         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                             " -U ".$DevelConf::sophomorix_file_admin."%'******'".
-                            " //$root_dns/$share -c 'mkdir $path_after_user_smb'";
+                            " //$root_dns/$share -c 'mkdir \"$path_after_user_smb\"'";
                         my $user_typeout;
                         if ($user eq ""){
                             $user_typeout="<none>";
@@ -908,7 +908,7 @@ sub AD_user_kill {
 
               my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                         " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
-                        $unc." -c 'deltree $smb_rel_path;'";
+                        $unc." -c 'deltree \"$smb_rel_path\";'";
               my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
               if($smbclient_return==0){
                   $home_delete_string="TRUE";
@@ -1145,16 +1145,16 @@ sub AD_group_kill {
             if ($smb_share ne  "unknown"){
                 my $smbclient_command_rmdir_homes=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' "
-                    .$unc." -c 'rmdir $smb_rel_path_homes;'";
+                    .$unc." -c 'rmdir \"$smb_rel_path_homes\";'";
                 my $smbclient_return_rmdir_homes=&Sophomorix::SophomorixBase::smb_command($smbclient_command_rmdir_homes,
                                                                                            $smb_admin_pass);
                 my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
-                    $unc." -c 'deltree $smb_rel_path_share;'";
+                    $unc." -c 'deltree \"$smb_rel_path_share\";'";
                 my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                 my $smbclient_command_ls=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
-                    $unc." -c 'ls $smb_rel_path_share;'";
+                    $unc." -c 'ls \"$smb_rel_path_share\";'";
                 my $return2=&Sophomorix::SophomorixBase::smb_command($smbclient_command_ls,$smb_admin_pass);
                 if($return2==1 or $return2==256){
                     print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
@@ -3187,7 +3187,7 @@ sub AD_user_move {
         # smbclient ... rename (=move)
         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " -U ".$DevelConf::sophomorix_file_admin."%'******'".
-            " //$root_dns/$school_old -c 'rename $smb_rel_path_old $smb_rel_path_new'";
+            " //$root_dns/$school_old -c 'rename \"$smb_rel_path_old\" \"$smb_rel_path_new\"'";
         &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
     } else {
         # this is dirty and works only if the shares are on the same server
