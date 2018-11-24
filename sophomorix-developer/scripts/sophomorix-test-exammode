@@ -82,6 +82,8 @@ my $test_kill_users=0;
 
 my $all_options="";
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
 my %fs_test_result=();
 
 
@@ -112,11 +114,16 @@ my $testopt=GetOptions(
            "test-kill-users" => \$test_kill_users,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl" => \$nontacl,
   );
 
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";
@@ -1365,7 +1372,9 @@ if ($test_exammode_users==1){
                          "/srv/samba/schools/default-school/share/management",                                      # ntacl
                          "/srv/samba/schools/default-school/share/school",                                      # ntacl
                         ); 
-# Testing NTACLs of exam users
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -1490,6 +1499,7 @@ if ($test_exammode_users==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -2774,8 +2784,10 @@ if ($test_file_transfer_share==1){
                     "/srv/samba/schools/default-school/share/classes",                           # ntacl
                     "/srv/samba/schools/default-school/share/management",                                      # ntacl
                     "/srv/samba/schools/default-school/share/school",                                      # ntacl
-                   ); 
-# Testing NTACLs of exam users
+                   );
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -2900,6 +2912,7 @@ if ($test_file_transfer_share==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -3128,7 +3141,9 @@ if ($test_file_transfer_collect_copy==1){
                     "/srv/samba/schools/default-school/share/management",                                      # ntacl
                     "/srv/samba/schools/default-school/share/school",                                      # ntacl
                    ); 
-# Testing NTACLs of exam users
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -3253,6 +3268,7 @@ if ($test_file_transfer_collect_copy==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -3517,7 +3533,9 @@ if ($test_file_transfer_collect_move==1){
                     "/srv/samba/schools/default-school/share/management",                                      # ntacl
                     "/srv/samba/schools/default-school/share/school",                                      # ntacl
                    ); 
-# Testing NTACLs of exam users
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -3642,6 +3660,7 @@ if ($test_file_transfer_collect_move==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -3804,7 +3823,9 @@ if ($test_file_transfer_clean==1){
                          "/srv/samba/schools/default-school/share/management",                                      # ntacl
                          "/srv/samba/schools/default-school/share/school",                                      # ntacl
                         ); 
-# Testing NTACLs of exam users
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -3929,6 +3950,7 @@ if ($test_file_transfer_clean==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -4142,7 +4164,9 @@ if ($test_file_transfer_home==1){
                     "/srv/samba/schools/default-school/share/management",                                      # ntacl
                     "/srv/samba/schools/default-school/share/school",                                      # ntacl
                    ); 
-# Testing NTACLs of exam users
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -4267,6 +4291,7 @@ if ($test_file_transfer_home==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -4446,7 +4471,9 @@ if ($test_file_transfer_home_clean==1){
                          "/srv/samba/schools/default-school/share/management",                                      # ntacl
                          "/srv/samba/schools/default-school/share/school",                                      # ntacl
                         ); 
-# Testing NTACLs of exam users
+
+    if ($ntacl==1){
+    # Testing NTACLs of exam users
     # /srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam
     &NTACL_test ("bsz",
                  "/examusers/subdir72/maiersa72-exam",
@@ -4570,7 +4597,8 @@ if ($test_file_transfer_home_clean==1){
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
-                );
+	        );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
