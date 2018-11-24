@@ -1,2 +1,2 @@
 #!/bin/sh
-# cusom logoff
+# custom logoff

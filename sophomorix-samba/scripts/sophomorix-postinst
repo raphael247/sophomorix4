@@ -83,14 +83,43 @@ print "* Installing netlogon example scripts for school $school:\n";
 # linux lmn
 my $netlogon_school_lmn_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/lmn/linux";
 system("mkdir -p \"$netlogon_school_lmn_linux\"");
-# add foreach here ???    
+my $startscript_skel_lmn_linux="/usr/share/sophomorix/devel/startscript-skel/lmn/linux";
+my @lmn_linux=("logon.sh",
+                 "logoff.sh",
+                 "sysstart.sh",
+                 "sysstop.sh",
+                );
+foreach my $script (@lmn_linux){
+    my $source=$startscript_skel_lmn_linux."/".$script;
+    my $target=$netlogon_school_lmn_linux."/".$script;
+    print "   Overwrite lmn/linux: $target\n";
+    system("install -oroot -groot --mode=0644 \"$source\" $target");
+}
 
 
 
 # linux custom
 my $netlogon_school_custom_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/linux";
 system("mkdir -p \"$netlogon_school_custom_linux\"");
-# add foreach here ???
+my $netlogon_school_custom_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/linux";
+system("mkdir -p \"$netlogon_school_custom_linux\"");
+my $startscript_skel_custom_linux="/usr/share/sophomorix/devel/startscript-skel/custom/linux";
+my @lmn_linux=("logon.sh",
+                 "logoff.sh",
+                 "sysstart.sh",
+                 "sysstop.sh",
+                );
+foreach my $script (@lmn_linux){
+    my $source=$startscript_skel_custom_linux."/".$script;
+    my $target=$netlogon_school_custom_linux."/".$script;
+    if (-f $target){
+        print "   Custom linux exists: $target\n";
+    } else {
+        print "   Create custom/linux: $target\n";
+        system("install -oroot -groot --mode=0644 \"$source\" \"$target\"");
+    }
+} 
+
 
 
 
