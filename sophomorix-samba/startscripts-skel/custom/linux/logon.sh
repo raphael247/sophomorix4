@@ -1,0 +1,2 @@
+#!/bin/sh
+# custom logon
