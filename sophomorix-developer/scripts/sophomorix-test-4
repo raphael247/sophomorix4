@@ -54,6 +54,8 @@ my $test_kill_class=0;
 
 my $all_options="";
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
 my %fs_test_result=();
 
 my $testopt=GetOptions(
@@ -61,6 +63,7 @@ my $testopt=GetOptions(
            "full|f" => \$full,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl" => \$nontacl,
            "add-class" => \$add_class,
            "test-add-class" => \$test_add_class,
            "mod-class" => \$mod_class,
@@ -74,6 +77,10 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";

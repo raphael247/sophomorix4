@@ -78,8 +78,6 @@ my $test_nonexammode_users=0;
 my $kill_users=0;
 my $test_kill_users=0;
 
-
-
 my $all_options="";
 my $json=0;
 my $ntacl=1;
@@ -90,6 +88,8 @@ my %fs_test_result=();
 my $testopt=GetOptions(
            "help|h" => \$help,
            "full|f" => \$full,
+           "json|j+" => \$json,
+           "nontacl|n" => \$nontacl,
            "add-users" => \$add_users,
            "test-add-users" => \$test_add_users,
            "exammode-users" => \$exammode_users,
@@ -113,8 +113,6 @@ my $testopt=GetOptions(
            "kill-users" => \$kill_users,
            "test-kill-users" => \$test_kill_users,
            "verbose|v+" => \$Conf::log_level,
-           "json|j+" => \$json,
-           "nontacl" => \$nontacl,
   );
 
 

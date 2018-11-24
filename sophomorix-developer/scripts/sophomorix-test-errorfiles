@@ -38,6 +38,9 @@ use Sophomorix::SophomorixTest qw(
 $Conf::log_level=1;
 my $help=0;
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
+
 my $all_options="";
 my $full=0;
 
@@ -50,6 +53,7 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl|n" => \$nontacl,
            "class|c" => \$class,
            "last|l" => \$last,
            "first" => \$first,
@@ -59,6 +63,10 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";

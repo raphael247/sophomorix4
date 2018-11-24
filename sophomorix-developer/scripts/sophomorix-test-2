@@ -91,6 +91,9 @@ my $ws_count=0;
 my $birthdate="1970-01-01";
 my $all_options="";
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
+
 my %fs_test_result=();
 
 # dns
@@ -100,6 +103,7 @@ my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl|n" => \$nontacl,
            "copy-devfile-1" => \$copy_devfile_1,
            "test-dev-1" => \$test_ws_1,
            "copy-devfile-2" => \$copy_devfile_2,
@@ -116,6 +120,10 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";

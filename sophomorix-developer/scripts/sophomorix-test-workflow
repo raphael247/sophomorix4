@@ -66,12 +66,15 @@ my $full=0;
 my $help=0;
 my $all_options="";
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
 my %fs_test_result=();
 
 my $testopt=GetOptions(
            "help|h" => \$help,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl|n" => \$nontacl,
            "add-check" => \$add_check,
            "add-do" => \$add_do,
            "modify-1-check" => \$modify_1_check,
@@ -101,6 +104,10 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";
