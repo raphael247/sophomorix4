@@ -21,6 +21,14 @@ upload to fleischsalat: scp sophomorix*3.42.1-3* fleischsalat:bionic-testing
 Todo:
 ############################################################
 
+
+
+
+Aufrufe von sophomorix aus der WEBUI:
+--> optionen werden mit 
+
+
+
 sophomorix-transfer -scopy
 
 -> performance: do no recreate dirs found on scan
@@ -126,9 +134,38 @@ password clonen tut nicht beim anlegen eines examusers
    tuts da?
 --> tut!
 
-GPO
-xml-Datei, mehrere, einfach ablegen.
+ ------------------------------------------------------------
+????
+         schulgruppen samaccountname mit prefix s_
+      --> ulm muss alte schule löschen
+         hardwareclassen d_  --> devicegroup, globaldevicegroup
+         r_ NICHT bei Räumen: probleme abfangen
 
+
+
+         sophomorix-transfer
+         im smb-Dateinamen nicht erlaubt: \ / : ? " < > |
+         Leerzeichen in Dateinamen zulassen, sowie ...
+         
+ ------------------------------------------------------------
+         
+
+------------------------------------------------------------
+GPO
+
+HERE ???
+         sophomorix-postinst overwrite files in  
+          /var/lib/samba/sysvol/...linuxmuster.local.../scripts/@@SCHOOL@@/custom/linux/::root::root::0755::noacl::
+#ls /var/lib/samba/sysvol/linuxmuster.local/scripts/@@SCHOOL@@/custom/windows/::root::root::0755::noacl::
+#ls /var/lib/samba/sysvol/linuxmuster.local/scripts/@@SCHOOL@@/lmn/linux/::root::root::0755::noacl::
+#ls /var/lib/samba/sysvol/linuxmuster.local/scripts/@@SCHOOL@@/lmn/windows/::root::root::0755::noacl::
+
+--> GPO weiter nach Telefonat
+         
+------------------------------------------------------------
+
+
+         
 
 Filesystem:
 
