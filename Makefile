@@ -214,6 +214,10 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/custom
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/custom/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/linux/logoff.sh $(STARTSCRIPTSSKEL)/custom/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/linux/logon.sh $(STARTSCRIPTSSKEL)/custom/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/linux/sysstart.sh $(STARTSCRIPTSSKEL)/custom/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/linux/sysstop.sh $(STARTSCRIPTSSKEL)/custom/linux
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/custom/windows
 	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/logoff.bat $(STARTSCRIPTSSKEL)/custom/windows
 	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/logon.bat $(STARTSCRIPTSSKEL)/custom/windows
@@ -221,6 +225,10 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/custom/windows/sysstop.bat $(STARTSCRIPTSSKEL)/custom/windows
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/lmn
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/lmn/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/linux/logoff.sh $(STARTSCRIPTSSKEL)/lmn/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/linux/logon.sh $(STARTSCRIPTSSKEL)/lmn/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/linux/sysstart.sh $(STARTSCRIPTSSKEL)/lmn/linux
+	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/linux/sysstop.sh $(STARTSCRIPTSSKEL)/lmn/linux
 	@install -d -m755 -oroot -groot $(STARTSCRIPTSSKEL)/lmn/windows
 	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/windows/logoff.bat $(STARTSCRIPTSSKEL)/lmn/windows
 	@install -oroot -groot --mode=0644 sophomorix-samba/startscripts-skel/lmn/windows/logon.bat $(STARTSCRIPTSSKEL)/lmn/windows
