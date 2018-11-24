@@ -19,7 +19,6 @@ print Dumper(\%smb_conf);
 my $conf_dir="/etc/linuxmuster/sophomorix";
 my $conf_file=$conf_dir."/sophomorix.conf";
 my $conf_file_source="/usr/share/sophomorix/config-templates/sophomorix.conf.template.ini";
-
 print "##### sophomorix-postinst start #####\n";
 
 print "\n";
@@ -76,6 +75,62 @@ if (-e $school_file){
     print "     Installing $school_file\n";
     system("install -oroot -groot --mode=0644 $school_file_source $school_file");    
 }
+
+
+print "\n";
+print "* Installing netlogon example scripts for school $school:\n";
+
+# linux lmn
+my $netlogon_school_lmn_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/lmn/linux";
+system("mkdir -p \"$netlogon_school_lmn_linux\"");
+# add foreach here ???    
+
+
+
+# linux custom
+my $netlogon_school_custom_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/linux";
+system("mkdir -p \"$netlogon_school_custom_linux\"");
+# add foreach here ???
+
+
+
+# windows lmn
+my $netlogon_school_lmn_windows=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/lmn/windows";
+system("mkdir -p \"$netlogon_school_lmn_windows\"");
+my $startscript_skel_lmn_windows="/usr/share/sophomorix/devel/startscript-skel/lmn/windows";
+my @lmn_windows=("logon.bat",
+                 "logoff.bat",
+                 "sysstart.bat",
+                 "sysstop.bat",
+                );
+foreach my $script (@lmn_windows){
+    my $source=$startscript_skel_lmn_windows."/".$script;
+    my $target=$netlogon_school_lmn_windows."/".$script;
+    print "   Overwrite lmn/windows: $target\n";
+    system("install -oroot -groot --mode=0644 \"$source\" $target");
+}
+
+
+# windows custom 
+my $netlogon_school_custom_windows=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/windows";
+system("mkdir -p \"$netlogon_school_custom_windows\"");
+my $startscript_skel_custom_windows="/usr/share/sophomorix/devel/startscript-skel/custom/windows";
+my @lmn_windows=("logon.bat",
+                 "logoff.bat",
+                 "sysstart.bat",
+                 "sysstop.bat",
+                );
+foreach my $script (@lmn_windows){
+    my $source=$startscript_skel_custom_windows."/".$script;
+    my $target=$netlogon_school_custom_windows."/".$script;
+    if (-f $target){
+        print "   Custom windows exists: $target\n";
+    } else {
+        print "   Create custom/windows: $target\n";
+        system("install -oroot -groot --mode=0644 \"$source\" \"$target\"");
+    }
+} 
+
 
 
 ######################################################################
