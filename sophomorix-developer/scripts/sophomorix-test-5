@@ -58,6 +58,8 @@ my $test_kill_admin=0;
 
 my $all_options="";
 my $json=0;
+my $ntacl=1;
+my $nontacl=0;
 my %fs_test_result=();
 
 my $testopt=GetOptions(
@@ -65,6 +67,7 @@ my $testopt=GetOptions(
            "full|f" => \$full,
            "verbose|v+" => \$Conf::log_level,
            "json|j+" => \$json,
+           "nontacl" => \$nontacl,
            "add-admin" => \$add_admin,
            "test-add-admin" => \$test_add_admin,
            "mod-admin" => \$mod_admin,
@@ -76,6 +79,10 @@ my $testopt=GetOptions(
 
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt);
+
+if ($nontacl==1){
+    $ntacl=0;
+}
 
 if ($Conf::log_level==1){
     $all_options="";
@@ -984,6 +991,7 @@ if ($test_add_admin==1){
                          "/srv/samba/schools/default-school/share/school",                                      # ntacl
                          "/srv/samba/schools/uni",
                         ); 
+    if ($ntacl==1){
     # /srv/samba/schools/default-school
     &NTACL_test ("default-school",
                  "/",
@@ -1276,6 +1284,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\admin-abc-666:ALLOWED/OI|CI/FULL', 
                 );
+    }
     &end_fs_test(\%fs_test_result);
 
     ############################################################
@@ -1301,6 +1310,7 @@ if ($test_add_admin==1){
                          "/srv/samba/global/students",
                          "/srv/samba/global/teachers",
                         );
+    if ($ntacl==1){
     # /srv/samba/global/management
     &NTACL_test ("linuxmuster-global",
                  "/management",
@@ -1378,6 +1388,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admin-666:ALLOWED/OI|CI/FULL',
                 );
+    }
     &end_fs_test(\%fs_test_result);
 }
 
