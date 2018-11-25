@@ -15,14 +15,56 @@ git push https-origin bionic
 Username for 'https://github.com': ########
 Password for 'https://jeffbeck@github.com': ########
 
-upload to fleischsalat: scp sophomorix*3.42.1-3* fleischsalat:bionic-testing
+############################################################
+upload to fleischsalat: scp ../sophomorix*3.42.1-3* fleischsalat:/srv/www/lmn7
+
+.ssh/config:
+###########################
+Host fleischsalat
+ HostName fleischsalat.linuxmuster.org
+ User ruediger
+ Port 22
+
 
 ############################################################
 Todo:
 ############################################################
 
+Prioliste:
+- --scopy/--move
+   - tests erweitern
+   - auch von schule zu schule
+- maildoman parameter raus, neuer einfügen
+- neuer schulname in sophomorix.conf (Kurzzeichen, testen)
+- h_ und s_ umsetzen
+   command.log: " werden nicht mitgeloggt, ist das OK?
+
+? schoolsetup automatisch oder per Hand(wie jetzt)?(sophomorix-postinst <school>)
+
+export HISTSIZE=100000
+
+/etc/bash completion anschauen
+
+README for logonscripts wie man neue scripte ausrollt
+   
+überlegen, wenn eine Klasse gelöscht wird, die in einem Projekt
+   mitglied ist:
+wird dieser Eintrag gut entfernt aus dem Projekt?
+
+nextfree uidnumber:
+- aus /etc raus?
+- ins ldap?/nach /var?
+   - was passiert beim Datei löschen?
+      wiederverwerten von uid?
+
+      leere schuler.csv
 
 
+      Migration scripten, homes moven nach
+   olddata_from_linuxmuster.net6.x
+   --sync-user-home <user1>,<user2>, ...
+      --sync-all-user-homes
+      
 
 Aufrufe von sophomorix aus der WEBUI:
 --> optionen werden mit 
