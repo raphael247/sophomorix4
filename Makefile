@@ -316,6 +316,9 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01-03-01.txt $(TESTFILES)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01-03-02.txt $(TESTFILES)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/testfile-01-03-03.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/blockfile.txt $(TESTFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testfiles/blockfile2.txt $(TESTFILES)
+
 
 # installing  testdata
 	@install -d $(TESTDATA)
