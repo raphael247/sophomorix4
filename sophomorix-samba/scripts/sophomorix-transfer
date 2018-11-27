@@ -927,7 +927,7 @@ sub scan_smb_dir {
     print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
     $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
-
+    print "HERE start\n";
     my $num=0;
     foreach my $rel_item (@scanlist){
         $num++;
@@ -936,9 +936,10 @@ sub scan_smb_dir {
             $ref_copy->{$location}{$user}{'OPTION_NODE'}=$type;   
         }
         if ($type eq "DIR"){
+
             $ref_copy->{$location}{$user}{'LOOKUP'}{$rel_item}="DIR";
             push @{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'} },$rel_item;
-
+print "HERE DIR $rel_item found\n";
             # scan the contents
             my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
@@ -947,33 +948,136 @@ sub scan_smb_dir {
                 $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
                 " -c 'cd \"$rel_item\"; ls'";
             my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+
+
             foreach my $status (@out_lines){
-                my ($dummy,$name,$smb_type,)=split(/\s+/,$status);
-                if (not defined $name or not defined $smb_type){
-                    next;
+                my $smb_type="";
+                my $smb_name="";
+
+                # get the
+                my (@list_tmp)=split(/(  D  |  N  |  A  )/,$status); # split wuth 2 chars of space before/after
+                #print Dumper(\@list_tmp);
+                foreach my $item (@list_tmp){
+                   if ($item eq "  D  "){
+                       # directory
+                       $smb_type="DIR";
+                       last;
+                   } elsif ($item eq "  N  " or $item eq "  A  "){
+                       # node/files
+                       $smb_type="FILE";
+                       last;
+                   } else {
+                       $smb_name=$smb_name.$item;
+                   }      
                 }
-                if ($name eq "." or $name eq ".."){
+                $smb_name=&Sophomorix::SophomorixBase::remove_embracing_whitespace($smb_name);
+                if ($smb_name eq "" or 
+                    $smb_name eq "." or 
+                    $smb_name eq ".." or
+                    ($smb_name=~m/blocks of size/ and $smb_name=~m/available/)){
                     next;
+                } else {
+                    my $dir_rel_path=$rel_item."/".$smb_name;
+                    if ($smb_type eq "DIR"){
+                        push @scanlist, $dir_rel_path;
+                    } elsif ($smb_type eq "FILE"){
+                        $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
+                        push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
+                    }
                 }
 
-		print "$status\n";
-                # valid entries
-                my $dir_rel_path=$rel_item."/".$name;
-                if ($smb_type eq "D"){
-                    # directory
-                    push @scanlist, $dir_rel_path;
-                } elsif ($smb_type eq "N" or $smb_type eq "A"){
-                    # node/files
-                    $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
-                    push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
-                }
+                print "FINAL: <$smb_type>   >$smb_name<\n";
+
+                #my $dir_rel_path=$rel_item."/".$name;
+
+                # my ($dummy,@names)=split(/\s+/,$status);
+                # foreach my $name (@names){
+                #     my $test_name=$name;
+                #     # vary test name
+
+                #     my $test_path=$rel_item."/".$test_name;
+                #     my ($exists,$smb_type_tmp)=&smb_stat_test($root_dns,$school,$test_path,\%sophomorix_config);
+                #     if ($exists eq "TRUE"){
+                #         $smb_type=$smb_type_tmp;
+                #         $smb_name=$test_name;
+                #         last;
+                #     } else {
+
+                #     }
+                #     print ">>$name<<  $test_path\n";
+                    
+                # }
+		# print "HERE RESULT:  $smb_type $smb_name\n";
+
+
+                #my $smb_type eq "todo";
+                # if ($smb_type eq "D"){
+                #     # directory
+                #     push @scanlist, $dir_rel_path;
+                # } elsif ($smb_type eq "N" or $smb_type eq "A"){
+                #     # node/files
+                #     $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
+                #     push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
+                # } elsif ($smb_type eq "blocks"){
+                #     # ignore this line
+                # } else {
+                #     print "HERE: unknown type $smb_type\n";
+                # }
             }
+
+            # # filetype old style, fails on spaces in filename, fails completely on space at file end
+            # foreach my $status (@out_lines){
+            #     my ($dummy,$name,$smb_type,)=split(/\s+/,$status);
+            #     if (not defined $name or not defined $smb_type){
+            #         next;
+            #     }
+            #     if ($name eq "." or $name eq ".."){
+            #         next;
+            #     }
+	    # 	print "HERE status : $status\n";
+            #     # valid entries
+            #     my $dir_rel_path=$rel_item."/".$name;
+            #     if ($smb_type eq "D"){
+            #         # directory
+            #         push @scanlist, $dir_rel_path;
+            #     } elsif ($smb_type eq "N" or $smb_type eq "A"){
+            #         # node/files
+            #         $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
+            #         push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
+            #     } elsif ($smb_type eq "blocks"){
+            #         # ignore this line
+            #     } else {
+            #         print "HERE: unknown type $smb_type\n";
+            #     }
+            # }
         } elsif ($type eq "FILE"){
             push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$rel_item;
         }
     }
     $ref_copy->{$location}{$user}{'COUNT'}{'FILES'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'}  }+1;
     $ref_copy->{$location}{$user}{'COUNT'}{'DIRS'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'}  }+1;
+    print "HERE end\n";
+}
+
+
+
+sub smb_stat_test {
+    my ($root_dns,$share,$rel_path,$ref_sophomorix_config)=@_;
+    my $exists="FALSE";
+    my $smb_type="-?-";
+    print "Test in share $share $rel_path\n";
+    my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+        " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+        "%'******'".
+        " //$root_dns/$share "." ".
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+        " -c 'stat $rel_path'";
+        print "HERE SMB $smbclient_command\n";
+        my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    if ($return_value==0){
+        $exists="TRUE";
+    }
+    return($exists,$smb_type);
 }
 
 
