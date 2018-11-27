@@ -576,6 +576,12 @@ sub smbclient_scopy_recurse {
                           root_dns=>$root_dns,
                           user=>$from_user,
                         });
+
+        if ($existing_AD_from_user eq "FALSE"){
+            &log_script_exit("ERROR: Source user $from_user not found",1,1,0,
+                $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+        }
+
         my $smb_dir_home_from_user=$home_directory_AD_from_user;
         $smb_dir_home_from_user=~s/\\/\//g;
         my ($string_from_user,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
@@ -598,7 +604,7 @@ sub smbclient_scopy_recurse {
         $copy{'FROM'}{$from_user}{'SCHOOL'}=$school_AD_from_user;
     }
 
-    foreach my $from_user ( @{ $copy{'LIST'}{'TO'} } ){
+    foreach my $to_user ( @{ $copy{'LIST'}{'TO'} } ){
         # to user
         my ($firstname_utf8_AD_to_user,
             $lastname_utf8_AD_to_user,
@@ -619,6 +625,10 @@ sub smbclient_scopy_recurse {
                           root_dns=>$root_dns,
                           user=>$to_user,
                         });
+        if ($existing_AD_to_user eq "FALSE"){
+            &log_script_exit("ERROR: Target user $to_user not found",1,1,0,
+                $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+        }
 
         my $smb_dir_home_to_user=$home_directory_AD_to_user;
         $smb_dir_home_to_user=~s/\\/\//g;
@@ -927,7 +937,6 @@ sub scan_smb_dir {
     print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
     $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
-    print "HERE start\n";
     my $num=0;
     foreach my $rel_item (@scanlist){
         $num++;
@@ -939,7 +948,6 @@ sub scan_smb_dir {
 
             $ref_copy->{$location}{$user}{'LOOKUP'}{$rel_item}="DIR";
             push @{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'} },$rel_item;
-print "HERE DIR $rel_item found\n";
             # scan the contents
             my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
@@ -986,7 +994,7 @@ print "HERE DIR $rel_item found\n";
                     }
                 }
 
-                print "FINAL: <$smb_type>   >$smb_name<\n";
+                #print "FINAL: <$smb_type>   >$smb_name<\n";
 
                 #my $dir_rel_path=$rel_item."/".$name;
 
@@ -1056,7 +1064,6 @@ print "HERE DIR $rel_item found\n";
     }
     $ref_copy->{$location}{$user}{'COUNT'}{'FILES'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'}  }+1;
     $ref_copy->{$location}{$user}{'COUNT'}{'DIRS'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'}  }+1;
-    print "HERE end\n";
 }
 
 
