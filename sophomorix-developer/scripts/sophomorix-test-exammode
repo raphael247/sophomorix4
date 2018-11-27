@@ -2317,7 +2317,7 @@ if ($file_transfer_move==1){
     # Test B) cp file to NONEXISTING (within school)
     # move file only
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user jonsonad72-exam --to-path \"dir/to/new-filename.txt\"");
-     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile-move.txt\""); 
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile-move.txt\""); 
 
     # C) file -> dir (move into dir if no other dir is in the way, within school)
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\"");
@@ -2333,6 +2333,12 @@ if ($file_transfer_move==1){
     # --keep-source-directory
     &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"transfer\" --to-user blackmri72 --to-path \"transfer/mydir\" --keep-source-directory");
 
+
+    # move from one school to another
+    # Test A) not neded
+    # Test B) move file to NONEXISTING
+    # create parent dir and copy file
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03/testfile 03-01.txt\" --to-user oe72 --to-path \"dir/to/new-filename2.txt\"");
 
     # test moved files
     ############################################################
@@ -2380,6 +2386,9 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
                          "/srv/samba/schools/bsz/teachers/oe72/transfer",
+                         "/srv/samba/schools/bsz/teachers/oe72/dir",
+                         "/srv/samba/schools/bsz/teachers/oe72/dir/to",
+                         "/srv/samba/schools/bsz/teachers/oe72/dir/to/new-filename2.txt",
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
                          "/srv/samba/schools/bsz/teachers/wu72/testfile-01.txt",
@@ -2486,7 +2495,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testfile-01-01.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testfile-01-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testfile-01-03.txt",
-                         "/srv/samba/schools/uni/teachers/gal72/testdir 03/testfile 03-01.txt",
+#                         "/srv/samba/schools/uni/teachers/gal72/testdir 03/testfile 03-01.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir 03/testfile 03-02.txt",
                          "/srv/samba/schools/uni/share/teachers",
                          "/srv/samba/schools/uni/share/classes",
@@ -2584,6 +2593,8 @@ if ($file_transfer_move==1){
 
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/transfer/mydir\"");
  
+    # delete created files from B) from school to school
+    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/dir\"");
 
     # Test file deletion
     ############################################################

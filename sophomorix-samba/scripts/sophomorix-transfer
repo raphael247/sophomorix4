@@ -732,6 +732,7 @@ sub smbclient_scopy_recurse {
                               $from_user,
                               $copy{'TO'}{$to_user}{'PATH_REL_SCHOOL'},
                               $to_user,
+                              $scopy_move,
                               \%copy,
                               $ref_sophomorix_config,
                               $ref_sophomorix_result);
@@ -778,6 +779,7 @@ sub smbclient_scopy_recurse {
                               $from_user,
                               $target,
                               $to_user,
+                              $scopy_move,
                               \%copy,
                               $ref_sophomorix_config,
                               $ref_sophomorix_result);
@@ -891,6 +893,7 @@ sub smbclient_scopy_recurse {
                                   $from_user,
                                   $target_file,
                                   $to_user,
+                                  $scopy_move,
                                   \%copy,
                                   $ref_sophomorix_config,
                                   $ref_sophomorix_result);
@@ -1074,6 +1077,7 @@ sub smb_get_put_copy {
         $from_user,
         $target_file,
         $to_user,
+        $scopy_move,
         $ref_copy,
         $ref_sophomorix_config,
         $ref_sophomorix_result)=@_;
@@ -1104,7 +1108,19 @@ sub smb_get_put_copy {
             " -c 'lcd \"$tmp\"; cd \"$target_dirname\"; prompt; put \"$source_filename\" \"$target_filename\"; exit;'";
         print "$smbclient_command_put\n";
         my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
-
+    if ($scopy_move eq "rename"){
+        # delete the source if target exists
+        # ???
+        # delete
+        my $smbclient_command_get=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$ref_copy->{'FROM'}{$from_user}{'SCHOOL'} "." ".
+            $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+            " -c 'cd \"$source_dirname\"; rm \"$source_filename\"; exit;'";
+        print "$smbclient_command_get\n";
+        my ($return_value_get,@out_lines_get)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_get,$smb_admin_pass);        
+    }
 }
 
 
