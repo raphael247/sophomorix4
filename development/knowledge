@@ -185,7 +185,7 @@ server:
     - linuxmuster-prepare -s -u -d linuxmuster.local -n 172.16.0.1/12 -f 172.16.0.254
     - reboot
 * apt update && apt -y dist-upgrade
-* apt install emacs nfs-common sshpass
+* apt install emacs nfs-common sshpass tree make
 
 
   emacs .bashrc 
@@ -202,7 +202,13 @@ server:
    linuxmuster.local (statt linuxmuster.lan, wichtig für tests)
 
 
-   danach die vom setup angelegten admins löschen
+   Danach vorbereiten für die Tests: 
+     - die vom setup angelegten admins löschen (wichtig für Tests)
+     - cp /etc/linuxmuster/sophomorix/default-school/devices.csv /root/
+
+       server;bionic;nopxe;08:00:27:e0:fc:97;172.16.0.1;;;;server;;0;;;;SETUP;
+       server;firewall;nopxe;08:00:27:C7:26:71;172.16.0.254;;;;server;;0;;;;SETUP;
+
 
    Zeile in devices.csv für nextcloud
    server;nextcloud;nopxe;08:00:27:38:DF:01;172.16.0.5;;;;;1;0
