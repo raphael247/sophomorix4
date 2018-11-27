@@ -78,6 +78,10 @@ my $test_nonexammode_users=0;
 my $kill_users=0;
 my $test_kill_users=0;
 
+# helper stuff
+my $create_dirs_school_user=0;
+
+
 my $all_options="";
 my $json=0;
 my $ntacl=1;
@@ -111,6 +115,7 @@ my $testopt=GetOptions(
            "nonexammode-users" => \$nonexammode_users,
            "test-nonexammode-users" => \$test_nonexammode_users,
            "kill-users" => \$kill_users,
+           "create-dirs-school-user=s" => \$create_dirs_school_user,
            "test-kill-users" => \$test_kill_users,
            "verbose|v+" => \$Conf::log_level,
   );
@@ -198,6 +203,11 @@ Options
    Kill all users:
     sophomorix-test-exammode --kill-users  
     sophomorix-test-exammode --test-kill-users  
+
+
+Helper stuff:
+ sophomorix-test-exammode --create-dirs-school-user <bsz>::<blackmri72>
+
 
 ');
    print "\n";
@@ -5358,12 +5368,27 @@ if ($test_kill_users==1){
 }
 
 
+############################################################
+# helper stuff
+############################################################
+if ($create_dirs_school_user ne ""){
+    my ($school,$user)=split(/::/,$create_dirs_school_user);
+    &create_files_at_user($school,$user);
+}
+
+
 &AD_unbind_admin($ldap);
 
 
 sub create_files_at_user {
     my ($school,$user)=@_;
     # create some files/dirs at user $user
+    if (not -d "/srv/samba/schools/$school/teachers/$user"){
+        print "\n";
+        print "ERROR: Target directory not existing: /srv/samba/schools/$school/teachers/$user\n";
+        print "\n";
+        exit;
+    }
     &run_command("cp \"/usr/share/sophomorix-developer/testfiles/testfile-01.txt\" \"/srv/samba/schools/$school/teachers/$user\"");
     &run_command("cp \"/usr/share/sophomorix-developer/testfiles/testfile-02.txt\" \"/srv/samba/schools/$school/teachers/$user\"");
     &run_command("cp \"/usr/share/sophomorix-developer/testfiles/testfile-03.txt\" \"/srv/samba/schools/$school/teachers/$user/testfile 03.txt\"");
