@@ -1301,10 +1301,13 @@ if ($rsync_all_student_homes==1){
             my $rsync_command="rsync -rv $source_dir $target_dir";
             print "$rsync_command\n";
             system($rsync_command);
+        } elsif (not -d "$source_dir") {
+            print "   * No oldhome found for student $sam in class $class\n";
         }
     }
     &AD_unbind_admin($ldap);
 }
+
 
 
 # --rsync-all-teacher-homes
@@ -1333,17 +1336,48 @@ if ($rsync_all_teacher_homes==1){
             my $rsync_command="rsync -rv $source_dir $target_dir";
             print "$rsync_command\n";
             system($rsync_command);
+        } elsif (not -d "$source_dir") {
+            print "   * No oldhome found for teacher $sam\n";
+        }
+    }
+    &AD_unbind_admin($ldap);
+}
+
+
+
+# --rsync-all-class-shares
+if ($rsync_all_class_shares==1){
+    my ($ldap,$root_dse) = &AD_bind_admin();
+    my $filter="(& (objectClass=group) (sophomorixType=adminclass) )";
+    my $mesg = $ldap->search( # perform a search
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attrs => ['sAMAccountName',
+                                'objectClass',
+                               ]);
+    my $max = $mesg->count;
+    for ( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $class=$entry->get_value('sophomorixAdminClass');
+        my $source_dir=$oldserver_path."/home/share/classes/".$sam."/";
+        my $target_dir="/srv/samba/mounts/schools/default-school/share/classes/".$sam;
+	if (-d "$source_dir" and -d "$target_dir"){
+            print "   * rsync share of class $sam\n";
+            print "      * Source: $source_dir\n";
+            print "      * Target: $target_dir\n";
+            my $rsync_command="rsync -rv $source_dir $target_dir";
+            print "$rsync_command\n";
+            system($rsync_command);
+        } elsif (not -d "$source_dir") {
+            print "   * No share data found for class $sam\n";
         }
     }
     &AD_unbind_admin($ldap);
 
 }
 
-
-# --rsync-all-class-shares
-if ($rsync_all_class_shares==1){
-
-}
 
 
 # --rsync-all-project-shares
