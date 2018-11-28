@@ -101,20 +101,26 @@ my $verify_uid=0;
 my $verify_gid=0;
 
 
+############################################################
+# rsync data
 # --oldserver-path
 my $oldserver_path="";
 
 # --rsync-all-student-homes
 my $rsync_all_student_homes=0;
+my $rsync_student_homes="";
 
 # --rsync-all-teacher-homes
 my $rsync_all_teacher_homes=0;
+my $rsync_teacher_homes="";
 
 # sophomorix-vampire --rsync-all-class-shares
 my $rsync_all_class_shares=0;
+my $rsync_class_shares="";
 
 # sophomorix-vampire --rsync-all-project-shares
 my $rsync_all_project_shares=0;
+my $rsync_project_shares="";
 
 
 
@@ -146,9 +152,13 @@ my $testopt=GetOptions(
            "verify-gid" => \$verify_gid,
            "oldserver-path=s" => \$oldserver_path,
            "rsync-all-student-homes" => \$rsync_all_student_homes,
+           "rsync-student-homes=s" => \$rsync_student_homes,
            "rsync-all-teacher-homes" => \$rsync_all_teacher_homes,
+           "rsync-teacher-homes=s" => \$rsync_teacher_homes,
            "rsync-all-class-shares" => \$rsync_all_class_shares,
+           "rsync-class-shares=s" => \$rsync_class_shares,
            "rsync-all-project-shares" => \$rsync_all_project_shares,
+           "rsync-project-shares=s" => \$rsync_project_shares,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -227,12 +237,17 @@ Vampire data into the new server V7:
 9.  Import the workstations (later use linuxmuster command)
     # sophomorix-device
 
-10. Sync data of students
-  
-    # sophomorix-vampire --rsync-all-student-homes --path-oldserver /mnt/home
-    # sophomorix-vampire --rsync-all-teacher-homes --path-oldserver /mnt/home
-    # sophomorix-vampire --rsync-all-class-shares --path-oldserver /mnt/home
+10. Sync data of students,teachers,classe,projects:
+    # sophomorix-vampire --rsync-all-student-homes  --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-all-teacher-homes  --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-all-class-shares   --path-oldserver /mnt/home
     # sophomorix-vampire --rsync-all-project-shares --path-oldserver /mnt/home
+
+    Or just for a single student,teacher,class,project:
+    # sophomorix-vampire --rsync-student-homes <student>  --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-teacher-homes <teacher>  --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-class-shares <class>     --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-project-shares <project> --path-oldserver /mnt/home
 
 1x. Manually do the rest (will be automated):
     Copy files in /etc/linuxmuster/sophomorix/user/mail/* to new server.
@@ -1276,8 +1291,12 @@ if ($verify_gid==1){
 # rsync data
 ############################################################
 # --rsync-all-student-homes
-if ($rsync_all_student_homes==1){
+if ($rsync_all_student_homes==1 or $rsync_student_homes ne ""){
     my ($ldap,$root_dse) = &AD_bind_admin();
+    print "\n";
+    &print_line();
+    &print_title("rsync student homes");
+    &print_line();
     my $filter="(& (objectClass=user) (sophomorixRole=student) )";
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
@@ -1294,6 +1313,13 @@ if ($rsync_all_student_homes==1){
         my $class=$entry->get_value('sophomorixAdminClass');
         my $source_dir=$oldserver_path."/home/students/".$class."/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/students/".$class."/".$sam;
+
+        if ($rsync_student_homes ne ""){
+            if ($sam ne $rsync_student_homes){
+                next;
+            }
+        }
+
 	if (-d "$source_dir" and -d "$target_dir"){
             print "   * rsync home of student $sam in class $class\n";
             print "      * Source: $source_dir\n";
@@ -1313,8 +1339,12 @@ if ($rsync_all_student_homes==1){
 
 
 # --rsync-all-teacher-homes
-if ($rsync_all_teacher_homes==1){
+if ($rsync_all_teacher_homes==1 or $rsync_teacher_homes ne ""){
     my ($ldap,$root_dse) = &AD_bind_admin();
+    print "\n";
+    &print_line();
+    &print_title("rsync teacher homes");
+    &print_line();
     my $filter="(& (objectClass=user) (sophomorixRole=teacher) )";
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
@@ -1331,6 +1361,13 @@ if ($rsync_all_teacher_homes==1){
         my $class=$entry->get_value('sophomorixAdminClass');
         my $source_dir=$oldserver_path."/home/teachers/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/teachers/".$sam;
+
+        if ($rsync_teacher_homes ne ""){
+            if ($sam ne $rsync_teacher_homes){
+                next;
+            }
+        }
+
 	if (-d "$source_dir" and -d "$target_dir"){
             print "   * rsync home of teacher $sam\n";
             print "      * Source: $source_dir\n";
@@ -1350,8 +1387,12 @@ if ($rsync_all_teacher_homes==1){
 
 
 # --rsync-all-class-shares
-if ($rsync_all_class_shares==1){
+if ($rsync_all_class_shares==1 or $rsync_class_shares ne ""){
     my ($ldap,$root_dse) = &AD_bind_admin();
+    print "\n";
+    &print_line();
+    &print_title("rsync class shares");
+    &print_line();
     my $filter="(& (objectClass=group) (sophomorixType=adminclass) )";
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
@@ -1364,9 +1405,15 @@ if ($rsync_all_class_shares==1){
     for ( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        my $class=$entry->get_value('sophomorixAdminClass');
         my $source_dir=$oldserver_path."/home/share/classes/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/share/classes/".$sam;
+
+        if ($rsync_class_shares ne ""){
+            if ($sam ne $rsync_class_shares){
+                next;
+            }
+        }
+
 	if (-d "$source_dir" and -d "$target_dir"){
             print "   * rsync share of class $sam\n";
             print "      * Source: $source_dir\n";
@@ -1386,8 +1433,12 @@ if ($rsync_all_class_shares==1){
 
 
 # --rsync-all-project-shares
-if ($rsync_all_project_shares==1){
+if ($rsync_all_project_shares==1 or $rsync_project_shares ne ""){
     my ($ldap,$root_dse) = &AD_bind_admin();
+    print "\n";
+    &print_line();
+    &print_title("rsync project shares");
+    &print_line();
     my $filter="(& (objectClass=group) (sophomorixType=project) )";
     my $mesg = $ldap->search( # perform a search
                       base   => $root_dse,
@@ -1400,9 +1451,15 @@ if ($rsync_all_project_shares==1){
     for ( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        my $class=$entry->get_value('sophomorixAdminClass');
         my $source_dir=$oldserver_path."/home/share/projects/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/share/projects/".$sam;
+
+        if ($rsync_project_shares ne ""){
+            if ($sam ne $rsync_project_shares){
+                next;
+            }
+        }
+
 	if (-d "$source_dir" and -d "$target_dir"){
             print "   * rsync share of project $sam\n";
             print "      * Source: $source_dir\n";
