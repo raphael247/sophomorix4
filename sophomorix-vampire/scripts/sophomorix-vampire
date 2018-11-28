@@ -100,6 +100,24 @@ my $verify_uid_gid=0;
 my $verify_uid=0;
 my $verify_gid=0;
 
+
+# --oldserver-path
+my $oldserver_path="";
+
+# --rsync-all-student-homes
+my $rsync_all_student_homes=0;
+
+# --rsync-all-teacher-homes
+my $rsync_all_teacher_homes=0;
+
+# sophomorix-vampire --rsync-all-class-shares
+my $rsync_all_class_shares=0;
+
+# sophomorix-vampire --rsync-all-project-shares
+my $rsync_all_project_shares=0;
+
+
+
 my $missig_files_error_count=0;
 my $missig_files_warn_count=0;
 my $overwriting_files_count=0;
@@ -126,6 +144,11 @@ my $testopt=GetOptions(
            "verify-uid-gid" => \$verify_uid_gid,
            "verify-uid" => \$verify_uid,
            "verify-gid" => \$verify_gid,
+           "oldserver-path=s" => \$oldserver_path,
+           "rsync-all-student-homes" => \$rsync_all_student_homes,
+           "rsync-all-teacher-homes" => \$rsync_all_teacher_homes,
+           "rsync-all-class-shares" => \$rsync_all_class_shares,
+           "rsync-all-project-shares" => \$rsync_all_project_shares,
            "verbose|v+" => \$Conf::log_level,
          );
 
@@ -203,7 +226,15 @@ Vampire data into the new server V7:
     sophomorix-kill (this might delete some users that are oberdue to be deleted)
 9.  Import the workstations (later use linuxmuster command)
     # sophomorix-device
-10. Manually do the rest (will be automated):
+
+10. Sync data of students
+  
+    # sophomorix-vampire --rsync-all-student-homes --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-all-teacher-homes --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-all-class-shares --path-oldserver /mnt/home
+    # sophomorix-vampire --rsync-all-project-shares --path-oldserver /mnt/home
+
+1x. Manually do the rest (will be automated):
     Copy files in /etc/linuxmuster/sophomorix/user/mail/* to new server.
 
 Do some tests:
@@ -1109,7 +1140,7 @@ if ($verify_uid==1){
                                 'objectClass',
                                ]);
     my $max = $mesg->count;
-    for( my $index = 0 ; $index < $max ; $index++) {
+    for ( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $uidnumber=$entry->get_value('uidNumber');
@@ -1241,8 +1272,57 @@ if ($verify_gid==1){
 
 
 
+############################################################
+# rsync data
+############################################################
+# --rsync-all-student-homes
+if ($rsync_all_student_homes==1){
+    my ($ldap,$root_dse) = &AD_bind_admin();
+    my $filter="(& (objectClass=user) (sophomorixRole=student) )";
+    my $mesg = $ldap->search( # perform a search
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attrs => ['sAMAccountName',
+                                'sophomorixAdminClass',
+                                'objectClass',
+                               ]);
+    my $max = $mesg->count;
+    for ( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        my $class=$entry->get_value('sophomorixAdminClass');
+        my $source_dir=$oldserver_path."/home/students/".$class."/".$sam."/";
+        my $target_dir="/srv/samba/mounts/schools/default-school/students/".$class."/".$sam;
+	if (-d "$source_dir" and -d "$target_dir"){
+            print "   * rsync home of user $sam in class $class\n";
+            print "      * Source: $source_dir\n";
+            print "      * Target: $target_dir\n";
+            my $rsync_command="rsync -rv $source_dir $target_dir";
+            print "$rsync_command\n";
+            system($rsync_command);
+        }
+    }
+    &AD_unbind_admin($ldap);
+}
 
 
+# --rsync-all-teacher-homes
+if ($rsync_all_teacher_homes==1){
+
+}
+
+
+# --rsync-all-class-shares
+if ($rsync_all_class_shares==1){
+
+}
+
+
+# --rsync-all-project-shares
+if ($rsync_all_project_shares==1){
+
+}
 
 
 
