@@ -832,7 +832,7 @@ if ($test_exammode_users==1){
                    sn=>"Maier",
                    userPrincipalName => "maiersa72-exam@".$root_dns,
                    mail => "maiersa72-exam@".$root_dns,
-                   sophomorixAdminClass => "---",
+                   sophomorixAdminClass => "bsz-m7ab-exam",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "Sarina",
@@ -930,7 +930,7 @@ if ($test_exammode_users==1){
                    sn=>"Müller",
                    userPrincipalName => "muellegr72-exam@".$root_dns,
                    mail => "muellegr72-exam@".$root_dns,
-                   sophomorixAdminClass => "---",
+                   sophomorixAdminClass => "bsz-m7ab-exam",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "Gregor",
@@ -1028,7 +1028,7 @@ if ($test_exammode_users==1){
                    sn=>"Jónsson",
                    userPrincipalName => "jonsonad72-exam@".$root_dns,
                    mail => "jonsonad72-exam@".$root_dns,
-                   sophomorixAdminClass => "---",
+                   sophomorixAdminClass => "bsz-m8cd-exam",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "Adalradur",
@@ -1126,7 +1126,7 @@ if ($test_exammode_users==1){
                    sn=>"Samardžić",
                    userPrincipalName => "samardze72-exam@".$root_dns,
                    mail => "samardze72-exam@".$root_dns,
-                   sophomorixAdminClass => "---",
+                   sophomorixAdminClass => "bsz-m8cd-exam",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "Zeljko",
@@ -1706,7 +1706,7 @@ if ($file_transfer_scopy==1){
     # Test B) cp file to NONEXISTING (within school)
     # create parent dir and copy file
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user jonsonad72-exam --to-path \"dir/to/new-filename.txt\"");
-    # move file only
+    # copy file only
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user \"jonsonad72-exam\" --to-path \"topfile.txt\""); 
 
     # C) file -> dir (copy into dir if no other dir is in the way, within school)

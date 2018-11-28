@@ -7741,6 +7741,7 @@ sub AD_examuser_create {
     my $display_name = $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_DISPLAYNAME_PREFIX'}." ".
                        $firstname_utf8_AD." ".$lastname_utf8_AD;
     my $examuser=$participant.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
+    my $adminclass=$adminclass_AD.$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'ADMINCLASS_POSTFIX'};
 
     my $uni_password=&_unipwd_from_plainpwd($DevelConf::student_password_default);
 
@@ -7823,7 +7824,6 @@ sub AD_examuser_create {
         }
  
     my $role="examuser";
-    my $group_basename="examusers";
     my $group_type="ouexamusers";
 
     my $result = $ldap->add( $dn,
@@ -7841,7 +7841,7 @@ sub AD_examuser_create {
                    sophomorixExitAdminClass => "unknown", 
                    sophomorixUnid => $unid,
                    sophomorixStatus => $status,
-                   sophomorixAdminClass => "---",    
+                   sophomorixAdminClass => $adminclass,    
                    sophomorixAdminFile => $file,    
                    sophomorixFirstPassword => "---", 
                    sophomorixFirstnameASCII => $firstname_ASCII_AD,
@@ -7872,6 +7872,7 @@ sub AD_examuser_create {
     &AD_debug_logdump($result,2,(caller(0))[3]);
     # clone the password ???
 
+    my $group_basename="examusers";
     my $exam_group=&AD_get_name_tokened($group_basename,$school_AD,$group_type);
     &AD_group_addmember({ldap => $ldap,
                          root_dse => $root_dse, 
