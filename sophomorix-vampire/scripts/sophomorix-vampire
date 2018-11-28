@@ -234,20 +234,28 @@ Vampire data into the new server V7:
     sophomorix-add -i (should show no new users)
     sophomorix-update
     sophomorix-kill (this might delete some users that are oberdue to be deleted)
-9.  Import the workstations (later use linuxmuster command)
-    # sophomorix-device
+9.  Import the workstations 
+    # linuxmster-import-devices
 
-10. Sync data of students,teachers,classe,projects:
-    # sophomorix-vampire --rsync-all-student-homes  --path-oldserver /mnt/home
-    # sophomorix-vampire --rsync-all-teacher-homes  --path-oldserver /mnt/home
-    # sophomorix-vampire --rsync-all-class-shares   --path-oldserver /mnt/home
-    # sophomorix-vampire --rsync-all-project-shares --path-oldserver /mnt/home
+10. To rsync data from the old server, do the following steps
 
-    Or just for a single student,teacher,class,project:
+    A) Mount the old server home somewhere (for example to /mnt), so you can see:
+        /mnt/home/share
+        /mnt/home/students
+        /mnt/home/teachers
+    and specify your mount directory as:  --path-oldserver /mnt
+
+    B) Do some tests for a single student,teacher,class,project:
     # sophomorix-vampire --rsync-student-homes <student>  --path-oldserver /mnt/home
     # sophomorix-vampire --rsync-teacher-homes <teacher>  --path-oldserver /mnt/home
     # sophomorix-vampire --rsync-class-shares <class>     --path-oldserver /mnt/home
     # sophomorix-vampire --rsync-project-shares <project> --path-oldserver /mnt/home
+
+    C) Sync all data of students,teachers,classe,projects:
+    # sophomorix-vampire --rsync-all-student-homes  --path-oldserver /mnt
+    # sophomorix-vampire --rsync-all-teacher-homes  --path-oldserver /mnt
+    # sophomorix-vampire --rsync-all-class-shares   --path-oldserver /mnt
+    # sophomorix-vampire --rsync-all-project-shares --path-oldserver /mnt
 
 1x. Manually do the rest (will be automated):
     Copy files in /etc/linuxmuster/sophomorix/user/mail/* to new server.
