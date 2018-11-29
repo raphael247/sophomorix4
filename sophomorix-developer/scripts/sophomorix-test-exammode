@@ -79,7 +79,7 @@ my $kill_users=0;
 my $test_kill_users=0;
 
 # helper stuff
-my $create_dirs_school_user="";
+my $create_dirs_school_teacher="";
 
 
 my $all_options="";
@@ -115,7 +115,7 @@ my $testopt=GetOptions(
            "nonexammode-users" => \$nonexammode_users,
            "test-nonexammode-users" => \$test_nonexammode_users,
            "kill-users" => \$kill_users,
-           "create-dirs-school-user=s" => \$create_dirs_school_user,
+           "create-dirs-school-teacher=s" => \$create_dirs_school_teacher,
            "test-kill-users" => \$test_kill_users,
            "verbose|v+" => \$Conf::log_level,
   );
@@ -5456,8 +5456,8 @@ if ($test_kill_users==1){
 ############################################################
 # helper stuff
 ############################################################
-if ($create_dirs_school_user ne ""){
-    my ($school,$user)=split(/::/,$create_dirs_school_user);
+if ($create_dirs_school_teacher ne ""){
+    my ($school,$user)=split(/::/,$create_dirs_school_teacher);
     &create_files_at_teacher($school,$user);
 }
 
