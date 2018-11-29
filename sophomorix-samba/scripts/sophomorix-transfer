@@ -85,6 +85,7 @@ my $scopy=0;
 my $move=0;
 my $from_path="";
 my $to_path="";
+my $to_path_addon="";
 my $no_target_directory=0;
 my $keep_source_directory=0;
 
@@ -114,6 +115,7 @@ my $testopt=GetOptions(
            "move" => \$move,
            "from-path=s" => \$from_path,
            "to-path=s" => \$to_path,
+           "to-path-addon=s" => \$to_path_addon,
            "to-user=s" => \$to_user,
            "from-user=s" => \$from_user,
            "subdir=s" => \$subdir,
@@ -234,6 +236,7 @@ if (($scopy==1 or $move==1) and $from_user ne "" and $to_user ne ""){
                              from_path=>$from_path,
                              to_user=>$to_user,
                              to_path=>$to_path,
+                             to_path_addon=>$to_path_addon,
                              json=>$json,
                              arguments=>\@arguments,
                              sophomorix_config=>\%sophomorix_config,
@@ -539,6 +542,7 @@ sub smbclient_scopy_recurse {
     my $from_path = $arg_ref->{from_path};
     my $to_user_option = $arg_ref->{to_user};
     my $to_path = $arg_ref->{to_path};
+    my $to_path_addon = $arg_ref->{to_path_addon};
     my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
@@ -607,7 +611,7 @@ sub smbclient_scopy_recurse {
         # home relative to school
         $rel_path_home_from_user=~s/^\///g;
 
-        # path incl. subdir
+        # path incl. --from-path
         my $rel_path_from_user;
         if ($from_path ne ""){
             # append subdir
@@ -616,6 +620,23 @@ sub smbclient_scopy_recurse {
             $rel_path_from_user=$rel_path_home_from_user;
         }
     
+        # --to-path-addon (saved at every from_user)
+        if ($to_path_addon eq "login"){
+            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$from_user_item;
+        } elsif ($to_path_addon eq "fullinfo"){
+            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
+                                                            $from_user_item;
+        } elsif ($to_path_addon eq "fullinfo-utf8"){
+            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
+                                                            $lastname_utf8_AD_from_user."_".
+                                                            $firstname_utf8_AD_from_user."_".
+                                                            $from_user_item;
+        } else {
+            # add nothing
+            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}="";
+        }
+
+
         # save some stuff
         $copy{'FROM'}{$from_user_item}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
         $copy{'FROM'}{$from_user_item}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
@@ -627,6 +648,7 @@ sub smbclient_scopy_recurse {
                       $from_user_item,
                       $copy{'FROM'}{$from_user_item}{'SCHOOL'},
                       $copy{'FROM'}{$from_user_item}{'PATH_REL_SCHOOL'},
+                      "", # addon path ????
                       $smb_admin_pass,
                       $ref_sophomorix_config,
                       $ref_sophomorix_result);
@@ -669,7 +691,7 @@ sub smbclient_scopy_recurse {
         # home relative to school
         $rel_path_home_to_user=~s/^\///g;
 
-        # path incl. subdir
+        # path incl. --to-path
         my $rel_path_to_user;
         if ($to_path ne ""){
             # append subdir
@@ -689,6 +711,7 @@ sub smbclient_scopy_recurse {
                       $to_user_item,
                       $copy{'TO'}{$to_user_item}{'SCHOOL'},
                       $copy{'TO'}{$to_user_item}{'PATH_REL_SCHOOL'},
+                      "", # addon path ????
                       $smb_admin_pass,                                 
                       $ref_sophomorix_config,
                       $ref_sophomorix_result);
@@ -940,7 +963,16 @@ sub smbclient_scopy_recurse {
 
 
 sub scan_smb_dir {
-    my ($root_dns,$location,$ref_copy,$user,$school,$rel_path,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result)=@_;
+    my ($root_dns,
+        $location,
+        $ref_copy,
+        $user,
+        $school,
+        $rel_path,
+        $addon_path,
+        $smb_admin_pass,
+        $ref_sophomorix_config,
+        $ref_sophomorix_result)=@_;
     print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
     $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
