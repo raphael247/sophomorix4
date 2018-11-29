@@ -56,6 +56,11 @@ use Sophomorix::SophomorixSambaAD qw(
 # Variablen für Optionen
 $Conf::log_level=1;
 my $help=0;
+
+my $ls=0;
+my $stat=0;
+my $allinfo=0;
+
 my $append_to_file="";
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-cacls");
@@ -70,6 +75,9 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "help|h" => \$help,
+           "ls" => \$ls,
+           "allinfo" => \$allinfo,
+           "stat" => \$stat,
            "append-to-file=s" => \$append_to_file,
           );
 
@@ -83,7 +91,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-cacls accepts one ore more unix paths as the option and connects via smb to this path to show ntacls with smbcacls
+sophomorix-cacls accepts one or more unix paths as the option and connects via smb to this path to show ntacls with smbcacls
 
 Options:
   -h  / --help
@@ -91,6 +99,16 @@ Options:
   --append-to-file /abs/file.txt   
     appends >> the diffable result to /abs/file.txt
     (this is used for sophomorix-repair to make an ACL snapshot)
+
+Alternative options:
+   Do a dir listing with smbclient instead of smbcacls:
+      --ls
+
+   Show allinfo with smbclient instead of smbcacls:
+      --allinfo
+
+   Show stat with smbclient instead of smbcacls:
+      --stat
 
 ');
    print "\n";
@@ -154,8 +172,20 @@ foreach my $linux_path (@linux_paths){
             if ($smb_rel eq ""){
                 $smb_rel="/"; # not allowed to be empty
             }
-            $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCACLS'}.
-                     " -U ".$user."%".$pass." ".$smb_unc." '".$smb_rel."'";
+            if ($allinfo==1){
+                $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                     " -U ".$user."%`cat /etc/linuxmuster/.secret/administrator` ".$smb_unc." -c 'allinfo \"".$smb_rel."\"'";
+            } elsif ($stat==1){
+                $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                     " -U ".$user."%`cat /etc/linuxmuster/.secret/administrator` ".$smb_unc." -mNT1 -c 'stat \"".$smb_rel."\"'";
+            } elsif ($ls==1){
+                $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                     " -U ".$user."%`cat /etc/linuxmuster/.secret/administrator` ".$smb_unc." -c 'cd \"".$smb_rel."\"; ls'";
+            } else {
+                $command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCACLS'}.
+                     " -U ".$user."%`cat /etc/linuxmuster/.secret/administrator` ".$smb_unc." '".$smb_rel."'";
+            }
+
             $command_append=$command." >> ".$append_to_file;
         }
     }
