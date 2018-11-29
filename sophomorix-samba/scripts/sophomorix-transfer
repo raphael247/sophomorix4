@@ -373,6 +373,9 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
                                                         });
     }
 
+
+
+
     if ($collect_copy==1){
         $target_dir=&smbclient_mget_recurse({ldap=>$ldap,
                                              root_dse=>$root_dse,
@@ -913,7 +916,7 @@ sub smbclient_scopy_recurse {
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".
-                    " //$root_dns/$copy{'TO'}{$to_user}{'SCHOOL'} "." ".
+                    " //$root_dns/$copy{'FROM'}{$from_user}{'SCHOOL'} "." ".
                     $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
                     " -c 'rmdir \"$source_dir\"'";
                 print "$smbclient_command\n";
