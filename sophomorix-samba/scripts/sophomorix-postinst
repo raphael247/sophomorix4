@@ -101,15 +101,13 @@ foreach my $script (@lmn_linux){
 # linux custom
 my $netlogon_school_custom_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/linux";
 system("mkdir -p \"$netlogon_school_custom_linux\"");
-my $netlogon_school_custom_linux=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/linux";
-system("mkdir -p \"$netlogon_school_custom_linux\"");
 my $startscript_skel_custom_linux="/usr/share/sophomorix/devel/startscript-skel/custom/linux";
-my @lmn_linux=("logon.sh",
+my @custom_linux=("logon.sh",
                "logoff.sh",
                "sysstart.sh",
                "sysstop.sh",
               );
-foreach my $script (@lmn_linux){
+foreach my $script (@custom_linux){
     my $source=$startscript_skel_custom_linux."/".$script;
     my $target=$netlogon_school_custom_linux."/".$script;
     if (-f $target){
@@ -141,12 +139,12 @@ foreach my $script (@lmn_windows){
 my $netlogon_school_custom_windows=$smb_conf{'samba'}{'smb.conf'}{'netlogon'}{'path'}."/".$school."/custom/windows";
 system("mkdir -p \"$netlogon_school_custom_windows\"");
 my $startscript_skel_custom_windows="/usr/share/sophomorix/devel/startscript-skel/custom/windows";
-my @lmn_windows=("logon.bat",
+my @custom_windows=("logon.bat",
                  "logoff.bat",
                  "sysstart.bat",
                  "sysstop.bat",
                 );
-foreach my $script (@lmn_windows){
+foreach my $script (@custom_windows){
     my $source=$startscript_skel_custom_windows."/".$script;
     my $target=$netlogon_school_custom_windows."/".$script;
     if (-f $target){
