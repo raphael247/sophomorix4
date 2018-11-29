@@ -956,13 +956,21 @@ sub scan_smb_dir {
                 my $smb_type="";
                 my $smb_name="";
 
-                my (@list_tmp)=split(/(  D  |  N  |  A  )/,$status); # split wuth 2 chars of space before/after
+                # simple and works, but fails with  " D ", ... in filename
+                #my (@list_tmp)=split(/( D | N | A )/,$status); # split with 1 chars of space before/after
+
+                # best effort is to split at: whitespace D|N|A whitespace 0|0-9 whitespace
+                my (@list_tmp)=split(/(\s+D\s+0\s+|\s+N\s+[0-9]+\s+|\s+A\s+[0-9]+\s+)/,$status); # split with 1 chars of space before/after
+                #print Dumper(\@list_tmp);
+
                 foreach my $item (@list_tmp){
-                   if ($item eq "  D  "){
+                   # if ($item eq " D "){
+                   if ($item=~m/\s+D\s+0\s+/){
                        # directory
                        $smb_type="DIR";
                        last;
-                   } elsif ($item eq "  N  " or $item eq "  A  "){
+                   # } elsif ($item eq " N " or $item eq " A "){
+                   } elsif ($item=~m/\s+N\s+[0-9]+\s+/ or $item=~m/\s+A\s+[0-9]+\s+/){
                        # node/files
                        $smb_type="FILE";
                        last;
@@ -971,6 +979,7 @@ sub scan_smb_dir {
                    }      
                 }
                 $smb_name=&Sophomorix::SophomorixBase::remove_embracing_whitespace($smb_name);
+
                 if ($smb_name eq "" or 
                     $smb_name eq "." or 
                     $smb_name eq ".." or
