@@ -206,7 +206,8 @@ Options
 
 
 Helper stuff:
- sophomorix-test-exammode --create-dirs-school-user <bsz>::<blackmri72>
+ Create some files in a teachers home:
+ sophomorix-test-exammode --create-dirs-school-teacher <uni>::<gal72>
 
 
 ');
@@ -1536,8 +1537,8 @@ if ($test_exammode_users==1){
 # do the file transfer, scopy
 ############################################################
 if ($file_transfer_scopy==1){
-    &create_files_at_user("bsz","wu72");
-    &create_files_at_user("uni","gal72");
+    &create_files_at_teacher("bsz","wu72");
+    &create_files_at_teacher("uni","gal72");
 
     # the blocking file to make copying a dir to this place fail
     &run_command("cp \"/usr/share/sophomorix-developer/testfiles/blockfile.txt\" \"/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt\"");
@@ -2124,9 +2125,9 @@ if ($file_transfer_scopy==1){
 if ($file_transfer_move==1){
 
     # create some files to move
-    &create_files_at_user("bsz","wu72");
-    &create_files_at_user("uni","gal72");
-    &create_files_at_user("uni","kep72");
+    &create_files_at_teacher("bsz","wu72");
+    &create_files_at_teacher("uni","gal72");
+    &create_files_at_teacher("uni","kep72");
 
     # the blocking file to make copying a dir to this place fail
     &run_command("cp \"/usr/share/sophomorix-developer/testfiles/blockfile.txt\" \"/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt\"");
@@ -5401,14 +5402,14 @@ if ($test_kill_users==1){
 ############################################################
 if ($create_dirs_school_user ne ""){
     my ($school,$user)=split(/::/,$create_dirs_school_user);
-    &create_files_at_user($school,$user);
+    &create_files_at_teacher($school,$user);
 }
 
 
 &AD_unbind_admin($ldap);
 
 
-sub create_files_at_user {
+sub create_files_at_teacher {
     my ($school,$user)=@_;
     # create some files/dirs at user $user
     if (not -d "/srv/samba/schools/$school/teachers/$user"){
