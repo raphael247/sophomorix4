@@ -159,9 +159,9 @@ Options:
 
 
 # serverside copy (universal recursive cp command)
-  # overwrite dirs/files as the unix cp command would do
-    sophomorix-transfer --scopy --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
-    sophomorix-transfer --move --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
+  # overwrite dirs/files as the unix cp command would do (dirs are created like: mkdir -p)
+    sophomorix-transfer --scopy --from-user <from1>,... --from-path <fpath> --to-user <to2>,... --to-path <tpath>
+    sophomorix-transfer --move  --from-user <from1>,... --from-path <fpath> --to-user <to2>,... --to-path <tpath>
   # modifiers
     --no-target-directory   (cp contents of source directory only, but not directory itself)
     --keep-source-directory (do NOT delete source directory, when recursively moving a directory)
