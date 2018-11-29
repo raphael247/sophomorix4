@@ -2356,6 +2356,10 @@ if ($file_transfer_move==1){
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03/testfile 03-01.txt\" --to-user oe72 --to-path \"dir/to/new-filename2.txt\"");
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-01.txt\" --to-user oe72 --to-path \"topfile-move2.txt\""); 
 
+    # C) file -> dir (move into dir if no other dir is in the way,  from one school to another)
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer\"");
+
+
     # test moved files
     ############################################################
     # fs test
@@ -2403,6 +2407,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/bsz/teachers/oe72",
                          "/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt",
                          "/srv/samba/schools/bsz/teachers/oe72/transfer",
+                         "/srv/samba/schools/bsz/teachers/oe72/transfer/testfile-02.txt",
                          "/srv/samba/schools/bsz/teachers/oe72/dir",
                          "/srv/samba/schools/bsz/teachers/oe72/dir/to",
                          "/srv/samba/schools/bsz/teachers/oe72/dir/to/new-filename2.txt",
@@ -2495,7 +2500,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
 #                         "/srv/samba/schools/uni/teachers/gal72/testfile-01.txt",
-                         "/srv/samba/schools/uni/teachers/gal72/testfile-02.txt",
+#                         "/srv/samba/schools/uni/teachers/gal72/testfile-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testfile 03.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-02",
@@ -2613,6 +2618,9 @@ if ($file_transfer_move==1){
     # delete created files from B) from school to school
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/dir\"");
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt\"");
+
+    # delete created files from B) from school to school
+    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/transfer/testfile-02.txt\"");
 
     # Test file deletion
     ############################################################
