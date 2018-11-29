@@ -2359,6 +2359,18 @@ if ($file_transfer_move==1){
     # C) file -> dir (move into dir if no other dir is in the way,  from one school to another)
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer\"");
 
+    # D) dir -> file (error)
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
+
+
+    # E) dir -> dir (move recursively, from school to another)
+    # move into transfer (results in muellegr72-exam/transfer/testdir-01)
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer\"");
+    # test --no-target-directory
+#    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"transfer\" --no-target-directory");
+    # --keep-source-directory
+#    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"transfer\" --to-user blackmri72 --to-path \"transfer/mydir\" --keep-source-directory");
+
 
     # test moved files
     ############################################################
@@ -2503,7 +2515,7 @@ if ($file_transfer_move==1){
 #                         "/srv/samba/schools/uni/teachers/gal72/testfile-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testfile 03.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01",
-                         "/srv/samba/schools/uni/teachers/gal72/testdir-02",
+ #                        "/srv/samba/schools/uni/teachers/gal72/testdir-02",
                          "/srv/samba/schools/uni/teachers/gal72/testdir 03",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testdir-01-01",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testdir-01-01/testfile-01-01-01.txt",
@@ -2513,7 +2525,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testdir-01 03/testfile-01-03-01.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testdir-01 03/testfile-01-03-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testdir-01 03/testfile-01 03 03.txt",
-                         "/srv/samba/schools/uni/teachers/gal72/testdir-02/testdir-02-01",
+#                         "/srv/samba/schools/uni/teachers/gal72/testdir-02/testdir-02-01",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testfile-01-01.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testfile-01-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01/testfile-01-03.txt",
@@ -2539,6 +2551,8 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/default-school/teachers",
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02/testdir-02-01",
                          "/srv/samba/schools/default-school/share/teachers",
                          "/srv/samba/schools/default-school/share/classes",
                          "/srv/samba/schools/default-school/share/management",
@@ -2619,8 +2633,13 @@ if ($file_transfer_move==1){
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/dir\"");
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt\"");
 
-    # delete created files from B) from school to school
+    # delete created files from C) from school to school
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/transfer/testfile-02.txt\"");
+
+    # delete created files from E) from school to school
+    &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02\"");
+
+
 
     # Test file deletion
     ############################################################
