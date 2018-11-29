@@ -2354,6 +2354,7 @@ if ($file_transfer_move==1){
     # Test B) move file to NONEXISTING
     # create parent dir and copy file
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03/testfile 03-01.txt\" --to-user oe72 --to-path \"dir/to/new-filename2.txt\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-01.txt\" --to-user oe72 --to-path \"topfile-move2.txt\""); 
 
     # test moved files
     ############################################################
@@ -2400,6 +2401,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
+                         "/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt",
                          "/srv/samba/schools/bsz/teachers/oe72/transfer",
                          "/srv/samba/schools/bsz/teachers/oe72/dir",
                          "/srv/samba/schools/bsz/teachers/oe72/dir/to",
@@ -2492,7 +2494,7 @@ if ($file_transfer_move==1){
                          "/srv/samba/schools/uni/teachers/kep72/testdir 03/testfile 03-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72",
                          "/srv/samba/schools/uni/teachers/gal72/transfer",
-                         "/srv/samba/schools/uni/teachers/gal72/testfile-01.txt",
+#                         "/srv/samba/schools/uni/teachers/gal72/testfile-01.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testfile-02.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testfile 03.txt",
                          "/srv/samba/schools/uni/teachers/gal72/testdir-01",
@@ -2610,6 +2612,7 @@ if ($file_transfer_move==1){
  
     # delete created files from B) from school to school
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/dir\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt\"");
 
     # Test file deletion
     ############################################################
