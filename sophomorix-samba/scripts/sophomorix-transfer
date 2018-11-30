@@ -563,6 +563,8 @@ sub smbclient_scopy_recurse {
 
     $copy{'OPTIONS'}{'FROM'}=$from_user_option;
     $copy{'OPTIONS'}{'TO'}=$to_user_option;
+    $copy{'OPTIONS'}{'FROM_PATH'}=$from_path;
+    $copy{'OPTIONS'}{'TO_PATH'}=$to_path;
 
     @{ $copy{'OPTIONS'}{'FROM_LIST'} }=split(/,/,$from_user_option);
     @{ $copy{'OPTIONS'}{'TO_LIST'} }=split(/,/,$to_user_option);
@@ -624,24 +626,25 @@ sub smbclient_scopy_recurse {
             } else {
                 $rel_path_from_user=$rel_path_home_from_user;
             }
-    
+
+            my $addon_calc="";
             # --to-path-addon (saved at every from_user)
             if ($to_path_addon eq "login"){
-                $copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}=$from;
+                $addon_calc="/".
+                             $from;
             } elsif ($to_path_addon eq "fullinfo"){
-                $copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
-                                                                 $from;
+                $addon_calc="/".
+                            $adminclass_AD_from_user."_".$from;
             } elsif ($to_path_addon eq "fullinfo-utf8"){
-                $copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
-                                                                 $lastname_utf8_AD_from_user."_".
-                                                                 $firstname_utf8_AD_from_user."_".
-                                                                 $from;
-            } else {
-                # add nothing
-                $copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}="";
+                $addon_calc="/".
+                            $adminclass_AD_from_user."_".
+                            $lastname_utf8_AD_from_user."_".
+                            $firstname_utf8_AD_from_user."_".
+                            $from;
             }
 
             # save some stuff
+            $copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}=$addon_calc;
             $copy{'FROM'}{$from}{'TO'}{$to}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
             $copy{'FROM'}{$from}{'TO'}{$to}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
             $copy{'FROM'}{$from}{'TO'}{$to}{'SCHOOL'}=$school_AD_from_user;
@@ -701,9 +704,14 @@ sub smbclient_scopy_recurse {
                 $rel_path_to_user=$rel_path_home_to_user;
             }
 
+            
+            my $rel_path_to_user_addon=$rel_path_to_user.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'};
+
             # save some stuff
+            $copy{'TO'}{$to}{'FROM'}{$from}{'TO_PATH_ADDON'}=$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'};
             $copy{'TO'}{$to}{'FROM'}{$from}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
             $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL'}=$rel_path_to_user;
+            $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL_ADDON'}=$rel_path_to_user_addon;
             $copy{'TO'}{$to}{'FROM'}{$from}{'SCHOOL'}=$school_AD_to_user;
 
             &scan_smb_dir($root_dns,
@@ -712,7 +720,8 @@ sub smbclient_scopy_recurse {
                           $from,
                           $to,
                           $school_AD_to_user,
-                          $rel_path_to_user,
+#                          $rel_path_to_user,
+                          $rel_path_to_user_addon,
                           "", # addon path ????
                           $smb_admin_pass,                                 
                           $ref_sophomorix_config,
@@ -748,7 +757,7 @@ sub smbclient_scopy_recurse {
                 }
                 &smb_mkdir_parent($root_dns,
                                   $copy{'TO'}{$to}{'FROM'}{$from}{'SCHOOL'},
-                                  $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL'},
+                                  $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL_ADDON'},
                                   $smb_admin_pass,
                                   $copy{'TO'}{$to}{'FROM'}{$from}{'HOME_REL_SCHOOL'}, # start below from here
                                   "ALL_BUT_LAST",
@@ -854,7 +863,7 @@ sub smbclient_scopy_recurse {
                 print "##### Creating parent dirs in target\n";
                 &smb_mkdir_parent($root_dns,
                                   $copy{'TO'}{$to}{'FROM'}{$from}{'SCHOOL'},
-                                  $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL'},
+                                  $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL_ADDON'},
                                   $smb_admin_pass,
                                   $copy{'TO'}{$to}{'FROM'}{$from}{'HOME_REL_SCHOOL'}, # start below from here
                                   "ALL",
