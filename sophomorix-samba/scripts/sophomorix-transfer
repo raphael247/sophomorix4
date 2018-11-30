@@ -132,6 +132,19 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
           );
 
+
+if ($to_path_addon eq "" or
+    $to_path_addon eq "login" or
+    $to_path_addon eq "fullinfo" or
+    $to_path_addon eq "fullinfo-utf8" 
+#    $to_path_addon eq "fullinfo-utf8-alt"
+    ) {
+    # OK
+} else {
+    print "\nERROR: Unknown option: --to-path-addon $to_path_addon\n\n";
+    exit;
+}
+
 my %sophomorix_result=&result_sophomorix_init("sophomorix-transfer");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
@@ -167,7 +180,7 @@ Options:
   # modifiers
     --no-target-directory   (cp contents of source directory only, but not directory itself)
     --keep-source-directory (do NOT delete source directory, when recursively moving a directory)
-
+    --to-path-addon login|fullinfo|fullinfo-utf8
 
 # share data
   sophomorix-transfer --from-unix-path /srv/upload/... --to-user <user1>,<user2>-exam, ... --subdir <dir>
