@@ -636,14 +636,14 @@ sub smbclient_scopy_recurse {
                                                                  $from;
             } else {
                 # add nothing
-                $copy{'FROM'}{$from}{'TO_PATH_ADDON'}="";
+                $copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}="";
             }
 
 
             # save some stuff old
-            $copy{'FROM'}{$from}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
-            $copy{'FROM'}{$from}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
-            $copy{'FROM'}{$from}{'SCHOOL'}=$school_AD_from_user;
+#            $copy{'FROM'}{$from}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
+#            $copy{'FROM'}{$from}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
+#            $copy{'FROM'}{$from}{'SCHOOL'}=$school_AD_from_user;
 
             # save some stuff new
             $copy{'FROM'}{$from}{'TO'}{$to}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
@@ -653,7 +653,7 @@ sub smbclient_scopy_recurse {
             &scan_smb_dir($root_dns,
                           "FROM",
                           \%copy,
-                          $from, # user remove later
+#                          $from, # user remove later
                           $from,
                           $to,
                           $school_AD_from_user,
@@ -707,9 +707,9 @@ sub smbclient_scopy_recurse {
             }
 
             # save some stuff old
-            $copy{'TO'}{$to}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
-            $copy{'TO'}{$to}{'PATH_REL_SCHOOL'}=$rel_path_to_user;
-            $copy{'TO'}{$to}{'SCHOOL'}=$school_AD_to_user;
+#            $copy{'TO'}{$to}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
+#            $copy{'TO'}{$to}{'PATH_REL_SCHOOL'}=$rel_path_to_user;
+#            $copy{'TO'}{$to}{'SCHOOL'}=$school_AD_to_user;
 
             # save some stuff new
             $copy{'TO'}{$to}{'FROM'}{$from}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
@@ -719,7 +719,7 @@ sub smbclient_scopy_recurse {
             &scan_smb_dir($root_dns,
                           "TO",
                           \%copy,
-                          $to, # user reomve later ???
+#                          $to, # user reomve later ???
                           $from,
                           $to,
                           $school_AD_to_user,
@@ -959,7 +959,7 @@ sub smbclient_scopy_recurse {
                         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                             "%'******'".
-                            " //$root_dns/$copy{'FROM'}{$from_user}{'SCHOOL'} "." ".
+                            " //$root_dns/$copy{'FROM'}{$from}{'TO'}{$to}{'SCHOOL'} "." ".
                             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
                             " -c 'rmdir \"$source_dir\"'";
                         print "$smbclient_command\n";
@@ -978,7 +978,7 @@ sub scan_smb_dir {
     my ($root_dns,
         $location,
         $ref_copy,
-        $user,
+#        $user,
         $from,
         $to,
         $school,
@@ -991,7 +991,7 @@ sub scan_smb_dir {
     my @scanlist=($rel_path);
 
     # old
-    $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
+#    $ref_copy->{$location}{$user}{'OPTION_REL_PATH'}=$rel_path;
     # new
     if ($location eq "FROM"){
         $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'OPTION_REL_PATH'}=$rel_path;
@@ -1005,7 +1005,7 @@ sub scan_smb_dir {
         my $type=&get_type_inode($root_dns,$school,$rel_item,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
         if ($num==1){
             # old
-            $ref_copy->{$location}{$user}{'OPTION_NODE'}=$type;
+#            $ref_copy->{$location}{$user}{'OPTION_NODE'}=$type;
             # new
             if ($location eq "FROM"){
                 $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'OPTION_NODE'}=$type;
@@ -1016,8 +1016,8 @@ sub scan_smb_dir {
         if ($type eq "DIR"){
 
             # old
-            $ref_copy->{$location}{$user}{'LOOKUP'}{$rel_item}="DIR";
-            push @{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'} },$rel_item;
+#            $ref_copy->{$location}{$user}{'LOOKUP'}{$rel_item}="DIR";
+#            push @{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'} },$rel_item;
             # new
             if ($location eq "FROM"){
                 $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'LOOKUP'}{$rel_item}="DIR";
@@ -1076,8 +1076,8 @@ sub scan_smb_dir {
                         push @scanlist, $dir_rel_path;
                     } elsif ($smb_type eq "FILE"){
                         # old
-                        $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
-                        push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
+#                        $ref_copy->{$location}{$user}{'LOOKUP'}{$dir_rel_path}="FILE";
+#                        push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$dir_rel_path;
                         # new
                         if ($location eq "FROM"){
                             $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'LOOKUP'}{$dir_rel_path}="FILE";
@@ -1091,7 +1091,7 @@ sub scan_smb_dir {
             }
         } elsif ($type eq "FILE"){
             # old
-            push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$rel_item;
+#            push @{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'} },$rel_item;
             # new
             if ($location eq "FROM"){
                 push @{ $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'LISTS'}{'FILES'} },$rel_item;
@@ -1101,8 +1101,8 @@ sub scan_smb_dir {
         }
     }
     # old
-    $ref_copy->{$location}{$user}{'COUNT'}{'FILES'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'}  }+1;
-    $ref_copy->{$location}{$user}{'COUNT'}{'DIRS'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'}  }+1;
+#    $ref_copy->{$location}{$user}{'COUNT'}{'FILES'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'FILES'}  }+1;
+#    $ref_copy->{$location}{$user}{'COUNT'}{'DIRS'}=$#{ $ref_copy->{$location}{$user}{'LISTS'}{'DIRS'}  }+1;
     # new
     if ($location eq "FROM"){
         $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'COUNT'}{'FILES'}=$#{ $ref_copy->{'FROM'}{$from}{'TO'}{$to}{'LISTS'}{'FILES'}  }+1;
@@ -1211,7 +1211,7 @@ sub smb_get_put_copy {
         my $smbclient_command_get=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$ref_copy->{'FROM'}{$from_user}{'SCHOOL'} "." ".
+            " //$root_dns/$ref_copy->{'FROM'}{$from_user}{'TO'}{$to_user}{'SCHOOL'} "." ".
             $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c 'lcd \"$tmp\"; cd \"$source_dirname\"; prompt; get \"$source_filename\"; exit;'";
         print "$smbclient_command_get\n";
@@ -1223,7 +1223,7 @@ sub smb_get_put_copy {
         my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$ref_copy->{'TO'}{$to_user}{'SCHOOL'} "." ".
+            " //$root_dns/$ref_copy->{'TO'}{$to_user}{'FROM'}{$from_user}{'SCHOOL'} "." ".
             $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c 'lcd \"$tmp\"; cd \"$target_dirname\"; prompt; put \"$source_filename\" \"$target_filename\"; exit;'";
         print "$smbclient_command_put\n";
@@ -1235,7 +1235,7 @@ sub smb_get_put_copy {
         my $smbclient_command_get=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$ref_copy->{'FROM'}{$from_user}{'SCHOOL'} "." ".
+            " //$root_dns/$ref_copy->{'FROM'}{$from_user}{'TO'}{$to_user}{'SCHOOL'} "." ".
             $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
             " -c 'cd \"$source_dirname\"; rm \"$source_filename\"; exit;'";
         print "$smbclient_command_get\n";
