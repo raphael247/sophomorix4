@@ -236,8 +236,9 @@ if ($info==1) {
 # --scopy --from-user <user1> --from-path <fpath> --to-user <user2> --to-path <tpath>
 if (($scopy==1 or $move==1) and $from_user ne "" and $to_user ne ""){
     &print_title("Copying/Moving ...");
-    print "   * From user:  $from_user  $from_path \n";
-    print "   * To user:    $to_user  $to_path\n";
+    print "   * From user:     $from_user    $from_path \n";
+    print "   * To user:       $to_user      $to_path\n";
+    print "   * To user addon: $to_path_addon\n";
 
     &smbclient_scopy_recurse({ldap=>$ldap,
                              root_dse=>$root_dse,
@@ -669,7 +670,7 @@ sub smbclient_scopy_recurse {
                           $to,
                           $school_AD_from_user,
                           $rel_path_from_user,
-                          "", # addon path ????
+                          $addon_calc,
                           $smb_admin_pass,
                           $ref_sophomorix_config,
                           $ref_sophomorix_result);
@@ -733,9 +734,9 @@ sub smbclient_scopy_recurse {
                           $from,
                           $to,
                           $school_AD_to_user,
-#                          $rel_path_to_user,
-                          $rel_path_to_user_addon,
-                          "", # addon path ????
+                          $rel_path_to_user,
+#                          $rel_path_to_user_addon,
+                          $copy{'TO'}{$to}{'FROM'}{$from}{'TO_PATH_ADDON'},
                           $smb_admin_pass,                                 
                           $ref_sophomorix_config,
                           $ref_sophomorix_result);
@@ -770,7 +771,7 @@ sub smbclient_scopy_recurse {
                 }
                 &smb_mkdir_parent($root_dns,
                                   $copy{'TO'}{$to}{'FROM'}{$from}{'SCHOOL'},
-                                  $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL_ADDON'},
+                                  $copy{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL'}, # not {'PATH_REL_SCHOOL_ADDON'}, addon is ignored
                                   $smb_admin_pass,
                                   $copy{'TO'}{$to}{'FROM'}{$from}{'HOME_REL_SCHOOL'}, # start below from here
                                   "ALL_BUT_LAST",
@@ -1000,12 +1001,35 @@ sub scan_smb_dir {
         $from,
         $to,
         $school,
-        $rel_path,
+        $rel_path_opt,
         $addon_path,
         $smb_admin_pass,
         $ref_sophomorix_config,
         $ref_sophomorix_result)=@_;
-    print "##### Scanning:  School: $school Subdir: $rel_path ...\n";
+
+    # decide if addon is INSERTED or appendended
+    my $rel_path; # what to scan 
+    if ($location eq "TO" and $addon_path ne ""){
+        my $type=&get_type_inode($root_dns,$school,$rel_path_opt,$smb_admin_pass,$ref_sophomorix_config,$ref_sophomorix_result);
+        if ($type eq "DIR"){
+            $rel_path=$rel_path_opt.$addon_path;
+        } else {
+            my $rel_dirname  = dirname($rel_path_opt);
+            my $rel_filename  = basename($rel_path_opt);
+            $rel_path=$rel_dirname.$addon_path."/".$rel_filename;
+
+            # update hash
+            $ref_copy->{'TO'}{$to}{'FROM'}{$from}{'PATH_REL_SCHOOL_ADDON'}=$rel_path;
+            print "HERE ERROR: insert path $addon_path in $rel_path_opt $rel_dirname $rel_filename\n";
+            print "HERE   $rel_path\n";
+        }
+    } elsif ($location eq "TO") {
+        $rel_path=$rel_path_opt.$addon_path;
+    } else {
+        $rel_path=$rel_path_opt;
+    }
+
+    print "##### Scanning $location:  School: $school Subdir: $rel_path ...\n";
     my @scanlist=($rel_path);
 
     if ($location eq "FROM"){
