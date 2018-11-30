@@ -575,154 +575,152 @@ sub smbclient_scopy_recurse {
     }
 
     ############################################################
-    #  1) analyze source users
+    #  1) analyze users and dirs
     ############################################################
     foreach my $from_user_item ( @{ $copy{'LIST'}{'FROM'} } ){
-        # from user
-        my ($firstname_utf8_AD_from_user,
-            $lastname_utf8_AD_from_user,
-            $adminclass_AD_from_user,
-            $existing_AD_from_user,
-            $exammode_AD_from_user,
-            $role_AD_from_user,
-            $home_directory_AD_from_user,
-            $user_account_control_AD_from_user,
-            $toleration_date_AD_from_user,
-            $deactivation_date_AD_from_user,
-            $school_AD_from_user,
-            $status_AD_from_user,
-            $firstpassword_AD_from_user,
-            $unid_AD_from_user)=
-            &AD_get_user({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          user=>$from_user_item,
-                        });
+        foreach my $to_user_item ( @{ $copy{'LIST'}{'TO'} } ){
+            ############################################################
+            # from user
+            ############################################################
+            my ($firstname_utf8_AD_from_user,
+                $lastname_utf8_AD_from_user,
+                $adminclass_AD_from_user,
+                $existing_AD_from_user,
+                $exammode_AD_from_user,
+                $role_AD_from_user,
+                $home_directory_AD_from_user,
+                $user_account_control_AD_from_user,
+                $toleration_date_AD_from_user,
+                $deactivation_date_AD_from_user,
+                $school_AD_from_user,
+                $status_AD_from_user,
+                $firstpassword_AD_from_user,
+                $unid_AD_from_user)=
+                &AD_get_user({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              root_dns=>$root_dns,
+                              user=>$from_user_item,
+                            });
 
-        if ($existing_AD_from_user eq "FALSE"){
-            &log_script_exit("ERROR: Source user $from_user_item not found",1,1,0,
-                $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
-        }
+            if ($existing_AD_from_user eq "FALSE"){
+                &log_script_exit("ERROR: Source user $from_user_item not found",1,1,0,
+                    $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+            }
 
-        my $smb_dir_home_from_user=$home_directory_AD_from_user;
-        $smb_dir_home_from_user=~s/\\/\//g;
-        my ($string_from_user,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
+            my $smb_dir_home_from_user=$home_directory_AD_from_user;
+            $smb_dir_home_from_user=~s/\\/\//g;
+            my ($string_from_user,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
 
-        # home relative to school
-        $rel_path_home_from_user=~s/^\///g;
+            # home relative to school
+            $rel_path_home_from_user=~s/^\///g;
 
-        # path incl. --from-path
-        my $rel_path_from_user;
-        if ($from_path ne ""){
-            # append subdir
-            $rel_path_from_user=$rel_path_home_from_user."/".$from_path;
-        } else {
-            $rel_path_from_user=$rel_path_home_from_user;
-        }
+            # path incl. --from-path
+            my $rel_path_from_user;
+            if ($from_path ne ""){
+                # append subdir
+                $rel_path_from_user=$rel_path_home_from_user."/".$from_path;
+            } else {
+                $rel_path_from_user=$rel_path_home_from_user;
+            }
     
-        # --to-path-addon (saved at every from_user)
-        if ($to_path_addon eq "login"){
-            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$from_user_item;
-        } elsif ($to_path_addon eq "fullinfo"){
-            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
-                                                            $from_user_item;
-        } elsif ($to_path_addon eq "fullinfo-utf8"){
-            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
-                                                            $lastname_utf8_AD_from_user."_".
-                                                            $firstname_utf8_AD_from_user."_".
-                                                            $from_user_item;
-        } else {
-            # add nothing
-            $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}="";
-        }
+            # --to-path-addon (saved at every from_user)
+            if ($to_path_addon eq "login"){
+                $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$from_user_item;
+            } elsif ($to_path_addon eq "fullinfo"){
+                $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
+                                                                $from_user_item;
+            } elsif ($to_path_addon eq "fullinfo-utf8"){
+                $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}=$adminclass_AD_from_user."_".
+                                                                $lastname_utf8_AD_from_user."_".
+                                                                $firstname_utf8_AD_from_user."_".
+                                                                $from_user_item;
+            } else {
+                # add nothing
+                $copy{'FROM'}{$from_user_item}{'TO_PATH_ADDON'}="";
+            }
 
 
-        # save some stuff
-        $copy{'FROM'}{$from_user_item}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
-        $copy{'FROM'}{$from_user_item}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
-        $copy{'FROM'}{$from_user_item}{'SCHOOL'}=$school_AD_from_user;
+            # save some stuff
+            $copy{'FROM'}{$from_user_item}{'HOME_REL_SCHOOL'}=$rel_path_home_from_user;
+            $copy{'FROM'}{$from_user_item}{'PATH_REL_SCHOOL'}=$rel_path_from_user;
+            $copy{'FROM'}{$from_user_item}{'SCHOOL'}=$school_AD_from_user;
 
-        &scan_smb_dir($root_dns,
-                      "FROM",
-                      \%copy,
-                      $from_user_item,
-                      $copy{'FROM'}{$from_user_item}{'SCHOOL'},
-                      $copy{'FROM'}{$from_user_item}{'PATH_REL_SCHOOL'},
-                      "", # addon path ????
-                      $smb_admin_pass,
-                      $ref_sophomorix_config,
-                      $ref_sophomorix_result);
-    }
+            &scan_smb_dir($root_dns,
+                          "FROM",
+                          \%copy,
+                          $from_user_item,
+                          $copy{'FROM'}{$from_user_item}{'SCHOOL'},
+                          $copy{'FROM'}{$from_user_item}{'PATH_REL_SCHOOL'},
+                          "", # addon path ????
+                          $smb_admin_pass,
+                          $ref_sophomorix_config,
+                          $ref_sophomorix_result);
 
+            ############################################################
+            # to user
+            ############################################################
+            my ($firstname_utf8_AD_to_user,
+                $lastname_utf8_AD_to_user,
+                $adminclass_AD_to_user,
+                $existing_AD_to_user,
+                $exammode_AD_to_user,
+                $role_AD_to_user,
+                $home_directory_AD_to_user,
+                $user_account_control_AD_to_user,
+                $toleration_date_AD_to_user,
+                $deactivation_date_AD_to_user,
+                $school_AD_to_user,
+                $status_AD_to_user,
+                $firstpassword_AD_to_user,
+                $unid_AD_to_user)=
+                &AD_get_user({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              root_dns=>$root_dns,
+                              user=>$to_user_item,
+                            });
+            if ($existing_AD_to_user eq "FALSE"){
+                &log_script_exit("ERROR: Target user $to_user_item not found",1,1,0,
+                    $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+            }
 
-    ############################################################
-    #  2) analyze target users
-    ############################################################
-    foreach my $to_user_item ( @{ $copy{'LIST'}{'TO'} } ){
-        # to user
-        my ($firstname_utf8_AD_to_user,
-            $lastname_utf8_AD_to_user,
-            $adminclass_AD_to_user,
-            $existing_AD_to_user,
-            $exammode_AD_to_user,
-            $role_AD_to_user,
-            $home_directory_AD_to_user,
-            $user_account_control_AD_to_user,
-            $toleration_date_AD_to_user,
-            $deactivation_date_AD_to_user,
-            $school_AD_to_user,
-            $status_AD_to_user,
-            $firstpassword_AD_to_user,
-            $unid_AD_to_user)=
-            &AD_get_user({ldap=>$ldap,
-                          root_dse=>$root_dse,
-                          root_dns=>$root_dns,
-                          user=>$to_user_item,
-                        });
-        if ($existing_AD_to_user eq "FALSE"){
-            &log_script_exit("ERROR: Target user $to_user_item not found",1,1,0,
-                $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
-        }
+            my $smb_dir_home_to_user=$home_directory_AD_to_user;
+            $smb_dir_home_to_user=~s/\\/\//g;
+            my ($string_to_user,$rel_path_home_to_user)=split(/$school_AD_to_user/,$smb_dir_home_to_user);
 
-        my $smb_dir_home_to_user=$home_directory_AD_to_user;
-        $smb_dir_home_to_user=~s/\\/\//g;
-        my ($string_to_user,$rel_path_home_to_user)=split(/$school_AD_to_user/,$smb_dir_home_to_user);
+            # home relative to school
+            $rel_path_home_to_user=~s/^\///g;
 
-        # home relative to school
-        $rel_path_home_to_user=~s/^\///g;
+            # path incl. --to-path
+            my $rel_path_to_user;
+            if ($to_path ne ""){
+                # append subdir
+                $rel_path_to_user=$rel_path_home_to_user."/".$to_path;
+            } else {
+                $rel_path_to_user=$rel_path_home_to_user;
+            }
 
-        # path incl. --to-path
-        my $rel_path_to_user;
-        if ($to_path ne ""){
-            # append subdir
-            $rel_path_to_user=$rel_path_home_to_user."/".$to_path;
-        } else {
-            $rel_path_to_user=$rel_path_home_to_user;
-        }
+            # save some stuff
+            $copy{'TO'}{$to_user_item}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
+            $copy{'TO'}{$to_user_item}{'PATH_REL_SCHOOL'}=$rel_path_to_user;
+            $copy{'TO'}{$to_user_item}{'SCHOOL'}=$school_AD_to_user;
 
-        # save some stuff
-        $copy{'TO'}{$to_user_item}{'HOME_REL_SCHOOL'}=$rel_path_home_to_user;
-        $copy{'TO'}{$to_user_item}{'PATH_REL_SCHOOL'}=$rel_path_to_user;
-        $copy{'TO'}{$to_user_item}{'SCHOOL'}=$school_AD_to_user;
-
-        &scan_smb_dir($root_dns,
-                      "TO",
-                      \%copy,
-                      $to_user_item,
-                      $copy{'TO'}{$to_user_item}{'SCHOOL'},
-                      $copy{'TO'}{$to_user_item}{'PATH_REL_SCHOOL'},
-                      "", # addon path ????
-                      $smb_admin_pass,                                 
-                      $ref_sophomorix_config,
-                      $ref_sophomorix_result);
-    }
-
-
+            &scan_smb_dir($root_dns,
+                          "TO",
+                          \%copy,
+                          $to_user_item,
+                          $copy{'TO'}{$to_user_item}{'SCHOOL'},
+                          $copy{'TO'}{$to_user_item}{'PATH_REL_SCHOOL'},
+                          "", # addon path ????
+                          $smb_admin_pass,                                 
+                          $ref_sophomorix_config,
+                          $ref_sophomorix_result);
+        } # end TO loop
+    } # end FROM loop
 
     print Dumper(\%copy);  
 
     ############################################################
-    #  3) do the copy/move loops
+    #  2) do the copy/move loops
     ############################################################
     foreach my $from_user_item ( @{ $copy{'LIST'}{'FROM'} } ){
         foreach my $to_user_item ( @{ $copy{'LIST'}{'TO'} } ){
@@ -912,7 +910,7 @@ sub smbclient_scopy_recurse {
                     }
 
                     if ($copy{'TO'}{$to_user_item}{'SCHOOL'} eq $copy{'FROM'}{$from_user_item}{'SCHOOL'}){
-                        # within school
+                        # scopy/move within school
                         my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                             " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                             "%'******'".
