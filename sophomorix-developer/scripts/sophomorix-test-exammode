@@ -3594,12 +3594,12 @@ if ($file_transfer_move_addon==1){
 
     # do the tests
     # Test A) source nonexisting (within school)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"transfer/66.txt\" --to-user jonsonad72-exam --to-path \"transfer/\""); 
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"transfer/66.txt\" --to-user jonsonad72-exam --to-path \"transfer/\" --to-path-addon login"); 
 
     # Test B) cp file to NONEXISTING (within school)
     # move file only
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user jonsonad72-exam --to-path \"dir/to/new-filename.txt\"");
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile-move.txt\""); 
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user jonsonad72-exam --to-path \"dir/to/new-filename.txt\" --to-path-addon login");
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile-move.txt\" --to-path-addon login"); 
 
     # C) file -> dir (move into dir if no other dir is in the way, within school)
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer/\"");
@@ -3676,8 +3676,10 @@ if ($file_transfer_move_addon==1){
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir",
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir/to",
-                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir/to/new-filename.txt",
-                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile-move.txt",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir/to/wu72",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir/to/wu72/new-filename.txt",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72",
+                         "/srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72/topfile-move.txt",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
                          "/srv/samba/schools/bsz/share/projects",
@@ -3886,7 +3888,7 @@ if ($file_transfer_move_addon==1){
 
     # delete created files from B)
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile-move.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72\"");
 
     # delete created files from C)
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer/testfile-02.txt\"");
