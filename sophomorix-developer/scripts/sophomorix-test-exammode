@@ -3637,9 +3637,9 @@ if ($file_transfer_move_addon==1){
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer/\" --to-path-addon login");
     # test --no-target-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir/\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir/\" --no-target-directory --to-path-addon login");
     # --keep-source-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01-01\" --to-user blackmri72 --to-path \"newdir2/\" --keep-source-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01-01\" --to-user blackmri72 --to-path \"newdir2/\" --keep-source-directory --to-path-addon login");
 
 
     # test moved files
@@ -3768,13 +3768,15 @@ if ($file_transfer_move_addon==1){
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/kep72/testfile-01-02.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/kep72/testfile-01-03.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/newdir",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/testfile-01-03-01.txt",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/testfile-01-03-02.txt",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/testfile-01 03 03.txt",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/gal72",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/gal72/testfile-01-03-01.txt",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/gal72/testfile-01-03-02.txt",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir/gal72/testfile-01 03 03.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/testdir-01-01",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/testdir-01-01/testfile-01-01-01.txt",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/testdir-01-01/testfile-01-01-02.txt",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/gal72",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/gal72/testdir-01-01",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/gal72/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/newdir2/gal72/testdir-01-01/testfile-01-01-02.txt",
                          "/srv/samba/schools/uni/teachers",
                          "/srv/samba/schools/uni/teachers/kep72",
                          "/srv/samba/schools/uni/teachers/kep72/transfer",
@@ -3915,13 +3917,11 @@ if ($file_transfer_move_addon==1){
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/dir\"");
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/gal72\"");
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/transfer/gal72\"");
-#    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt\"");
 
     # delete created files from C) from school to school
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/transfer/testfile-02.txt\"");
 
     # delete created files from E) from school to school
-#    &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02\"");
     &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/gal72\"");
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/newdir\"");
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/newdir2\"");
