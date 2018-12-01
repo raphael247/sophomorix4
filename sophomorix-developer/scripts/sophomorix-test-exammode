@@ -1712,7 +1712,7 @@ if ($file_transfer_scopy==1){
 
     ############################################################
     # Test A) source nonexisting (within school)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"transfer/77.txt\" --to-user jonsonad72-exam --to-path \"transfer\""); 
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"transfer/77.txt\" --to-user jonsonad72-exam --to-path \"transfer/\""); 
 
     # Test B) cp file to NONEXISTING (within school)
     # create parent dir and copy file
@@ -1721,16 +1721,16 @@ if ($file_transfer_scopy==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user \"jonsonad72-exam\" --to-path \"topfile.txt\""); 
 
     # C) file -> dir (copy into dir if no other dir is in the way, within school)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
 
     # E) dir -> dir (copy recursively, within school)
     # copy into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer/\"");
     # use --no-target-directory 
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer/\" --no-target-directory");
 
 
     # copy from one school to another
@@ -1742,15 +1742,15 @@ if ($file_transfer_scopy==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72  --to-path \"topfile2.txt\""); 
  
     # C) file -> dir (copy into dir if no other dir is in the way)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user schneima72 --to-path \"blockfile2.txt\"");
 
     # E) dir -> dir (copy recursively, bsz -> uni)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user lordjo72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user lordjo72 --to-path \"transfer/\"");
     # use --no-target-directory 
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"thisdir\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"thisdir/\" --no-target-directory");
     
 
     ############################################################
@@ -2337,7 +2337,7 @@ if ($file_transfer_move==1){
 
     # do the tests
     # Test A) source nonexisting (within school)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"transfer/66.txt\" --to-user jonsonad72-exam --to-path \"transfer\""); 
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"transfer/66.txt\" --to-user jonsonad72-exam --to-path \"transfer/\""); 
 
     # Test B) cp file to NONEXISTING (within school)
     # move file only
@@ -2345,18 +2345,18 @@ if ($file_transfer_move==1){
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile-move.txt\""); 
 
     # C) file -> dir (move into dir if no other dir is in the way, within school)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
 
     # E) dir -> dir (move recursively, within school)
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer/\"");
     # test --no-target-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"transfer\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"transfer/\" --no-target-directory");
     # --keep-source-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"transfer\" --to-user blackmri72 --to-path \"transfer/mydir\" --keep-source-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"transfer\" --to-user blackmri72 --to-path \"transfer/mydir/\" --keep-source-directory");
 
 
     # move from one school to another
@@ -2367,7 +2367,7 @@ if ($file_transfer_move==1){
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-01.txt\" --to-user oe72 --to-path \"topfile-move2.txt\""); 
 
     # C) file -> dir (move into dir if no other dir is in the way,  from one school to another)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
@@ -2375,11 +2375,11 @@ if ($file_transfer_move==1){
 
     # E) dir -> dir (move recursively, from school to another)
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer/\"");
     # test --no-target-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir/\" --no-target-directory");
     # --keep-source-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01-01\" --to-user blackmri72 --to-path \"newdir2\" --keep-source-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01-01\" --to-user blackmri72 --to-path \"newdir2/\" --keep-source-directory");
 
 
     # test moved files
@@ -2949,29 +2949,29 @@ if ($file_transfer_scopy_addon==1){
 
     ############################################################
     # Test A) source nonexisting (within school)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"transfer/77.txt\" --to-user jonsonad72-exam --to-path \"transfer\" --to-path-addon login"); 
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"transfer/77.txt\" --to-user jonsonad72-exam --to-path \"transfer/\" --to-path-addon login"); 
 
     # Test B) cp file to NONEXISTING (within school)
     # create parent dir and copy file
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user jonsonad72-exam --to-path \"dir/to/new-filename.txt\" --to-path-addon login");
-#    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user jonsonad72-exam --to-path \"dir/to/new-filename.txt\"");
+
     # copy file only
-#    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user \"jonsonad72-exam\" --to-path \"topfile.txt\" --to-path-addon login"); 
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user \"jonsonad72-exam\" --to-path \"topfile.txt\""); 
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user \"jonsonad72-exam\" --to-path \"topfile.txt\" --to-path-addon login"); 
+#    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user \"jonsonad72-exam\" --to-path \"topfile.txt\""); 
 
     # C) file -> dir (copy into dir if no other dir is in the way, within school)
 # todo: becomes case B) nonexisting
-#    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\" --to-path-addon login");
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\" ");
+#    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer/\" --to-path-addon login");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer/\" ");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user maiersa72-exam --to-path \"blockfile.txt\" --to-path-addon login");
 
     # E) dir -> dir (copy recursively, within school)
     # copy into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\" --to-path-addon login");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer/\" --to-path-addon login");
     # use --no-target-directory 
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory --to-path-addon login");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer/\" --no-target-directory --to-path-addon login");
 
     # copy from one school to another
     # Test A) not neded
@@ -2982,15 +2982,15 @@ if ($file_transfer_scopy_addon==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72  --to-path \"topfile2.txt\""); 
  
     # C) file -> dir (copy into dir if no other dir is in the way)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user schneima72 --to-path \"blockfile2.txt\"");
 
     # E) dir -> dir (copy recursively, bsz -> uni)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user lordjo72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user lordjo72 --to-path \"transfer/\"");
     # use --no-target-directory 
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"thisdir\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"thisdir/\" --no-target-directory");
     
 
     ############################################################
@@ -3590,7 +3590,7 @@ if ($file_transfer_move_addon==1){
 
     # do the tests
     # Test A) source nonexisting (within school)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"transfer/66.txt\" --to-user jonsonad72-exam --to-path \"transfer\""); 
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"transfer/66.txt\" --to-user jonsonad72-exam --to-path \"transfer/\""); 
 
     # Test B) cp file to NONEXISTING (within school)
     # move file only
@@ -3598,18 +3598,18 @@ if ($file_transfer_move_addon==1){
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile-move.txt\""); 
 
     # C) file -> dir (move into dir if no other dir is in the way, within school)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
 
     # E) dir -> dir (move recursively, within school)
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer/\"");
     # test --no-target-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"transfer\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"testdir-01\" --to-user blackmri72 --to-path \"transfer/\" --no-target-directory");
     # --keep-source-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"transfer\" --to-user blackmri72 --to-path \"transfer/mydir\" --keep-source-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user kep72 --from-path \"transfer\" --to-user blackmri72 --to-path \"transfer/mydir/\" --keep-source-directory");
 
 
     # move from one school to another
@@ -3620,7 +3620,7 @@ if ($file_transfer_move_addon==1){
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-01.txt\" --to-user oe72 --to-path \"topfile-move2.txt\""); 
 
     # C) file -> dir (move into dir if no other dir is in the way,  from one school to another)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
@@ -3628,11 +3628,11 @@ if ($file_transfer_move_addon==1){
 
     # E) dir -> dir (move recursively, from school to another)
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer/\"");
     # test --no-target-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir/\" --no-target-directory");
     # --keep-source-directory
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01-01\" --to-user blackmri72 --to-path \"newdir2\" --keep-source-directory");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01-01\" --to-user blackmri72 --to-path \"newdir2/\" --keep-source-directory");
 
 
     # test moved files
