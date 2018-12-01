@@ -2985,7 +2985,7 @@ if ($file_transfer_scopy_addon==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72  --to-path \"topfile2.txt\" --to-path-addon login"); 
  
     # C) file -> dir (copy into dir if no other dir is in the way)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer/\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer/\" --to-path-addon login");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user schneima72 --to-path \"blockfile2.txt\"");
@@ -3129,7 +3129,8 @@ if ($file_transfer_scopy_addon==1){
                          "/srv/samba/schools/uni/students/12abc/lordjo72/wu72/topfile2.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
-                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-02.txt",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/wu72",
+                         "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/wu72/testfile-02.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/thisdir",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/thisdir/testdir-01-01",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/thisdir/testdir-01-01/testfile-01-01-01.txt",
@@ -3243,7 +3244,7 @@ if ($file_transfer_scopy_addon==1){
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72\"");
 
     # delete created files from C) from school to school
-    &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-02.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/transfer/wu72\"");
 
 
     # delete created files from E) from school to school

@@ -725,7 +725,13 @@ sub smbclient_scopy_recurse {
                 $target_mkdir=$rel_dir."/".$rel_last.$copy{'FROM'}{$from}{'TO'}{$to}{'TARGET_PATH_ADDON'};
                 $copy{'TO'}{$to}{'FROM'}{$from}{'TARGET_MKDIR'}=$target_mkdir;
 
-                $target_path=$rel_dir."/".$rel_last.$copy{'FROM'}{$from}{'TO'}{$to}{'TARGET_PATH_ADDON'};  
+                $target_path=$rel_dir."/".$rel_last.$copy{'FROM'}{$from}{'TO'}{$to}{'TARGET_PATH_ADDON'}; 
+                # if source is a file (and target a dir), append its name to target path (make 'put' work)
+                if ($copy{'FROM'}{$from}{'TO'}{$to}{'SOURCE_NODE'} eq "FILE"){
+                    my $filename  = basename($copy{'FROM'}{$from}{'TO'}{$to}{'SOURCE_PATH'});
+                    $target_path=$target_path."/".$filename;
+                }
+
                 $copy{'TO'}{$to}{'FROM'}{$from}{'TARGET_PATH'}=$target_path;
             } else {
                 # no /: required file
