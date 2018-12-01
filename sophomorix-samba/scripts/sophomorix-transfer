@@ -1164,6 +1164,7 @@ sub smb_mkdir_parent {
     my (@dirs)=split("/",$target_mkdir);
     my @mkdir_paths=();
     my $mkdir="";
+    print "Done: Creating parent dirs until $target_mkdir\n";
     foreach my $dir (@dirs){
         $mkdir=$mkdir."/".$dir;
         $mkdir=~s/^\///g;
