@@ -728,10 +728,12 @@ sub smbclient_scopy_recurse {
                 # ends with / --> required dir
                 print "HEREO: $rel_path_to_user is required to be a dir\n";
 
-                $target_mkdir=$rel_dir.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}."/".$rel_last;
+#                $target_mkdir=$rel_dir.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}."/".$rel_last;
+                $target_mkdir=$rel_dir."/".$rel_last.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'};
                 $copy{'TO'}{$to}{'FROM'}{$from}{'TARGET_MKDIR'}=$target_mkdir;
 
-                $target_path=$rel_dir.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}."/".$rel_last;
+#                $target_path=$rel_dir.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'}."/".$rel_last;
+                $target_path=$rel_dir."/".$rel_last.$copy{'FROM'}{$from}{'TO'}{$to}{'TO_PATH_ADDON'};  
                 $copy{'TO'}{$to}{'FROM'}{$from}{'TARGET_PATH'}=$target_path;
             } else {
                 # no /: required file
