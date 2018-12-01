@@ -1971,6 +1971,8 @@ if ($file_transfer_scopy==1){
     &test_file_content("/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt","blockfile.txt");
     &test_file_content("/srv/samba/schools/default-school/students/s6ade/schneima72/blockfile2.txt","blockfile2.txt");
 
+#/srv/samba/schools/uni/students/12abc/lordjo72/topfile2.txt
+
     # Test if overwriting of a file works
     &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile.txt\""); 
     &test_file_content("/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt","testfile-01-02.txt");
@@ -2978,9 +2980,9 @@ if ($file_transfer_scopy_addon==1){
     # Test A) not neded
     # Test B) cp file to NONEXISTING
     # create parent dir and copy file
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72 --to-path \"dir/to/new-filename2.txt\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72 --to-path \"dir/to/new-filename2.txt\" --to-path-addon login");
     # copy file only
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72  --to-path \"topfile2.txt\""); 
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72  --to-path \"topfile2.txt\" --to-path-addon login"); 
  
     # C) file -> dir (copy into dir if no other dir is in the way)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer/\"");
@@ -3121,8 +3123,10 @@ if ($file_transfer_scopy_addon==1){
                          "/srv/samba/schools/uni/students/12abc/lordjo72/transfer/testdir-01/testfile-01-03.txt",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/dir",
                          "/srv/samba/schools/uni/students/12abc/lordjo72/dir/to",
-                         "/srv/samba/schools/uni/students/12abc/lordjo72/dir/to/new-filename2.txt",
-                         "/srv/samba/schools/uni/students/12abc/lordjo72/topfile2.txt",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/dir/to/wu72",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/dir/to/wu72/new-filename2.txt",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/wu72",
+                         "/srv/samba/schools/uni/students/12abc/lordjo72/wu72/topfile2.txt",
                          "/srv/samba/schools/uni/students/12abc/blackmri72",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer",
                          "/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-02.txt",
@@ -3244,7 +3248,7 @@ if ($file_transfer_scopy_addon==1){
 
     # delete created files from E) from school to school
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/lordjo72/dir\"");
-    &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/lordjo72/topfile2.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/lordjo72/wu72\"");
 
     # delete created files from E) from school to school
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/lordjo72/transfer/testdir-01\"");
