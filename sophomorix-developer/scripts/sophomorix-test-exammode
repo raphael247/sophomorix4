@@ -3622,19 +3622,20 @@ if ($file_transfer_move_addon==1){
     # Test A) not neded
     # Test B) move file to NONEXISTING
     # create parent dir and copy file
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03/testfile 03-01.txt\" --to-user oe72 --to-path \"dir/to/new-filename2.txt\"");
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-01.txt\" --to-user oe72 --to-path \"topfile-move2.txt\""); 
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03/testfile 03-01.txt\" --to-user oe72 --to-path \"dir/to/new-filename2.txt\" --to-path-addon login");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-01.txt\" --to-user oe72 --to-path \"topfile-move2.txt\" --to-path-addon login"); 
 
     # C) file -> dir (move into dir if no other dir is in the way,  from one school to another)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer/\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testfile-02.txt\" --to-user oe72 --to-path \"transfer/\" --to-path-addon login");
 
     # D) dir -> file (error)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
+    # test obsolete, --to-path-addon creates a new nonexisting subdir, so its case E) 
+    #&run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir 03\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
 
 
     # E) dir -> dir (move recursively, from school to another)
     # move into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer/\"");
+    &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-02\" --to-user sch72 --to-path \"transfer/\" --to-path-addon login");
     # test --no-target-directory
     &run_command("sophomorix-transfer $all_options --move --from-user gal72 --from-path \"testdir-01/testdir-01 03\" --to-user blackmri72 --to-path \"newdir/\" --no-target-directory");
     # --keep-source-directory
@@ -3689,12 +3690,15 @@ if ($file_transfer_move_addon==1){
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
                          "/srv/samba/schools/bsz/teachers/oe72",
-                         "/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt",
+                         "/srv/samba/schools/bsz/teachers/oe72/gal72",
+                         "/srv/samba/schools/bsz/teachers/oe72/gal72/topfile-move2.txt",
                          "/srv/samba/schools/bsz/teachers/oe72/transfer",
-                         "/srv/samba/schools/bsz/teachers/oe72/transfer/testfile-02.txt",
+                         "/srv/samba/schools/bsz/teachers/oe72/transfer/gal72",
+                         "/srv/samba/schools/bsz/teachers/oe72/transfer/gal72/testfile-02.txt",
                          "/srv/samba/schools/bsz/teachers/oe72/dir",
                          "/srv/samba/schools/bsz/teachers/oe72/dir/to",
-                         "/srv/samba/schools/bsz/teachers/oe72/dir/to/new-filename2.txt",
+                         "/srv/samba/schools/bsz/teachers/oe72/dir/to/gal72",
+                         "/srv/samba/schools/bsz/teachers/oe72/dir/to/gal72/new-filename2.txt",
                          "/srv/samba/schools/bsz/teachers/wu72",
                          "/srv/samba/schools/bsz/teachers/wu72/transfer",
                          "/srv/samba/schools/bsz/teachers/wu72/testfile-01.txt",
@@ -3833,8 +3837,9 @@ if ($file_transfer_move_addon==1){
                          "/srv/samba/schools/default-school/teachers",
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
-                         "/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02",
-                         "/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02/testdir-02-01",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer/gal72",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer/gal72/testdir-02",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer/gal72/testdir-02/testdir-02-01",
                          "/srv/samba/schools/default-school/share/teachers",
                          "/srv/samba/schools/default-school/share/classes",
                          "/srv/samba/schools/default-school/share/management",
@@ -3908,13 +3913,16 @@ if ($file_transfer_move_addon==1){
  
     # delete created files from B) from school to school
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/dir\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/gal72\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/transfer/gal72\"");
+#    &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/topfile-move2.txt\"");
 
     # delete created files from C) from school to school
     &run_command("rm -rf \"/srv/samba/schools/bsz/teachers/oe72/transfer/testfile-02.txt\"");
 
     # delete created files from E) from school to school
-    &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02\"");
+#    &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/testdir-02\"");
+    &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/gal72\"");
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/newdir\"");
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/newdir2\"");
 
