@@ -2966,18 +2966,16 @@ if ($file_transfer_scopy_addon==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user maiersa72-exam --to-path \"transfer\" ");
 
     # D) dir -> file (error)
-    
-    # not working: scans \examusers\subdir72\maiersa72-exam\blockfile.txt\wu72 (without success)
-    # solution ??: scannning first without addon, if its a file exit
-    # better: if $rel_path_to_user is a file, INSERT addon, otherwise append
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user maiersa72-exam --to-path \"blockfile.txt\" --to-path-addon login");
     #&run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user maiersa72-exam --to-path \"blockfile.txt\"");
 
     # E) dir -> dir (copy recursively, within school)
     # copy into transfer (results in muellegr72-exam/transfer/testdir-01)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\"");
+    #&run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\" --to-path-addon login");
     # use --no-target-directory 
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory");
+    #&run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory --to-path-addon login");
 
     # copy from one school to another
     # Test A) not neded
@@ -3036,18 +3034,19 @@ if ($file_transfer_scopy_addon==1){
                          "/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/wu72/blockfile.txt/testdir-01/testfile-01-03.txt",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam",
                          "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-01",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-01/testfile-01-01-01.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-01/testfile-01-01-02.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01-02",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01 03",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01 03/testfile-01-03-01.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01 03/testfile-01-03-02.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testdir-01 03/testfile-01 03 03.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testfile-01-01.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testfile-01-02.txt",
-                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01/testfile-01-03.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01-01",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01-01/testfile-01-01-02.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01-02",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01 03",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01 03/testfile-01-03-01.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01 03/testfile-01-03-02.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testdir-01 03/testfile-01 03 03.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testfile-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testfile-01-02.txt",
+                         "/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72/testdir-01/testfile-01-03.txt",
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam",
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/transfer",
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir",
@@ -3250,7 +3249,7 @@ if ($file_transfer_scopy_addon==1){
 
 
     # delete created files from E) within school
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/testdir-01\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72\"");
     
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01\"");
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-02\"");
