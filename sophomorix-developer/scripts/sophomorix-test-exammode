@@ -2974,8 +2974,8 @@ if ($file_transfer_scopy_addon==1){
     #&run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\"");
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user muellegr72-exam --to-path \"transfer\" --to-path-addon login");
     # use --no-target-directory 
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory");
-    #&run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory --to-path-addon login");
+    #&run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user samardze72-exam --to-path \"transfer\" --no-target-directory --to-path-addon login");
 
     # copy from one school to another
     # Test A) not neded
@@ -3055,17 +3055,18 @@ if ($file_transfer_scopy_addon==1){
                          "/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam",
                          "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01/testfile-01-01-01.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01/testfile-01-01-02.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-02",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01 03",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01 03/testfile-01-03-01.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01 03/testfile-01-03-02.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01 03/testfile-01 03 03.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-02.txt",
-                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-03.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01-01",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01-01/testfile-01-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01-01/testfile-01-01-02.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01-02",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01 03",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01 03/testfile-01-03-01.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01 03/testfile-01-03-02.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testdir-01 03/testfile-01 03 03.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testfile-01-01.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testfile-01-02.txt",
+                         "/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72/testfile-01-03.txt",
                          "/srv/samba/schools/bsz/share/projects",
                          "/srv/samba/schools/bsz/students",
                          "/srv/samba/schools/bsz/teachers",
@@ -3250,13 +3251,7 @@ if ($file_transfer_scopy_addon==1){
 
     # delete created files from E) within school
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/transfer/wu72\"");
-    
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-01\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01-02\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testdir-01 03\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-01.txt\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-02.txt\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/testfile-01-03.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/samardze72-exam/transfer/wu72\"");
 
     # delete created files from C) from school to school
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-02.txt\"");
