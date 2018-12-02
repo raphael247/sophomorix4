@@ -617,7 +617,13 @@ sub smbclient_scopy_recurse {
                 $school_AD_from_user,
                 $status_AD_from_user,
                 $firstpassword_AD_from_user,
-                $unid_AD_from_user)=
+                $unid_AD_from_user,
+                $firstname_ASCII_AD_from_user,
+                $lastname_ASCII_AD_from_user,
+                $firstname_initial_AD_from_user,
+                $lastname_initial_AD_from_user,
+                $user_token_AD_from_user,
+                $file_AD_from_user)=
                 &AD_get_user({ldap=>$ldap,
                               root_dse=>$root_dse,
                               root_dns=>$root_dns,
@@ -651,13 +657,24 @@ sub smbclient_scopy_recurse {
                 $addon_calc="/".
                              $from;
             } elsif ($to_path_addon eq "fullinfo"){
-                $addon_calc="/".
-                            $adminclass_AD_from_user."_".$from;
-            } elsif ($to_path_addon eq "fullinfo-utf8"){
+                my $last=$lastname_ASCII_AD_from_user;
+                $last=~s/\s+/_/g;
+                my $first=$firstname_ASCII_AD_from_user;
+                $first=~s/\s+/_/g;
                 $addon_calc="/".
                             $adminclass_AD_from_user."_".
-                            $lastname_utf8_AD_from_user."_".
-                            $firstname_utf8_AD_from_user."_".
+                            $last."_".
+                            $first."_".
+                            $from;
+            } elsif ($to_path_addon eq "fullinfo-utf8"){
+                my $last=$lastname_utf8_AD_from_user;
+                $last=~s/\s+/_/g;
+                my $first=$firstname_utf8_AD_from_user;
+                $first=~s/\s+/_/g;
+                $addon_calc="/".
+                            $adminclass_AD_from_user."_".
+                            $last."_".
+                            $first."_".
                             $from;
             }
 
@@ -762,7 +779,8 @@ sub smbclient_scopy_recurse {
         } # end TO loop
     } # end FROM loop
 
-    print Dumper(\%copy);  
+
+    print Dumper(\%copy); 
 
     ############################################################
     #  2) do the copy/move loops
