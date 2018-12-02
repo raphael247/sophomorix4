@@ -129,4 +129,34 @@ echo "linuxmuster-import-devices"
 time linuxmuster-import-devices 1> /tmp/LOGDIR/file-16.log 2> /tmp/ERRORDIR/file-16.err
 cat /tmp/ERRORDIR/file-16.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
 
+
+
+
+# rsync-all-student-homes
+echo "rsync-all-student-homes"
+time sophomorix-vampire --rsync-all-student-homes  --path-oldserver ../vampire_daten_bsz --datadir ../sophomorix-dump 1> /tmp/LOGDIR/file-17.log 2> /tmp/ERRORDIR/file-17.err
+cat /tmp/ERRORDIR/file-17.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+# rsync-all-teacher-homes
+echo "rsync-all-teacher-homes"
+time sophomorix-vampire --rsync-all-teacher-homes  --path-oldserver ../vampire_daten_bsz --datadir ../sophomorix-dump 1> /tmp/LOGDIR/file-18.log 2> /tmp/ERRORDIR/file-18.err
+cat /tmp/ERRORDIR/file-18.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+# rsync-all-class-shares
+echo "rsync-all-class-shares"
+time sophomorix-vampire --rsync-all-class-shares  --path-oldserver ../vampire_daten_bsz --datadir ../sophomorix-dump 1> /tmp/LOGDIR/file-19.log 2> /tmp/ERRORDIR/file-19.err
+cat /tmp/ERRORDIR/file-19.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+# rsync-all-project-shares
+echo "rsync-all-project-shares"
+time sophomorix-vampire --rsync-all-project-shares  --path-oldserver ../vampire_daten_bsz --datadir ../sophomorix-dump 1> /tmp/LOGDIR/file-20.log 2> /tmp/ERRORDIR/file-20.err
+cat /tmp/ERRORDIR/file-20.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
+
+
+# linbo
+echo "rsync-linbo"
+time sophomorix-vampire --rsync-linbo  --path-oldserver ../vampire_daten_bsz --datadir ../sophomorix-dump 1> /tmp/LOGDIR/file-21.log 2> /tmp/ERRORDIR/file-21.err
+cat /tmp/ERRORDIR/file-21.err | grep -v "Domain=" | grep -v "OS=" | grep -v "Server="
+
 date
