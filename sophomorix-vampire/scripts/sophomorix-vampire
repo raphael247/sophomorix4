@@ -103,8 +103,8 @@ my $verify_gid=0;
 
 ############################################################
 # rsync data
-# --oldserver-path
-my $oldserver_path="";
+# --path-oldserver
+my $path_oldserver="";
 
 # --rsync-all-student-homes
 my $rsync_all_student_homes=0;
@@ -150,7 +150,7 @@ my $testopt=GetOptions(
            "verify-uid-gid" => \$verify_uid_gid,
            "verify-uid" => \$verify_uid,
            "verify-gid" => \$verify_gid,
-           "oldserver-path=s" => \$oldserver_path,
+           "path-oldserver=s" => \$path_oldserver,
            "rsync-all-student-homes" => \$rsync_all_student_homes,
            "rsync-student-homes=s" => \$rsync_student_homes,
            "rsync-all-teacher-homes" => \$rsync_all_teacher_homes,
@@ -1320,7 +1320,7 @@ if ($rsync_all_student_homes==1 or $rsync_student_homes ne ""){
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $class=$entry->get_value('sophomorixAdminClass');
-        my $source_dir=$oldserver_path."/home/students/".$class."/".$sam."/";
+        my $source_dir=$path_oldserver."/home/students/".$class."/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/students/".$class."/".$sam;
 
         if ($rsync_student_homes ne ""){
@@ -1370,7 +1370,7 @@ if ($rsync_all_teacher_homes==1 or $rsync_teacher_homes ne ""){
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
         my $class=$entry->get_value('sophomorixAdminClass');
-        my $source_dir=$oldserver_path."/home/teachers/".$sam."/";
+        my $source_dir=$path_oldserver."/home/teachers/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/teachers/".$sam;
 
         if ($rsync_teacher_homes ne ""){
@@ -1418,7 +1418,7 @@ if ($rsync_all_class_shares==1 or $rsync_class_shares ne ""){
     for ( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        my $source_dir=$oldserver_path."/home/share/classes/".$sam."/";
+        my $source_dir=$path_oldserver."/home/share/classes/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/share/classes/".$sam;
 
         if ($rsync_class_shares ne ""){
@@ -1466,7 +1466,7 @@ if ($rsync_all_project_shares==1 or $rsync_project_shares ne ""){
     for ( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
         my $sam=$entry->get_value('sAMAccountName');
-        my $source_dir=$oldserver_path."/home/share/projects/".$sam."/";
+        my $source_dir=$path_oldserver."/home/share/projects/".$sam."/";
         my $target_dir="/srv/samba/mounts/schools/default-school/share/projects/".$sam;
 
         if ($rsync_project_shares ne ""){
@@ -1509,14 +1509,14 @@ sub before_rsync {
     print "RSYNC TEST\n";
 
     # source
-    if (-d "$oldserver_path/home/students/" and
-        -d "$oldserver_path/home/teachers" and
-        -d "$oldserver_path/home/share/classes" and
-        -d "$oldserver_path/home/share/projects"
+    if (-d "$path_oldserver/home/students/" and
+        -d "$path_oldserver/home/teachers" and
+        -d "$path_oldserver/home/share/classes" and
+        -d "$path_oldserver/home/share/projects"
 	){
-        print "  * OK: There is source data in: $oldserver_path\n";
+        print "  * OK: There is source data in: $path_oldserver\n";
     } else {
-        print "  * ERROR: There is no source data in: $oldserver_path\n";
+        print "  * ERROR: There is no source data in: $path_oldserver\n";
         exit;
     }
 
