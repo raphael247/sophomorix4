@@ -37,12 +37,19 @@ Prioliste:
    - auch von schule zu schule
 - maildomain parameter raus, neuer einfügen
 - neuer schulname in sophomorix.conf (Kurzzeichen, testen)
-- h_ und s_ umsetzen
+- h_ umsetzen, neue Orte 
+- s_ umsetzen
+
+
    command.log: " werden nicht mitgeloggt, ist das OK?
 
 ? schoolsetup automatisch oder per Hand(wie jetzt)?(sophomorix-postinst <school>)
 
+sophomorix-transfer:
 
+mitloggen per user ob vollständig ausgeteilt wurde
+wenn man als quelle ein dir hat und beim ziel den / vergisst -> nicht kopiert, ohne rückmeldung
+einsammeln an viele tut nicht, schleifen?
 
 export HISTSIZE=100000
 
@@ -57,10 +64,15 @@ wird dieser Eintrag gut entfernt aus dem Projekt?
 nextfree uidnumber:
 - aus /etc raus?
 - ins ldap?/nach /var?
-   - was passiert beim Datei löschen?
-      wiederverwerten von uid?
+   - was passiert beim Datei löschen? -> wird wieder erzeugt, mit der niedrigstmöglichen uidnumber ab 10000
+      wiederverwerten von uid? -> ja, wenn sie frei ist
+      (auch in den logfiles schauen???? nicht wiederverwerten)
 
       leere schuler.csv
+
+
+TODO:
+Daten moven von schule zu schule mit sophomorix-transfer statt linux mv
 
 
 sophomorix-transfer -scopy
@@ -402,6 +414,17 @@ sophomorix-device
 
 
 Migration Bugs:
+
+Beim syncen der homes folgender Fehler:
+rsync: opendir "/mnt/vampire_daten_bsz/home/students/m1kk3t/tarlunko/Einstellungen/firefox" failed: Permission denied (13)
+
+/srv/linbo: Müssen die Rechner diesselbe IP haben?
+
+Link auf linbo in sophomorix Migration?
+
+Was passiert beim ändern der IP, wird linbo umgezogen?
+
+
 
 classen.map
  - OK: man sollte sehen, ob es bei der gruppe um eine klasse oder raum handelt (oder ...)
