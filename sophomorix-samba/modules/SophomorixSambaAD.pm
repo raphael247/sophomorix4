@@ -3433,18 +3433,17 @@ sub AD_school_create {
                         attr => ['objectClass' => ['top', 'organizationalUnit']]);
     &AD_debug_logdump($result1,2,(caller(0))[3]);
     ############################################################
-    # providing group <schoolname>
+    # providing group s_<schoolname>
     ############################################################
-    my $dn_schoolname="CN=".$school.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    print "$dn_schoolname\n";
+    my $dn_schoolname="CN=".$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     &AD_group_create({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
                       dn_wish=>$dn_schoolname,
                       school=>$school,
-                      group=>$school,
-                      group_basename=>$school,
-                      description=>"The school group of school ".$school,
+                      group=>$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
+                      group_basename=>$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
+                      description=>"The school group of school ".$school, # no s_ (This is the schoolname)
                       type=>"school",
                       status=>"P",
                       joinable=>"FALSE",
@@ -3453,11 +3452,11 @@ sub AD_school_create {
                       sophomorix_config=>$ref_sophomorix_config,
                       sophomorix_result=>$ref_sophomorix_result,
                      });
-    # make group <schoolname> member in SCHOOLS
+    # make group s_<schoolname> member in SCHOOLS
     &AD_group_addmember({ldap => $ldap,
                          root_dse => $root_dse, 
                          group => $DevelConf::AD_schools_group,
-                         addgroup => $school,
+                         addgroup => $ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school, # s_ (This is the group name)
                         }); 
     ############################################################
     # sub ou's for OU=*    
@@ -3483,10 +3482,10 @@ sub AD_school_create {
     ############################################################
     # adding groups to <schoolname>-group
     foreach my $ref_membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
-    my $membergroup=$ref_membergroup; # make copy to not modify the hash 
+    my $membergroup=$ref_membergroup; # make copy to not modify the hash
     &AD_group_addmember({ldap => $ldap,
                          root_dse => $root_dse, 
-                         group => $school,
+                         group => $ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
                          addgroup => $membergroup,
                         }); 
     }

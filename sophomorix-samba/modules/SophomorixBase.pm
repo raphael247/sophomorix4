@@ -3849,7 +3849,8 @@ sub replace_vars {
     my ($string,$ref_sophomorix_config,$school)=@_;
     my $replacement=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'};
     $string=~s/\@\@SCHOOLPREFIX\@\@/$replacement/g; 
-    $string=~s/\@\@SCHOOLNAME\@\@/$school/g; 
+#    $string=~s/\@\@SCHOOLNAME\@\@/$school/g; 
+    $string=~s/\@\@SCHOOLNAME\@\@/$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}$school/g; 
     return $string;
 }
 
@@ -5359,7 +5360,8 @@ sub NTACL_set_file {
         }
         if ($school ne ""){
             my $prefix=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PREFIX'};
-            $line=~s/\@\@SCHOOLNAME\@\@/$school/;
+#            $line=~s/\@\@SCHOOLNAME\@\@/$school/;
+            $line=~s/\@\@SCHOOLNAME\@\@/$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}$school/; # s_ (This is the group name in the NTACL)
             $line=~s/\@\@SCHOOLPREFIX\@\@/$prefix/;
         }
 
