@@ -251,7 +251,7 @@ if ($test_add_admin==1){
                    mail => "bsz-admins@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-admins",
+                   memberOf => "s_bsz|all-admins",
                    member => "admin-bsz-66|global-admins",
                   });
     &file_test_chars("/etc/linuxmuster/.secret/admin-bsz-66",20);
@@ -308,7 +308,7 @@ if ($test_add_admin==1){
                    mail => "abc-admins@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "abc",
-                   memberOf => "abc|all-admins",
+                   memberOf => "s_abc|all-admins",
                    member => "admin-abc-666|global-admins",
                   });
 
@@ -404,7 +404,7 @@ if ($test_add_admin==1){
                    mail => "admins@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-admins",
+                   memberOf => "s_default-school|all-admins",
                    member => "admin-66|admin-666|global-admins",
                   });
     &file_test_chars("/etc/linuxmuster/.secret/admin-66",20);
@@ -543,7 +543,7 @@ if ($test_add_admin==1){
                    userPrincipalName => "binduser-bsz-66@".$root_dns,
                    mail => "binduser-bsz-66@".$root_dns,
 #                   sophomorixAdminClass => "bsz-AD_RO_auth",
-                   sophomorixAdminClass => "bsz",
+                   sophomorixAdminClass => "s_bsz",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "bsz",
@@ -567,7 +567,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    userAccountControl => "512",
 #                   memberOf => "bsz-AD_RO_auth",
-                   memberOf => "bsz",
+                   memberOf => "s_bsz",
                   });
     ##### Testing the users group
     # &AD_test_object({ldap=>$ldap,
@@ -585,13 +585,13 @@ if ($test_add_admin==1){
     #               });
     # group <schoolname>
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bsz,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"bsz",
+                   dn=>"CN=s_bsz,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"s_bsz",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"school",
-                   mail => "bsz@".$root_dns,
+                   mail => "s_bsz@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "bsz",
@@ -618,7 +618,7 @@ if ($test_add_admin==1){
                    userPrincipalName => "binduser-abc-666@".$root_dns,
                    mail => "binduser-abc-666@".$root_dns,
 #                   sophomorixAdminClass => "abc-AD_RO_auth",
-                   sophomorixAdminClass => "abc",
+                   sophomorixAdminClass => "s_abc",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "abc",
@@ -642,7 +642,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    userAccountControl => "512",
 #                   memberOf => "abc-AD_RO_auth",
-                   memberOf => "abc",
+                   memberOf => "s_abc",
                   });
     ##### Testing the users group
     # &AD_test_object({ldap=>$ldap,
@@ -660,13 +660,13 @@ if ($test_add_admin==1){
     #               });
     # group <schoolname>
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=abc,OU=abc,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"abc",
+                   dn=>"CN=s_abc,OU=abc,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"s_abc",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"school",
-                   mail => "abc@".$root_dns,
+                   mail => "s_abc@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "abc",
@@ -691,7 +691,7 @@ if ($test_add_admin==1){
                    userPrincipalName => "binduser-66@".$root_dns,
                    mail => "binduser-66@".$root_dns,
 #                   sophomorixAdminClass => "AD_RO_auth",
-                   sophomorixAdminClass => "default-school",
+                   sophomorixAdminClass => "s_default-school",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "default-school",
@@ -715,7 +715,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    userAccountControl => "512",
 #                   memberOf => "AD_RO_auth",
-                   memberOf => "default-school",
+                   memberOf => "s_default-school",
                   });
     &file_test_chars("/etc/linuxmuster/.secret/binduser-66",19);
 
@@ -736,7 +736,7 @@ if ($test_add_admin==1){
                    userPrincipalName => "binduser-666@".$root_dns,
                    mail => "binduser-666@".$root_dns,
 #                   sophomorixAdminClass => "AD_RO_auth",
-                   sophomorixAdminClass => "default-school",
+                   sophomorixAdminClass => "s_default-school",
                    sophomorixExitAdminClass => "unknown",
                    sophomorixFirstPassword => "---",
                    sophomorixFirstnameASCII => "default-school",
@@ -760,7 +760,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    userAccountControl => "512",
 #                   memberOf => "AD_RO_auth",
-                   memberOf => "default-school",
+                   memberOf => "s_default-school",
                   });
     # ##### Testing the users group
     # &AD_test_object({ldap=>$ldap,
@@ -778,13 +778,13 @@ if ($test_add_admin==1){
     #               });
     # group <schoolname>
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
-                   sAMAccountname=>"default-school",
+                   dn=>"CN=s_default-school,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"s_default-school",
                    gidNumber=>"-1",
                    sophomorixCreationDate => "exists",
                    sophomorixStatus=>"P",
                    sophomorixType=>"school",
-                   mail => "default-school@".$root_dns,
+                   mail => "s_default-school@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "default-school",
@@ -924,7 +924,7 @@ if ($test_add_admin==1){
                    sophomorixJoinable=>"FALSE",
                    sophomorixSchoolname => "SCHOOLS",
                    memberOf => "",
-                   member => "global-binduser-66|global-binduser-666|bsz|abc|default-school",
+                   member => "global-binduser-66|global-binduser-666|s_bsz|s_abc|s_default-school",
                   });
 
 
@@ -1002,7 +1002,7 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:LINUXMUSTER\Administrator', 
                  'GROUP:S-1-22-2-0',
-                 'ACL:LINUXMUSTER\default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                 );
     # /srv/samba/schools/default-school/management
@@ -1028,7 +1028,7 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/default-school/students
@@ -1108,7 +1108,7 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:LINUXMUSTER\Administrator', 
                  'GROUP:S-1-22-2-0',
-                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                 );
     # /srv/samba/schools/bsz/management
@@ -1134,7 +1134,7 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
                 );
    # /srv/samba/schools/bsz/students
@@ -1201,7 +1201,7 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:LINUXMUSTER\Administrator', 
                  'GROUP:S-1-22-2-0',
-                 'ACL:LINUXMUSTER\abc:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\s_abc:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|IO/FULL',
                 );
     # /srv/samba/schools/abc/management
@@ -1227,7 +1227,7 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\abc:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\s_abc:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|I/FULL', 
                 );
    # /srv/samba/schools/abc/students
