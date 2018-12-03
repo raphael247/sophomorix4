@@ -1,0 +1,124 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-ldbsearch) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 backup_auk_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_add_summary
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 filelist_fetch
+                                 remove_whitespace
+                                 json_dump
+                                 recode_utf8_to_ascii
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_get_passwd
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_group_create
+                                 AD_group_addmember
+                                 AD_group_update
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_dn_fetch_multivalue
+                                 AD_dns_get
+                                 AD_object_search
+                                     );
+
+# Variablen für Optionen
+$Conf::log_level=1;
+my $help=0;
+
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-cacls");
+my $user=$DevelConf::sophomorix_AD_admin;
+my ($pass)=&AD_get_passwd($DevelConf::sophomorix_AD_admin,$DevelConf::secret_file_sophomorix_AD_admin);
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "verbose|v+" => \$Conf::log_level,
+           "help|h" => \$help,
+          );
+
+# Prüfen, ob Optionen erkannt wurden, sonst Abbruch
+&check_options($testopt);
+
+# --help
+if ($help==1) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlsbeschreibung
+   print('
+sophomorix-ldbsearch connects via ldbsearch to samba AD
+
+sophomorix-ldbsearch (ldb-filter) [attributes]
+
+Options:
+  -h  / --help
+
+');
+   print "\n";
+   exit;
+}
+
+
+my @opts=("-H ldap://localhost",
+	  " --sign",
+	  " --encrypt",
+          " --simple-bind-dn=\"CN=Administrator,CN=Users,".$root_dse."\"",
+          " --password=`cat /etc/linuxmuster/.secret/administrator`");
+
+my $options="";
+my $arg="";
+
+print "\n";
+print "ldbsearch\n";
+
+foreach my $opt (@opts){
+    $options=$options." ".$opt;
+    print "   $opt\n";
+}
+
+foreach my $arg_item (@ARGV){
+    print "      $arg_item\n";
+    $arg=$arg." \"".$arg_item."\"";
+}
+print "\n";
+
+my $ldb_command="ldbsearch ".$options." ".$arg;
+
+
+system ($ldb_command);
