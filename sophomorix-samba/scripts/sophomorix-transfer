@@ -787,7 +787,7 @@ sub smbclient_scopy_recurse {
     ############################################################
     foreach my $from ( @{ $copy{'OPTIONS'}{'FROM_LIST'} } ){
         foreach my $to ( @{ $copy{'OPTIONS'}{'TO_LIST'} } ){
-            print "$scopy_move: $from  -----> $to\n";
+            print "$scopy_move: $from  -----> $to (start)\n";
 
             ############################################################
             # A) source nonexisting
@@ -1024,6 +1024,7 @@ sub smbclient_scopy_recurse {
                         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                     }
                 }
+                print "$scopy_move: $from  -----> $to (end)\n";
             } # end to loop
         } # end FROM loop
         &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
