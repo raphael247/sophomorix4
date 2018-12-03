@@ -779,7 +779,6 @@ sub smbclient_scopy_recurse {
         } # end TO loop
     } # end FROM loop
 
-
     print Dumper(\%copy); 
 
     ############################################################
@@ -1025,10 +1024,10 @@ sub smbclient_scopy_recurse {
                     }
                 }
                 print "$scopy_move: $from  -----> $to (end)\n";
-            } # end to loop
-        } # end FROM loop
-        &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
-    }
+            } 
+        } # end to loop
+    } # end FROM loop
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
