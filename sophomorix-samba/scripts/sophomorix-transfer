@@ -590,6 +590,14 @@ sub smbclient_scopy_recurse {
     $copy{'OPTIONS'}{'FROM_COUNT'}=$#{ $copy{'OPTIONS'}{'FROM_LIST'} }+1;
     $copy{'OPTIONS'}{'TO_COUNT'}=$#{ $copy{'OPTIONS'}{'TO_LIST'} }+1;
 
+    if ($copy{'OPTIONS'}{'FROM_COUNT'} > $copy{'OPTIONS'}{'TO_COUNT'}){
+	$copy{'OPTIONS'}{'MAX_COUNT'}=$copy{'OPTIONS'}{'FROM_COUNT'};
+    } else {
+	$copy{'OPTIONS'}{'MAX_COUNT'}=$copy{'OPTIONS'}{'TO_COUNT'};
+    }
+
+    
+    
     # 1 -> many, many -> one is supported but not many to many
     if ($copy{'OPTIONS'}{'FROM_COUNT'}>1 and $copy{'OPTIONS'}{'TO_COUNT'}>1){
         print "ERROR: Copying from $copy{'OPTIONS'}{'FROM_COUNT'} users to $copy{'OPTIONS'}{'TO_COUNT'} users not supported\n\n";
@@ -781,6 +789,8 @@ sub smbclient_scopy_recurse {
 
     print Dumper(\%copy); 
 
+
+    my $copy_count=0;
     ############################################################
     #  2) do the copy/move loops
     ############################################################
@@ -1023,8 +1033,28 @@ sub smbclient_scopy_recurse {
                         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                     }
                 }
-                print "$scopy_move: $from  -----> $to (end)\n";
-            } 
+            }
+
+            print "$scopy_move: $from  -----> $to (end)\n";
+	    $copy_count++;
+            if ($json>=1){
+                # prepare json object
+                my %json_progress=();
+                $json_progress{'JSONINFO'}="PROGRESS";
+                $json_progress{'COMMENT_EN'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'SCOPY_FILES_PREFIX_EN'}.
+                                             " $from --> $to".
+                                             $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'SCOPY_FILES_POSTFIX_EN'};
+                $json_progress{'COMMENT_DE'}=$ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'SCOPY_FILES_PREFIX_DE'}.
+                                             " $from --> $to".
+                                             $ref_sophomorix_config->{'INI'}{'LANG.PROGRESS'}{'SCOPY_FILES_POSTFIX_DE'};
+                $json_progress{'STEP'}=$copy_count;
+                $json_progress{'FINAL_STEP'}=$copy{'OPTIONS'}{'MAX_COUNT'};
+                # print JSON Object
+                &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                                  json=>$json,
+                                                                  sophomorix_config=>$ref_sophomorix_config,
+                                                                });
+            }
         } # end to loop
     } # end FROM loop
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
