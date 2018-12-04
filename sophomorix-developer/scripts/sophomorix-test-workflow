@@ -624,7 +624,7 @@ if ($add_do==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -637,7 +637,7 @@ if ($add_do==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|global-students",
                   });
 
@@ -906,7 +906,7 @@ if ($add_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => "rukri99|olinst99|skula99|bjarna99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -921,7 +921,7 @@ if ($add_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "koperni99|darwi99|global-teachers",
                   });
 }
@@ -1322,7 +1322,7 @@ if ($modify_1_do==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1335,7 +1335,7 @@ if ($modify_1_do==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|global-students",
                   });
 
@@ -1604,7 +1604,7 @@ if ($modify_1_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => "rukri99|olinst99|skula99|bjarna99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -1619,7 +1619,7 @@ if ($modify_1_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "koperni99|darwi99|global-teachers",
                   });
 }
@@ -2113,7 +2113,7 @@ if ($modify_2_do==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -2126,7 +2126,7 @@ if ($modify_2_do==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|bsz-m3kk4t|global-students",
                   });
 
@@ -2396,7 +2396,7 @@ if ($modify_2_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => "rukri99|olinst99|skula99|bjarna99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -2411,7 +2411,7 @@ if ($modify_2_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => $mendelgr."|koperni99|global-teachers",
                   });
 }
@@ -2942,7 +2942,7 @@ if ($modify_3_do==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|9b|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -2955,7 +2955,7 @@ if ($modify_3_do==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|bsz-m3kk4t|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -2968,7 +2968,7 @@ if ($modify_3_do==1){
                    mail => "uni-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-students",
+                   memberOf => "s_uni|all-students",
                    member => "uni-12b|global-students",
                   });
 
@@ -3238,7 +3238,7 @@ if ($modify_3_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => $mendelgr."|rukri99|olinst99|skula99|bjarna99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -3253,7 +3253,7 @@ if ($modify_3_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -3268,7 +3268,7 @@ if ($modify_3_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-teachers",
+                   memberOf => "s_uni|all-teachers",
                    member => "koperni99|global-teachers",
                   });
 }
@@ -3785,7 +3785,7 @@ if ($modify_4_do==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|9b|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -3798,7 +3798,7 @@ if ($modify_4_do==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|bsz-m3kk4t|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -3811,7 +3811,7 @@ if ($modify_4_do==1){
                    mail => "uni-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-students",
+                   memberOf => "s_uni|all-students",
                    member => "uni-12b|global-students",
                   });
 
@@ -4078,7 +4078,7 @@ if ($modify_4_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => "darwi99|rukri99|olinst99|skula99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4093,7 +4093,7 @@ if ($modify_4_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4108,7 +4108,7 @@ if ($modify_4_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-teachers",
+                   memberOf => "s_uni|all-teachers",
                    member => "koperni99|global-teachers",
                   });
 }
@@ -4610,7 +4610,7 @@ if ($modify_5_do==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|9b|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4623,7 +4623,7 @@ if ($modify_5_do==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|bsz-m3kk4t|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4636,7 +4636,7 @@ if ($modify_5_do==1){
                    mail => "uni-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-students",
+                   memberOf => "s_uni|all-students",
                    member => "uni-12b|global-students",
                   });
 
@@ -4903,7 +4903,7 @@ if ($modify_5_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => $wallacal."|rukri99|olinst99|skula99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4918,7 +4918,7 @@ if ($modify_5_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -4933,7 +4933,7 @@ if ($modify_5_do==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-teachers",
+                   memberOf => "s_uni|all-teachers",
                    member => $mendelgr."|global-teachers",
                   });
 
@@ -5217,7 +5217,7 @@ if ($kill_user_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers|p_full-blown",
+                   memberOf => "s_default-school|all-teachers|p_full-blown",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5232,7 +5232,7 @@ if ($kill_user_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5247,7 +5247,7 @@ if ($kill_user_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-teachers",
+                   memberOf => "s_uni|all-teachers",
                    member => "global-teachers",
                   });
 
@@ -5382,7 +5382,7 @@ if ($kill_user_test==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "7a|9b|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5395,7 +5395,7 @@ if ($kill_user_test==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "bsz-m3kk3t|bsz-m3kk4t|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5408,7 +5408,7 @@ if ($kill_user_test==1){
                    mail => "uni-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-students",
+                   memberOf => "s_uni|all-students",
                    member => "uni-12b|global-students",
                   });
 }
@@ -5484,7 +5484,7 @@ if ($kill_adminclasses_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers|p_full-blown",
+                   memberOf => "s_default-school|all-teachers|p_full-blown",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5499,7 +5499,7 @@ if ($kill_adminclasses_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5514,7 +5514,7 @@ if ($kill_adminclasses_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-teachers",
+                   memberOf => "s_uni|all-teachers",
                    member => "global-teachers",
                   });
 
@@ -5563,7 +5563,7 @@ if ($kill_projects_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-teachers",
+                   memberOf => "s_default-school|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5578,7 +5578,7 @@ if ($kill_projects_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-teachers",
+                   memberOf => "s_bsz|all-teachers",
                    member => "global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5593,7 +5593,7 @@ if ($kill_projects_test==1){
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-teachers",
+                   memberOf => "s_uni|all-teachers",
                    member => "global-teachers",
                   });
 
@@ -5609,7 +5609,7 @@ if ($kill_projects_test==1){
                    mail => "students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
-                   memberOf => "default-school|all-students",
+                   memberOf => "s_default-school|all-students",
                    member => "global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5622,7 +5622,7 @@ if ($kill_projects_test==1){
                    mail => "bsz-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "bsz",
-                   memberOf => "bsz|all-students",
+                   memberOf => "s_bsz|all-students",
                    member => "global-students",
                   });
     &AD_test_object({ldap=>$ldap,
@@ -5635,7 +5635,7 @@ if ($kill_projects_test==1){
                    mail => "uni-students@".$root_dns,
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "uni",
-                   memberOf => "uni|all-students",
+                   memberOf => "s_uni|all-students",
                    member => "global-students",
                   });
 }
