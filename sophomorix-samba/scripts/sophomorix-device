@@ -954,15 +954,13 @@ foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
 # devicegroup members to add
 foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
     # go through all dgr in files
-    foreach my $member_file (keys %{$devices_file{$dgr_type}{$dgr}}) {
+    foreach my $member_file (keys %{$devices_file{$dgr_type}{$dgr}{'member'}}) {
         # go through all members of dgr in files
         # skip if this device has no account
         # the data in $devices_file{'device'}{<device>} uses the small letter name
-        my $member_smalletters=$devices_file{$dgr_type}{$dgr}{$member_file};
-        if ($devices_file{'device'}{$member_smalletters}{'ACCOUNT'} eq "FALSE"){
+        if ($devices_file{'device'}{$member_file}{'ACCOUNT'} eq "FALSE"){
             next;
         }
-
         if (not exists $ref_AD_device->{$dgr_type}{$dgr}{'member_sAMAccountName'}{$member_file}){
 	    $addmembers_devicegroups{$member_file}=$dgr;
         }
@@ -982,7 +980,7 @@ foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
 
     foreach my $member_AD (keys %{$ref_AD_device->{$dgr_type}{$dgr}{'member_sAMAccountName'} }) {
         # go through all members of dgr in AD
-        if (not exists $devices_file{$dgr_type}{$dgr}{$member_AD}){
+        if (not exists $devices_file{$dgr_type}{$dgr}{'member'}{$member_AD}){
 	    $killmembers_devicegroups{$member_AD}=$dgr;
         }
     }
@@ -1649,7 +1647,8 @@ sub analyze_device_line {
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
         $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr_token;                 # 03
-        $devices_file{$dgr_type}{$dgr_token}{'HOSTS'}{$ws_token}=$dnsnode_name;
+        $devices_file{$dgr_type}{$dgr_token}{'COMPUTER'}{$ws_token_account}=$dnsnode_name;
+        $devices_file{$dgr_type}{$dgr_token}{'member'}{$dnsnode_name}=$ws_token_account;
         $devices_file{$dgr_type}{$dgr_token}{'SCHOOL'}=$school;
 
         $devices_file{'device'}{$dnsnode_name}{'MAC'}=$mac;                       # 04

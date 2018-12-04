@@ -4493,6 +4493,7 @@ sub AD_get_AD_for_device {
                 foreach my $dn (@{ $AD{$type}{$sam}{'member'} }){
                     my @parts=split(",",$dn);
                     my ($unused,$memsam)=split("=",$parts[0]);
+		    $memsam=~tr/A-Z/a-z/;
                     $AD{$type}{$sam}{'member_sAMAccountName'}{$memsam}="seen";
                 }
             }
