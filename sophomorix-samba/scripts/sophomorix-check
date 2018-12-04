@@ -2416,8 +2416,9 @@ sub analyze_encoding {
         # firstname
         # split firstname-field into single firstnames
         # split at 'space' and '-'
-        $firstname=&remove_whitespace($firstname);
+        $firstname=&remove_embracing_whitespace($firstname);
         my @firstnames=split(/[ ,-]/, $firstname); # split for double names
+	
         foreach my $first (@firstnames){
             if ($first=~/[^a-zA-Z\-]/) {
                 $nonstandard_name_count++; 
@@ -2473,7 +2474,7 @@ sub analyze_encoding {
         # lastname
         # split lastname-field into single lastnames
         # split at 'space' and '-'
-        $lastname=&remove_whitespace($lastname);
+        $lastname=&remove_embracing_whitespace($lastname);
         my @lastnames=split(/[ ,-]/, $lastname); # split for double names
         foreach my $last (@lastnames){
             if ($last=~/[^a-zA-Z\-]/) { 
