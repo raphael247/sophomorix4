@@ -437,8 +437,8 @@ sub _console_print_devices {
     my $head_dev ="| dnsNode          IPv4             Room          sophomorixComment               |\n";
     my $line_room="+---------------------+-------+---------------------------------------------------+\n";
     my $head_room="| Room                  Comp.   description                                       |\n";
-    my $line_hwk= "+------------------------+-------+------------------------------------------------+\n";
-    my $head_hwk= "| Hardwarclass             Comp.   description                                    |\n";
+    my $line_dgr= "+------------------------+-------+------------------------------------------------+\n";
+    my $head_dgr= "| Devicegroup              Comp.   description                                    |\n";
     foreach my $school (@school_list){
         # rooms
         my $school_rooms_count=$#{ $ref_devices->{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$school}{'rooms'} }+1;
@@ -494,17 +494,17 @@ sub _console_print_devices {
             print $line_dev;
             foreach my $dns_node ( @{ $ref_devices->{'LISTS'}{'DEVICE_BY_sophomorixSchoolname'}{$school}{$role} } ){
                 my $computer;
-                my $hwc;
+                my $dgr;
                 my $adminclass;
                 my $mac;
                 if (exists $ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node}){
                     $computer=$ref_devices->{'LOOKUP'}{'sAMAccountName_BY_sophomorixDnsNodename'}{$dns_node};
-                    $hwc="";
+                    $dgr="";
                     $adminclass=$ref_devices->{'computer'}{$computer}{'sophomorixAdminClass'};
                     $mac=$ref_devices->{'computer'}{$computer}{'sophomorixComputerMAC'};
                 } else {
                     $computer="---";
-                    $hwc="---";
+                    $dgr="---";
                     $adminclass="---";
                     $mac="---";
                 }
@@ -567,22 +567,21 @@ sub _console_print_devices {
     }
 
     # global part
-    my $hwk_global_count=$#{ $ref_devices->{'LIST_DEVICEGROUPS'} }+1;
+    my $dgr_global_count=$#{ $ref_devices->{'LIST_DEVICEGROUPS'} }+1;
     print "\n";
     print $line;
-    printf "| %-80s|\n","".$hwk_global_count." Hardwareclasses (global):";
-    print $head_hwk;
-    print $line_hwk;
-#        foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-        foreach my $hwk (@{ $ref_devices->{'LIST_DEVICEGROUPS'} }) {
+    printf "| %-80s|\n","".$dgr_global_count." Devicegroups (global):";
+    print $head_dgr;
+    print $line_dgr;
+        foreach my $dgr (@{ $ref_devices->{'LIST_DEVICEGROUPS'} }) {
             printf "| %-23s| %5s | %-46s |\n",
-                $hwk,
-                $#{ $ref_devices->{'hardwareclass'}{$hwk}{'member'} }+1,
-                $ref_devices->{'hardwareclass'}{$hwk}{'description'};
+                $dgr,
+                $#{ $ref_devices->{$ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}}{$dgr}{'member'} }+1,
+                $ref_devices->{$ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}}{$dgr}{'description'};
         }
-    print $line_hwk;
-    print $head_hwk;
-    printf "| %-80s|\n"," ... ".$hwk_global_count." Hardwareclasses (global)";
+    print $line_dgr;
+    print $head_dgr;
+    printf "| %-80s|\n"," ... ".$dgr_global_count." Devicegroups (global)";
     print $line;
 }
 

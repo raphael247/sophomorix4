@@ -1195,7 +1195,7 @@ sub AD_group_kill {
             my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
                 " group delete ". $group;
             &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
-	} elsif ($type eq "hardwareclass"){
+	} elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
             ### devicegroup #####################################
             # just delete the group
             my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
@@ -4450,7 +4450,7 @@ sub AD_get_AD_for_device {
         &Sophomorix::SophomorixBase::print_title("$max_group sophomorix rooms/devicegroupes found in AD");
         $AD{'RESULT'}{'group'}{'TOTAL'}{'COUNT'}=$max_group;
         $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=0;
-        $AD{'RESULT'}{'group'}{'hardwareclass'}{'COUNT'}=0;
+        $AD{'RESULT'}{'group'}{$ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}}{'COUNT'}=0;
         for( my $index = 0 ; $index < $max_group ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -4493,7 +4493,7 @@ sub AD_get_AD_for_device {
             # lists
             if ($type eq "room"){
                 push @{ $AD{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$schoolname}{'rooms'} }, $sam;
-            } elsif ($type eq "hardwareclass"){
+            } elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
                 push @{ $AD{'LIST_DEVICEGROUPS'} }, $sam;
             }
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
@@ -7283,7 +7283,7 @@ sub AD_group_create {
                                 ]
                             );
             &AD_debug_logdump($result,2,(caller(0))[3]);
-	} elsif ($type eq "hardwareclass"){
+	} elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
             my $result = $ldap->add( $dn,
                                 attr => [
                                     cn   => $cn,
@@ -7447,7 +7447,7 @@ sub AD_group_create {
                                sophomorix_config=>$ref_sophomorix_config,
                                sophomorix_result=>$ref_sophomorix_result,
                              });
-    } elsif ($type eq "hardwareclass"){
+    } elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
         # nothing to do so far
     }
     &Sophomorix::SophomorixBase::print_title("Creating group $group of type $type (end)");

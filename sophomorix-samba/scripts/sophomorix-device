@@ -208,6 +208,8 @@ my @filelist=&filelist_fetch({filetype=>"devices",
                               sophomorix_config=>\%sophomorix_config,
                             });
 
+my $dgr_type=$sophomorix_config{'INI'}{'TYPE'}{'DGR'};
+
 # set linuxmuster.local as a dnsZone needed in files
 $devices_file{'dnsZone'}{$root_dns}="seen";
 
@@ -930,8 +932,8 @@ foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
 
 
 # deveicegroups to kill
-foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
-    if (not exists $devices_file{'hardwareclass'}{$dgr} ){
+foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
+    if (not exists $devices_file{$dgr_type}{$dgr} ){
         # dwg is not needed anymore
         &push_kill_devicegroup($dgr);
     }
@@ -940,8 +942,8 @@ foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
 
 
 # deveicegroups to create
-foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
-    if (not exists $ref_AD_device->{'hardwareclass'}{$dgr} ){
+foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
+    if (not exists $ref_AD_device->{$dgr_type}{$dgr} ){
         # nonexisting --> add dgr
         &push_add_devicegroup($dgr);
     }
@@ -950,18 +952,18 @@ foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
 
 
 # devicegroup members to add
-foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
+foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
     # go through all dgr in files
-    foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$dgr}}) {
+    foreach my $member_file (keys %{$devices_file{$dgr_type}{$dgr}}) {
         # go through all members of dgr in files
         # skip if this device has no account
         # the data in $devices_file{'device'}{<device>} uses the small letter name
-        my $member_smalletters=$devices_file{'hardwareclass'}{$dgr}{$member_file};
+        my $member_smalletters=$devices_file{$dgr_type}{$dgr}{$member_file};
         if ($devices_file{'device'}{$member_smalletters}{'ACCOUNT'} eq "FALSE"){
             next;
         }
 
-        if (not exists $ref_AD_device->{'hardwareclass'}{$dgr}{'member_sAMAccountName'}{$member_file}){
+        if (not exists $ref_AD_device->{$dgr_type}{$dgr}{'member_sAMAccountName'}{$member_file}){
 	    $addmembers_deveicegroups{$member_file}=$dgr;
         }
     }
@@ -970,7 +972,7 @@ foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
 
 
 # devicegroup members to kill
-foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
+foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
     # go through all dgr in AD
     # if the dgr is going to be deleted, skip removing users
     if (exists $killing_deveicegroups{$dgr}){
@@ -978,9 +980,9 @@ foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
         next;
     }
 
-    foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$dgr}{'member_sAMAccountName'} }) {
+    foreach my $member_AD (keys %{$ref_AD_device->{$dgr_type}{$dgr}{'member_sAMAccountName'} }) {
         # go through all members of dgr in AD
-        if (not exists $devices_file{'hardwareclass'}{$dgr}{$member_AD}){
+        if (not exists $devices_file{$dgr_type}{$dgr}{$member_AD}){
 	    $killmembers_deveicegroups{$member_AD}=$dgr;
         }
     }
@@ -1492,7 +1494,7 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                         root_dse=>$root_dse,
                         root_dns=>$root_dns,
                         group=>$dgr,
-                        type=>"hardwareclass",
+                        type=>$dgr_type,
                         group_count=>$kill_dgr_count,
                         sophomorix_config=>\%sophomorix_config,
                   });
@@ -1522,9 +1524,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                           group=>$dgr,
                           group_basename=>$dgr,
                           description=>$dgr,
-                          type=>"hardwareclass",
+                          type=>$dgr_type,
                           status=>"P",
-                          sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
+                          sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_devicegroup_ou'},
                           smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>\%sophomorix_config,
                           sophomorix_result=>\%sophomorix_result,
@@ -1645,7 +1647,7 @@ sub analyze_device_line {
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
         $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr;                       # 03
-        $devices_file{'hardwareclass'}{$dgr}{$ws_token}=$dnsnode_name;
+        $devices_file{$dgr_type}{$dgr}{$ws_token}=$dnsnode_name;
 
         $devices_file{'device'}{$dnsnode_name}{'MAC'}=$mac;                       # 04
         $devices_file{'device'}{$dnsnode_name}{'IPv4'}=$ip;                       # 05
