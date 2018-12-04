@@ -4494,7 +4494,7 @@ sub AD_get_AD_for_device {
             if ($type eq "room"){
                 push @{ $AD{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$schoolname}{'rooms'} }, $sam;
             } elsif ($type eq "hardwareclass"){
-                push @{ $AD{'LIST_HARDWARECLASSES'} }, $sam;
+                push @{ $AD{'LIST_DEVICEGROUPS'} }, $sam;
             }
             #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
             #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
@@ -4636,9 +4636,9 @@ sub AD_get_AD_for_device {
         }
     }
 
-    # sort LIST_HARDWARECLASSES
-    if($#{ $AD{'LIST_HARDWARECLASSES'}        }>0){
-        @{ $AD{'LIST_HARDWARECLASSES'} } = sort @{ $AD{'LIST_HARDWARECLASSES'} };
+    # sort LIST_DEVICEGROUPS
+    if($#{ $AD{'LIST_DEVICEGROUPS'}        }>0){
+        @{ $AD{'LIST_DEVICEGROUPS'} } = sort @{ $AD{'LIST_DEVICEGROUPS'} };
     }
     # sort some lists under 'room'
     foreach my $room (keys %{$AD{'room'}}) {

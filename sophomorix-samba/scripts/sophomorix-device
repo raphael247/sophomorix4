@@ -145,15 +145,15 @@ my @adding_dnsnodes=();
 my @killing_dnsnodes=();
 my @updating_dnsnodes=();
 
-# hardwareclasses
-my @adding_hardwareclasses=();
-my %adding_hardwareclasses=();
+# deveicegroups
+my @adding_deveicegroups=();
+my %adding_deveicegroups=();
 
-my @killing_hardwareclasses=();
-my %killing_hardwareclasses=();
+my @killing_deveicegroups=();
+my %killing_deveicegroups=();
 
-my %addmembers_hardwareclasses=();
-my %killmembers_hardwareclasses=();
+my %addmembers_deveicegroups=();
+my %killmembers_deveicegroups=();
 
 my %update_computer=(); # device -> count
 my %update_room=();
@@ -929,59 +929,59 @@ foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
 
 
 
-# hardwareclasses to kill
-foreach my $hwk (keys %{$ref_AD_device->{'hardwareclass'}}) {
-    if (not exists $devices_file{'hardwareclass'}{$hwk} ){
+# deveicegroups to kill
+foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
+    if (not exists $devices_file{'hardwareclass'}{$dgr} ){
         # hwk is not needed anymore
-        &push_kill_hardwareclass($hwk);
+        &push_kill_devicegroup($dgr);
     }
 }
 
 
 
-# hardwareclasses to create
-foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
-    if (not exists $ref_AD_device->{'hardwareclass'}{$hwk} ){
+# deveicegroups to create
+foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
+    if (not exists $ref_AD_device->{'hardwareclass'}{$dgr} ){
         # nonexisting --> add hwk
-        &push_add_hardwareclass($hwk);
+        &push_add_devicegroup($dgr);
     }
 }
 
 
 
-# hardwareclass members to add
-foreach my $hwk (keys %{$devices_file{'hardwareclass'}}) {
+# devicegroup members to add
+foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
     # go through all hwk in files
-    foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$hwk}}) {
+    foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$dgr}}) {
         # go through all members of hwk in files
         # skip if this device has no account
         # the data in $devices_file{'device'}{<device>} uses the small letter name
-        my $member_smalletters=$devices_file{'hardwareclass'}{$hwk}{$member_file};
+        my $member_smalletters=$devices_file{'hardwareclass'}{$dgr}{$member_file};
         if ($devices_file{'device'}{$member_smalletters}{'ACCOUNT'} eq "FALSE"){
             next;
         }
 
-        if (not exists $ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'}{$member_file}){
-	    $addmembers_hardwareclasses{$member_file}=$hwk;
+        if (not exists $ref_AD_device->{'hardwareclass'}{$dgr}{'member_sAMAccountName'}{$member_file}){
+	    $addmembers_deveicegroups{$member_file}=$dgr;
         }
     }
 }
 
 
 
-# hardwareclass members to kill
-foreach my $hwk (keys %{$ref_AD_device->{'hardwareclass'}}) {
+# devicegroup members to kill
+foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
     # go through all hwk in AD
     # if the hwk is going to be deleted, skip removing users
-    if (exists $killing_hardwareclasses{$hwk}){
-        print "$hwk is going to be killed anyway, skip testing for members to be killed\n";
+    if (exists $killing_deveicegroups{$dgr}){
+        print "$dgr is going to be killed anyway, skip testing for members to be killed\n";
         next;
     }
 
-    foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$hwk}{'member_sAMAccountName'} }) {
+    foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$dgr}{'member_sAMAccountName'} }) {
         # go through all members of hwk in AD
-        if (not exists $devices_file{'hardwareclass'}{$hwk}{$member_AD}){
-	    $killmembers_hardwareclasses{$member_AD}=$hwk;
+        if (not exists $devices_file{'hardwareclass'}{$dgr}{$member_AD}){
+	    $killmembers_deveicegroups{$member_AD}=$dgr;
         }
     }
 }
@@ -1101,44 +1101,44 @@ if($no_sync==1){
         print "UPDATE: $dns_node ($update_dnsnode{$dns_node}{'COUNT'} attributes)\n";
     }
 
-    # hardwareclasses
+    # deveicegroups
     print "\n";
-    $count=$#killing_hardwareclasses+1;
-    &print_title("Hardwareclasses that must be killed ($count):");
-    foreach my $hwk (@killing_hardwareclasses){
-        print "KILL: $hwk\n";
+    $count=$#killing_deveicegroups+1;
+    &print_title("Deveicegroups that must be killed ($count):");
+    foreach my $dgr (@killing_deveicegroups){
+        print "KILL: $dgr\n";
     }
     print "\n";
-    $count=$#adding_hardwareclasses+1;
-    &print_title("Hardwareclasses that must be added: ($count)");
-    foreach my $hwk (@adding_hardwareclasses){
-        print "ADD: $hwk\n";
+    $count=$#adding_deveicegroups+1;
+    &print_title("Deveicegroups that must be added: ($count)");
+    foreach my $dgr (@adding_deveicegroups){
+        print "ADD: $dgr\n";
     }
     print "\n";
     {
         my @computers=();
-        foreach my $member (keys %addmembers_hardwareclasses){
+        foreach my $member (keys %addmembers_deveicegroups){
             push @computers, $member
         }
 	@computers=sort @computers;
         $count=$#computers+1;
 
-        &print_title("Hardwareclass memberships to add ($count):");
+        &print_title("Devicegroup memberships to add ($count):");
         foreach my $member (@computers){
-            print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
+            print "ADD: $member to $addmembers_deveicegroups{$member}\n";
         }
     }
     print "\n";
     {
         my @computers=();
-        foreach my $member (keys %killmembers_hardwareclasses){
+        foreach my $member (keys %killmembers_deveicegroups){
             push @computers, $member
         }
 	@computers=sort @computers;
         $count=$#computers+1;
-        &print_title("Hardwareclass memberships to kill ($count):");
+        &print_title("Devicegroup memberships to kill ($count):");
         foreach my $member (@computers){
-            print "KILL: $member from $killmembers_hardwareclasses{$member}\n";
+            print "KILL: $member from $killmembers_deveicegroups{$member}\n";
         }
     }
 
@@ -1481,17 +1481,17 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Kill hardwareclasses
+    # Kill deveicegroups
     print "\n";
-    my $max_hwk_count_kill=$#killing_hardwareclasses+1;
-    &print_title("Killing $max_hwk_count_kill hardwareclasses:");
+    my $max_hwk_count_kill=$#killing_deveicegroups+1;
+    &print_title("Killing $max_hwk_count_kill deveicegroups:");
     my $kill_hwk_count=1;
-    foreach my $hwk (@killing_hardwareclasses){
-        print "   * Killing Hardwareclass $hwk ...\n";
+    foreach my $dgr (@killing_deveicegroups){
+        print "   * Killing devicegroup $dgr ...\n";
         &AD_group_kill({ldap=>$ldap,
                         root_dse=>$root_dse,
                         root_dns=>$root_dns,
-                        group=>$hwk,
+                        group=>$dgr,
                         type=>"hardwareclass",
                         group_count=>$kill_hwk_count,
                         sophomorix_config=>\%sophomorix_config,
@@ -1499,13 +1499,13 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Add hardwareclasses
+    # Add deveicegroups
     print "\n";
-    my $max_hwk_count_add=$#adding_hardwareclasses+1;
-    &print_title("Adding $max_hwk_count_add hardwareclasses:");
-    my $hwk_count=0;
-    foreach my $hwk (@adding_hardwareclasses){
-        $hwk_count++;
+    my $max_hwk_count_add=$#adding_deveicegroups+1;
+    &print_title("Adding $max_hwk_count_add deveicegroups:");
+    my $dgr_count=0;
+    foreach my $dgr (@adding_deveicegroups){
+        $dgr_count++;
         # create school
         &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
@@ -1519,9 +1519,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
                           school=>$school,
-                          group=>$hwk,
-                          group_basename=>$hwk,
-                          description=>$hwk,
+                          group=>$dgr,
+                          group_basename=>$dgr,
+                          description=>$dgr,
                           type=>"hardwareclass",
                           status=>"P",
                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_hardwareclass_ou'},
@@ -1532,31 +1532,31 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Add hardwareclass memberships
+    # Add devicegroup memberships
     print "\n";
-    &print_title("Hardwareclass members to be added:");
-    my $hwk_count_addmember=0;
-    foreach my $member (keys %addmembers_hardwareclasses){
-        $hwk_count_addmember++;
-        print "ADD: $member to $addmembers_hardwareclasses{$member}\n";
+    &print_title("Devicegroup members to be added:");
+    my $dgr_count_addmember=0;
+    foreach my $member (keys %addmembers_deveicegroups){
+        $dgr_count_addmember++;
+        print "ADD: $member to $addmembers_deveicegroups{$member}\n";
         &AD_group_addmember({ldap => $ldap, 
                              root_dse => $root_dse, 
-                             group => $addmembers_hardwareclasses{$member},
+                             group => $addmembers_deveicegroups{$member},
                              addmember => $member,
                            });   
     }
 
     ############################################################
-    # Kill hardwareclass memberships
+    # Kill devicegroup memberships
     print "\n";
-    &print_title("Hardwareclass members to be killed:");
-    my $hwk_count_killmember=0;
-    foreach my $member (keys %killmembers_hardwareclasses){
-        $hwk_count_killmember++;
-        print "KILL: $member from $killmembers_hardwareclasses{$member}\n";
+    &print_title("Devicegroup members to be killed:");
+    my $dgr_count_killmember=0;
+    foreach my $member (keys %killmembers_deveicegroups){
+        $dgr_count_killmember++;
+        print "KILL: $member from $killmembers_deveicegroups{$member}\n";
         &AD_group_removemember({ldap => $ldap, 
                                 root_dse => $root_dse, 
-                                group => $killmembers_hardwareclasses{$member},
+                                group => $killmembers_deveicegroups{$member},
                                 removemember => $member,
                               });   
     }
@@ -1581,7 +1581,7 @@ sub analyze_device_line {
         chomp($line);
         my ($room,
             $host,
-            $hwk,
+            $dgr,
             $mac,
             $ip,
             $ms_office_key,
@@ -1597,7 +1597,7 @@ sub analyze_device_line {
 
         $room=&check_room($room,$line,$filename,$device_file,$device_line_count);
         $host=&check_host($host,$line,$filename,$device_file,$device_line_count);
-        $hwk=&check_hwk($hwk,$line,$filename,$device_file,$device_line_count);
+        $dgr=&check_hwk($dgr,$line,$filename,$device_file,$device_line_count);
         $mac=&check_mac($mac,$line,$filename,$device_file,$device_line_count);
         $ip=&check_ip($ip,$line);
         $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line,$filename,$device_file,$device_line_count);
@@ -1644,8 +1644,8 @@ sub analyze_device_line {
         # save data into hash for reuse
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
-        $devices_file{'device'}{$dnsnode_name}{'HWK'}=$hwk;                       # 03
-        $devices_file{'hardwareclass'}{$hwk}{$ws_token}=$dnsnode_name;
+        $devices_file{'device'}{$dnsnode_name}{'HWK'}=$dgr;                       # 03
+        $devices_file{'hardwareclass'}{$dgr}{$ws_token}=$dnsnode_name;
 
         $devices_file{'device'}{$dnsnode_name}{'MAC'}=$mac;                       # 04
         $devices_file{'device'}{$dnsnode_name}{'IPv4'}=$ip;                       # 05
@@ -1764,20 +1764,20 @@ sub check_host {
 
 
 sub check_hwk {
-    my ($hwk,$line,$filename,$device_file,$device_line_count) = @_;
+    my ($dgr,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
-        print "   HWK:     $hwk\n";
+        print "   HWK:     $dgr\n";
     }
     # allow A-Za-z0-9   
-    if ( $hwk=~/[^A-Za-z0-9\-_]/ ) {
+    if ( $dgr=~/[^A-Za-z0-9\-_]/ ) {
         print "\n";
         print "LINE: $line\n";
-        print "ERROR: $hwk contains invalid characters in $filename\n\n";
+        print "ERROR: $dgr contains invalid characters in $filename\n\n";
         exit 88;
     } else {
 
     }
-    return $hwk;
+    return $dgr;
 }
 
 
@@ -2064,17 +2064,17 @@ sub push_kill_dnszone {
 }
 
 
-sub push_add_hardwareclass {
+sub push_add_devicegroup {
     my ($add) = @_;
-    push @adding_hardwareclasses, $add;
-    $adding_hardwareclasses{$add}="add";
+    push @adding_deveicegroups, $add;
+    $adding_deveicegroups{$add}="add";
 }
 
 
-sub push_kill_hardwareclass {
+sub push_kill_devicegroup {
     my ($kill) = @_;
-    push @killing_hardwareclasses, $kill;
-    $killing_hardwareclasses{$kill}="kill";
+    push @killing_deveicegroups, $kill;
+    $killing_deveicegroups{$kill}="kill";
 }
 
 

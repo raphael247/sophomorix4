@@ -567,14 +567,14 @@ sub _console_print_devices {
     }
 
     # global part
-    my $hwk_global_count=$#{ $ref_devices->{'LIST_HARDWARECLASSES'} }+1;
+    my $hwk_global_count=$#{ $ref_devices->{'LIST_DEVICEGROUPS'} }+1;
     print "\n";
     print $line;
     printf "| %-80s|\n","".$hwk_global_count." Hardwareclasses (global):";
     print $head_hwk;
     print $line_hwk;
 #        foreach my $hwk (keys %{ $ref_devices->{'hardwareclass'} }) {
-        foreach my $hwk (@{ $ref_devices->{'LIST_HARDWARECLASSES'} }) {
+        foreach my $hwk (@{ $ref_devices->{'LIST_DEVICEGROUPS'} }) {
             printf "| %-23s| %5s | %-46s |\n",
                 $hwk,
                 $#{ $ref_devices->{'hardwareclass'}{$hwk}{'member'} }+1,
