@@ -40,25 +40,35 @@ Prioliste:
    
 - s_ umsetzen:
 
-   vorher alle Gruppen mit sophomorixType=school anzeigen lassen:
-
-      sophomorix-ldbsearch "(sophomorixType=school)" cn sAMAccountName dn sophomorixType
-
-   Für jede Schule gibt eine.
-
-   Mit neuem Paket: bzw. in sophomorix.ini umstellen: SCHOOLGROUP_PREFIX=s_
-
-   sophomorix-school --recreate-all-schools
-
---> neue gruppen müssten da sein: s_bsz
-
-
-   
-   
    Gruppe default-school -> s_default-school
                      bsz -> s_bsz
                      ...    
-   Update installierter Systeme:
+   1) vorher alle Gruppen mit sophomorixType=school anzeigen lassen:
+
+      sophomorix-ldbsearch "(sophomorixType=school)" cn sAMAccountName dn sophomorixType
+
+      (Für jede Schule gibt eine solche Gruppe).
+
+   2) Neues Paket 3.63.x einspielen : (SCHOOLGROUP_PREFIX=s_)
+
+   
+   3) sophomorix-school --recreate-all-schools
+
+      Testen:
+   
+      --> neue gruppen müssten ZUSÄTZLICH da sein: s_bsz
+
+      --> neue ACL:
+          sophomorix-cacls /srv/samba/schools/default-school/
+          enthält die Zeile (s_<school>):  ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ
+
+   4) alte Gruppen löschen
+
+      samba-tool group delete bsz (und alle weiteren)
+
+   5) fertig
+   
+   Zusatzinfo:
    school.ntacl.template enthält als einziges @@SCHOOLNAME@@
    --> diese ACL checken, bei schulgruppeGruppennamenänderung ändern
    sophomorix-cacls /srv/samba/schools/default-school/
@@ -68,6 +78,16 @@ Prioliste:
    ACL:S-1-5-21-1024969777-3138973310-22357969-1104:ALLOWED/0x0/READ
    --> user nicht mehr gefunden
 
+
+
+
+
+
+
+
+
+
+   
    command.log: " werden nicht mitgeloggt, ist das OK?
 
 ? schoolsetup automatisch oder per Hand(wie jetzt)?(sophomorix-postinst <school>)
