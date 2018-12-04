@@ -1196,7 +1196,7 @@ sub AD_group_kill {
                 " group delete ". $group;
             &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 	} elsif ($type eq "hardwareclass"){
-            ### hardwareclass #####################################
+            ### devicegroup #####################################
             # just delete the group
             my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
                 " group delete ". $group;
@@ -4419,11 +4419,11 @@ sub AD_get_AD_for_device {
         }
     }  # BLOCK computer end
     ############################################################
-    # sophomorix rooms/hardwareclasses from ldap
+    # sophomorix rooms/devicegroupes from ldap
     { # BLOCK group start
         my $filter="(& (objectClass=group) (| ".
                    "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'ROOM'}.") ".
-                   "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}.") ";
+                   "(sophomorixType=".$ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}.") ";
         # add defined host group types from sophomorix.ini
         foreach my $type (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'} }) {
             $filter=$filter."(sophomorixType=".$type.") ";
@@ -4447,7 +4447,7 @@ sub AD_get_AD_for_device {
                                  'sophomorixRoomDefaults',
                                 ]);
         my $max_group = $mesg->count; 
-        &Sophomorix::SophomorixBase::print_title("$max_group sophomorix rooms/hardwareclasses found in AD");
+        &Sophomorix::SophomorixBase::print_title("$max_group sophomorix rooms/devicegroupes found in AD");
         $AD{'RESULT'}{'group'}{'TOTAL'}{'COUNT'}=$max_group;
         $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=0;
         $AD{'RESULT'}{'group'}{'hardwareclass'}{'COUNT'}=0;
@@ -4480,8 +4480,8 @@ sub AD_get_AD_for_device {
                 $AD{'host_group'}{$sam}=$type;
             }
 
-            # hardwareclass memberships
-            if ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'HWK'}){
+            # devicegroup memberships
+            if ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
                 @{ $AD{$type}{$sam}{'member'} }=$entry->get_value('member');
                 foreach my $dn (@{ $AD{$type}{$sam}{'member'} }){
                     my @parts=split(",",$dn);

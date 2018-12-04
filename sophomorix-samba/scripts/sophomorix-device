@@ -932,7 +932,7 @@ foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
 # deveicegroups to kill
 foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
     if (not exists $devices_file{'hardwareclass'}{$dgr} ){
-        # hwk is not needed anymore
+        # dwg is not needed anymore
         &push_kill_devicegroup($dgr);
     }
 }
@@ -942,7 +942,7 @@ foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
 # deveicegroups to create
 foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
     if (not exists $ref_AD_device->{'hardwareclass'}{$dgr} ){
-        # nonexisting --> add hwk
+        # nonexisting --> add dgr
         &push_add_devicegroup($dgr);
     }
 }
@@ -951,9 +951,9 @@ foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
 
 # devicegroup members to add
 foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
-    # go through all hwk in files
+    # go through all dgr in files
     foreach my $member_file (keys %{$devices_file{'hardwareclass'}{$dgr}}) {
-        # go through all members of hwk in files
+        # go through all members of dgr in files
         # skip if this device has no account
         # the data in $devices_file{'device'}{<device>} uses the small letter name
         my $member_smalletters=$devices_file{'hardwareclass'}{$dgr}{$member_file};
@@ -971,15 +971,15 @@ foreach my $dgr (keys %{$devices_file{'hardwareclass'}}) {
 
 # devicegroup members to kill
 foreach my $dgr (keys %{$ref_AD_device->{'hardwareclass'}}) {
-    # go through all hwk in AD
-    # if the hwk is going to be deleted, skip removing users
+    # go through all dgr in AD
+    # if the dgr is going to be deleted, skip removing users
     if (exists $killing_deveicegroups{$dgr}){
         print "$dgr is going to be killed anyway, skip testing for members to be killed\n";
         next;
     }
 
     foreach my $member_AD (keys %{$ref_AD_device->{'hardwareclass'}{$dgr}{'member_sAMAccountName'} }) {
-        # go through all members of hwk in AD
+        # go through all members of dgr in AD
         if (not exists $devices_file{'hardwareclass'}{$dgr}{$member_AD}){
 	    $killmembers_deveicegroups{$member_AD}=$dgr;
         }
@@ -1483,9 +1483,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Kill deveicegroups
     print "\n";
-    my $max_hwk_count_kill=$#killing_deveicegroups+1;
-    &print_title("Killing $max_hwk_count_kill deveicegroups:");
-    my $kill_hwk_count=1;
+    my $max_dgr_count_kill=$#killing_deveicegroups+1;
+    &print_title("Killing $max_dgr_count_kill deveicegroups:");
+    my $kill_dgr_count=1;
     foreach my $dgr (@killing_deveicegroups){
         print "   * Killing devicegroup $dgr ...\n";
         &AD_group_kill({ldap=>$ldap,
@@ -1493,7 +1493,7 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                         root_dns=>$root_dns,
                         group=>$dgr,
                         type=>"hardwareclass",
-                        group_count=>$kill_hwk_count,
+                        group_count=>$kill_dgr_count,
                         sophomorix_config=>\%sophomorix_config,
                   });
     }
@@ -1501,8 +1501,8 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     ############################################################
     # Add deveicegroups
     print "\n";
-    my $max_hwk_count_add=$#adding_deveicegroups+1;
-    &print_title("Adding $max_hwk_count_add deveicegroups:");
+    my $max_dgr_count_add=$#adding_deveicegroups+1;
+    &print_title("Adding $max_dgr_count_add deveicegroups:");
     my $dgr_count=0;
     foreach my $dgr (@adding_deveicegroups){
         $dgr_count++;
@@ -1597,7 +1597,7 @@ sub analyze_device_line {
 
         $room=&check_room($room,$line,$filename,$device_file,$device_line_count);
         $host=&check_host($host,$line,$filename,$device_file,$device_line_count);
-        $dgr=&check_hwk($dgr,$line,$filename,$device_file,$device_line_count);
+        $dgr=&check_dgr($dgr,$line,$filename,$device_file,$device_line_count);
         $mac=&check_mac($mac,$line,$filename,$device_file,$device_line_count);
         $ip=&check_ip($ip,$line);
         $ms_office_key=&check_ms_software_key($ms_office_key,"MS-OFFICE-KEY",$host,$line,$filename,$device_file,$device_line_count);
@@ -1644,7 +1644,7 @@ sub analyze_device_line {
         # save data into hash for reuse
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
-        $devices_file{'device'}{$dnsnode_name}{'HWK'}=$dgr;                       # 03
+        $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr;                       # 03
         $devices_file{'hardwareclass'}{$dgr}{$ws_token}=$dnsnode_name;
 
         $devices_file{'device'}{$dnsnode_name}{'MAC'}=$mac;                       # 04
@@ -1763,10 +1763,10 @@ sub check_host {
 
 
 
-sub check_hwk {
+sub check_dgr {
     my ($dgr,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
-        print "   HWK:     $dgr\n";
+        print "   DGR:     $dgr\n";
     }
     # allow A-Za-z0-9   
     if ( $dgr=~/[^A-Za-z0-9\-_]/ ) {
