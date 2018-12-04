@@ -145,15 +145,15 @@ my @adding_dnsnodes=();
 my @killing_dnsnodes=();
 my @updating_dnsnodes=();
 
-# deveicegroups
-my @adding_deveicegroups=();
-my %adding_deveicegroups=();
+# devicegroups
+my @adding_devicegroups=();
+my %adding_devicegroups=();
 
-my @killing_deveicegroups=();
-my %killing_deveicegroups=();
+my @killing_devicegroups=();
+my %killing_devicegroups=();
 
-my %addmembers_deveicegroups=();
-my %killmembers_deveicegroups=();
+my %addmembers_devicegroups=();
+my %killmembers_devicegroups=();
 
 my %update_computer=(); # device -> count
 my %update_room=();
@@ -931,7 +931,7 @@ foreach my $dns_zone (keys %{$devices_file{'dnsZone'}}) {
 
 
 
-# deveicegroups to kill
+# devicegroups to kill
 foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
     if (not exists $devices_file{$dgr_type}{$dgr} ){
         # dwg is not needed anymore
@@ -941,7 +941,7 @@ foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
 
 
 
-# deveicegroups to create
+# devicegroups to create
 foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
     if (not exists $ref_AD_device->{$dgr_type}{$dgr} ){
         # nonexisting --> add dgr
@@ -964,7 +964,7 @@ foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
         }
 
         if (not exists $ref_AD_device->{$dgr_type}{$dgr}{'member_sAMAccountName'}{$member_file}){
-	    $addmembers_deveicegroups{$member_file}=$dgr;
+	    $addmembers_devicegroups{$member_file}=$dgr;
         }
     }
 }
@@ -975,7 +975,7 @@ foreach my $dgr (keys %{$devices_file{$dgr_type}}) {
 foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
     # go through all dgr in AD
     # if the dgr is going to be deleted, skip removing users
-    if (exists $killing_deveicegroups{$dgr}){
+    if (exists $killing_devicegroups{$dgr}){
         print "$dgr is going to be killed anyway, skip testing for members to be killed\n";
         next;
     }
@@ -983,7 +983,7 @@ foreach my $dgr (keys %{$ref_AD_device->{$dgr_type}}) {
     foreach my $member_AD (keys %{$ref_AD_device->{$dgr_type}{$dgr}{'member_sAMAccountName'} }) {
         # go through all members of dgr in AD
         if (not exists $devices_file{$dgr_type}{$dgr}{$member_AD}){
-	    $killmembers_deveicegroups{$member_AD}=$dgr;
+	    $killmembers_devicegroups{$member_AD}=$dgr;
         }
     }
 }
@@ -1103,23 +1103,23 @@ if($no_sync==1){
         print "UPDATE: $dns_node ($update_dnsnode{$dns_node}{'COUNT'} attributes)\n";
     }
 
-    # deveicegroups
+    # devicegroups
     print "\n";
-    $count=$#killing_deveicegroups+1;
-    &print_title("Deveicegroups that must be killed ($count):");
-    foreach my $dgr (@killing_deveicegroups){
+    $count=$#killing_devicegroups+1;
+    &print_title("Devicegroups that must be killed ($count):");
+    foreach my $dgr (@killing_devicegroups){
         print "KILL: $dgr\n";
     }
     print "\n";
-    $count=$#adding_deveicegroups+1;
-    &print_title("Deveicegroups that must be added: ($count)");
-    foreach my $dgr (@adding_deveicegroups){
+    $count=$#adding_devicegroups+1;
+    &print_title("Devicegroups that must be added: ($count)");
+    foreach my $dgr (@adding_devicegroups){
         print "ADD: $dgr\n";
     }
     print "\n";
     {
         my @computers=();
-        foreach my $member (keys %addmembers_deveicegroups){
+        foreach my $member (keys %addmembers_devicegroups){
             push @computers, $member
         }
 	@computers=sort @computers;
@@ -1127,20 +1127,20 @@ if($no_sync==1){
 
         &print_title("Devicegroup memberships to add ($count):");
         foreach my $member (@computers){
-            print "ADD: $member to $addmembers_deveicegroups{$member}\n";
+            print "ADD: $member to $addmembers_devicegroups{$member}\n";
         }
     }
     print "\n";
     {
         my @computers=();
-        foreach my $member (keys %killmembers_deveicegroups){
+        foreach my $member (keys %killmembers_devicegroups){
             push @computers, $member
         }
 	@computers=sort @computers;
         $count=$#computers+1;
         &print_title("Devicegroup memberships to kill ($count):");
         foreach my $member (@computers){
-            print "KILL: $member from $killmembers_deveicegroups{$member}\n";
+            print "KILL: $member from $killmembers_devicegroups{$member}\n";
         }
     }
 
@@ -1483,12 +1483,12 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Kill deveicegroups
+    # Kill devicegroups
     print "\n";
-    my $max_dgr_count_kill=$#killing_deveicegroups+1;
-    &print_title("Killing $max_dgr_count_kill deveicegroups:");
+    my $max_dgr_count_kill=$#killing_devicegroups+1;
+    &print_title("Killing $max_dgr_count_kill devicegroups:");
     my $kill_dgr_count=1;
-    foreach my $dgr (@killing_deveicegroups){
+    foreach my $dgr (@killing_devicegroups){
         print "   * Killing devicegroup $dgr ...\n";
         &AD_group_kill({ldap=>$ldap,
                         root_dse=>$root_dse,
@@ -1501,12 +1501,12 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
     ############################################################
-    # Add deveicegroups
+    # Add devicegroups
     print "\n";
-    my $max_dgr_count_add=$#adding_deveicegroups+1;
-    &print_title("Adding $max_dgr_count_add deveicegroups:");
+    my $max_dgr_count_add=$#adding_devicegroups+1;
+    &print_title("Adding $max_dgr_count_add devicegroups:");
     my $dgr_count=0;
-    foreach my $dgr (@adding_deveicegroups){
+    foreach my $dgr (@adding_devicegroups){
         $dgr_count++;
         # create school
         &AD_school_create({ldap=>$ldap,
@@ -1538,12 +1538,12 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     print "\n";
     &print_title("Devicegroup members to be added:");
     my $dgr_count_addmember=0;
-    foreach my $member (keys %addmembers_deveicegroups){
+    foreach my $member (keys %addmembers_devicegroups){
         $dgr_count_addmember++;
-        print "ADD: $member to $addmembers_deveicegroups{$member}\n";
+        print "ADD: $member to $addmembers_devicegroups{$member}\n";
         &AD_group_addmember({ldap => $ldap, 
                              root_dse => $root_dse, 
-                             group => $addmembers_deveicegroups{$member},
+                             group => $addmembers_devicegroups{$member},
                              addmember => $member,
                            });   
     }
@@ -1553,12 +1553,12 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     print "\n";
     &print_title("Devicegroup members to be killed:");
     my $dgr_count_killmember=0;
-    foreach my $member (keys %killmembers_deveicegroups){
+    foreach my $member (keys %killmembers_devicegroups){
         $dgr_count_killmember++;
-        print "KILL: $member from $killmembers_deveicegroups{$member}\n";
+        print "KILL: $member from $killmembers_devicegroups{$member}\n";
         &AD_group_removemember({ldap => $ldap, 
                                 root_dse => $root_dse, 
-                                group => $killmembers_deveicegroups{$member},
+                                group => $killmembers_devicegroups{$member},
                                 removemember => $member,
                               });   
     }
@@ -2068,15 +2068,15 @@ sub push_kill_dnszone {
 
 sub push_add_devicegroup {
     my ($add) = @_;
-    push @adding_deveicegroups, $add;
-    $adding_deveicegroups{$add}="add";
+    push @adding_devicegroups, $add;
+    $adding_devicegroups{$add}="add";
 }
 
 
 sub push_kill_devicegroup {
     my ($kill) = @_;
-    push @killing_deveicegroups, $kill;
-    $killing_deveicegroups{$kill}="kill";
+    push @killing_devicegroups, $kill;
+    $killing_devicegroups{$kill}="kill";
 }
 
 
