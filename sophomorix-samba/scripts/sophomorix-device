@@ -1507,11 +1507,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Adding $max_dgr_count_add devicegroups:");
     my $dgr_count=0;
     foreach my $dgr (@adding_devicegroups){
-	my $dgr_tokened=&AD_get_name_tokened(
-            $dgr,
-            $school,
-            $sophomorix_config{'INI'}{'TYPE'}{'DGR'});
         $dgr_count++;
+	my $school=$devices_file{'devicegroup'}{$dgr}{'SCHOOL'};
+
         # create school
         &AD_school_create({ldap=>$ldap,
                            root_dse=>$root_dse,
@@ -1525,9 +1523,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
                           school=>$school,
-                          group=>$dgr_tokened,
+                          group=>$dgr,
                           group_basename=>$dgr,
-                          description=>$dgr_tokened,
+                          description=>$dgr,
                           type=>$dgr_type,
                           status=>"P",
                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_devicegroup_ou'},
@@ -1621,8 +1619,8 @@ sub analyze_device_line {
         $option=&check_option($option,$line,$filename,$device_file,$device_line_count);
 
         # use tokened names 
+        my $dgr_token=&AD_get_name_tokened($dgr,$school,$dgr_type);
         my $dnsnode_name=&AD_get_name_tokened($host,$school,"dnsnode");
-
         my $room_token=&AD_get_name_tokened($room,$school,"roomws");
         my $ws_token=&AD_get_name_tokened($host,$school,"computer");
         my $ws_token_account=$ws_token."\$";
@@ -1650,8 +1648,9 @@ sub analyze_device_line {
         # save data into hash for reuse
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
-        $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr;                       # 03
-        $devices_file{$dgr_type}{$dgr}{$ws_token}=$dnsnode_name;
+        $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr_token;                 # 03
+        $devices_file{$dgr_type}{$dgr_token}{'HOSTS'}{$ws_token}=$dnsnode_name;
+        $devices_file{$dgr_type}{$dgr_token}{'SCHOOL'}=$school;
 
         $devices_file{'device'}{$dnsnode_name}{'MAC'}=$mac;                       # 04
         $devices_file{'device'}{$dnsnode_name}{'IPv4'}=$ip;                       # 05
