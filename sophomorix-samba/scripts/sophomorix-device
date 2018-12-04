@@ -1507,6 +1507,10 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Adding $max_dgr_count_add devicegroups:");
     my $dgr_count=0;
     foreach my $dgr (@adding_devicegroups){
+	my $dgr_tokened=&AD_get_name_tokened(
+            $dgr,
+            $school,
+            $sophomorix_config{'INI'}{'TYPE'}{'DGR'});
         $dgr_count++;
         # create school
         &AD_school_create({ldap=>$ldap,
@@ -1521,9 +1525,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                           root_dse=>$root_dse,
                           root_dns=>$root_dns,
                           school=>$school,
-                          group=>$dgr,
+                          group=>$dgr_tokened,
                           group_basename=>$dgr,
-                          description=>$dgr,
+                          description=>$dgr_tokened,
                           type=>$dgr_type,
                           status=>"P",
                           sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_devicegroup_ou'},

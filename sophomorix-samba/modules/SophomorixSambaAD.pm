@@ -3247,6 +3247,7 @@ sub AD_get_name_tokened {
         $role eq "teacherclass" or
         $role eq "all" or
         $role eq "room" or 
+        $role eq "devicegroup" or 
         $role eq "roomws" or
         $role eq "dnsnode" or
         $role eq "computer" or
@@ -3280,6 +3281,12 @@ sub AD_get_name_tokened {
             unless ($name_tokened =~ m/^p\_/) { 
                 # add prefix to projects: p_ 
                 $name_tokened="p_".$name_tokened;
+            }
+        }
+        if ($role eq "devicegroup"){
+            unless ($name_tokened =~ m/^d\_/) { 
+                # add prefix to : d_devicegroup 
+                $name_tokened="d_".$name_tokened;
             }
         }
         return $name_tokened;
