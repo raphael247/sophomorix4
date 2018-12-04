@@ -1954,6 +1954,43 @@ if ($test_ws_1==1){
                      sophomorixRole => "sophomorixdnsZone",
                    });
 
+    ############################################################
+    # test device groups
+    ############################################################
+      &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=m13,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   cn=>"m13",
+                   name=>"m13",
+                   description=>"m13",
+                   mail => "m13@".$root_dns,
+                   sAMAccountname=>"m13",
+                   sophomorixType => "hardwareclass",
+                   sophomorixStatus=>"P",
+		   sophomorixMailAlias => "FALSE",
+		   sophomorixMailList => "FALSE",
+		   sophomorixHidden => "FALSE",
+                   sophomorixMaxMembers => "0",
+                   sophomorixSchoolname => "default-school",
+                   });
+    
+    
+      &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=m13-t,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   cn=>"m13-t",
+                   name=>"m13-t",
+                   description=>"m13-t",
+                   mail => "m13-t@".$root_dns,
+                   sAMAccountname=>"m13-t",
+                   sophomorixType => "hardwareclass",
+                   sophomorixStatus=>"P",
+		   sophomorixMailAlias => "FALSE",
+		   sophomorixMailList => "FALSE",
+		   sophomorixHidden => "FALSE",
+                   sophomorixMaxMembers => "0",
+                   sophomorixSchoolname => "default-school",
+                   });
+    
+    
     # 18 devices -> 36 dnsNode Objects (incl. reverse lookup)
     &AD_dnsnodes_count_lookup(18,$ldap,$root_dse);
     &AD_dnsnodes_count_reverse(18,$ldap,$root_dse);
