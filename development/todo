@@ -86,9 +86,11 @@ sophomorix-test-2 : test devicegroups in step 2
 group swi hat keine members (da workstations kesopinen account haben): dann besser keine Gruppe anlegen
 
 
-OK:    &AD_rooms_any  -> &AD_room_count(0,$ldap,$root_dse);
-Todo:  &AD_computers_any &AD_computer_count(0,$ldap,$root_dse);
-Todo:  &AD_examaccounts_any -> any
+OK:   &AD_rooms_any  -> &AD_room_count(0,$ldap,$root_dse);
+OK:   &AD_computers_any &AD_computer_count(0,$ldap,$root_dse);
+OK:   &AD_examaccounts_any -> &AD_examaccount_count(0,$ldap,$root_dse);
+
+   TODO: use this stuff in all steps of the tests
    
    command.log: " werden nicht mitgeloggt, ist das OK?
 

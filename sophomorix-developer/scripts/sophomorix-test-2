@@ -52,9 +52,9 @@ use Sophomorix::SophomorixTest qw(
                                  AD_test_object
                                  AD_test_dns
                                  AD_test_nondns
-                                 AD_computers_any
-                                 AD_examaccounts_any
+                                 AD_computer_count
                                  AD_devicegroup_count
+                                 AD_examaccount_count
                                  AD_room_count
                                  AD_dnsnodes_count_lookup
                                  AD_dnsnodes_count_reverse
@@ -4069,9 +4069,9 @@ if ($test_ws_5==1){
 
     &AD_devicegroup_count(0,$ldap,$root_dse);
     &AD_room_count(0,$ldap,$root_dse);
+    &AD_computer_count(0,$ldap,$root_dse);
+    &AD_examaccount_count(0,$ldap,$root_dse);
 
-    &AD_computers_any($ldap,$root_dse);
-    &AD_examaccounts_any($ldap,$root_dse);
     &AD_dnsnodes_count_lookup(0,$ldap,$root_dse);
     &AD_dnsnodes_count_reverse(0,$ldap,$root_dse);
     &AD_dnszones_count(0,$ldap,$root_dse);

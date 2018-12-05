@@ -28,14 +28,10 @@ $Data::Dumper::Terse = 1;
             AD_test_session_count
             AD_test_dns
             AD_test_nondns
-            AD_computers_any
-            AD_examaccounts_any
             AD_devicegroup_count
-
             AD_room_count
-#            AD_computer_count
-#            AD_examaccount_count
-
+            AD_computer_count
+            AD_examaccount_count
             AD_dnsnodes_count_lookup
             AD_dnsnodes_count_reverse
             AD_dnszones_count
@@ -63,24 +59,6 @@ sub AD_test_session_count {
     my $count=$sessions{'SESSIONCOUNT'};
     is ($count,$should,"  * There exist $should sessions");
     return $count;
-}
-
-
-
-sub AD_computers_any {
-    my ($ldap,$root_dse) = @_;
-    my $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
-                   scope => 'sub',
-                   filter => '(&(objectClass=computer)(sophomorixRole=computer))',
-                   attrs => ['sAMAccountName']
-                         );
-    my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All sophomorix computers are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        print "   * ",$entry->get_value('sAMAccountName'),"\n";
-    }
 }
 
 
@@ -119,26 +97,7 @@ sub AD_test_nondns {
     }
 }
 
-
            
-sub AD_examaccounts_any {
-    my ($ldap,$root_dse) = @_;
-    $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
-                   scope => 'sub',
-                   filter => '(&(objectClass=user)(sophomorixRole=examaccount))',
-                   attrs => ['sAMAccountName',"sophomorixAdminClass"]
-                         );
-    my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All ExamAccounts are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-            print "   * ",$entry->get_value('sAMAccountName'),
-                  "  sophomorixAdminClass:  ".$entry->get_value('sophomorixAdminClass')."\n";
-    }
-}
-
-
 
 sub AD_user_timeupdate {
     my ($ldap,$root_dse,$dn,$toleration_date,$deactivation_date)=@_;
@@ -200,6 +159,54 @@ sub AD_room_count {
         # no output
     } else {
         print "   * rooms:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            printf "   * %-14s-> %-50s\n",$entry->get_value('sAMAccountName'),"sophomorixType: ".$entry->get_value('sophomorixType');
+        }
+    }
+}
+
+
+
+sub AD_computer_count {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=computer)(sophomorixRole=computer))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['sophomorixRole','sAMAccountName']
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,$expected,"  * $expected sophomorix computers found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * computers:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            printf "   * %-14s-> %-50s\n",$entry->get_value('sAMAccountName'),"sophomorixType: ".$entry->get_value('sophomorixType');
+        }
+    }
+}
+
+
+
+sub AD_examaccount_count {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=user)(sophomorixRole=examaccount))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['sophomorixRole','sAMAccountName','sophomorixAdminClass']
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,$expected,"  * $expected sophomorix examaccounts found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * examaccounts:\n";
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             printf "   * %-14s-> %-50s\n",$entry->get_value('sAMAccountName'),"sophomorixType: ".$entry->get_value('sophomorixType');
