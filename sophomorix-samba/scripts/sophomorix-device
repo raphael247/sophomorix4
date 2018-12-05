@@ -1647,7 +1647,7 @@ sub analyze_device_line {
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
         $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr_token;                 # 03
-        $devices_file{$dgr_type}{$dgr_token}{'COMPUTER'}{$ws_token_account}=$dnsnode_name;
+
         $devices_file{$dgr_type}{$dgr_token}{'member'}{$dnsnode_name}=$ws_token_account;
         $devices_file{$dgr_type}{$dgr_token}{'SCHOOL'}=$school;
 

@@ -3791,7 +3791,140 @@ if ($test_ws_2==1){
                      cn=>"2.171.10.in-addr.arpa",
                      sophomorixRole => "sophomorixdnsZone",
                    });
-   
+
+
+
+
+
+    ############################################################
+    # test device groups
+    ############################################################
+    # default-school
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_m13,OU=device-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_m13",
+                     name=>"d_m13",
+                     description=>"d_m13",
+                     mail => "d_m13@".$root_dns,
+                     sAMAccountname=>"d_m13",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=> "P",
+  		     sophomorixMailAlias => "FALSE",
+		     sophomorixMailList => "FALSE",
+		     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "default-school",
+                     member => "J1008P03|J1008P02|C001P01",
+                   });
+
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_m13-t,OU=device-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_m13-t",
+                     name=>"d_m13-t",
+                     description=>"d_m13-t",
+                     mail => "d_m13-t@".$root_dns,
+                     sAMAccountname=>"d_m13-t",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=>"P",
+                     sophomorixMailAlias => "FALSE",
+                     sophomorixMailList => "FALSE",
+                     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "default-school",
+                     member => "J1010P01|J1010P02|C002P01",
+                   });
+    
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_xx,OU=device-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_xx",
+                     name=>"d_xx",
+                     description=>"d_xx",
+                     mail => "d_xx@".$root_dns,
+                     sAMAccountname=>"d_xx",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=>"P",
+                     sophomorixMailAlias => "FALSE",
+                     sophomorixMailList => "FALSE",
+                     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "default-school",
+                     member => "LASER1008|LASER1010|",
+                   });
+    
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_swi,OU=device-groups,OU=Devices,OU=default-school,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_swi",
+                     name=>"d_swi",
+                     description=>"d_swi",
+                     mail => "d_swi@".$root_dns,
+                     sAMAccountname=>"d_swi",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=>"P",
+                     sophomorixMailAlias => "FALSE",
+                     sophomorixMailList => "FALSE",
+                     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "default-school",
+                   });
+    
+    
+    # bsz
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_bsz-m13,OU=device-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_bsz-m13",
+                     name=>"d_bsz-m13",
+                     description=>"d_bsz-m13",
+                     mail => "d_bsz-m13@".$root_dns,
+                     sAMAccountname=>"d_bsz-m13",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=> "P",
+  		     sophomorixMailAlias => "FALSE",
+		     sophomorixMailList => "FALSE",
+		     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "bsz",
+                     member => "BSZ-J1008P01|BSZ-J1008P02|BSZ-D001P01",
+                   });
+
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_bsz-m13-t,OU=device-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_bsz-m13-t",
+                     name=>"d_bsz-m13-t",
+                     description=>"d_bsz-m13-t",
+                     mail => "d_bsz-m13-t@".$root_dns,
+                     sAMAccountname=>"d_bsz-m13-t",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=>"P",
+                     sophomorixMailAlias => "FALSE",
+                     sophomorixMailList => "FALSE",
+                     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "bsz",
+                     member => "BSZ-J1010P01|BSZ-J1010P02|BSZ-D002P01",
+                   });
+    
+    &AD_test_object({ldap=>$ldap,
+                     dn=>"CN=d_bsz-xx,OU=device-groups,OU=Devices,OU=bsz,OU=SCHOOLS,".$root_dse,
+                     cn=>"d_bsz-xx",
+                     name=>"d_bsz-xx",
+                     description=>"d_bsz-xx",
+                     mail => "d_bsz-xx@".$root_dns,
+                     sAMAccountname=>"d_bsz-xx",
+                     sophomorixType => "devicegroup",
+                     sophomorixStatus=>"P",
+                     sophomorixMailAlias => "FALSE",
+                     sophomorixMailList => "FALSE",
+                     sophomorixHidden => "FALSE",
+                     sophomorixMaxMembers => "0",
+                     sophomorixSchoolname => "bsz",
+                     member => "BSZ-LASER1008|BSZ-LASER1010",
+                   });
+    
+
+
+
+
+    
     # 18 devices -> 36 dnsNode Objects (incl. reverse lookup)
     &AD_dnsnodes_count_lookup(18,$ldap,$root_dse);
     &AD_dnsnodes_count_reverse(18,$ldap,$root_dse);
@@ -3891,6 +4024,13 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"computer","SWITCH02\$");
     &AD_test_nondns($res,"switch02");
 
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m13");
+    &AD_object_nonexist($ldap,$root_dse,"group","d_bsz-m13");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-m13-t");
+    &AD_object_nonexist($ldap,$root_dse,"group","d_bsz-m13-t");
+    &AD_object_nonexist($ldap,$root_dse,"group","bsz-xx");
+    &AD_object_nonexist($ldap,$root_dse,"group","d_bsz-xx");
+    
     ############################################################
     # bsz
     &AD_object_nonexist($ldap,$root_dse,"examaccount","bsz-j1008p01");
@@ -3922,6 +4062,14 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"computer","BSZ-D002P01\$");
     &AD_test_nondns($res,"bsz-d002p01");
 
+    &AD_object_nonexist($ldap,$root_dse,"group","m13");
+    &AD_object_nonexist($ldap,$root_dse,"group","d_m13");
+    &AD_object_nonexist($ldap,$root_dse,"group","m13-t");
+    &AD_object_nonexist($ldap,$root_dse,"group","d_m13-t");
+    &AD_object_nonexist($ldap,$root_dse,"group","xx");
+    &AD_object_nonexist($ldap,$root_dse,"group","d_xx");
+
+    
     &AD_computers_any($ldap,$root_dse);
     &AD_examaccounts_any($ldap,$root_dse);
     &AD_dnsnodes_count_lookup(0,$ldap,$root_dse);
