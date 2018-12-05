@@ -30,6 +30,7 @@ $Data::Dumper::Terse = 1;
             AD_test_nondns
             AD_computers_any
             AD_examaccounts_any
+            AD_devicegroup_count
             AD_dnsnodes_count_lookup
             AD_dnsnodes_count_reverse
             AD_dnszones_count
@@ -170,6 +171,30 @@ sub AD_user_timeupdate {
 		      replace => { %replace }
                );
     #&AD_debug_logdump($mesg,2,(caller(0))[3]);
+}
+
+
+
+sub AD_devicegroup_count {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=group)(sophomorixType=devicegroup))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['sophomorixType','sAMAccountName']
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,$expected,"  * $expected sophomorix devicegroups found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * devicegroups:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            printf "   * %-14s-> %-50s\n",$entry->get_value('sAMAccountName'),"sophomorixType: ".$entry->get_value('sophomorixType');
+        }
+    }
 }
 
 
