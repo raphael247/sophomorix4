@@ -31,10 +31,14 @@ $Data::Dumper::Terse = 1;
             AD_computers_any
             AD_examaccounts_any
             AD_devicegroup_count
+
+            AD_room_count
+#            AD_computer_count
+#            AD_examaccount_count
+
             AD_dnsnodes_count_lookup
             AD_dnsnodes_count_reverse
             AD_dnszones_count
-            AD_rooms_any
             AD_user_timeupdate
             ACL_test
             NTACL_test
@@ -136,24 +140,6 @@ sub AD_examaccounts_any {
 
 
 
-sub AD_rooms_any {
-    my ($ldap,$root_dse) = @_;
-    $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
-                   scope => 'sub',
-                   filter => '(&(objectClass=group)(sophomorixType=room))',
-                   attrs => ['sAMAccountName',"sophomorixType"]
-                         );
-    my $max_user = $mesg->count; 
-    is ($max_user,0,"  * All room groups are deleted");
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-            print "   * ",$entry->get_value('sAMAccountName')."\n";
-    }
-}
-
-
-
 sub AD_user_timeupdate {
     my ($ldap,$root_dse,$dn,$toleration_date,$deactivation_date)=@_;
     print "Updating: $dn\n";
@@ -190,6 +176,30 @@ sub AD_devicegroup_count {
         # no output
     } else {
         print "   * devicegroups:\n";
+        for( my $index = 0 ; $index < $max_user ; $index++) {
+            my $entry = $mesg->entry($index);
+            printf "   * %-14s-> %-50s\n",$entry->get_value('sAMAccountName'),"sophomorixType: ".$entry->get_value('sophomorixType');
+        }
+    }
+}
+
+
+
+sub AD_room_count {
+    my ($expected,$ldap,$root_dse) = @_;
+    my $filter_node="(&(objectClass=group)(sophomorixType=room))";
+    $mesg = $ldap->search( # perform a search
+                   base   => "DC=linuxmuster,DC=local",
+                   scope => 'sub',
+                   filter => $filter_node,
+                   attrs => ['sophomorixType','sAMAccountName']
+                         );
+    my $max_user = $mesg->count; 
+    is ($max_user,$expected,"  * $expected sophomorix rooms found");
+    if ($max_user==$expected){
+        # no output
+    } else {
+        print "   * rooms:\n";
         for( my $index = 0 ; $index < $max_user ; $index++) {
             my $entry = $mesg->entry($index);
             printf "   * %-14s-> %-50s\n",$entry->get_value('sAMAccountName'),"sophomorixType: ".$entry->get_value('sophomorixType');

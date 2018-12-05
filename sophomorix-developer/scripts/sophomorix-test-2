@@ -55,10 +55,10 @@ use Sophomorix::SophomorixTest qw(
                                  AD_computers_any
                                  AD_examaccounts_any
                                  AD_devicegroup_count
+                                 AD_room_count
                                  AD_dnsnodes_count_lookup
                                  AD_dnsnodes_count_reverse
                                  AD_dnszones_count
-                                 AD_rooms_any
                                  run_command
                                  directory_tree_test
                                  start_fs_test
@@ -2080,6 +2080,7 @@ if ($test_ws_1==1){
                    });
 
     &AD_devicegroup_count(7,$ldap,$root_dse);
+    &AD_room_count(8,$ldap,$root_dse);
     
     # 18 devices -> 36 dnsNode Objects (incl. reverse lookup)
     &AD_dnsnodes_count_lookup(18,$ldap,$root_dse);
@@ -3920,6 +3921,7 @@ if ($test_ws_2==1){
                    });
     
     &AD_devicegroup_count(7,$ldap,$root_dse);
+    &AD_room_count(8,$ldap,$root_dse);
 
     # 18 devices -> 36 dnsNode Objects (incl. reverse lookup)
     &AD_dnsnodes_count_lookup(18,$ldap,$root_dse);
@@ -4066,14 +4068,13 @@ if ($test_ws_5==1){
     &AD_object_nonexist($ldap,$root_dse,"group","d_xx");
 
     &AD_devicegroup_count(0,$ldap,$root_dse);
+    &AD_room_count(0,$ldap,$root_dse);
 
-    
     &AD_computers_any($ldap,$root_dse);
     &AD_examaccounts_any($ldap,$root_dse);
     &AD_dnsnodes_count_lookup(0,$ldap,$root_dse);
     &AD_dnsnodes_count_reverse(0,$ldap,$root_dse);
     &AD_dnszones_count(0,$ldap,$root_dse);
-    &AD_rooms_any($ldap,$root_dse);
 }
 
 
