@@ -1548,7 +1548,7 @@ sub AD_user_unset_exam_mode {
     return 0;
 }
 
- 
+
 
 sub AD_user_create {
     my ($arg_ref) = @_;
@@ -1617,7 +1617,12 @@ sub AD_user_create {
     my $shell="/bin/false";
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@".$root_dns;
+    
+    # set the default for mail
     my $mail = $login."\@".$root_dns;
+    if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} ne ""){
+        $mail=$login."\@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+    }
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
         &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
@@ -1727,6 +1732,7 @@ sub AD_user_create {
         print "   Unid:               $unid\n";
         print "   Unix-uidNumber:     $uidnumber_wish\n";
         print "   File:               $file\n";
+        print "   Mail:               $mail\n";
         print "   homeDirectory:      $homedirectory\n";
         print "   unixHomeDirectory:  $unix_home\n";
         if (defined $ref_webui_permissions_calculated){
