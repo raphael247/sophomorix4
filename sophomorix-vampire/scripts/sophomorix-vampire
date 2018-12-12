@@ -368,6 +368,9 @@ if ($restore_config_files==1){
                      "/etc/linuxmuster/sophomorix/default-school/devices.csv.orig",
                      "/etc/linuxmuster/sophomorix/default-school/devices.csv",
                      "/etc/linuxmuster/sophomorix/default-school/devices.csv.tmp");
+    &subnets_rewrite("/etc/linuxmuster/subnets.csv.orig",
+                     "/etc/linuxmuster/subnets.csv",
+                     "/etc/linuxmuster/subnets.csv.tmp");
     &extrastudents_rewrite("/etc/linuxmuster/sophomorix/default-school/extrastudents.csv.orig",
   		           "/etc/linuxmuster/sophomorix/default-school/extrastudents.csv");
     &killog_rewrite("/var/log/sophomorix/user-modify-archive.log.migrated.orig",
@@ -1697,8 +1700,6 @@ sub extrastudents_rewrite {
 
 
 
-
-
 sub devices_rewrite {
     my ($ref_classes_map,$in,$out,$tmp)=@_;
     open(TMP,">$tmp") || die "Cannot create $tmp \n";
@@ -1729,7 +1730,7 @@ sub devices_rewrite {
     }
 
     print "### Writing temp file $tmp\n";
-    open(IN,"<$in") || die "Cannot create $in \n";
+    open(IN,"<$in") || die "Cannot open $in \n";
     while(<IN>){
         my $line=$_;
         my $new_line;
@@ -1848,6 +1849,69 @@ sub devices_rewrite {
     print "### Copying temp file to $out\n";
     system("cp $tmp $out");
 }
+
+
+
+sub subnets_rewrite {
+    my ($in,$out,$tmp)=@_;
+    open(TMP,">$tmp") || die "Cannot create $tmp \n";
+    my $special_line="######################### The following subnets were migrated #########################";
+    print "\n";
+
+    # reading existing subnets.csv until special_line
+    if (-f $out){
+        print "### Reading already existing $out\n";
+        open(OUT,"<$out") || die "Cannot create $out \n";
+        while(<OUT>){
+            my $line=$_;
+            chomp($line);
+            if ($line eq $special_line){
+                last;
+            }
+            print TMP $line."\n";
+        }
+        # finalize with special line
+        print TMP $special_line."\n";
+        print TMP "\n";
+        close(OUT);
+    } else {
+        print "### Not reading nonexisting: $out\n";
+        print TMP $special_line."\n";
+        print TMP "\n";
+    }
+
+    print "### Writing temp file $tmp\n";
+    open(IN,"<$in") || die "Cannot open $in \n";
+    while(<IN>){
+        my $line=$_;
+        my $new_line;
+        chomp($line);
+
+        $line=~s/^\s+//g;# remove leading whitespace
+        if(/^\#/){
+             # keep comment lines
+             $new_line=$line."\n";
+        } elsif ($line eq ""){
+             # keep empty lines
+             $new_line=$line."\n";
+        } else {
+            # do not use fiels 5 and 6 (i.e. [4][5])
+            my (@items)=split(/;/,$line);
+            $new_line=$items[0].";".
+                      $items[1].";".
+                      $items[2].";".
+                      $items[3].";".
+                      "MIGRATION;\n";
+        }
+
+        print TMP "$new_line";
+    }
+    close(IN);
+    close(TMP);
+    print "### Copying temp file to $out\n";
+    system("cp $tmp $out");
+}
+
 
 
 sub teachers_rewrite {
