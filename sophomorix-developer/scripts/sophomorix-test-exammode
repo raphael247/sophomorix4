@@ -1742,7 +1742,7 @@ if ($file_transfer_scopy==1){
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-01.txt\" --to-user lordjo72  --to-path \"topfile2.txt\""); 
  
     # C) file -> dir (copy into dir if no other dir is in the way)
-    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72 --to-path \"transfer/\"");
+    &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testfile-02.txt\" --to-user blackmri72,sch72 --to-path \"transfer/\"");
 
     # D) dir -> file (error)
     &run_command("sophomorix-transfer $all_options --scopy --from-user wu72 --from-path \"testdir-01\" --to-user schneima72 --to-path \"blockfile2.txt\"");
@@ -1942,6 +1942,7 @@ if ($file_transfer_scopy==1){
                          "/srv/samba/schools/default-school/teachers",
                          "/srv/samba/schools/default-school/teachers/sch72",
                          "/srv/samba/schools/default-school/teachers/sch72/transfer",
+                         "/srv/samba/schools/default-school/teachers/sch72/transfer/testfile-02.txt",
                          "/srv/samba/schools/default-school/share/teachers",
                          "/srv/samba/schools/default-school/share/classes",
                          "/srv/samba/schools/default-school/share/management",
@@ -2007,6 +2008,7 @@ if ($file_transfer_scopy==1){
 
     # delete created files from C) from school to school
     &run_command("rm -rf \"/srv/samba/schools/uni/students/12abc/blackmri72/transfer/testfile-02.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/default-school/teachers/sch72/transfer/testfile-02.txt\"");
 
 
     # delete created files from E) from school to school
@@ -3285,9 +3287,9 @@ if ($file_transfer_scopy_addon==1){
 
 
     # HERE tmp
-    &run_command("rm -rf /srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72");
-    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/wu72");
-    &run_command("rm -rf /srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/wu72");
+#    &run_command("rm -rf /srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72");
+#    &run_command("rm -rf /srv/samba/schools/bsz/examusers/samardze72-exam/wu72");
+#    &run_command("rm -rf /srv/samba/schools/bsz/examusers/subdir72/muellegr72-exam/wu72");
 
 
     # Test file deletion

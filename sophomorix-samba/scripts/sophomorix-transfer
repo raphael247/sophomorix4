@@ -795,9 +795,7 @@ sub smbclient_scopy_recurse {
     #  2) do the copy/move loops
     ############################################################
     foreach my $from ( @{ $copy{'OPTIONS'}{'FROM_LIST'} } ){
-        print "HERE FROM: $from  @{ $copy{'OPTIONS'}{'FROM_LIST'} } \n";
         foreach my $to ( @{ $copy{'OPTIONS'}{'TO_LIST'} } ){
-        print "HERE TO: $to @{ $copy{'OPTIONS'}{'TO_LIST'} } \n";
             print "$scopy_move: $from  -----> $to (start)\n";
 
             ############################################################
@@ -892,7 +890,6 @@ sub smbclient_scopy_recurse {
                                       $ref_sophomorix_config,
                                       $ref_sophomorix_result);
                 }
-                &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
             } # end C)
 
 
