@@ -1577,6 +1577,7 @@ sub AD_user_create {
     my $deactivationdate = $arg_ref->{deactivationdate};
     my $status = $arg_ref->{status};
     my $file = $arg_ref->{file};
+    my $mail = $arg_ref->{mail};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
@@ -1618,10 +1619,12 @@ sub AD_user_create {
     my $display_name = $firstname_utf8." ".$surname_utf8;
     my $user_principal_name = $login."\@".$root_dns;
     
-    # set the default for mail
-    my $mail = $login."\@".$root_dns;
-    if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} ne ""){
-        $mail=$login."\@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+    # calculate mail attribute, if not given as sub parameter
+    if (not defined $mail){
+        $mail = $login."\@".$root_dns;
+        if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} ne ""){
+            $mail=$login."\@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+        }
     }
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=
