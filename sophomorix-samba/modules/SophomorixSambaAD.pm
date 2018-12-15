@@ -1622,9 +1622,11 @@ sub AD_user_create {
     # calculate mail attribute, if not given as sub parameter
     if (not defined $mail){
         $mail = $login."\@".$root_dns;
-        if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} ne ""){
-            $mail=$login."\@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
-        }
+        if ( exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'}){
+            if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} ne ""){
+                $mail=$login."\@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+            }
+	}
     }
 
     my ($homedirectory,$unix_home,$unc,$smb_rel_path)=

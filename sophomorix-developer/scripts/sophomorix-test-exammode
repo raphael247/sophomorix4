@@ -3232,15 +3232,14 @@ if ($file_transfer_scopy_addon==1){
     &test_file_content("/srv/samba/schools/default-school/students/s6ade/schneima72/blockfile2.txt","blockfile2.txt");
 
     # Test if overwriting of a file works
-    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile.txt\""); 
-    &test_file_content("/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt","testfile-01-02.txt");
+    &run_command("sophomorix-transfer --scopy --from-user wu72 --from-path \"testdir-01/testfile-01-02.txt\" --to-user jonsonad72-exam --to-path \"topfile.txt\" --to-path-addon login"); 
+    &test_file_content("/srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72/topfile.txt","testfile-01-02.txt");
 
     # delete created files from B)
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/jonsonad72-exam/dir\"");
-    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/jonsonad72-exam/topfile.txt\"");
+    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/jonsonad72-exam/wu72\"");
 
     # delete created files from C)
-#    &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/maiersa72-exam/transfer/testfile-02.txt\"");
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/transfer/testfile-02.txt\"");
     # delete created files from D)
     &run_command("rm -rf \"/srv/samba/schools/bsz/examusers/subdir72/maiersa72-exam/blockfile.txt\"");
