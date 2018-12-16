@@ -1459,7 +1459,6 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     &print_title("Updating $max_dns_node_count_update dnsNodes:");
     $dns_node_count=1;
     foreach my $dns_node (@updating_dnsnodes){
-        print "$dns_node\n";
         my $filename=$devices_file{'device'}{$dns_node}{'FILENAME'};
         my $school=$devices_file{'device'}{$dns_node}{'SCHOOL'};
         my $role=$devices_file{'device'}{$dns_node}{'sophomorixRole'};
@@ -1572,9 +1571,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
 
 
 
-# ===========================================================================
+############################################################
 # subs
-# ===========================================================================
+############################################################
 sub analyze_device_line {
     my ($line,$device_file,$filename,$school,$device_line_count) = @_;
     if (/^#/ or /^\s*$/){
@@ -1671,10 +1670,15 @@ sub analyze_device_line {
         }       
         if (not defined $field_14){
             $field_14="";
-        }       
+        }
+ 
+        # sophomorixComment is a must field and doesn't have to be empty
         if (not defined $sophomorix_comment){
-            $sophomorix_comment="";
-        }       
+            $sophomorix_comment="---";
+        } elsif ($sophomorix_comment eq ""){
+            $sophomorix_comment="---";
+        }     
+
         $devices_file{'device'}{$dnsnode_name}{'sophomorixDnsNodename'}=$dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'sophomorixRole'}=$sophomorix_role;       # 09
         $devices_file{'device'}{$dnsnode_name}{'OPTION'}=$option;                        # 12

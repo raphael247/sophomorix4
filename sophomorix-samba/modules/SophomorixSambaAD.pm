@@ -335,11 +335,12 @@ sub AD_dns_nodecreate_update {
     my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
     my $dns_last_octet=$octets[3];
 
-    if($Conf::log_level>=1){
-        print "\n";
-        &Sophomorix::SophomorixBase::print_title(
-              "Creating dnsNode: $dns_node");
-    } 
+    print "\n";
+    if ($create eq "CREATE"){
+        &Sophomorix::SophomorixBase::print_title("Creating dnsNode: $dns_node (start)");
+    } else {
+        &Sophomorix::SophomorixBase::print_title("Updating dnsNode: $dns_node (start)");
+    }
 
     # set defaults if not defined
     if (not defined $filename){
@@ -410,6 +411,12 @@ sub AD_dns_nodecreate_update {
                               sophomorixComment => $comment,
                     });
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    if ($create eq "CREATE"){
+        &Sophomorix::SophomorixBase::print_title("Creating dnsNode: $dns_node (end)");
+    } else {
+        &Sophomorix::SophomorixBase::print_title("Updating dnsNode: $dns_node (end)");
+    }
+
     return;
 }
 

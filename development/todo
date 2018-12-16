@@ -42,8 +42,8 @@ Umsetzen
 
 Todo:
 student
-teacher
- OK:creation
+teacher 
+OK:creation
  OK: update wenn config sich ändert
  Nicht OK: anpassen bei schulwechsel
  ?? Rollenwechsel?
@@ -102,7 +102,6 @@ OK:
    ACL:S-1-5-21-1024969777-3138973310-22357969-1104:ALLOWED/0x0/READ
    --> user nicht mehr gefunden
 ------------------------------------------------------------
-
 
 
 TODO: globale devicegroups
@@ -281,7 +280,39 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
 
          
 --> GPO weiter nach Telefonat
-         
+        
+samba-tool --> pgo anlegen
+-> Verzeichnisbaum unter sysvol und AD Eintrag mit der uuid
+-> zip von maurice reinmergen mit anpassungen
+  -> User -> preferences -> drives.xml
+  -> Uer -> preferences -> printers.xml
+
+gilt für ganze Domain
+
+------------------------------------------------------------
+
+Nur die Dateien, welche im Dateisystem liegen, zu kopieren reicht hier nicht um eine GPO einzurichten. Grund dafür ist, dass die Gruppenrichtlinien selbst Bestandteil des ADs selbst sind, also des Verzeichnisses.
+Um eine GPO zu erstellen muss diese also zunächst im AD angelegt werden.
+Dabei wird dann auch ein nahezu leerer Ordner im Dateisystem angelegt, welcher dann die eigentlichen Richtlinien enthält.
+
+Das nächste Samba Major-Release wird ein Feature enthalten, mit dem sich Gruppenrichtlinien per samba-tool in eine Datei herunterladen lassen und dann aus dem "Backup"-Ordner in einem AD auch wiederhergestellt werden können.
+
+Da das in den aktuellen stable-Releases noch nicht enthalten ist müssen die einzelnen Schritte manuell vorgenommen werden.
+
+Zuerst muss eine neue GPO, z.B. per samba-tool angelegt werden:
+samba-tool gpo create meineNeueGPO
+
+Mit 'samba-tool gpo listall' bekommen Sie die GUID und den Namen der GPO und damit den Ort im Dateisystem. z.B.
+/var/lib/samba/sysvol/meine.domain/Policies/{0D757E3B-769D-40BD-A7AB-C86B7983615E}/
+
+Hier können dann die Daten aus der vorher kopierten GPO eingefügt werden. Mit 'samba-tool ntacl sysvolreset' werden die erwarteten Berechtigungen angewandt.
+
+Anschließend ist die neue GPO meineNeueGPO mit den Richtlinien zur Anwendung verfügbar.
+
+
+
+
+ 
 ------------------------------------------------------------
 
 
