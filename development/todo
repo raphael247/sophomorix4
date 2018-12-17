@@ -280,14 +280,39 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
 
          
 --> GPO weiter nach Telefonat
-        
-samba-tool --> pgo anlegen
--> Verzeichnisbaum unter sysvol und AD Eintrag mit der uuid
--> zip von maurice reinmergen mit anpassungen
+
+1) Vorlagen GPO ins Paket
+-> zip von maurice, Variablen einbauen @@WORKGROUP@@, ...siehe ACL's
   -> User -> preferences -> drives.xml
-  -> Uer -> preferences -> printers.xml
+  -> User -> preferences -> printers.xml
+
+2) sophomorix-school erzeugt/updated beim Schule erstellen eine gpo
+   
+   --> ID-Ermittelung, falls schon da
+   --> Anlegen und IDermittelung falls noch nicht
+   --> Kommentarfeld: sophomorix::schoolname
+3) --> Verzeichnisbaum unter sysvol  aktualisieren
+   A) --> Dateisystem der Schule wird erzeugt,
+       - unter sysvol
+       mit ntacls hinterlegen
+       (evtl. leere Dateien erzeugen)
+   B) dateien gepatched einspielen
+      je Datei eine sub (Quelle/Ziel), mit denselben Ersetzungen, Zeilenweise
+      mit smbclient hochladen
+   C) evtl. nochmal A) um 
+      
+
+4) option um die gpo restlos zu entfernen (AD und filesystem)
+ sophomorix-school --delete-gpo schulname
+
+samba-tool --> gpo anlegen
+-> Verzeichnisbaum unter sysvol und AD Eintrag mit der uuid
 
 gilt für ganze Domain
+
+
+
+
 
 ------------------------------------------------------------
 
