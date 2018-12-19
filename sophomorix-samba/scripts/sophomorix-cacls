@@ -118,7 +118,7 @@ Alternative options:
 # use multiple options
 my @linux_paths=@ARGV;
 
-# create lokup-table: path -> sharename 
+# create lookup-table: path -> sharename 
 my %share_by_path=();
 foreach my $share (keys %{$sophomorix_config{'samba'}{'net_conf_list'}}) {
     if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$share}{'path'}){
@@ -127,6 +127,8 @@ foreach my $share (keys %{$sophomorix_config{'samba'}{'net_conf_list'}}) {
         $share_by_path{$path}=$share;
     }
 }
+# add some shares
+$share_by_path{'/var/lib/samba/sysvol'}='sysvol';
 
 
 
