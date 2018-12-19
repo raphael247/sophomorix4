@@ -570,7 +570,10 @@ sub AD_gpo_listall {
         }
     }
 
-    if ($json==0){
+    # what to do/return
+    if ($json==-1){
+        return \%gpo;
+    } elsif ($json==0){
         print $gpo_listall_out;
     } elsif ($json>0){
         print Dumper(\%gpo);
@@ -585,13 +588,14 @@ sub AD_gpo_create {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $gpo = $arg_ref->{gpo};
+    my $gpo_type = $arg_ref->{gpo_type};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (start)");
     my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
                 " gpo create ".
-                "\"sophomorix:".$gpo."\" ".
+                "\"sophomorix:".$gpo_type.":".$gpo."\" ".
                 "-U administrator%`cat /etc/linuxmuster/.secret/administrator`".
                 "";
                 
@@ -608,12 +612,35 @@ sub AD_gpo_kill {
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
     my $gpo = $arg_ref->{gpo};
+    my $gpo_type = $arg_ref->{gpo_type};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
-    &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo (start)");
 
-    &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo (end)");
+    my $gpo_real="sophomorix:".$gpo_type.":".$gpo."";
+
+    &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo_real (start)");
+    # find out the iD of the named gpo
+    my $ref_gpo=&AD_gpo_listall({json=>-1,
+                                 sophomorix_config=>$ref_sophomorix_config,
+                                 sophomorix_result=>$ref_result,
+                               });
+    my $id="";
+    if (exists $ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real}){
+        $id=$ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real};
+    } else {
+        print "\nERROR: \"$gpo_real\" not found!\n\n";
+        exit;
+    }
+
+    my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " gpo del \"".$id."\" ".
+                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`".
+                "";
+                
+    print "$command\n";
+    system($command);
+    &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo_real (end)");
 }
 
 

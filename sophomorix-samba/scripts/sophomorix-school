@@ -148,6 +148,8 @@ Options:
 
   --gpo-create <school>
   --gpo-kill <school>
+  --gpo-listall
+  --gpo-listall -j (return parsed data as JSON)
 
 Dumping data:                     
   -ij / --info --json              (dump configuration)
@@ -310,15 +312,25 @@ if ($gpo_listall==1){
 
 # --gpo-create
 if ($gpo_create ne ""){
-    &AD_gpo_create({ldap=>$ldap,
-                    root_dse=>$root_dse,
-                    root_dns=>$root_dns,
-                    gpo=>$gpo_create,
-                    smb_admin_pass=>$smb_admin_pass,
-                    sophomorix_config=>\%sophomorix_config,
-                    sophomorix_result=>\%sophomorix_result,
-                  });
-    exit;
+    if (not exists $sophomorix_config{'SCHOOLS'}{$gpo_create}){
+        print "\n";
+        print "WARNING: You must add the school in\n";
+        print "         $DevelConf::file_conf_sophomorix\n";
+        print "         before you can create a gpo for it!\n\n";
+        exit;
+    } else {
+        &AD_gpo_create({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        root_dns=>$root_dns,
+                        gpo=>$gpo_create,
+                        gpo_type=>"school",
+                        smb_admin_pass=>$smb_admin_pass,
+                        sophomorix_config=>\%sophomorix_config,
+                        sophomorix_result=>\%sophomorix_result,
+                      });
+  
+        exit;
+    }
 }
 
 
@@ -329,6 +341,7 @@ if ($gpo_kill ne ""){
                   root_dse=>$root_dse,
                   root_dns=>$root_dns,
                   gpo=>$gpo_kill,
+                  gpo_type=>"school",
                   smb_admin_pass=>$smb_admin_pass,
                   sophomorix_config=>\%sophomorix_config,
                   sophomorix_result=>\%sophomorix_result,
