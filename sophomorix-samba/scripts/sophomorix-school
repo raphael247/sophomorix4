@@ -62,6 +62,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_get_passwd
                                  AD_object_search
+                                 AD_gpo_create
+                                 AD_gpo_kill
                                     );
 
 my @arguments = @ARGV;
@@ -73,6 +75,9 @@ my $school="";
 my $create=0;
 my $recreate_all_schools=0;
 my $kill=0;
+
+my $gpo_create="";
+my $gpo_kill="";
 
 my $mount="";
 my $umount="";
@@ -97,6 +102,8 @@ my $testopt=GetOptions(
            "mount=s" => \$mount,
            "umount=s" => \$umount,
            "listmount|list-mount" => \$listmount,
+           "gpo-create=s" => \$gpo_create,
+           "gpo-kill=s" => \$gpo_kill,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-school");
@@ -135,6 +142,9 @@ Options:
   --mount <school>
   --umount <school>
   --listmount
+
+  --gpo-create <school>
+  --gpo-kill <school>
 
 Dumping data:                     
   -ij / --info --json              (dump configuration)
@@ -281,12 +291,37 @@ if ($school ne "" and $kill==1){
 }
 
 
+############################################################
+# gpo
+############################################################
 
-# ============================================================
-# listing schools
-# ============================================================
+# --gpo-create
+if ($gpo_create ne ""){
+    &AD_gpo_create({ldap=>$ldap,
+                    root_dse=>$root_dse,
+                    root_dns=>$root_dns,
+                    gpo=>$gpo_create,
+                    smb_admin_pass=>$smb_admin_pass,
+                    sophomorix_config=>\%sophomorix_config,
+                    sophomorix_result=>\%sophomorix_result,
+                  });
+    exit;
+}
 
 
+
+# --gpo-kill
+if ($gpo_kill ne ""){
+    &AD_gpo_kill({ldap=>$ldap,
+                  root_dse=>$root_dse,
+                  root_dns=>$root_dns,
+                  gpo=>$gpo_kill,
+                  smb_admin_pass=>$smb_admin_pass,
+                  sophomorix_config=>\%sophomorix_config,
+                  sophomorix_result=>\%sophomorix_result,
+                });
+    exit;
+}
 
 
 &AD_unbind_admin($ldap);

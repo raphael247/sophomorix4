@@ -93,6 +93,8 @@ $Data::Dumper::Terse = 1;
             AD_dns_zonecreate
             AD_dns_kill
             AD_dns_zonekill
+            AD_gpo_create
+            AD_gpo_kill
             AD_repdir_using_file
             AD_examuser_create
             AD_examuser_kill
@@ -530,6 +532,38 @@ sub AD_dns_zonekill {
     my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
         " dns zonedelete $dns_server $dns_zone --password='******' -U $DevelConf::sophomorix_AD_admin";
     &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
+}
+
+
+
+sub AD_gpo_create {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $gpo = $arg_ref->{gpo};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_result = $arg_ref->{sophomorix_result};
+    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (start)");
+
+    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (end)");
+}
+
+
+
+sub AD_gpo_kill {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $gpo = $arg_ref->{gpo};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_result = $arg_ref->{sophomorix_result};
+    &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo (start)");
+
+    &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo (end)");
 }
 
 
