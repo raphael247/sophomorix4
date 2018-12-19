@@ -62,6 +62,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_get_passwd
                                  AD_object_search
+                                 AD_gpo_listall
                                  AD_gpo_create
                                  AD_gpo_kill
                                     );
@@ -76,6 +77,7 @@ my $create=0;
 my $recreate_all_schools=0;
 my $kill=0;
 
+my $gpo_listall=0;
 my $gpo_create="";
 my $gpo_kill="";
 
@@ -102,6 +104,7 @@ my $testopt=GetOptions(
            "mount=s" => \$mount,
            "umount=s" => \$umount,
            "listmount|list-mount" => \$listmount,
+           "gpo-listall" => \$gpo_listall,
            "gpo-create=s" => \$gpo_create,
            "gpo-kill=s" => \$gpo_kill,
           );
@@ -294,6 +297,16 @@ if ($school ne "" and $kill==1){
 ############################################################
 # gpo
 ############################################################
+
+# --gpo-listall
+if ($gpo_listall==1){
+    &AD_gpo_listall({json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                  });
+    exit;
+}
+
 
 # --gpo-create
 if ($gpo_create ne ""){

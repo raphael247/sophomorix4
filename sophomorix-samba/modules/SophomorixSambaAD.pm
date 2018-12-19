@@ -93,6 +93,7 @@ $Data::Dumper::Terse = 1;
             AD_dns_zonecreate
             AD_dns_kill
             AD_dns_zonekill
+            AD_gpo_listall
             AD_gpo_create
             AD_gpo_kill
             AD_repdir_using_file
@@ -536,6 +537,48 @@ sub AD_dns_zonekill {
 
 
 
+sub AD_gpo_listall {
+    my ($arg_ref) = @_;
+    my $json = $arg_ref->{json};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_result = $arg_ref->{sophomorix_result};
+    my %gpo=();
+    my $gpo_listall_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}." gpo listall";
+    print "$gpo_listall_command\n";
+    $gpo_listall_out=`$gpo_listall_command`;
+    my $gpo_listall_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+
+    my @lines=split(/\n/,$gpo_listall_out);
+    my $gpo_current="";
+    foreach my $line (@lines){
+        if ($line eq ""){
+            next;
+        }
+        my ($key,$value)=split(/:/,$line,2);
+        $key=&Sophomorix::SophomorixBase::remove_embracing_whitespace($key);
+        $value=&Sophomorix::SophomorixBase::remove_embracing_whitespace($value);
+        if ($key eq "GPO"){
+            # update current gpo name 
+            $gpo_current=$value;
+            $gpo{'GPO'}{$value}{'EXISTING'}="TRUE";
+	} else{
+            # store key value
+            $gpo{'GPO'}{$gpo_current}{$key}=$value;
+            if ($key eq "display name"){
+                $gpo{'LOOKUP'}{"by_display_name"}{$value}=$gpo_current;
+            }
+        }
+    }
+
+    if ($json==0){
+        print $gpo_listall_out;
+    } elsif ($json>0){
+        print Dumper(\%gpo);
+    }
+}
+
+
+
 sub AD_gpo_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -546,7 +589,14 @@ sub AD_gpo_create {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (start)");
-
+    my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " gpo create ".
+                "\"sophomorix:".$gpo."\" ".
+                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`".
+                "";
+                
+    print "$command\n";
+    system($command);
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (end)");
 }
 
