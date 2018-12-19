@@ -592,16 +592,17 @@ sub AD_gpo_create {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
-    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (start)");
+
+    my $gpo_real="sophomorix".":".$gpo_type.":".$gpo;
+
+    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (start)");
     my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
-                " gpo create ".
-                "\"sophomorix:".$gpo_type.":".$gpo."\" ".
-                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`".
-                "";
+                " gpo create \"".$gpo_real."\" ".
+                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`";
                 
     print "$command\n";
     system($command);
-    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo (end)");
+    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
 }
 
 
@@ -617,7 +618,7 @@ sub AD_gpo_kill {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
 
-    my $gpo_real="sophomorix:".$gpo_type.":".$gpo."";
+    my $gpo_real="sophomorix".":".$gpo_type.":".$gpo;
 
     &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo_real (start)");
     # find out the iD of the named gpo
@@ -629,14 +630,13 @@ sub AD_gpo_kill {
     if (exists $ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real}){
         $id=$ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real};
     } else {
-        print "\nERROR: \"$gpo_real\" not found!\n\n";
+        print "\nERROR: gpo \"$gpo_real\" not found!\n\n";
         exit;
     }
 
     my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
                 " gpo del \"".$id."\" ".
-                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`".
-                "";
+                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`";
                 
     print "$command\n";
     system($command);
