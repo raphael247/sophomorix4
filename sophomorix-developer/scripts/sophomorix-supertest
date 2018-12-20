@@ -216,6 +216,14 @@ sub prepare_smb {
 sub reset_smb {
     &printline();
     print "Resetting samba for test ... \n";
+    # clear scchool gpo's
+    system("sophomorix-school --gpo-kill abc");
+    system("sophomorix-school --gpo-kill bsz");
+    system("sophomorix-school --gpo-kill default-school");
+    system("sophomorix-school --gpo-kill ghs");
+    system("sophomorix-school --gpo-kill lin");
+    system("sophomorix-school --gpo-kill uni");
+    # recreate shares
     system("net conf delshare linuxmuster-global");
     system("net conf delshare abc");
     system("net conf delshare bsz");
