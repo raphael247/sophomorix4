@@ -299,7 +299,14 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
                        └── User
        mit ntacls hinterlegen
        (evtl. leere Dateien erzeugen)
+OK: /usr/bin/smbclient -U administrator%`cat /etc/linuxmuster/.secret/administrator` //linuxmuster.local/sysvol -c 'mkdir "test"'
+FU: /usr/bin/smbclient -U administrator%'******'                                    //linuxmuster.local/ -c 'mkdir "/var/lib/samba/sysvol/test"'
+
    B) TODO: Dateien gepatched einspielen
+
+      GPT.INI
+      --> Version anpassen ?
+      --> displayName= anpassen ?
       je Datei eine sub (Quelle/Ziel), mit denselben Ersetzungen, Zeilenweise
       mit smbclient hochladen
 

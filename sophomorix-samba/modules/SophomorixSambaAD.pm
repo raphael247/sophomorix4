@@ -582,6 +582,25 @@ sub AD_gpo_listall {
 
 
 
+sub AD_gpo_get_uuid {
+    my ($gpo,$gpo_type,$ref_sophomorix_config,$ref_result)=@_;
+    my $ref_gpo=&AD_gpo_listall({json=>-1,
+                                 sophomorix_config=>$ref_sophomorix_config,
+                                 sophomorix_result=>$ref_result,
+                               });
+    my $gpo_real="sophomorix".":".$gpo_type.":".$gpo;
+    my $uuid="";
+    if (exists $ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real}){
+        $uuid=$ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real};
+    } else {
+        print "\nERROR: gpo \"$gpo_real\" not found!\n\n";
+        exit;
+    }
+    return $uuid;
+}
+
+
+
 sub AD_gpo_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -602,6 +621,19 @@ sub AD_gpo_create {
                 
     print "$command\n";
     system($command);
+
+    my $uuid = &AD_gpo_get_uuid($gpo,"school",$ref_sophomorix_config,$ref_result);
+    print "Using gpo uuid $uuid\n";
+
+    # update some files in sysvol
+    &AD_repdir_using_file({root_dns=>$root_dns,
+                           repdir_file=>"repdir.school_gpo",
+                           smb_admin_pass=>$smb_admin_pass,
+                           gpo_uuid=>$uuid,
+                           sophomorix_config=>$ref_sophomorix_config,
+                           sophomorix_result=>$ref_sophomorix_result,
+                         });
+
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
 }
 
@@ -626,16 +658,16 @@ sub AD_gpo_kill {
                                  sophomorix_config=>$ref_sophomorix_config,
                                  sophomorix_result=>$ref_result,
                                });
-    my $id="";
+    my $uuid="";
     if (exists $ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real}){
-        $id=$ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real};
+        $uuid=$ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real};
     } else {
         print "\nERROR: gpo \"$gpo_real\" not found!\n\n";
         exit;
     }
 
     my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
-                " gpo del \"".$id."\" ".
+                " gpo del \"".$uuid."\" ".
                 "-U administrator%`cat /etc/linuxmuster/.secret/administrator`";
                 
     print "$command\n";
@@ -667,6 +699,7 @@ sub AD_repdir_using_file {
     my $extraclass = $arg_ref->{extraclass};
     my $subdir = $arg_ref->{subdir};
     my $student_home = $arg_ref->{student_home};
+    my $gpo_uuid = $arg_ref->{gpo_uuid};
 
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file}{'PATH_ABS'};
@@ -682,6 +715,7 @@ sub AD_repdir_using_file {
 
     }
 
+    print "HERE: $gpo_uuid\n";
     # reading repdir file
     open(REPDIRFILE, "<$repdir_file_abs")|| die "ERROR: $repdir_file_abs $!";
     while (<REPDIRFILE>) {
@@ -693,9 +727,9 @@ sub AD_repdir_using_file {
         if ($line eq ""){next;} # next on empty line
         if(/^\#/){next;} # next on comments
         $entry_num++;
+
         if (/\@\@SCHOOL\@\@/ and not defined $school) {
             @schools = @{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
-
         }
 
         if (/\@\@ADMINCLASS\@\@/) {
@@ -754,9 +788,15 @@ sub AD_repdir_using_file {
         my @new_dirs=();
         foreach my $dir (@old_dirs){
             $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
+
+
             # /var
             $dir=~s/>\$path_log</${DevelConf::path_log}/;
             $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
+            # /var/lib/samba/sysvol
+            $dir=~s/>\$sysvol<//;
+            $dir=~s/>\$root_dns</$root_dns/;
+            $dir=~s/>\$gpo_uuid</$gpo_uuid/;
             # /srv/samba
             $dir=~s/>\$homedir_all_schools</${DevelConf::homedir_all_schools}/;
             $dir=~s/>\$homedir_global</${DevelConf::homedir_global}/;
@@ -895,8 +935,12 @@ sub AD_repdir_using_file {
                         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
                             $share=$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
                         } else {
-                            $share=$school;
-                        }
+                            if (defined $gpo_uuid){
+                                $share="sysvol";
+                            } else {
+                                $share=$school;
+                            }
+                         }
                         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                             " -U ".$DevelConf::sophomorix_file_admin."%'******'".
                             " //$root_dns/$share -c 'mkdir \"$path_after_user_smb\"'";
