@@ -78,6 +78,7 @@ $Data::Dumper::Terse = 1;
             read_sophomorix_kill
             run_hook_scripts
             smb_command
+            smb_file_rewrite
             );
 
 
@@ -5303,6 +5304,36 @@ sub smb_command {
         &result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,$ref_parameter,"FAILED ($smb_command_return): $smb_display_command");
     }
     return ($smb_command_return,@returned_lines);
+}
+
+
+
+sub smb_file_rewrite {
+    my ($unix_path,
+        $smb_share,
+        $smb_top_path,
+        $uuid,
+        $smb_low_path,
+        $copy,
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config)=@_;
+    if ($copy eq "TRUE"){
+        my $source_dirname  = dirname($unix_path);
+        my $source_filename  = basename($unix_path);
+
+        my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$smb_share ".
+            " -c 'lcd \"$source_dirname\"; cd \"$smb_top_path/$uuid/$smb_low_path\"; prompt; put \"$source_filename\" ; exit;'";
+        print "$smbclient_command_put\n";
+        my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
+    }
+
+        # HERE ????? my $tmp = tempdir( DIR => $ref_sophomorix_config->{'PATHS'}{'TMP_SMB'}, CLEANUP =>  1 );
+
+    
 }
 
 

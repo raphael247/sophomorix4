@@ -196,6 +196,16 @@ install-sophomorix-samba:
 # ntacls
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/ntacl
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/ntacl/*ntacl.template $(DEVELCONF)/devel/ntacl
+# gpo stuff
+	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/gpo
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/comment.cmtx $(DEVELCONF)/devel/gpo/school/Machine/comment.cmtx
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/Registry.pol $(DEVELCONF)/devel/gpo/school/Machine/Registry.pol
+	@install -D -oroot -groot --mode=0644 "sophomorix-samba/config-devel/gpo/school/Machine/Microsoft/Windows NT/SecEdit/GptTmpl.inf" "$(DEVELCONF)/devel/gpo/school/Machine/Microsoft/Windows NT/SecEdit/GptTmpl.inf"
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/Scripts/scripts.ini $(DEVELCONF)/devel/gpo/school/Machine/Scripts/scripts.ini 
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/Scripts/Startup/http_proxy_signing_ca.p12 $(DEVELCONF)/devel/gpo/school/Machine/Scripts/Startup/http_proxy_signing_ca.p12
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/User/Preferences/Drives/Drives.xml $(DEVELCONF)/devel/gpo/school/User/Preferences/Drives/Drives.xml 
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/User/Preferences/Printers/Printers.xml $(DEVELCONF)/devel/gpo/school/User/Preferences/Printers/Printers.xml 
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/User/Scripts/scripts.ini $(DEVELCONF)/devel/gpo/school/User/Scripts/scripts.ini 
 # language stuff
 	@install -d -m755 -oroot -groot $(LANGUAGE)
 #	@install -oroot -groot --mode=0644 sophomorix-samba/lang/sophomorix-lang.*[a-z] $(LANGUAGE)

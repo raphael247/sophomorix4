@@ -289,9 +289,9 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
 2) OK: sophomorix-school erzeugt/updated beim Schule erstellen eine gpo
    --> Falls schon da, Abbruch -> muss erstmal nicht abgefangen werden
    --> display name: sophomorix:school:<schoolname>
-3) TODO:
-   --> Verzeichnisbaum unter sysvol  aktualisieren
-   A) --> Dateisystem der Schule wird erzeugt,
+3) OK:
+   --> Verzeichnisbaum unter sysvol aktualisieren
+   A) Dateisystem der Schule wird erzeugt,
        - unter sysvol:  
          tree /var/lib/samba/sysvol/linuxmuster.local/Policies/{2...3}/
                        ├── GPT.INI
@@ -299,10 +299,11 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
                        └── User
        mit ntacls hinterlegen
        (evtl. leere Dateien erzeugen)
-OK: /usr/bin/smbclient -U administrator%`cat /etc/linuxmuster/.secret/administrator` //linuxmuster.local/sysvol -c 'mkdir "test"'
-FU: /usr/bin/smbclient -U administrator%'******'                                    //linuxmuster.local/ -c 'mkdir "/var/lib/samba/sysvol/test"'
 
-   B) TODO: Dateien gepatched einspielen
+   B) OK:   Dateien ungepatched kopieren
+      TODO: Dateien gepatched einspielen
+         - Drives.xml
+         - Printers.xml
 
       GPT.INI
       --> Version anpassen ?

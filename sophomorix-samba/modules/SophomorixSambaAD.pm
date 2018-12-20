@@ -625,7 +625,7 @@ sub AD_gpo_create {
     my $uuid = &AD_gpo_get_uuid($gpo,"school",$ref_sophomorix_config,$ref_result);
     print "Using gpo uuid $uuid\n";
 
-    # update some files in sysvol
+    # create/update some dirs in sysvol
     &AD_repdir_using_file({root_dns=>$root_dns,
                            repdir_file=>"repdir.school_gpo",
                            smb_admin_pass=>$smb_admin_pass,
@@ -633,6 +633,73 @@ sub AD_gpo_create {
                            sophomorix_config=>$ref_sophomorix_config,
                            sophomorix_result=>$ref_sophomorix_result,
                          });
+
+    # copy some files without modification
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/Machine/comment.cmtx",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "Machine",
+        "TRUE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/Machine/Registry.pol",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "Machine",
+        "TRUE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/Machine/Microsoft/Windows NT/SecEdit/GptTmpl.inf",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "Machine/Microsoft/Windows NT/SecEdit",
+        "TRUE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/Machine/Scripts/scripts.ini",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "Machine/Scripts",
+        "TRUE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/Machine/Scripts/Startup/http_proxy_signing_ca.p12",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "Machine/Scripts/Startup",
+        "TRUE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/User/Scripts/scripts.ini",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "User/Scripts",
+        "TRUE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+
+    # copy some files line by line with modification
+
+    # Drives.xml, Printers.xml
+
 
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
 }
@@ -701,6 +768,10 @@ sub AD_repdir_using_file {
     my $student_home = $arg_ref->{student_home};
     my $gpo_uuid = $arg_ref->{gpo_uuid};
 
+    if (not defined $gpo_uuid){
+        $gpo_uuid="";
+    }
+
     # abs path
     my $repdir_file_abs=$ref_sophomorix_config->{'REPDIR_FILES'}{$repdir_file}{'PATH_ABS'};
     my $entry_num=0; # was $num
@@ -715,7 +786,6 @@ sub AD_repdir_using_file {
 
     }
 
-    print "HERE: $gpo_uuid\n";
     # reading repdir file
     open(REPDIRFILE, "<$repdir_file_abs")|| die "ERROR: $repdir_file_abs $!";
     while (<REPDIRFILE>) {
@@ -788,8 +858,6 @@ sub AD_repdir_using_file {
         my @new_dirs=();
         foreach my $dir (@old_dirs){
             $dir=">".$dir."<"; # add the ><, so that no substrings will be replaced
-
-
             # /var
             $dir=~s/>\$path_log</${DevelConf::path_log}/;
             $dir=~s/>\$path_log_user</${DevelConf::path_log_user}/;
@@ -935,7 +1003,7 @@ sub AD_repdir_using_file {
                         if ($school eq $ref_sophomorix_config->{'INI'}{'GLOBAL'}{'SCHOOLNAME'}){
                             $share=$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'};
                         } else {
-                            if (defined $gpo_uuid){
+                            if ($gpo_uuid ne ""){
                                 $share="sysvol";
                             } else {
                                 $share=$school;
