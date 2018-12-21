@@ -643,6 +643,7 @@ sub AD_gpo_create {
         "Machine",
         "COPY",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
     &Sophomorix::SophomorixBase::smb_file_rewrite(
@@ -653,6 +654,7 @@ sub AD_gpo_create {
         "Machine",
         "COPY",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
     &Sophomorix::SophomorixBase::smb_file_rewrite(
@@ -663,6 +665,7 @@ sub AD_gpo_create {
         "Machine/Microsoft/Windows NT/SecEdit",
         "COPY",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
     &Sophomorix::SophomorixBase::smb_file_rewrite(
@@ -673,6 +676,7 @@ sub AD_gpo_create {
         "Machine/Scripts",
         "COPY",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
     &Sophomorix::SophomorixBase::smb_file_rewrite(
@@ -683,6 +687,7 @@ sub AD_gpo_create {
         "Machine/Scripts/Startup",
         "COPY",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
     &Sophomorix::SophomorixBase::smb_file_rewrite(
@@ -693,6 +698,7 @@ sub AD_gpo_create {
         "User/Scripts",
         "COPY",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
 
@@ -706,6 +712,7 @@ sub AD_gpo_create {
         "User/Preferences/Drives",
         "REWRITE",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
     &Sophomorix::SophomorixBase::smb_file_rewrite(
@@ -716,6 +723,7 @@ sub AD_gpo_create {
         "User/Preferences/Printers",
         "REWRITE",
         $root_dns,
+        $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
 

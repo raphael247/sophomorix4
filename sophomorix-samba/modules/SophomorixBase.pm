@@ -5316,6 +5316,7 @@ sub smb_file_rewrite {
         $smb_low_path,
         $mode,
         $root_dns,
+        $school,
         $smb_admin_pass,
         $ref_sophomorix_config)=@_;
 
@@ -5341,6 +5342,8 @@ sub smb_file_rewrite {
         while(<SOURCE>){
             my $line=$_;
             # replacements
+            $line=~s/\@\@SCHOOL\@\@/$school/g; 
+            $line=~s/\@\@ROOTDNS\@\@/$root_dns/g; 
             print TMP "$line";
         }
 
