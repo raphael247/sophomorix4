@@ -641,7 +641,7 @@ sub AD_gpo_create {
         "linuxmuster.local/Policies",
         $uuid,
         "Machine",
-        "TRUE",
+        "COPY",
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config);
@@ -651,7 +651,7 @@ sub AD_gpo_create {
         "linuxmuster.local/Policies",
         $uuid,
         "Machine",
-        "TRUE",
+        "COPY",
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config);
@@ -661,7 +661,7 @@ sub AD_gpo_create {
         "linuxmuster.local/Policies",
         $uuid,
         "Machine/Microsoft/Windows NT/SecEdit",
-        "TRUE",
+        "COPY",
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config);
@@ -671,7 +671,7 @@ sub AD_gpo_create {
         "linuxmuster.local/Policies",
         $uuid,
         "Machine/Scripts",
-        "TRUE",
+        "COPY",
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config);
@@ -681,7 +681,7 @@ sub AD_gpo_create {
         "linuxmuster.local/Policies",
         $uuid,
         "Machine/Scripts/Startup",
-        "TRUE",
+        "COPY",
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config);
@@ -691,12 +691,34 @@ sub AD_gpo_create {
         "linuxmuster.local/Policies",
         $uuid,
         "User/Scripts",
-        "TRUE",
+        "COPY",
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config);
 
+
     # copy some files line by line with modification
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/User/Preferences/Drives/Drives.xml",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "User/Preferences/Drives",
+        "REWRITE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/User/Preferences/Printers/Printers.xml",
+        "sysvol",
+        "linuxmuster.local/Policies",
+        $uuid,
+        "User/Preferences/Printers",
+        "REWRITE",
+        $root_dns,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+
 
     # Drives.xml, Printers.xml
 

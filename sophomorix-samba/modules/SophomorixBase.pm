@@ -12,7 +12,7 @@ use Config::IniFiles;
 #use Unicode::GCString;
 use Encode qw(decode encode);
 use LaTeX::Encode ':all';
-use File::Temp qw/ tempfile /;
+use File::Temp qw/ tempfile tempdir /;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -5314,26 +5314,47 @@ sub smb_file_rewrite {
         $smb_top_path,
         $uuid,
         $smb_low_path,
-        $copy,
+        $mode,
         $root_dns,
         $smb_admin_pass,
         $ref_sophomorix_config)=@_;
-    if ($copy eq "TRUE"){
-        my $source_dirname  = dirname($unix_path);
-        my $source_filename  = basename($unix_path);
 
+    my $source_dir = dirname($unix_path);
+    my $source_file = basename($unix_path);
+
+    if ($mode eq "COPY"){
+        # upload file via smb protocol
         my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
             " //$root_dns/$smb_share ".
-            " -c 'lcd \"$source_dirname\"; cd \"$smb_top_path/$uuid/$smb_low_path\"; prompt; put \"$source_filename\" ; exit;'";
+            " -c 'lcd \"$source_dir\"; cd \"$smb_top_path/$uuid/$smb_low_path\"; prompt; put \"$source_file\" ; exit;'";
         print "$smbclient_command_put\n";
         my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
+    } elsif ($mode eq "REWRITE"){
+        my ($fh,$tmp) = tempfile( DIR => $ref_sophomorix_config->{'PATHS'}{'TMP_SMB'}, UNLINK =>  1 );
+        my $tmp_dir  = dirname($tmp);
+        my $tmp_file  = basename($tmp);
+
+        open(SOURCE, "<$unix_path") or die "File $unix_path not found";
+        open(TMP, ">$tmp") or die "File $tmp not found";
+        while(<SOURCE>){
+            my $line=$_;
+            # replacements
+            print TMP "$line";
+        }
+
+        # upload file via smb protocol
+        my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " -U ".$DevelConf::sophomorix_file_admin.
+            "%'******'".
+            " //$root_dns/$smb_share ".
+            " -c 'lcd \"$tmp_dir\"; cd \"$smb_top_path/$uuid/$smb_low_path\"; prompt; put \"$tmp_file\" \"$source_file\" ; exit;'";
+        print "$smbclient_command_put\n";
+        my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
+        close(TMP);
+        close(SOURCE);
     }
-
-        # HERE ????? my $tmp = tempdir( DIR => $ref_sophomorix_config->{'PATHS'}{'TMP_SMB'}, CLEANUP =>  1 );
-
-    
 }
 
 
