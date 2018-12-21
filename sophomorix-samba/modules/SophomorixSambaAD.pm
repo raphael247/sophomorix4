@@ -702,8 +702,8 @@ sub AD_gpo_create {
         $smb_admin_pass,
         $ref_sophomorix_config);
 
-
     # copy some files line by line with modification
+    # Drives.xml
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/User/Preferences/Drives/Drives.xml",
         "sysvol",
@@ -715,6 +715,7 @@ sub AD_gpo_create {
         $gpo,
         $smb_admin_pass,
         $ref_sophomorix_config);
+    # Printers.xml
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/User/Preferences/Printers/Printers.xml",
         "sysvol",
@@ -727,11 +728,12 @@ sub AD_gpo_create {
         $smb_admin_pass,
         $ref_sophomorix_config);
 
-
-    # Drives.xml, Printers.xml
-
-
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
+    # activate
+    my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+        " ntacl sysvolreset";
+    print "$sysvolreset_command\n";
+    system ($sysvolreset_command);
 }
 
 
@@ -770,6 +772,11 @@ sub AD_gpo_kill {
     print "$command\n";
     system($command);
     &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo_real (end)");
+    # activate
+    my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+        " ntacl sysvolreset";
+    print "$sysvolreset_command\n";
+    system ($sysvolreset_command);
 }
 
 

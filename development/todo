@@ -281,10 +281,7 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
          
 --> GPO weiter nach Telefonat
 
-1) TODO: Vorlagen GPO ins Paket
--> zip von maurice, Variablen einbauen @@WORKGROUP@@, ...siehe ACL's
-  -> User -> preferences -> drives.xml
-  -> User -> preferences -> printers.xml
+1) OK: Vorlagen GPO ins Paket
 
 2) OK: sophomorix-school erzeugt/updated beim Schule erstellen eine gpo
    --> Falls schon da, Abbruch -> muss erstmal nicht abgefangen werden
@@ -301,9 +298,9 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
        (evtl. leere Dateien erzeugen)
 
    B) OK:   Dateien ungepatched kopieren
-      TODO: Dateien gepatched einspielen
-         - Drives.xml
-         - Printers.xml
+      OK: Dateien gepatched einspielen
+         - OK: Drives.xml
+         - TODO: Printers.xml -> muss aus devices.csv erzeugt werden?
 
       GPT.INI
       --> Version anpassen ?
@@ -317,7 +314,7 @@ sophomorix-postinst -> read sophomorix.conf if school exists einbauen
      - Entfernt die GPO aus dem Dateisystem unter  
        /var/lib/samba/sysvol/linuxmuster.local/Policies
        
-5) TODO: samba-tool ntacl sysvolreset aktiviert die GPO
+5) OK: samba-tool ntacl sysvolreset aktiviert die GPO
 
 ------------------------------------------------------------
 
