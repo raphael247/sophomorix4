@@ -7457,7 +7457,15 @@ sub AD_group_create {
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$group.",".$target_branch;
+
     my $mail = $group."\@".$root_dns;
+    my $maildomain_key=$school."-".$type;
+    if (exists $ref_sophomorix_config->{'TYPES'}{$maildomain_key}{'MAILDOMAIN'}){
+        if ($ref_sophomorix_config->{'TYPES'}{$maildomain_key}{'MAILDOMAIN'} ne ""){
+            $mail=$group."\@".
+                $ref_sophomorix_config->{'TYPES'}{$maildomain_key}{'MAILDOMAIN'};
+	}
+    }
 
     if (defined $dn_wish){
         # override DN
