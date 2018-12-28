@@ -6474,6 +6474,7 @@ sub AD_get_groups_v {
             }
             $groups{'GROUPS'}{$sam}{'DN'}=$dn;
             $groups{'GROUPS'}{$sam}{'sophomorixStatus'}=$status;
+            $groups{'GROUPS'}{$sam}{'sophomorixType'}=$type;
             $groups{'GROUPS'}{$sam}{'displayName'}=$entry->get_value('displayName');
             $groups{'GROUPS'}{$sam}{'sophomorixMailQuota'}=$entry->get_value('sophomorixMailQuota');
             $groups{'GROUPS'}{$sam}{'sophomorixAddMailQuota'}=$entry->get_value('sophomorixAddMailQuota');
@@ -6957,6 +6958,7 @@ sub AD_group_update {
     my $type = $arg_ref->{type};
     my $description = $arg_ref->{description};
     my $quota = $arg_ref->{quota};
+    my $mail = $arg_ref->{mail};
     my $mailquota = $arg_ref->{mailquota};
     my $addquota = $arg_ref->{addquota};
     my $addmailquota = $arg_ref->{addmailquota};
@@ -7064,6 +7066,11 @@ sub AD_group_update {
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
     
+    # mail   
+    if (defined $mail){
+        print "   * Setting mail to '$mail'\n";
+        my $mesg = $ldap->modify($dn,replace => {mail => $mail}); 
+    }
     # mailquota   
     if (defined $mailquota){
         my ($value,$comment)=split(/:/,$mailquota);

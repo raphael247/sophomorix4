@@ -88,6 +88,7 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
 # define which options deliver which object
 $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
 $options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes";
+$options{'CONFIG'}{'SINGLE'}{'ACTION'}="update-maildomain";
 # define option that can modify which object
 $options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
                                      "teacherclass,".
@@ -130,6 +131,7 @@ my $testopt=GetOptions(\%options,
                        "addmembers=s",
                        "removemembers=s",
                        "delete-all-empty-classes",
+                       "update-maildomain",
                       );    
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
@@ -208,6 +210,9 @@ Changing one/multiple admin-/extra-/teacherclass:
     --addadmins user1,user2,user3, ...
     --removeadmins user1,user2,user3, ...
 
+Updating changes from school.conf
+    --update-maildomain  (for all schools)
+
 This is for migration/testing/fixing only (only one class allowed as option):
   --create --skip-school-creation --class <class> --set-gidnumber <num>
   --creationdate <20150529093330.0Z> (only for migration)
@@ -245,7 +250,7 @@ if ($options{'info'}==1 and not defined $options{'class'}){
                                    school=>$options{'school'},
                                    sophomorix_config=>\%sophomorix_config,
                                  });
-
+  
     #print Dumper($ref_group_v->{'LISTS'});
     my $jsoninfo="CLASSES_OVERVIEW";
     my $jsoncomment="All Groups";
@@ -294,6 +299,43 @@ if ($options{'info'}==1 and defined $options{'class'}){
 # Start
 ############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+
+
+
+# --update-maildomain
+if ($options{'update-maildomain'}==1 ){
+    my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   school=>$options{'school'},
+                                   sophomorix_config=>\%sophomorix_config,
+				     });
+    #print Dumper($ref_group_v);
+    foreach my $school (@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }){
+	foreach my $class (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
+	    my $type=$ref_group_v->{'GROUPS'}{$class}{'sophomorixType'};
+	    my $dn=$ref_group_v->{'GROUPS'}{$class}{'DN'};
+	    my $mail = $class."\@".$root_dns;
+	    my $maildomain_key=$school."-".$type;
+	    if (exists $sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'}){
+                if ($sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'} ne ""){
+                    $mail=$class."\@".
+                    $sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'};
+	        }
+            }
+	    &AD_group_update({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              dn=>$dn,
+	     	              school=>$school,
+                              type=>$type,
+                              mail=>$mail,
+                              sophomorix_config=>\%sophomorix_config,
+                            });
+	}
+    }
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+}
+
 
 
 # --delete-all-empty-classes
