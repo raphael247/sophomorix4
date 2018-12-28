@@ -292,9 +292,8 @@ if ($options{'info'}==1 and defined $options{'class'}){
 }
 
 
+
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$options{'json'});
-
-
 ############################################################
 # Start
 ############################################################
@@ -303,7 +302,7 @@ if ($options{'info'}==1 and defined $options{'class'}){
 
 
 # --update-maildomain
-if ($options{'update-maildomain'}==1 ){
+if (defined $options{'update-maildomain'}){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,

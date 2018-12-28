@@ -102,6 +102,8 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
 # define which options deliver which object
 $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="project";
 
+$options{'CONFIG'}{'SINGLE'}{'ACTION'}="update-maildomain";
+
 # define more dependencies
 $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
 $options{'CONFIG'}{'DEPENDS'}{'skip-school-creation'}="create";
@@ -141,6 +143,7 @@ my $testopt=GetOptions(\%options,
                        "creationdate=s",
                        "mailalias!",
                        "maillist!",
+		       "update-maildomain",
                       );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-project");
@@ -226,6 +229,9 @@ Changing/creating/killing a project:
 Syncing memberships of all projects (sophomorix* -> members):
   --sync-all-memberships
 
+Updating changes from school.conf
+    --update-maildomain  (for all schools)
+
 This is for migration/testing/fixing only:
   sophomorix-project --skip-school-creation --create --project <project> --set-gidnumber <num>
 
@@ -286,8 +292,51 @@ if ($options{'info'}==1 and defined $options{'project'}){
     exit;
 }
 
+
+
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$options{'json'});
+############################################################
+# Start
+############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+
+
+
+# --update-maildomain
+if (defined $options{'update-maildomain'}){
+    my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   school=>$options{'school'},
+                                   sophomorix_config=>\%sophomorix_config,
+				     });
+    print Dumper($ref_group_v);
+    foreach my $school (@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }){
+	foreach my $project (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'project'} }){
+	    my $type=$ref_group_v->{'GROUPS'}{$project}{'sophomorixType'};
+	    my $dn=$ref_group_v->{'GROUPS'}{$project}{'DN'};
+	    my $mail = $project."\@".$root_dns;
+	    my $maildomain_key=$school."-".$type;
+	    if (exists $sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'}){
+                if ($sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'} ne ""){
+                    $mail=$project."\@".
+                    $sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'};
+	        }
+            }
+
+	    &AD_group_update({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              dn=>$dn,
+	     	              school=>$school,
+                              type=>$type,
+                              mail=>$mail,
+                              sophomorix_config=>\%sophomorix_config,
+                            });
+	}
+    }
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+}
+
 
 
 # --create --project <name>
