@@ -310,7 +310,7 @@ if (defined $options{'update-maildomain'}){
                                    school=>$options{'school'},
                                    sophomorix_config=>\%sophomorix_config,
 				     });
-    print Dumper($ref_group_v);
+    #print Dumper($ref_group_v);
     foreach my $school (@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }){
 	foreach my $project (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'project'} }){
 	    my $type=$ref_group_v->{'GROUPS'}{$project}{'sophomorixType'};
@@ -327,7 +327,7 @@ if (defined $options{'update-maildomain'}){
 	    &AD_group_update({ldap=>$ldap,
                               root_dse=>$root_dse,
                               dn=>$dn,
-	     	              school=>$school,
+                              school=>$school,
                               type=>$type,
                               mail=>$mail,
                               sophomorix_config=>\%sophomorix_config,
