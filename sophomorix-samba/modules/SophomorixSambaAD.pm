@@ -306,7 +306,7 @@ sub AD_dns_get {
         push @dns_part_stripped, $part;
     }
     my $dns_name = join(".",@dns_part_stripped);
-    if($Conf::log_level>=2){
+    if($Conf::log_level>=3){
         my $caller=(caller(0))[3];
         print "$caller RootDSE: $root_dse -> DNS: $dns_name\n";
     }
@@ -3593,11 +3593,11 @@ sub AD_school_create {
     # if school was already created in this script
     if (exists $ref_sophomorix_config->{'RUNTIME'}{'SCHOOLS_CREATED'}{$school}){
         print "   * $school already created RUNTIME\n";
-        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+        #print Dumper ($ref_sophomorix_config->{'RUNTIME'});
         return;
     } else {
         print "   * $school must be created RUNTIME\n";
-        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+        #print Dumper ($ref_sophomorix_config->{'RUNTIME'});
     }
     $school=&AD_get_schoolname($school);
 
@@ -7433,15 +7433,13 @@ sub AD_group_create {
         $file="none";    
     }
 
-    print Dumper($ref_sophomorix_config->{'RUNTIME'});
-
     if (exists $ref_sophomorix_config->{'RUNTIME'}{'GROUPS_CREATED'}{$group}){
         print "   * $group already created RUNTIME\n";
-        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+        #print Dumper ($ref_sophomorix_config->{'RUNTIME'});
         return;
     } else {
         print "   * $group must be created RUNTIME\n";
-        print Dumper ($ref_sophomorix_config->{'RUNTIME'});
+        #print Dumper ($ref_sophomorix_config->{'RUNTIME'});
     }
 
     print "\n";
