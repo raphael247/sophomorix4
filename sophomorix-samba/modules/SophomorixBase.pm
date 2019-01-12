@@ -3873,11 +3873,15 @@ sub read_smb_conf {
     my $domain=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'realm'};
     $domain=~tr/A-Z/a-z/; # make lowercase
     my @dns=split(/\./,$domain);
-    $domain_dns = join(',DC=', @dns);
+    my $domain_dns = join(',DC=', @dns);
     $domain_dns="DC=".$domain_dns;
+    my $server_dns=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'netbios name'};
+    $server_dns=~tr/A-Z/a-z/; # make lowercase
     $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'DomainDNS'}=$domain_dns;
+    $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}=$server_dns;
 }
 
+            $line=~s/\@\@ROOTDNS\@\@/$root_dns/g; 
 
 
 sub read_ui {
@@ -5344,6 +5348,7 @@ sub smb_file_rewrite {
             # replacements
             $line=~s/\@\@SCHOOL\@\@/$school/g; 
             $line=~s/\@\@ROOTDNS\@\@/$root_dns/g; 
+            $line=~s/\@\@SERVER\@\@/$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}/g; 
             print TMP "$line";
         }
 

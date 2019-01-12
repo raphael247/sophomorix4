@@ -30,6 +30,9 @@ Host fleischsalat
 Todo:
 ############################################################
 
+
+
+
 Prioliste:
 
 * statt mv sophomorix-transfer beim versetzen
@@ -243,6 +246,35 @@ password clonen tut nicht beim anlegen eines examusers
 ------------------------------------------------------------
 GPO
 
+gpo test:
+         uid anpassen in Drives.xml
+         Drives: clsid="{8FDDCC1A-0C3C-43cd-A6B4-71A6DF20DA8C} -> Ulm
+                         8FDDCC1A-0C3C-43cd-A6B4-71A6DF20DA8C  -> MSexample
+         935D1B74-9CB8-4e3c-9914-7DD559B7A417
+         
+clsid="{935D1B74-9CB8-4e3c-9914-7DD559B7A417}"
+           uid="{297391D1-F96E-48E5-81B4-01208C4D8E92}"
+
+
+         OK: statt linuxmuster.local servername in Drives.xml
+         
+          
+         ????? Beim entfernen der GPO auch verzeichnis löschen
+         ????TODO: so verlinken mit samba-tool gpo ....
+         samba-tool gpo setlink
+   OU=bsz,OU=SCHOOLS,DC=linuxmuster,DC=local
+   {21ED2FE6-34B7-4338-99A1-CA4F6A4430EF} -U Administrator --password='flzsEHZGKxG1WRcf'
+
+
+
+         
+         ⚡ root@server  ~  samba-tool gpo listcontainers {68419CFB-90FD-4640-B583-944D4B52ED30}
+Container(s) using GPO {68419CFB-90FD-4640-B583-944D4B52ED30}
+    DN: OU=default-school,OU=SCHOOLS,DC=lmn,DC=schmitt,DC=tk
+
+         
+
+         
       OK: sophomorix-postinst overwrite files in
       OK: ordner lmn (mit denen vom paket)
       OK:    ordner custom: anlegen, wenn noch nicht da, wenn da unberührt lassen

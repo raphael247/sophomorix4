@@ -198,6 +198,7 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/ntacl/*ntacl.template $(DEVELCONF)/devel/ntacl
 # gpo stuff
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/gpo
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/GPT.INI $(DEVELCONF)/devel/gpo/school/GPT.INI
 	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/comment.cmtx $(DEVELCONF)/devel/gpo/school/Machine/comment.cmtx
 	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/Registry.pol $(DEVELCONF)/devel/gpo/school/Machine/Registry.pol
 	@install -D -oroot -groot --mode=0644 "sophomorix-samba/config-devel/gpo/school/Machine/Microsoft/Windows NT/SecEdit/GptTmpl.inf" "$(DEVELCONF)/devel/gpo/school/Machine/Microsoft/Windows NT/SecEdit/GptTmpl.inf"
