@@ -728,6 +728,17 @@ sub AD_gpo_create {
         $smb_admin_pass,
         $ref_sophomorix_config);
 
+    # set gpo link to school
+    my $command_link=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+	        " gpo setlink ".
+	        $ref_sophomorix_config->{'SCHOOLS'}{$gpo}{'OU_TOP'}.
+                " \"".$uuid."\" ".
+                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`";
+                
+    print "$command_link\n";
+    system($command_link);
+
+    
     &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
     # activate
     my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
