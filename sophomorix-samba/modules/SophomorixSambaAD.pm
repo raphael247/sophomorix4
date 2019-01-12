@@ -638,7 +638,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/Machine/comment.cmtx",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "Machine",
         "COPY",
@@ -649,7 +649,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/Machine/Registry.pol",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "Machine",
         "COPY",
@@ -660,7 +660,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/Machine/Microsoft/Windows NT/SecEdit/GptTmpl.inf",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "Machine/Microsoft/Windows NT/SecEdit",
         "COPY",
@@ -671,7 +671,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/Machine/Scripts/scripts.ini",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "Machine/Scripts",
         "COPY",
@@ -682,7 +682,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/Machine/Scripts/Startup/http_proxy_signing_ca.p12",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "Machine/Scripts/Startup",
         "COPY",
@@ -693,7 +693,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/User/Scripts/scripts.ini",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "User/Scripts",
         "COPY",
@@ -707,7 +707,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/User/Preferences/Drives/Drives.xml",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "User/Preferences/Drives",
         "REWRITE",
@@ -719,7 +719,7 @@ sub AD_gpo_create {
     &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/User/Preferences/Printers/Printers.xml",
         "sysvol",
-        "linuxmuster.local/Policies",
+        $root_dns."/Policies",
         $uuid,
         "User/Preferences/Printers",
         "REWRITE",
