@@ -544,24 +544,39 @@ sub AD_gpo_listall {
     my $ref_result = $arg_ref->{sophomorix_result};
     my %gpo=();
     my $gpo_listall_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}." gpo listall";
-    print "$gpo_listall_command\n";
+    print "$gpo_listall_command (and: gpo listcontainers)\n";
     $gpo_listall_out=`$gpo_listall_command`;
     my $gpo_listall_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+  
+    $gpo_out="";
 
     my @lines=split(/\n/,$gpo_listall_out);
+    push @lines, ""; # add empty line to allow to finalize last gpo
     my $gpo_current="";
     foreach my $line (@lines){
         if ($line eq ""){
+            my $gpo_listcontainers_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+                " gpo listcontainers $gpo_current";
+            $gpo_listcontainers_out=`$gpo_listcontainers_command`;
+	    #print $gpo_listcontainers_command."\n";
+	    #print $gpo_listcontainers_out."\n";
+
+            $gpo_out=$gpo_out."  ".$gpo_listcontainers_out."\n";
+            # ???? analyze $listcontainers_out for json
+
             next;
         }
+
         my ($key,$value)=split(/:/,$line,2);
         $key=&Sophomorix::SophomorixBase::remove_embracing_whitespace($key);
         $value=&Sophomorix::SophomorixBase::remove_embracing_whitespace($value);
         if ($key eq "GPO"){
+	    $gpo_out=$gpo_out."\n".$line."\n";
             # update current gpo name 
             $gpo_current=$value;
             $gpo{'GPO'}{$value}{'EXISTING'}="TRUE";
 	} else{
+            $gpo_out=$gpo_out.$line."\n";
             # store key value
             $gpo{'GPO'}{$gpo_current}{$key}=$value;
             if ($key eq "display name"){
@@ -574,7 +589,9 @@ sub AD_gpo_listall {
     if ($json==-1){
         return \%gpo;
     } elsif ($json==0){
-        print $gpo_listall_out;
+        #print $gpo_listall_out;
+	#print "\n\n";
+        print $gpo_out;
     } elsif ($json>0){
         print Dumper(\%gpo);
     }
@@ -728,6 +745,9 @@ sub AD_gpo_create {
         $smb_admin_pass,
         $ref_sophomorix_config);
 
+    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
+
+    &Sophomorix::SophomorixBase::print_title("Creating link to $gpo_real (start)");
     # set gpo link to school
     my $command_link=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
 	        " gpo setlink ".
@@ -737,9 +757,17 @@ sub AD_gpo_create {
                 
     print "$command_link\n";
     system($command_link);
+    &Sophomorix::SophomorixBase::print_title("Creating link to $gpo_real (end)");
 
+    my $command_inherit=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
+	        " gpo setinheritance ".
+	        $ref_sophomorix_config->{'SCHOOLS'}{$gpo}{'OU_TOP'}.
+                " inherit".
+                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`";
+                
+    print "MAYBE: $command_inherit\n";
+    system($command_inherit);
     
-    &Sophomorix::SophomorixBase::print_title("Creating gpo $gpo_real (end)");
     # activate
     my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
         " ntacl sysvolreset";
