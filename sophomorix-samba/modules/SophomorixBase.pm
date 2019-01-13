@@ -3881,7 +3881,6 @@ sub read_smb_conf {
     $ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}=$server_dns;
 }
 
-            $line=~s/\@\@ROOTDNS\@\@/$root_dns/g; 
 
 
 sub read_ui {
