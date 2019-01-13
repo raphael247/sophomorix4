@@ -250,32 +250,40 @@ gpo test:
          uid anpassen in Drives.xml
          Drives: clsid="{8FDDCC1A-0C3C-43cd-A6B4-71A6DF20DA8C} -> Ulm
                          8FDDCC1A-0C3C-43cd-A6B4-71A6DF20DA8C  -> MSexample
-         935D1B74-9CB8-4e3c-9914-7DD559B7A417
-         
-clsid="{935D1B74-9CB8-4e3c-9914-7DD559B7A417}"
-           uid="{297391D1-F96E-48E5-81B4-01208C4D8E92}"
+   --> uuids sind überall gleich -> nix anpassen
 
 
-         OK: statt linuxmuster.local servername in Drives.xml
+Test 1: inherit Flag?
+
+Test 2: /usr/bin/samba-tool gpo aclcheck  -U administrator%`cat /etc/linuxmuster/.secret/administrator`
+--> zeigt keine Ausgabe: ist dann alles OK?
+
+Test 3: samba-tool gpo list <user>
+Zeigt dass die ACL gilt für den user (tut aber auch ohne ntacl sysvolreset)
+
+GPOs for user schwein42
+    sophomorix:school:default-school {CC37E8AA-D779-405A-957A-4269D83CE81A}
+
+Test 4:
+/usr/bin/samba-tool ntacl sysvolcheck
+-> ohne ausgabe, ist dann alles OK?
+
+Test 5:
+gpo anlegen -> per win tool aktivieren -> Drives.xml sichern
+gpo löschen 
+gpo anlegen
+Drives.xml reinkopieren
+samba-tool ntacl sysvolreset
+Wenn es dann tut liegts evtl. an den *.xml Dateien (Zeilenumruch, usw....) 
+
+
+Debuglevel einstellen von samba-tool: -d <num>
+
+
          
           
          ????? Beim entfernen der GPO auch verzeichnis löschen
-
-TODO:
-samba-tool gpo listcontainers {8BC0B23D-556F-4FFD-81A0-18376BBAF22A}
--> nach jeder GPO listen welche container diese GPO nutzen 
-         
-         ⚡ root@server  ~  samba-tool gpo listcontainers {68419CFB-90FD-4640-B583-944D4B52ED30}
-Container(s) using GPO {68419CFB-90FD-4640-B583-944D4B52ED30}
-    DN: OU=default-school,OU=SCHOOLS,DC=lmn,DC=schmitt,DC=tk
-
-BUG:       
-sophomorix-ldbsearch  > /root/log2
-Use of uninitialized value $Sophomorix::SophomorixBase::line in substitution (s///) at /usr/share/perl5/Sophomorix/SophomorixBase.pm line 3884, <DAT
-
-
-
-
+         ---> geschieht automatisch, so wies aussieht
 
          
       OK: sophomorix-postinst overwrite files in
