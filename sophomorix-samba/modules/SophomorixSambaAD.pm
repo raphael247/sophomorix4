@@ -763,10 +763,10 @@ sub AD_gpo_create {
 	        " gpo setinheritance ".
 	        $ref_sophomorix_config->{'SCHOOLS'}{$gpo}{'OU_TOP'}.
                 " inherit".
-                "-U administrator%`cat /etc/linuxmuster/.secret/administrator`";
+                " -U administrator%`cat /etc/linuxmuster/.secret/administrator`";
                 
-    print "MAYBE: $command_inherit\n";
-    system($command_inherit);
+    print "MAYBE DO: $command_inherit\n";
+    #system($command_inherit);
     
     # activate
     my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
