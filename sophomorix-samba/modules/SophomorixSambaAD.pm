@@ -653,6 +653,17 @@ sub AD_gpo_create {
 
     # copy some files without modification
     &Sophomorix::SophomorixBase::smb_file_rewrite(
+        "/usr/share/sophomorix/devel/gpo/school/GPT.INI",
+        "sysvol",
+        $root_dns."/Policies",
+        $uuid,
+        "",
+        "COPY",
+        $root_dns,
+        $gpo,
+        $smb_admin_pass,
+        $ref_sophomorix_config);
+    &Sophomorix::SophomorixBase::smb_file_rewrite(
         "/usr/share/sophomorix/devel/gpo/school/Machine/comment.cmtx",
         "sysvol",
         $root_dns."/Policies",
