@@ -30,6 +30,32 @@ Host fleischsalat
 Todo:
 ############################################################
 
+A)
+
+smbcacls tut auf smb share nicht
+
+konfigurierbar:
+SMBCACLS_NET_CONF_DFSPATH_=yes/no # yes: fix smbcacls Bug, no: let samb do the dfs stuff
+
+-> heute mit Bug: yes, später no (samba tut das für einen)
+
+1. in net conf list steht bei jedem share
+   der Pfad, ODER msdfsroot=yes
+
+2. Wenn msdfsroot=yes, dann msdfsproxy nutzen (nur bei SMBCACLS_NET_CONF_DFSPATH=yes)
+
+
+B)
+uidNumber raus beim user anlegen
+-> beim anlegen
+-> beim anzeigen, usw
+
+C)
+gidNumber raus beim group anlegen
+-> beim anlegen
+-> beim anzeigen, usw
+
+
 
 
 
