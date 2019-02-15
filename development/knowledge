@@ -23,6 +23,38 @@ Manche attribute müssen explizit angefordert werden dass sie erscheinen:
 
 ############################################################
 
+msdfs example
+
+[default-school]
+        msdfs root = yes
+        msdfs proxy = \lmn-hu.schule.caritas.dicv-fr.de\default-school
+
+To set this, issue the following commands:
+# delete share to create it new (can be omitted, when editing the existing share, see below)
+net conf delshare uni
+
+# create the share new
+net conf addshare uni /path  (a path is needed to create the share, this creates more parameters)
+net conf setparm uni 'msdfs root' 'yes'
+net conf setparm uni 'msdfs proxy' '\lmn-hu.schule.caritas.dicv-fr.de\default-school'
+
+# remove unnecessary stuff
+net conf delparm uni 'read only'
+net conf delparm uni 'path'
+net conf delparm uni 'guest ok'
+
+Test with:
+net conf list
+
+smbcacls Bug: statt
+
+/usr/bin/smbcacls -U administrator%'******' //linuxmuster.local/uni iso
+
+/usr/bin/smbcacls -U administrator%'******' //lmn.schule.dicv.de/uni iso
+
+
+############################################################
+
 E-Mail migration:
 cyrus2dovecot
 
