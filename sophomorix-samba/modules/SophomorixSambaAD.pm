@@ -1118,7 +1118,7 @@ sub AD_repdir_using_file {
                             print "* NOT executed (ntaclonly): smbclient command\n";
                         }
 
-                        # smbcacls
+                        # use smbcacls
                         &Sophomorix::SophomorixBase::NTACL_set_file({root_dns=>$root_dns,
                                                                      user=>$user,
                                                                      group=>$group,

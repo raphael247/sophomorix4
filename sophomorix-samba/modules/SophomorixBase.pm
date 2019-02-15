@@ -5431,11 +5431,22 @@ sub NTACL_set_file {
         }
     }
     $smbcacls_option="\"".$smbcacls_option."\"";
+    my $server_share="//".$root_dns."/".$school;
+
+    if ($ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCACLS_SERVER_FIX'} eq "TRUE"){
+        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'} and
+            exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs proxy'} ){
+            if ($ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'} eq "yes"){
+                $server_share=$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs proxy'};
+            }
+        }
+    }
+
     my $smbcacls_base_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCACLS'}.
-                              " -U ".$DevelConf::sophomorix_file_admin."%'******'".
-                              " //$root_dns/$school $smbpath --set ";
+                              " -U ".$DevelConf::sophomorix_file_admin."%'******' ".
+                              $server_share." ".$smbpath." --set ";
     my $smbcacls_display_command=$smbcacls_base_command.$smbcacls_option;
- 
+
     # assemble real command
     my $smbcacls_command=$smbcacls_display_command;
     $smbcacls_command=~s/\*\*\*\*\*\*/$smb_admin_pass/;
