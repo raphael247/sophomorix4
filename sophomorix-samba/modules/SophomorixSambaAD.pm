@@ -2150,7 +2150,7 @@ sub AD_user_create {
         sophomorixWebuiDashboard => "---",
         sophomorixExamMode => "---", 
         userAccountControl => $user_account_control,
-        uidNumber => $uidnumber_wish,
+#        uidNumber => $uidnumber_wish,
                     ];
 
     # add sophomorixWebuiPermissionsCalculated only if defined
@@ -7572,7 +7572,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_wish,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7599,7 +7599,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_wish,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7626,7 +7626,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_wish,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7653,7 +7653,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_wish,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7679,7 +7679,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_wish,
                                     sophomorixRoomIPs => $ref_room_ips,
                                     sophomorixRoomMACs => $ref_room_macs,
                                     sophomorixRoomComputers => $ref_room_computers,
@@ -7708,7 +7708,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_wish,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
