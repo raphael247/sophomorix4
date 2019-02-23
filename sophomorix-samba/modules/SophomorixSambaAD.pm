@@ -607,13 +607,15 @@ sub AD_gpo_get_uuid {
                                });
     my $gpo_real="sophomorix".":".$gpo_type.":".$gpo;
     my $uuid="";
+    my $gpo_dn="";
     if (exists $ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real}){
         $uuid=$ref_gpo->{'LOOKUP'}{"by_display_name"}{$gpo_real};
+        $gpo_dn=$ref_gpo->{'GPO'}{$uuid}{'dn'};
     } else {
         print "\nERROR: gpo \"$gpo_real\" not found!\n\n";
         exit;
     }
-    return $uuid;
+    return ($uuid,$gpo_dn);
 }
 
 
@@ -639,7 +641,7 @@ sub AD_gpo_create {
     print "$command\n";
     system($command);
 
-    my $uuid = &AD_gpo_get_uuid($gpo,"school",$ref_sophomorix_config,$ref_result);
+    my ($uuid,$gpo_dn) = &AD_gpo_get_uuid($gpo,"school",$ref_sophomorix_config,$ref_result);
     print "Using gpo uuid $uuid\n";
 
     # create/update some dirs in sysvol
@@ -779,6 +781,8 @@ sub AD_gpo_create {
     print "MAYBE DO: $command_inherit\n";
     #system($command_inherit);
     
+    print "GPO uuid: $uuid $gpo_dn\n";
+
     # activate
     my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
         " ntacl sysvolreset";
