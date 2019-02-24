@@ -3163,13 +3163,16 @@ sub AD_user_setquota {
             print $smbcquotas_out_ident;
         }
         #chomp($smbcquotas_return);
-        my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$smbcquotas_out);
-        my ($unused,$quota_user)=split(/\\/,$full_user);
-        $used=~s/\/$//;
-        $hard_limit=~s/\/$//;
-        if ($hard_limit eq "NO"){
-            $hard_limit="NO LIMIT";
-        }
+        my ($full_user,
+            $quota_user,
+            $colon,
+            $used,
+            $soft_limit,
+            $hard_limit,
+            $used_mib,
+            $soft_limit_mib,
+            $hard_limit_mib,
+           )=&Sophomorix::SophomorixBase::analyze_smbcquotas_out($smbcquotas_out,$user);
 
         # update the sophomorixQuota entry at the user
         my $share_quota=$share.":".$quota;

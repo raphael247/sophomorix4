@@ -17,6 +17,7 @@ $Data::Dumper::Useqq = 1;
 $Data::Dumper::Terse = 1; 
 use JSON;
 use Sophomorix::SophomorixBase qw(
+                                 analyze_smbcquotas_out
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
@@ -813,17 +814,25 @@ for( my $index = 0 ; $index < $max ; $index++) {
             # run the command
             my $smbcquotas_out=`$smbcquotas_command`;
             my $smbcquotas_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
-            my ($full_user,$colon,$used,$soft_limit,$hard_limit)=split(/\s+/,$smbcquotas_out);
-            $used=~s/\/$//;
-            $soft_limit=~s/\/$//;
-            $hard_limit=~s/\/$//;
+
+            my ($full_user,
+                $quota_user,
+                $colon,
+                $used,
+                $soft_limit,
+                $hard_limit,
+                $used_mib,
+                $soft_limit_mib,
+                $hard_limit_mib,
+               )=&Sophomorix::SophomorixBase::analyze_smbcquotas_out($smbcquotas_out,$sam);
+
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'FULL_USER'}=$full_user;
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED'}=$used;
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT'}=$soft_limit;
             $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT'}=$hard_limit;
-            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED_MiB'}=round(10*$used/1024/1024)/10;
-            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT_MiB'}=round(10*$soft_limit/1024/1024)/10;;
-            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT_MiB'}=round(10*$hard_limit/1024/1024)/10;;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'USED_MiB'}=$used_mib;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'SOFT_LIMIT_MiB'}=$soft_limit_mib;
+            $search{$top_key}{$sam}{'QUOTA_USAGE_BY_SHARE'}{$share}{'HARD_LIMIT_MiB'}=$hard_limit_mib;
         }    
     }
 

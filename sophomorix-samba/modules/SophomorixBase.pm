@@ -13,6 +13,7 @@ use Config::IniFiles;
 use Encode qw(decode encode);
 use LaTeX::Encode ':all';
 use File::Temp qw/ tempfile tempdir /;
+use Math::Round;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -64,6 +65,7 @@ $Data::Dumper::Terse = 1;
             console_print_mail_user
             console_print_quota_user
             console_print_mailquota_user
+            analyze_smbcquotas_out
             get_homedirectory
             get_sharedirectory
             get_group_basename
@@ -5678,6 +5680,65 @@ sub get_homedirectory {
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/unknown/".$group_basename."/".$user;
     }
     return ($homedirectory,$unix_home,$unc,$smb_rel_path);
+}
+
+
+
+sub analyze_smbcquotas_out {
+    my ($smbcquotas_out,$user) = @_;
+
+    my ($full_user,$quota_data)=split(/:/,$smbcquotas_out);
+    # extract full user/quota user from part before colon(:)
+    $full_user=~s/\/$//; # remove trailing whitespace
+    my ($realm,$quota_user)=split(/\\/,$full_user);
+
+    my $used;
+    my $soft_limit;
+    my $hard_limit;
+    my $used_mib;
+    my $soft_limit_mib;
+    my $hard_limit_mib;
+
+    if ($full_user=~m/NT_STATUS_ACCESS_DENIED/){
+        # ERROR fetching quota
+        $quota_user=$user;
+        $used="NT_STATUS_ACCESS_DENIED";
+        $soft_limit="NT_STATUS_ACCESS_DENIED";
+        $hard_limit="NT_STATUS_ACCESS_DENIED";
+        $used_mib="NT_STATUS_ACCESS_DENIED";
+        $soft_limit_mib="NT_STATUS_ACCESS_DENIED";
+        $hard_limit_mib="NT_STATUS_ACCESS_DENIED";
+
+    } else {
+        # extract quota data from part after colon(:)
+        $quota_data=~s/\s+//g;
+        ($used,$soft_limit,$hard_limit)=split(/\//,$quota_data);
+        $used_mib=round(10*$used/1024/1024)/10;
+        $soft_limit_mib=round(10*$soft_limit/1024/1024)/10;
+        $hard_limit_mib=round(10*$hard_limit/1024/1024)/10;
+    }
+
+    # debug output
+    #print "HERE full: $full_user \n";
+    #print "HERE user: $quota_user \n";
+    #print "HERE used: $used \n";
+    #print "HERE sl:   $soft_limit \n";
+    #print "HERE hl:   $hard_limit \n";
+    #print "HERE used: $used_mib \n";
+    #print "HERE sl:   $soft_limit_mib \n";
+    #print "HERE hl:   $hard_limit_mib \n";
+    #print $smbcquotas_out;
+
+    return ($full_user,
+            $quota_user,
+            $colon,
+            $used,
+            $soft_limit,
+            $hard_limit,
+            $used_mib,
+            $soft_limit_mib,
+            $hard_limit_mib,
+           );
 }
 
 
