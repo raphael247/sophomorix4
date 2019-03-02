@@ -6128,7 +6128,6 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'uSNChanged'}=$entry->get_value('uSNChanged');
         $users{'USERS'}{$sam}{'uSNCreated'}=$entry->get_value('uSNCreated');
         # unix
-        $users{'USERS'}{$sam}{'uidNumber'}=$entry->get_value('uidNumber');
         $users{'USERS'}{$sam}{'unixHomeDirectory'}=$entry->get_value('unixHomeDirectory');
         $users{'USERS'}{$sam}{'primaryGroupID'}=$entry->get_value('primaryGroupID');
         # password from file
@@ -6865,7 +6864,6 @@ sub AD_get_printdata {
                                  'sophomorixRole',
                                  'sophomorixCreationDate',
                                  'sophomorixFirstPassword',
-                                 'uidNumber',
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found for password printout");
@@ -6882,8 +6880,7 @@ sub AD_get_printdata {
                      $entry->get_value('sophomorixSurnameASCII').";".
                      $entry->get_value('sophomorixFirstnameASCII').";".
                      $entry->get_value('sophomorixRole').";".
-                     $entry->get_value('sophomorixCreationDate').";".
-                     $entry->get_value('uidNumber').";";
+                     $entry->get_value('sophomorixCreationDate').";;";
             if (not exists $seen_classes{$entry->get_value('sophomorixAdminClass')}){
                 push @{ $AD_printdata{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
 		                      {$entry->get_value('sophomorixSchoolname')} },$entry->get_value('sophomorixAdminClass');
@@ -7582,32 +7579,6 @@ sub AD_group_create {
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
 	if ($type eq "project"){
-#             my $result = $ldap->add( $dn,
-#                                 attr => [
-#                                     cn   => $cn,
-#                                     description => $description,
-#                                     sAMAccountName => $group,
-#                                     mail => $mail,
-#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-#                                     sophomorixType => $type, 
-#                                     sophomorixSchoolname => $school, 
-#                                     sophomorixStatus => $status,
-#                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-#                                                         "$school:---:---:"],
-#                                     sophomorixAddMailQuota => ["---:---:"],
-#                                     sophomorixQuota => "---",
-#                                     sophomorixMailQuota => "---",
-#                                     sophomorixMaxMembers => "0",
-#                                     sophomorixMailAlias => "FALSE",
-#                                     sophomorixMailList => "FALSE",
-#                                     sophomorixJoinable => $joinable,
-#                                     sophomorixHidden => "FALSE",
-# #                                    gidNumber => $gidnumber_migrate,
-#                                     objectclass => ['top',
-#                                                       'group' ],
-#                                 ]
-#                             );
-
             my $add_array = [
                 objectClass => ['top','group'],
                 cn   => $cn,
@@ -7638,36 +7609,6 @@ sub AD_group_create {
             my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "adminclass" or $type eq "teacherclass" or $type eq "extraclass"){
-
-
-#             my $result = $ldap->add( $dn,
-#                                 attr => [
-#                                     cn   => $cn,
-#                                     description => $description,
-#                                     sAMAccountName => $group,
-#                                     mail => $mail,
-#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-#                                     sophomorixType => $type, 
-#                                     sophomorixSchoolname => $school, 
-#                                     sophomorixStatus => $status,
-#                                     sophomorixAddQuota => ["---"],
-#                                     sophomorixAddMailQuota => "---",
-#                                     sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-#                                                         "$school:---:---:"],
-#                                     sophomorixMailQuota => "---:---:",
-#                                     sophomorixMaxMembers => "0",
-#                                     sophomorixMailAlias => "FALSE",
-#                                     sophomorixMailList => "FALSE",
-#                                     sophomorixJoinable => $joinable,
-#                                     sophomorixHidden => "FALSE",
-# #                                    gidNumber => $gidnumber_migrate,
-#                                     objectclass => ['top',
-#                                                       'group' ],
-#                                 ]
-#                             );
-#            &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
             my $add_array = [
                 objectClass => ['top','group'],
                 cn   => $cn,
@@ -7698,35 +7639,6 @@ sub AD_group_create {
             my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "sophomorix-group"){
-
-#             my $result = $ldap->add( $dn,
-#                                 attr => [
-#                                     cn   => $cn,
-#                                     description => $description,
-#                                     sAMAccountName => $group,
-#                                     mail => $mail,
-#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-#                                     sophomorixType => $type, 
-#                                     sophomorixSchoolname => $school, 
-#                                     sophomorixStatus => $status,
-#                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-#                                                         "$school:---:---:"],
-#                                     sophomorixAddMailQuota => ["---:---:"],
-#                                     sophomorixQuota => "---",
-#                                     sophomorixMailQuota => "---",
-#                                     sophomorixMaxMembers => "0",
-#                                     sophomorixMailAlias => "FALSE",
-#                                     sophomorixMailList => "FALSE",
-#                                     sophomorixJoinable => $joinable,
-#                                     sophomorixHidden => "FALSE",
-# #                                    gidNumber => $gidnumber_migrate,
-#                                     objectclass => ['top',
-#                                                       'group' ],
-#                                 ]
-#                             );
-#             &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
             my $add_array = [
                 objectClass => ['top','group'],
                 cn   => $cn,
@@ -7757,35 +7669,6 @@ sub AD_group_create {
             my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
-
-#             my $result = $ldap->add( $dn,
-#                                 attr => [
-#                                     cn   => $cn,
-#                                     description => $description,
-#                                     sAMAccountName => $group,
-#                                     mail => $mail,
-#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-#                                     sophomorixType => $type, 
-#                                     sophomorixSchoolname => $school, 
-#                                     sophomorixStatus => $status,
-#                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-#                                                         "$school:---:---:"],
-#                                     sophomorixAddMailQuota => ["---:---:"],
-#                                     sophomorixQuota => "---",
-#                                     sophomorixMailQuota => "---",
-#                                     sophomorixMaxMembers => "0",
-#                                     sophomorixMailAlias => "FALSE",
-#                                     sophomorixMailList => "FALSE",
-#                                     sophomorixJoinable => $joinable,
-#                                     sophomorixHidden => "FALSE",
-# #                                    gidNumber => $gidnumber_migrate,
-#                                     objectclass => ['top',
-#                                                       'group' ],
-#                                 ]
-#                             );
-#             &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
             my $add_array = [
                 objectClass => ['top','group'],
                 cn   => $cn,
@@ -7815,40 +7698,7 @@ sub AD_group_create {
             # do it
             my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
 	} elsif ($type eq "room"){
-
-#             my $result = $ldap->add( $dn,
-#                                 attr => [
-#                                     cn   => $cn,
-#                                     description => $description,
-#                                     sAMAccountName => $group,
-#                                     mail => $mail,
-#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-#                                     sophomorixType => $type, 
-#                                     sophomorixSchoolname => $school, 
-#                                     sophomorixStatus => $status,
-#                                     sophomorixAddQuota => ["---"],
-#                                     sophomorixAddMailQuota => "---",
-#                                     sophomorixQuota => ["---"],
-#                                     sophomorixMailQuota => "---",
-#                                     sophomorixMaxMembers => "0",
-#                                     sophomorixMailAlias => "FALSE",
-#                                     sophomorixMailList => "FALSE",
-#                                     sophomorixJoinable => $joinable,
-#                                     sophomorixHidden => "FALSE",
-# #                                    gidNumber => $gidnumber_migrate,
-#                                     sophomorixRoomIPs => $ref_room_ips,
-#                                     sophomorixRoomMACs => $ref_room_macs,
-#                                     sophomorixRoomComputers => $ref_room_computers,
-#                                     objectclass => ['top',
-#                                                       'group' ],
-#                                 ]
-#                             );
-#            &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
             my $add_array = [
                 objectClass => ['top','group'],
                 cn   => $cn,
@@ -7880,38 +7730,7 @@ sub AD_group_create {
             # do it
             my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
-
         } else {
-
-#             my $result = $ldap->add( $dn,
-#                                 attr => [
-#                                     cn   => $cn,
-#                                     description => $description,
-#                                     sAMAccountName => $group,
-#                                     mail => $mail,
-#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-#                                     sophomorixType => $type, 
-#                                     sophomorixSchoolname => $school, 
-#                                     sophomorixStatus => $status,
-#                                     sophomorixAddQuota => ["---"],
-#                                     sophomorixAddMailQuota => "---",
-#                                     sophomorixQuota => ["---"],
-#                                     sophomorixMailQuota => "---",
-#                                     sophomorixMaxMembers => "0",
-#                                     sophomorixMailAlias => "FALSE",
-#                                     sophomorixMailList => "FALSE",
-#                                     sophomorixJoinable => $joinable,
-#                                     sophomorixHidden => "FALSE",
-# #                                    gidNumber => $gidnumber_migrate,
-#                                     objectclass => ['top',
-#                                                       'group' ],
-#                                 ]
-#                             );
-#            &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
             my $add_array = [
                 objectClass => ['top','group'],
                 cn   => $cn,
@@ -7940,8 +7759,6 @@ sub AD_group_create {
             # do it
             my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
-
-
 	}
     } else {
         print "   * Group $group exists already ($count results)\n";
