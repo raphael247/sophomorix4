@@ -101,10 +101,6 @@ $Data::Dumper::Terse = 1;
             AD_examuser_kill
             AD_smbclient_testfile
             AD_sophomorix_schema_update
-            next_free_uidnumber_set
-            next_free_uidnumber_get
-            next_free_gidnumber_set
-            next_free_gidnumber_get
             samba_stop
             samba_start
             samba_status
@@ -1914,7 +1910,7 @@ sub AD_user_create {
     my $birthdate = $arg_ref->{birthdate};
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password};
     my $unid = $arg_ref->{unid};
-    my $uidnumber_wish = $arg_ref->{uidnumber_wish};
+    my $uidnumber_migrate = $arg_ref->{uidnumber_migrate};
     my $school = $arg_ref->{school};
     my $role = $arg_ref->{role};
     my $type = $arg_ref->{type};
@@ -1945,8 +1941,8 @@ sub AD_user_create {
     if (not defined $identifier){
         $identifier="---";
     }
-    if (not defined $uidnumber_wish or $uidnumber_wish eq "---"){
-        $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
+    if (not defined $uidnumber_migrate){
+        $uidnumber_migrate="---";
     }
 
     if ($tolerationdate eq "---"){
@@ -2081,7 +2077,7 @@ sub AD_user_create {
         print "   Tolerationdate:     $tolerationdate\n";
         print "   Deactivationdate:   $deactivationdate\n";
         print "   Unid:               $unid\n";
-        print "   Unix-uidNumber:     $uidnumber_wish\n";
+        print "   Unix-uidNumber:     $uidnumber_migrate\n";
         print "   File:               $file\n";
         print "   Mail:               $mail\n";
         print "   homeDirectory:      $homedirectory\n";
@@ -2179,8 +2175,12 @@ sub AD_user_create {
         sophomorixWebuiDashboard => "---",
         sophomorixExamMode => "---", 
         userAccountControl => $user_account_control,
-#        uidNumber => $uidnumber_wish,
+#        uidNumber => $uidnumber_migrate,
                     ];
+    if (defined $uidnumber_migrate and $uidnumber_migrate ne "---"){
+        push @{ $add_array }, "uidNumber", $uidnumber_migrate;
+    }
+
 
     # add sophomorixWebuiPermissionsCalculated only if defined
     if (defined $ref_webui_permissions_calculated){
@@ -3669,7 +3669,6 @@ sub AD_school_create {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
-    my $gidnumber_wish;
 
     # test with RUNTIME stuff in sophomorix_config
     # if school was already created in this script
@@ -7494,7 +7493,7 @@ sub AD_group_create {
     my $type = $arg_ref->{type};
     my $status = $arg_ref->{status};
     my $joinable = $arg_ref->{joinable};
-    my $gidnumber_wish = $arg_ref->{gidnumber_wish};
+    my $gidnumber_migrate = $arg_ref->{gidnumber_migrate};
     my $dn_wish = $arg_ref->{dn_wish};
     my $cn = $arg_ref->{cn};
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
@@ -7565,13 +7564,13 @@ sub AD_group_create {
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count==0){
         # adding the group
-        if (not defined $gidnumber_wish or $gidnumber_wish eq "---"){
-            $gidnumber_wish=&next_free_gidnumber_get($ldap,$root_dse);
+        if (not defined $gidnumber_migrate){
+            $gidnumber_migrate="---";
         }
         print "   DN:              $dn\n";
         print "   Target:          $target_branch\n";
         print "   Group:           $group\n";
-        print "   Unix-gidNumber:  $gidnumber_wish\n";
+        print "   Unix-gidNumber:  $gidnumber_migrate\n";
         print "   Type:            $type\n";
         print "   Joinable:        $joinable\n";
         print "   Creationdate:    $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}\n";
@@ -7604,7 +7603,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_migrate,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7631,7 +7630,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_migrate,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7658,7 +7657,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_migrate,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7685,7 +7684,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_migrate,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -7711,7 +7710,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_migrate,
                                     sophomorixRoomIPs => $ref_room_ips,
                                     sophomorixRoomMACs => $ref_room_macs,
                                     sophomorixRoomComputers => $ref_room_computers,
@@ -7740,7 +7739,7 @@ sub AD_group_create {
                                     sophomorixMailList => "FALSE",
                                     sophomorixJoinable => $joinable,
                                     sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_wish,
+#                                    gidNumber => $gidnumber_migrate,
                                     objectclass => ['top',
                                                       'group' ],
                                 ]
@@ -8130,9 +8129,6 @@ sub AD_examuser_create {
         # empty token creates error on AD add 
         $prefix="---";
     }
-    if (not defined $uidnumber_wish or $uidnumber_wish eq "---"){
-        $uidnumber_wish=&next_free_uidnumber_get($ldap,$root_dse);
-    }
     my $user_principal_name = $examuser."\@".$root_dns;
     my $mail = $examuser."\@".$root_dns;
 
@@ -8242,8 +8238,6 @@ sub AD_examuser_create {
                    sophomorixComment => "created by sophomorix", 
                    sophomorixExamMode => $exammode_AD, 
                    userAccountControl => $DevelConf::default_user_account_control,
-                   uidNumber => $uidnumber_wish,
-
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
                                      'user' ],
@@ -8580,104 +8574,6 @@ sub AD_sophomorix_schema_version {
         #print "Something went wrong retrieving Sophomorix-Schema-Version\n";
         return 0; # no version found
     }
-}
-
-
-
-sub next_free_uidnumber_set {
-    my ($ldap,$root_dse,$uidnumber) = @_;
-    # test for numbers ??? 0-9
-    if (not defined $uidnumber){
-       $uidnumber="10000";
-    }
-    #print "* setting uidNumber to file/ldap: $uidnumber\n";
-    system("echo $uidnumber > $DevelConf::next_free_uidnumber_file");
-}
-
-
-
-sub next_free_uidnumber_get {
-    # _prop : proposed number
-    my ($ldap,$root_dse) = @_;
-    my $uidnumber_free;
-    if (not -e $DevelConf::next_free_uidnumber_file){
-        &next_free_uidnumber_set($ldap,$root_dse,"10000");
-    }
-    my $uidnumber_prop= `cat $DevelConf::next_free_uidnumber_file`;
-    chomp($uidnumber_prop);
-    #print "* getting uidNumber from file/ldap: $uidnumber_prop\n";
-    my $count=1;
-    until ($count==0){
-        #print "   * Testing uidNumber <$uidnumber_prop>\n";
-        my $filter="(&(objectClass=user) (uidNumber=".$uidnumber_prop."))"; 
-        #print "      * Filter: $filter\n";
-        my $mesg = $ldap->search(
-                          base   => $root_dse,
-                          scope => 'sub',
-                          filter => $filter,
-                          attr => ['cn']
-                            );
-        $count = $mesg->count;
-        #print "      * Hits: $count\n";
-        if ($count>0){
-            $uidnumber_prop++;
-        } else {
-            $uidnumber_free=$uidnumber_prop;
-        }
-    }
-    &Sophomorix::SophomorixBase::print_title("Next Free uidNumber is: $uidnumber_free");
-    my $uidnumber_free_next=$uidnumber_free+1;
-    &next_free_uidnumber_set($ldap,$root_dse,$uidnumber_free_next);
-    return $uidnumber_free;
-}
-
-
-
-sub next_free_gidnumber_set {
-    my ($ldap,$root_dse,$gidnumber) = @_;
-    # test for numbers ??? 0-9
-    if (not defined $gidnumber){
-       $gidnumber="10000";
-    }
-    #print "* setting gidnumber to file/ldap: $gidnumber\n";
-    system("echo $gidnumber > $DevelConf::next_free_gidnumber_file");
-}
-
-
-
-sub next_free_gidnumber_get {
-    # _prop : proposed number
-    my ($ldap,$root_dse) = @_;
-    my $gidnumber_free;
-    if (not -e $DevelConf::next_free_gidnumber_file){
-        &next_free_gidnumber_set($ldap,$root_dse,"10000");
-    }
-    my $gidnumber_prop= `cat $DevelConf::next_free_gidnumber_file`;
-    chomp($gidnumber_prop);
-    #print "* getting gidNumber from file/ldap: $gidnumber_prop\n";
-    my $count=1;
-    until ($count==0){
-        #print "   * Testing gidNumber <$gidnumber_prop>\n";
-        my $filter="(&(objectClass=user) (gidnumber=".$gidnumber_prop."))"; 
-        #print "      * Filter: $filter\n";
-           my $mesg = $ldap->search(
-                          base   => $root_dse,
-                          scope => 'sub',
-                          filter => $filter,
-                          attr => ['cn']
-                            );
-        $count = $mesg->count;
-        #print "      * Hits: $count\n";
-        if ($count>0){
-            $gidnumber_prop++;
-        } else {
-            $gidnumber_free=$gidnumber_prop;
-        }
-    }
-    &Sophomorix::SophomorixBase::print_title("Next Free gidNumber is: $gidnumber_free");
-    my $gidnumber_free_next=$gidnumber_free+1;
-    &next_free_gidnumber_set($ldap,$root_dse,$gidnumber_free_next);
-    return $gidnumber_free;
 }
 
 

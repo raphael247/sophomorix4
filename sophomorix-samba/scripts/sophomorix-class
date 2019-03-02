@@ -74,7 +74,7 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "status,".
                                       "maxmembers,".
                                       "creationdate,".
-                                      "set-gidnumber,".
+                                      "gidnumber-migrate,".
                                       "mailalias,".
                                       "maillist,".
                                       "join,".
@@ -95,7 +95,7 @@ $options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
                                      "adminclass,".
                                      "extraclass,";
 # define more dependencies
-$options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
+$options{'CONFIG'}{'DEPENDS'}{'gidnumber-migrate'}="create";
 $options{'CONFIG'}{'DEPENDS'}{'skip-school-creation'}="create";
 
 my $testopt=GetOptions(\%options, 
@@ -119,7 +119,7 @@ my $testopt=GetOptions(\%options,
                        "status=s",
                        "maxmembers=s",
                        "creationdate=s",
-                       "set-gidnumber=i",
+                       "gidnumber-migrate=i",
                        "mailalias!",
                        "maillist!",
                        "join!",
@@ -139,8 +139,8 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
 &check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
 
 # defaults
-if (not defined $options{'set-gidnumber'}){
-    $options{'set-gidnumber'}="---";
+if (not defined $options{'gidnumber-migrate'}){
+    $options{'gidnumber-migrate'}="---";
 }
 if (not defined $options{'school'}){
     $options{'school'}="---";
@@ -214,9 +214,9 @@ Updating changes from school.conf
     --update-maildomain  (for all schools)
 
 This is for migration/testing/fixing only (only one class allowed as option):
-  --create --skip-school-creation --class <class> --set-gidnumber <num>
+  --create --skip-school-creation --class <class> --gidnumber-migrate <num>
   --creationdate <20150529093330.0Z> (only for migration)
-  --set-gidnumber <num>
+  --gidnumber-migrate <num>
   --members user1,user2,user3, ... 
   --addmembers user1,user2,user3, ...
   --removemembers user1,user2,user3, ...
@@ -448,7 +448,7 @@ if (defined $options{'create'} and defined $options{'class'}){
 	   	          sub_ou=>"OU=".$class_option.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
                           joinable=>"TRUE",
                           hidden=>"FALSE",
-                          gidnumber_wish=>$options{'set-gidnumber'},
+                          gidnumber_migrate=>$options{'gidnumber-migrate'},
                           smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>\%sophomorix_config,
                           sophomorix_result=>\%sophomorix_result,
@@ -659,15 +659,15 @@ if (defined $options{'creationdate'}){
 
 
 
-# --set-gidnumber <num>
-if (defined $options{'set-gidnumber'}){
+# --gidnumber-migrate <num>
+if (defined $options{'gidnumber-migrate'}){
     foreach my $class_valid (@{ $classes{'CLASS_VALID_LIST'} }){
         &AD_group_update({ldap=>$ldap,
                           root_dse=>$root_dse,
                           dn=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'DN'},
                           school=>$classes{'CLASS_VALID_DATA'}{$class_valid}{'SCHOOL'},
                           type=>$class_type,
-                          gidnumber=>$options{'set-gidnumber'},
+                          gidnumber=>$options{'gidnumber-migrate'},
                           sophomorix_config=>\%sophomorix_config,
                         });
     }

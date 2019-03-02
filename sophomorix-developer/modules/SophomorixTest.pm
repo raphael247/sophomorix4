@@ -393,7 +393,6 @@ sub AD_test_object {
     my $ser_pri_name =$arg_ref->{servicePrincipalName};
     my $sn =$arg_ref->{sn};
     my $description =$arg_ref->{description};
-    my $uidnumber =$arg_ref->{uidNumber};
     my $homedrive =$arg_ref->{homeDrive};
     my $homedirectory =$arg_ref->{homeDirectory};
     my $unixhomedirectory =$arg_ref->{unixHomeDirectory};
@@ -548,38 +547,6 @@ sub AD_test_object {
             is ($entry->get_value ('userAccountControl'),$useraccountcontrol,
 		"  * userAccountControl is $useraccountcontrol");
         }
-        # if (defined $uidnumber){
-        #     my $uidnumber_sys=$entry->get_value ('uidNumber');
-        #     if ($uidnumber==-1){
-        #         my $min=9999;
-        #         my $max=3000000;
-        #         my $uidnumber_ok=0;
-        #         if($uidnumber_sys > $min and $uidnumber_sys < $max){
-        #             $uidnumber_ok=1;
-        #         }
-        #         is ($uidnumber_ok,1,
-	# 	    "  * uidNumber $uidnumber_sys between $max and $min");
-        #     } else {
-        #         is ($uidnumber_sys,$uidnumber,
-	# 	    "  * uidNumber is $uidnumber");
-        #     }
-        # }
-        # if (defined $gidnumber){
-        #     my $gidnumber_sys=$entry->get_value ('gidNumber');
-        #     if ($gidnumber==-1){
-        #         my $min=9999;
-        #         my $max=3000000;
-        #         my $gidnumber_ok=0;
-        #         if($gidnumber_sys > $min and $gidnumber_sys < $max){
-        #             $gidnumber_ok=1;
-        #         }
-        #         is ($gidnumber_ok,1,
-	# 	    "  * gidNumber $gidnumber_sys between $max and $min");
-        #     } else {
-        #         is ($gidnumber_sys,$gidnumber,
-	# 	    "  * gidNumber is $gidnumber");
-        #     }
-        # }
         if (defined $upn){
             is ($entry->get_value ('userPrincipalName'),$upn,
 		"  * userPrincipalName is $upn");

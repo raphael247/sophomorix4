@@ -1263,7 +1263,6 @@ sub _console_print_group_full {
         printf "%25s: %-40s\n","sAMAccountName",$ref_groups->{'GROUPS'}{$group}{'sAMAccountName'};
         printf "%25s: %-40s\n","sAMAccountType",$ref_groups->{'GROUPS'}{$group}{'sAMAccountType'};
         printf "%25s: %-40s\n","objectSid",$ref_groups->{'GROUPS'}{$group}{'objectSid'};
-        printf "%25s: %-40s\n","gidNumber",$ref_groups->{'GROUPS'}{$group}{'gidNumber'};
         print $line;
 
         # sophomorix attributes
@@ -2144,7 +2143,6 @@ sub _console_print_user_full {
 
         # unix stuff:
         if ($log_level>=2){
-            printf "%19s: %-50s\n","uidNumber",$ref_users->{'USERS'}{$user}{'uidNumber'};
             printf "%19s: %-50s\n","unixHomeDirectory",$ref_users->{'USERS'}{$user}{'unixHomeDirectory'};
             printf "%19s: %-50s\n","primaryGroupID",$ref_users->{'USERS'}{$user}{'primaryGroupID'};
             print $line;
@@ -2255,8 +2253,6 @@ sub _console_print_device_full {
 
             # unix stuff:
             if ($log_level>=2){
-                #printf "%19s: %-50s\n","uidNumber",
-                #    $ref_devices->{'DEVICES'}{$device}{'uidNumber'};
                 #printf "%19s: %-50s\n","unixHomeDirectory",
                 #    $ref_devices->{'DEVICES'}{$device}{'computer'}{'unixHomeDirectory'};
                 printf "%19s: %-50s\n","primaryGroupID",
@@ -2968,8 +2964,8 @@ sub read_sophomorix_add {
         $identifier,
         $sam,
         $password_wish,
-        $uidnumber_wish,
-        $gidnumber_wish,
+        $uidnumber_migrate,
+        $gidnumber_migrate,
         $unid,
         $school,
         $role,
@@ -2993,8 +2989,8 @@ sub read_sophomorix_add {
        $add{'USER'}{$sam}{'IDENTIFIER'}=$identifier;
        $add{'USER'}{$sam}{'SAM'}=$sam;
        $add{'USER'}{$sam}{'PWD_WISH'}=$password_wish;
-       $add{'USER'}{$sam}{'UID_WISH'}=$uidnumber_wish;
-       $add{'USER'}{$sam}{'GID_WISH'}=$gidnumber_wish;
+       $add{'USER'}{$sam}{'UID_WISH'}=$uidnumber_migrate;
+       $add{'USER'}{$sam}{'GID_WISH'}=$gidnumber_migrate;
        $add{'USER'}{$sam}{'UNID'}=$unid;
        $add{'USER'}{$sam}{'SCHOOL'}=$school;
        $add{'USER'}{$sam}{'ROLE'}=$role;
@@ -5829,8 +5825,8 @@ sub check_options{
     #
     #     CONFIG-->DEPENDS--><option>="opt"
     #        defines that option <option> needs option opt
-    #        Example: $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create";
-    #           option set-gidnumber is only useful, when option create is also given
+    #        Example: $options{'CONFIG'}{'DEPENDS'}{'gidnumber-migrate'}="create";
+    #           option gidnumber-migrate is only useful, when option create is also given
 
 
     # get effective/real userID
