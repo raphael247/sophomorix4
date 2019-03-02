@@ -776,7 +776,7 @@ sub AD_gpo_create {
                 
     print "MAYBE DO: $command_inherit\n";
     #system($command_inherit);
-    
+
     # update the gpo
     if ($gpo_type eq "school"){
         $replace{'versionNumber'}="18612234";
@@ -1891,7 +1891,6 @@ sub AD_user_unset_exam_mode {
 }
 
 
-
 sub AD_user_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -2175,7 +2174,6 @@ sub AD_user_create {
         sophomorixWebuiDashboard => "---",
         sophomorixExamMode => "---", 
         userAccountControl => $user_account_control,
-#        uidNumber => $uidnumber_migrate,
                     ];
     if (defined $uidnumber_migrate and $uidnumber_migrate ne "---"){
         my $intrinsic_string="MIGRATION uidNumber: ".$uidnumber_migrate;
@@ -7584,168 +7582,366 @@ sub AD_group_create {
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
 	if ($type eq "project"){
-            my $result = $ldap->add( $dn,
-                                attr => [
-                                    cn   => $cn,
-                                    description => $description,
-                                    sAMAccountName => $group,
-                                    mail => $mail,
-                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-                                    sophomorixType => $type, 
-                                    sophomorixSchoolname => $school, 
-                                    sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-                                                        "$school:---:---:"],
-                                    sophomorixAddMailQuota => ["---:---:"],
-                                    sophomorixQuota => "---",
-                                    sophomorixMailQuota => "---",
-                                    sophomorixMaxMembers => "0",
-                                    sophomorixMailAlias => "FALSE",
-                                    sophomorixMailList => "FALSE",
-                                    sophomorixJoinable => $joinable,
-                                    sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_migrate,
-                                    objectclass => ['top',
-                                                      'group' ],
-                                ]
-                            );
+#             my $result = $ldap->add( $dn,
+#                                 attr => [
+#                                     cn   => $cn,
+#                                     description => $description,
+#                                     sAMAccountName => $group,
+#                                     mail => $mail,
+#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+#                                     sophomorixType => $type, 
+#                                     sophomorixSchoolname => $school, 
+#                                     sophomorixStatus => $status,
+#                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+#                                                         "$school:---:---:"],
+#                                     sophomorixAddMailQuota => ["---:---:"],
+#                                     sophomorixQuota => "---",
+#                                     sophomorixMailQuota => "---",
+#                                     sophomorixMaxMembers => "0",
+#                                     sophomorixMailAlias => "FALSE",
+#                                     sophomorixMailList => "FALSE",
+#                                     sophomorixJoinable => $joinable,
+#                                     sophomorixHidden => "FALSE",
+# #                                    gidNumber => $gidnumber_migrate,
+#                                     objectclass => ['top',
+#                                                       'group' ],
+#                                 ]
+#                             );
+
+            my $add_array = [
+                objectClass => ['top','group'],
+                cn   => $cn,
+                description => $description,
+                sAMAccountName => $group,
+                mail => $mail,
+                sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                sophomorixType => $type, 
+                sophomorixSchoolname => $school, 
+                sophomorixStatus => $status,
+                sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                       "$school:---:---:"],
+                sophomorixAddMailQuota => ["---:---:"],
+                sophomorixQuota => "---",
+                sophomorixMailQuota => "---",
+                sophomorixMaxMembers => "0",
+                sophomorixMailAlias => "FALSE",
+                sophomorixMailList => "FALSE",
+                sophomorixJoinable => $joinable,
+                sophomorixHidden => "FALSE",
+                    ];
+            if (defined $gidnumber_migrate and $gidnumber_migrate ne "---"){
+                my $intrinsic_string="MIGRATION gidNumber: ".$gidnumber_migrate;
+                push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
+            }
+
+            # do it
+            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "adminclass" or $type eq "teacherclass" or $type eq "extraclass"){
-            my $result = $ldap->add( $dn,
-                                attr => [
-                                    cn   => $cn,
-                                    description => $description,
-                                    sAMAccountName => $group,
-                                    mail => $mail,
-                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-                                    sophomorixType => $type, 
-                                    sophomorixSchoolname => $school, 
-                                    sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["---"],
-                                    sophomorixAddMailQuota => "---",
-                                    sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-                                                        "$school:---:---:"],
-                                    sophomorixMailQuota => "---:---:",
-                                    sophomorixMaxMembers => "0",
-                                    sophomorixMailAlias => "FALSE",
-                                    sophomorixMailList => "FALSE",
-                                    sophomorixJoinable => $joinable,
-                                    sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_migrate,
-                                    objectclass => ['top',
-                                                      'group' ],
-                                ]
-                            );
-           &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+#             my $result = $ldap->add( $dn,
+#                                 attr => [
+#                                     cn   => $cn,
+#                                     description => $description,
+#                                     sAMAccountName => $group,
+#                                     mail => $mail,
+#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+#                                     sophomorixType => $type, 
+#                                     sophomorixSchoolname => $school, 
+#                                     sophomorixStatus => $status,
+#                                     sophomorixAddQuota => ["---"],
+#                                     sophomorixAddMailQuota => "---",
+#                                     sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+#                                                         "$school:---:---:"],
+#                                     sophomorixMailQuota => "---:---:",
+#                                     sophomorixMaxMembers => "0",
+#                                     sophomorixMailAlias => "FALSE",
+#                                     sophomorixMailList => "FALSE",
+#                                     sophomorixJoinable => $joinable,
+#                                     sophomorixHidden => "FALSE",
+# #                                    gidNumber => $gidnumber_migrate,
+#                                     objectclass => ['top',
+#                                                       'group' ],
+#                                 ]
+#                             );
+#            &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+            my $add_array = [
+                objectClass => ['top','group'],
+                cn   => $cn,
+                description => $description,
+                sAMAccountName => $group,
+                mail => $mail,
+                sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                sophomorixType => $type, 
+                sophomorixSchoolname => $school, 
+                sophomorixStatus => $status,
+                sophomorixAddQuota => ["---"],
+                sophomorixAddMailQuota => "---",
+                sophomorixQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                    "$school:---:---:"],
+                sophomorixMailQuota => "---:---:",
+                sophomorixMaxMembers => "0",
+                sophomorixMailAlias => "FALSE",
+                sophomorixMailList => "FALSE",
+                sophomorixJoinable => $joinable,
+                sophomorixHidden => "FALSE",
+                    ];
+            if (defined $gidnumber_migrate and $gidnumber_migrate ne "---"){
+                my $intrinsic_string="MIGRATION gidNumber: ".$gidnumber_migrate;
+                push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
+            }
+
+            # do it
+            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "sophomorix-group"){
-            my $result = $ldap->add( $dn,
-                                attr => [
-                                    cn   => $cn,
-                                    description => $description,
-                                    sAMAccountName => $group,
-                                    mail => $mail,
-                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-                                    sophomorixType => $type, 
-                                    sophomorixSchoolname => $school, 
-                                    sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-                                                        "$school:---:---:"],
-                                    sophomorixAddMailQuota => ["---:---:"],
-                                    sophomorixQuota => "---",
-                                    sophomorixMailQuota => "---",
-                                    sophomorixMaxMembers => "0",
-                                    sophomorixMailAlias => "FALSE",
-                                    sophomorixMailList => "FALSE",
-                                    sophomorixJoinable => $joinable,
-                                    sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_migrate,
-                                    objectclass => ['top',
-                                                      'group' ],
-                                ]
-                            );
+
+#             my $result = $ldap->add( $dn,
+#                                 attr => [
+#                                     cn   => $cn,
+#                                     description => $description,
+#                                     sAMAccountName => $group,
+#                                     mail => $mail,
+#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+#                                     sophomorixType => $type, 
+#                                     sophomorixSchoolname => $school, 
+#                                     sophomorixStatus => $status,
+#                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+#                                                         "$school:---:---:"],
+#                                     sophomorixAddMailQuota => ["---:---:"],
+#                                     sophomorixQuota => "---",
+#                                     sophomorixMailQuota => "---",
+#                                     sophomorixMaxMembers => "0",
+#                                     sophomorixMailAlias => "FALSE",
+#                                     sophomorixMailList => "FALSE",
+#                                     sophomorixJoinable => $joinable,
+#                                     sophomorixHidden => "FALSE",
+# #                                    gidNumber => $gidnumber_migrate,
+#                                     objectclass => ['top',
+#                                                       'group' ],
+#                                 ]
+#                             );
+#             &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+            my $add_array = [
+                objectClass => ['top','group'],
+                cn   => $cn,
+                description => $description,
+                sAMAccountName => $group,
+                mail => $mail,
+                sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                sophomorixType => $type, 
+                sophomorixSchoolname => $school, 
+                sophomorixStatus => $status,
+                sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                       "$school:---:---:"],
+                sophomorixAddMailQuota => ["---:---:"],
+                sophomorixQuota => "---",
+                sophomorixMailQuota => "---",
+                sophomorixMaxMembers => "0",
+                sophomorixMailAlias => "FALSE",
+                sophomorixMailList => "FALSE",
+                sophomorixJoinable => $joinable,
+                sophomorixHidden => "FALSE",
+                    ];
+            if (defined $gidnumber_migrate and $gidnumber_migrate ne "---"){
+                my $intrinsic_string="MIGRATION gidNumber: ".$gidnumber_migrate;
+                push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
+            }
+
+            # do it
+            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
-            my $result = $ldap->add( $dn,
-                                attr => [
-                                    cn   => $cn,
-                                    description => $description,
-                                    sAMAccountName => $group,
-                                    mail => $mail,
-                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-                                    sophomorixType => $type, 
-                                    sophomorixSchoolname => $school, 
-                                    sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
-                                                        "$school:---:---:"],
-                                    sophomorixAddMailQuota => ["---:---:"],
-                                    sophomorixQuota => "---",
-                                    sophomorixMailQuota => "---",
-                                    sophomorixMaxMembers => "0",
-                                    sophomorixMailAlias => "FALSE",
-                                    sophomorixMailList => "FALSE",
-                                    sophomorixJoinable => $joinable,
-                                    sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_migrate,
-                                    objectclass => ['top',
-                                                      'group' ],
-                                ]
-                            );
+
+#             my $result = $ldap->add( $dn,
+#                                 attr => [
+#                                     cn   => $cn,
+#                                     description => $description,
+#                                     sAMAccountName => $group,
+#                                     mail => $mail,
+#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+#                                     sophomorixType => $type, 
+#                                     sophomorixSchoolname => $school, 
+#                                     sophomorixStatus => $status,
+#                                     sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+#                                                         "$school:---:---:"],
+#                                     sophomorixAddMailQuota => ["---:---:"],
+#                                     sophomorixQuota => "---",
+#                                     sophomorixMailQuota => "---",
+#                                     sophomorixMaxMembers => "0",
+#                                     sophomorixMailAlias => "FALSE",
+#                                     sophomorixMailList => "FALSE",
+#                                     sophomorixJoinable => $joinable,
+#                                     sophomorixHidden => "FALSE",
+# #                                    gidNumber => $gidnumber_migrate,
+#                                     objectclass => ['top',
+#                                                       'group' ],
+#                                 ]
+#                             );
+#             &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+            my $add_array = [
+                objectClass => ['top','group'],
+                cn   => $cn,
+                description => $description,
+                sAMAccountName => $group,
+                mail => $mail,
+                sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                sophomorixType => $type, 
+                sophomorixSchoolname => $school, 
+                sophomorixStatus => $status,
+                sophomorixAddQuota => ["$ref_sophomorix_config->{'INI'}{'VARS'}{'GLOBALSHARENAME'}:---:---:",
+                                       "$school:---:---:"],
+                sophomorixAddMailQuota => ["---:---:"],
+                sophomorixQuota => "---",
+                sophomorixMailQuota => "---",
+                sophomorixMaxMembers => "0",
+                sophomorixMailAlias => "FALSE",
+                sophomorixMailList => "FALSE",
+                sophomorixJoinable => $joinable,
+                sophomorixHidden => "FALSE",
+                    ];
+            if (defined $gidnumber_migrate and $gidnumber_migrate ne "---"){
+                my $intrinsic_string="MIGRATION gidNumber: ".$gidnumber_migrate;
+                push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
+            }
+
+            # do it
+            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
 	} elsif ($type eq "room"){
-            my $result = $ldap->add( $dn,
-                                attr => [
-                                    cn   => $cn,
-                                    description => $description,
-                                    sAMAccountName => $group,
-                                    mail => $mail,
-                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-                                    sophomorixType => $type, 
-                                    sophomorixSchoolname => $school, 
-                                    sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["---"],
-                                    sophomorixAddMailQuota => "---",
-                                    sophomorixQuota => ["---"],
-                                    sophomorixMailQuota => "---",
-                                    sophomorixMaxMembers => "0",
-                                    sophomorixMailAlias => "FALSE",
-                                    sophomorixMailList => "FALSE",
-                                    sophomorixJoinable => $joinable,
-                                    sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_migrate,
-                                    sophomorixRoomIPs => $ref_room_ips,
-                                    sophomorixRoomMACs => $ref_room_macs,
-                                    sophomorixRoomComputers => $ref_room_computers,
-                                    objectclass => ['top',
-                                                      'group' ],
-                                ]
-                            );
-           &AD_debug_logdump($result,2,(caller(0))[3]);
+
+#             my $result = $ldap->add( $dn,
+#                                 attr => [
+#                                     cn   => $cn,
+#                                     description => $description,
+#                                     sAMAccountName => $group,
+#                                     mail => $mail,
+#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+#                                     sophomorixType => $type, 
+#                                     sophomorixSchoolname => $school, 
+#                                     sophomorixStatus => $status,
+#                                     sophomorixAddQuota => ["---"],
+#                                     sophomorixAddMailQuota => "---",
+#                                     sophomorixQuota => ["---"],
+#                                     sophomorixMailQuota => "---",
+#                                     sophomorixMaxMembers => "0",
+#                                     sophomorixMailAlias => "FALSE",
+#                                     sophomorixMailList => "FALSE",
+#                                     sophomorixJoinable => $joinable,
+#                                     sophomorixHidden => "FALSE",
+# #                                    gidNumber => $gidnumber_migrate,
+#                                     sophomorixRoomIPs => $ref_room_ips,
+#                                     sophomorixRoomMACs => $ref_room_macs,
+#                                     sophomorixRoomComputers => $ref_room_computers,
+#                                     objectclass => ['top',
+#                                                       'group' ],
+#                                 ]
+#                             );
+#            &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+            my $add_array = [
+                objectClass => ['top','group'],
+                cn   => $cn,
+                description => $description,
+                sAMAccountName => $group,
+                mail => $mail,
+                sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                sophomorixType => $type, 
+                sophomorixSchoolname => $school, 
+                sophomorixStatus => $status,
+                sophomorixAddQuota => ["---"],
+                sophomorixAddMailQuota => "---",
+                sophomorixQuota => ["---"],
+                sophomorixMailQuota => "---",
+                sophomorixMaxMembers => "0",
+                sophomorixMailAlias => "FALSE",
+                sophomorixMailList => "FALSE",
+                sophomorixJoinable => $joinable,
+                sophomorixHidden => "FALSE",
+                sophomorixRoomIPs => $ref_room_ips,
+                sophomorixRoomMACs => $ref_room_macs,
+                sophomorixRoomComputers => $ref_room_computers,
+                    ];
+            if (defined $gidnumber_migrate and $gidnumber_migrate ne "---"){
+                my $intrinsic_string="MIGRATION gidNumber: ".$gidnumber_migrate;
+                push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
+            }
+
+            # do it
+            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+
         } else {
-            my $result = $ldap->add( $dn,
-                                attr => [
-                                    cn   => $cn,
-                                    description => $description,
-                                    sAMAccountName => $group,
-                                    mail => $mail,
-                                    sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
-                                    sophomorixType => $type, 
-                                    sophomorixSchoolname => $school, 
-                                    sophomorixStatus => $status,
-                                    sophomorixAddQuota => ["---"],
-                                    sophomorixAddMailQuota => "---",
-                                    sophomorixQuota => ["---"],
-                                    sophomorixMailQuota => "---",
-                                    sophomorixMaxMembers => "0",
-                                    sophomorixMailAlias => "FALSE",
-                                    sophomorixMailList => "FALSE",
-                                    sophomorixJoinable => $joinable,
-                                    sophomorixHidden => "FALSE",
-#                                    gidNumber => $gidnumber_migrate,
-                                    objectclass => ['top',
-                                                      'group' ],
-                                ]
-                            );
-           &AD_debug_logdump($result,2,(caller(0))[3]);
+
+#             my $result = $ldap->add( $dn,
+#                                 attr => [
+#                                     cn   => $cn,
+#                                     description => $description,
+#                                     sAMAccountName => $group,
+#                                     mail => $mail,
+#                                     sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+#                                     sophomorixType => $type, 
+#                                     sophomorixSchoolname => $school, 
+#                                     sophomorixStatus => $status,
+#                                     sophomorixAddQuota => ["---"],
+#                                     sophomorixAddMailQuota => "---",
+#                                     sophomorixQuota => ["---"],
+#                                     sophomorixMailQuota => "---",
+#                                     sophomorixMaxMembers => "0",
+#                                     sophomorixMailAlias => "FALSE",
+#                                     sophomorixMailList => "FALSE",
+#                                     sophomorixJoinable => $joinable,
+#                                     sophomorixHidden => "FALSE",
+# #                                    gidNumber => $gidnumber_migrate,
+#                                     objectclass => ['top',
+#                                                       'group' ],
+#                                 ]
+#                             );
+#            &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
+            my $add_array = [
+                objectClass => ['top','group'],
+                cn   => $cn,
+                description => $description,
+                sAMAccountName => $group,
+                mail => $mail,
+                sophomorixCreationDate => $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}, 
+                sophomorixType => $type, 
+                sophomorixSchoolname => $school, 
+                sophomorixStatus => $status,
+                sophomorixAddQuota => ["---"],
+                sophomorixAddMailQuota => "---",
+                sophomorixQuota => ["---"],
+                sophomorixMailQuota => "---",
+                sophomorixMaxMembers => "0",
+                sophomorixMailAlias => "FALSE",
+                sophomorixMailList => "FALSE",
+                sophomorixJoinable => $joinable,
+                sophomorixHidden => "FALSE",
+                    ];
+            if (defined $gidnumber_migrate and $gidnumber_migrate ne "---"){
+                my $intrinsic_string="MIGRATION gidNumber: ".$gidnumber_migrate;
+                push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
+            }
+
+            # do it
+            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            &AD_debug_logdump($result,2,(caller(0))[3]);
+
+
 	}
     } else {
         print "   * Group $group exists already ($count results)\n";
