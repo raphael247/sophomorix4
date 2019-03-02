@@ -636,7 +636,7 @@ if ($create_class_script==1){
                 $class_type="--extraclass";
                 $description="extrakurs ".$line{'gid'}." migrated"; # use unmapped name
             }
-            my $command_create="sophomorix-class --skip-school-creation --create -c $class --set-gidnumber $line{'gidnumber'} $class_type";
+            my $command_create="sophomorix-class --skip-school-creation --create -c $class --gidnumber-migrate $line{'gidnumber'} $class_type";
             my $command_modify="sophomorix-class --class $class";
 
             # --description
@@ -1018,7 +1018,7 @@ if ($create_project_script==1){
     # Part1: create projects
     # (projects need to exist for memberships in other projects)
     foreach my $pro (@pro){
-        my $command="sophomorix-project --skip-school-creation --create -p $pro --set-gidnumber $name_gid_map{$pro}";
+        my $command="sophomorix-project --skip-school-creation --create -p $pro --gidnumber-migrate $name_gid_map{$pro}";
         print "  $command\n";
         print PROSCRIPT "$command\n";
    
