@@ -5713,9 +5713,22 @@ sub analyze_smbcquotas_out {
         # extract quota data from part after colon(:)
         $quota_data=~s/\s+//g;
         ($used,$soft_limit,$hard_limit)=split(/\//,$quota_data);
+
         $used_mib=round(10*$used/1024/1024)/10;
-        $soft_limit_mib=round(10*$soft_limit/1024/1024)/10;
-        $hard_limit_mib=round(10*$hard_limit/1024/1024)/10;
+
+        if ($soft_limit eq "NOLIMIT"){
+            $soft_limit="NO LIMIT";
+            $soft_limit_mib="NO LIMIT";
+        } else {
+            $soft_limit_mib=round(10*$soft_limit/1024/1024)/10;
+        }
+
+        if ($hard_limit eq "NOLIMIT"){
+            $hard_limit="NO LIMIT";
+            $hard_limit_mib="NO LIMIT";
+        } else {
+            $hard_limit_mib=round(10*$hard_limit/1024/1024)/10;
+        }
     }
 
     # debug output
