@@ -782,29 +782,31 @@ sub AD_gpo_create {
     #system($command_inherit);
     
     # update the gpo
-    $replace{'versionNumber'}="18612234";
-    $replace{'gPCUserExtensionNames'}="[".
-                                      "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
-                                      "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                      "][".
-                                      "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
-                                      "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
-                                      "][".
-                                      "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
-                                      "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                      "]";
-    $replace{'gPCMachineExtensionNames'}="[".
-                                      "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
-                                      "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                      "][".
-                                      "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
-                                      "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
-                                      "][".
-                                      "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
-                                      "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                      "]";
-    my $mesg = $ldap->modify( $gpo_dn, replace => { %replace } );
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    if ($gpo_type eq "school"){
+        $replace{'versionNumber'}="18612234";
+        $replace{'gPCUserExtensionNames'}="[".
+                                          "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
+                                          "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
+                                          "][".
+                                          "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
+                                          "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
+                                          "][".
+                                          "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
+                                          "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
+                                          "]";
+        $replace{'gPCMachineExtensionNames'}="[".
+                                             "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
+                                             "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
+                                             "][".
+                                             "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
+                                             "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
+                                             "][".
+                                             "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
+                                             "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
+                                             "]";
+        my $mesg = $ldap->modify( $gpo_dn, replace => { %replace } );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
 
     # activate
     my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
