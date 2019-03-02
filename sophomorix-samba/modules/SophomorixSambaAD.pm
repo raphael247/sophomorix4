@@ -2178,7 +2178,8 @@ sub AD_user_create {
 #        uidNumber => $uidnumber_migrate,
                     ];
     if (defined $uidnumber_migrate and $uidnumber_migrate ne "---"){
-        push @{ $add_array }, "uidNumber", $uidnumber_migrate;
+        my $intrinsic_string="MIGRATION uidNumber: ".$uidnumber_migrate;
+        push @{ $add_array }, "sophomorixIntrinsic1", $intrinsic_string;
     }
 
 
