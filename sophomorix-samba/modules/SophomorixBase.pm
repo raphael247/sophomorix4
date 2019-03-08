@@ -14,6 +14,8 @@ use Encode qw(decode encode);
 use LaTeX::Encode ':all';
 use File::Temp qw/ tempfile tempdir /;
 use Math::Round;
+use Text::Iconv;
+
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -70,6 +72,8 @@ $Data::Dumper::Terse = 1;
             get_sharedirectory
             get_group_basename
             recode_utf8_to_ascii
+            read_encoding_data
+            analyze_encoding_new
             read_smb_conf
             test_webui_permission
             call_sophomorix_command
@@ -6219,6 +6223,331 @@ sub detach_dollar {
         # OK, no $ at the end
     }
     return $string;
+}
+
+
+
+sub read_encoding_data {
+    my %encoding_data=();
+    # firstnames
+    foreach my $file_rel ( @DevelConf::enc_firstnames ){
+        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+        my @list = split(/\//,$file_abs);
+        my $filename = pop @list;
+        my ($string1,$enc,$string2)=split(/\./,$filename);
+        open(DATAFILE, "$file_abs") ||
+             die "Error: $! $file_abs not found!";
+        while (<DATAFILE>){
+            chomp();
+            s/^ //g; # remove spaces oat beginning of line
+            if(/^\#/){ # ignore commented lines
+               next;
+	    }
+            if($_ eq ""){
+                next;
+            }
+            my ($first,$first_new) = split(/:/);
+            $encoding_data{FIRSTNAME_DATA}{$enc}{$first}=0;
+        }
+        if($Conf::log_level>=3){
+            print "   Reading $file_abs for encoding: $enc\n";
+        }
+        close(DATAFILE);
+    }
+
+    # firstname errors
+    foreach my $file_rel ( @DevelConf::enc_err_firstnames ){
+        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+        my @list = split(/\//,$file_abs);
+        my $filename = pop @list;
+        my ($string1,$enc,$string2)=split(/\./,$filename);
+        open(DATAFILE, "$file_abs") ||
+             die "Error: $! $file_abs not found!";
+        while (<DATAFILE>){
+             chomp();
+            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+                next;
+            }
+            if($_ eq ""){
+                next;
+            }
+            my ($error,$message) = split(/:/);
+            $message=~s/^\s+ //g;
+            $encoding_data{FIRSTNAME_ERRORS}{$enc}{$error}=$message;
+        }
+        if($Conf::log_level>=3){
+            print "   Reading $file_abs for errors: $enc\n";
+        }
+        close(DATAFILE);
+    }
+
+    # lastnames
+    foreach my $file_rel ( @DevelConf::enc_lastnames ){
+        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+        my @list = split(/\//,$file_abs);
+        my $filename = pop @list;
+        my ($string1,$enc,$string2)=split(/\./,$filename);
+        open(DATAFILE, "$file_abs") ||
+             die "Error: $! $file_abs not found!";
+        while (<DATAFILE>){
+            chomp();
+            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+               next;
+	    }
+            if($_ eq ""){
+                next;
+            }
+            my ($last,$last_new) = split(/:/);
+            $encoding_data{LASTNAME_DATA}{$enc}{$last}=0;
+        }
+        if($Conf::log_level>=3){
+            print "   Reading $file_abs for encoding: $enc\n";
+        }
+        close(DATAFILE);
+    }
+
+    # lastname errors
+        foreach my $file_rel ( @DevelConf::enc_err_lastnames ){
+        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+        my @list = split(/\//,$file_abs);
+        my $filename = pop @list;
+        my ($string1,$enc,$string2)=split(/\./,$filename);
+        open(DATAFILE, "$file_abs") ||
+             die "Error: $! $file_abs not found!";
+        while (<DATAFILE>){
+            chomp();
+            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+               next;
+	    }
+            if($_ eq ""){
+                next;
+            }
+            my ($error,$message) = split(/:/);
+            $message=~s/^\s+ //g;
+            $encoding_data{LASTNAME_ERRORS}{$enc}{$error}=$message;
+        }
+        if($Conf::log_level>=3){
+            print "   Reading $file_abs for errors: $enc\n";
+        }
+        close(DATAFILE);
+    }
+    return \%encoding_data;
+}
+
+
+sub analyze_encoding_new {
+    my ($file,$file_tmp,$show_special_char_lines,$ref_encoding_data)=@_;
+    # $file ist for printout and path in config hash only
+    # $file_tmp will be analyzed
+    my @encodings_to_check=("UTF8","ISO_8859-1");
+
+    my $filename = basename($file);
+    my $filename_tmp = basename($file_tmp);
+    my $nonstandard_name_count=0;
+    # set all result counters to 0
+    foreach my $enc (@encodings_to_check){
+        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=0;
+        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=0;
+        $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}=0;
+        $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc}=0;
+    }
+    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=0;
+    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{'none'}=0;
+    $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=0;
+    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{'none'}=0;
+    $encoding_check_results{$file}{'NAMES'}{'RESULT'}="unknown";
+
+    # start to analyze file_tmp
+    &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
+    open(DATAFILE, "$file_tmp") ||
+         die "Error: $! $file_tmp not found!";
+    my $count=0;
+    while (<DATAFILE>){
+	print "HERE $_";
+        $count++;
+        chomp();
+        s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+        if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+            next;
+        }
+        if ($_ eq ""){ # ignore empty line
+            next;
+        }
+
+        ####################################
+        if ($show_special_char_lines==1){
+            if ($_=~/[^a-zA-Z0-9\-\.;_\/\s]/) {
+                push @special_char_lines, "Line ".$count."   ".$_;
+                #$special_char_lines{$count}=$line;
+            }
+        }
+
+        my $line=$_;
+        chomp($line);
+        my $semikolon_count=$line=~tr/;//;
+        if ($semikolon_count<3){
+            &log_script_exit("$filename: Not 3 Semicolons in $line",1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+        }
+
+        # add trailing ; if not there
+        if (not $line=~m/;$/){
+            $line=$line.";";
+        }
+        my ($class,$lastname,$firstname,$date) = split(/;/);
+
+        # firstname
+        # split firstname-field into single firstnames
+        # split at 'space' and '-'
+        $firstname=&remove_embracing_whitespace($firstname);
+        my @firstnames=split(/[ ,-]/, $firstname); # split for double names
+
+        foreach my $first (@firstnames){
+            if ($first=~/[^a-zA-Z\-]/) {
+                print "HERE FIRST: $first\n";
+                $nonstandard_name_count++; 
+                # continue with non-standard(~non-ascii) chars
+                my $hit_count=0;
+                my $error_count=0;
+	        foreach my $enc (@encodings_to_check){
+	            print "HERE ENC: $enc\n";
+                    my $conv = Text::Iconv->new($enc,"utf8");
+                    my $first_utf8 = $conv->convert($first);
+
+                    # check for positive hits (known, valid firstnames)
+#                    if (exists $firstnames_data{$enc}{$first}){
+                    if (exists $ref_encoding_data->{FIRSTNAME_DATA}{$enc}{$first}){
+                        # remember hits
+	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} },
+                                { first => "$first",
+                                  first_utf8 => "$first_utf8",
+                                  line => "$_"};
+                        # count hits
+                        my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc};
+                        my $new=$old+1;
+                        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=$new;
+                        $hit_count++;
+                    }
+                    # check for errors
+#                    if (exists $firstnames_errors{$enc}{$first}){
+                    if (exists $ref_encoding_data->{FIRSTNAME_ERRORS}{$enc}{$first}){
+                        # remember errors
+	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_errors'} },
+                                { first => "$first",
+                                  first_utf8 => "$first_utf8",
+                                  line => "$_"};
+                        # count errors
+                        my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc};
+                        my $new=$old+1;
+                        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=$new;
+                        $hit_count++;
+                    }
+                }
+                # non-hits and non-errors (unknown firstnames)
+                if ($hit_count==0 and $error_count==0){
+                    # remember unknown names
+                    push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_unknown'} },
+                           { first => "$first",
+                             line => "$_"};
+                    # count unknown names
+                    my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'};
+                    my $new=$old+1;
+                    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=$new;
+                }
+            }
+        }
+
+
+        # lastname
+        # split lastname-field into single lastnames
+        # split at 'space' and '-'
+        $lastname=&remove_embracing_whitespace($lastname);
+        my @lastnames=split(/[ ,-]/, $lastname); # split for double names
+        foreach my $last (@lastnames){
+            if ($last=~/[^a-zA-Z\-]/) {
+                $nonstandard_name_count++;
+                # continue with non-standard(~non-ascii) chars
+                my $hit_count=0;
+                my $error_count=0;
+                foreach my $enc (@encodings_to_check){
+                    my $conv = Text::Iconv->new($enc,"utf8");
+                    my $last_utf8 = $conv->convert($last);
+
+                    # check for positive hits (known, valid firstnames)
+		    #                    if (exists $lastnames_data{$enc}{$last}){
+		    print "HERE: $enc $last\n";
+                    if (exists $ref_encoding_data->{LASTNAME_DATA}{$enc}{$last}){
+                        # remember hits
+	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_hits'} },
+                                { last => "$last",
+                                  last_utf8 => "$last_utf8",
+                                  line => "$_"};
+                        # count hits
+                        my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc};
+                        my $new=$old+1;
+                        $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}=$new;
+                        $hit_count++;
+                    }
+                    # check for errors
+#                    if (exists $lastnames_errors{$enc}{$last}){
+                    if (exists $ref_encoding_data->{LASTNAME_ERRORS}{$enc}{$last}){
+                        # remember errors
+	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_errors'} },
+                                { last => "$last",
+                                  last_utf8 => "$last_utf8",
+                                  line => "$_"};
+                        # count errors
+                        my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
+                        my $new=$old+1;
+                        $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc}=$new;
+                        $hit_count++;
+                    }
+                }
+                # non-hits and non-errors (unknown lastnames)
+                if ($hit_count==0 and $error_count==0){
+                    # remember unknown names
+                    push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_unknown'} },
+                           { last => "$last",
+                             line => "$_"};
+                    # count unknown names
+                    my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'};
+                    my $new=$old+1;
+                    $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=$new;
+                }
+            }
+        }
+    }
+
+    # calculate sum
+    my $oldsum=0;
+    foreach my $enc (@encodings_to_check){
+        my $sum=
+            $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}+
+	    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}+
+            $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}+
+	    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
+        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_sum'}{$enc}=$sum;
+        if($sum > $oldsum){
+            $encoding_check_results{$file}{'NAMES'}{'RESULT'}=$enc;
+        }
+    }
+
+    if ($nonstandard_name_count==0){
+        # none non ascii names encountered
+        $encoding_check_results{$file}{'NAMES'}{'RESULT'}="ASCII";
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="ASCII";
+    } else {
+        # save result in config hash
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
+            $encoding_check_results{$file}{'NAMES'}{'RESULT'};
+    }
+    if($Conf::log_level>=2){
+        print "$file_tmp --> $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n";
+    }
+    return $encoding_check_results{$file}{'NAMES'}{'RESULT'};
 }
 
 

@@ -26,6 +26,8 @@ use Sophomorix::SophomorixBase qw(
                                  print_title
                                  unlock_sophomorix
                                  lock_sophomorix
+                                 read_encoding_data
+                                 analyze_encoding_new
                                  log_script_start
                                  log_script_end
                                  log_script_exit
@@ -68,6 +70,7 @@ my $json=0;
 my $filter_only=0;
 my $name="";
 my $convert_to_utf8=0;
+my $show_special_char_lines=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -77,6 +80,7 @@ my $testopt=GetOptions(
            "verbose|v+" => \$Conf::log_level,
            "name=s" => \$name,
            "convert-to-utf8" => \$convert_to_utf8,
+           "show-special-char-lines" => \$show_special_char_lines,
            "filter-only" => \$filter_only,
           );
 
@@ -119,7 +123,7 @@ Examples:
   
 Options:
   --convert-to-utf8   (converts the file to utf8, if the file format is not detactable, nothing is done at all)
-
+  --show-special-char-lines (show lines with special characters)
  
 Please see the sophomorix-newfile(8) man pages for full documentation
 ');
@@ -216,15 +220,19 @@ if ($name ne ""){
 
 
 
-# # --convert-to-utf8
-# # analyze one file
-# if ($convert_to_utf8 ne ""){
-#     if($Conf::log_level>=3){
-#         print "\n";
-#         print "Analyzing encoding\n";
-#     }
-#     # new
-#     $ref_encoding_data=&read_encoding_data();
+# --convert-to-utf8
+if ($convert_to_utf8 ne ""){
+    if($Conf::log_level>=3){
+        print "\n";
+        print "Analyzing encoding\n";
+    }
+    # new
+    my $ref_encoding_data=&read_encoding_data();
+
+    print Dumper($ref_encoding_data->{LASTNAME_ERRORS});
+    my $enc=&analyze_encoding_new($newfile,$newfile,$ref_encoding_data);
+
+    print "ENCODING IS $enc ($newfile)\n";
 
 #     # old
 #     &reading_firstnames();
@@ -256,7 +264,7 @@ if ($name ne ""){
 #     &print_analyzed_encoding($analyze_encoding);
 #     my $result="$analyze_encoding is $enc encoded";
 #     print "$result\n";
-# }
+}
 
 
 
