@@ -81,6 +81,7 @@ STARTSCRIPTSSKEL=$(DESTDIR)/usr/share/sophomorix/devel/startscript-skel
 DEVELOPERDIR=$(DESTDIR)/usr/share/sophomorix-developer
 TESTDATA=$(DESTDIR)/usr/share/sophomorix-developer/testdata
 TESTFILES=$(DESTDIR)/usr/share/sophomorix-developer/testfiles
+EXAMPLEFILES=$(DESTDIR)/usr/share/sophomorix-developer/examplefiles
 TESTTEMPLATES=$(DESTDIR)/usr/share/sophomorix-developer/testtemplates
 
 
@@ -312,6 +313,11 @@ install-developer:
 # schema tols
 	@install -d -m755 -oroot -groot $(DEVELOPERDIR)/schema-tools
 	@install -oroot -groot --mode=0644 sophomorix-developer/schema-tools/sophomorix-schema-update-set-schema-version.ldif $(DEVELOPERDIR)/schema-tools
+
+# installing  examplefiles
+	@install -d $(EXAMPLEFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/examplefiles/students.csv.utf-8 $(EXAMPLEFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/examplefiles/students.csv.8859_1 $(EXAMPLEFILES)
 
 # installing  testdata
 	@install -d $(TESTFILES)
