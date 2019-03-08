@@ -67,6 +67,7 @@ my $info=0;
 my $json=0;
 my $filter_only=0;
 my $name="";
+my $convert_to_utf8=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -75,6 +76,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "name=s" => \$name,
+           "convert-to-utf8" => \$convert_to_utf8,
            "filter-only" => \$filter_only,
           );
 
@@ -100,7 +102,7 @@ sophomorix-newfile registers new user export files to the correct location in /e
 - New files and overwritten files are logged
 - a filter is applied if configured
   (check with --filteronly)
-- (later: encoding is analyzed and written to extemded attributes)
+- (later: encoding is analyzed and written to extended attributes)
 
 Options:
   -h  / --help
@@ -115,6 +117,8 @@ Examples:
 
     sophomorix-newfile /path/to/students.csv --filter-only   (filtering to stdout)
   
+Options:
+  --convert-to-utf8   (converts the file to utf8, if the file format is not detactable, nothing is done at all)
 
  
 Please see the sophomorix-newfile(8) man pages for full documentation
@@ -208,6 +212,54 @@ if ($name ne ""){
     &print_valid_filenames;
     exit 88;
 }
+
+
+
+
+# # --convert-to-utf8
+# # analyze one file
+# if ($convert_to_utf8 ne ""){
+#     if($Conf::log_level>=3){
+#         print "\n";
+#         print "Analyzing encoding\n";
+#     }
+#     # new
+#     $ref_encoding_data=&read_encoding_data();
+
+#     # old
+#     &reading_firstnames();
+#     &reading_firstname_errors();
+#     &reading_lastnames();
+#     &reading_lastname_errors();
+
+#     # old
+#     my $enc=&analyze_encoding($analyze_encoding,$analyze_encoding);
+#     if ($show_special_char_lines==1){
+#         my $count=0;
+# 	foreach my $line (@special_char_lines){
+#             my $conv = Text::Iconv->new($enc,"utf8");
+#             my $line_utf8 = $conv->convert($line);
+#             if ($non_umlaut==1){
+#                 # äöüÄÖÜß works because its unicode
+#                 if ($line_utf8=~/[^äöüÄÖÜßa-zA-Z0-9\-\.;_\/\s]/) { 
+#                     $count++;
+#                     print "$count)  $line_utf8\n";
+#                 }
+#             } else {
+#                     $count++;
+#                     print "$count)  $line_utf8\n";
+#             }
+#         }
+#     }
+
+
+#     &print_analyzed_encoding($analyze_encoding);
+#     my $result="$analyze_encoding is $enc encoded";
+#     print "$result\n";
+# }
+
+
+
 
 
 
