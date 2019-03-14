@@ -4755,9 +4755,40 @@ sub filelist_fetch {
 
 
 
+sub rewrite_smb_path {
+    my ($smb_dir,$ref_sophomorix_config)=@_;
+    $smb_dir_new=$smb_dir; 
+    my ($dnsdomain,$school,@path)=split(/\//,$smb_dir_new);
+    if ($ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'FILESYSSMBCLIENT_SERVER_FIX'} eq "TRUE"){
+        if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'} and
+            exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs proxy'} ){
+            if ($ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'} eq "yes"){
+                $server_share=$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs proxy'};
+                print "OLD: $smb_dir_new\n";
+                $smb_dir_new=~s/smb:\/\///g;
+
+                $server_share=~s/^\\//g;# remove leading \
+                $server_share=~s/^\///g;# remove leading /
+                $server_share=~s/\\/\//g;# convert \ to /
+
+                $smb_dir_new=join("/",$server_share,@path);
+                $smb_dir_new="smb://".$smb_dir_new;
+                print "NEW: $smb_dir_new\n";
+            }
+        }
+    }
+    return $smb_dir_new;
+}
+
+
+
 sub dir_listing_user {
     # directory listing for supervisor of session only
     my ($sam,$smb_dir,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
+
+    # rewrite smb_dir with msdfs root
+    $smb_dir=&rewrite_smb_path($smb_dir,$ref_sophomorix_config);
+
     print "      * fetching filelist of user $sam  ($smb_dir)\n";
     my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                      password  => $smb_admin_pass,
