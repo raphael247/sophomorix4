@@ -1511,9 +1511,14 @@ sub AD_group_kill {
 	} elsif ($type eq "project"){
             # delete the share, when succesful the group
             if ($smb_share ne  "unknown"){
+
+                # rewrite smb_dir with msdfs root
+                $smb_share=&Sophomorix::SophomorixBase::rewrite_smb_path($smb_share,$ref_sophomorix_config);
+
                 my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                  password  => $smb_admin_pass,
                                                  debug     => 0);
+
                 my $return1=$smb->rmdir_recurse($smb_share);
                 if($return1==1){
                     print "OK: Deleted with succes $smb_share\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
@@ -8345,6 +8350,9 @@ sub AD_examuser_kill {
         my $command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
             " user delete ". $examuser;
         &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
+
+        # rewrite smb_dir with msdfs root
+        $smb_home=&Sophomorix::SophomorixBase::rewrite_smb_path($smb_home,$ref_sophomorix_config);
 
         # deleting home
         my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,

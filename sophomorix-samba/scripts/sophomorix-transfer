@@ -1407,6 +1407,10 @@ sub smbclient_mget_recurse {
                         # other dirs, romove them completely
 		        # example: smb://linuxmuster.local/<school>/subdir1/subdir2
                         my $smb_share="smb://".$root_dns."/".$school_AD.$cd_path;
+ 
+                        # rewrite smb_dir with msdfs root
+                        $smb_share=&Sophomorix::SophomorixBase::rewrite_smb_path($smb_share,$ref_sophomorix_config);
+
                         my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                                          password  => $smb_admin_pass,
                                                          debug     => 0);
@@ -1588,7 +1592,9 @@ sub clean_home_without_transfer {
                 $smb_dir="smb:".$smb_dir;
             }
 
-            #print "  * $user: $smb_dir\n";
+            # rewrite smb_dir with msdfs root
+            $smb_dir=&Sophomorix::SophomorixBase::rewrite_smb_path($smb_dir,$ref_sophomorix_config);
+
             my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                          password  => $smb_admin_pass,
                                          debug     => 0);
@@ -1670,6 +1676,7 @@ sub list_home_subdir {
                                           dirlist => \%dirlist,
                                           user => $user,
                                           transfer => $transfer,
+                                          sophomorix_config => \%sophomorix_config,
                                         });
         } else {
             print "\nERROR: cannot list home of nonexisting user $user\n\n";
@@ -1697,9 +1704,13 @@ sub smb_dirlist {
     my $transfer = $arg_ref->{transfer};
     my $user = $arg_ref->{user};
     my $ref_dirlist = $arg_ref->{dirlist};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     $ref_dirlist->{'sAMAccountName'}{$user}{'COUNT'}{'directories'}=0;
     $ref_dirlist->{'sAMAccountName'}{$user}{'COUNT'}{'files'}=0;
+
+    # rewrite smb_dir with msdfs root
+    $smb_dir=&Sophomorix::SophomorixBase::rewrite_smb_path($smb_dir,$ref_sophomorix_config);
 
     my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
                                      password  => $smb_admin_pass,
