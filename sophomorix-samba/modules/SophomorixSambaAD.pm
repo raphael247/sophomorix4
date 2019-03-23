@@ -871,7 +871,25 @@ sub AD_gpo_dump {
     my $ref_result = $arg_ref->{sophomorix_result};
 
     &Sophomorix::SophomorixBase::print_title("Dumping gpo $gpo_dump (start)");
+    # assemble ldif path
+    my $path_ldif=$gpo_dump_path."/".$gpo_dump_type.".ldif";
+    my $path_ldif_template=$gpo_dump_path."/".$gpo_dump_type.".ldif.template";
+    # assemble ldbsearch command
+    my $ldbsearch_command="ldbsearch -b CN=Policies,CN=System,".$root_dse.
+                          " -H /var/lib/samba/private/sam.ldb".
+                          " '(name=".$gpo_dump.")'".
+                          " gPCMachineExtensionNames".
+                          " gPCUserExtensionNames".
+                          " versionNumber".
+                          " > $path_ldif";
+    print "$ldbsearch_command\n";
+    system($ldbsearch_command);
 
+    # create a template
+    my $sed_command="sed 's/".$root_dse."/\@\@ROOTDSE\@\@/g' ".
+                    $path_ldif." > ".$path_ldif_template;
+    system($sed_command);
+    
     &Sophomorix::SophomorixBase::print_title("Dumping gpo $gpo_dump (end)");
 }
 
