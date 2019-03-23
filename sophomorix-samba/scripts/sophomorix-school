@@ -65,6 +65,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_gpo_listall
                                  AD_gpo_create
                                  AD_gpo_kill
+                                 AD_gpo_dump
                                     );
 
 my @arguments = @ARGV;
@@ -80,6 +81,9 @@ my $kill=0;
 my $gpo_listall=0;
 my $gpo_create="";
 my $gpo_kill="";
+my $gpo_dump="";
+my $gpo_dump_type="";
+my $gpo_dump_path="";
 
 my $mount="";
 my $umount="";
@@ -107,6 +111,9 @@ my $testopt=GetOptions(
            "gpo-listall" => \$gpo_listall,
            "gpo-create=s" => \$gpo_create,
            "gpo-kill=s" => \$gpo_kill,
+           "gpo-dump=s" => \$gpo_dump,
+           "gpo-dump-type=s" => \$gpo_dump_type,
+           "gpo-dump-path=s" => \$gpo_dump_path,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-school");
@@ -150,6 +157,9 @@ Options:
   --gpo-kill <school>
   --gpo-listall
   --gpo-listall -j (return parsed data as JSON)
+Export a gpo:
+  --gpo-dump {...} --gpo-dump-type <school, ...> --gpo-dump_path /path/to/dump
+
 
 Dumping data:                     
   -ij / --info --json              (dump configuration)
@@ -348,6 +358,23 @@ if ($gpo_kill ne ""){
                 });
     exit;
 }
+
+# --gpo-dump ... --gpo-dump-type ... --gpo-dump-path ... 
+if ($gpo_dump ne "" and $gpo_dump_type ne "" and $gpo_dump_path ne ""){
+    &AD_gpo_dump({ldap=>$ldap,
+                  root_dse=>$root_dse,
+                  root_dns=>$root_dns,
+                  gpo_dump=>$gpo_dump,
+                  gpo_dump_type=>$gpo_dump_type,
+                  gpo_dump_path=>$gpo_dump_path,
+                  smb_admin_pass=>$smb_admin_pass,
+                  sophomorix_config=>\%sophomorix_config,
+                  sophomorix_result=>\%sophomorix_result,
+                });
+    exit;
+}
+
+
 
 
 &AD_unbind_admin($ldap);

@@ -96,6 +96,7 @@ $Data::Dumper::Terse = 1;
             AD_gpo_listall
             AD_gpo_create
             AD_gpo_kill
+            AD_gpo_dump
             AD_repdir_using_file
             AD_examuser_create
             AD_examuser_kill
@@ -780,16 +781,19 @@ sub AD_gpo_create {
     # update the gpo
     if ($gpo_type eq "school"){
         $replace{'versionNumber'}="18612234";
-        $replace{'gPCUserExtensionNames'}="[".
-                                          "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
-                                          "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                          "][".
-                                          "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
-                                          "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
-                                          "][".
-                                          "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
-                                          "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                          "]";
+        # $replace{'gPCUserExtensionNames'}="[".
+        #                                   "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
+        #                                   "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
+        #                                   "][".
+        #                                   "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
+        #                                   "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
+        #                                   "][".
+        #                                   "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
+        #                                   "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
+	#                                   "]";
+
+$replace{'gPCUserExtensionNames'}="[{00000000-0000-0000-0000-000000000000}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{5794DAFD-BE60-433F-88A2-1A31939AC01F}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}][{75378EAC-683F-11D2-A89A-00C04FBBCFA2}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}][{927D319E-6EAC-11D2-A4EA-00C04F79F83A}{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{BC75B1ED-5833-4858-9BB8-CBF0B166DF9D}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}]";
+	
         $replace{'gPCMachineExtensionNames'}="[".
                                              "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
                                              "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
@@ -852,6 +856,23 @@ sub AD_gpo_kill {
         " ntacl sysvolreset";
     print "$sysvolreset_command\n";
     system ($sysvolreset_command);
+}
+
+sub AD_gpo_dump {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $gpo_dump = $arg_ref->{gpo_dump};
+    my $gpo_dump_type = $arg_ref->{gpo_dump_type};
+    my $gpo_dump_path = $arg_ref->{gpo_dump_path};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_result = $arg_ref->{sophomorix_result};
+
+    &Sophomorix::SophomorixBase::print_title("Dumping gpo $gpo_dump (start)");
+
+    &Sophomorix::SophomorixBase::print_title("Dumping gpo $gpo_dump (end)");
 }
 
 
