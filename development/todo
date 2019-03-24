@@ -30,6 +30,40 @@ Host fleischsalat
 Todo:
 ############################################################
 
+GPO abernten:
+
+geernteter output muss editiert werden
+   changetype: modify
+   replace: gPCUserExtensionNames
+   replace: versionNumber
+   replace: gPCMachineExtensionNames
+
+   sowie dn: CN=@@GPO@@,CN=Policies,CN=System,@@ROOTDSE@@
+
+
+-> code cleanup gpo create nur noch mit ldif
+
+
+
+
+
+Befehl sophomorix-school --gpo-dump {dsffdgdghfh} --gpo-dump-path
+   /path/to/dump --name <school>
+
+Erzeugt folgendes:
+1) ldif dump mit 
+ldbsearch -b CN=Policies,CN=System,DC=linuxmuster,DC=lan -H /var/lib/samba/private/sam.ldb '(name={F3C758D9-E831-41FC-861E-1C66F8818BC9})' gPCMachineExtensionNames gPCUserExtensionNames versionNumber
+
+--> <school>.ldif
+
+2) verknüpfungsort, format noch nicht bekannt
+3) Verzeichnis der GPO mit Inhalt im sysvol/Policies
+
+
+Datei system
+
+
+
 rooms bug aus Migration Testen:
 
 Test if workstations are there:

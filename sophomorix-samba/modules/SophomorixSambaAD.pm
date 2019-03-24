@@ -792,7 +792,7 @@ sub AD_gpo_create {
         #                                   "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
 	#                                   "]";
 
-$replace{'gPCUserExtensionNames'}="[{00000000-0000-0000-0000-000000000000}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{5794DAFD-BE60-433F-88A2-1A31939AC01F}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}][{75378EAC-683F-11D2-A89A-00C04FBBCFA2}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}][{927D319E-6EAC-11D2-A4EA-00C04F79F83A}{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{BC75B1ED-5833-4858-9BB8-CBF0B166DF9D}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}]";
+#$replace{'gPCUserExtensionNames'}="[{00000000-0000-0000-0000-000000000000}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{5794DAFD-BE60-433F-88A2-1A31939AC01F}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}][{75378EAC-683F-11D2-A89A-00C04FBBCFA2}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}][{927D319E-6EAC-11D2-A4EA-00C04F79F83A}{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{BC75B1ED-5833-4858-9BB8-CBF0B166DF9D}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}]";
 	
         $replace{'gPCMachineExtensionNames'}="[".
                                              "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
@@ -806,6 +806,22 @@ $replace{'gPCUserExtensionNames'}="[{00000000-0000-0000-0000-000000000000}{2EA1A
                                              "]";
         my $mesg = $ldap->modify( $gpo_dn, replace => { %replace } );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+	
+        # update AD from ldif file
+        my $path_ldif="/usr/share/sophomorix/devel/gpo/".
+                      $gpo_type.".ldif";
+        my $path_ldif_template="/usr/share/sophomorix/devel/gpo/".
+	    $gpo_type.".ldif.template";
+	my $sed_command="sed ".
+                        "-e 's/\@\@ROOTDSE\@\@/".$root_dse."/g' ".
+                        "-e 's/\@\@GPO\@\@/".$uuid."/g' ".
+	                $path_ldif_template." > ".$path_ldif;
+	print "$sed_command\n";
+        system($sed_command);
+	my $ldbmodify_command="ldbmodify -H /var/lib/samba/private/sam.ldb ".$path_ldif;
+        print "$ldbmodify_command\n";
+        system($ldbmodify_command);
     }
 
     # activate
@@ -881,6 +897,7 @@ sub AD_gpo_dump {
                           " gPCMachineExtensionNames".
                           " gPCUserExtensionNames".
                           " versionNumber".
+                          " objectClass".
                           " > $path_ldif";
     print "$ldbsearch_command\n";
     system($ldbsearch_command);
