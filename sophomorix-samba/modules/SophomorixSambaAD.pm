@@ -780,35 +780,7 @@ sub AD_gpo_create {
 
     # update the gpo
     if ($gpo_type eq "school"){
-        $replace{'versionNumber'}="18612234";
-        # $replace{'gPCUserExtensionNames'}="[".
-        #                                   "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
-        #                                   "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-        #                                   "][".
-        #                                   "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
-        #                                   "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
-        #                                   "][".
-        #                                   "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
-        #                                   "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-	#                                   "]";
-
-#$replace{'gPCUserExtensionNames'}="[{00000000-0000-0000-0000-000000000000}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{5794DAFD-BE60-433F-88A2-1A31939AC01F}{2EA1A81B-48E5-45E9-8BB7-A6E3AC170006}][{75378EAC-683F-11D2-A89A-00C04FBBCFA2}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}][{927D319E-6EAC-11D2-A4EA-00C04F79F83A}{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{BC75B1ED-5833-4858-9BB8-CBF0B166DF9D}{A8C42CEA-CDB8-4388-97F4-5831F933DA84}][{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{73D6AB1B-2488-11D1-A28C-00C04FB94F17}]";
-	
-        $replace{'gPCMachineExtensionNames'}="[".
-                                             "{75378EAC-683F-11D2-A89A-00C04FBBCFA2}".
-                                             "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                             "][".
-                                             "{927D319E-6EAC-11D2-A4EA-00C04F79F83A}".
-                                             "{903E14A0-B4FB-11D0-A0D0-00A0C90F574B}".
-                                             "][".
-                                             "{C1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}".
-                                             "{73D6AB1B-2488-11D1-A28C-00C04FB94F17}".
-                                             "]";
-        my $mesg = $ldap->modify( $gpo_dn, replace => { %replace } );
-        &AD_debug_logdump($mesg,2,(caller(0))[3]);
-
-	
-        # update AD from ldif file
+        # prepare *.ldif from *.ldif.template
         my $path_ldif="/usr/share/sophomorix/devel/gpo/".
                       $gpo_type.".ldif";
         my $path_ldif_template="/usr/share/sophomorix/devel/gpo/".
@@ -819,12 +791,14 @@ sub AD_gpo_create {
 	                $path_ldif_template." > ".$path_ldif;
 	print "$sed_command\n";
         system($sed_command);
+
+        # update AD from modified *.ldif.template file
 	my $ldbmodify_command="ldbmodify -H /var/lib/samba/private/sam.ldb ".$path_ldif;
         print "$ldbmodify_command\n";
         system($ldbmodify_command);
     }
 
-    # activate
+    # sysvoreset (updates acls for files)
     my $sysvolreset_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SAMBA_TOOL'}.
         " ntacl sysvolreset";
     print "$sysvolreset_command\n";
@@ -874,6 +848,8 @@ sub AD_gpo_kill {
     system ($sysvolreset_command);
 }
 
+
+
 sub AD_gpo_dump {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -897,15 +873,27 @@ sub AD_gpo_dump {
                           " gPCMachineExtensionNames".
                           " gPCUserExtensionNames".
                           " versionNumber".
-                          " objectClass".
                           " > $path_ldif";
     print "$ldbsearch_command\n";
     system($ldbsearch_command);
 
     # create a template
-    my $sed_command="sed 's/".$root_dse."/\@\@ROOTDSE\@\@/g' ".
+    my $sed_command="sed ".
+                    " -e 's/#.*\$//g' ". # remove commented lines, $ must be escaped here
+                    " -e '/^\$/d' ". # remove empty lines
+                    " -e 's/".$gpo_dump."/\@\@GPO\@\@/g' ".
+                    " -e 's/".$root_dse."/\@\@ROOTDSE\@\@/g' ".
+                    " -e 's/gPCMachineExtensionNames/replace: gPCMachineExtensionNames\\ngPCMachineExtensionNames/g' ".
+                    " -e 's/gPCUserExtensionNames/replace: gPCUserExtensionNames\\ngPCUserExtensionNames/g' ".
+                    " -e 's/versionNumber/replace: versionNumber\\nversionNumber/g' ".
                     $path_ldif." > ".$path_ldif_template;
+    print "$sed_command\n";
     system($sed_command);
+
+    # insert "changetype: modify"-line after dn: ... line (i.e. line 2)
+    my $sed_command2="sed -i '2ichangetype: modify' $path_ldif_template";
+    print "$sed_command2\n";
+    system($sed_command2);
     
     &Sophomorix::SophomorixBase::print_title("Dumping gpo $gpo_dump (end)");
 }

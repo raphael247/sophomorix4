@@ -158,7 +158,7 @@ Options:
   --gpo-listall
   --gpo-listall -j (return parsed data as JSON)
 Export a gpo:
-  --gpo-dump {...} --gpo-dump-type <school, ...> --gpo-dump_path /path/to/dump
+  --gpo-dump {...} --gpo-dump-type <school, ...> --gpo-dump-path /path/to/dump
 
 
 Dumping data:                     
@@ -229,7 +229,7 @@ if ($info==1){
 if ($school ne "" and $create==1){
     if (not exists $sophomorix_config{'SCHOOLS'}{$school}){
         print "\n";
-        print "WARNING: You must add the school in\n";
+        print "WARNING: You must add the school \"$school\" in\n";
         print "         $DevelConf::file_conf_sophomorix\n";
         print "         before you can create it!\n\n";
         exit;
@@ -324,7 +324,7 @@ if ($gpo_listall==1){
 if ($gpo_create ne ""){
     if (not exists $sophomorix_config{'SCHOOLS'}{$gpo_create}){
         print "\n";
-        print "WARNING: You must add the school in\n";
+        print "WARNING: You must add the school \"$gpo_create\" in\n";
         print "         $DevelConf::file_conf_sophomorix\n";
         print "         before you can create a gpo for it!\n\n";
         exit;
