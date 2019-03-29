@@ -2231,6 +2231,8 @@ if ($add==1 or $test_add==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -2734,6 +2736,8 @@ if ($add==1 or $test_add==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -3082,6 +3086,8 @@ if ($add==1 or $test_add==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -5036,6 +5042,8 @@ if ($mod==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -5491,6 +5499,8 @@ if ($mod==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -5839,6 +5849,8 @@ if ($mod==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -7606,6 +7618,8 @@ if ($ses==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -8061,6 +8075,8 @@ if ($ses==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -8409,6 +8425,8 @@ if ($ses==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -8808,6 +8826,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/global/teachers
     &NTACL_test ("linuxmuster-global",
@@ -10531,6 +10550,8 @@ if ($update==1 or $test_update==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -11096,6 +11117,8 @@ if ($update==1 or $test_update==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -11317,6 +11340,8 @@ if ($update==1 or $test_update==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -11630,6 +11655,8 @@ if ($update==1 or $test_update==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -11884,6 +11911,8 @@ if ($update==1 or $test_update==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -12820,6 +12849,8 @@ if ($kill==1 or $test_kill==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -13185,6 +13216,8 @@ if ($kill==1 or $test_kill==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -13376,6 +13409,8 @@ if ($kill==1 or $test_kill==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -13625,6 +13660,8 @@ if ($kill==1 or $test_kill==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -13845,6 +13882,8 @@ if ($kill==1 or $test_kill==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -14455,6 +14494,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -14648,6 +14689,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -14810,6 +14853,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -15017,6 +15062,7 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # # /srv/samba/schools/uni/students/alumni
     # &NTACL_test ("uni",
@@ -15056,6 +15102,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -15247,6 +15295,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -15777,6 +15827,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -15968,6 +16020,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -16130,6 +16184,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -16350,6 +16406,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
@@ -16541,6 +16599,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
                  'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
