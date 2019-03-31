@@ -977,7 +977,10 @@ if ($test_add_admin==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|IO/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/management
     &NTACL_test ("default-school",
@@ -991,6 +994,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\admins:ALLOWED/0x0/FULL',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -1002,8 +1006,10 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/students
     &NTACL_test ("default-school",
@@ -1018,6 +1024,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/teachers
     &NTACL_test ("default-school",
@@ -1031,6 +1038,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/teachers
     &NTACL_test ("default-school",
@@ -1044,7 +1052,8 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL', 
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/abc/management/admin-66
     &NTACL_test ("default-school",
@@ -1058,6 +1067,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\admin-66:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/abc/management/admin-666
     &NTACL_test ("default-school",
@@ -1071,6 +1081,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\admin-666:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/bsz
     &NTACL_test ("bsz",
@@ -1083,7 +1094,10 @@ if ($test_add_admin==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|IO/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/management
     &NTACL_test ("bsz",
@@ -1097,6 +1111,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/0x0/FULL',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -1108,8 +1123,10 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
    # /srv/samba/schools/bsz/students
     &NTACL_test ("bsz",
@@ -1124,6 +1141,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/teachers
     &NTACL_test ("bsz",
@@ -1137,6 +1155,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/teachers
     &NTACL_test ("bsz",
@@ -1151,6 +1170,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/bsz/management/admin-bsz-66
     &NTACL_test ("bsz",
@@ -1164,6 +1184,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\admin-bsz-66:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/abc
     &NTACL_test ("abc",
@@ -1176,7 +1197,10 @@ if ($test_add_admin==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:S-1-22-2-0',
                  'ACL:LINUXMUSTER\s_abc:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\abc-students:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|IO/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/abc/management
     &NTACL_test ("abc",
@@ -1190,6 +1214,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/0x0/FULL',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/abc/share/projects
     &NTACL_test ("abc",
@@ -1201,8 +1226,10 @@ if ($test_add_admin==1){
                  "CONTROL:SR|DP",
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\s_abc:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\abc-students:ALLOWED/0x0/READ', 
+                 'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
    # /srv/samba/schools/abc/students
     &NTACL_test ("abc",
@@ -1217,6 +1244,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\abc-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/abc/teachers
     &NTACL_test ("abc",
@@ -1230,6 +1258,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/READ', 
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/abc/share/teachers
     &NTACL_test ("abc",
@@ -1244,6 +1273,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\abc-teachers:ALLOWED/0x0/RWX', 
                  'ACL:LINUXMUSTER\abc-teachers:ALLOWED/OI|CI|IO/FULL', 
                  'ACL:LINUXMUSTER\abc-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/schools/abc/management/admin-abc-666
     &NTACL_test ("abc",
@@ -1257,6 +1287,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\admin-abc-666:ALLOWED/OI|CI/FULL', 
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     }
     &end_fs_test(\%fs_test_result);
@@ -1296,6 +1327,7 @@ if ($test_add_admin==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/0x0/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/global/share/projects
     &NTACL_test ("linuxmuster-global",
@@ -1310,6 +1342,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/global/teachers
     &NTACL_test ("linuxmuster-global",
@@ -1323,6 +1356,7 @@ if ($test_add_admin==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/global/students
     &NTACL_test ("linuxmuster-global",
@@ -1337,6 +1371,7 @@ if ($test_add_admin==1){
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\global-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\global-teachers:ALLOWED/0x0/READ',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/global/management/global-admin-66
     &NTACL_test ("linuxmuster-global",
@@ -1349,6 +1384,7 @@ if ($test_add_admin==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admin-66:ALLOWED/OI|CI/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     # /srv/samba/global/management/global-admin-666
     &NTACL_test ("linuxmuster-global",
@@ -1361,6 +1397,7 @@ if ($test_add_admin==1){
                  'OWNER:LINUXMUSTER\Domain Admins', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\global-admin-666:ALLOWED/OI|CI/FULL',
+                 'ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL', 
                 );
     }
     &end_fs_test(\%fs_test_result);
