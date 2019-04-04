@@ -229,11 +229,17 @@ if ($convert_to_utf8 ne ""){
     # new
     my $ref_encoding_data=&read_encoding_data();
 
-    print Dumper($ref_encoding_data->{LASTNAME_ERRORS});
-    my $enc=&analyze_encoding_new($newfile,$newfile,$ref_encoding_data);
+    #print Dumper($ref_encoding_data->{FIRSTNAME_DATA});
+    my ($enc,$ref_encoding_check_results)=&analyze_encoding_new($newfile,
+                                  $newfile,
+                                  $show_special_char_lines,
+                                  $ref_encoding_data,
+                                 );
 
     print "ENCODING IS $enc ($newfile)\n";
+    #print Dumper ($ref_encoding_check_results);
 
+    
 #     # old
 #     &reading_firstnames();
 #     &reading_firstname_errors();

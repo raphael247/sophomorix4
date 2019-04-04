@@ -6369,12 +6369,14 @@ sub read_encoding_data {
 }
 
 
+
 sub analyze_encoding_new {
     my ($file,$file_tmp,$show_special_char_lines,$ref_encoding_data)=@_;
     # $file ist for printout and path in config hash only
     # $file_tmp will be analyzed
     my @encodings_to_check=("UTF8","ISO_8859-1");
-
+    my %encoding_check_results=();
+    
     my $filename = basename($file);
     my $filename_tmp = basename($file_tmp);
     my $nonstandard_name_count=0;
@@ -6444,13 +6446,14 @@ sub analyze_encoding_new {
                 my $hit_count=0;
                 my $error_count=0;
 	        foreach my $enc (@encodings_to_check){
-	            print "HERE ENC: $enc\n";
+	            print "HERE ENC: $enc $first\n";
                     my $conv = Text::Iconv->new($enc,"utf8");
                     my $first_utf8 = $conv->convert($first);
-
                     # check for positive hits (known, valid firstnames)
 #                    if (exists $firstnames_data{$enc}{$first}){
                     if (exists $ref_encoding_data->{FIRSTNAME_DATA}{$enc}{$first}){
+		       
+			print "HERE: HIT $first in $enc\n";
                         # remember hits
 	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} },
                                 { first => "$first",
@@ -6560,17 +6563,36 @@ sub analyze_encoding_new {
 	    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}+
             $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}+
 	    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
-        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_sum'}{$enc}=$sum;
+        $encoding_check_results{$file}{'TOTAL_POINTS'}{$enc}=$sum;
         if($sum > $oldsum){
             $encoding_check_results{$file}{'NAMES'}{'RESULT'}=$enc;
         }
     }
 
+
+    
+    # calculate result
     if ($nonstandard_name_count==0){
-        # none non ascii names encountered
-        $encoding_check_results{$file}{'NAMES'}{'RESULT'}="ASCII";
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="ASCII";
+        # none non ascii names encountered -> treat as UTF8 for convenience
+        $encoding_check_results{$file}{'NAMES'}{'RESULT'}="UTF8";
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="UTF8";
+        $encoding_check_results{$file}{'SURE'}="TRUE";
     } else {
+        # test if result sure (TRUE/FALSE)
+        my $enc_nonzero=0;
+        foreach my $enc (@encodings_to_check){
+	    if ($encoding_check_results{$file}{'TOTAL_POINTS'}{$enc}>0){
+                print "$enc has hits\n";
+	        $enc_nonzero++;
+	    }
+        }
+
+        if ($enc_nonzero==1){
+            $encoding_check_results{$file}{'SURE'}="TRUE";
+        } else {
+            $encoding_check_results{$file}{'SURE'}="FALSE";
+        }
+
         # save result in config hash
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
             $encoding_check_results{$file}{'NAMES'}{'RESULT'};
@@ -6578,7 +6600,7 @@ sub analyze_encoding_new {
     if($Conf::log_level>=2){
         print "$file_tmp --> $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n";
     }
-    return $encoding_check_results{$file}{'NAMES'}{'RESULT'};
+    return ($encoding_check_results{$file}{'NAMES'}{'RESULT'},\%encoding_check_results);
 }
 
 
