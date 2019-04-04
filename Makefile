@@ -319,6 +319,7 @@ install-developer:
 	@install -d $(EXAMPLEFILES)
 	@install -oroot -groot --mode=0644 sophomorix-developer/examplefiles/students.csv.utf-8 $(EXAMPLEFILES)
 	@install -oroot -groot --mode=0644 sophomorix-developer/examplefiles/students.csv.8859_1 $(EXAMPLEFILES)
+	@install -oroot -groot --mode=0644 sophomorix-developer/examplefiles/students.csv.ascii $(EXAMPLEFILES)
 
 # installing  testdata
 	@install -d $(TESTFILES)
