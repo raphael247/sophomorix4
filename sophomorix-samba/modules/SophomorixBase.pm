@@ -6399,7 +6399,6 @@ sub analyze_encoding_new {
          die "Error: $! $file_tmp not found!";
     my $count=0;
     while (<DATAFILE>){
-	print "HERE $_";
         $count++;
         chomp();
         s/^ //g; # Leerzeichen am Zeilenangfang entfernen
@@ -6440,20 +6439,16 @@ sub analyze_encoding_new {
 
         foreach my $first (@firstnames){
             if ($first=~/[^a-zA-Z\-]/) {
-                print "HERE FIRST: $first\n";
                 $nonstandard_name_count++; 
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
                 my $error_count=0;
 	        foreach my $enc (@encodings_to_check){
-	            print "HERE ENC: $enc $first\n";
                     my $conv = Text::Iconv->new($enc,"utf8");
                     my $first_utf8 = $conv->convert($first);
                     # check for positive hits (known, valid firstnames)
-#                    if (exists $firstnames_data{$enc}{$first}){
                     if (exists $ref_encoding_data->{FIRSTNAME_DATA}{$enc}{$first}){
 		       
-			print "HERE: HIT $first in $enc\n";
                         # remember hits
 	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} },
                                 { first => "$first",
@@ -6466,7 +6461,6 @@ sub analyze_encoding_new {
                         $hit_count++;
                     }
                     # check for errors
-#                    if (exists $firstnames_errors{$enc}{$first}){
                     if (exists $ref_encoding_data->{FIRSTNAME_ERRORS}{$enc}{$first}){
                         # remember errors
 	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_errors'} },
@@ -6494,7 +6488,6 @@ sub analyze_encoding_new {
             }
         }
 
-
         # lastname
         # split lastname-field into single lastnames
         # split at 'space' and '-'
@@ -6511,8 +6504,6 @@ sub analyze_encoding_new {
                     my $last_utf8 = $conv->convert($last);
 
                     # check for positive hits (known, valid firstnames)
-		    #                    if (exists $lastnames_data{$enc}{$last}){
-		    print "HERE: $enc $last\n";
                     if (exists $ref_encoding_data->{LASTNAME_DATA}{$enc}{$last}){
                         # remember hits
 	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_hits'} },
@@ -6526,7 +6517,6 @@ sub analyze_encoding_new {
                         $hit_count++;
                     }
                     # check for errors
-#                    if (exists $lastnames_errors{$enc}{$last}){
                     if (exists $ref_encoding_data->{LASTNAME_ERRORS}{$enc}{$last}){
                         # remember errors
 	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_errors'} },
@@ -6555,7 +6545,7 @@ sub analyze_encoding_new {
         }
     }
 
-    # calculate sum
+    # calculate sum of hits
     my $oldsum=0;
     foreach my $enc (@encodings_to_check){
         my $sum=
@@ -6569,8 +6559,6 @@ sub analyze_encoding_new {
         }
     }
 
-
-    
     # calculate result
     if ($nonstandard_name_count==0){
         # none non ascii names encountered -> treat as UTF8 for convenience
@@ -6578,11 +6566,10 @@ sub analyze_encoding_new {
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="UTF8";
         $encoding_check_results{$file}{'SURE'}="TRUE";
     } else {
-        # test if result sure (TRUE/FALSE)
+        # test if result is sure (TRUE/FALSE)
         my $enc_nonzero=0;
         foreach my $enc (@encodings_to_check){
 	    if ($encoding_check_results{$file}{'TOTAL_POINTS'}{$enc}>0){
-                print "$enc has hits\n";
 	        $enc_nonzero++;
 	    }
         }
