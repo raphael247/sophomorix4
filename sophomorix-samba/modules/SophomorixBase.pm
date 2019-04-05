@@ -6408,27 +6408,30 @@ foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'LASTNAME_ERRORS'} }) {
 
 
 sub analyze_encoding_new {
-    my ($file,$file_tmp,$show_special_char_lines,$ref_encoding_data)=@_;
+    my ($file,
+        $file_tmp,
+        $show_special_char_lines,
+        $ref_encoding_data,
+        $ref_encoding_check_results,
+        $ref_sophomorix_config)=@_;
     # $file ist for printout and path in config hash only
     # $file_tmp will be analyzed
-    my @encodings_to_check=("UTF8","ISO_8859-1");
-    my %encoding_check_results=();
-    
+
     my $filename = basename($file);
     my $filename_tmp = basename($file_tmp);
     my $nonstandard_name_count=0;
-    # set all result counters to 0
-    foreach my $enc (@encodings_to_check){
-        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=0;
-        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=0;
-        $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}=0;
-        $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc}=0;
+
+    foreach my $enc (@{ $ref_encoding_data->{'TO_CHECK'} }){
+        $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=0;
+        $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=0;
+        $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{$enc}=0;
+        $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{$enc}=0;
     }
-    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=0;
-    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{'none'}=0;
-    $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=0;
-    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{'none'}=0;
-    $encoding_check_results{$file}{'RESULT'}="unknown";
+    $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=0;
+    $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{'none'}=0;
+    $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'none'}=0;
+    $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{'none'}=0;
+    $ref_encoding_check_results->{$file}{'RESULT'}="unknown";
 
     # start to analyze file_tmp
     &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
@@ -6459,7 +6462,7 @@ sub analyze_encoding_new {
         my $semikolon_count=$line=~tr/;//;
         if ($semikolon_count<3){
             &log_script_exit("$filename: Not 3 Semicolons in $line",1,1,0,
-                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+                     \@arguments,\%sophomorix_result,$ref_sophomorix_config,$json);
         }
 
         # add trailing ; if not there
@@ -6480,47 +6483,47 @@ sub analyze_encoding_new {
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
                 my $error_count=0;
-	        foreach my $enc (@encodings_to_check){
+                foreach my $enc (@{ $ref_encoding_data->{'TO_CHECK'} }){
                     my $conv = Text::Iconv->new($enc,"utf8");
                     my $first_utf8 = $conv->convert($first);
                     # check for positive hits (known, valid firstnames)
                     if (exists $ref_encoding_data->{FIRSTNAME_DATA}{$enc}{$first}){
 		       
                         # remember hits
-	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} },
+	                push @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_hits'} },
                                 { first => "$first",
                                   first_utf8 => "$first_utf8",
                                   line => "$_"};
                         # count hits
-                        my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc};
+                        my $old=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=$new;
+                        $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}=$new;
                         $hit_count++;
                     }
                     # check for errors
                     if (exists $ref_encoding_data->{FIRSTNAME_ERRORS}{$enc}{$first}){
                         # remember errors
-	                push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_errors'} },
+	                push @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_errors'} },
                                 { first => "$first",
                                   first_utf8 => "$first_utf8",
                                   line => "$_"};
                         # count errors
-                        my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc};
+                        my $old=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=$new;
+                        $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}=$new;
                         $hit_count++;
                     }
                 }
                 # non-hits and non-errors (unknown firstnames)
                 if ($hit_count==0 and $error_count==0){
                     # remember unknown names
-                    push @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_unknown'} },
+                    push @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_unknown'} },
                            { first => "$first",
                              line => "$_"};
                     # count unknown names
-                    my $old=$encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'};
+                    my $old=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'none'};
                     my $new=$old+1;
-                    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=$new;
+                    $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=$new;
                 }
             }
         }
@@ -6536,47 +6539,47 @@ sub analyze_encoding_new {
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
                 my $error_count=0;
-                foreach my $enc (@encodings_to_check){
+                foreach my $enc (@{ $ref_encoding_data->{'TO_CHECK'} }){
                     my $conv = Text::Iconv->new($enc,"utf8");
                     my $last_utf8 = $conv->convert($last);
 
                     # check for positive hits (known, valid firstnames)
                     if (exists $ref_encoding_data->{LASTNAME_DATA}{$enc}{$last}){
                         # remember hits
-	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_hits'} },
+	                push @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_hits'} },
                                 { last => "$last",
                                   last_utf8 => "$last_utf8",
                                   line => "$_"};
                         # count hits
-                        my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc};
+                        my $old=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}=$new;
+                        $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{$enc}=$new;
                         $hit_count++;
                     }
                     # check for errors
                     if (exists $ref_encoding_data->{LASTNAME_ERRORS}{$enc}{$last}){
                         # remember errors
-	                push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_errors'} },
+	                push @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_errors'} },
                                 { last => "$last",
                                   last_utf8 => "$last_utf8",
                                   line => "$_"};
                         # count errors
-                        my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
+                        my $old=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{$enc};
                         my $new=$old+1;
-                        $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc}=$new;
+                        $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{$enc}=$new;
                         $hit_count++;
                     }
                 }
                 # non-hits and non-errors (unknown lastnames)
                 if ($hit_count==0 and $error_count==0){
                     # remember unknown names
-                    push @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_unknown'} },
+                    push @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_unknown'} },
                            { last => "$last",
                              line => "$_"};
                     # count unknown names
-                    my $old=$encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'};
+                    my $old=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'none'};
                     my $new=$old+1;
-                    $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=$new;
+                    $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'none'}=$new;
                 }
             }
         }
@@ -6584,47 +6587,48 @@ sub analyze_encoding_new {
 
     # calculate sum of hits
     my $oldsum=0;
-    foreach my $enc (@encodings_to_check){
+    foreach my $enc (@{ $ref_encoding_data->{'TO_CHECK'} }){
         my $sum=
-            $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}+
-	    $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}+
-            $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc}+
-	    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
-        $encoding_check_results{$file}{'TOTAL_POINTS'}{$enc}=$sum;
+            $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{$enc}+
+	    $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{$enc}+
+            $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{$enc}+
+	    $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{$enc};
+        $ref_encoding_check_results->{$file}{'TOTAL_POINTS'}{$enc}=$sum;
         if($sum > $oldsum){
-            $encoding_check_results{$file}{'RESULT'}=$enc;
+            $ref_encoding_check_results->{$file}{'RESULT'}=$enc;
         }
     }
 
     # calculate result
     if ($nonstandard_name_count==0){
         # none non ascii names encountered -> treat as UTF8 for convenience
-        $encoding_check_results{$file}{'RESULT'}="UTF8";
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="UTF8";
-        $encoding_check_results{$file}{'SURE'}="TRUE";
+        $ref_encoding_check_results->{$file}{'RESULT'}="UTF8";
+        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="UTF8";
+        $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
     } else {
         # test if result is sure (TRUE/FALSE)
         my $enc_nonzero=0;
-        foreach my $enc (@encodings_to_check){
-	    if ($encoding_check_results{$file}{'TOTAL_POINTS'}{$enc}>0){
+         foreach my $enc (@{ $ref_encoding_data->{'TO_CHECK'} }){
+	    if ($ref_encoding_check_results->{$file}{'TOTAL_POINTS'}{$enc}>0){
 	        $enc_nonzero++;
 	    }
         }
 
         if ($enc_nonzero==1){
-            $encoding_check_results{$file}{'SURE'}="TRUE";
+            $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
         } else {
-            $encoding_check_results{$file}{'SURE'}="FALSE";
+            $ref_encoding_check_results->{$file}{'SURE'}="FALSE";
         }
 
         # save result in config hash
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
-            $encoding_check_results{$file}{'RESULT'};
+        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
+            $ref_encoding_check_results->{$file}{'RESULT'};
     }
     if($Conf::log_level>=2){
-        print "$file_tmp --> $encoding_check_results{$file}{'RESULT'}\n";
+        print "$file_tmp --> $ref_encoding_check_results->{$file}{'RESULT'}\n";
     }
-    return ($encoding_check_results{$file}{'RESULT'},\%encoding_check_results);
+
+    return ($ref_encoding_check_results->{$file}{'RESULT'},$ref_encoding_check_results);
 }
 
 
@@ -6666,7 +6670,8 @@ sub print_analyzed_encoding {
                 $item->{first_utf8},
                 $item->{line};
         my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
-        printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
+#        printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
+        printf  "|          ---> %-60s|\n",$ref_encoding_data->{'FIRSTNAME_ERRORS'}{$enc_result}{ $item->{'first'} };
         print "+---------------------------------------------------------------------------+\n";
     }
 
@@ -6688,7 +6693,8 @@ sub print_analyzed_encoding {
                 $item->{last_utf8},
                 $item->{line};
         my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
-        printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
+#        printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
+        printf  "|          ---> %-60s|\n",$ref_encoding_data->{'LASTNAME_ERRORS'}{$enc_result}{ $item->{'last'} };
         print "+---------------------------------------------------------------------------+\n";
     }
 

@@ -437,20 +437,17 @@ if ($analyze_encoding ne ""){
     }
 
     my $ref_encoding_data=&read_encoding_data();
-    # ???
-#    &reading_firstnames();
-#    &reading_firstname_errors();
-#    &reading_lastnames();
-#    &reading_lastname_errors();
-    #my $enc=&analyze_encoding($analyze_encoding,$analyze_encoding);
-    #print Dumper($ref_encoding_data->{FIRSTNAME_DATA});
-    print Dumper($ref_encoding_data);
-    my ($enc,$ref_encoding_check_results)=&analyze_encoding_new($analyze_encoding,
-                                                                $analyze_encoding,
-                                                                $show_special_char_lines,
-                                                                $ref_encoding_data,
-                                                               );
+   #print Dumper($ref_encoding_data);
+    my $enc;
+    my $ref_encoding_check_results;
 
+    ($enc,$ref_encoding_check_results)=&analyze_encoding_new($analyze_encoding,
+                                                             $analyze_encoding,
+                                                             $show_special_char_lines,
+                                                             $ref_encoding_data,
+                                                             $ref_encoding_check_results,
+                                                             \%sophomorix_config,
+                                                            );
     if ($show_special_char_lines==1){
         my $count=0;
 	foreach my $line (@special_char_lines){
@@ -513,15 +510,21 @@ open (ERROR, ">$error_file");
 # analyzing encoding of all filtered user files in tmp
 # ============================================================
 my $ref_encoding_data=&read_encoding_data();
-# ???
-#&reading_firstnames();
-#&reading_firstname_errors();
-#&reading_lastnames();
-#&reading_lastname_errors();
+my $ref_encoding_check_results;
 foreach my  $user_file (@filelist){
-    &analyze_encoding($user_file,$user_file);
-}
+    my $enc;
+#    &analyze_encoding_new($user_file,$user_file);
+    ($enc,$ref_encoding_check_results)=&analyze_encoding_new($user_file,
+                                                             $user_file,
+                                                             $show_special_char_lines,
+                                                             $ref_encoding_data,
+                                                             $ref_encoding_check_results,
+                                                             \%sophomorix_config,
+                                                            );
 
+
+}
+print Dumper ($ref_encoding_check_results);
 
 
 # ============================================================
