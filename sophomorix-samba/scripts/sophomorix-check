@@ -52,7 +52,7 @@ use Sophomorix::SophomorixBase qw(
                                  remove_embracing_whitespace
                                  json_dump
                                  read_encoding_data
-                                 analyze_encoding_new
+                                 analyze_encoding
                                  print_analyzed_encoding
                                  recode_utf8_to_ascii
                                  );
@@ -443,13 +443,13 @@ if ($analyze_encoding ne ""){
     my $enc;
     my $ref_encoding_check_results;
 
-    ($enc,$ref_encoding_check_results)=&analyze_encoding_new($analyze_encoding,
-                                                             $analyze_encoding,
-                                                             $show_special_char_lines,
-                                                             $ref_encoding_data,
-                                                             $ref_encoding_check_results,
-                                                             \%sophomorix_config,
-                                                            );
+    ($enc,$ref_encoding_check_results)=&analyze_encoding($analyze_encoding,
+                                                         $analyze_encoding,
+                                                         $show_special_char_lines,
+                                                         $ref_encoding_data,
+                                                         $ref_encoding_check_results,
+                                                         \%sophomorix_config,
+                                                        );
     if ($show_special_char_lines==1){
         my $count=0;
 	foreach my $line ( @{ $ref_encoding_check_results->{$analyze_encoding}{'SPECIAL_CHAR_LINES'} } ){
@@ -515,16 +515,13 @@ my $ref_encoding_data=&read_encoding_data();
 my $ref_encoding_check_results;
 foreach my  $user_file (@filelist){
     my $enc;
-#    &analyze_encoding_new($user_file,$user_file);
-    ($enc,$ref_encoding_check_results)=&analyze_encoding_new($user_file,
-                                                             $user_file,
-                                                             $show_special_char_lines,
-                                                             $ref_encoding_data,
-                                                             $ref_encoding_check_results,
-                                                             \%sophomorix_config,
-                                                            );
-
-
+    ($enc,$ref_encoding_check_results)=&analyze_encoding($user_file,
+                                                         $user_file,
+                                                         $show_special_char_lines,
+                                                         $ref_encoding_data,
+                                                         $ref_encoding_check_results,
+                                                         \%sophomorix_config,
+                                                        );
 }
 print Dumper ($ref_encoding_check_results);
 
@@ -2376,7 +2373,7 @@ sub get_encoding {
 
 
 
-sub analyze_encoding {
+sub analyze_encoding_old {
     my ($file,$file_tmp) = @_;
     # $file ist for printout and path in config hash only
     # $file_tmp will be analyzed

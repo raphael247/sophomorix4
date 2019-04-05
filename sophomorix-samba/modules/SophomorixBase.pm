@@ -73,7 +73,7 @@ $Data::Dumper::Terse = 1;
             get_group_basename
             recode_utf8_to_ascii
             read_encoding_data
-            analyze_encoding_new
+            analyze_encoding
             print_analyzed_encoding
             read_smb_conf
             test_webui_permission
@@ -6372,7 +6372,7 @@ sub read_encoding_data {
 
 
 
-sub analyze_encoding_new {
+sub analyze_encoding {
     my ($file,
         $file_tmp,
         $show_special_char_lines,
