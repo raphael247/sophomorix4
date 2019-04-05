@@ -30,7 +30,29 @@ Host fleischsalat
 Todo:
 ############################################################
 
-BUg: wenn 2 dateien von Schulen da undkeine user angelegt,
+todo: code cleanup in sophomorix-check: commented subs
+
+BUg: wenn 2 dateien von 2 Schulen da sind 
+UND dieselben user darin vorkommen
+--> landen alle in der default-schule
+--> Lösung: 
+    ?sollen in richtiger schule angelegt werden ?
+    ? Fehler wegen identischen Eintrag? ignorieren? beide ignorieren?
+    1. Schritt: identische Zeilen ignorieren
+Idee beim Zeilendurchgehen:
+-- identischer identifier tritt auf
+   --> gleiche Schule, gleiche klasse: Zusatz-Zeile ignorieren
+   --> gleiche Schule, verschiedene Klasse: beide anlegen, oder keinen?
+   --> verschieden Schulen: beide ignorieren/beide anlegen? 
+
+
+
+
+
+school.conf:
+TEACHER_PREFIX=True/false  erzeugt bsz-bz
+
+
 
 dann kommen alle in die default schule
 
