@@ -863,6 +863,7 @@ sub AD_gpo_dump {
     my $ref_result = $arg_ref->{sophomorix_result};
 
     &Sophomorix::SophomorixBase::print_title("Dumping gpo $gpo_dump (start)");
+    system("mkdir -p $gpo_dump_path");
     # assemble ldif path
     my $path_ldif=$gpo_dump_path."/".$gpo_dump_type.".ldif";
     my $path_ldif_template=$gpo_dump_path."/".$gpo_dump_type.".ldif.template";
