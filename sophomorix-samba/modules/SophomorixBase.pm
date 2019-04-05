@@ -6268,35 +6268,15 @@ sub read_encoding_data {
             ${DevelConf::path_encoding_data}."/firstnames.".$enc_to_check.".txt";
         $encoding_data{'DATAFILES'}{'LASTNAMES'}{$enc_to_check}=
             ${DevelConf::path_encoding_data}."/lastnames.".$enc_to_check.".txt";
-
         $encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'}{$enc_to_check}=
             ${DevelConf::path_encoding_data}."/firstname_errors.".$enc_to_check.".txt";
         $encoding_data{'DATAFILES'}{'LASTNAME_ERRORS'}{$enc_to_check}=
             ${DevelConf::path_encoding_data}."/lastname_errors.".$enc_to_check.".txt";
-
-#        push @{ $encoding_data{'DATAFILES'}{$enc_to_check}{'FIRSTNAMES'} }, 
-#            ${DevelConf::path_encoding_data}."/firstnames.".$enc_to_check.".txt";
-#        push @{ $encoding_data{'DATAFILES'}{$enc_to_check}{'LASTNAMES'} }, 
-#            ${DevelConf::path_encoding_data}."/lastnames.".$enc_to_check.".txt";
-
     }
 
     # firstnames
-#    foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'FIRSTNAMES'} }) {
-#        my $file_abs=$encoding_data{'DATAFILES'}{'FIRSTNAMES'}{$enc};
-#        print "HERE1: $enc -> $file_abs\n";
-#    }
-
-#    foreach my $file_rel ( @DevelConf::enc_firstnames ){
     foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'FIRSTNAMES'} }) {
-         my $file_abs=$encoding_data{'DATAFILES'}{'FIRSTNAMES'}{$enc};
- #       my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
- #       my @list = split(/\//,$file_abs);
-#        my $filename = pop @list;
-#        my ($string1,$enc,$string2)=split(/\./,$filename);
-#        print "HERE2: $enc -> $file_abs\n";
-
-
+        my $file_abs=$encoding_data{'DATAFILES'}{'FIRSTNAMES'}{$enc};
         open(DATAFILE, "$file_abs") ||
              die "Error: $! $file_abs not found!";
         while (<DATAFILE>){
@@ -6318,13 +6298,8 @@ sub read_encoding_data {
     }
 
     # firstname errors
-foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'} }) {
-         my $file_abs=$encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'}{$enc};
-#    foreach my $file_rel ( @DevelConf::enc_err_firstnames ){
-#        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-#        my @list = split(/\//,$file_abs);
-#        my $filename = pop @list;
-#        my ($string1,$enc,$string2)=split(/\./,$filename);
+    foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'} }) {
+        my $file_abs=$encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'}{$enc};
         open(DATAFILE, "$file_abs") ||
              die "Error: $! $file_abs not found!";
         while (<DATAFILE>){
@@ -6348,12 +6323,7 @@ foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'} }) {
 
     # lastnames
     foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'LASTNAMES'} }) {
-         my $file_abs=$encoding_data{'DATAFILES'}{'LASTNAMES'}{$enc};
-#    foreach my $file_rel ( @DevelConf::enc_lastnames ){
-#        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-#        my @list = split(/\//,$file_abs);
-#        my $filename = pop @list;
-#        my ($string1,$enc,$string2)=split(/\./,$filename);
+        my $file_abs=$encoding_data{'DATAFILES'}{'LASTNAMES'}{$enc};
         open(DATAFILE, "$file_abs") ||
              die "Error: $! $file_abs not found!";
         while (<DATAFILE>){
@@ -6375,13 +6345,8 @@ foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'FIRSTNAME_ERRORS'} }) {
     }
 
     # lastname errors
-foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'LASTNAME_ERRORS'} }) {
-         my $file_abs=$encoding_data{'DATAFILES'}{'LASTNAME_ERRORS'}{$enc};
-#        foreach my $file_rel ( @DevelConf::enc_err_lastnames ){
-#        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-#        my @list = split(/\//,$file_abs);
-#        my $filename = pop @list;
-#        my ($string1,$enc,$string2)=split(/\./,$filename);
+    foreach my $enc (keys %{ $encoding_data{'DATAFILES'}{'LASTNAME_ERRORS'} }) {
+        my $file_abs=$encoding_data{'DATAFILES'}{'LASTNAME_ERRORS'}{$enc};
         open(DATAFILE, "$file_abs") ||
              die "Error: $! $file_abs not found!";
         while (<DATAFILE>){
@@ -6452,7 +6417,9 @@ sub analyze_encoding_new {
         ####################################
         if ($show_special_char_lines==1){
             if ($_=~/[^a-zA-Z0-9\-\.;_\/\s]/) {
+                push @{ $ref_encoding_check_results->{$file}{'SPECIAL_CHAR_LINES'} }, "Line ".$count.":  ".$_;
                 push @special_char_lines, "Line ".$count."   ".$_;
+                $ref_encoding_check_results->{$file}{'SPECIAL_CHAR_LINES_NUMBERED'}{$count}=$_;
                 #$special_char_lines{$count}=$line;
             }
         }

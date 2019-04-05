@@ -415,6 +415,7 @@ if ($info==1 and $level==0) {
 
 
 
+
 # --list-files
 if ($list_files==1) {
     &print_title("Reading the following user files:");
@@ -426,6 +427,7 @@ if ($list_files==1) {
     }
     exit;
 }
+
 
 
 # --analyze-encoding
@@ -450,7 +452,7 @@ if ($analyze_encoding ne ""){
                                                             );
     if ($show_special_char_lines==1){
         my $count=0;
-	foreach my $line (@special_char_lines){
+	foreach my $line ( @{ $ref_encoding_check_results->{$analyze_encoding}{'SPECIAL_CHAR_LINES'} } ){
             my $conv = Text::Iconv->new($enc,"utf8");
             my $line_utf8 = $conv->convert($line);
             if ($non_umlaut==1){
