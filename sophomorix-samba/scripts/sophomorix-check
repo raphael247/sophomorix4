@@ -51,6 +51,9 @@ use Sophomorix::SophomorixBase qw(
                                  remove_whitespace
                                  remove_embracing_whitespace
                                  json_dump
+                                 read_encoding_data
+                                 analyze_encoding_new
+                                 print_analyzed_encoding
                                  recode_utf8_to_ascii
                                  );
 use Sophomorix::SophomorixSambaAD qw(
@@ -432,11 +435,22 @@ if ($analyze_encoding ne ""){
         print "\n";
         print "Analyzing encoding\n";
     }
-    &reading_firstnames();
-    &reading_firstname_errors();
-    &reading_lastnames();
-    &reading_lastname_errors();
-    my $enc=&analyze_encoding($analyze_encoding,$analyze_encoding);
+
+    my $ref_encoding_data=&read_encoding_data();
+    # ???
+#    &reading_firstnames();
+#    &reading_firstname_errors();
+#    &reading_lastnames();
+#    &reading_lastname_errors();
+    #my $enc=&analyze_encoding($analyze_encoding,$analyze_encoding);
+    #print Dumper($ref_encoding_data->{FIRSTNAME_DATA});
+    print Dumper($ref_encoding_data);
+    my ($enc,$ref_encoding_check_results)=&analyze_encoding_new($analyze_encoding,
+                                                                $analyze_encoding,
+                                                                $show_special_char_lines,
+                                                                $ref_encoding_data,
+                                                               );
+
     if ($show_special_char_lines==1){
         my $count=0;
 	foreach my $line (@special_char_lines){
@@ -454,7 +468,7 @@ if ($analyze_encoding ne ""){
             }
         }
     }
-    &print_analyzed_encoding($analyze_encoding);
+    &print_analyzed_encoding($analyze_encoding,$ref_encoding_check_results,$ref_encoding_data);
     my $result="$analyze_encoding is $enc encoded";
     &result_sophomorix_add_summary({
                          NAME=>"ANALYZE-ENCODING", 
@@ -498,10 +512,12 @@ open (ERROR, ">$error_file");
 # ============================================================
 # analyzing encoding of all filtered user files in tmp
 # ============================================================
-&reading_firstnames();
-&reading_firstname_errors();
-&reading_lastnames();
-&reading_lastname_errors();
+my $ref_encoding_data=&read_encoding_data();
+# ???
+#&reading_firstnames();
+#&reading_firstname_errors();
+#&reading_lastnames();
+#&reading_lastname_errors();
 foreach my  $user_file (@filelist){
     &analyze_encoding($user_file,$user_file);
 }
@@ -2181,120 +2197,120 @@ sub check_login {
 
 # Encoding stuff
 ################################################################################
-sub reading_firstnames {
-    foreach my $file_rel ( @DevelConf::enc_firstnames ){
-        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-        my @list = split(/\//,$file_abs);
-        my $filename = pop @list;
-        my ($string1,$enc,$string2)=split(/\./,$filename); 
-        open(DATAFILE, "$file_abs") || 
-             die "Error: $! $file_abs not found!"; 
-        while (<DATAFILE>){
-            chomp();
-            s/^ //g; # remove spaces oat beginning of line
-            if(/^\#/){ # ignore commented lines
-               next;
-	    }
-            if($_ eq ""){
-                next;
-            }
-            my ($first,$first_new) = split(/:/);
-            $firstnames_data{$enc}{$first}=0;
-        }
-        if($Conf::log_level>=3){
-            print "   Reading $file_abs for encoding: $enc\n";
-        }
-        close(DATAFILE);
-    }
-}
+# sub reading_firstnames {
+#     foreach my $file_rel ( @DevelConf::enc_firstnames ){
+#         my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+#         my @list = split(/\//,$file_abs);
+#         my $filename = pop @list;
+#         my ($string1,$enc,$string2)=split(/\./,$filename); 
+#         open(DATAFILE, "$file_abs") || 
+#              die "Error: $! $file_abs not found!"; 
+#         while (<DATAFILE>){
+#             chomp();
+#             s/^ //g; # remove spaces oat beginning of line
+#             if(/^\#/){ # ignore commented lines
+#                next;
+# 	    }
+#             if($_ eq ""){
+#                 next;
+#             }
+#             my ($first,$first_new) = split(/:/);
+#             $firstnames_data{$enc}{$first}=0;
+#         }
+#         if($Conf::log_level>=3){
+#             print "   Reading $file_abs for encoding: $enc\n";
+#         }
+#         close(DATAFILE);
+#     }
+# }
 
 
 
-sub reading_firstname_errors {
-    foreach my $file_rel ( @DevelConf::enc_err_firstnames ){
-        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-        my @list = split(/\//,$file_abs);
-        my $filename = pop @list;
-        my ($string1,$enc,$string2)=split(/\./,$filename); 
-        open(DATAFILE, "$file_abs") || 
-             die "Error: $! $file_abs not found!"; 
-        while (<DATAFILE>){
-            chomp();
-            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
-            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-               next;
-	    }
-            if($_ eq ""){
-                next;
-            }
-            my ($error,$message) = split(/:/);
-            $message=~s/^\s+ //g;
-            $firstnames_errors{$enc}{$error}=$message;
-        }
-        if($Conf::log_level>=3){
-            print "   Reading $file_abs for errors: $enc\n";
-        }
-        close(DATAFILE);
-    }
-}
+# sub reading_firstname_errors {
+#     foreach my $file_rel ( @DevelConf::enc_err_firstnames ){
+#         my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+#         my @list = split(/\//,$file_abs);
+#         my $filename = pop @list;
+#         my ($string1,$enc,$string2)=split(/\./,$filename); 
+#         open(DATAFILE, "$file_abs") || 
+#              die "Error: $! $file_abs not found!"; 
+#         while (<DATAFILE>){
+#             chomp();
+#             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+#             if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+#                next;
+# 	    }
+#             if($_ eq ""){
+#                 next;
+#             }
+#             my ($error,$message) = split(/:/);
+#             $message=~s/^\s+ //g;
+#             $firstnames_errors{$enc}{$error}=$message;
+#         }
+#         if($Conf::log_level>=3){
+#             print "   Reading $file_abs for errors: $enc\n";
+#         }
+#         close(DATAFILE);
+#     }
+# }
 
 
-sub reading_lastnames {
-    foreach my $file_rel ( @DevelConf::enc_lastnames ){
-        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-        my @list = split(/\//,$file_abs);
-        my $filename = pop @list;
-        my ($string1,$enc,$string2)=split(/\./,$filename); 
-        open(DATAFILE, "$file_abs") || 
-             die "Error: $! $file_abs not found!"; 
-        while (<DATAFILE>){
-            chomp();
-            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
-            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-               next;
-	    }
-            if($_ eq ""){
-                next;
-            }
-            my ($last,$last_new) = split(/:/);
-            $lastnames_data{$enc}{$last}=0;
-        }
-        if($Conf::log_level>=3){
-            print "   Reading $file_abs for encoding: $enc\n";
-        }
-        close(DATAFILE);
-    }
-}
+# sub reading_lastnames {
+#     foreach my $file_rel ( @DevelConf::enc_lastnames ){
+#         my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+#         my @list = split(/\//,$file_abs);
+#         my $filename = pop @list;
+#         my ($string1,$enc,$string2)=split(/\./,$filename); 
+#         open(DATAFILE, "$file_abs") || 
+#              die "Error: $! $file_abs not found!"; 
+#         while (<DATAFILE>){
+#             chomp();
+#             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+#             if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+#                next;
+# 	    }
+#             if($_ eq ""){
+#                 next;
+#             }
+#             my ($last,$last_new) = split(/:/);
+#             $lastnames_data{$enc}{$last}=0;
+#         }
+#         if($Conf::log_level>=3){
+#             print "   Reading $file_abs for encoding: $enc\n";
+#         }
+#         close(DATAFILE);
+#     }
+# }
 
 
 
-sub reading_lastname_errors {
-    foreach my $file_rel ( @DevelConf::enc_err_lastnames ){
-        my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
-        my @list = split(/\//,$file_abs);
-        my $filename = pop @list;
-        my ($string1,$enc,$string2)=split(/\./,$filename); 
-        open(DATAFILE, "$file_abs") || 
-             die "Error: $! $file_abs not found!"; 
-        while (<DATAFILE>){
-            chomp();
-            s/^ //g; # Leerzeichen am Zeilenangfang entfernen
-            if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
-               next;
-	    }
-            if($_ eq ""){
-                next;
-            }
-            my ($error,$message) = split(/:/);
-            $message=~s/^\s+ //g;
-            $lastnames_errors{$enc}{$error}=$message;
-        }
-        if($Conf::log_level>=3){
-            print "   Reading $file_abs for errors: $enc\n";
-        }
-        close(DATAFILE);
-    }
-}
+# sub reading_lastname_errors {
+#     foreach my $file_rel ( @DevelConf::enc_err_lastnames ){
+#         my $file_abs=${DevelConf::path_encoding_data}."/".$file_rel;
+#         my @list = split(/\//,$file_abs);
+#         my $filename = pop @list;
+#         my ($string1,$enc,$string2)=split(/\./,$filename); 
+#         open(DATAFILE, "$file_abs") || 
+#              die "Error: $! $file_abs not found!"; 
+#         while (<DATAFILE>){
+#             chomp();
+#             s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+#             if(/^\#/){ # # am Anfang bedeutet Kommentarzeile
+#                next;
+# 	    }
+#             if($_ eq ""){
+#                 next;
+#             }
+#             my ($error,$message) = split(/:/);
+#             $message=~s/^\s+ //g;
+#             $lastnames_errors{$enc}{$error}=$message;
+#         }
+#         if($Conf::log_level>=3){
+#             print "   Reading $file_abs for errors: $enc\n";
+#         }
+#         close(DATAFILE);
+#     }
+# }
 
 
 
@@ -2373,7 +2389,7 @@ sub analyze_encoding {
     $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{'none'}=0;
     $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'}=0;
     $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{'none'}=0;
-    $encoding_check_results{$file}{'NAMES'}{'RESULT'}="unknown";
+    $encoding_check_results{$file}{'RESULT'}="unknown";
 
     # start to analyze file_tmp
     &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
@@ -2538,129 +2554,130 @@ sub analyze_encoding {
 	    $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc};
         $encoding_check_results{$file}{'FIRSTNAMES'}{'count_sum'}{$enc}=$sum;
         if($sum > $oldsum){
-            $encoding_check_results{$file}{'NAMES'}{'RESULT'}=$enc;
+            $encoding_check_results{$file}{'RESULT'}=$enc;
         }
     }
 
     if ($nonstandard_name_count==0){
         # none non ascii names encountered
-        $encoding_check_results{$file}{'NAMES'}{'RESULT'}="ASCII";
+        $encoding_check_results{$file}{'RESULT'}="ASCII";
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="ASCII";
     } else {
         # save result in config hash
         $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
-            $encoding_check_results{$file}{'NAMES'}{'RESULT'};
+            $encoding_check_results{$file}{'RESULT'};
     }
     if($Conf::log_level>=2){
-        print "$file_tmp --> $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n";
+        print "$file_tmp --> $encoding_check_results{$file}{'RESULT'}\n";
     }
-    return $encoding_check_results{$file}{'NAMES'}{'RESULT'};
+    return $encoding_check_results{$file}{'RESULT'};
 }
 
 
 
-sub print_analyzed_encoding {
-    my ($file) = @_;
-    print "\nEncoding check result for:\n";
-    print "   $file\n";
+# sub print_analyzed_encoding_old {
+#     my ($file,$ref_encoding_check_results) = @_;
+#     print "\nEncoding check result for:\n";
+#     print "   $file\n";
 
-    # print valid firstnames
-    if($Conf::log_level>=2){
-    print "\nValid firstnames: ",
-          "($encoding_check_results{$file}{'NAMES'}{'RESULT'} ---> utf8)\n";
-    print "==========================================================================\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_hits'} } ){
-        printf  "%-20s %-12s %-20s\n",
-                $item->{first},
-                "--->",
-                $item->{first_utf8};
-    }
-    print "--------------------------------------------------------------------------\n";
-    }
+#     # print valid firstnames
+#     if($Conf::log_level>=2){
+#     print "\nValid firstnames: ",
+#           "($ref_encoding_check_results->{$file}{'RESULT'} ---> utf8)\n";
+#     print "==========================================================================\n";
+#     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_hits'} } ){
+#         printf  "%-20s %-12s %-20s\n",
+#                 $item->{first},
+#                 "--->",
+#                 $item->{first_utf8};
+#     }
+#     print "--------------------------------------------------------------------------\n";
+#     }
 
-    # print unknown firstnames
-    print "\n";
-    print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
-    print "+------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_unknown'} } ){
-        printf  "| %-40s |\n",
-                $item->{first},
-    }
-    print "+------------------------------------------+\n";
+#     # print unknown firstnames
+#     print "\n";
+#     print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
+#     print "+------------------------------------------+\n";
+#     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_unknown'} } ){
+#         printf  "| %-40s |\n",
+#                 $item->{first},
+#     }
+#     print "+------------------------------------------+\n";
 
-    #  print firstnames with errors
-    print "\nFirstnames that should be an error (Please report the the School Office):\n";
-    print "+---------------------------------------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'FIRSTNAMES'}{'data_errors'} } ){
-        printf  "| %-15s%-60s|\n",
-                $item->{first_utf8},
-                $item->{line};
-        my $enc_result=$encoding_check_results{$file}{'NAMES'}{'RESULT'};
-        printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
-        print "+---------------------------------------------------------------------------+\n";
-    }
+#     #  print firstnames with errors
+#     print "\nFirstnames that should be an error (Please report the the School Office):\n";
+#     print "+---------------------------------------------------------------------------+\n";
+#     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_errors'} } ){
+#         printf  "| %-15s%-60s|\n",
+#                 $item->{first_utf8},
+#                 $item->{line};
+#         my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
+#         printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
+#         print "+---------------------------------------------------------------------------+\n";
+#     }
 
-    # print unknown lastnames
-    print "\n";
-    print "Unknown lastnames (Please report to info\@linuxmuster.net):\n";
-    print "+------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_unknown'} } ){
-        printf  "| %-40s |\n",
-                $item->{last},
-    }
-    print "+------------------------------------------+\n";
+#     # print unknown lastnames
+#     print "\n";
+#     print "Unknown lastnames (Please report to info\@linuxmuster.net):\n";
+#     print "+------------------------------------------+\n";
+#     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_unknown'} } ){
+#         printf  "| %-40s |\n",
+#                 $item->{last},
+#     }
+#     print "+------------------------------------------+\n";
 
-    #  print lastnames with errors
-    print "\nLastnames that should be an error (Please report the the School Office):\n";
-    print "+---------------------------------------------------------------------------+\n";
-    foreach my $item ( @{ $encoding_check_results{$file}{'LASTNAMES'}{'data_errors'} } ){
-        printf  "| %-15s%-60s|\n",
-                $item->{last_utf8},
-                $item->{line};
-        my $enc_result=$encoding_check_results{$file}{'NAMES'}{'RESULT'};
-        printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
-        print "+---------------------------------------------------------------------------+\n";
-    }
+#     #  print lastnames with errors
+#     print "\nLastnames that should be an error (Please report the the School Office):\n";
+#     print "+---------------------------------------------------------------------------+\n";
+#     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_errors'} } ){
+#         printf  "| %-15s%-60s|\n",
+#                 $item->{last_utf8},
+#                 $item->{line};
+#         my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
+#         printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
+#         print "+---------------------------------------------------------------------------+\n";
+#     }
 
-    # print debug dump
-    if($Conf::log_level>=3){
-        print "Dump of \%encoding_check_results:\n";
-        print Dumper(\%encoding_check_results);
-    }
+#     # print debug dump
+#     if($Conf::log_level>=3){
+#         print "Dump of \$ref_encoding_check_results:\n";
+#         print Dumper($ref_encoding_check_results);
+#     }
 
-    # Print Result
-    print "\n";
-    print "                      +-----------------+-----------------+         \n";
-    print "                      |    firstname    |     surname     |         \n";
-    print "+---------------------+--------+--------+--------+--------+--------+\n";
-    printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
-            "Tested Encodings:",
-            "Hits",
-            "Errors",
-            "Hits",
-            "Errors",
-            "Sum";
-    print "+---------------------+--------+--------+--------+--------+--------+\n";
-    foreach my $enc (@encodings_to_check){
-        printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
-                $enc,
-                $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{$enc},
-                $encoding_check_results{$file}{'FIRSTNAMES'}{'count_errors'}{$enc},
-                $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{$enc},
-                $encoding_check_results{$file}{'LASTNAMES'}{'count_errors'}{$enc},
-   	        $encoding_check_results{$file}{'FIRSTNAMES'}{'count_sum'}{$enc};# ?????????
-    }
-    print "+---------------------+--------+--------+--------+--------+--------+\n";
-    printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
-            "none of the above",
-            $encoding_check_results{$file}{'FIRSTNAMES'}{'count_hits'}{'none'},
-            "-",
-            $encoding_check_results{$file}{'LASTNAMES'}{'count_hits'}{'none'},
-            "-",
-            "-";
-    print "+---------------------+--------+--------+--------+--------+--------+\n";
-    print "$file:\n",
-          "    File-Encoding is $encoding_check_results{$file}{'NAMES'}{'RESULT'}\n"; 
-    print "\n";
-    close(DATAFILE);
-}
+#     # Print Result
+#     print "\n";
+#     print "                      +-----------------+-----------------+         \n";
+#     print "                      |    firstname    |     surname     |         \n";
+#     print "+---------------------+--------+--------+--------+--------+--------+\n";
+#     printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
+#             "Tested Encodings:",
+#             "Hits",
+#             "Errors",
+#             "Hits",
+#             "Errors",
+#             "Sum";
+#     print "+---------------------+--------+--------+--------+--------+--------+\n";
+#     foreach my $enc (@encodings_to_check){
+#         printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
+#                 $enc,
+#                 $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{$enc},
+#                 $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{$enc},
+#                 $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{$enc},
+#                 $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{$enc},
+#    	        $ref_encoding_check_results->{$file}{'TOTAL_POINTS'}{$enc};# ?????????
+#     }
+#     print "+---------------------+--------+--------+--------+--------+--------+\n";
+#     printf  "| %-20s|%7s |%7s |%7s |%7s |%7s |\n",
+#             "none of the above",
+#             $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'none'},
+#             "-",
+#             $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'none'},
+#             "-",
+#             "-";
+#     print "+---------------------+--------+--------+--------+--------+--------+\n";
+#     print "$file:\n",
+#           "    File-Encoding is $ref_encoding_check_results->{$file}{'RESULT'}".
+#           " (Sureness: $ref_encoding_check_results->{$file}{'SURE'})\n"; 
+#     print "\n";
+#     close(DATAFILE);
+# }
