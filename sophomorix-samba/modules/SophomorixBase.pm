@@ -6376,12 +6376,12 @@ sub analyze_encoding {
     my ($file,
         $file_tmp,
         $show_special_char_lines,
+        $non_umlaut,
         $ref_encoding_data,
         $ref_encoding_check_results,
         $ref_sophomorix_config)=@_;
     # $file ist for printout and path in config hash only
     # $file_tmp will be analyzed
-
     my $filename = basename($file);
     my $filename_tmp = basename($file_tmp);
     my $nonstandard_name_count=0;
@@ -6595,6 +6595,27 @@ sub analyze_encoding {
         print "$file_tmp --> $ref_encoding_check_results->{$file}{'RESULT'}\n";
     }
 
+    if ($show_special_char_lines==1){
+        my $count=0;
+        print "\n";
+        &print_title("Special char lines in $filename (utf8-encoded):");
+	foreach my $line ( @{ $ref_encoding_check_results->{$file}{'SPECIAL_CHAR_LINES'} } ){
+            my $conv = Text::Iconv->new($ref_encoding_check_results->{$file}{'RESULT'},"utf8");
+            my $line_utf8 = $conv->convert($line);
+            if ($non_umlaut==1){
+                # äöüÄÖÜß works because its unicode
+                if ($line_utf8=~/[^äöüÄÖÜßa-zA-Z0-9\-\.;_\/\s]/) { 
+                    $count++;
+                    print "$count)  $line_utf8\n";
+                }
+            } else {
+                    $count++;
+                    print "$count)  $line_utf8\n";
+            }
+        }
+        print "\n";
+    }
+
     return ($ref_encoding_check_results->{$file}{'RESULT'},$ref_encoding_check_results);
 }
 
@@ -6602,6 +6623,9 @@ sub analyze_encoding {
 
 sub print_analyzed_encoding {
     my ($file,$ref_encoding_check_results,$ref_encoding_data) = @_;
+    my $line1="==========================================================================\n";
+    my $line2="--------------------------------------------------------------------------\n";
+    my $line3="+------------------------------------------------------------------------+\n";
     print "\nEncoding check result for:\n";
     print "   $file\n";
 
@@ -6609,60 +6633,58 @@ sub print_analyzed_encoding {
     if($Conf::log_level>=2){
     print "\nValid firstnames: ",
           "($ref_encoding_check_results->{$file}{'RESULT'} ---> utf8)\n";
-    print "==========================================================================\n";
+    print $line1;
     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_hits'} } ){
         printf  "%-20s %-12s %-20s\n",
                 $item->{first},
                 "--->",
                 $item->{first_utf8};
     }
-    print "--------------------------------------------------------------------------\n";
+    print $line2;
     }
 
     # print unknown firstnames
     print "\n";
     print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
-    print "+------------------------------------------+\n";
+    print $line3;
     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_unknown'} } ){
         printf  "| %-40s |\n",
                 $item->{first},
     }
-    print "+------------------------------------------+\n";
+    print $line3;
 
     #  print firstnames with errors
     print "\nFirstnames that should be an error (Please report the the School Office):\n";
-    print "+---------------------------------------------------------------------------+\n";
+    print $line3;
     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_errors'} } ){
         printf  "| %-15s%-60s|\n",
                 $item->{first_utf8},
                 $item->{line};
         my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
-#        printf  "|          ---> %-60s|\n",$firstnames_errors{$enc_result}{ $item->{first} };
         printf  "|          ---> %-60s|\n",$ref_encoding_data->{'FIRSTNAME_ERRORS'}{$enc_result}{ $item->{'first'} };
-        print "+---------------------------------------------------------------------------+\n";
+        print $line3;
     }
 
     # print unknown lastnames
     print "\n";
     print "Unknown lastnames (Please report to info\@linuxmuster.net):\n";
-    print "+------------------------------------------+\n";
+    print $line3;
     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_unknown'} } ){
         printf  "| %-40s |\n",
                 $item->{last},
     }
-    print "+------------------------------------------+\n";
+    print $line3;
 
     #  print lastnames with errors
     print "\nLastnames that should be an error (Please report the the School Office):\n";
-    print "+---------------------------------------------------------------------------+\n";
+    print $line3;
     foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_errors'} } ){
         printf  "| %-15s%-60s|\n",
                 $item->{last_utf8},
                 $item->{line};
         my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
-#        printf  "|          ---> %-60s|\n",$lastnames_errors{$enc_result}{ $item->{last} };
         printf  "|          ---> %-60s|\n",$ref_encoding_data->{'LASTNAME_ERRORS'}{$enc_result}{ $item->{'last'} };
-        print "+---------------------------------------------------------------------------+\n";
+        print $line3;
     }
 
     # print debug dump

@@ -223,7 +223,6 @@ my $unlock=0;
 my $analyze_encoding="";
 my $show_special_char_lines=0;
 my $non_umlaut=0;
-my @special_char_lines=();
 my $follow="";
 my @injectlines=(); # list of injected lines
 
@@ -445,27 +444,11 @@ if ($analyze_encoding ne ""){
     ($enc,$ref_encoding_check_results)=&analyze_encoding($analyze_encoding,
                                                          $analyze_encoding,
                                                          $show_special_char_lines,
+                                                         $non_umlaut,
                                                          $ref_encoding_data,
                                                          $ref_encoding_check_results,
                                                          \%sophomorix_config,
                                                         );
-    if ($show_special_char_lines==1){
-        my $count=0;
-	foreach my $line ( @{ $ref_encoding_check_results->{$analyze_encoding}{'SPECIAL_CHAR_LINES'} } ){
-            my $conv = Text::Iconv->new($enc,"utf8");
-            my $line_utf8 = $conv->convert($line);
-            if ($non_umlaut==1){
-                # äöüÄÖÜß works because its unicode
-                if ($line_utf8=~/[^äöüÄÖÜßa-zA-Z0-9\-\.;_\/\s]/) { 
-                    $count++;
-                    print "$count)  $line_utf8\n";
-                }
-            } else {
-                    $count++;
-                    print "$count)  $line_utf8\n";
-            }
-        }
-    }
     &print_analyzed_encoding($analyze_encoding,$ref_encoding_check_results,$ref_encoding_data);
     my $result="$analyze_encoding is $enc encoded";
     &result_sophomorix_add_summary({
@@ -517,6 +500,7 @@ foreach my  $user_file (@filelist){
     ($enc,$ref_encoding_check_results)=&analyze_encoding($user_file,
                                                          $user_file,
                                                          $show_special_char_lines,
+                                                         $non_umlaut,
                                                          $ref_encoding_data,
                                                          $ref_encoding_check_results,
                                                          \%sophomorix_config,

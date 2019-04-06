@@ -71,6 +71,7 @@ my $filter_only=0;
 my $name="";
 my $convert_to_utf8=0;
 my $show_special_char_lines=0;
+my $non_umlaut=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -81,6 +82,7 @@ my $testopt=GetOptions(
            "name=s" => \$name,
            "convert-to-utf8" => \$convert_to_utf8,
            "show-special-char-lines" => \$show_special_char_lines,
+           "non-umlaut|nonumlaut" => \$non_umlaut,
            "filter-only" => \$filter_only,
           );
 
@@ -89,6 +91,7 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-newfile");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
 
+# last option is the abs path of the new file
 my $newfile=$ARGV[0];
 
 
@@ -115,11 +118,11 @@ Options:
   -i  / --info
 
 Examples:
-    sophomorix-newfile students.csv                         (target according to given file)
-    sophomorix-newfile /path/to/students.csv                (target according to given file)
-    sophomorix-newfile somefile.csv --name students.csv     (target according to given name)
+    sophomorix-newfile students.csv                            (target according to given file)
+    sophomorix-newfile /path/to/students.csv                   (target according to given file)
+    sophomorix-newfile /path/somefile.txt --name students.csv  (target according to given name)
 
-    sophomorix-newfile /path/to/students.csv --filter-only   (filtering to stdout)
+    sophomorix-newfile /path/to/students.csv --filter-only     (filtering/utf8 converting to stdout)
   
 Options:
   --convert-to-utf8   (converts the file to utf8, if the file format is not detactable, nothing is done at all)
@@ -178,9 +181,11 @@ my $newfile_abs = abs_path($newfile);
 my $target="";
 my $newfile_log;
 my $newfile_log_filter;
+my $newfile_log_utf8;
 my $etcfile_log;
 my $filter_script;
 
+# calculate paths
 if ($name ne ""){
     # option --name ....
     if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
@@ -189,13 +194,15 @@ if ($name ne ""){
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
         $newfile_log_filter=$DevelConf::path_log_newfiles."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".filter";
+        $newfile_log_utf8=$DevelConf::path_log_newfiles."/".
+            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".utf8";
         $etcfile_log=$DevelConf::path_log_etcfiles."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
         $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'FILTERSCRIPT'};
     } else {
         # --name with wrong filename
         print "\nERROR: Your --name $name is not a valid filename on this server\n\n";
-        print "   * Please use a valid filename so I can find out where to copy it.\n\n";
+        print "   * Please use a valid filename so I can find out where to copy your new file.\n\n";
         &print_valid_filenames;
         exit 88;
     }
@@ -206,6 +213,8 @@ if ($name ne ""){
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
     $newfile_log_filter=$DevelConf::path_log_newfiles."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".filter";
+    $newfile_log_utf8=$DevelConf::path_log_newfiles."/".
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".utf8";
     $etcfile_log=$DevelConf::path_log_etcfiles."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
     $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
@@ -226,19 +235,19 @@ if ($convert_to_utf8 ne ""){
         print "\n";
         print "Analyzing encoding\n";
     }
-    # new
     my $ref_encoding_data=&read_encoding_data();
-
-    #print Dumper($ref_encoding_data->{FIRSTNAME_DATA});
-    my ($enc,$ref_encoding_check_results)=&analyze_encoding($newfile,
-                                                            $newfile,
-                                                            $show_special_char_lines,
-                                                            $ref_encoding_data,
-                                                            \%sophomorix_config,
-                                                           );
+    my $enc;
+    my $ref_encoding_check_results;
+    ($enc,$ref_encoding_check_results)=&analyze_encoding($newfile,
+                                                         $newfile,
+                                                         $show_special_char_lines,
+                                                         $non_umlaut,
+                                                         $ref_encoding_data,
+                                                         $ref_encoding_check_results,
+                                                         \%sophomorix_config,
+                                                        );
 
     print "ENCODING IS $enc ($ref_encoding_check_results->{$newfile}{'SURE'}, $newfile)\n";
-    #print Dumper ($ref_encoding_check_results);
 
     
 #     # old
@@ -273,20 +282,14 @@ if ($convert_to_utf8 ne ""){
 #     print "$result\n";
 }
 
-
-
-
-
-
-print "   * Option:           $newfile\n";
-print "   * Newfile:          $basename\n";
-print "     * Renamed to:       $name\n";
-print "     * Newfile_abs:      $newfile_abs\n";
-print "   * Target in /etc:   $target\n";
+print "   * New file:         $basename  (Renamed to: $name)\n";
+print "     * Newfile_abs:    $newfile_abs\n";
+print "   * Target file:      $target\n";
 print "   * Log new file to:  $newfile_log\n";
 print "     * filtered:       $newfile_log_filter\n";
-print "   * Log etc file to:  $etcfile_log\n";
-print "   * Filter:           $filter_script\n";
+print "     * utf8:           $newfile_log_utf8\n";
+print "   * Log old file to:  $etcfile_log\n";
+print "   * Filterscript:  $filter_script\n";
 
 ## --filter-only
 if ($filter_only==1 and $filter_script ne "---"){
@@ -300,7 +303,7 @@ if ($filter_only==1 and $filter_script ne "---"){
 }
 
 
-
+############################################################
 # do it
 print "\n";
 my $mkdir_command_1="mkdir -p $DevelConf::path_log_newfiles";
@@ -362,11 +365,6 @@ if ($filter_script eq "---"){
 
 } 
 
-
-
-
-
-
 &AD_unbind_admin($ldap);
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -377,15 +375,16 @@ if ($filter_script eq "---"){
 # Sub
 ################################################################################
 
-sub print_valid_filenames{
+sub print_valid_filenames {
     my @list=();
     foreach my $key (keys %{$sophomorix_config{'FILES'}{'USER_FILE'}}) {
 	push @list, $key;
     }
     @list=sort @list;
-    print "   * Valid files/names are:\n";
+    print "   * Valid filenames on this server are:\n";
     foreach my $file (@list){
         print "      * $file\n";
     }
+    print "\n";
 }
 
