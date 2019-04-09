@@ -80,6 +80,7 @@ my $user_count=0;
 
 my $school="";
 my %users_file=();
+my %users_file2=();
 my %unid_seen=();
 
 my %counters=();
@@ -663,6 +664,13 @@ if ($dump_files==1){
                 jsoncomment => "All users read from all user files",
                 log_level => $Conf::log_level,
                 hash_ref=>\%users_file,
+                sophomorix_config=>\%sophomorix_config,
+               });
+    &json_dump({json => $json,
+                jsoninfo => "USERS",
+                jsoncomment => "All users read from all user files",
+                log_level => $Conf::log_level,
+                hash_ref=>\%users_file2,
                 sophomorix_config=>\%sophomorix_config,
                });
 }
@@ -1989,22 +1997,22 @@ sub analyze_user_line {
         $users_file{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
 
         # new
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{CLASS}=$class;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}=$unid;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LOGIN}=$login;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE}=$filename;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}=$count;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{CLASS}=$class;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}=$unid;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LOGIN}=$login;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE}=$filename;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}=$count;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
 
 
         # old?
@@ -2014,19 +2022,24 @@ sub analyze_user_line {
         $users_file{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
 
+        # new
         # add here more stuff to create sophomorix.add, ...
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{ROLE}=
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{ROLE}=
             $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
-        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
+        $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
 
         # identifier list
         #push @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
         #push @{ $users_file{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
 
-        # identifier hash
+        # identifier hash old
         $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii}="files, not matched";
         $Match{'file_dynamic_identifiers_utf8'}{$identifier_utf8}="files, not matched";
+
+        # identifier hash new
+        $Match{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii}="files, not matched";
+        $Match{'file_dynamic_identifiers_utf8'}{$filename}{$identifier_utf8}="files, not matched";
 
         # file -> line
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
