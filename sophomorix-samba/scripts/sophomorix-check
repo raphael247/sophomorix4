@@ -438,7 +438,6 @@ if ($analyze_encoding ne ""){
     }
 
     my $ref_encoding_data=&read_encoding_data();
-   #print Dumper($ref_encoding_data);
     my $enc;
     my $ref_encoding_check_results;
     ($enc,$ref_encoding_check_results)=&analyze_encoding($analyze_encoding,
@@ -506,7 +505,6 @@ foreach my  $user_file (@filelist){
                                                          \%sophomorix_config,
                                                         );
 }
-print Dumper ($ref_encoding_check_results);
 
 
 # ============================================================
@@ -784,7 +782,7 @@ if ($dump_matches==1){
 
 # ADD users that could not be matched to AD users
 ############################################################
-foreach my $line_new ( @{ $Match{'lines'} } ){
+foreach my $line_new ( @{ $Match{'lines_with_filename'} } ){
     if (not defined $Match{'ACTION'}{$line_new}{'sAMAccountName'}){
         &write_add_file($line_new);
     }
@@ -1481,41 +1479,44 @@ sub test_user_update {
 ################################################################################
 sub write_add_file {
     my ($line_new)=@_;
+
+    my ($filename,$line_add)=split(/::/,$line_new);
     if($Conf::log_level>=2){
-        print "$line_new\n";
+        print "$filename -> >$line_add<\n";
         print "   * not matched to any sAMAccountName\n";
     }
+
     my $status;
-    if ($Match{'ACTION'}{$line_new}{'inject'} eq "yes"){
+    if ($Match{'ACTION'}{$filename}{$line_add}{'inject'} eq "yes"){
         $status="S"; # injected users have status S=selfactivated
     } else {
         $status="U";
     }
-    my $login=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
-                                 $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
-                                 $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
+    my $login=&create_test_login($Match{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}, # user data
+                                 $Match{'ACTION'}{$filename}{$line_add}{'filename'}, # filename for password length
+                                 $Match{'ACTION'}{$filename}{$line_add}{'login'}, # proposed login (will be tested)
                                  $ref_AD_check, # forbidden logins
                                  $ref_login_avoid, # logins to avoid
-                                 $Match{'ACTION'}{$line_new}{'line_count'},
+                                 $Match{'ACTION'}{$filename}{$line_add}{'line_count'},
                                  \%users_file,
                                  \%sophomorix_config);
 
     my $mail=$login."@".
-        $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'MAILDOMAIN'};
+        $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$filename}{$line_add}{'school'}}{$Match{'ACTION'}{$filename}{$line_add}{'role'}}{'MAILDOMAIN'};
     my $webui_permissions_string=join(",",
-        @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
-    my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
-                 $Match{'ACTION'}{$line_new}{'class'}."::".
-                 $Match{'ACTION'}{$line_new}{'identifier_ascii'}."::".
+        @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$filename}{$line_add}{'school'}}{$Match{'ACTION'}{$filename}{$line_add}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
+    my $add_line=$Match{'ACTION'}{$filename}{$line_add}{'filename'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'class'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}."::".
                  $login."::".
                  "---::". # firstpassword
                  "---::". # uid
                  "---::". # gid
-                 $Match{'ACTION'}{$line_new}{'unid'}."::".
-                 $Match{'ACTION'}{$line_new}{'school'}."::".
-                 $Match{'ACTION'}{$line_new}{'role'}."::".
-                 $Match{'ACTION'}{$line_new}{'surname_utf8'}."::".
-                 $Match{'ACTION'}{$line_new}{'firstname_utf8'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'unid'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'school'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'role'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'surname_utf8'}."::".
+                 $Match{'ACTION'}{$filename}{$line_add}{'firstname_utf8'}."::".
                  $status."::".   # status
                  "---::". # creationdate
                  "---::". # tolerationdate
@@ -1530,17 +1531,17 @@ sub write_add_file {
         print ADD $add_line;
         # create result
         push @{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} }, $login;
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminFile'}=$Match{'ACTION'}{$line_new}{'filename'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminClass'}=$Match{'ACTION'}{$line_new}{'class'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sn'}=$Match{'ACTION'}{$line_new}{'surname_utf8'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'givenName'}=$Match{'ACTION'}{$line_new}{'firstname_utf8'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixUnid'}=$Match{'ACTION'}{$line_new}{'unid'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixSchoolname'}=$Match{'ACTION'}{$line_new}{'school'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixRole'}=$Match{'ACTION'}{$line_new}{'role'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'identifier_ascii'}=$Match{'ACTION'}{$line_new}{'identifier_ascii'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminFile'}=$Match{'ACTION'}{$filename}{$line_add}{'filename'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminClass'}=$Match{'ACTION'}{$filename}{$line_add}{'class'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sn'}=$Match{'ACTION'}{$filename}{$line_add}{'surname_utf8'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'givenName'}=$Match{'ACTION'}{$filename}{$line_add}{'firstname_utf8'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixUnid'}=$Match{'ACTION'}{$filename}{$line_add}{'unid'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixSchoolname'}=$Match{'ACTION'}{$filename}{$line_add}{'school'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixRole'}=$Match{'ACTION'}{$filename}{$line_add}{'role'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'identifier_ascii'}=$Match{'ACTION'}{$filename}{$line_add}{'identifier_ascii'};
         $counters{'ADD'}++;
     } else {
-        print "\n   ERROR: Login for $line_new could no be created\n\n";
+        print "\n   ERROR: Login for $line_add could no be created\n\n";
         exit 88;
     }
 }
@@ -1811,9 +1812,9 @@ sub analyze_user_line {
         ########## Analyze the line ##########
         my $line_raw=$line;
         chomp($line);
+
         my $semikolon_count=$line=~tr/;//;
         if ($semikolon_count<3){
-            print "\n";
             if ($injected eq "yes"){
                &result_sophomorix_add(\%sophomorix_result,
                    "ERROR",
@@ -1969,6 +1970,7 @@ sub analyze_user_line {
             return;
 	}
 
+        # old?
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
         $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
         $users_file{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
@@ -1986,11 +1988,36 @@ sub analyze_user_line {
         $users_file{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
         $users_file{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
 
+        # new
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{CLASS}=$class;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}=$unid;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LOGIN}=$login;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE}=$filename;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}=$count;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
 
+
+        # old?
         # add here more stuff to create sophomorix.add, ...
         $users_file{'identifier_ascii'}{$identifier_ascii}{ROLE}=
             $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
         $users_file{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
+            $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
+
+        # add here more stuff to create sophomorix.add, ...
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{ROLE}=
+            $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
+        $users_file{$filename}{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
 
         # identifier list
@@ -2005,7 +2032,7 @@ sub analyze_user_line {
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
-        # save for action 
+        # save for action old 
         $Match{'ACTION'}{$line_new}{'identifier_ascii'}=$identifier_ascii;
         $Match{'ACTION'}{$line_new}{'school'}=
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
@@ -2023,8 +2050,26 @@ sub analyze_user_line {
 	$Match{'ACTION'}{$line_new}{'login'}=$login;
 	$Match{'ACTION'}{$line_new}{'inject'}=$injected;
 
-         # list of lines
-         push @{ $Match{'lines'} }, $line_new;
+        # save for action new 
+        $Match{'ACTION'}{$filename}{$line_new}{'identifier_ascii'}=$identifier_ascii;
+        $Match{'ACTION'}{$filename}{$line_new}{'school'}=
+            $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
+	$Match{'ACTION'}{$filename}{$line_new}{'birthdate'}=$birthdate;
+	$Match{'ACTION'}{$filename}{$line_new}{'class'}=$class;
+	$Match{'ACTION'}{$filename}{$line_new}{'filename'}=$filename;
+	$Match{'ACTION'}{$filename}{$line_new}{'firstname_ascii'}=$first_ascii;
+	$Match{'ACTION'}{$filename}{$line_new}{'surname_ascii'}=$last_ascii;
+	$Match{'ACTION'}{$filename}{$line_new}{'firstname_utf8'}=$first_utf8;
+	$Match{'ACTION'}{$filename}{$line_new}{'surname_utf8'}=$last_utf8;
+	$Match{'ACTION'}{$filename}{$line_new}{'line_count'}=$count;
+        $Match{'ACTION'}{$filename}{$line_new}{'role'}=
+            $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
+	$Match{'ACTION'}{$filename}{$line_new}{'unid'}=$unid;
+	$Match{'ACTION'}{$filename}{$line_new}{'login'}=$login;
+	$Match{'ACTION'}{$filename}{$line_new}{'inject'}=$injected;
+
+        # list of lines
+        push @{ $Match{'lines_with_filename'} }, $filename."::".$line_new;
     }
 }
 

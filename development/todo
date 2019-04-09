@@ -30,14 +30,20 @@ Host fleischsalat
 Todo:
 ############################################################
 
-auto recode file with sophomorix-newfile, bei sureness=TRUE
-test non-umlaut with sophomorix-newfile
+
 --analyze_encoding ist better in sophomorix-newfile???
 
 sophomorix-ceck non_umlaut tut nicht
 
-sophomorix-check -vv --analyze /usr/share/sophomorix-developer/examplefiles/students.csv.mixed
+sophomorix-check --analyze /usr/share/sophomorix-developer/examplefiles/students.csv.mixed
 --> use of uninitialized error
+--> utf8,8859 OK -> forget it
+
+Herannaviegieren an den Bug:
+# sophomorix-newfile --name bsz.students.csv /usr/share/sophomorix-developer/examplefiles/students.csv.utf-8
+# make 
+# sophomorix-newfile --name students.csv /usr/share/sophomorix-developer/examplefiles/students.csv.utf-8
+
 
 BUg: wenn 2 dateien von 2 Schulen da sind 
 UND dieselben user darin vorkommen
@@ -51,6 +57,23 @@ Idee beim Zeilendurchgehen:
    --> gleiche Schule, gleiche klasse: Zusatz-Zeile ignorieren
    --> gleiche Schule, verschiedene Klasse: beide anlegen, oder keinen?
    --> verschieden Schulen: beide ignorieren/beide anlegen? 
+
+Behebung: komplex:-(
+1. Schritt in users file erden daten aus files doppelt gespeichert:
+   users_file{id}  (alt, buggy, gleiche id in verschiedenen files wird überschrieben
+   users_file{filename}{id} (neu, da zusatzlicher key, kein überschreiben)
+2. filelist mit filename vor identifier
+3. Schritt zusätzlich neu
+   $Match{'ACTION'}{$line_new} old
+   $Match{'ACTION'}{filename}{$line_new}
+   umgesetzt in: 
+     analyze_user_line zusätzlich befüllt, old immer noch
+   write_add_file umgestellt (final fertig)
+
+
+
+
+testen, update eines users der in 2 Schulen vorkommt
 
 
 
