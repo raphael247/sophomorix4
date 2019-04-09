@@ -250,7 +250,11 @@ sub reset_smb {
     system("rm -f /var/log/sophomorix/user-update.log");
     system("rm -f /var/log/sophomorix/user-kill.log");
     system("rm -rf /var/log/sophomorix/userlog");
-    # removing old log files
+    system("rm -rf /var/log/sophomorix/newfiles");
+    system("rm -rf /var/log/sophomorix/etcfiles");
+    system("rm -rf /var/log/sophomorix/user-modify-archive.log.migrated");
+    system("rm -rf /var/log/sophomorix/user-modify-archive.log.migrated.orig");
+    # removing old lib files
     system("rm -f /var/lib/sophomorix/check-result/*");
     system("rm -f /var/lib/sophomorix/tmp/*");
     system("rm -rf /var/lib/sophomorix/tmp_collect");
