@@ -179,6 +179,7 @@ if (not -f  $newfile){
 my $basename = basename($newfile);
 my $newfile_abs = abs_path($newfile);
 my $target="";
+my $target_school="";
 my $newfile_log;
 my $newfile_log_filter;
 my $newfile_log_utf8;
@@ -190,13 +191,14 @@ if ($name ne ""){
     # option --name ....
     if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
         $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'PATH_ABS'};
-        $newfile_log=$DevelConf::path_log_newfiles."/".
+        $target_school=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'SCHOOL'};
+        $newfile_log=$DevelConf::path_log_newfiles."/".$target_school."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
-        $newfile_log_filter=$DevelConf::path_log_newfiles."/".
+        $newfile_log_filter=$DevelConf::path_log_newfiles."/".$target_school."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".filter";
-        $newfile_log_utf8=$DevelConf::path_log_newfiles."/".
+        $newfile_log_utf8=$DevelConf::path_log_newfiles."/".$target_school."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".utf8";
-        $etcfile_log=$DevelConf::path_log_etcfiles."/".
+        $etcfile_log=$DevelConf::path_log_etcfiles."/".$target_school."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
         $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'FILTERSCRIPT'};
     } else {
@@ -209,13 +211,14 @@ if ($name ne ""){
 } elsif (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}){
     # valid filename
     $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'PATH_ABS'};
-    $newfile_log=$DevelConf::path_log_newfiles."/".
+    $target_school=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'SCHOOL'};
+    $newfile_log=$DevelConf::path_log_newfiles."/".$target_school."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
-    $newfile_log_filter=$DevelConf::path_log_newfiles."/".
+    $newfile_log_filter=$DevelConf::path_log_newfiles."/".$target_school."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".filter";
-    $newfile_log_utf8=$DevelConf::path_log_newfiles."/".
+    $newfile_log_utf8=$DevelConf::path_log_newfiles."/".$target_school."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".utf8";
-    $etcfile_log=$DevelConf::path_log_etcfiles."/".
+    $etcfile_log=$DevelConf::path_log_etcfiles."/".$target_school."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
     $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
 } else {
@@ -246,45 +249,14 @@ if ($convert_to_utf8 ne ""){
                                                          $ref_encoding_check_results,
                                                          \%sophomorix_config,
                                                         );
-
+    print "\n";
     print "ENCODING IS $enc ($ref_encoding_check_results->{$newfile}{'SURE'}, $newfile)\n";
-
-    
-#     # old
-#     &reading_firstnames();
-#     &reading_firstname_errors();
-#     &reading_lastnames();
-#     &reading_lastname_errors();
-
-#     # old
-#     my $enc=&analyze_encoding($analyze_encoding,$analyze_encoding);
-#     if ($show_special_char_lines==1){
-#         my $count=0;
-# 	foreach my $line (@special_char_lines){
-#             my $conv = Text::Iconv->new($enc,"utf8");
-#             my $line_utf8 = $conv->convert($line);
-#             if ($non_umlaut==1){
-#                 # äöüÄÖÜß works because its unicode
-#                 if ($line_utf8=~/[^äöüÄÖÜßa-zA-Z0-9\-\.;_\/\s]/) { 
-#                     $count++;
-#                     print "$count)  $line_utf8\n";
-#                 }
-#             } else {
-#                     $count++;
-#                     print "$count)  $line_utf8\n";
-#             }
-#         }
-#     }
-
-
-#     &print_analyzed_encoding($analyze_encoding);
-#     my $result="$analyze_encoding is $enc encoded";
-#     print "$result\n";
 }
 
 print "   * New file:         $basename  (Renamed to: $name)\n";
 print "     * Newfile_abs:    $newfile_abs\n";
 print "   * Target file:      $target\n";
+print "   * Target school:    $target_school\n";
 print "   * Log new file to:  $newfile_log\n";
 print "     * filtered:       $newfile_log_filter\n";
 print "     * utf8:           $newfile_log_utf8\n";
@@ -305,13 +277,15 @@ if ($filter_only==1 and $filter_script ne "---"){
 
 ############################################################
 # do it
+
+
 print "\n";
-my $mkdir_command_1="mkdir -p $DevelConf::path_log_newfiles";
-print "   $mkdir_command_1\n";
+my $mkdir_command_1="mkdir -p $DevelConf::path_log_newfiles"."/".$target_school;
+#print "   $mkdir_command_1\n";
 system($mkdir_command_1);
 
-my $mkdir_command_2="mkdir -p $DevelConf::path_log_etcfiles";
-print "   $mkdir_command_2\n";
+my $mkdir_command_2="mkdir -p $DevelConf::path_log_etcfiles"."/".$target_school;
+#print "   $mkdir_command_2\n";
 system($mkdir_command_2);
 
 if ($filter_script eq "---"){
@@ -319,6 +293,7 @@ if ($filter_script eq "---"){
     # backup
     if (-e $target){
         my $command_1="cp $target $etcfile_log";
+        print "Logging old etcfile $name:\n";
         print "   $command_1\n";
         system($command_1);
     }
