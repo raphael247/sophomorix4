@@ -68,6 +68,7 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $filter_only=0;
+my $test_only=0;
 my $name="";
 my $convert_to_utf8=0;
 my $show_special_char_lines=0;
@@ -84,6 +85,7 @@ my $testopt=GetOptions(
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
            "filter-only" => \$filter_only,
+           "test-only" => \$test_only,
           );
 
 
@@ -102,7 +104,16 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-newfile registers new user export files to the correct location in /etc/linuxmuster/sophomorix.
+sophomorix-newfile filters,converts and installs new user export files to the correct location in /etc/linuxmuster/sophomorix.
+
+Logging ist done to:
+  /var/log/sophomorix/etcfiles/     (backups from /etc)
+  /var/log/sophomorix/newfiles/     (new files and there conversion steps)
+     *.orig           unchanged file
+     *.filtered       filtered/copied file(when there is no filter) 
+     *.filtered.utf8  filtered and converted to UTF(this file is installed to /etc)
+
+
 
 - New files are deleted after registration
   (option --filteronly keeps the files)
@@ -125,7 +136,7 @@ Examples:
     sophomorix-newfile /path/to/students.csv --filter-only     (filtering/utf8 converting to stdout)
   
 Options:
-  --convert-to-utf8   (converts the file to utf8, if the file format is not detactable, nothing is done at all)
+  --test-only               (keeps new file and does not install file to etc)
   --show-special-char-lines (show lines with special characters)
  
 Please see the sophomorix-newfile(8) man pages for full documentation
@@ -315,7 +326,7 @@ print "\n";
 
 
 # 1) backup etcfile, if there
-if (-e $target){
+if (-e $target and $test_only==0){
     my $command_1="cp $target $etcfile_log";
     print "1) Logging old etcfile $name:\n";
     print "   $command_1\n";
@@ -360,10 +371,19 @@ if ($enc eq "UTF8" and $ref_encoding_check_results->{$newfile}{'SURE'} eq "TRUE"
     system($command_4);
 }
 
+if ($test_only==1){
+    print "\n";
+    print "The following steps were omitted(--test-only):\n";
+    print "     1) Logging old etcfile $name\n";
+    print "     5) Install filtered utf8 file in /etc\n";
+    print "     6) Deleting newfile\n";
+    exit;
+}
+
 
 # 5) install utf8 file in /etc
 my $command_5="cp $newfile_log_utf8 $target";
-print "6) Install filtered utf8 file in /etc:\n";
+print "5) Install filtered utf8 file in /etc:\n";
 print "   $command_5\n";
 system($command_5);
 
