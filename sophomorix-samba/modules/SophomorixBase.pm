@@ -6623,72 +6623,92 @@ sub analyze_encoding {
 
 sub print_analyzed_encoding {
     my ($file,$ref_encoding_check_results,$ref_encoding_data) = @_;
-    my $line1="==========================================================================\n";
-    my $line2="--------------------------------------------------------------------------\n";
-    my $line3="+------------------------------------------------------------------------+\n";
+    my $line1="================================================================================\n";
+    my $line2="--------------------------------------------------------------------------------\n";
+    my $line3="+------------------------------------------------------------------------------+\n";
     print "\nEncoding check result for:\n";
     print "   $file\n";
 
     # print valid firstnames
     if($Conf::log_level>=2){
-    print "\nValid firstnames: ",
-          "($ref_encoding_check_results->{$file}{'RESULT'} ---> utf8)\n";
-    print $line1;
-    foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_hits'} } ){
-        printf  "%-20s %-12s %-20s\n",
-                $item->{first},
-                "--->",
-                $item->{first_utf8};
+        print "\nValid firstnames: ",
+              "($ref_encoding_check_results->{$file}{'RESULT'} ---> utf8)\n";
+        print $line1;
+        foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_hits'} } ){
+            printf  "%-20s %-12s %-20s\n",
+                    $item->{first},
+                    "--->",
+                    $item->{first_utf8};
+        }
+        print $line2;
     }
-    print $line2;
+    # print valid lastnames
+    if($Conf::log_level>=2){
+        print "\nValid lastnames: ",
+              "($ref_encoding_check_results->{$file}{'RESULT'} ---> utf8)\n";
+        print $line1;
+        foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_hits'} } ){
+            printf  "%-20s %-12s %-20s\n",
+                    $item->{last},
+                    "--->",
+                    $item->{last_utf8};
+        }
+        print $line2;
     }
 
     # print unknown firstnames
-    print "\n";
-    print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
-    print $line3;
-    foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_unknown'} } ){
-        printf  "| %-40s |\n",
-                $item->{first},
+    if ($#{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_unknown'} } > -1 or $Conf::log_level>=2){
+        print "\n ";
+        print "Unknown firstnames (Please report to info\@linuxmuster.net):\n";
+        print $line3;
+        foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_unknown'} } ){
+            printf  "| %-40s |\n", $item->{first},
+        }
+        print $line3;
     }
-    print $line3;
 
     #  print firstnames with errors
-    print "\nFirstnames that should be an error (Please report the the School Office):\n";
-    print $line3;
-    foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_errors'} } ){
-        printf  "| %-15s%-60s|\n",
-                $item->{first_utf8},
-                $item->{line};
-        my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
-        printf  "|          ---> %-60s|\n",$ref_encoding_data->{'FIRSTNAME_ERRORS'}{$enc_result}{ $item->{'first'} };
+    if ($#{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_errors'} } > -1 or $Conf::log_level>=2){
+        print "\nFirstnames that should be an error (Please report the the School Office):\n";
         print $line3;
+        foreach my $item ( @{ $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'data_errors'} } ){
+            printf  "| %-15s%-63s|\n",
+                    $item->{first_utf8},
+                    $item->{line};
+            my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
+            printf  "|          ---> %-63s|\n",$ref_encoding_data->{'FIRSTNAME_ERRORS'}{$enc_result}{ $item->{'first'} };
+            print $line3;
+        }
     }
 
     # print unknown lastnames
-    print "\n";
-    print "Unknown lastnames (Please report to info\@linuxmuster.net):\n";
-    print $line3;
-    foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_unknown'} } ){
-        printf  "| %-40s |\n",
-                $item->{last},
+    if ($#{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_unknown'} } > -1 or $Conf::log_level>=2){
+        print "\n";
+        print "Unknown lastnames (Please report to info\@linuxmuster.net):\n";
+        print $line3;
+        foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_unknown'} } ){
+            printf  "| %-40s |\n", $item->{last},
+        }
+        print $line3;
     }
-    print $line3;
 
     #  print lastnames with errors
-    print "\nLastnames that should be an error (Please report the the School Office):\n";
-    print $line3;
-    foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_errors'} } ){
-        printf  "| %-15s%-60s|\n",
-                $item->{last_utf8},
-                $item->{line};
-        my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
-        printf  "|          ---> %-60s|\n",$ref_encoding_data->{'LASTNAME_ERRORS'}{$enc_result}{ $item->{'last'} };
+    if ($#{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_errors'} } > -1 or $Conf::log_level>=2){
+        print "\nLastnames that should be an error (Please report the the School Office):\n";
         print $line3;
+        foreach my $item ( @{ $ref_encoding_check_results->{$file}{'LASTNAMES'}{'data_errors'} } ){
+            printf  "| %-15s%-63s|\n",
+                    $item->{last_utf8},
+                    $item->{line};
+            my $enc_result=$ref_encoding_check_results->{$file}{'RESULT'};
+            printf  "|          ---> %-63s|\n",$ref_encoding_data->{'LASTNAME_ERRORS'}{$enc_result}{ $item->{'last'} };
+            print $line3;
+        }
     }
 
     # print debug dump
     if($Conf::log_level>=3){
+        print "\n";
         print "Dump of \$ref_encoding_check_results:\n";
         print Dumper($ref_encoding_check_results);
     }
