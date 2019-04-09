@@ -193,11 +193,11 @@ if ($name ne ""){
         $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'PATH_ABS'};
         $target_school=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'SCHOOL'};
         $newfile_log=$DevelConf::path_log_newfiles."/".$target_school."/".
-            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
+            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".orig";
         $newfile_log_filter=$DevelConf::path_log_newfiles."/".$target_school."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".filter";
         $newfile_log_utf8=$DevelConf::path_log_newfiles."/".$target_school."/".
-            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".utf8";
+            $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name.".filter.utf8";
         $etcfile_log=$DevelConf::path_log_etcfiles."/".$target_school."/".
             $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$name;
         $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$name}{'FILTERSCRIPT'};
@@ -213,11 +213,11 @@ if ($name ne ""){
     $target=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'PATH_ABS'};
     $target_school=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'SCHOOL'};
     $newfile_log=$DevelConf::path_log_newfiles."/".$target_school."/".
-        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".orig";
     $newfile_log_filter=$DevelConf::path_log_newfiles."/".$target_school."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".filter";
     $newfile_log_utf8=$DevelConf::path_log_newfiles."/".$target_school."/".
-        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".utf8";
+        $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename.".filter.utf8";
     $etcfile_log=$DevelConf::path_log_etcfiles."/".$target_school."/".
         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}."_".$basename;
     $filter_script=$sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{'FILTERSCRIPT'};
@@ -233,7 +233,7 @@ if ($name ne ""){
 
 
 # --convert-to-utf8
-if ($convert_to_utf8 ne ""){
+#if ($convert_to_utf8 ne ""){
     if($Conf::log_level>=3){
         print "\n";
         print "Analyzing encoding\n";
@@ -251,7 +251,7 @@ if ($convert_to_utf8 ne ""){
                                                         );
     print "\n";
     print "ENCODING IS $enc ($ref_encoding_check_results->{$newfile}{'SURE'}, $newfile)\n";
-}
+#}
 
 print "   * New file:         $basename  (Renamed to: $name)\n";
 print "     * Newfile_abs:    $newfile_abs\n";
@@ -275,70 +275,105 @@ if ($filter_only==1 and $filter_script ne "---"){
 }
 
 
+# exit if something is wrong
 ############################################################
-# do it
 
-
-print "\n";
-my $mkdir_command_1="mkdir -p $DevelConf::path_log_newfiles"."/".$target_school;
-#print "   $mkdir_command_1\n";
-system($mkdir_command_1);
-
-my $mkdir_command_2="mkdir -p $DevelConf::path_log_etcfiles"."/".$target_school;
-#print "   $mkdir_command_2\n";
-system($mkdir_command_2);
-
-if ($filter_script eq "---"){
-    # no filter script
-    # backup
-    if (-e $target){
-        my $command_1="cp $target $etcfile_log";
-        print "Logging old etcfile $name:\n";
-        print "   $command_1\n";
-        system($command_1);
-    }
-
-    # newfile to /etc
-    my $command_2="cp $newfile_abs $target";
-    print "   $command_2\n";
-    system($command_2);
-
-    # newfile to log
-    my $command_3="mv $newfile_abs $newfile_log";
-    print "   $command_3\n";
-    system($command_3);
-} elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
+# filterscript not there
+if ($filter_script eq "ERROR_FILTERSCRIPT"){
     print "\nERROR: The configured Filter is not an executable script:\n";
     print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
     print "\n";
     exit 88;
+}
+
+# autoconversion to utf8 can't be done
+if ($ref_encoding_check_results->{$newfile}{'SURE'} ne "TRUE"){
+    print "\n";
+    print "ERROR: Encoding could not be determined for this file:\n";
+    print "   $newfile\n";
+    print "\n";
+    print "NOT doing anything!\n";
+    print "\n";
+    print "For hints what went wrong use:\n";
+    print "  sophomorix-check -vv --analyze $newfile\n";
+    print "\n";
+    exit 88;
+}
+
+
+
+############################################################
+# do it
+
+my $mkdir_command_1="mkdir -p $DevelConf::path_log_newfiles"."/".$target_school;
+system($mkdir_command_1);
+
+my $mkdir_command_2="mkdir -p $DevelConf::path_log_etcfiles"."/".$target_school;
+system($mkdir_command_2);
+
+print "\n";
+
+
+# 1) backup etcfile, if there
+if (-e $target){
+    my $command_1="cp $target $etcfile_log";
+    print "1) Logging old etcfile $name:\n";
+    print "   $command_1\n";
+    system($command_1);
 } else {
-    # filter script is executable, when in config hash -> run it
-    # backup
-    if (-e $target){
-        my $command_1="cp $target $etcfile_log";
-        print "   $command_1\n";
-        system($command_1);
-    }
+    print "1) NO file to log: $target\n";
+}
 
-    # newfile to /etc, using filter
-    my $command_2="$filter_script $newfile_abs $target";
-    print "   $command_2\n";
-    system($command_2);
 
-    # filtered newfile to log
-    if (-e $target){
-        my $command_3="cp $target $newfile_log_filter";
-        print "   $command_3\n";
-        system($command_3);
-    }
+# 2) cp newfile to log as *.orig
+my $command_2="cp $newfile_abs $newfile_log";
+print "2) Copy newfile to log as *.orig:\n";
+print "   $command_2\n";
+system($command_2);
 
-    # unfiltered newfile to log
-    my $command_4="mv $newfile_abs $newfile_log";
+
+# 3) filter or NOT to *.filter
+if ($filter_script eq "---"){
+    print "3) NOT filtering ($filter_script), just copying:\n";
+    my $command_3="cp $newfile_abs $newfile_log_filter";
+    print "   $command_3\n";
+    system($command_3);
+} else {
+    print "3) Filtering with: $filter_script\n";
+    my $command_3="$filter_script $newfile_abs $newfile_log_filter";
+    print "   $command_3\n";
+    system($command_3);
+}
+
+
+# 4) cp or iconv to *.filter.utf8
+if ($enc eq "UTF8" and $ref_encoding_check_results->{$newfile}{'SURE'} eq "TRUE"){
+    my $command_4="cp $newfile_log_filter $newfile_log_utf8";
+    print "4) File is $enc: just copying filtered file:\n";
     print "   $command_4\n";
     system($command_4);
+} else {
+#    my $command_4="iconv --verbose -f $enc -t UTF8 $newfile_log_filter -o $newfile_log_utf8";
+    my $command_4="iconv -f $enc -t UTF8 -o $newfile_log_utf8 $newfile_log_filter";
+    print "4) File is $enc: converting to UTF8:\n";
+    print "   $command_4\n";
+    system($command_4);
+}
 
-} 
+
+# 5) install utf8 file in /etc
+my $command_5="cp $newfile_log_utf8 $target";
+print "6) Install filtered utf8 file in /etc:\n";
+print "   $command_5\n";
+system($command_5);
+
+# 6) delete newfile
+my $command_6="rm $newfile_abs";
+    print "6) Deleting newfile:\n";
+    print "   $command_6\n";
+    system($command_6);
+
+print "\n";
 
 &AD_unbind_admin($ldap);
 
