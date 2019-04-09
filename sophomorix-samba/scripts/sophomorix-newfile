@@ -67,10 +67,8 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
-my $filter_only=0;
 my $test_only=0;
 my $name="";
-my $convert_to_utf8=0;
 my $show_special_char_lines=0;
 my $non_umlaut=0;
 
@@ -81,10 +79,8 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "name=s" => \$name,
-           "convert-to-utf8" => \$convert_to_utf8,
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
-           "filter-only" => \$filter_only,
            "test-only" => \$test_only,
           );
 
@@ -241,28 +237,23 @@ if ($name ne ""){
 }
 
 
-
-
-# --convert-to-utf8
-#if ($convert_to_utf8 ne ""){
-    if($Conf::log_level>=3){
-        print "\n";
-        print "Analyzing encoding\n";
-    }
-    my $ref_encoding_data=&read_encoding_data();
-    my $enc;
-    my $ref_encoding_check_results;
-    ($enc,$ref_encoding_check_results)=&analyze_encoding($newfile,
-                                                         $newfile,
-                                                         $show_special_char_lines,
-                                                         $non_umlaut,
-                                                         $ref_encoding_data,
-                                                         $ref_encoding_check_results,
-                                                         \%sophomorix_config,
-                                                        );
+if($Conf::log_level>=3){
     print "\n";
-    print "ENCODING IS $enc ($ref_encoding_check_results->{$newfile}{'SURE'}, $newfile)\n";
-#}
+    print "Analyzing encoding\n";
+}
+my $ref_encoding_data=&read_encoding_data();
+my $enc;
+my $ref_encoding_check_results;
+($enc,$ref_encoding_check_results)=&analyze_encoding($newfile,
+                                                     $newfile,
+                                                     $show_special_char_lines,
+                                                     $non_umlaut,
+                                                     $ref_encoding_data,
+                                                     $ref_encoding_check_results,
+                                                     \%sophomorix_config,
+                                                    );
+print "\n";
+print "ENCODING IS $enc ($ref_encoding_check_results->{$newfile}{'SURE'}, $newfile)\n";
 
 print "   * New file:         $basename  (Renamed to: $name)\n";
 print "     * Newfile_abs:    $newfile_abs\n";
@@ -273,18 +264,6 @@ print "     * filtered:       $newfile_log_filter\n";
 print "     * utf8:           $newfile_log_utf8\n";
 print "   * Log old file to:  $etcfile_log\n";
 print "   * Filterscript:  $filter_script\n";
-
-## --filter-only
-if ($filter_only==1 and $filter_script ne "---"){
-    my $command="$filter_script --filter --short $newfile_abs $target";
-    print "   $command\n";
-    system($command);
-    exit;
-} elsif ($filter_only==1) {
-    print "\nERROR: No filter script defined\n\n";
-    exit 88;
-}
-
 
 # exit if something is wrong
 ############################################################
@@ -364,7 +343,6 @@ if ($enc eq "UTF8" and $ref_encoding_check_results->{$newfile}{'SURE'} eq "TRUE"
     print "   $command_4\n";
     system($command_4);
 } else {
-#    my $command_4="iconv --verbose -f $enc -t UTF8 $newfile_log_filter -o $newfile_log_utf8";
     my $command_4="iconv -f $enc -t UTF8 -o $newfile_log_utf8 $newfile_log_filter";
     print "4) File is $enc: converting to UTF8:\n";
     print "   $command_4\n";
