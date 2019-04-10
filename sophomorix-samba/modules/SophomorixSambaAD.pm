@@ -4737,7 +4737,6 @@ sub AD_get_AD_for_check2 {
                    $AD{'sAMAccountName'}{$sam}{'mail'}=$entry->get_value('mail');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
-                   my $filename=$entry->get_value('sophomorixAdminFile');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$filename;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
